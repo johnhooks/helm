@@ -1,0 +1,31 @@
+:root {
+  --helm-ui-font-family: "Antonio", "Helvetica Neue", Arial, sans-serif;
+  --helm-ui-color-bg: #0a0a0a;
+  --helm-ui-color-surface: #141414;
+  --helm-ui-color-surface-2: #1b1b1b;
+  --helm-ui-color-border: #2a2a2a;
+  --helm-ui-color-text: #f0e6d2;
+  --helm-ui-color-muted: #a39a88;
+  --helm-ui-color-accent: #f2b654;
+  --helm-ui-color-danger: #cc4444;
+  --helm-ui-color-focus: #9cc7ff;
+  --helm-ui-color-warning: #f2b654;
+  --helm-ui-color-success: #8fbf4d;
+  --helm-ui-color-info: #7fb2ff;
+
+  /* LCARS palette accents */
+  --helm-ui-color-orange: #ff9900;
+  --helm-ui-color-gold: #ffcc66;
+  --helm-ui-color-peach: #ffcc99;
+  --helm-ui-color-sunset: #ff9966;
+  --helm-ui-color-blue: #99ccff;
+  --helm-ui-color-sky: #6699cc;
+  --helm-ui-color-ice: #ccddff;
+  --helm-ui-color-lilac: #cc99cc;
+  --helm-ui-color-violet: #9999cc;
+  --helm-ui-color-plum: #664466;
+  --helm-ui-color-hopbush: #c082a9;
+  --helm-ui-radius-md: 12px;
+  --helm-ui-radius-lg: 16px;
+  --helm-ui-stack-gap: 8px;
+}

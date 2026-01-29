@@ -1,0 +1,67 @@
+@import "../../styles/index.css";
+
+.helm-arc-indicator {
+  display: inline-block;
+  border-radius: 50%;
+  background: conic-gradient(
+    var(--helm-surface-bg) 0deg,
+    var(--helm-surface-bg) calc(var(--helm-arc-level) * 2.7deg),
+    color-mix(in srgb, var(--helm-surface-bg) 20%, transparent) 0
+  );
+  mask: radial-gradient(
+    farthest-side,
+    transparent calc(50% - 3px),
+    #000 calc(50% - 2px)
+  );
+  -webkit-mask: radial-gradient(
+    farthest-side,
+    transparent calc(50% - 3px),
+    #000 calc(50% - 2px)
+  );
+  transform: rotate(-135deg);
+}
+
+.helm-arc-indicator--sm {
+  width: 14px;
+  height: 14px;
+}
+
+.helm-arc-indicator--md {
+  width: 18px;
+  height: 18px;
+}
+
+.helm-arc-indicator--lg {
+  width: 24px;
+  height: 24px;
+}
+
+.helm-arc-indicator--xl {
+  width: 36px;
+  height: 36px;
+  mask: radial-gradient(
+    farthest-side,
+    transparent calc(50% - 5px),
+    #000 calc(50% - 4px)
+  );
+  -webkit-mask: radial-gradient(
+    farthest-side,
+    transparent calc(50% - 5px),
+    #000 calc(50% - 4px)
+  );
+}
+
+.helm-arc-indicator--2xl {
+  width: 48px;
+  height: 48px;
+  mask: radial-gradient(
+    farthest-side,
+    transparent calc(50% - 6px),
+    #000 calc(50% - 5px)
+  );
+  -webkit-mask: radial-gradient(
+    farthest-side,
+    transparent calc(50% - 6px),
+    #000 calc(50% - 5px)
+  );
+}

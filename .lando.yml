@@ -1,0 +1,70 @@
+name: helm
+recipe: wordpress
+config:
+  php: "8.1"
+  database: mariadb:10.6
+  xdebug: true
+
+services:
+  appserver:
+    overrides:
+      volumes:
+        - ./tmp/wordpress:/app
+        - .:/app/wp-content/plugins/helm
+        - ./tmp/logs:/var/log/helm
+      environment:
+        XDEBUG_MODE: "off"
+    build_as_root:
+      - rm -f /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini || true
+
+  database:
+    portforward: 4501
+
+  mailhog:
+    type: mailhog
+    hogfrom:
+      - appserver
+
+proxy:
+  mailhog:
+    - mail.helm.lndo.site
+
+tooling:
+  xdebug-on:
+    service: appserver
+    description: Enable Xdebug
+    cmd: docker-php-ext-enable xdebug && apache2ctl graceful && echo "Xdebug enabled"
+    user: root
+
+  xdebug-off:
+    service: appserver
+    description: Disable Xdebug
+    cmd: rm -f /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && apache2ctl graceful && echo "Xdebug disabled"
+    user: root
+
+  install-wp:
+    service: appserver
+    description: Download and install WordPress
+    cmd: /app/wp-content/plugins/helm/bin/install-wp.sh
+
+  composer:
+    service: appserver
+    description: Run Composer in the plugin directory
+    cmd: composer
+    dir: /app/wp-content/plugins/helm
+
+  phpstan:
+    service: appserver
+    description: Run PHPStan static analysis
+    cmd: /app/wp-content/plugins/helm/vendor/bin/phpstan analyse --memory-limit=4G --no-progress
+    dir: /app/wp-content/plugins/helm
+
+  phpcs:
+    service: appserver
+    description: Run PHP CodeSniffer
+    cmd: /app/wp-content/plugins/helm/vendor/bin/phpcs -ps --colors --extensions=php
+    dir: /app/wp-content/plugins/helm
+
+events:
+  post-start:
+    - appserver: /app/wp-content/plugins/helm/bin/install-wp.sh

@@ -1,0 +1,32 @@
+@import "../../styles/index.css";
+
+.helm-orb-indicator {
+  display: inline-block;
+  border-radius: 50%;
+  background: var(--helm-surface-bg);
+}
+
+.helm-orb-indicator--sm {
+  width: 10px;
+  height: 10px;
+}
+
+.helm-orb-indicator--md {
+  width: 12px;
+  height: 12px;
+}
+
+.helm-orb-indicator--lg {
+  width: 16px;
+  height: 16px;
+}
+
+.helm-orb-indicator--xl {
+  width: 24px;
+  height: 24px;
+}
+
+.helm-orb-indicator--2xl {
+  width: 32px;
+  height: 32px;
+}

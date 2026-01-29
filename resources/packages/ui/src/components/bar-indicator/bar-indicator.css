@@ -1,0 +1,43 @@
+@import "../../styles/index.css";
+
+.helm-bar-indicator {
+  display: inline-block;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--helm-surface-bg) 20%, transparent);
+  position: relative;
+  overflow: hidden;
+}
+
+.helm-bar-indicator::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: var(--helm-bar-level);
+  background: var(--helm-surface-bg);
+  border-radius: inherit;
+}
+
+.helm-bar-indicator--sm {
+  width: 40px;
+  height: 6px;
+}
+
+.helm-bar-indicator--md {
+  width: 56px;
+  height: 8px;
+}
+
+.helm-bar-indicator--lg {
+  width: 72px;
+  height: 10px;
+}
+
+.helm-bar-indicator--xl {
+  width: 96px;
+  height: 12px;
+}
+
+.helm-bar-indicator--2xl {
+  width: 128px;
+  height: 16px;
+}

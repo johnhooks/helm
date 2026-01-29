@@ -1,0 +1,32 @@
+@import "../../styles/index.css";
+
+.helm-title {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  font-family: var(--helm-ui-font-family);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--helm-ui-color-text);
+}
+
+.helm-title--sm {
+  font-size: 12px;
+}
+
+.helm-title--md {
+  font-size: 13px;
+}
+
+.helm-title--left {
+  justify-content: flex-start;
+}
+
+.helm-title--right {
+  justify-content: flex-end;
+}
+
+.helm-title__label {
+  line-height: 1;
+  white-space: nowrap;
+}

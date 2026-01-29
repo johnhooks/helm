@@ -1,0 +1,43 @@
+@import "../../styles/index.css";
+
+.helm-stack-indicator {
+  display: grid;
+  grid-template-rows: repeat(auto-fit, minmax(0, 1fr));
+  gap: 3px;
+}
+
+.helm-stack-indicator__segment {
+  width: 12px;
+  height: 5px;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--helm-surface-bg) 20%, transparent);
+}
+
+.helm-stack-indicator--sm .helm-stack-indicator__segment {
+  width: 8px;
+  height: 3px;
+}
+
+.helm-stack-indicator--md .helm-stack-indicator__segment {
+  width: 12px;
+  height: 5px;
+}
+
+.helm-stack-indicator--lg .helm-stack-indicator__segment {
+  width: 16px;
+  height: 6px;
+}
+
+.helm-stack-indicator--xl .helm-stack-indicator__segment {
+  width: 20px;
+  height: 8px;
+}
+
+.helm-stack-indicator--2xl .helm-stack-indicator__segment {
+  width: 28px;
+  height: 10px;
+}
+
+.helm-stack-indicator__segment--filled {
+  background: var(--helm-surface-bg);
+}

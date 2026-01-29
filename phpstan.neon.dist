@@ -1,0 +1,15 @@
+parameters:
+    level: 6
+    bootstrapFiles:
+        - helm.php
+
+    paths:
+        - helm.php
+        - src
+
+    scanFiles:
+        - vendor/php-stubs/wordpress-stubs/wordpress-stubs.php
+        - vendor/woocommerce/action-scheduler/functions.php
+
+    # Treat PHPDoc types as uncertain to allow defensive runtime checks.
+    treatPhpDocTypesAsCertain: false

@@ -1,0 +1,30 @@
+@import "../../styles/index.css";
+
+.helm-button-panel {
+  --helm-button-justify: flex-end;
+  --helm-button-text: right;
+
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--helm-ui-stack-gap);
+}
+
+.helm-button-panel--right {
+  --helm-button-justify: flex-start;
+  --helm-button-text: left;
+}
+
+.helm-button-panel--space {
+  justify-content: space-between;
+  height: 100%;
+}
+
+.helm-button-panel--stretch {
+  height: 100%;
+}
+
+.helm-button-panel--stretch > * {
+  flex: 1;
+  min-height: 44px;
+}

@@ -1,0 +1,45 @@
+@import "../../styles/index.css";
+
+.helm-titlebar {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  width: 100%;
+  border: 0;
+  border-radius: 0;
+  padding: 0 16px;
+  background: var(--helm-surface-bg);
+  color: var(--helm-surface-text);
+  font-family: var(--helm-ui-font-family);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.helm-titlebar--sm {
+  height: 26px;
+  font-size: 12px;
+}
+
+.helm-titlebar--md {
+  height: 30px;
+  font-size: 13px;
+}
+
+.helm-titlebar--left {
+  justify-content: flex-start;
+}
+
+.helm-titlebar--right {
+  justify-content: flex-end;
+}
+
+.helm-titlebar--edge-left,
+.helm-titlebar--edge-right,
+.helm-titlebar--edge-none {
+  border-radius: 0;
+}
+
+.helm-titlebar__label {
+  line-height: 1;
+  white-space: nowrap;
+}

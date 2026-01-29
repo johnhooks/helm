@@ -1,0 +1,19 @@
+@import "../../styles/index.css";
+
+.helm-matrix-indicator {
+  display: grid;
+  grid-template-columns: repeat(var(--helm-matrix-cols), 1fr);
+  grid-template-rows: repeat(var(--helm-matrix-rows), 1fr);
+  gap: 2px;
+}
+
+.helm-matrix-indicator__cell {
+  width: 4px;
+  height: 4px;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--helm-surface-bg) 20%, transparent);
+}
+
+.helm-matrix-indicator__cell--filled {
+  background: var(--helm-surface-bg);
+}

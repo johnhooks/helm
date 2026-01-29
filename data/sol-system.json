@@ -1,0 +1,276 @@
+{
+    "star": {
+        "id": "SOL",
+        "name": "Sol",
+        "display_name": "Sol",
+        "spectral_type": "G2V",
+        "spectral_class": "G",
+        "distance_ly": 0,
+        "ra": 0,
+        "dec": 0,
+        "luminosity_solar": 1,
+        "mass_solar": 1,
+        "radius_solar": 1,
+        "temperature_k": 5778,
+        "constellation": null,
+        "confirmed_planets": [
+            {
+                "name": "Mercury",
+                "semi_major_axis_au": 0.387,
+                "orbital_period_days": 88,
+                "mass_earth": 0.055,
+                "radius_earth": 0.383
+            },
+            {
+                "name": "Venus",
+                "semi_major_axis_au": 0.723,
+                "orbital_period_days": 224.7,
+                "mass_earth": 0.815,
+                "radius_earth": 0.949
+            },
+            {
+                "name": "Earth",
+                "semi_major_axis_au": 1,
+                "orbital_period_days": 365.25,
+                "mass_earth": 1,
+                "radius_earth": 1,
+                "equilibrium_temp_k": 255
+            },
+            {
+                "name": "Mars",
+                "semi_major_axis_au": 1.524,
+                "orbital_period_days": 687,
+                "mass_earth": 0.107,
+                "radius_earth": 0.532
+            },
+            {
+                "name": "Jupiter",
+                "semi_major_axis_au": 5.203,
+                "orbital_period_days": 4332.6,
+                "mass_earth": 317.8,
+                "radius_earth": 10.97
+            },
+            {
+                "name": "Saturn",
+                "semi_major_axis_au": 9.537,
+                "orbital_period_days": 10759.2,
+                "mass_earth": 95.2,
+                "radius_earth": 9.14
+            },
+            {
+                "name": "Uranus",
+                "semi_major_axis_au": 19.19,
+                "orbital_period_days": 30688.5,
+                "mass_earth": 14.5,
+                "radius_earth": 3.98
+            },
+            {
+                "name": "Neptune",
+                "semi_major_axis_au": 30.07,
+                "orbital_period_days": 60182,
+                "mass_earth": 17.1,
+                "radius_earth": 3.86
+            }
+        ],
+        "properties": {
+            "x": 0,
+            "y": 0,
+            "z": 0,
+            "apparent_mag": -26.74,
+            "absolute_mag": 4.83,
+            "luminosity_solar": 1,
+            "temperature_k": 5778,
+            "mass_solar": 1,
+            "radius_solar": 1,
+            "age_gyr": 4.6
+        }
+    },
+    "system": {
+        "planets": [
+            {
+                "id": "SOL_MERCURY",
+                "name": "Mercury",
+                "type": "terrestrial",
+                "orbit_index": 0,
+                "orbit_au": 0.387,
+                "orbital_period_days": 88,
+                "radius_earth": 0.383,
+                "mass_earth": 0.055,
+                "resources": {
+                    "iron": 85,
+                    "nickel": 60,
+                    "titanium": 30
+                },
+                "habitable": false,
+                "moons": 0,
+                "confirmed": true
+            },
+            {
+                "id": "SOL_VENUS",
+                "name": "Venus",
+                "type": "terrestrial",
+                "orbit_index": 1,
+                "orbit_au": 0.723,
+                "orbital_period_days": 224.7,
+                "radius_earth": 0.949,
+                "mass_earth": 0.815,
+                "resources": {
+                    "iron": 70,
+                    "copper": 45,
+                    "rare_earth": 25
+                },
+                "habitable": false,
+                "moons": 0,
+                "confirmed": true
+            },
+            {
+                "id": "SOL_EARTH",
+                "name": "Earth",
+                "type": "terrestrial",
+                "orbit_index": 2,
+                "orbit_au": 1.0,
+                "orbital_period_days": 365.25,
+                "radius_earth": 1.0,
+                "mass_earth": 1.0,
+                "equilibrium_temp_k": 255,
+                "resources": {
+                    "water": 100,
+                    "iron": 65,
+                    "copper": 50,
+                    "organics": 90
+                },
+                "habitable": true,
+                "moons": 1,
+                "confirmed": true
+            },
+            {
+                "id": "SOL_MARS",
+                "name": "Mars",
+                "type": "terrestrial",
+                "orbit_index": 3,
+                "orbit_au": 1.524,
+                "orbital_period_days": 687,
+                "radius_earth": 0.532,
+                "mass_earth": 0.107,
+                "resources": {
+                    "iron": 80,
+                    "water": 15,
+                    "rare_earth": 35
+                },
+                "habitable": false,
+                "moons": 2,
+                "confirmed": true
+            },
+            {
+                "id": "SOL_JUPITER",
+                "name": "Jupiter",
+                "type": "gas-giant",
+                "orbit_index": 4,
+                "orbit_au": 5.203,
+                "orbital_period_days": 4332.6,
+                "radius_earth": 10.97,
+                "mass_earth": 317.8,
+                "resources": {
+                    "hydrogen": 95,
+                    "helium": 85
+                },
+                "habitable": false,
+                "moons": 95,
+                "confirmed": true
+            },
+            {
+                "id": "SOL_SATURN",
+                "name": "Saturn",
+                "type": "gas-giant",
+                "orbit_index": 5,
+                "orbit_au": 9.537,
+                "orbital_period_days": 10759.2,
+                "radius_earth": 9.14,
+                "mass_earth": 95.2,
+                "resources": {
+                    "hydrogen": 90,
+                    "helium": 80
+                },
+                "habitable": false,
+                "moons": 146,
+                "confirmed": true
+            },
+            {
+                "id": "SOL_URANUS",
+                "name": "Uranus",
+                "type": "ice-giant",
+                "orbit_index": 6,
+                "orbit_au": 19.19,
+                "orbital_period_days": 30688.5,
+                "radius_earth": 3.98,
+                "mass_earth": 14.5,
+                "resources": {
+                    "hydrogen": 70,
+                    "helium": 50,
+                    "water": 60,
+                    "ice": 75
+                },
+                "habitable": false,
+                "moons": 28,
+                "confirmed": true
+            },
+            {
+                "id": "SOL_NEPTUNE",
+                "name": "Neptune",
+                "type": "ice-giant",
+                "orbit_index": 7,
+                "orbit_au": 30.07,
+                "orbital_period_days": 60182,
+                "radius_earth": 3.86,
+                "mass_earth": 17.1,
+                "resources": {
+                    "hydrogen": 65,
+                    "helium": 45,
+                    "water": 55,
+                    "ice": 70
+                },
+                "habitable": false,
+                "moons": 16,
+                "confirmed": true
+            }
+        ],
+        "asteroid_belts": [
+            {
+                "id": "SOL_BELT_MAIN",
+                "name": "Main Asteroid Belt",
+                "type": "rocky",
+                "inner_au": 2.1,
+                "outer_au": 3.3,
+                "density": 40,
+                "resources": {
+                    "iron": 75,
+                    "nickel": 60,
+                    "platinum": 25,
+                    "rare_earth": 40
+                }
+            },
+            {
+                "id": "SOL_BELT_KUIPER",
+                "name": "Kuiper Belt",
+                "type": "icy",
+                "inner_au": 30,
+                "outer_au": 55,
+                "density": 20,
+                "resources": {
+                    "ice": 90,
+                    "water": 70,
+                    "hydrogen": 30
+                }
+            }
+        ],
+        "stations": [],
+        "anomalies": []
+    },
+    "summary": {
+        "planets": 8,
+        "asteroid_belts": 2,
+        "stations": 0,
+        "anomalies": 0,
+        "habitable_planets": 1
+    }
+}

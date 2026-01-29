@@ -1,0 +1,115 @@
+@import "../../styles/index.css";
+
+.helm-warp-indicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.helm-warp-indicator__shell {
+  position: relative;
+  display: block;
+  background: color-mix(in srgb, var(--helm-surface-bg) 30%, #000 70%);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.helm-warp-indicator__core {
+  position: absolute;
+  inset: 3px;
+  border-radius: 999px;
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: repeat(var(--helm-warp-segments), 1fr);
+  gap: 2px;
+}
+
+.helm-warp-indicator__segment {
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--helm-surface-bg) 35%, #000 65%);
+  opacity: calc(var(--helm-warp-intensity) * 0.35);
+  animation: helm-warp-glow var(--helm-warp-speed) ease-in-out infinite;
+  animation-delay: var(--helm-warp-delay);
+  animation-play-state: var(--helm-warp-play);
+  transition:
+    opacity 320ms ease,
+    background-color 320ms ease;
+}
+
+.helm-warp-indicator--sm .helm-warp-indicator__shell {
+  width: 20px;
+  height: 64px;
+}
+
+.helm-warp-indicator--sm .helm-warp-indicator__core {
+  inset: 3px;
+  gap: 2px;
+}
+
+.helm-warp-indicator--md .helm-warp-indicator__shell {
+  width: 26px;
+  height: 88px;
+}
+
+.helm-warp-indicator--md .helm-warp-indicator__core {
+  inset: 4px;
+  gap: 2px;
+}
+
+.helm-warp-indicator--lg .helm-warp-indicator__shell {
+  width: 34px;
+  height: 112px;
+}
+
+.helm-warp-indicator--lg .helm-warp-indicator__core {
+  inset: 5px;
+  gap: 3px;
+}
+
+.helm-warp-indicator--xl .helm-warp-indicator__shell {
+  width: 42px;
+  height: 140px;
+}
+
+.helm-warp-indicator--xl .helm-warp-indicator__core {
+  inset: 6px;
+  gap: 3px;
+}
+
+.helm-warp-indicator--2xl .helm-warp-indicator__shell {
+  width: 52px;
+  height: 176px;
+}
+
+.helm-warp-indicator--2xl .helm-warp-indicator__core {
+  inset: 7px;
+  gap: 4px;
+}
+
+@keyframes helm-warp-pulse {
+  0%,
+  100% {
+    opacity: calc(var(--helm-warp-intensity) * 0.6);
+  }
+  50% {
+    opacity: calc(var(--helm-warp-intensity) * 1.1);
+  }
+}
+
+@keyframes helm-warp-glow {
+  0%,
+  100% {
+    opacity: calc(var(--helm-warp-intensity) * 0.35);
+    background: color-mix(in srgb, var(--helm-surface-bg) 35%, #000 65%);
+  }
+  50% {
+    opacity: calc(var(--helm-warp-intensity) * 1.05);
+    background: color-mix(in srgb, var(--helm-surface-bg) 85%, #fff 15%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .helm-warp-indicator__core {
+    animation: none;
+  }
+}

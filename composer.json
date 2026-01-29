@@ -1,0 +1,78 @@
+{
+    "name": "okaywp/helm",
+    "description": "Starship Operating System built on WordPress",
+    "type": "wordpress-plugin",
+    "license": "GPL-2.0-or-later",
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "require": {
+        "php": ">=8.1",
+        "lucatume/di52": "^4.0",
+        "woocommerce/action-scheduler": "^3.8"
+    },
+    "require-dev": {
+        "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
+        "lucatume/codeception-snapshot-assertions": "^1.4",
+        "lucatume/wp-browser": "^4.0",
+        "php-stubs/wordpress-stubs": "^6.4",
+        "phpstan/extension-installer": "^1.3",
+        "phpstan/phpstan": "^1.10",
+        "phpstan/phpstan-strict-rules": "^1.5",
+        "phpunit/phpunit": "^10.5",
+        "szepeviktor/phpstan-wordpress": "^1.3",
+        "wp-cli/wp-cli-bundle": "^2.10",
+        "wp-coding-standards/wpcs": "^3.0",
+        "yoast/phpunit-polyfills": "^2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Helm\\": "src/Helm/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "phpstan/extension-installer": true
+        },
+        "sort-packages": true,
+        "optimize-autoloader": true
+    },
+    "scripts": {
+        "strauss-install": [
+            "test -f ./bin/strauss.phar || curl -o bin/strauss.phar -L -C - https://github.com/BrianHenryIE/strauss/releases/download/0.19.4/strauss.phar"
+        ],
+        "strauss": [
+            "@strauss-install",
+            "@php bin/strauss.phar",
+            "@composer dump-autoload"
+        ],
+        "strauss-release": [
+            "@strauss-install",
+            "@php bin/strauss.phar --deleteVendorPackages=true",
+            "@composer dump-autoload"
+        ],
+        "analyse": "@php vendor/bin/phpstan analyse --memory-limit=4G --no-progress",
+        "lint": "@php vendor/bin/phpcs -ps --colors --extensions=php",
+        "lint:fix": "@php vendor/bin/phpcbf -ps --extensions=php",
+        "test": "slic run Wpunit",
+        "test:coverage": "XDEBUG_MODE=coverage slic run Wpunit -- --coverage-html coverage/html"
+    },
+    "extra": {
+        "strauss": {
+            "target_directory": "vendor/vendor-prefixed",
+            "namespace_prefix": "Helm\\",
+            "classmap_prefix": "Helm_",
+            "constant_prefix": "HELM_",
+            "delete_vendor_packages": false,
+            "packages": [
+                "lucatume/di52",
+                "woocommerce/action-scheduler"
+            ]
+        }
+    }
+}
