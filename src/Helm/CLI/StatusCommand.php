@@ -6,8 +6,10 @@ namespace Helm\CLI;
 
 use Helm\Config\Config;
 use Helm\Origin\Origin;
+use Helm\Planets\PlanetBatchGenerator;
 use Helm\Planets\PlanetRepository;
 use Helm\Ships\ShipRepository;
+use Helm\Stars\StarBatchGenerator;
 use Helm\Stars\StarCatalog;
 use Helm\Stars\StarRepository;
 use WP_CLI;
@@ -24,6 +26,8 @@ class StatusCommand
         private readonly StarRepository $starRepository,
         private readonly PlanetRepository $planetRepository,
         private readonly ShipRepository $shipRepository,
+        private readonly StarBatchGenerator $starGenerator,
+        private readonly PlanetBatchGenerator $planetGenerator,
     ) {
     }
 
@@ -65,6 +69,10 @@ class StatusCommand
         $planetCount = $this->planetRepository->count();
         $shipCount = $this->shipRepository->count();
 
+        // Generation progress
+        $starProgress = $this->starGenerator->getProgress();
+        $planetProgress = $this->planetGenerator->getProgress();
+
         $data = [
             'origin' => [
                 'label' => 'Origin',
@@ -86,9 +94,17 @@ class StatusCommand
                 'label' => 'Star Posts',
                 'value' => sprintf('%d / %d (%.1f%%)', $starCount, $catalogCount, $catalogCount > 0 ? ($starCount / $catalogCount) * 100 : 0),
             ],
+            'star_gen' => [
+                'label' => 'Star Generation',
+                'value' => $this->formatStarGenerationStatus($starProgress),
+            ],
             'planets' => [
                 'label' => 'Planet Posts',
                 'value' => (string) $planetCount,
+            ],
+            'planet_gen' => [
+                'label' => 'Planet Generation',
+                'value' => $this->formatPlanetGenerationStatus($planetProgress),
             ],
             'ships' => [
                 'label' => 'Ship Posts',
@@ -115,5 +131,66 @@ class StatusCommand
         }
 
         WP_CLI::log('');
+    }
+
+    /**
+     * Format star generation status for display.
+     *
+     * @param array{status: string, total: int, processed: int, batch_size: int, started_at: int|null, completed_at: int|null, errors: array<mixed>} $progress
+     */
+    private function formatStarGenerationStatus(array $progress): string
+    {
+        $status = $progress['status'];
+        $total = $progress['total'];
+        $processed = $progress['processed'];
+
+        if ($status === 'idle' || $total === 0) {
+            return 'Not started';
+        }
+
+        if ($status === 'completed') {
+            $errorCount = count($progress['errors']);
+            $suffix = $errorCount > 0 ? sprintf(' (%d errors)', $errorCount) : '';
+            return sprintf('Complete%s', $suffix);
+        }
+
+        if ($status === 'cancelled') {
+            return sprintf('Cancelled at %d/%d', $processed, $total);
+        }
+
+        // Processing or scheduled
+        $percent = $total > 0 ? ($processed / $total) * 100 : 0;
+        return sprintf('%s: %d/%d (%.1f%%)', ucfirst($status), $processed, $total, $percent);
+    }
+
+    /**
+     * Format planet generation status for display.
+     *
+     * @param array{status: string, total_stars: int, stars_processed: int, planets_created: int, batch_size: int, started_at: int|null, completed_at: int|null, errors: array<mixed>} $progress
+     */
+    private function formatPlanetGenerationStatus(array $progress): string
+    {
+        $status = $progress['status'];
+        $total = $progress['total_stars'];
+        $processed = $progress['stars_processed'];
+        $planetsCreated = $progress['planets_created'];
+
+        if ($status === 'idle' || $total === 0) {
+            return 'Not started';
+        }
+
+        if ($status === 'completed') {
+            $errorCount = count($progress['errors']);
+            $suffix = $errorCount > 0 ? sprintf(' (%d errors)', $errorCount) : '';
+            return sprintf('Complete - %d planets%s', $planetsCreated, $suffix);
+        }
+
+        if ($status === 'cancelled') {
+            return sprintf('Cancelled at %d/%d stars', $processed, $total);
+        }
+
+        // Processing or scheduled
+        $percent = $total > 0 ? ($processed / $total) * 100 : 0;
+        return sprintf('%s: %d/%d stars (%.1f%%), %d planets', ucfirst($status), $processed, $total, $percent, $planetsCreated);
     }
 }

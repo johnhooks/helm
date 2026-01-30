@@ -8,8 +8,10 @@ use Helm\Config\Config;
 use Helm\Generation\SystemGenerator;
 use Helm\lucatume\DI52\ServiceProvider;
 use Helm\Origin\Origin;
+use Helm\Planets\PlanetBatchGenerator;
 use Helm\Planets\PlanetRepository;
 use Helm\Ships\ShipRepository;
+use Helm\Stars\StarBatchGenerator;
 use Helm\Stars\StarCatalog;
 use Helm\Stars\StarRepository;
 use WP_CLI;
@@ -46,6 +48,8 @@ final class Provider extends ServiceProvider
                 $this->container->get(StarRepository::class),
                 $this->container->get(PlanetRepository::class),
                 $this->container->get(ShipRepository::class),
+                $this->container->get(StarBatchGenerator::class),
+                $this->container->get(PlanetBatchGenerator::class),
             );
         });
     }

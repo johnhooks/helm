@@ -18,11 +18,16 @@ final class Provider extends ServiceProvider
         $this->container->singleton(PostTypeRegistry::class, function () {
             return new PostTypeRegistry();
         });
+
+        $this->container->singleton(AdminColumns::class, function () {
+            return new AdminColumns();
+        });
     }
 
     public function boot(): void
     {
         add_action('init', [$this, 'registerPostTypesAndTaxonomies'], 5);
+        add_action('admin_init', [$this, 'registerAdminColumns']);
     }
 
     /**
@@ -38,5 +43,15 @@ final class Provider extends ServiceProvider
         // Taxonomies must be registered before post types that use them
         $registry->registerTaxonomies();
         $registry->registerPostTypes();
+    }
+
+    /**
+     * Register admin column customizations.
+     */
+    public function registerAdminColumns(): void
+    {
+        /** @var AdminColumns $columns */
+        $columns = $this->container->get(AdminColumns::class);
+        $columns->register();
     }
 }
