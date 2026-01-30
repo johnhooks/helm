@@ -1,42 +1,54 @@
 # Helm
 
-Starship Operating System built on WordPress.
+A slow, asynchronous space exploration game built on WordPress.
 
 ## What This Is
 
-Helm is the software infrastructure for operating a multi-crew starship. WordPress provides the foundation: mature codebase, extensible architecture, role-based access, REST API for system integration.
+Helm is a space MMO where WordPress is the game server. Players are WordPress users. Ships are player-owned entities stored as data. The game runs on a single WordPress instance (the "Origin") that tracks all state, processes work, and manages the economy.
 
-The simulation is written as if the ship is real. The architecture doesn't know otherwise.
+Actions take real time. Scans take hours. Travel takes days. You check in between meetings, before bed, over morning coffee. "What did my ship find?"
+
+The architecture supports future federation (multiple Origins with trade deals), but current focus is single-Origin multiplayer.
+
+For the full vision, see `docs/vision.md`. For the lore, see `docs/lore.md`.
 
 ## Core Concepts
 
+### Origin
+
+The Origin is the game server - a WordPress instance running Helm. It holds all truth:
+- Processes work units (scans, mining, travel)
+- Stores game state (ships, items, maps)
+- Manages the economy (credits, trades)
+- Runs procedural generation
+- Tracks discoveries and ownership
+
+### Ships
+
+Ships belong to WordPress users. A ship is data, not infrastructure. Players issue commands through the UI, Origin processes them over time, players check back for results.
+
 ### ShipLink
 
-ShipLink is the hardware abstraction layer. **All ship state is accessed through ShipLink.** Systems never touch storage directly.
+ShipLink is the abstraction layer for ship state. **All state is accessed through ShipLink contracts.** Systems never touch storage directly.
 
 ```php
-// Systems use ShipLink contracts
 $shields = helm(ShipLinkContract::class)->getShieldStrength();
-
-// DI provides the implementation (Simulation now, real hardware later)
 ```
 
 ### Simulation
 
-The Simulation implements ShipLink contracts using WordPress data structures:
-- `wp_options` for ship state
-- Timestamp-based calculation (state is computed on demand)
-- Action Scheduler for background tick processing
-
-When real hardware exists, a different ShipLink implementation replaces Simulation.
+The Simulation implements ShipLink using WordPress data structures:
+- `wp_options` for state storage
+- Timestamp-based calculation (state computed on demand)
+- Action Scheduler for background processing
 
 ### Systems
 
 Ship systems are self-contained domains in `src/Helm/Systems/`. Each system:
 - Has its own `Provider.php` (service provider)
-- Registers its own hooks, REST routes, CLI commands
+- Registers hooks, REST routes, CLI commands
 - Uses ShipLink for all state access
-- Knows nothing about storage implementation
+- Knows nothing about storage
 
 ### Timestamp-Based State
 
@@ -45,10 +57,7 @@ State is calculated from "last known value + elapsed time":
 current_shields = last_shields + (elapsed_seconds * regen_rate)
 ```
 
-This means state is always accurate on-demand. The tick's job is to:
-- Handle complex interactions
-- Fire threshold events
-- Write checkpoints
+State is always accurate on-demand. Background ticks handle complex interactions and fire threshold events.
 
 ## Tech Stack
 
@@ -96,24 +105,38 @@ helm/
 ## Commands
 
 ```bash
-# PHP
+# Install dependencies
 composer install
-composer test              # Run Wpunit tests
-composer analyse           # PHPStan
-
-# JavaScript
 bun install
-bun run build              # wp-scripts build
-bun run dev                # wp-scripts start
-bun run test               # Vitest
 
-# E2E
-bun run test:e2e           # Playwright
+# Linting
+composer analyse           # PHPStan static analysis
+composer lint              # PHP_CodeSniffer (WPCS)
+composer lint:fix          # Auto-fix PHP linting issues
+bun run lint:js            # ESLint for JS/TS
+bun run lint:style         # Stylelint for CSS
+bun run lint:fix           # Auto-fix JS linting issues
+bun run format             # Prettier formatting
+bun run check-types        # TypeScript type checking
 
-# WordPress CLI (future)
-wp helm status             # Ship status
-wp helm power:status       # Power systems
+# Testing
+composer test              # Full PHP suite (analyse + lint + Wpunit)
+composer test:unit         # Wpunit tests only
+composer test:coverage     # Wpunit with coverage report
+bun run test               # Vitest (JS unit tests)
+bun run test:watch         # Vitest in watch mode
+bun run test:coverage      # Vitest with coverage
+bun run test:e2e           # Playwright E2E tests
+bun run test:e2e:ui        # Playwright with UI
+bun run test:e2e:headed    # Playwright in headed mode
+
+# Development
+bun run dev                # wp-scripts start (watch mode)
+bun run build              # wp-scripts build (production)
+bun run storybook          # Component development UI
 ```
+
+Note: PHP tests run via [slic](https://github.com/developer-toolbelt/slic) for WordPress integration.
 
 ## Container Access
 
@@ -129,9 +152,16 @@ $shields = helm(ShieldsSystem::class);
 
 ## Development Principles
 
-1. **Ship state through ShipLink** - Never access storage directly from Systems
+1. **State through ShipLink** - Never access storage directly from Systems
 2. **Systems are self-contained** - Each domain has its own provider, routes, CLI
-3. **Simulation is realistic** - Timing, power budgets, failure modes
-4. **WordPress-native** - Use WP patterns, don't fight the platform
-5. **Contracts first** - Interfaces before implementations
-6. **PHP and JS are separate** - They communicate via REST API only
+3. **WordPress-native** - Use WP patterns, don't fight the platform
+4. **Contracts first** - Interfaces before implementations
+5. **PHP and JS are separate** - They communicate via REST API only
+6. **Deterministic generation** - Same seed = same content (enables future federation)
+
+## Documentation
+
+- `docs/vision.md` - Full game design and architecture
+- `docs/lore.md` - Worldbuilding and backstory
+- `docs/federation.md` - Multi-Origin protocol (future)
+- `docs/structure.md` - Project structure details

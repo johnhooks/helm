@@ -19,6 +19,8 @@ final class Schema
     public const TABLE_NAV_NODES = 'helm_nav_nodes';
     public const TABLE_NAV_EDGES = 'helm_nav_edges';
     public const TABLE_NAV_ROUTES = 'helm_nav_routes';
+    public const TABLE_SHIP_SYSTEMS = 'helm_ship_systems';
+    public const TABLE_SHIP_ACTIONS = 'helm_ship_actions';
 
     /**
      * All custom tables (without prefix).
@@ -28,6 +30,8 @@ final class Schema
         self::TABLE_NAV_NODES,
         self::TABLE_NAV_EDGES,
         self::TABLE_NAV_ROUTES,
+        self::TABLE_SHIP_SYSTEMS,
+        self::TABLE_SHIP_ACTIONS,
     ];
 
     /**
@@ -57,7 +61,9 @@ final class Schema
         $sql = self::getDiscoveriesTableSql($prefix, $charsetCollate)
              . self::getNavNodesTableSql($prefix, $charsetCollate)
              . self::getNavEdgesTableSql($prefix, $charsetCollate)
-             . self::getNavRoutesTableSql($prefix, $charsetCollate);
+             . self::getNavRoutesTableSql($prefix, $charsetCollate)
+             . self::getShipSystemsTableSql($prefix, $charsetCollate)
+             . self::getShipActionsTableSql($prefix, $charsetCollate);
 
         // Run dbDelta with error handling
         $wpError = self::dbDeltaWithErrorHandling($sql);
@@ -285,6 +291,80 @@ CREATE TABLE {$prefix}helm_nav_routes (
     KEY start_end (start_node_id,end_node_id),
     KEY visibility (visibility),
     KEY discovered_by_ship_id (discovered_by_ship_id)
+) {$charsetCollate};
+";
+    }
+
+    /**
+     * Ship systems state table SQL.
+     *
+     * Stores rapidly-changing ship state separately from the Ship CPT.
+     * Component configuration stays in post meta; operational state lives here.
+     * Credits are stored on the user, not the ship.
+     *
+     * Regenerating resources (power, shields) use "full_at" timestamps -
+     * current value is calculated from time remaining until full.
+     */
+    private static function getShipSystemsTableSql(string $prefix, string $charsetCollate): string
+    {
+        return "
+CREATE TABLE {$prefix}helm_ship_systems (
+    ship_post_id bigint(20) unsigned NOT NULL,
+    core_type smallint(5) unsigned NOT NULL DEFAULT 1,
+    drive_type smallint(5) unsigned NOT NULL DEFAULT 1,
+    sensor_type smallint(5) unsigned NOT NULL DEFAULT 1,
+    shield_type smallint(5) unsigned NOT NULL DEFAULT 1,
+    nav_tier smallint(5) unsigned NOT NULL DEFAULT 1,
+    power_full_at datetime DEFAULT NULL,
+    power_max float NOT NULL DEFAULT 100.0,
+    shields_full_at datetime DEFAULT NULL,
+    shields_max float NOT NULL DEFAULT 100.0,
+    core_life float NOT NULL DEFAULT 750.0,
+    hull_integrity float NOT NULL DEFAULT 100.0,
+    hull_max float NOT NULL DEFAULT 100.0,
+    node_id bigint(20) unsigned DEFAULT NULL,
+    cargo longtext DEFAULT NULL,
+    current_action_id bigint(20) unsigned DEFAULT NULL,
+    created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY  (ship_post_id),
+    KEY node_id (node_id),
+    KEY core_life (core_life),
+    KEY current_action_id (current_action_id)
+) {$charsetCollate};
+";
+    }
+
+    /**
+     * Ship actions table SQL.
+     *
+     * Tracks queued, running, and completed ship actions.
+     *
+     * Status values:
+     * - pending: queued, waiting to start
+     * - running: currently being processed
+     * - fulfilled: completed successfully
+     * - partial: completed with partial results
+     * - failed: completed with error
+     */
+    private static function getShipActionsTableSql(string $prefix, string $charsetCollate): string
+    {
+        return "
+CREATE TABLE {$prefix}helm_ship_actions (
+    id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+    ship_post_id bigint(20) unsigned NOT NULL,
+    action_type varchar(50) NOT NULL,
+    params longtext DEFAULT NULL,
+    status varchar(20) NOT NULL DEFAULT 'pending',
+    deferred_until datetime DEFAULT NULL,
+    result longtext DEFAULT NULL,
+    created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY  (id),
+    KEY ship_post_id (ship_post_id),
+    KEY status (status),
+    KEY deferred_until (deferred_until),
+    KEY ship_status (ship_post_id,status)
 ) {$charsetCollate};
 ";
     }
