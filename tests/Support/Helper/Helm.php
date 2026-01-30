@@ -9,8 +9,8 @@ use Helm\Generation\PlanetType;
 use Helm\Origin\Origin;
 use Helm\Planets\Planet;
 use Helm\Planets\PlanetRepository;
-use Helm\Ships\Ship;
-use Helm\Ships\ShipRepository;
+use Helm\PostTypes\PostTypeRegistry;
+use Helm\Ships\ShipPost;
 use Helm\Stars\Star;
 use Helm\Stars\StarRepository;
 
@@ -169,51 +169,39 @@ class Helm extends Module
      * Create a ship in the database.
      *
      * @param array<string, mixed> $attributes Ship attributes to override defaults
-     * @return \Helm\Ships\Ship
+     * @return ShipPost
      */
-    public function haveShip(array $attributes = []): Ship
+    public function haveShip(array $attributes = []): ShipPost
     {
         $defaults = [
             'id' => 'SHIP_' . uniqid(),
             'name' => 'Test Ship',
             'ownerId' => 1, // Default to admin user
-            'location' => 'SOL',
-            'nodeId' => 0,
-            'credits' => 1000,
-            'fuel' => Ship::DEFAULT_FUEL,
-            'driveRange' => Ship::DEFAULT_DRIVE_RANGE,
-            'navSkill' => Ship::DEFAULT_NAV_SKILL,
-            'navEfficiency' => Ship::DEFAULT_NAV_EFFICIENCY,
-            'cargo' => [],
-            'artifacts' => [],
-            'createdAt' => time(),
-            'updatedAt' => time(),
         ];
 
         $data = array_merge($defaults, $attributes);
 
-        $ship = new Ship(
-            id: $data['id'],
-            name: $data['name'],
-            ownerId: $data['ownerId'],
-            location: $data['location'],
-            nodeId: $data['nodeId'],
-            credits: $data['credits'],
-            fuel: $data['fuel'],
-            driveRange: $data['driveRange'],
-            navSkill: $data['navSkill'],
-            navEfficiency: $data['navEfficiency'],
-            cargo: $data['cargo'],
-            artifacts: $data['artifacts'],
-            createdAt: $data['createdAt'],
-            updatedAt: $data['updatedAt'],
-        );
+        $postId = wp_insert_post([
+            'post_type' => PostTypeRegistry::POST_TYPE_SHIP,
+            'post_status' => 'publish',
+            'post_title' => $data['name'],
+            'post_author' => $data['ownerId'],
+        ], true);
 
-        /** @var ShipRepository $repository */
-        $repository = helm(ShipRepository::class);
-        $repository->save($ship);
+        if (is_wp_error($postId)) {
+            throw new \RuntimeException(
+                sprintf('Failed to create ship post: %s', $postId->get_error_message())
+            );
+        }
 
-        return $ship;
+        update_post_meta($postId, PostTypeRegistry::META_SHIP_ID, $data['id']);
+
+        $shipPost = ShipPost::fromId($postId);
+        if ($shipPost === null) {
+            throw new \RuntimeException('Failed to load ship post after creation');
+        }
+
+        return $shipPost;
     }
 
     /**
@@ -221,7 +209,7 @@ class Helm extends Module
      *
      * @param int $count Number of ships to create
      * @param array<string, mixed> $attributes Attributes to apply to all ships
-     * @return array<\Helm\Ships\Ship>
+     * @return array<ShipPost>
      */
     public function haveShips(int $count, array $attributes = []): array
     {
@@ -246,13 +234,23 @@ class Helm extends Module
     }
 
     /**
-     * Get a ship by ID.
+     * Get a ship by its string ID.
      */
-    public function grabShip(string $id): ?Ship
+    public function grabShip(string $id): ?ShipPost
     {
-        /** @var ShipRepository $repository */
-        $repository = helm(ShipRepository::class);
-        return $repository->get($id);
+        global $wpdb;
+
+        $postId = $wpdb->get_var($wpdb->prepare(
+            "SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = %s AND meta_value = %s",
+            PostTypeRegistry::META_SHIP_ID,
+            $id
+        ));
+
+        if ($postId === null) {
+            return null;
+        }
+
+        return ShipPost::fromId((int) $postId);
     }
 
     /**

@@ -2003,10 +2003,10 @@ trait WpunitTesterActions
      * Create a ship in the database.
      *
      * @param array<string, mixed> $attributes Ship attributes to override defaults
-     * @return \Helm\Ships\Ship
+     * @return ShipPost
      * @see \Tests\Support\Helper\Helm::haveShip()
      */
-    public function haveShip(array $attributes = []): \Helm\Ships\Ship {
+    public function haveShip(array $attributes = []): \Helm\Ships\ShipPost {
         return $this->getScenario()->runStep(new \Codeception\Step\Action('haveShip', func_get_args()));
     }
 
@@ -2018,7 +2018,7 @@ trait WpunitTesterActions
      *
      * @param int $count Number of ships to create
      * @param array<string, mixed> $attributes Attributes to apply to all ships
-     * @return array<\Helm\Ships\Ship>
+     * @return array<ShipPost>
      * @see \Tests\Support\Helper\Helm::haveShips()
      */
     public function haveShips(int $count, array $attributes = []): array {
@@ -2040,10 +2040,10 @@ trait WpunitTesterActions
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
-     * Get a ship by ID.
+     * Get a ship by its string ID.
      * @see \Tests\Support\Helper\Helm::grabShip()
      */
-    public function grabShip(string $id): ?\Helm\Ships\Ship {
+    public function grabShip(string $id): ?\Helm\Ships\ShipPost {
         return $this->getScenario()->runStep(new \Codeception\Step\Action('grabShip', func_get_args()));
     }
 

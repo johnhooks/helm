@@ -67,4 +67,11 @@ final class Power implements PowerSystem
     {
         return $this->model->powerFullAt;
     }
+
+    public function getOutputMultiplier(): float
+    {
+        // Core's base output, will be multiplied by power mode when implemented
+        // outputMultiplier = coreType.baseOutput × powerMode.outputMultiplier
+        return $this->model->coreType->baseOutput();
+    }
 }

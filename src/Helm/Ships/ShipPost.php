@@ -8,10 +8,10 @@ use Helm\PostTypes\PostTypeRegistry;
 use WP_Post;
 
 /**
- * Adapter between WP_Post and Ship value object.
+ * Ship CPT wrapper.
  *
  * Wraps a WordPress post of type helm_ship and provides
- * conversion to/from the Ship value object.
+ * access to ship metadata.
  */
 final class ShipPost
 {
@@ -65,36 +65,12 @@ final class ShipPost
     }
 
     /**
-     * Convert to Ship value object.
+     * Get the total count of ships.
      */
-    public function toShip(): Ship
+    public static function count(): int
     {
-        $postId = $this->post->ID;
-
-        $cargo = get_post_meta($postId, PostTypeRegistry::META_SHIP_CARGO, true);
-        $artifacts = get_post_meta($postId, PostTypeRegistry::META_SHIP_ARTIFACTS, true);
-        $nodeId = get_post_meta($postId, PostTypeRegistry::META_SHIP_NODE_ID, true);
-        $fuel = get_post_meta($postId, PostTypeRegistry::META_SHIP_FUEL, true);
-        $driveRange = get_post_meta($postId, PostTypeRegistry::META_SHIP_DRIVE_RANGE, true);
-        $navSkill = get_post_meta($postId, PostTypeRegistry::META_SHIP_NAV_SKILL, true);
-        $navEfficiency = get_post_meta($postId, PostTypeRegistry::META_SHIP_NAV_EFFICIENCY, true);
-
-        return new Ship(
-            id: $this->shipId(),
-            name: $this->post->post_title,
-            ownerId: $this->ownerId(),
-            location: (string) get_post_meta($postId, PostTypeRegistry::META_SHIP_LOCATION, true),
-            nodeId: $nodeId !== '' ? (int) $nodeId : 0,
-            credits: (int) get_post_meta($postId, PostTypeRegistry::META_SHIP_CREDITS, true),
-            fuel: $fuel !== '' ? (float) $fuel : Ship::DEFAULT_FUEL,
-            driveRange: $driveRange !== '' ? (float) $driveRange : Ship::DEFAULT_DRIVE_RANGE,
-            navSkill: $navSkill !== '' ? (float) $navSkill : Ship::DEFAULT_NAV_SKILL,
-            navEfficiency: $navEfficiency !== '' ? (float) $navEfficiency : Ship::DEFAULT_NAV_EFFICIENCY,
-            cargo: is_array($cargo) ? $cargo : [],
-            artifacts: is_array($artifacts) ? $artifacts : [],
-            createdAt: strtotime($this->post->post_date_gmt),
-            updatedAt: strtotime($this->post->post_modified_gmt),
-        );
+        $counts = wp_count_posts(PostTypeRegistry::POST_TYPE_SHIP);
+        return (int) ($counts->publish ?? 0);
     }
 
     /**

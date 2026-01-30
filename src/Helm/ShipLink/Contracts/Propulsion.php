@@ -8,11 +8,14 @@ namespace Helm\ShipLink\Contracts;
  * Propulsion system contract.
  *
  * Handles drive mechanics: jump duration, core stress, and range.
+ * Range and speed are calculated from drive specs and core output.
  */
 interface Propulsion
 {
     /**
      * Get jump duration in seconds for a given distance.
+     *
+     * Duration = (distance × BASE_SECONDS_PER_LY) / effectiveAmplitude
      */
     public function getJumpDuration(float $distanceLy): int;
 
@@ -20,20 +23,13 @@ interface Propulsion
      * Get the core decay multiplier for this drive.
      *
      * Higher values burn core life faster per jump.
-     * DR-7 Boost: 1.5x, DR-5 Standard: 1.0x, DR-3 Economy: 0.75x
      */
     public function getCoreDecayMultiplier(): float;
 
     /**
-     * Get the speed multiplier for this drive.
-     *
-     * Affects how long jumps take.
-     * DR-7 Boost: 2.0x, DR-5 Standard: 1.0x, DR-3 Economy: 0.5x
-     */
-    public function getSpeedMultiplier(): float;
-
-    /**
      * Get maximum jump range in light-years.
+     *
+     * Calculated from: sustain × coreOutput × performanceRatio
      */
     public function getMaxRange(): float;
 
@@ -46,4 +42,22 @@ interface Propulsion
      * Calculate core life cost for a jump.
      */
     public function calculateCoreCost(float $distanceLy): float;
+
+    /**
+     * Get the drive's performance ratio based on current power.
+     *
+     * performanceRatio = min(1.0, coreOutput / consumption)
+     * When underpowered (ratio < 1.0), drive underperforms.
+     */
+    public function getPerformanceRatio(): float;
+
+    /**
+     * Get the drive's base sustain (max distance at full performance).
+     */
+    public function getSustain(): float;
+
+    /**
+     * Get the drive's consumption factor.
+     */
+    public function getConsumption(): float;
 }

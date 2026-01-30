@@ -27,14 +27,16 @@ class ShipFactoryTest extends WPTestCase
     public function _before(): void
     {
         parent::_before();
-        $this->systemsRepository = new ShipSystemsRepository();
-        $this->factory = new ShipFactory($this->systemsRepository);
+        $this->tester->haveOrigin();
+
+        $this->systemsRepository = helm(ShipSystemsRepository::class);
+        $this->factory = helm(ShipFactory::class);
     }
 
     public function test_build_creates_ship_link(): void
     {
-        $ship = $this->tester->haveShip(['name' => 'Test Ship']);
-        $postId = $this->getShipPostId($ship->id);
+        $shipPost = $this->tester->haveShip(['name' => 'Test Ship']);
+        $postId = $shipPost->postId();
 
         $shipLink = $this->factory->build($postId);
 
@@ -53,8 +55,8 @@ class ShipFactoryTest extends WPTestCase
 
     public function test_build_creates_systems_if_missing(): void
     {
-        $ship = $this->tester->haveShip();
-        $postId = $this->getShipPostId($ship->id);
+        $shipPost = $this->tester->haveShip();
+        $postId = $shipPost->postId();
 
         $this->assertFalse($this->systemsRepository->exists($postId));
 
@@ -65,9 +67,7 @@ class ShipFactoryTest extends WPTestCase
 
     public function test_build_from_post(): void
     {
-        $ship = $this->tester->haveShip(['name' => 'From Post']);
-        $postId = $this->getShipPostId($ship->id);
-        $shipPost = ShipPost::fromId($postId);
+        $shipPost = $this->tester->haveShip(['name' => 'From Post']);
 
         $shipLink = $this->factory->buildFromPost($shipPost);
 
@@ -76,9 +76,8 @@ class ShipFactoryTest extends WPTestCase
 
     public function test_build_from_parts(): void
     {
-        $ship = $this->tester->haveShip(['name' => 'From Parts']);
-        $postId = $this->getShipPostId($ship->id);
-        $shipPost = ShipPost::fromId($postId);
+        $shipPost = $this->tester->haveShip(['name' => 'From Parts']);
+        $postId = $shipPost->postId();
         $systems = ShipSystems::defaults($postId);
 
         $shipLink = $this->factory->buildFromParts($shipPost, $systems);
@@ -89,9 +88,8 @@ class ShipFactoryTest extends WPTestCase
 
     public function test_build_from_model(): void
     {
-        $ship = $this->tester->haveShip();
-        $postId = $this->getShipPostId($ship->id);
-        $shipPost = ShipPost::fromId($postId);
+        $shipPost = $this->tester->haveShip();
+        $postId = $shipPost->postId();
         $systems = ShipSystems::defaults($postId);
         $model = ShipModel::fromParts($shipPost, $systems);
 
@@ -105,8 +103,8 @@ class ShipFactoryTest extends WPTestCase
 
     public function test_ship_link_has_all_systems(): void
     {
-        $ship = $this->tester->haveShip();
-        $postId = $this->getShipPostId($ship->id);
+        $shipPost = $this->tester->haveShip();
+        $postId = $shipPost->postId();
 
         $shipLink = $this->factory->build($postId);
 
@@ -116,17 +114,5 @@ class ShipFactoryTest extends WPTestCase
         $this->assertNotNull($shipLink->navigation());
         $this->assertNotNull($shipLink->shields());
         $this->assertNotNull($shipLink->hull());
-    }
-
-    /**
-     * Get the WordPress post ID for a ship by its string ID.
-     */
-    private function getShipPostId(string $shipId): int
-    {
-        global $wpdb;
-        return (int) $wpdb->get_var($wpdb->prepare(
-            "SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = '_helm_ship_id' AND meta_value = %s",
-            $shipId
-        ));
     }
 }

@@ -11,8 +11,11 @@ use DateTimeImmutable;
  *
  * Manages ship power (regenerating tactical resource) and core life
  * (finite strategic resource consumed on jumps).
+ *
+ * Extends PowerMetrics to provide read-only access to output values
+ * for other systems.
  */
-interface PowerSystem
+interface PowerSystem extends PowerMetrics
 {
     /**
      * Get current available power units.
@@ -60,4 +63,15 @@ interface PowerSystem
      * Get timestamp when power will be full.
      */
     public function getFullAt(): ?DateTimeImmutable;
+
+    /**
+     * Get current output multiplier.
+     *
+     * This is the core's effective output, combining:
+     * - Core type's base output
+     * - Power mode multiplier (when implemented)
+     *
+     * Used by other systems to scale their capabilities.
+     */
+    public function getOutputMultiplier(): float;
 }

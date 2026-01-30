@@ -25,9 +25,8 @@ class ShipModelTest extends WPTestCase
 {
     public function test_from_parts_combines_data(): void
     {
-        $ship = $this->tester->haveShip(['name' => 'USS Enterprise']);
-        $postId = $this->getShipPostId($ship->id);
-        $shipPost = ShipPost::fromId($postId);
+        $shipPost = $this->tester->haveShip(['name' => 'USS Enterprise']);
+        $postId = $shipPost->postId();
 
         $systems = ShipSystems::defaults($postId);
 
@@ -41,9 +40,8 @@ class ShipModelTest extends WPTestCase
 
     public function test_to_systems_converts_back(): void
     {
-        $ship = $this->tester->haveShip();
-        $postId = $this->getShipPostId($ship->id);
-        $shipPost = ShipPost::fromId($postId);
+        $shipPost = $this->tester->haveShip();
+        $postId = $shipPost->postId();
 
         $systems = ShipSystems::defaults($postId);
         $model = ShipModel::fromParts($shipPost, $systems);
@@ -275,17 +273,5 @@ class ShipModelTest extends WPTestCase
         $model->updatedAt = new DateTimeImmutable();
 
         return $model;
-    }
-
-    /**
-     * Get the WordPress post ID for a ship by its string ID.
-     */
-    private function getShipPostId(string $shipId): int
-    {
-        global $wpdb;
-        return (int) $wpdb->get_var($wpdb->prepare(
-            "SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = '_helm_ship_id' AND meta_value = %s",
-            $shipId
-        ));
     }
 }

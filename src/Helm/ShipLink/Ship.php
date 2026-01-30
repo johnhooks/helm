@@ -11,38 +11,26 @@ use Helm\ShipLink\Contracts\Propulsion;
 use Helm\ShipLink\Contracts\Sensors;
 use Helm\ShipLink\Contracts\Shields;
 use Helm\ShipLink\Contracts\ShipLink;
-use Helm\ShipLink\System\Hull as HullSystem;
-use Helm\ShipLink\System\Navigation as NavigationSystem;
-use Helm\ShipLink\System\Power;
-use Helm\ShipLink\System\Propulsion as PropulsionSystem;
-use Helm\ShipLink\System\Sensors as SensorsSystem;
-use Helm\ShipLink\System\Shields as ShieldsSystem;
 
 /**
  * Ship implementation of ShipLink.
  *
  * This is the main starship interface. It holds the mutable model
  * and provides access to all ship systems.
+ *
+ * All systems are injected via constructor - use ShipFactory to build.
  */
 final class Ship implements ShipLink
 {
-    private Power $powerSystem;
-    private PropulsionSystem $propulsionSystem;
-    private SensorsSystem $sensorSystem;
-    private NavigationSystem $navigationSystem;
-    private ShieldsSystem $shieldSystem;
-    private HullSystem $hullSystem;
-
     public function __construct(
         private ShipModel $model,
+        private PowerSystem $powerSystem,
+        private Propulsion $propulsionSystem,
+        private Sensors $sensorSystem,
+        private Navigation $navigationSystem,
+        private Shields $shieldSystem,
+        private Hull $hullSystem,
     ) {
-        // Initialize all systems with the shared model
-        $this->powerSystem = new Power($model);
-        $this->propulsionSystem = new PropulsionSystem($model);
-        $this->sensorSystem = new SensorsSystem($model);
-        $this->navigationSystem = new NavigationSystem($model);
-        $this->shieldSystem = new ShieldsSystem($model);
-        $this->hullSystem = new HullSystem($model);
     }
 
     public function getModel(): ShipModel
@@ -135,38 +123,55 @@ final class Ship implements ShipLink
 
     /**
      * Process a jump action.
+     *
+     * Ship orchestrates: gathers route info, calculates costs, executes via systems.
      */
     private function processJump(Action $action): ActionResult
     {
-        $distance = $action->params['distance'] ?? 0.0;
         $targetNodeId = $action->params['target_node_id'] ?? null;
 
-        // Check if we can reach the target
+        if ($targetNodeId === null) {
+            return ActionResult::withError('navigation', new \WP_Error(
+                'no_target',
+                __('No target node specified.', 'helm')
+            ));
+        }
+
+        // 1. Navigation system validates graph and gets route info
+        $routeInfo = $this->navigationSystem->getRouteInfo($targetNodeId);
+        if (is_wp_error($routeInfo)) {
+            return ActionResult::withError('navigation', $routeInfo);
+        }
+
+        $distance = $routeInfo->distance;
+
+        // 2. Check propulsion can handle the distance
         if (!$this->propulsionSystem->canReach($distance)) {
             return ActionResult::withError('propulsion', new \WP_Error(
                 'out_of_range',
-                __('Target is beyond jump range.', 'helm')
+                __('Target is beyond jump range.', 'helm'),
+                ['distance' => $distance, 'max_range' => $this->propulsionSystem->getMaxRange()]
             ));
         }
 
-        // Calculate and check core cost
-        $coreCost = $this->propulsionSystem->calculateCoreCost($distance);
+        // 3. Calculate costs (Ship orchestrates, gathering from systems)
+        $coreCost = $this->calculateJumpCoreCost($distance);
+        $duration = $this->propulsionSystem->getJumpDuration($distance);
+
+        // 4. Validate resources
         if ($this->powerSystem->getCoreLife() < $coreCost) {
             return ActionResult::withError('power', new \WP_Error(
                 'insufficient_core_life',
-                __('Insufficient core life for this jump.', 'helm')
+                __('Insufficient core life for this jump.', 'helm'),
+                ['required' => $coreCost, 'available' => $this->powerSystem->getCoreLife()]
             ));
         }
 
-        // Execute jump
+        // 5. Execute via system calls
         $this->powerSystem->consumeCoreLife($coreCost);
+        $this->navigationSystem->setPosition($targetNodeId);
 
-        if ($targetNodeId !== null) {
-            $this->model->nodeId = $targetNodeId;
-        }
-
-        $duration = $this->propulsionSystem->getJumpDuration($distance);
-
+        // 6. Return result
         $result = new ActionResult();
         return $result->add('jump', SystemResult::from([
             'distance' => $distance,
@@ -174,6 +179,20 @@ final class Ship implements ShipLink
             'duration' => $duration,
             'target_node_id' => $targetNodeId,
         ]));
+    }
+
+    /**
+     * Calculate core life cost for a jump.
+     *
+     * Gathers contributions from relevant systems.
+     */
+    private function calculateJumpCoreCost(float $distance): float
+    {
+        // Core cost = distance × core multiplier × drive decay contribution
+        // This will expand as we add power modes
+        return $distance
+            * $this->model->coreType->jumpCostMultiplier()
+            * $this->propulsionSystem->getCoreDecayMultiplier();
     }
 
     /**

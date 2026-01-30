@@ -40,7 +40,7 @@ class ShipSystemsRepositoryTest extends WPTestCase
     public function test_insert_and_find(): void
     {
         $shipPost = $this->tester->haveShip();
-        $postId = $this->getShipPostId($shipPost->id);
+        $postId = $shipPost->postId();
 
         $systems = ShipSystems::defaults($postId);
         $this->repository->insert($systems);
@@ -55,7 +55,7 @@ class ShipSystemsRepositoryTest extends WPTestCase
     public function test_exists_returns_correct_value(): void
     {
         $shipPost = $this->tester->haveShip();
-        $postId = $this->getShipPostId($shipPost->id);
+        $postId = $shipPost->postId();
 
         $this->assertFalse($this->repository->exists($postId));
 
@@ -67,7 +67,7 @@ class ShipSystemsRepositoryTest extends WPTestCase
     public function test_find_or_create_creates_when_missing(): void
     {
         $shipPost = $this->tester->haveShip();
-        $postId = $this->getShipPostId($shipPost->id);
+        $postId = $shipPost->postId();
 
         $this->assertFalse($this->repository->exists($postId));
 
@@ -80,7 +80,7 @@ class ShipSystemsRepositoryTest extends WPTestCase
     public function test_find_or_create_returns_existing(): void
     {
         $shipPost = $this->tester->haveShip();
-        $postId = $this->getShipPostId($shipPost->id);
+        $postId = $shipPost->postId();
 
         // Create with custom core type
         $custom = new ShipSystems(
@@ -113,7 +113,7 @@ class ShipSystemsRepositoryTest extends WPTestCase
     public function test_update_modifies_record(): void
     {
         $shipPost = $this->tester->haveShip();
-        $postId = $this->getShipPostId($shipPost->id);
+        $postId = $shipPost->postId();
 
         $systems = ShipSystems::defaults($postId);
         $this->repository->insert($systems);
@@ -152,7 +152,7 @@ class ShipSystemsRepositoryTest extends WPTestCase
     public function test_save_inserts_new_record(): void
     {
         $shipPost = $this->tester->haveShip();
-        $postId = $this->getShipPostId($shipPost->id);
+        $postId = $shipPost->postId();
 
         $systems = ShipSystems::defaults($postId);
         $result = $this->repository->save($systems);
@@ -164,7 +164,7 @@ class ShipSystemsRepositoryTest extends WPTestCase
     public function test_save_updates_existing_record(): void
     {
         $shipPost = $this->tester->haveShip();
-        $postId = $this->getShipPostId($shipPost->id);
+        $postId = $shipPost->postId();
 
         $systems = ShipSystems::defaults($postId);
         $this->repository->save($systems);
@@ -198,7 +198,7 @@ class ShipSystemsRepositoryTest extends WPTestCase
     public function test_delete_removes_record(): void
     {
         $shipPost = $this->tester->haveShip();
-        $postId = $this->getShipPostId($shipPost->id);
+        $postId = $shipPost->postId();
 
         $this->repository->insert(ShipSystems::defaults($postId));
         $this->assertTrue($this->repository->exists($postId));
@@ -215,9 +215,9 @@ class ShipSystemsRepositoryTest extends WPTestCase
         $ship2 = $this->tester->haveShip();
         $ship3 = $this->tester->haveShip();
 
-        $postId1 = $this->getShipPostId($ship1->id);
-        $postId2 = $this->getShipPostId($ship2->id);
-        $postId3 = $this->getShipPostId($ship3->id);
+        $postId1 = $ship1->postId();
+        $postId2 = $ship2->postId();
+        $postId3 = $ship3->postId();
 
         // Two ships at node 10, one at node 20
         $this->insertWithNode($postId1, 10);
@@ -234,7 +234,7 @@ class ShipSystemsRepositoryTest extends WPTestCase
     public function test_update_node_id(): void
     {
         $shipPost = $this->tester->haveShip();
-        $postId = $this->getShipPostId($shipPost->id);
+        $postId = $shipPost->postId();
 
         $this->repository->insert(ShipSystems::defaults($postId));
 
@@ -247,7 +247,7 @@ class ShipSystemsRepositoryTest extends WPTestCase
     public function test_update_current_action(): void
     {
         $shipPost = $this->tester->haveShip();
-        $postId = $this->getShipPostId($shipPost->id);
+        $postId = $shipPost->postId();
 
         $this->repository->insert(ShipSystems::defaults($postId));
 
@@ -264,23 +264,11 @@ class ShipSystemsRepositoryTest extends WPTestCase
         $ship1 = $this->tester->haveShip();
         $ship2 = $this->tester->haveShip();
 
-        $this->repository->insert(ShipSystems::defaults($this->getShipPostId($ship1->id)));
+        $this->repository->insert(ShipSystems::defaults($ship1->postId()));
         $this->assertSame(1, $this->repository->count());
 
-        $this->repository->insert(ShipSystems::defaults($this->getShipPostId($ship2->id)));
+        $this->repository->insert(ShipSystems::defaults($ship2->postId()));
         $this->assertSame(2, $this->repository->count());
-    }
-
-    /**
-     * Get the WordPress post ID for a ship by its string ID.
-     */
-    private function getShipPostId(string $shipId): int
-    {
-        global $wpdb;
-        return (int) $wpdb->get_var($wpdb->prepare(
-            "SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = '_helm_ship_id' AND meta_value = %s",
-            $shipId
-        ));
     }
 
     /**

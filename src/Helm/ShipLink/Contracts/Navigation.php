@@ -4,10 +4,15 @@ declare(strict_types=1);
 
 namespace Helm\ShipLink\Contracts;
 
+use Helm\Navigation\EdgeInfo;
+use Helm\Navigation\Node;
+use Helm\Navigation\ScanResult;
+
 /**
  * Navigation system contract.
  *
  * Handles route computation and nav computer capabilities.
+ * Delegates graph operations to NavigationService.
  */
 interface Navigation
 {
@@ -44,4 +49,38 @@ interface Navigation
      * Check if ship has a known route to destination.
      */
     public function hasRouteTo(int $nodeId): bool;
+
+    /**
+     * Get route information to a target node.
+     *
+     * Returns edge info including distance, or error if no route.
+     *
+     * @param int $targetNodeId Target node
+     * @return EdgeInfo|\WP_Error Edge info or error
+     */
+    public function getRouteInfo(int $targetNodeId): EdgeInfo|\WP_Error;
+
+    /**
+     * Scan for routes toward a destination.
+     *
+     * Uses nav computer skill and efficiency to discover waypoints.
+     *
+     * @param int $targetNodeId Target node
+     * @return ScanResult Discovered nodes and edges
+     */
+    public function scanForRoutes(int $targetNodeId): ScanResult;
+
+    /**
+     * Get all nodes connected to current position.
+     *
+     * @return array<array{node: Node, distance: float}> Connected nodes
+     */
+    public function getConnectedNodes(): array;
+
+    /**
+     * Set ship position (called by Ship during jump execution).
+     *
+     * @param int $nodeId New position node ID
+     */
+    public function setPosition(int $nodeId): void;
 }

@@ -35,10 +35,10 @@ class Action
     /**
      * Create a jump action.
      */
-    public static function jump(int $destinationNodeId): self
+    public static function jump(int $targetNodeId): self
     {
         return new self(ActionType::Jump, [
-            'destination_node_id' => $destinationNodeId,
+            'target_node_id' => $targetNodeId,
         ]);
     }
 

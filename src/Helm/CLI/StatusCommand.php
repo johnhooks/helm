@@ -8,7 +8,7 @@ use Helm\Config\Config;
 use Helm\Origin\Origin;
 use Helm\Planets\PlanetBatchGenerator;
 use Helm\Planets\PlanetRepository;
-use Helm\Ships\ShipRepository;
+use Helm\Ships\ShipPost;
 use Helm\Stars\StarBatchGenerator;
 use Helm\Stars\StarCatalog;
 use Helm\Stars\StarRepository;
@@ -25,7 +25,6 @@ class StatusCommand
         private readonly StarCatalog $catalog,
         private readonly StarRepository $starRepository,
         private readonly PlanetRepository $planetRepository,
-        private readonly ShipRepository $shipRepository,
         private readonly StarBatchGenerator $starGenerator,
         private readonly PlanetBatchGenerator $planetGenerator,
     ) {
@@ -67,7 +66,7 @@ class StatusCommand
         $catalogCount = $this->catalog->count();
         $starCount = $this->starRepository->count();
         $planetCount = $this->planetRepository->count();
-        $shipCount = $this->shipRepository->count();
+        $shipCount = ShipPost::count();
 
         // Generation progress
         $starProgress = $this->starGenerator->getProgress();

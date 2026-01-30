@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Tests\Wpunit\ShipLink;
 
 use DateTimeImmutable;
+use Helm\Navigation\EdgeRepository;
+use Helm\Navigation\NodeRepository;
 use Helm\ShipLink\Action;
 use Helm\ShipLink\ActionType;
 use Helm\ShipLink\Components\CoreType;
@@ -12,29 +14,37 @@ use Helm\ShipLink\Components\DriveType;
 use Helm\ShipLink\Components\NavTier;
 use Helm\ShipLink\Components\SensorType;
 use Helm\ShipLink\Components\ShieldType;
-use Helm\ShipLink\Ship;
+use Helm\ShipLink\Contracts\ShipLink;
 use Helm\ShipLink\ShipFactory;
 use Helm\ShipLink\ShipModel;
-use Helm\ShipLink\ShipSystemsRepository;
 use lucatume\WPBrowser\TestCase\WPTestCase;
+use Tests\Support\WpunitTester;
 
 /**
  * @covers \Helm\ShipLink\Ship
+ *
+ * @property WpunitTester $tester
  */
 class ShipTest extends WPTestCase
 {
     private ShipFactory $factory;
+    private NodeRepository $nodeRepository;
+    private EdgeRepository $edgeRepository;
 
     public function _before(): void
     {
         parent::_before();
-        $this->factory = new ShipFactory(new ShipSystemsRepository());
+        $this->tester->haveOrigin();
+
+        $this->factory = helm(ShipFactory::class);
+        $this->nodeRepository = helm(NodeRepository::class);
+        $this->edgeRepository = helm(EdgeRepository::class);
     }
 
     public function test_get_model_returns_model(): void
     {
         $model = $this->createModel();
-        $ship = new Ship($model);
+        $ship = $this->createShip($model);
 
         $this->assertSame($model, $ship->getModel());
     }
@@ -43,7 +53,7 @@ class ShipTest extends WPTestCase
     {
         $model = $this->createModel();
         $model->postId = 123;
-        $ship = new Ship($model);
+        $ship = $this->createShip($model);
 
         $this->assertSame(123, $ship->getId());
     }
@@ -52,7 +62,7 @@ class ShipTest extends WPTestCase
     {
         $model = $this->createModel();
         $model->ownerId = 456;
-        $ship = new Ship($model);
+        $ship = $this->createShip($model);
 
         $this->assertSame(456, $ship->getOwnerId());
     }
@@ -61,7 +71,7 @@ class ShipTest extends WPTestCase
     {
         $model = $this->createModel();
         $model->hullIntegrity = 0.0;
-        $ship = new Ship($model);
+        $ship = $this->createShip($model);
 
         $action = new Action(ActionType::Jump, []);
         $result = $ship->process($action);
@@ -76,7 +86,7 @@ class ShipTest extends WPTestCase
     {
         $model = $this->createModel();
         $model->coreLife = 0.0;
-        $ship = new Ship($model);
+        $ship = $this->createShip($model);
 
         $action = new Action(ActionType::Jump, []);
         $result = $ship->process($action);
@@ -91,7 +101,7 @@ class ShipTest extends WPTestCase
     {
         $model = $this->createModel();
         $model->hullIntegrity = 0.0;
-        $ship = new Ship($model);
+        $ship = $this->createShip($model);
 
         $action = new Action(ActionType::Jump, []);
 
@@ -100,49 +110,84 @@ class ShipTest extends WPTestCase
 
     public function test_process_jump_succeeds(): void
     {
+        // Create nodes and edge for the jump
+        $nodeA = $this->nodeRepository->create(x: 0.0, y: 0.0, z: 0.0);
+        $nodeB = $this->nodeRepository->create(x: 5.0, y: 0.0, z: 0.0);
+        $this->edgeRepository->create($nodeA->id, $nodeB->id, 5.0);
+
         $model = $this->createModel();
         $model->coreLife = 100.0;
-        $ship = new Ship($model);
+        $model->nodeId = $nodeA->id;
+        $ship = $this->createShip($model);
 
-        $action = new Action(ActionType::Jump, [
-            'distance' => 5.0,
-            'target_node_id' => 42,
-        ]);
+        $action = Action::jump($nodeB->id);
         $result = $ship->process($action);
 
         $this->assertFalse($result->hasErrors());
         $jumpResult = $result->get('jump');
         $this->assertNotNull($jumpResult);
         $this->assertSame(5.0, $jumpResult->get('distance'));
-        $this->assertSame(42, $ship->getModel()->nodeId);
+        $this->assertSame($nodeB->id, $ship->getModel()->nodeId);
     }
 
     public function test_process_jump_consumes_core_life(): void
     {
+        // Create nodes and edge within DR-5 range (max ~7 ly)
+        $nodeA = $this->nodeRepository->create(x: 0.0, y: 0.0, z: 0.0);
+        $nodeB = $this->nodeRepository->create(x: 5.0, y: 0.0, z: 0.0);
+        $this->edgeRepository->create($nodeA->id, $nodeB->id, 5.0);
+
         $model = $this->createModel();
         $model->coreType = CoreType::EpochS; // 1.0x jump cost
-        $model->driveType = DriveType::DR5; // 1.0x decay
+        $model->driveType = DriveType::DR5; // 1.0x consumption
         $model->coreLife = 100.0;
-        $ship = new Ship($model);
+        $model->nodeId = $nodeA->id;
+        $ship = $this->createShip($model);
 
-        $action = new Action(ActionType::Jump, ['distance' => 10.0]);
+        $action = Action::jump($nodeB->id);
         $ship->process($action);
 
-        // 10 * 1.0 * 1.0 = 10 core consumed
-        $this->assertSame(90.0, $ship->getModel()->coreLife);
+        // 5 * 1.0 * 1.0 = 5 core consumed
+        $this->assertSame(95.0, $ship->getModel()->coreLife);
     }
 
-    public function test_process_jump_fails_out_of_range(): void
+    public function test_process_jump_fails_without_route(): void
     {
-        $model = $this->createModel();
-        $ship = new Ship($model);
+        // Create nodes but NO edge
+        $nodeA = $this->nodeRepository->create(x: 0.0, y: 0.0, z: 0.0);
+        $nodeB = $this->nodeRepository->create(x: 10.0, y: 0.0, z: 0.0);
 
-        $action = new Action(ActionType::Jump, ['distance' => 100.0]); // Way beyond max
+        $model = $this->createModel();
+        $model->nodeId = $nodeA->id;
+        $ship = $this->createShip($model);
+
+        $action = Action::jump($nodeB->id);
         $result = $ship->process($action);
 
         $this->assertTrue($result->hasErrors());
-        $error = $result->get('propulsion');
-        $this->assertSame('out_of_range', $error->get_error_code());
+        $error = $result->get('navigation');
+        $this->assertInstanceOf(\WP_Error::class, $error);
+    }
+
+    public function test_process_jump_fails_insufficient_core_life(): void
+    {
+        // Create nodes and edge within range but requiring more core than available
+        $nodeA = $this->nodeRepository->create(x: 0.0, y: 0.0, z: 0.0);
+        $nodeB = $this->nodeRepository->create(x: 5.0, y: 0.0, z: 0.0);
+        $this->edgeRepository->create($nodeA->id, $nodeB->id, 5.0);
+
+        $model = $this->createModel();
+        $model->coreLife = 1.0; // Not enough for 5 ly jump (costs 5 core)
+        $model->nodeId = $nodeA->id;
+        $ship = $this->createShip($model);
+
+        $action = Action::jump($nodeB->id);
+        $result = $ship->process($action);
+
+        $this->assertTrue($result->hasErrors());
+        $error = $result->get('power');
+        $this->assertInstanceOf(\WP_Error::class, $error);
+        $this->assertSame('insufficient_core_life', $error->get_error_code());
     }
 
     public function test_process_scan_route_succeeds(): void
@@ -150,7 +195,7 @@ class ShipTest extends WPTestCase
         $model = $this->createModel();
         $model->sensorType = SensorType::SRS; // 12 ly range
         $model->powerFullAt = new DateTimeImmutable('-1 hour'); // Full power
-        $ship = new Ship($model);
+        $ship = $this->createShip($model);
 
         $action = new Action(ActionType::ScanRoute, ['distance' => 5.0]);
         $result = $ship->process($action);
@@ -164,7 +209,7 @@ class ShipTest extends WPTestCase
     {
         $model = $this->createModel();
         $model->sensorType = SensorType::SRH; // Only 6 ly range
-        $ship = new Ship($model);
+        $ship = $this->createShip($model);
 
         $action = new Action(ActionType::ScanRoute, ['distance' => 10.0]);
         $result = $ship->process($action);
@@ -179,7 +224,7 @@ class ShipTest extends WPTestCase
         $model = $this->createModel();
         $model->hullIntegrity = 50.0;
         $model->hullMax = 100.0;
-        $ship = new Ship($model);
+        $ship = $this->createShip($model);
 
         $action = new Action(ActionType::Repair, ['amount' => 25.0]);
         $result = $ship->process($action);
@@ -192,7 +237,7 @@ class ShipTest extends WPTestCase
     {
         $model = $this->createModel();
         $model->cargo = [];
-        $ship = new Ship($model);
+        $ship = $this->createShip($model);
 
         $action = new Action(ActionType::Transfer, [
             'resource' => 'ore',
@@ -209,7 +254,7 @@ class ShipTest extends WPTestCase
     {
         $model = $this->createModel();
         $model->cargo = ['ore' => 100];
-        $ship = new Ship($model);
+        $ship = $this->createShip($model);
 
         $action = new Action(ActionType::Transfer, [
             'resource' => 'ore',
@@ -227,7 +272,7 @@ class ShipTest extends WPTestCase
         $model = $this->createModel();
         $model->powerFullAt = new DateTimeImmutable('-1 hour');
         $model->powerMax = 100.0;
-        $ship = new Ship($model);
+        $ship = $this->createShip($model);
 
         $this->assertSame(100.0, $ship->power()->getCurrentPower());
         $this->assertSame(100.0, $ship->power()->getMaxPower());
@@ -238,7 +283,7 @@ class ShipTest extends WPTestCase
         $model = $this->createModel();
         $model->shieldsFullAt = new DateTimeImmutable('-1 hour');
         $model->shieldsMax = 100.0;
-        $ship = new Ship($model);
+        $ship = $this->createShip($model);
 
         $this->assertSame(100.0, $ship->shields()->getCurrentStrength());
     }
@@ -248,7 +293,7 @@ class ShipTest extends WPTestCase
         $model = $this->createModel();
         $model->hullIntegrity = 75.0;
         $model->hullMax = 100.0;
-        $ship = new Ship($model);
+        $ship = $this->createShip($model);
 
         $this->assertSame(75.0, $ship->hull()->getIntegrity());
         $this->assertSame(0.75, $ship->hull()->getIntegrityPercent());
@@ -256,11 +301,21 @@ class ShipTest extends WPTestCase
 
     public function test_navigation_reports_position(): void
     {
-        $model = $this->createModel();
-        $model->nodeId = 42;
-        $ship = new Ship($model);
+        $node = $this->nodeRepository->create(x: 0.0, y: 0.0, z: 0.0);
 
-        $this->assertSame(42, $ship->navigation()->getCurrentPosition());
+        $model = $this->createModel();
+        $model->nodeId = $node->id;
+        $ship = $this->createShip($model);
+
+        $this->assertSame($node->id, $ship->navigation()->getCurrentPosition());
+    }
+
+    /**
+     * Create a Ship from a model using the factory.
+     */
+    private function createShip(ShipModel $model): ShipLink
+    {
+        return $this->factory->buildFromModel($model);
     }
 
     /**

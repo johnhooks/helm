@@ -5,13 +5,12 @@ declare(strict_types=1);
 namespace Helm\Navigation;
 
 use Helm\Core\ErrorCode;
-use Helm\Ships\Ship;
-use Helm\Ships\ShipRepository;
 
 /**
- * High-level navigation API for ships.
+ * Graph operations for navigation.
  *
- * Coordinates scanning, jumping, and route management.
+ * Pure infrastructure - no knowledge of ships, power, or core life.
+ * Takes primitives, returns results.
  */
 final class NavigationService
 {
@@ -20,23 +19,63 @@ final class NavigationService
         private readonly NodeRepository $nodeRepository,
         private readonly EdgeRepository $edgeRepository,
         private readonly RouteRepository $routeRepository,
-        private readonly ShipRepository $shipRepository,
     ) {
     }
 
     /**
-     * Scan toward a destination star.
+     * Get edge information between two nodes.
      *
-     * Uses ship's navigation skills to discover waypoints.
+     * Validates that both nodes exist and are connected.
      *
-     * @param Ship $ship The scanning ship
-     * @param int $destinationNodeId Target star's node ID
+     * @param int $fromNodeId Starting node
+     * @param int $toNodeId Target node
+     * @return EdgeInfo|\WP_Error Edge info on success, error if invalid
+     */
+    public function getEdgeInfo(int $fromNodeId, int $toNodeId): EdgeInfo|\WP_Error
+    {
+        $fromNode = $this->nodeRepository->get($fromNodeId);
+        if ($fromNode === null) {
+            return ErrorCode::NavigationInvalidNode->error(
+                __('Current position is not a valid node', 'helm')
+            );
+        }
+
+        $toNode = $this->nodeRepository->get($toNodeId);
+        if ($toNode === null) {
+            return ErrorCode::NavigationInvalidTarget->error(
+                __('Target node does not exist', 'helm')
+            );
+        }
+
+        $edge = $this->edgeRepository->getBetween($fromNodeId, $toNodeId);
+        if ($edge === null) {
+            return ErrorCode::NavigationNoRoute->error(
+                __('No known route to target', 'helm')
+            );
+        }
+
+        return EdgeInfo::fromEdge($edge, $fromNodeId, $toNode);
+    }
+
+    /**
+     * Scan for routes toward a destination.
+     *
+     * Uses nav computer to discover waypoints based on skill and efficiency.
+     *
+     * @param int $fromNodeId Starting node
+     * @param int $toNodeId Target node
+     * @param float $skill Navigation skill (0.0 - 1.0)
+     * @param float $efficiency Navigation efficiency (0.0 - 1.0)
      * @return ScanResult Discovered nodes and edges
      */
-    public function scan(Ship $ship, int $destinationNodeId): ScanResult
-    {
-        $fromNode = $this->nodeRepository->get($ship->nodeId);
-        $toNode = $this->nodeRepository->get($destinationNodeId);
+    public function scan(
+        int $fromNodeId,
+        int $toNodeId,
+        float $skill,
+        float $efficiency,
+    ): ScanResult {
+        $fromNode = $this->nodeRepository->get($fromNodeId);
+        $toNode = $this->nodeRepository->get($toNodeId);
 
         if ($fromNode === null || $toNode === null) {
             return ScanResult::failure();
@@ -45,162 +84,68 @@ final class NavigationService
         $input = new ScanInput(
             from: $fromNode,
             to: $toNode,
-            chance: 1.0, // Base chance, could be modified by equipment
-            skill: $ship->navSkill,
-            efficiency: $ship->navEfficiency,
+            chance: 1.0,
+            skill: $skill,
+            efficiency: $efficiency,
         );
 
         return $this->navComputer->scan($input);
     }
 
     /**
-     * Execute a jump to an adjacent node.
+     * Get all nodes connected to a given node.
      *
-     * @param Ship $ship The jumping ship
-     * @param int $targetNodeId Node to jump to
-     * @return JumpResult|\WP_Error Result on success, WP_Error on failure
+     * Returns nodes that have known edges, regardless of distance.
+     *
+     * @param int $nodeId The node to query from
+     * @return array<array{node: Node, distance: float}> Connected nodes with distances
      */
-    public function jump(Ship $ship, int $targetNodeId): JumpResult|\WP_Error
+    public function getConnectedNodes(int $nodeId): array
     {
-        // Verify ship is at a node
-        $currentNode = $this->nodeRepository->get($ship->nodeId);
-        if ($currentNode === null) {
-            return ErrorCode::NavigationInvalidNode->error(__('Ship is not at a valid node', 'helm'));
-        }
-
-        // Verify target exists
-        $targetNode = $this->nodeRepository->get($targetNodeId);
-        if ($targetNode === null) {
-            return ErrorCode::NavigationInvalidTarget->error(__('Target node does not exist', 'helm'));
-        }
-
-        // Verify edge exists (nodes are connected)
-        $edge = $this->edgeRepository->getBetween($ship->nodeId, $targetNodeId);
-        if ($edge === null) {
-            return ErrorCode::NavigationNoRoute->error(__('No known route to target', 'helm'));
-        }
-
-        // Check distance against drive range
-        if ($edge->distance > $ship->driveRange) {
-            return ErrorCode::NavigationBeyondRange->error(__('Target is beyond drive range', 'helm'), [
-                'distance' => $edge->distance,
-                'driveRange' => $ship->driveRange,
-            ]);
-        }
-
-        // Calculate fuel cost
-        $fuelCost = $this->calculateFuelCost($edge->distance, $ship->driveRange);
-
-        // Check fuel
-        if ($ship->fuel < $fuelCost) {
-            return ErrorCode::NavigationInsufficientFuel->error(__('Insufficient fuel', 'helm'), [
-                'required' => $fuelCost,
-                'available' => $ship->fuel,
-            ]);
-        }
-
-        // Execute jump
-        $updatedShip = $ship
-            ->withNodeId($targetNodeId)
-            ->withFuel($ship->fuel - $fuelCost);
-
-        // Update location if target is a star
-        if ($targetNode->starPostId !== null) {
-            $updatedShip = $updatedShip->withLocation($this->getStarIdForNode($targetNode));
-        }
-
-        $this->shipRepository->save($updatedShip);
-
-        return new JumpResult(
-            ship: $updatedShip,
-            fuelUsed: $fuelCost,
-            distance: $edge->distance,
-        );
-    }
-
-    /**
-     * Get nodes reachable from ship's current position.
-     *
-     * Returns nodes connected by known edges within drive range.
-     *
-     * @return Node[]
-     */
-    public function getReachableNodes(Ship $ship): array
-    {
-        $edges = $this->edgeRepository->fromNode($ship->nodeId);
-        $reachable = [];
+        $edges = $this->edgeRepository->fromNode($nodeId);
+        $connected = [];
 
         foreach ($edges as $edge) {
-            // Skip if beyond drive range
-            if ($edge->distance > $ship->driveRange) {
-                continue;
-            }
-
-            // Get the other node
-            $otherNodeId = $edge->nodeAId === $ship->nodeId
+            $otherNodeId = $edge->nodeAId === $nodeId
                 ? $edge->nodeBId
                 : $edge->nodeAId;
 
             $node = $this->nodeRepository->get($otherNodeId);
             if ($node !== null) {
-                $reachable[] = $node;
+                $connected[] = [
+                    'node' => $node,
+                    'distance' => $edge->distance,
+                ];
             }
         }
 
-        return $reachable;
+        return $connected;
     }
 
     /**
-     * Get nodes reachable with current fuel.
-     *
-     * @return Node[]
+     * Get a node by ID.
      */
-    public function getReachableWithFuel(Ship $ship): array
+    public function getNode(int $nodeId): ?Node
     {
-        $edges = $this->edgeRepository->fromNode($ship->nodeId);
-        $reachable = [];
-
-        foreach ($edges as $edge) {
-            $fuelCost = $this->calculateFuelCost($edge->distance, $ship->driveRange);
-
-            // Skip if not enough fuel
-            if ($ship->fuel < $fuelCost) {
-                continue;
-            }
-
-            // Skip if beyond drive range
-            if ($edge->distance > $ship->driveRange) {
-                continue;
-            }
-
-            $otherNodeId = $edge->nodeAId === $ship->nodeId
-                ? $edge->nodeBId
-                : $edge->nodeAId;
-
-            $node = $this->nodeRepository->get($otherNodeId);
-            if ($node !== null) {
-                $reachable[] = $node;
-            }
-        }
-
-        return $reachable;
+        return $this->nodeRepository->get($nodeId);
     }
 
     /**
      * Save a completed route.
      *
-     * Call this when a ship reaches its destination to record the path.
-     *
-     * @param Ship $ship The ship that completed the route
+     * @param string $discoveredBy Identifier of who discovered the route
      * @param int[] $path Node IDs traversed
      * @param float $totalDistance Total distance traveled
      */
-    public function saveRoute(Ship $ship, array $path, float $totalDistance): Route
-    {
+    public function saveRoute(
+        string $discoveredBy,
+        array $path,
+        float $totalDistance,
+    ): Route {
         $route = Route::create(
             path: $path,
             totalDistance: $totalDistance,
-            discoveredByShipId: $ship->id,
+            discoveredByShipId: $discoveredBy,
             algorithmVersion: NodeGenerator::ALGORITHM_VERSION,
         );
 
@@ -208,31 +153,21 @@ final class NavigationService
     }
 
     /**
-     * Calculate fuel cost for a jump.
-     *
-     * Fuel cost is based on distance relative to drive range.
-     * A ship with longer range is more efficient.
+     * Calculate straight-line distance between two nodes.
      */
-    public function calculateFuelCost(float $distance, float $driveRange): float
+    public function calculateDistance(int $fromNodeId, int $toNodeId): ?float
     {
-        // Base cost: 10 fuel per light year
-        // Efficiency bonus: better drives use less fuel
-        $baseCost = $distance * 10.0;
-        $efficiencyFactor = $distance / $driveRange;
+        $fromNode = $this->nodeRepository->get($fromNodeId);
+        $toNode = $this->nodeRepository->get($toNodeId);
 
-        return $baseCost * $efficiencyFactor;
-    }
-
-    /**
-     * Get star catalog ID for a node.
-     */
-    private function getStarIdForNode(Node $node): string
-    {
-        if ($node->starPostId === null) {
-            return '';
+        if ($fromNode === null || $toNode === null) {
+            return null;
         }
 
-        $starId = get_post_meta($node->starPostId, '_helm_star_id', true);
-        return is_string($starId) ? $starId : '';
+        return sqrt(
+            pow($toNode->x - $fromNode->x, 2) +
+            pow($toNode->y - $fromNode->y, 2) +
+            pow($toNode->z - $fromNode->z, 2)
+        );
     }
 }

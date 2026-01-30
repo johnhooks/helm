@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace Helm\ShipLink\System;
 
+use Helm\ShipLink\Contracts\PowerMetrics;
 use Helm\ShipLink\Contracts\Sensors as SensorsContract;
 use Helm\ShipLink\ShipModel;
 
 /**
  * Sensor system implementation.
+ *
+ * Calculates scan range based on sensor specs and power output.
  */
 final class Sensors implements SensorsContract
 {
@@ -29,10 +32,17 @@ final class Sensors implements SensorsContract
 
     public function __construct(
         private ShipModel $model,
+        private PowerMetrics $powerMetrics,
     ) {
     }
 
     public function getRange(): float
+    {
+        // effectiveRange = baseRange × outputMultiplier
+        return $this->getBaseRange() * $this->getOutputMultiplier();
+    }
+
+    public function getBaseRange(): float
     {
         return $this->model->sensorType->range();
     }
@@ -66,5 +76,13 @@ final class Sensors implements SensorsContract
     public function getScanSuccessChance(): float
     {
         return $this->model->sensorType->scanSuccessChance();
+    }
+
+    /**
+     * Get current power output multiplier.
+     */
+    private function getOutputMultiplier(): float
+    {
+        return $this->powerMetrics->getOutputMultiplier();
     }
 }

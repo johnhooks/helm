@@ -4,51 +4,49 @@ declare(strict_types=1);
 
 namespace Helm\ShipLink\System;
 
+use Helm\ShipLink\Contracts\PowerMetrics;
 use Helm\ShipLink\Contracts\Propulsion as PropulsionContract;
 use Helm\ShipLink\ShipModel;
 
 /**
  * Propulsion system implementation.
+ *
+ * Calculates jump range and duration based on drive specs and power output.
+ * No hard-coded limits - range emerges from the power economics.
  */
 final class Propulsion implements PropulsionContract
 {
     /**
-     * Base jump duration in seconds per light-year at 1.0x speed.
+     * Base jump duration in seconds per light-year at 1.0x amplitude.
      */
     private const BASE_SECONDS_PER_LY = 60;
 
-    /**
-     * Maximum jump range (limited by drive, not core life).
-     */
-    private const MAX_JUMP_RANGE = 15.0;
-
     public function __construct(
         private ShipModel $model,
+        private PowerMetrics $powerMetrics,
     ) {
     }
 
     public function getJumpDuration(float $distanceLy): int
     {
-        $speedMultiplier = $this->getSpeedMultiplier();
+        $effectiveAmplitude = $this->getEffectiveAmplitude();
         $baseDuration = $distanceLy * self::BASE_SECONDS_PER_LY;
 
-        // Higher speed = shorter duration
-        return (int) ceil($baseDuration / $speedMultiplier);
+        // Higher amplitude = shorter duration
+        return (int) ceil($baseDuration / $effectiveAmplitude);
     }
 
     public function getCoreDecayMultiplier(): float
     {
-        return $this->model->driveType->decayMultiplier();
-    }
-
-    public function getSpeedMultiplier(): float
-    {
-        return $this->model->driveType->speedMultiplier();
+        return $this->model->driveType->consumption();
     }
 
     public function getMaxRange(): float
     {
-        return self::MAX_JUMP_RANGE;
+        // maxRange = sustain × outputMultiplier × performanceRatio
+        return $this->getSustain()
+            * $this->powerMetrics->getOutputMultiplier()
+            * $this->getPerformanceRatio();
     }
 
     public function canReach(float $distanceLy): bool
@@ -58,9 +56,39 @@ final class Propulsion implements PropulsionContract
 
     public function calculateCoreCost(float $distanceLy): float
     {
-        // Core cost = distance * core type multiplier * drive decay multiplier
+        // Core cost = distance × core type multiplier × drive consumption
         return $distanceLy
             * $this->model->coreType->jumpCostMultiplier()
             * $this->getCoreDecayMultiplier();
+    }
+
+    public function getPerformanceRatio(): float
+    {
+        // performanceRatio = min(1.0, outputMultiplier / consumption)
+        // When underpowered, drive underperforms
+        $ratio = $this->powerMetrics->getOutputMultiplier() / $this->getConsumption();
+        return min(1.0, $ratio);
+    }
+
+    public function getSustain(): float
+    {
+        return $this->model->driveType->sustain();
+    }
+
+    public function getConsumption(): float
+    {
+        return $this->model->driveType->consumption();
+    }
+
+    /**
+     * Get effective amplitude (speed) accounting for power.
+     *
+     * effectiveAmplitude = baseAmplitude × outputMultiplier × performanceRatio
+     */
+    private function getEffectiveAmplitude(): float
+    {
+        return $this->model->driveType->amplitude()
+            * $this->powerMetrics->getOutputMultiplier()
+            * $this->getPerformanceRatio();
     }
 }

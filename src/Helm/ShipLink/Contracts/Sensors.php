@@ -8,13 +8,21 @@ namespace Helm\ShipLink\Contracts;
  * Sensor system contract.
  *
  * Handles scanning: route discovery, system surveys, and detection.
+ * Range is calculated from sensor specs and core output.
  */
 interface Sensors
 {
     /**
-     * Get sensor range in light-years.
+     * Get effective sensor range in light-years.
+     *
+     * Calculated from: baseRange × coreOutput
      */
     public function getRange(): float;
+
+    /**
+     * Get base sensor range before power scaling.
+     */
+    public function getBaseRange(): float;
 
     /**
      * Check if a target is within sensor range.

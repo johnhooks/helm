@@ -19,7 +19,7 @@ use Helm\Navigation\Provider as NavigationProvider;
 use Helm\Origin\Provider as OriginProvider;
 use Helm\Planets\Provider as PlanetsProvider;
 use Helm\PostTypes\Provider as PostTypesProvider;
-use Helm\Ships\Provider as ShipsProvider;
+use Helm\ShipLink\Provider as ShipLinkProvider;
 use Helm\Stars\Provider as StarsProvider;
 use Helm\View\Provider as ViewProvider;
 
@@ -58,7 +58,7 @@ final class Helm
         PlanetsProvider::class,
         GenerationProvider::class,
         DiscoveryProvider::class,
-        ShipsProvider::class,
+        ShipLinkProvider::class,  // After Navigation (depends on it)
         CLIProvider::class,
     ];
 

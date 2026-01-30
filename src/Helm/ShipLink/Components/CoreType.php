@@ -71,4 +71,21 @@ enum CoreType: int
             self::EpochR => 1.5,
         };
     }
+
+    /**
+     * Base output multiplier.
+     *
+     * This is the core's inherent output capacity, modified by PowerMode.
+     * Currently returns 1.0 - will be enhanced when PowerMode is implemented.
+     *
+     * Effective output = baseOutput × powerMode.outputMultiplier
+     */
+    public function baseOutput(): float
+    {
+        return match ($this) {
+            self::EpochE => 0.9,   // Conservative output, longer life
+            self::EpochS => 1.0,   // Baseline
+            self::EpochR => 1.1,   // Higher output, faster decay
+        };
+    }
 }
