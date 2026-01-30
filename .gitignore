@@ -12,3 +12,4 @@
 .phpunit.result.cache
 artifacts
 bin/strauss.phar
+docs/plans/.wip/
