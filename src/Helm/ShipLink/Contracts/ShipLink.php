@@ -6,7 +6,7 @@ namespace Helm\ShipLink\Contracts;
 
 use Helm\ShipLink\Action;
 use Helm\ShipLink\ActionResult;
-use Helm\Ships\Ship;
+use Helm\ShipLink\ShipModel;
 
 /**
  * ShipLink contract - the starship interface.
@@ -19,7 +19,7 @@ interface ShipLink
     /**
      * Get the underlying ship model.
      */
-    public function getShip(): Ship;
+    public function getModel(): ShipModel;
 
     /**
      * Get the ship ID.
