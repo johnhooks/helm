@@ -47,9 +47,14 @@ final class PostTypeRegistry
     // Meta Keys - Ships
     public const META_SHIP_ID = '_helm_ship_id';
     public const META_SHIP_LOCATION = '_helm_location';
+    public const META_SHIP_NODE_ID = '_helm_node_id';
     public const META_SHIP_CREDITS = '_helm_credits';
     public const META_SHIP_CARGO = '_helm_cargo';
     public const META_SHIP_ARTIFACTS = '_helm_artifacts';
+    public const META_SHIP_FUEL = '_helm_fuel';
+    public const META_SHIP_DRIVE_RANGE = '_helm_drive_range';
+    public const META_SHIP_NAV_SKILL = '_helm_nav_skill';
+    public const META_SHIP_NAV_EFFICIENCY = '_helm_nav_efficiency';
 
     /**
      * Register all custom post types.

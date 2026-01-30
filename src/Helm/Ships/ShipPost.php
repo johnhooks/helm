@@ -64,12 +64,22 @@ final class ShipPost
 
         $cargo = get_post_meta($postId, PostTypeRegistry::META_SHIP_CARGO, true);
         $artifacts = get_post_meta($postId, PostTypeRegistry::META_SHIP_ARTIFACTS, true);
+        $nodeId = get_post_meta($postId, PostTypeRegistry::META_SHIP_NODE_ID, true);
+        $fuel = get_post_meta($postId, PostTypeRegistry::META_SHIP_FUEL, true);
+        $driveRange = get_post_meta($postId, PostTypeRegistry::META_SHIP_DRIVE_RANGE, true);
+        $navSkill = get_post_meta($postId, PostTypeRegistry::META_SHIP_NAV_SKILL, true);
+        $navEfficiency = get_post_meta($postId, PostTypeRegistry::META_SHIP_NAV_EFFICIENCY, true);
 
         return new Ship(
             id: $this->shipId(),
             name: $this->post->post_title,
             location: (string) get_post_meta($postId, PostTypeRegistry::META_SHIP_LOCATION, true),
+            nodeId: $nodeId !== '' ? (int) $nodeId : 0,
             credits: (int) get_post_meta($postId, PostTypeRegistry::META_SHIP_CREDITS, true),
+            fuel: $fuel !== '' ? (float) $fuel : Ship::DEFAULT_FUEL,
+            driveRange: $driveRange !== '' ? (float) $driveRange : Ship::DEFAULT_DRIVE_RANGE,
+            navSkill: $navSkill !== '' ? (float) $navSkill : Ship::DEFAULT_NAV_SKILL,
+            navEfficiency: $navEfficiency !== '' ? (float) $navEfficiency : Ship::DEFAULT_NAV_EFFICIENCY,
             cargo: is_array($cargo) ? $cargo : [],
             artifacts: is_array($artifacts) ? $artifacts : [],
             createdAt: strtotime($this->post->post_date_gmt),

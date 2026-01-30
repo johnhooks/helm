@@ -210,4 +210,37 @@ class ShipRepositoryTest extends WPTestCase
 
         $this->assertSame(['ancient_tablet', 'star_map', 'alien_device'], $retrieved->artifacts);
     }
+
+    public function test_navigation_fields_are_preserved(): void
+    {
+        $this->tester->haveShip([
+            'id' => 'nav-test',
+            'nodeId' => 42,
+            'fuel' => 75.5,
+            'driveRange' => 10.0,
+            'navSkill' => 0.8,
+            'navEfficiency' => 0.6,
+        ]);
+
+        $retrieved = $this->repository->get('nav-test');
+
+        $this->assertSame(42, $retrieved->nodeId);
+        $this->assertSame(75.5, $retrieved->fuel);
+        $this->assertSame(10.0, $retrieved->driveRange);
+        $this->assertSame(0.8, $retrieved->navSkill);
+        $this->assertSame(0.6, $retrieved->navEfficiency);
+    }
+
+    public function test_navigation_fields_use_defaults_when_not_set(): void
+    {
+        $this->tester->haveShip(['id' => 'nav-defaults-test']);
+
+        $retrieved = $this->repository->get('nav-defaults-test');
+
+        $this->assertSame(0, $retrieved->nodeId);
+        $this->assertSame(Ship::DEFAULT_FUEL, $retrieved->fuel);
+        $this->assertSame(Ship::DEFAULT_DRIVE_RANGE, $retrieved->driveRange);
+        $this->assertSame(Ship::DEFAULT_NAV_SKILL, $retrieved->navSkill);
+        $this->assertSame(Ship::DEFAULT_NAV_EFFICIENCY, $retrieved->navEfficiency);
+    }
 }

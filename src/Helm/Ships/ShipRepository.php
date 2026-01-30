@@ -133,7 +133,12 @@ final class ShipRepository
     {
         update_post_meta($postId, PostTypeRegistry::META_SHIP_ID, $ship->id);
         update_post_meta($postId, PostTypeRegistry::META_SHIP_LOCATION, $ship->location);
+        update_post_meta($postId, PostTypeRegistry::META_SHIP_NODE_ID, $ship->nodeId);
         update_post_meta($postId, PostTypeRegistry::META_SHIP_CREDITS, $ship->credits);
+        update_post_meta($postId, PostTypeRegistry::META_SHIP_FUEL, $ship->fuel);
+        update_post_meta($postId, PostTypeRegistry::META_SHIP_DRIVE_RANGE, $ship->driveRange);
+        update_post_meta($postId, PostTypeRegistry::META_SHIP_NAV_SKILL, $ship->navSkill);
+        update_post_meta($postId, PostTypeRegistry::META_SHIP_NAV_EFFICIENCY, $ship->navEfficiency);
         update_post_meta($postId, PostTypeRegistry::META_SHIP_CARGO, $ship->cargo);
         update_post_meta($postId, PostTypeRegistry::META_SHIP_ARTIFACTS, $ship->artifacts);
     }

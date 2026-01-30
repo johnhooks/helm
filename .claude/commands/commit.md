@@ -4,10 +4,10 @@ Create git commits for Helm.
 
 ## Format
 
-Single line conventional commits:
-
 ```
-type: brief description (max 72 chars)
+type: brief description (max 50 chars)
+
+Optional body line with more detail (max 80 chars)
 ```
 
 ### Types
@@ -20,10 +20,10 @@ type: brief description (max 72 chars)
 
 ## Rules
 
-1. Single line, max 72 characters
-2. Lowercase, no period
-3. No emoji, no co-author lines
-4. Be concise
+1. Title: max 50 characters
+2. Body: optional single line, max 80 characters
+3. Lowercase, no period
+4. No emoji, no co-author lines
 
 ## Process
 
@@ -35,15 +35,16 @@ type: brief description (max 72 chars)
 
 Good:
 ```
-feat: add navigation computer with deterministic waypoints
+feat: add navigation computer
+
+deterministic waypoint generation with corridor seeds
+```
+
+```
 fix: correct waypoint scatter calculation
-refactor: rename repository methods to create()
-docs: update navigation plan with scan mechanics
 ```
 
 Bad:
 ```
-Update stuff
-Added new features and fixed bugs
-feat: Add Navigation Computer System For Computing Routes 📝
+feat: add navigation computer with deterministic waypoints and corridor seeds
 ```
