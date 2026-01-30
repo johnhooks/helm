@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Helm\Generation\Generated;
 
+use Helm\Generation\PlanetType;
+
 /**
  * Generated planet value object.
  *
@@ -11,19 +13,9 @@ namespace Helm\Generation\Generated;
  */
 final class Planet
 {
-    public const TYPE_TERRESTRIAL = 'terrestrial';
-    public const TYPE_SUPER_EARTH = 'super-earth';
-    public const TYPE_GAS_GIANT = 'gas-giant';
-    public const TYPE_ICE_GIANT = 'ice-giant';
-    public const TYPE_DWARF = 'dwarf';
-    public const TYPE_MOLTEN = 'molten';
-    public const TYPE_FROZEN = 'frozen';
-    public const TYPE_HOT_JUPITER = 'hot-jupiter';
-    public const TYPE_MINI_NEPTUNE = 'mini-neptune';
-
     /**
      * @param string $id Unique identifier
-     * @param string $type Planet type
+     * @param PlanetType $type Planet type
      * @param int $orbitIndex Orbital position (0 = closest to star)
      * @param float $orbitAu Distance from star in AU
      * @param array<string, int> $resources Resource type => richness (1-100)
@@ -38,7 +30,7 @@ final class Planet
      */
     public function __construct(
         public readonly string $id,
-        public readonly string $type,
+        public readonly PlanetType $type,
         public readonly int $orbitIndex,
         public readonly float $orbitAu,
         public readonly array $resources = [],
@@ -62,7 +54,7 @@ final class Planet
     {
         return new self(
             id: $data['id'],
-            type: $data['type'],
+            type: PlanetType::from($data['type']),
             orbitIndex: $data['orbit_index'],
             orbitAu: $data['orbit_au'],
             resources: $data['resources'] ?? [],
@@ -111,61 +103,61 @@ final class Planet
     /**
      * Infer planet type from physical properties.
      */
-    private static function inferType(?float $radiusEarth, ?float $massEarth, float $orbitAu, ?float $tempK): string
+    private static function inferType(?float $radiusEarth, ?float $massEarth, float $orbitAu, ?float $tempK): PlanetType
     {
         // Use radius if available (most reliable)
         if ($radiusEarth !== null) {
             if ($radiusEarth > 10) {
                 // Hot Jupiter if close-in and large
                 if ($orbitAu < 0.1) {
-                    return self::TYPE_HOT_JUPITER;
+                    return PlanetType::HotJupiter;
                 }
-                return self::TYPE_GAS_GIANT;
+                return PlanetType::GasGiant;
             }
             if ($radiusEarth > 4) {
-                return self::TYPE_ICE_GIANT;
+                return PlanetType::IceGiant;
             }
             if ($radiusEarth > 2) {
-                return self::TYPE_MINI_NEPTUNE;
+                return PlanetType::MiniNeptune;
             }
             if ($radiusEarth > 1.25) {
-                return self::TYPE_SUPER_EARTH;
+                return PlanetType::SuperEarth;
             }
             // Small rocky planet - check temperature
             if ($tempK !== null && $tempK > 800) {
-                return self::TYPE_MOLTEN;
+                return PlanetType::Molten;
             }
             if ($tempK !== null && $tempK < 150) {
-                return self::TYPE_FROZEN;
+                return PlanetType::Frozen;
             }
-            return self::TYPE_TERRESTRIAL;
+            return PlanetType::Terrestrial;
         }
 
         // Fall back to mass if no radius
         if ($massEarth !== null) {
             if ($massEarth > 300) {
                 if ($orbitAu < 0.1) {
-                    return self::TYPE_HOT_JUPITER;
+                    return PlanetType::HotJupiter;
                 }
-                return self::TYPE_GAS_GIANT;
+                return PlanetType::GasGiant;
             }
             if ($massEarth > 15) {
-                return self::TYPE_ICE_GIANT;
+                return PlanetType::IceGiant;
             }
             if ($massEarth > 5) {
-                return self::TYPE_MINI_NEPTUNE;
+                return PlanetType::MiniNeptune;
             }
             if ($massEarth > 1.5) {
-                return self::TYPE_SUPER_EARTH;
+                return PlanetType::SuperEarth;
             }
-            return self::TYPE_TERRESTRIAL;
+            return PlanetType::Terrestrial;
         }
 
         // No size data - use orbital distance
         if ($orbitAu < 0.1) {
-            return self::TYPE_MOLTEN;
+            return PlanetType::Molten;
         }
-        return self::TYPE_TERRESTRIAL;
+        return PlanetType::Terrestrial;
     }
 
     /**
@@ -223,7 +215,7 @@ final class Planet
     {
         $data = [
             'id' => $this->id,
-            'type' => $this->type,
+            'type' => $this->type->value,
             'orbit_index' => $this->orbitIndex,
             'orbit_au' => $this->orbitAu,
             'resources' => $this->resources,

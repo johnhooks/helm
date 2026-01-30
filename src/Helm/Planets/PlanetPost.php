@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Helm\Planets;
 
+use Helm\Generation\PlanetType;
 use Helm\PostTypes\PostTypeRegistry;
 use WP_Post;
 
@@ -79,13 +80,13 @@ final class PlanetPost
     /**
      * Get the planet type.
      */
-    public function type(): string
+    public function type(): PlanetType
     {
         $types = wp_get_post_terms($this->post->ID, PostTypeRegistry::TAXONOMY_PLANET_TYPE);
         if (is_array($types) && $types !== []) {
-            return $types[0]->slug;
+            return PlanetType::from($types[0]->slug);
         }
-        return Planet::TYPE_TERRESTRIAL;
+        return PlanetType::Terrestrial;
     }
 
     /**
@@ -114,10 +115,10 @@ final class PlanetPost
         $resources = get_post_meta($postId, PostTypeRegistry::META_PLANET_RESOURCES, true);
 
         // Get planet type from taxonomy
-        $type = Planet::TYPE_TERRESTRIAL;
+        $type = PlanetType::Terrestrial;
         $types = wp_get_post_terms($postId, PostTypeRegistry::TAXONOMY_PLANET_TYPE);
         if (is_array($types) && $types !== []) {
-            $type = $types[0]->slug;
+            $type = PlanetType::from($types[0]->slug);
         }
 
         return new Planet(

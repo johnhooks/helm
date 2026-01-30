@@ -237,7 +237,7 @@ final class PlanetRepository
     private function saveGeneratedTaxonomies(int $postId, GeneratedPlanet $planet): void
     {
         // Set planet type taxonomy
-        wp_set_object_terms($postId, $planet->type, PostTypeRegistry::TAXONOMY_PLANET_TYPE);
+        wp_set_object_terms($postId, $planet->type->value, PostTypeRegistry::TAXONOMY_PLANET_TYPE);
     }
 
     /**
@@ -246,7 +246,7 @@ final class PlanetRepository
     private function saveTaxonomies(int $postId, Planet $planet): void
     {
         // Set planet type taxonomy
-        wp_set_object_terms($postId, $planet->type, PostTypeRegistry::TAXONOMY_PLANET_TYPE);
+        wp_set_object_terms($postId, $planet->type->value, PostTypeRegistry::TAXONOMY_PLANET_TYPE);
     }
 
     /**

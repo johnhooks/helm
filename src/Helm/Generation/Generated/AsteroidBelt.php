@@ -4,19 +4,16 @@ declare(strict_types=1);
 
 namespace Helm\Generation\Generated;
 
+use Helm\Generation\AsteroidBeltType;
+
 /**
  * Generated asteroid belt value object.
  */
 final class AsteroidBelt
 {
-    public const TYPE_ROCKY = 'rocky';
-    public const TYPE_METALLIC = 'metallic';
-    public const TYPE_ICY = 'icy';
-    public const TYPE_MIXED = 'mixed';
-
     /**
      * @param string $id Unique identifier
-     * @param string $type Belt composition type
+     * @param AsteroidBeltType $type Belt composition type
      * @param float $innerAu Inner edge distance in AU
      * @param float $outerAu Outer edge distance in AU
      * @param int $density Relative density (1-100)
@@ -24,7 +21,7 @@ final class AsteroidBelt
      */
     public function __construct(
         public readonly string $id,
-        public readonly string $type,
+        public readonly AsteroidBeltType $type,
         public readonly float $innerAu,
         public readonly float $outerAu,
         public readonly int $density = 50,
@@ -41,7 +38,7 @@ final class AsteroidBelt
     {
         return new self(
             id: $data['id'],
-            type: $data['type'],
+            type: AsteroidBeltType::from($data['type']),
             innerAu: $data['inner_au'],
             outerAu: $data['outer_au'],
             density: $data['density'] ?? 50,
@@ -58,7 +55,7 @@ final class AsteroidBelt
     {
         return [
             'id' => $this->id,
-            'type' => $this->type,
+            'type' => $this->type->value,
             'inner_au' => $this->innerAu,
             'outer_au' => $this->outerAu,
             'density' => $this->density,

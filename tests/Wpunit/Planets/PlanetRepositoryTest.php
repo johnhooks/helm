@@ -6,6 +6,7 @@ namespace Tests\Wpunit\Planets;
 
 use Helm\Generation\Generated\Planet as GeneratedPlanet;
 use Helm\Generation\Generated\SystemContents;
+use Helm\Generation\PlanetType;
 use Helm\Planets\Planet;
 use Helm\Planets\PlanetPost;
 use Helm\Planets\PlanetRepository;
@@ -88,7 +89,7 @@ class PlanetRepositoryTest extends WPTestCase
         $original = $this->tester->havePlanet($starPost->postId(), [
             'id' => 'TEST_P1',
             'starId' => 'TEST_STAR',
-            'type' => Planet::TYPE_TERRESTRIAL,
+            'type' => PlanetType::Terrestrial,
             'orbitAu' => 1.5,
             'habitable' => true,
         ]);
@@ -99,7 +100,7 @@ class PlanetRepositoryTest extends WPTestCase
         $this->assertInstanceOf(Planet::class, $planet);
         $this->assertSame($original->planetId(), $planet->id);
         $this->assertSame('TEST_STAR', $planet->starId);
-        $this->assertSame(Planet::TYPE_TERRESTRIAL, $planet->type);
+        $this->assertSame(PlanetType::Terrestrial, $planet->type);
         $this->assertSame(1.5, $planet->orbitAu);
         $this->assertTrue($planet->habitable);
     }
@@ -149,14 +150,14 @@ class PlanetRepositoryTest extends WPTestCase
         $this->tester->havePlanet($starPost->postId(), [
             'id' => 'EARTH_LIKE',
             'starId' => 'TEST_STAR',
-            'type' => Planet::TYPE_TERRESTRIAL,
+            'type' => PlanetType::Terrestrial,
             'habitable' => true,
         ]);
 
         $this->tester->havePlanet($starPost->postId(), [
             'id' => 'GAS_GIANT',
             'starId' => 'TEST_STAR',
-            'type' => Planet::TYPE_GAS_GIANT,
+            'type' => PlanetType::GasGiant,
             'habitable' => false,
             'orbitIndex' => 1,
         ]);
@@ -174,18 +175,18 @@ class PlanetRepositoryTest extends WPTestCase
         $this->tester->havePlanet($starPost->postId(), [
             'id' => 'TERRESTRIAL_1',
             'starId' => 'TEST_STAR',
-            'type' => Planet::TYPE_TERRESTRIAL,
+            'type' => PlanetType::Terrestrial,
         ]);
 
         $this->tester->havePlanet($starPost->postId(), [
             'id' => 'GAS_GIANT_1',
             'starId' => 'TEST_STAR',
-            'type' => Planet::TYPE_GAS_GIANT,
+            'type' => PlanetType::GasGiant,
             'orbitIndex' => 1,
         ]);
 
-        $terrestrial = $this->repository->byType(Planet::TYPE_TERRESTRIAL);
-        $gasGiants = $this->repository->byType(Planet::TYPE_GAS_GIANT);
+        $terrestrial = $this->repository->byType(PlanetType::Terrestrial->value);
+        $gasGiants = $this->repository->byType(PlanetType::GasGiant->value);
 
         $this->assertCount(1, $terrestrial);
         $this->assertCount(1, $gasGiants);
@@ -235,13 +236,13 @@ class PlanetRepositoryTest extends WPTestCase
             planets: [
                 new GeneratedPlanet(
                     id: 'TEST_STAR_P0',
-                    type: GeneratedPlanet::TYPE_TERRESTRIAL,
+                    type: PlanetType::Terrestrial,
                     orbitIndex: 0,
                     orbitAu: 1.0,
                 ),
                 new GeneratedPlanet(
                     id: 'TEST_STAR_P1',
-                    type: GeneratedPlanet::TYPE_GAS_GIANT,
+                    type: PlanetType::GasGiant,
                     orbitIndex: 1,
                     orbitAu: 5.0,
                 ),
@@ -275,7 +276,7 @@ class PlanetRepositoryTest extends WPTestCase
             planets: [
                 new GeneratedPlanet(
                     id: 'NEW_P0',
-                    type: GeneratedPlanet::TYPE_TERRESTRIAL,
+                    type: PlanetType::Terrestrial,
                     orbitIndex: 0,
                     orbitAu: 1.0,
                 ),
@@ -303,7 +304,7 @@ class PlanetRepositoryTest extends WPTestCase
             planets: [
                 new GeneratedPlanet(
                     id: 'TEST_STAR_P0',
-                    type: GeneratedPlanet::TYPE_TERRESTRIAL,
+                    type: PlanetType::Terrestrial,
                     orbitIndex: 0,
                     orbitAu: 1.0,
                 ),

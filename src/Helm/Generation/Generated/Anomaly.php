@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Helm\Generation\Generated;
 
+use Helm\Generation\AnomalyReward;
+use Helm\Generation\AnomalyType;
+
 /**
  * Generated anomaly value object.
  *
@@ -11,32 +14,22 @@ namespace Helm\Generation\Generated;
  */
 final class Anomaly
 {
-    public const TYPE_DERELICT = 'derelict';
-    public const TYPE_SIGNAL = 'signal';
-    public const TYPE_ARTIFACT = 'artifact';
-    public const TYPE_PHENOMENON = 'phenomenon';
-    public const TYPE_WRECKAGE = 'wreckage';
-
-    public const REWARD_CREDITS = 'credits';
-    public const REWARD_RESOURCES = 'resources';
-    public const REWARD_TECHNOLOGY = 'technology';
-    public const REWARD_DATA = 'data';
-    public const REWARD_ARTIFACT = 'artifact';
-
     /**
      * @param string $id Unique identifier
-     * @param string $type Anomaly type
+     * @param AnomalyType $type Anomaly type
      * @param string $description Brief description
      * @param float $locationAu Distance from star in AU
-     * @param array{type: string, value: mixed} $reward Reward for investigating
+     * @param AnomalyReward $rewardType Type of reward for investigating
+     * @param mixed $rewardValue Value of the reward
      * @param int $difficulty Investigation difficulty (1-100)
      */
     public function __construct(
         public readonly string $id,
-        public readonly string $type,
+        public readonly AnomalyType $type,
         public readonly string $description,
         public readonly float $locationAu,
-        public readonly array $reward,
+        public readonly AnomalyReward $rewardType,
+        public readonly mixed $rewardValue,
         public readonly int $difficulty = 50,
     ) {
     }
@@ -50,10 +43,11 @@ final class Anomaly
     {
         return new self(
             id: $data['id'],
-            type: $data['type'],
+            type: AnomalyType::from($data['type']),
             description: $data['description'],
             locationAu: $data['location_au'],
-            reward: $data['reward'],
+            rewardType: AnomalyReward::from($data['reward']['type']),
+            rewardValue: $data['reward']['value'],
             difficulty: $data['difficulty'] ?? 50,
         );
     }
@@ -67,10 +61,13 @@ final class Anomaly
     {
         return [
             'id' => $this->id,
-            'type' => $this->type,
+            'type' => $this->type->value,
             'description' => $this->description,
             'location_au' => $this->locationAu,
-            'reward' => $this->reward,
+            'reward' => [
+                'type' => $this->rewardType->value,
+                'value' => $this->rewardValue,
+            ],
             'difficulty' => $this->difficulty,
         ];
     }

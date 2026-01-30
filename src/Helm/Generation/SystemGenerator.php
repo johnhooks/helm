@@ -12,6 +12,8 @@ use Helm\Generation\Generated\SystemContents;
 use Helm\Origin\SeededRandom;
 use Helm\Stars\Star;
 
+// phpcs:disable Squiz.Arrays.ArrayDeclaration.KeySpecified
+
 /**
  * Generates star system contents deterministically.
  *
@@ -49,29 +51,31 @@ final class SystemGenerator
 
     /**
      * Anomaly descriptions by type.
+     *
+     * @var array<string, array<string>>
      */
     private const ANOMALY_DESCRIPTIONS = [
-        Anomaly::TYPE_DERELICT => [
+        'derelict' => [
             'Abandoned cargo vessel drifting in orbit',
             'Derelict mining ship with power signatures',
             'Ancient spacecraft of unknown origin',
         ],
-        Anomaly::TYPE_SIGNAL => [
+        'signal' => [
             'Repeating signal from unknown source',
             'Encrypted transmission beacon',
             'Distress signal, origin unclear',
         ],
-        Anomaly::TYPE_ARTIFACT => [
+        'artifact' => [
             'Unusual energy readings from debris field',
             'Object exhibiting impossible properties',
             'Fragment of advanced technology',
         ],
-        Anomaly::TYPE_PHENOMENON => [
+        'phenomenon' => [
             'Gravitational anomaly detected',
             'Unusual radiation pattern',
             'Spatial distortion readings',
         ],
-        Anomaly::TYPE_WRECKAGE => [
+        'wreckage' => [
             'Debris field from recent engagement',
             'Scattered wreckage with salvageable parts',
             'Remains of destroyed station',
@@ -417,10 +421,10 @@ final class SystemGenerator
             $outerAu = $innerAu + $width;
 
             $type = $rng->pick([
-                AsteroidBelt::TYPE_ROCKY,
-                AsteroidBelt::TYPE_METALLIC,
-                AsteroidBelt::TYPE_ICY,
-                AsteroidBelt::TYPE_MIXED,
+                AsteroidBeltType::Rocky,
+                AsteroidBeltType::Metallic,
+                AsteroidBeltType::Icy,
+                AsteroidBeltType::Mixed,
             ]);
 
             $belts[] = new AsteroidBelt(
@@ -458,10 +462,10 @@ final class SystemGenerator
 
         for ($i = 0; $i < $stationCount; $i++) {
             $type = $rng->pick([
-                Station::TYPE_TRADING,
-                Station::TYPE_MINING,
-                Station::TYPE_RESEARCH,
-                Station::TYPE_REFUELING,
+                StationType::Trading,
+                StationType::Mining,
+                StationType::Research,
+                StationType::Refueling,
             ]);
 
             // Determine location
@@ -509,21 +513,24 @@ final class SystemGenerator
 
         for ($i = 0; $i < $anomalyCount; $i++) {
             $type = $rng->pick([
-                Anomaly::TYPE_DERELICT,
-                Anomaly::TYPE_SIGNAL,
-                Anomaly::TYPE_ARTIFACT,
-                Anomaly::TYPE_PHENOMENON,
-                Anomaly::TYPE_WRECKAGE,
+                AnomalyType::Derelict,
+                AnomalyType::Signal,
+                AnomalyType::Artifact,
+                AnomalyType::Phenomenon,
+                AnomalyType::Wreckage,
             ]);
 
-            $descriptions = self::ANOMALY_DESCRIPTIONS[$type];
+            $descriptions = self::ANOMALY_DESCRIPTIONS[$type->value];
+
+            $reward = $this->generateAnomalyReward($type, $rng);
 
             $anomalies[] = new Anomaly(
                 id: $star->id . '_ANOM' . ($i + 1),
                 type: $type,
                 description: $rng->pick($descriptions),
                 locationAu: $rng->between(1, 100) / 10, // 0.1 to 10.0 AU
-                reward: $this->generateAnomalyReward($type, $rng),
+                rewardType: $reward['type'],
+                rewardValue: $reward['value'],
                 difficulty: $rng->between(20, 80),
             );
         }
@@ -564,7 +571,7 @@ final class SystemGenerator
      * - Mini-Neptunes are common in intermediate zones
      * - Size gradient: smaller planets closer in, larger further out
      */
-    private function determinePlanetType(Star $star, float $au, SeededRandom $rng): string
+    private function determinePlanetType(Star $star, float $au, SeededRandom $rng): PlanetType
     {
         $innerHz = $this->innerHabitableZone($star);
         $outerHz = $innerHz * 1.5;
@@ -572,76 +579,71 @@ final class SystemGenerator
         if ($au < 0.1) {
             // Very close - hot Jupiters possible but rare
             if ($rng->chance(100)) { // 10% chance of hot Jupiter
-                return Planet::TYPE_HOT_JUPITER;
+                return PlanetType::HotJupiter;
             }
-            return $rng->pick([Planet::TYPE_MOLTEN, Planet::TYPE_TERRESTRIAL]);
+            return $rng->pick([PlanetType::Molten, PlanetType::Terrestrial]);
         }
 
         if ($au < $innerHz * 0.5) {
             // Close to star
             return $rng->pick([
-                Planet::TYPE_MOLTEN,
-                Planet::TYPE_TERRESTRIAL,
-                Planet::TYPE_SUPER_EARTH,
+                PlanetType::Molten,
+                PlanetType::Terrestrial,
+                PlanetType::SuperEarth,
             ]);
         }
 
         if ($au < $innerHz) {
             // Inside habitable zone - mini-Neptunes common here
             return $rng->pick([
-                Planet::TYPE_TERRESTRIAL,
-                Planet::TYPE_SUPER_EARTH,
-                Planet::TYPE_MINI_NEPTUNE,
+                PlanetType::Terrestrial,
+                PlanetType::SuperEarth,
+                PlanetType::MiniNeptune,
             ]);
         }
 
         if ($au <= $outerHz) {
             // In habitable zone - favor rocky planets
             return $rng->pick([
-                Planet::TYPE_TERRESTRIAL,
-                Planet::TYPE_TERRESTRIAL,
-                Planet::TYPE_SUPER_EARTH,
+                PlanetType::Terrestrial,
+                PlanetType::Terrestrial,
+                PlanetType::SuperEarth,
             ]);
         }
 
         if ($au < $outerHz * 2) {
             // Just outside habitable zone
             return $rng->pick([
-                Planet::TYPE_SUPER_EARTH,
-                Planet::TYPE_MINI_NEPTUNE,
-                Planet::TYPE_ICE_GIANT,
+                PlanetType::SuperEarth,
+                PlanetType::MiniNeptune,
+                PlanetType::IceGiant,
             ]);
         }
 
         if ($au < $outerHz * 5) {
             // Outer system
             return $rng->pick([
-                Planet::TYPE_GAS_GIANT,
-                Planet::TYPE_GAS_GIANT,
-                Planet::TYPE_ICE_GIANT,
+                PlanetType::GasGiant,
+                PlanetType::GasGiant,
+                PlanetType::IceGiant,
             ]);
         }
 
         // Far outer system
         return $rng->pick([
-            Planet::TYPE_ICE_GIANT,
-            Planet::TYPE_FROZEN,
-            Planet::TYPE_DWARF,
+            PlanetType::IceGiant,
+            PlanetType::Frozen,
+            PlanetType::Dwarf,
         ]);
     }
 
     /**
      * Check if a planet could be habitable.
      */
-    private function isHabitable(Star $star, float $au, string $type): bool
+    private function isHabitable(Star $star, float $au, PlanetType $type): bool
     {
         // Only rocky/terrestrial planets can be habitable
-        $habitableTypes = [
-            Planet::TYPE_TERRESTRIAL,
-            Planet::TYPE_SUPER_EARTH,
-        ];
-
-        if (! in_array($type, $habitableTypes, true)) {
+        if (! $type->canBeHabitable()) {
             return false;
         }
 
@@ -656,20 +658,19 @@ final class SystemGenerator
      *
      * @return array<string, int>
      */
-    private function generatePlanetResources(string $type, SeededRandom $rng): array
+    private function generatePlanetResources(PlanetType $type, SeededRandom $rng): array
     {
         $resources = [];
         $resourceCount = $rng->between(1, 4);
 
         $available = match ($type) {
-            Planet::TYPE_TERRESTRIAL, Planet::TYPE_SUPER_EARTH => ['iron', 'copper', 'titanium', 'rare_earth', 'water', 'organics'],
-            Planet::TYPE_GAS_GIANT => ['hydrogen', 'helium'],
-            Planet::TYPE_HOT_JUPITER => ['hydrogen', 'helium'], // Mostly gas, some exotic chemistry
-            Planet::TYPE_ICE_GIANT, Planet::TYPE_FROZEN => ['water', 'ice', 'hydrogen', 'helium'],
-            Planet::TYPE_MINI_NEPTUNE => ['water', 'hydrogen', 'helium', 'ice'],
-            Planet::TYPE_MOLTEN => ['iron', 'nickel', 'titanium', 'platinum'],
-            Planet::TYPE_DWARF => ['iron', 'nickel', 'ice'],
-            default => ['iron', 'nickel'],
+            PlanetType::Terrestrial, PlanetType::SuperEarth => ['iron', 'copper', 'titanium', 'rare_earth', 'water', 'organics'],
+            PlanetType::GasGiant => ['hydrogen', 'helium'],
+            PlanetType::HotJupiter => ['hydrogen', 'helium'], // Mostly gas, some exotic chemistry
+            PlanetType::IceGiant, PlanetType::Frozen => ['water', 'ice', 'hydrogen', 'helium'],
+            PlanetType::MiniNeptune => ['water', 'hydrogen', 'helium', 'ice'],
+            PlanetType::Molten => ['iron', 'nickel', 'titanium', 'platinum'],
+            PlanetType::Dwarf => ['iron', 'nickel', 'ice'],
         };
 
         $shuffled = $rng->shuffle($available);
@@ -684,14 +685,14 @@ final class SystemGenerator
     /**
      * Generate moon count for a planet.
      */
-    private function generateMoonCount(string $type, SeededRandom $rng): int
+    private function generateMoonCount(PlanetType $type, SeededRandom $rng): int
     {
         return match ($type) {
-            Planet::TYPE_GAS_GIANT, Planet::TYPE_HOT_JUPITER => $rng->between(4, 20),
-            Planet::TYPE_ICE_GIANT => $rng->between(2, 10),
-            Planet::TYPE_MINI_NEPTUNE => $rng->between(1, 5),
-            Planet::TYPE_TERRESTRIAL, Planet::TYPE_SUPER_EARTH => $rng->between(0, 2),
-            default => $rng->between(0, 1),
+            PlanetType::GasGiant, PlanetType::HotJupiter => $rng->between(4, 20),
+            PlanetType::IceGiant => $rng->between(2, 10),
+            PlanetType::MiniNeptune => $rng->between(1, 5),
+            PlanetType::Terrestrial, PlanetType::SuperEarth => $rng->between(0, 2),
+            PlanetType::Dwarf, PlanetType::Molten, PlanetType::Frozen => $rng->between(0, 1),
         };
     }
 
@@ -700,19 +701,18 @@ final class SystemGenerator
      *
      * Applies the radius gap pattern: avoids 1.5-2.0 R⊕ (observed in real data).
      */
-    private function generateRadius(string $type, SeededRandom $rng): float
+    private function generateRadius(PlanetType $type, SeededRandom $rng): float
     {
         $radius = match ($type) {
-            Planet::TYPE_GAS_GIANT => $rng->between(900, 1400) / 100, // 9-14 R⊕
-            Planet::TYPE_HOT_JUPITER => $rng->between(1000, 1600) / 100, // 10-16 R⊕ (inflated)
-            Planet::TYPE_ICE_GIANT => $rng->between(350, 450) / 100, // 3.5-4.5 R⊕
-            Planet::TYPE_MINI_NEPTUNE => $rng->between(200, 350) / 100, // 2.0-3.5 R⊕ (above gap)
-            Planet::TYPE_SUPER_EARTH => $rng->between(120, 150) / 100, // 1.2-1.5 R⊕ (below gap)
-            Planet::TYPE_TERRESTRIAL => $rng->between(50, 120) / 100, // 0.5-1.2 R⊕
-            Planet::TYPE_DWARF => $rng->between(20, 50) / 100, // 0.2-0.5 R⊕
-            Planet::TYPE_MOLTEN => $rng->between(40, 100) / 100, // 0.4-1.0 R⊕
-            Planet::TYPE_FROZEN => $rng->between(30, 80) / 100, // 0.3-0.8 R⊕
-            default => $rng->between(50, 150) / 100,
+            PlanetType::GasGiant => $rng->between(900, 1400) / 100, // 9-14 R⊕
+            PlanetType::HotJupiter => $rng->between(1000, 1600) / 100, // 10-16 R⊕ (inflated)
+            PlanetType::IceGiant => $rng->between(350, 450) / 100, // 3.5-4.5 R⊕
+            PlanetType::MiniNeptune => $rng->between(200, 350) / 100, // 2.0-3.5 R⊕ (above gap)
+            PlanetType::SuperEarth => $rng->between(120, 150) / 100, // 1.2-1.5 R⊕ (below gap)
+            PlanetType::Terrestrial => $rng->between(50, 120) / 100, // 0.5-1.2 R⊕
+            PlanetType::Dwarf => $rng->between(20, 50) / 100, // 0.2-0.5 R⊕
+            PlanetType::Molten => $rng->between(40, 100) / 100, // 0.4-1.0 R⊕
+            PlanetType::Frozen => $rng->between(30, 80) / 100, // 0.3-0.8 R⊕
         };
 
         return round($radius, 2);
@@ -723,19 +723,18 @@ final class SystemGenerator
      *
      * Uses mass-radius relationship from exoplanet data.
      */
-    private function generateMass(string $type, SeededRandom $rng): float
+    private function generateMass(PlanetType $type, SeededRandom $rng): float
     {
         $mass = match ($type) {
-            Planet::TYPE_GAS_GIANT => $rng->between(5000, 50000) / 100, // 50-500 M⊕
-            Planet::TYPE_HOT_JUPITER => $rng->between(10000, 100000) / 100, // 100-1000 M⊕
-            Planet::TYPE_ICE_GIANT => $rng->between(1000, 3000) / 100, // 10-30 M⊕
-            Planet::TYPE_MINI_NEPTUNE => $rng->between(500, 1500) / 100, // 5-15 M⊕
-            Planet::TYPE_SUPER_EARTH => $rng->between(150, 500) / 100, // 1.5-5 M⊕
-            Planet::TYPE_TERRESTRIAL => $rng->between(30, 200) / 100, // 0.3-2 M⊕
-            Planet::TYPE_DWARF => $rng->between(1, 30) / 100, // 0.01-0.3 M⊕
-            Planet::TYPE_MOLTEN => $rng->between(20, 150) / 100, // 0.2-1.5 M⊕
-            Planet::TYPE_FROZEN => $rng->between(5, 50) / 100, // 0.05-0.5 M⊕
-            default => $rng->between(50, 200) / 100,
+            PlanetType::GasGiant => $rng->between(5000, 50000) / 100, // 50-500 M⊕
+            PlanetType::HotJupiter => $rng->between(10000, 100000) / 100, // 100-1000 M⊕
+            PlanetType::IceGiant => $rng->between(1000, 3000) / 100, // 10-30 M⊕
+            PlanetType::MiniNeptune => $rng->between(500, 1500) / 100, // 5-15 M⊕
+            PlanetType::SuperEarth => $rng->between(150, 500) / 100, // 1.5-5 M⊕
+            PlanetType::Terrestrial => $rng->between(30, 200) / 100, // 0.3-2 M⊕
+            PlanetType::Dwarf => $rng->between(1, 30) / 100, // 0.01-0.3 M⊕
+            PlanetType::Molten => $rng->between(20, 150) / 100, // 0.2-1.5 M⊕
+            PlanetType::Frozen => $rng->between(5, 50) / 100, // 0.05-0.5 M⊕
         };
 
         return round($mass, 2);
@@ -762,16 +761,15 @@ final class SystemGenerator
      *
      * @return array<string, int>
      */
-    private function generateBeltResources(string $type, SeededRandom $rng): array
+    private function generateBeltResources(AsteroidBeltType $type, SeededRandom $rng): array
     {
         $resources = [];
 
         $available = match ($type) {
-            AsteroidBelt::TYPE_ROCKY => ['iron', 'nickel', 'copper'],
-            AsteroidBelt::TYPE_METALLIC => ['iron', 'nickel', 'titanium', 'platinum', 'rare_earth'],
-            AsteroidBelt::TYPE_ICY => ['water', 'ice', 'hydrogen'],
-            AsteroidBelt::TYPE_MIXED => ['iron', 'nickel', 'water', 'ice'],
-            default => ['iron', 'nickel'],
+            AsteroidBeltType::Rocky => ['iron', 'nickel', 'copper'],
+            AsteroidBeltType::Metallic => ['iron', 'nickel', 'titanium', 'platinum', 'rare_earth'],
+            AsteroidBeltType::Icy => ['water', 'ice', 'hydrogen'],
+            AsteroidBeltType::Mixed => ['iron', 'nickel', 'water', 'ice'],
         };
 
         foreach ($available as $resource) {
@@ -829,25 +827,25 @@ final class SystemGenerator
     /**
      * Generate services for a station.
      *
-     * @return array<string>
+     * @return array<StationService>
      */
-    private function generateStationServices(string $type, SeededRandom $rng): array
+    private function generateStationServices(StationType $type, SeededRandom $rng): array
     {
         // Base services by type
         $services = match ($type) {
-            Station::TYPE_TRADING => [Station::SERVICE_TRADE],
-            Station::TYPE_MINING => [Station::SERVICE_TRADE],
-            Station::TYPE_RESEARCH => [Station::SERVICE_MISSIONS],
-            Station::TYPE_REFUELING => [Station::SERVICE_REFUEL],
-            default => [],
+            StationType::Trading => [StationService::Trade],
+            StationType::Mining => [StationService::Trade],
+            StationType::Research => [StationService::Missions],
+            StationType::Refueling => [StationService::Refuel],
+            StationType::Military => [],
         };
 
         // Add random additional services
         $additional = [
-            Station::SERVICE_REPAIR,
-            Station::SERVICE_REFUEL,
-            Station::SERVICE_UPGRADE,
-            Station::SERVICE_MISSIONS,
+            StationService::Repair,
+            StationService::Refuel,
+            StationService::Upgrade,
+            StationService::Missions,
         ];
 
         foreach ($additional as $service) {
@@ -862,36 +860,32 @@ final class SystemGenerator
     /**
      * Generate reward for an anomaly.
      *
-     * @return array{type: string, value: mixed}
+     * @return array{type: AnomalyReward, value: mixed}
      */
-    private function generateAnomalyReward(string $type, SeededRandom $rng): array
+    private function generateAnomalyReward(AnomalyType $type, SeededRandom $rng): array
     {
         return match ($type) {
-            Anomaly::TYPE_DERELICT => [
-                'type' => Anomaly::REWARD_RESOURCES,
+            AnomalyType::Derelict => [
+                'type' => AnomalyReward::Resources,
                 'value' => [
                     $rng->pick(self::RESOURCES) => $rng->between(50, 200),
                 ],
             ],
-            Anomaly::TYPE_SIGNAL => [
-                'type' => Anomaly::REWARD_DATA,
+            AnomalyType::Signal => [
+                'type' => AnomalyReward::Data,
                 'value' => $rng->between(100, 500),
             ],
-            Anomaly::TYPE_ARTIFACT => [
-                'type' => Anomaly::REWARD_ARTIFACT,
+            AnomalyType::Artifact => [
+                'type' => AnomalyReward::Artifact,
                 'value' => 'artifact_' . $rng->between(1, 100),
             ],
-            Anomaly::TYPE_PHENOMENON => [
-                'type' => Anomaly::REWARD_TECHNOLOGY,
+            AnomalyType::Phenomenon => [
+                'type' => AnomalyReward::Technology,
                 'value' => $rng->between(1, 5),
             ],
-            Anomaly::TYPE_WRECKAGE => [
-                'type' => Anomaly::REWARD_CREDITS,
+            AnomalyType::Wreckage => [
+                'type' => AnomalyReward::Credits,
                 'value' => $rng->between(1000, 10000),
-            ],
-            default => [
-                'type' => Anomaly::REWARD_CREDITS,
-                'value' => $rng->between(500, 2000),
             ],
         };
     }

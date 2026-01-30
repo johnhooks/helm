@@ -6,6 +6,7 @@ namespace Tests\Wpunit\Generation;
 
 use Helm\Generation\Generated\Planet;
 use Helm\Generation\Generated\SystemContents;
+use Helm\Generation\PlanetType;
 use Helm\Generation\SystemGenerator;
 use Helm\Stars\StarCatalog;
 use lucatume\WPBrowser\TestCase\WPTestCase;
@@ -107,21 +108,11 @@ class SystemGeneratorTest extends WPTestCase
 
     public function test_planets_have_valid_types(): void
     {
-        $validTypes = [
-            Planet::TYPE_TERRESTRIAL,
-            Planet::TYPE_SUPER_EARTH,
-            Planet::TYPE_GAS_GIANT,
-            Planet::TYPE_ICE_GIANT,
-            Planet::TYPE_DWARF,
-            Planet::TYPE_MOLTEN,
-            Planet::TYPE_FROZEN,
-        ];
-
         $star = $this->catalog->sol();
         $contents = $this->generator->generate($star, 'type-test');
 
         foreach ($contents->planets as $planet) {
-            $this->assertContains($planet->type, $validTypes);
+            $this->assertInstanceOf(PlanetType::class, $planet->type);
         }
     }
 

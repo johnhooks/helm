@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Support\Helper;
 
 use Codeception\Module;
+use Helm\Generation\PlanetType;
 use Helm\Origin\Origin;
 use Helm\Planets\Planet;
 use Helm\Planets\PlanetRepository;
@@ -109,7 +110,7 @@ class Helm extends Module
             'id' => 'TEST_P' . uniqid(),
             'starId' => 'TEST_STAR',
             'name' => 'Test Planet',
-            'type' => Planet::TYPE_TERRESTRIAL,
+            'type' => PlanetType::Terrestrial,
             'orbitIndex' => 0,
             'orbitAu' => 1.0,
             'radiusEarth' => 1.0,

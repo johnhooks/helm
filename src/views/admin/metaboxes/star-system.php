@@ -30,7 +30,7 @@
                 <?php $editUrl = get_edit_post_link($planetPost->postId()); ?>
                 <tr>
                     <td><a href="<?php echo esc_url($editUrl ?? '#'); ?>"><?php echo esc_html($planetPost->displayName()); ?></a></td>
-                    <td><?php echo esc_html($planetPost->type()); ?></td>
+                    <td><?php echo esc_html($planetPost->type()->label()); ?></td>
                     <td><?php echo esc_html(number_format($planetPost->orbitAu(), 2)); ?> AU</td>
                     <td><?php echo $planetPost->isHabitable() ? esc_html__('Yes', 'helm') : '—'; ?></td>
                 </tr>
