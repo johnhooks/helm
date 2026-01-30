@@ -20,6 +20,10 @@ final class Provider extends ServiceProvider
             return new ShipSystemsRepository();
         });
 
+        $this->container->singleton(ActionRepository::class, function () {
+            return new ActionRepository();
+        });
+
         $this->container->singleton(ShipFactory::class, function () {
             return new ShipFactory(
                 $this->container->get(ShipSystemsRepository::class),
