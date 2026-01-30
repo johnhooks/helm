@@ -6,6 +6,7 @@ namespace Helm\Navigation;
 
 use Helm\lucatume\DI52\ServiceProvider;
 use Helm\Origin\Origin;
+use Helm\Ships\ShipRepository;
 use Helm\Stars\Star;
 use Helm\Stars\StarPost;
 
@@ -31,6 +32,14 @@ final class Provider extends ServiceProvider
             $this->container->get(NodeGenerator::class),
             $this->container->get(NodeRepository::class),
             $this->container->get(EdgeRepository::class),
+        ));
+
+        $this->container->singleton(NavigationService::class, fn () => new NavigationService(
+            $this->container->get(NavComputer::class),
+            $this->container->get(NodeRepository::class),
+            $this->container->get(EdgeRepository::class),
+            $this->container->get(RouteRepository::class),
+            $this->container->get(ShipRepository::class),
         ));
     }
 
