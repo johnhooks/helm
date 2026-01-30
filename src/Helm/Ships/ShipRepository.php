@@ -96,6 +96,7 @@ final class ShipRepository
             'post_type' => PostTypeRegistry::POST_TYPE_SHIP,
             'post_status' => 'publish',
             'post_title' => $ship->name,
+            'post_author' => $ship->ownerId,
             'post_date' => gmdate('Y-m-d H:i:s', $ship->createdAt !== 0 ? $ship->createdAt : time()),
             'post_date_gmt' => gmdate('Y-m-d H:i:s', $ship->createdAt !== 0 ? $ship->createdAt : time()),
         ], true);
@@ -119,6 +120,7 @@ final class ShipRepository
         wp_update_post([
             'ID' => $postId,
             'post_title' => $ship->name,
+            'post_author' => $ship->ownerId,
             'post_modified' => gmdate('Y-m-d H:i:s', $ship->updatedAt !== 0 ? $ship->updatedAt : time()),
             'post_modified_gmt' => gmdate('Y-m-d H:i:s', $ship->updatedAt !== 0 ? $ship->updatedAt : time()),
         ]);
@@ -181,6 +183,76 @@ final class ShipRepository
             fn(WP_Post $post) => ShipPost::fromPost($post)->toShip(),
             $query->posts
         );
+    }
+
+    /**
+     * Get all ships owned by a user.
+     *
+     * @return array<Ship>
+     */
+    public function allByOwner(int $userId): array
+    {
+        $query = new WP_Query([
+            'post_type' => PostTypeRegistry::POST_TYPE_SHIP,
+            'post_status' => 'publish',
+            'posts_per_page' => -1,
+            'author' => $userId,
+            'orderby' => 'date',
+            'order' => 'DESC',
+            'no_found_rows' => true,
+            'update_post_meta_cache' => true,
+            'update_post_term_cache' => false,
+        ]);
+
+        return array_map(
+            fn(WP_Post $post) => ShipPost::fromPost($post)->toShip(),
+            $query->posts
+        );
+    }
+
+    /**
+     * Get the first ship owned by a user.
+     *
+     * For the one-ship-per-user model, this returns the user's ship.
+     */
+    public function getByOwner(int $userId): ?Ship
+    {
+        $query = new WP_Query([
+            'post_type' => PostTypeRegistry::POST_TYPE_SHIP,
+            'post_status' => 'publish',
+            'posts_per_page' => 1,
+            'author' => $userId,
+            'orderby' => 'date',
+            'order' => 'ASC', // Get oldest (first) ship
+            'no_found_rows' => true,
+            'update_post_meta_cache' => true,
+            'update_post_term_cache' => false,
+        ]);
+
+        if (! $query->have_posts()) {
+            return null;
+        }
+
+        return ShipPost::fromPost($query->posts[0])->toShip();
+    }
+
+    /**
+     * Check if a user owns any ships.
+     */
+    public function ownerHasShip(int $userId): bool
+    {
+        $query = new WP_Query([
+            'post_type' => PostTypeRegistry::POST_TYPE_SHIP,
+            'post_status' => 'publish',
+            'posts_per_page' => 1,
+            'author' => $userId,
+            'fields' => 'ids',
+            'no_found_rows' => true,
+            'update_post_meta_cache' => false,
+            'update_post_term_cache' => false,
+        ]);
+
+        return $query->posts !== [];
     }
 
     /**

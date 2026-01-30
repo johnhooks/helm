@@ -175,6 +175,7 @@ class Helm extends Module
         $defaults = [
             'id' => 'SHIP_' . uniqid(),
             'name' => 'Test Ship',
+            'ownerId' => 1, // Default to admin user
             'location' => 'SOL',
             'nodeId' => 0,
             'credits' => 1000,
@@ -193,6 +194,7 @@ class Helm extends Module
         $ship = new Ship(
             id: $data['id'],
             name: $data['name'],
+            ownerId: $data['ownerId'],
             location: $data['location'],
             nodeId: $data['nodeId'],
             credits: $data['credits'],

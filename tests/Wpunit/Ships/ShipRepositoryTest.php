@@ -30,6 +30,7 @@ class ShipRepositoryTest extends WPTestCase
         $ship = new Ship(
             id: 'save-test',
             name: 'Test Ship',
+            ownerId: 1,
             location: 'SOL',
             credits: 1000,
             cargo: [],
@@ -86,6 +87,7 @@ class ShipRepositoryTest extends WPTestCase
         $updated = new Ship(
             id: 'update-test',
             name: 'Updated Name',
+            ownerId: $ship->ownerId,
             location: 'HIP_8102',
             credits: 5000,
             cargo: ['gold' => 100],
@@ -242,5 +244,74 @@ class ShipRepositoryTest extends WPTestCase
         $this->assertSame(Ship::DEFAULT_DRIVE_RANGE, $retrieved->driveRange);
         $this->assertSame(Ship::DEFAULT_NAV_SKILL, $retrieved->navSkill);
         $this->assertSame(Ship::DEFAULT_NAV_EFFICIENCY, $retrieved->navEfficiency);
+    }
+
+    public function test_owner_id_is_preserved(): void
+    {
+        $this->tester->haveShip(['id' => 'owner-test', 'ownerId' => 42]);
+
+        $retrieved = $this->repository->get('owner-test');
+
+        $this->assertSame(42, $retrieved->ownerId);
+    }
+
+    public function test_owner_id_is_stored_as_post_author(): void
+    {
+        $this->tester->haveShip(['id' => 'author-test', 'ownerId' => 99]);
+
+        // Verify via WordPress directly
+        $posts = get_posts([
+            'post_type' => 'helm_ship',
+            'meta_key' => '_helm_ship_id',
+            'meta_value' => 'author-test',
+            'posts_per_page' => 1,
+        ]);
+
+        $this->assertNotEmpty($posts);
+        $this->assertSame(99, (int) $posts[0]->post_author);
+    }
+
+    public function test_get_by_owner_returns_ship(): void
+    {
+        $this->tester->haveShip(['id' => 'owner-ship-1', 'ownerId' => 100]);
+        $this->tester->haveShip(['id' => 'owner-ship-2', 'ownerId' => 200]);
+
+        $ship = $this->repository->getByOwner(100);
+
+        $this->assertNotNull($ship);
+        $this->assertSame('owner-ship-1', $ship->id);
+        $this->assertSame(100, $ship->ownerId);
+    }
+
+    public function test_get_by_owner_returns_null_when_no_ship(): void
+    {
+        $ship = $this->repository->getByOwner(99999);
+
+        $this->assertNull($ship);
+    }
+
+    public function test_all_by_owner_returns_only_owner_ships(): void
+    {
+        $this->tester->haveShip(['id' => 'multi-owner-1', 'ownerId' => 300]);
+        $this->tester->haveShip(['id' => 'multi-owner-2', 'ownerId' => 300]);
+        $this->tester->haveShip(['id' => 'other-owner', 'ownerId' => 400]);
+
+        $ships = $this->repository->allByOwner(300);
+
+        $this->assertCount(2, $ships);
+        $ids = array_map(fn(Ship $s) => $s->id, $ships);
+        $this->assertContains('multi-owner-1', $ids);
+        $this->assertContains('multi-owner-2', $ids);
+        $this->assertNotContains('other-owner', $ids);
+    }
+
+    public function test_owner_has_ship(): void
+    {
+        $this->assertFalse($this->repository->ownerHasShip(500));
+
+        $this->tester->haveShip(['id' => 'has-ship-test', 'ownerId' => 500]);
+
+        $this->assertTrue($this->repository->ownerHasShip(500));
+        $this->assertFalse($this->repository->ownerHasShip(600));
     }
 }

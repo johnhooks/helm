@@ -22,6 +22,7 @@ final class Ship
     /**
      * @param string $id Unique identifier
      * @param string $name Ship name
+     * @param int $ownerId WordPress user ID of owner
      * @param string $location Current star ID (legacy, use nodeId)
      * @param int $nodeId Current navigation node ID
      * @param int $credits Available credits
@@ -37,6 +38,7 @@ final class Ship
     public function __construct(
         public readonly string $id,
         public readonly string $name,
+        public readonly int $ownerId,
         public readonly string $location,
         public readonly int $nodeId = 0,
         public readonly int $credits = 10000,
@@ -61,6 +63,7 @@ final class Ship
         return new self(
             id: $row['id'],
             name: $row['name'],
+            ownerId: (int) ($row['owner_id'] ?? 0),
             location: $row['location'],
             nodeId: (int) ($row['node_id'] ?? 0),
             credits: (int) $row['credits'],
@@ -85,6 +88,7 @@ final class Ship
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'owner_id' => $this->ownerId,
             'location' => $this->location,
             'node_id' => $this->nodeId,
             'credits' => $this->credits,
@@ -131,6 +135,7 @@ final class Ship
         return new self(
             id: $this->id,
             name: $this->name,
+            ownerId: $this->ownerId,
             location: $location,
             nodeId: $this->nodeId,
             credits: $this->credits,
@@ -153,6 +158,7 @@ final class Ship
         return new self(
             id: $this->id,
             name: $this->name,
+            ownerId: $this->ownerId,
             location: $this->location,
             nodeId: $nodeId,
             credits: $this->credits,
@@ -175,6 +181,7 @@ final class Ship
         return new self(
             id: $this->id,
             name: $this->name,
+            ownerId: $this->ownerId,
             location: $this->location,
             nodeId: $this->nodeId,
             credits: $this->credits,
@@ -197,6 +204,7 @@ final class Ship
         return new self(
             id: $this->id,
             name: $this->name,
+            ownerId: $this->ownerId,
             location: $this->location,
             nodeId: $this->nodeId,
             credits: $credits,
@@ -221,6 +229,7 @@ final class Ship
         return new self(
             id: $this->id,
             name: $this->name,
+            ownerId: $this->ownerId,
             location: $this->location,
             nodeId: $this->nodeId,
             credits: $this->credits,

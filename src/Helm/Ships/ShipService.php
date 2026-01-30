@@ -20,11 +20,12 @@ final class ShipService
     /**
      * Create a new ship.
      */
-    public function create(string $name, ?string $id = null): Ship
+    public function create(string $name, int $ownerId, ?string $id = null): Ship
     {
         $ship = new Ship(
             id: $id ?? $this->generateId($name),
             name: $name,
+            ownerId: $ownerId,
             location: self::DEFAULT_START_LOCATION,
             credits: self::DEFAULT_START_CREDITS,
             cargo: [],
@@ -36,6 +37,43 @@ final class ShipService
         $this->repository->save($ship);
 
         return $ship;
+    }
+
+    /**
+     * Get the ship for a user.
+     *
+     * In the one-ship-per-user model, each user has at most one ship.
+     */
+    public function getForUser(int $userId): ?Ship
+    {
+        return $this->repository->getByOwner($userId);
+    }
+
+    /**
+     * Get or create a ship for a user.
+     *
+     * If the user already has a ship, returns it.
+     * Otherwise creates a new ship with the given name.
+     *
+     * This enforces the one-ship-per-user constraint at the service level.
+     */
+    public function getOrCreateForUser(int $userId, string $name): Ship
+    {
+        $existing = $this->repository->getByOwner($userId);
+
+        if ($existing !== null) {
+            return $existing;
+        }
+
+        return $this->create($name, $userId);
+    }
+
+    /**
+     * Check if a user has a ship.
+     */
+    public function userHasShip(int $userId): bool
+    {
+        return $this->repository->ownerHasShip($userId);
     }
 
     /**

@@ -57,6 +57,14 @@ final class ShipPost
     }
 
     /**
+     * Get the owner's WordPress user ID.
+     */
+    public function ownerId(): int
+    {
+        return (int) $this->post->post_author;
+    }
+
+    /**
      * Convert to Ship value object.
      */
     public function toShip(): Ship
@@ -74,6 +82,7 @@ final class ShipPost
         return new Ship(
             id: $this->shipId(),
             name: $this->post->post_title,
+            ownerId: $this->ownerId(),
             location: (string) get_post_meta($postId, PostTypeRegistry::META_SHIP_LOCATION, true),
             nodeId: $nodeId !== '' ? (int) $nodeId : 0,
             credits: (int) get_post_meta($postId, PostTypeRegistry::META_SHIP_CREDITS, true),
