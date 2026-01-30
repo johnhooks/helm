@@ -38,11 +38,11 @@ A fast drive means less waiting. An efficient drive means your core lasts longer
 
 The first generation of warp drives are the **DR series** - rugged, proven designs with different tuning for different needs.
 
-| Model | Speed | Core Efficiency | Character |
-|-------|-------|-----------------|-----------|
-| DR-7 Boost | 2x | 1.5x decay | *"Running hot."* |
+| Model | Speed | Power Appetite | Character |
+|-------|-------|----------------|-----------|
+| DR-7 Boost | 2x | 1.5x (hungry) | *"Running hot."* |
 | DR-5 Standard | 1x | 1.0x | *"Fleet standard."* |
-| DR-3 Economy | 0.5x | 0.75x decay | *"She sips, not gulps."* |
+| DR-3 Economy | 0.5x | 0.6x (efficient) | *"She sips, not gulps."* |
 
 The number indicates power output - higher means more thrust, more speed, more stress on the core.
 
@@ -87,7 +87,7 @@ Drive and core choices multiply together, creating distinct ship personalities.
 **The Endurance Runner** (DR-3 Economy + Epoch-E)
 - Jumps take a while (economy drive)
 - Power regenerates slowly (cold core)
-- But: Core burns at 0.75x × 0.75x = 0.56x rate
+- But: Core burns at 0.6x × 0.75x = 0.45x rate
 - *"Still running when everyone else is space dust."*
 
 **The Balanced Build** (DR-5 Standard + Epoch-S)
@@ -121,16 +121,25 @@ The drive determines how long that journey takes. A 5-hop route with a DR-7 migh
 
 Neither is wrong - it depends on whether you're actively playing or checking in once a day.
 
+## Jump Range
+
+Drives determine maximum jump distance through their **sustain** rating - how far the drive can push the ship in a single jump.
+
+| Model | Sustain | Effective Range |
+|-------|---------|-----------------|
+| DR-7 Boost | 5 ly | Short sprints |
+| DR-5 Standard | 7 ly | Balanced |
+| DR-3 Economy | 10 ly | Long hauls |
+
+Effective range scales with core output. A hot core (high output) extends range; efficiency mode reduces it. This creates interesting decisions:
+
+- DR-7 on overdrive: Fast jumps, but limited range
+- DR-3 on normal: Slow jumps, but reaches distant stars
+- Any drive on efficiency: Reduced range, but no core decay
+
+There's no arbitrary "max range" limit. The practical limit emerges from economics - longer jumps cost more core life.
+
 ## Future Considerations
-
-### Drive Range
-
-Should drives affect maximum jump distance? Currently `driveRange` exists as a ship stat. This could become a drive property:
-
-- Long-range drives reach further but maybe cost more power?
-- Short-range drives are limited but efficient?
-
-Or range could remain separate from speed/efficiency.
 
 ### Drive Damage
 

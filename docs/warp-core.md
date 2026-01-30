@@ -47,11 +47,13 @@ Same core, different tuning. The suffix tells you what the engineers optimized f
 
 ### Specifications
 
-| Model | Life (ly) | Regen/Hour | Jump Multiplier |
-|-------|-----------|------------|-----------------|
-| Epoch-E | 1000 | 5 | 0.75x |
-| Epoch-S | 750 | 10 | 1.0x |
-| Epoch-R | 500 | 20 | 1.5x |
+| Model | Life (ly) | Regen/Hour | Jump Multiplier | Base Output |
+|-------|-----------|------------|-----------------|-------------|
+| Epoch-E | 1000 | 5 | 0.75x | 0.9x |
+| Epoch-S | 750 | 10 | 1.0x | 1.0x |
+| Epoch-R | 500 | 20 | 1.5x | 1.1x |
+
+**Base Output** affects all systems that scale with core power - including drive range and sensor range. A cold Epoch-E core produces 90% output, reducing effective range but contributing to its conservative nature. A hot Epoch-R produces 110%, slightly extending capabilities at the cost of faster decay.
 
 *Starting values, subject to balancing.*
 

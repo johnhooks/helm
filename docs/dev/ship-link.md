@@ -78,47 +78,49 @@ class ShipModel {
 }
 ```
 
-### ShipRepository
+### ShipSystemsRepository
 
-Persistence layer. Knows how to load/save ShipModel. Knows nothing about ShipLink or systems.
+Persistence layer for the `helm_ship_systems` table. Handles operational state.
 
 ```php
-class ShipRepository {
-    public function find(int $id): ?ShipModel;
-    public function findByOwner(int $owner_id): array;
-    public function save(ShipModel $model): void;
+class ShipSystemsRepository {
+    public function find(int $shipPostId): ?ShipSystems;
+    public function findOrCreate(int $shipPostId): ShipSystems;
+    public function save(ShipSystems $systems): bool;
 }
 ```
 
 ### ShipFactory
 
-Builds a live ShipLink from model data. Reads component types, instantiates the appropriate system implementations, wires dependencies.
+Builds a live ShipLink from model data. Wires all system dependencies.
 
 ```php
 class ShipFactory {
-    public function build(ShipModel $model): ShipLink
+    public function __construct(
+        private ShipSystemsRepository $systemsRepository,
+        private NavigationService $navigationService,
+    ) {}
+
+    public function buildFromModel(ShipModel $model): ShipLink
     {
-        // Build systems based on model's component types
-        $power = $this->buildPowerSystem($model);
-        $propulsion = $this->buildPropulsion($model, $power);
-        $sensors = $this->buildSensors($model, $power);
-        // ...
+        // Power system first - others depend on it
+        $power = new Power($model);
 
-        return new ShipLink($model, $power, $propulsion, $sensors, ...);
+        // Systems that need power metrics for calculations
+        $propulsion = new Propulsion($model, $power);  // PowerMetrics
+        $sensors = new Sensors($model, $power);        // PowerMetrics
+
+        // Remaining systems
+        $navigation = new Navigation($model, $this->navigationService);
+        $shields = new Shields($model);
+        $hull = new Hull($model);
+
+        return new Ship($model, $power, $propulsion, $sensors, ...);
     }
-
-    private function buildPowerSystem(ShipModel $model): PowerSystemInterface
-    {
-        return match($model->core_type) {
-            'Epoch-R' => new EpochRPower($model),
-            'Epoch-S' => new EpochSPower($model),
-            'Epoch-E' => new EpochEPower($model),
-        };
-    }
-
-    // Similar for propulsion, sensors, etc.
 }
 ```
+
+Component types (CoreType, DriveType, etc.) are enums with behavior. The same system classes work with any component - behavior varies based on enum values.
 
 ### ShipLink
 
@@ -202,39 +204,76 @@ class ActionProcessor {
 
 ## System Interfaces
 
-Each ship system has an interface. The factory builds concrete implementations based on model data.
+Each ship system has an interface. Systems receive the model and any dependencies they need.
+
+### PowerMetrics (Read-Only)
+
+Systems that need power data receive `PowerMetrics` - a read-only interface:
 
 ```php
-interface PowerSystemInterface {
-    public function getCurrentPower(): float;
-    public function consume(float $amount): bool;
+interface PowerMetrics {
+    public function getOutputMultiplier(): float;
     public function getRegenRate(): float;
-    public function getCoreLife(): float;
-    public function consumeCoreLife(float $lightyears): void;
-}
-
-interface PropulsionInterface {
-    public function getJumpDuration(float $distance): int;
-    public function getCoreDecayMultiplier(): float;
-    public function getMaxRange(): float;
-}
-
-interface SensorInterface {
-    public function canScanTarget(int $target_node_id): bool;
-    public function getScanDuration(string $scan_type): int;
-    public function getPowerCost(string $scan_type): float;
-    public function getRange(): float;
 }
 ```
 
-Systems can depend on other systems through interfaces:
+This prevents systems from accidentally consuming power or core life. Only Ship orchestrates mutations.
+
+### PowerSystem (Full Access)
+
+Extends PowerMetrics with mutation methods. Only Ship holds this interface.
 
 ```php
-class DR7Propulsion implements PropulsionInterface {
+interface PowerSystem extends PowerMetrics {
+    public function getCurrentPower(): float;
+    public function consume(float $amount): bool;
+    public function getCoreLife(): float;
+    public function consumeCoreLife(float $amount): void;
+}
+```
+
+### Propulsion
+
+Calculates range and duration based on drive specs and power output:
+
+```php
+interface Propulsion {
+    public function getMaxRange(): float;      // sustain × output × perf ratio
+    public function canReach(float $distance): bool;
+    public function getJumpDuration(float $distance): int;
+    public function getPerformanceRatio(): float;
+}
+```
+
+### Sensors
+
+Calculates scan range based on sensor specs and power output:
+
+```php
+interface Sensors {
+    public function getRange(): float;         // base × output multiplier
+    public function canScan(float $distance): bool;
+    public function getRouteScanCost(float $distance): float;
+}
+```
+
+### Dependency Injection
+
+Systems receive PowerMetrics for calculations:
+
+```php
+class Propulsion implements PropulsionContract {
     public function __construct(
         private ShipModel $model,
-        private PowerSystemInterface $power,  // can check/consume power
+        private PowerMetrics $powerMetrics,  // read-only
     ) {}
+
+    public function getMaxRange(): float
+    {
+        return $this->model->driveType->sustain()
+            * $this->powerMetrics->getOutputMultiplier()
+            * $this->getPerformanceRatio();
+    }
 }
 ```
 

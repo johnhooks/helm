@@ -63,13 +63,15 @@ Surveyors thoroughly document what's in each system - planets, resources, opport
 
 The first generation of sensor arrays are the **SR series** - standardized packages with different optimization profiles.
 
-| Model | Route Range | Survey Speed | Character |
-|-------|-------------|--------------|-----------|
-| SR-L (Long-range) | 20 ly | 2x time | *"What's out there?"* |
-| SR-S (Standard) | 12 ly | 1x | *"Jack of all trades."* |
-| SR-H (High-res) | 6 ly | 0.5x time | *"What's down there?"* |
+| Model | Base Range | Survey Speed | Accuracy | Character |
+|-------|------------|--------------|----------|-----------|
+| SR-L (Long-range) | 20 ly | 2x time | 60% | *"What's out there?"* |
+| SR-S (Standard) | 12 ly | 1x | 70% | *"Jack of all trades."* |
+| SR-H (High-res) | 6 ly | 0.5x time | 85% | *"What's down there?"* |
 
 *Starting values subject to balancing.*
+
+Effective range scales with core output. At full power, you get base range. In efficiency mode (70% output), your SR-S sees 8.4 ly instead of 12 ly. This creates meaningful tradeoffs when conserving power.
 
 ### SR-L (Long-range)
 
