@@ -308,6 +308,37 @@ final class PlanetRepository
     }
 
     /**
+     * Ensure planets exist for a star system.
+     *
+     * Creates planet posts from SystemContents if they don't already exist.
+     * Returns existing planets if already created.
+     *
+     * @param \Helm\Generation\Generated\SystemContents $contents The generated system
+     * @param string $starId The star's catalog ID
+     * @param int $starPostId The star's WordPress post ID
+     * @return array<PlanetPost> The planets (existing or newly created)
+     */
+    public function ensureSystemPlanetsExist(
+        \Helm\Generation\Generated\SystemContents $contents,
+        string $starId,
+        int $starPostId
+    ): array {
+        $existing = $this->forStarPostId($starPostId);
+
+        if ($existing !== []) {
+            return $existing;
+        }
+
+        // Create planets from generated contents
+        $planets = [];
+        foreach ($contents->planets as $planet) {
+            $planets[] = $this->saveGenerated($planet, $starId, $starPostId);
+        }
+
+        return $planets;
+    }
+
+    /**
      * Get all planets.
      *
      * @return array<PlanetPost>

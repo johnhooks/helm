@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Wpunit\Planets;
 
+use Helm\Generation\Generated\Planet as GeneratedPlanet;
+use Helm\Generation\Generated\SystemContents;
 use Helm\Planets\Planet;
 use Helm\Planets\PlanetPost;
 use Helm\Planets\PlanetRepository;
@@ -221,5 +223,110 @@ class PlanetRepositoryTest extends WPTestCase
 
         $this->assertSame(3, $deleted);
         $this->assertSame(0, $this->repository->count());
+    }
+
+    public function test_ensure_system_planets_exist_creates_planets(): void
+    {
+        $starPost = $this->tester->haveStar(['id' => 'TEST_STAR']);
+
+        $contents = new SystemContents(
+            starId: 'TEST_STAR',
+            algorithmVersion: 1,
+            planets: [
+                new GeneratedPlanet(
+                    id: 'TEST_STAR_P0',
+                    type: GeneratedPlanet::TYPE_TERRESTRIAL,
+                    orbitIndex: 0,
+                    orbitAu: 1.0,
+                ),
+                new GeneratedPlanet(
+                    id: 'TEST_STAR_P1',
+                    type: GeneratedPlanet::TYPE_GAS_GIANT,
+                    orbitIndex: 1,
+                    orbitAu: 5.0,
+                ),
+            ],
+        );
+
+        $planets = $this->repository->ensureSystemPlanetsExist(
+            $contents,
+            'TEST_STAR',
+            $starPost->postId()
+        );
+
+        $this->assertCount(2, $planets);
+        $this->assertSame('TEST_STAR_P0', $planets[0]->planetId());
+        $this->assertSame('TEST_STAR_P1', $planets[1]->planetId());
+    }
+
+    public function test_ensure_system_planets_exist_returns_existing(): void
+    {
+        $starPost = $this->tester->haveStar(['id' => 'TEST_STAR']);
+
+        // Create planets manually first
+        $this->tester->havePlanet($starPost->postId(), [
+            'id' => 'EXISTING_P0',
+            'starId' => 'TEST_STAR',
+        ]);
+
+        $contents = new SystemContents(
+            starId: 'TEST_STAR',
+            algorithmVersion: 1,
+            planets: [
+                new GeneratedPlanet(
+                    id: 'NEW_P0',
+                    type: GeneratedPlanet::TYPE_TERRESTRIAL,
+                    orbitIndex: 0,
+                    orbitAu: 1.0,
+                ),
+            ],
+        );
+
+        $planets = $this->repository->ensureSystemPlanetsExist(
+            $contents,
+            'TEST_STAR',
+            $starPost->postId()
+        );
+
+        // Should return existing, not create new
+        $this->assertCount(1, $planets);
+        $this->assertSame('EXISTING_P0', $planets[0]->planetId());
+    }
+
+    public function test_ensure_system_planets_exist_is_idempotent(): void
+    {
+        $starPost = $this->tester->haveStar(['id' => 'TEST_STAR']);
+
+        $contents = new SystemContents(
+            starId: 'TEST_STAR',
+            algorithmVersion: 1,
+            planets: [
+                new GeneratedPlanet(
+                    id: 'TEST_STAR_P0',
+                    type: GeneratedPlanet::TYPE_TERRESTRIAL,
+                    orbitIndex: 0,
+                    orbitAu: 1.0,
+                ),
+            ],
+        );
+
+        // First call creates
+        $first = $this->repository->ensureSystemPlanetsExist(
+            $contents,
+            'TEST_STAR',
+            $starPost->postId()
+        );
+
+        // Second call returns existing
+        $second = $this->repository->ensureSystemPlanetsExist(
+            $contents,
+            'TEST_STAR',
+            $starPost->postId()
+        );
+
+        $this->assertCount(1, $first);
+        $this->assertCount(1, $second);
+        $this->assertSame($first[0]->postId(), $second[0]->postId());
+        $this->assertSame(1, $this->repository->count());
     }
 }

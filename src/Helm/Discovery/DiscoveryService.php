@@ -9,6 +9,9 @@ use Helm\Origin\Origin;
 
 /**
  * Service for recording and querying discoveries.
+ *
+ * Discovery tracks when ships visit star systems, not the content of those systems.
+ * Planet creation should be handled separately by the caller before recording.
  */
 final class DiscoveryService
 {
@@ -20,6 +23,11 @@ final class DiscoveryService
 
     /**
      * Record a discovery.
+     *
+     * @param string $starId The catalog ID of the star
+     * @param string $shipId The discovering ship's ID
+     * @param SystemContents $contents The generated system contents (for hashing)
+     * @return Discovery The recorded discovery
      */
     public function record(string $starId, string $shipId, SystemContents $contents): Discovery
     {
