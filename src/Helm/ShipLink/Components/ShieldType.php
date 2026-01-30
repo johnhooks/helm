@@ -7,31 +7,32 @@ namespace Helm\ShipLink\Components;
 /**
  * Shield types.
  *
- * Shields determine:
- * - Maximum shield capacity
- * - Shield regeneration rate
+ * Aegis series shields with Greek letter designations:
+ * - Alpha: Light, fast-regenerating shields
+ * - Beta: Balanced capacity and regen
+ * - Gamma: Heavy, high-capacity shields
  */
 enum ShieldType: int
 {
-    case Light = 1;
-    case Standard = 2;
-    case Heavy = 3;
+    case Alpha = 1;  // Light - fast regen, low capacity
+    case Beta = 2;   // Standard - balanced
+    case Gamma = 3;  // Heavy - slow regen, high capacity
 
     public function slug(): string
     {
         return match ($this) {
-            self::Light => 'light',
-            self::Standard => 'standard',
-            self::Heavy => 'heavy',
+            self::Alpha => 'aegis_alpha',
+            self::Beta => 'aegis_beta',
+            self::Gamma => 'aegis_gamma',
         };
     }
 
     public function label(): string
     {
         return match ($this) {
-            self::Light => __('Light Shields', 'helm'),
-            self::Standard => __('Standard Shields', 'helm'),
-            self::Heavy => __('Heavy Shields', 'helm'),
+            self::Alpha => __('Aegis Alpha', 'helm'),
+            self::Beta => __('Aegis Beta', 'helm'),
+            self::Gamma => __('Aegis Gamma', 'helm'),
         };
     }
 
@@ -41,9 +42,9 @@ enum ShieldType: int
     public function maxCapacity(): float
     {
         return match ($this) {
-            self::Light => 50.0,
-            self::Standard => 100.0,
-            self::Heavy => 200.0,
+            self::Alpha => 50.0,
+            self::Beta => 100.0,
+            self::Gamma => 200.0,
         };
     }
 
@@ -53,9 +54,9 @@ enum ShieldType: int
     public function regenRate(): float
     {
         return match ($this) {
-            self::Light => 20.0,
-            self::Standard => 10.0,
-            self::Heavy => 5.0,
+            self::Alpha => 20.0,
+            self::Beta => 10.0,
+            self::Gamma => 5.0,
         };
     }
 }

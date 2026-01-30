@@ -106,13 +106,13 @@ final class ShipSystems
     {
         $now = new DateTimeImmutable();
         $coreType = CoreType::EpochS;
-        $shieldType = ShieldType::Standard;
+        $shieldType = ShieldType::Beta;
 
         return new self(
             shipPostId: $shipPostId,
             coreType: $coreType,
             driveType: DriveType::DR5,
-            sensorType: SensorType::SRS,
+            sensorType: SensorType::VRS,
             shieldType: $shieldType,
             navTier: NavTier::Tier1,
             powerFullAt: $now, // Start with full power

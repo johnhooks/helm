@@ -7,32 +7,32 @@ namespace Helm\ShipLink\Components;
 /**
  * Sensor types.
  *
- * Sensors determine:
- * - Scan range (how far you can scan)
- * - Survey duration multiplier (resolution vs range tradeoff)
- * - Scan success chance
+ * Different manufacturers optimize for different use cases:
+ * - DSC (DeepScan): Long-range detection, slower surveys
+ * - VRS (Versa): Balanced all-rounder
+ * - ACU (Acuity): High-resolution, precise but short range
  */
 enum SensorType: int
 {
-    case SRL = 1;  // Long-range
-    case SRS = 2;  // Standard
-    case SRH = 3;  // High-resolution
+    case DSC = 1;  // DeepScan - Long-range
+    case VRS = 2;  // Versa - Standard
+    case ACU = 3;  // Acuity - High-resolution
 
     public function slug(): string
     {
         return match ($this) {
-            self::SRL => 'sr_l',
-            self::SRS => 'sr_s',
-            self::SRH => 'sr_h',
+            self::DSC => 'dsc',
+            self::VRS => 'vrs',
+            self::ACU => 'acu',
         };
     }
 
     public function label(): string
     {
         return match ($this) {
-            self::SRL => __('SR-L Long-Range', 'helm'),
-            self::SRS => __('SR-S Standard', 'helm'),
-            self::SRH => __('SR-H High-Resolution', 'helm'),
+            self::DSC => __('DSC Mk I', 'helm'),
+            self::VRS => __('VRS Mk I', 'helm'),
+            self::ACU => __('ACU Mk I', 'helm'),
         };
     }
 
@@ -42,9 +42,9 @@ enum SensorType: int
     public function range(): float
     {
         return match ($this) {
-            self::SRL => 20.0,
-            self::SRS => 12.0,
-            self::SRH => 6.0,
+            self::DSC => 20.0,
+            self::VRS => 12.0,
+            self::ACU => 6.0,
         };
     }
 
@@ -54,9 +54,9 @@ enum SensorType: int
     public function surveyDurationMultiplier(): float
     {
         return match ($this) {
-            self::SRL => 2.0,
-            self::SRS => 1.0,
-            self::SRH => 0.5,
+            self::DSC => 2.0,
+            self::VRS => 1.0,
+            self::ACU => 0.5,
         };
     }
 
@@ -66,9 +66,9 @@ enum SensorType: int
     public function scanSuccessChance(): float
     {
         return match ($this) {
-            self::SRL => 0.6,
-            self::SRS => 0.7,
-            self::SRH => 0.85,
+            self::DSC => 0.6,
+            self::VRS => 0.7,
+            self::ACU => 0.85,
         };
     }
 }

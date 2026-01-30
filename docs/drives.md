@@ -40,15 +40,15 @@ The first generation of warp drives are the **DR series** - rugged, proven desig
 
 | Model | Speed | Power Appetite | Character |
 |-------|-------|----------------|-----------|
-| DR-7 Boost | 2x | 1.5x (hungry) | *"Running hot."* |
-| DR-5 Standard | 1x | 1.0x | *"Fleet standard."* |
-| DR-3 Economy | 0.5x | 0.6x (efficient) | *"She sips, not gulps."* |
+| DR-705 Boost | 2x | 1.5x (hungry) | *"Running hot."* |
+| DR-505 Standard | 1x | 1.0x | *"Fleet standard."* |
+| DR-305 Economy | 0.5x | 0.6x (efficient) | *"She sips, not gulps."* |
 
-The number indicates power output - higher means more thrust, more speed, more stress on the core.
+The model number indicates power class - higher means more thrust, more speed, more stress on the core.
 
 *Starting values subject to balancing.*
 
-### DR-7 Boost
+### DR-705 Boost
 
 For pilots who value their time over their credits.
 
@@ -57,7 +57,7 @@ For pilots who value their time over their credits.
 - Pairs well with cheap cores you plan to replace often
 - Good for: Scouts, couriers, impatient players
 
-### DR-3 Economy
+### DR-305 Economy
 
 For pilots who value longevity over speed.
 
@@ -66,7 +66,7 @@ For pilots who value longevity over speed.
 - Pairs well with expensive cores you want to preserve
 - Good for: Traders, deep-space explorers, patient players
 
-### DR-5 Standard
+### DR-505 Standard
 
 The baseline. No bonuses, no penalties.
 
@@ -78,19 +78,19 @@ The baseline. No bonuses, no penalties.
 
 Drive and core choices multiply together, creating distinct ship personalities.
 
-**The Sprinter** (DR-7 Boost + Epoch-R)
+**The Sprinter** (DR-705 Boost + Epoch-R)
 - Jumps complete quickly (boost drive)
 - Power regenerates quickly (hot core)
 - But: Core burns at 1.5x × 1.5x = 2.25x rate
 - *"Lives fast, dies young, leaves a beautiful derelict."*
 
-**The Endurance Runner** (DR-3 Economy + Epoch-E)
+**The Endurance Runner** (DR-305 Economy + Epoch-E)
 - Jumps take a while (economy drive)
 - Power regenerates slowly (cold core)
 - But: Core burns at 0.6x × 0.75x = 0.45x rate
 - *"Still running when everyone else is space dust."*
 
-**The Balanced Build** (DR-5 Standard + Epoch-S)
+**The Balanced Build** (DR-505 Standard + Epoch-S)
 - Normal everything
 - No extremes
 - *"Sensible. Reliable. Gets the job done."*
@@ -99,12 +99,12 @@ Drive and core choices multiply together, creating distinct ship personalities.
 
 Drive choice affects how you think about routes.
 
-**With a DR-7 Boost:**
+**With a DR-705 Boost:**
 - Multiple short hops aren't so bad (each is quick)
 - You might prefer discovered routes with more waypoints
 - Core replacement is a regular expense
 
-**With a DR-3 Economy:**
+**With a DR-305 Economy:**
 - Fewer hops is better (each takes a while)
 - Direct routes are valuable (less total time)
 - Core replacement is rare
@@ -117,7 +117,7 @@ Since jumps take real time, automation becomes essential:
 - Ship executes each jump in sequence
 - Check back when the journey is complete
 
-The drive determines how long that journey takes. A 5-hop route with a DR-7 might take 2 hours. The same route with a DR-3 might take 8 hours.
+The drive determines how long that journey takes. A 5-hop route with a DR-705 might take 2 hours. The same route with a DR-305 might take 8 hours.
 
 Neither is wrong - it depends on whether you're actively playing or checking in once a day.
 
@@ -127,14 +127,14 @@ Drives determine maximum jump distance through their **sustain** rating - how fa
 
 | Model | Sustain | Effective Range |
 |-------|---------|-----------------|
-| DR-7 Boost | 5 ly | Short sprints |
-| DR-5 Standard | 7 ly | Balanced |
-| DR-3 Economy | 10 ly | Long hauls |
+| DR-705 Boost | 5 ly | Short sprints |
+| DR-505 Standard | 7 ly | Balanced |
+| DR-305 Economy | 10 ly | Long hauls |
 
 Effective range scales with core output. A hot core (high output) extends range; efficiency mode reduces it. This creates interesting decisions:
 
-- DR-7 on overdrive: Fast jumps, but limited range
-- DR-3 on normal: Slow jumps, but reaches distant stars
+- DR-705 on overdrive: Fast jumps, but limited range
+- DR-305 on normal: Slow jumps, but reaches distant stars
 - Any drive on efficiency: Reduced range, but no core decay
 
 There's no arbitrary "max range" limit. The practical limit emerges from economics - longer jumps cost more core life.

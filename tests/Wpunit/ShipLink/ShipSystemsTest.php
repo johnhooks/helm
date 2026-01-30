@@ -46,8 +46,8 @@ class ShipSystemsTest extends WPTestCase
         $this->assertSame(123, $systems->shipPostId);
         $this->assertSame(CoreType::EpochS, $systems->coreType);
         $this->assertSame(DriveType::DR3, $systems->driveType);
-        $this->assertSame(SensorType::SRH, $systems->sensorType);
-        $this->assertSame(ShieldType::Standard, $systems->shieldType);
+        $this->assertSame(SensorType::ACU, $systems->sensorType);
+        $this->assertSame(ShieldType::Beta, $systems->shieldType);
         $this->assertSame(NavTier::Tier3, $systems->navTier);
         $this->assertSame(100.0, $systems->powerMax);
         $this->assertSame(500.0, $systems->coreLife);
@@ -97,8 +97,8 @@ class ShipSystemsTest extends WPTestCase
             shipPostId: 123,
             coreType: CoreType::EpochR,
             driveType: DriveType::DR7,
-            sensorType: SensorType::SRL,
-            shieldType: ShieldType::Heavy,
+            sensorType: SensorType::DSC,
+            shieldType: ShieldType::Gamma,
             navTier: NavTier::Tier5,
             powerFullAt: $now,
             powerMax: 100.0,
@@ -119,8 +119,8 @@ class ShipSystemsTest extends WPTestCase
         $this->assertSame(123, $row['ship_post_id']);
         $this->assertSame(3, $row['core_type']); // EpochR = 3
         $this->assertSame(3, $row['drive_type']); // DR7 = 3
-        $this->assertSame(1, $row['sensor_type']); // SRL = 1
-        $this->assertSame(3, $row['shield_type']); // Heavy = 3
+        $this->assertSame(1, $row['sensor_type']); // DSC = 1
+        $this->assertSame(3, $row['shield_type']); // Gamma = 3
         $this->assertSame(5, $row['nav_tier']);
         $this->assertSame('2025-01-15 10:00:00', $row['power_full_at']);
         $this->assertSame('{"ore":100}', $row['cargo']);
@@ -133,8 +133,8 @@ class ShipSystemsTest extends WPTestCase
         $this->assertSame(456, $systems->shipPostId);
         $this->assertSame(CoreType::EpochS, $systems->coreType);
         $this->assertSame(DriveType::DR5, $systems->driveType);
-        $this->assertSame(SensorType::SRS, $systems->sensorType);
-        $this->assertSame(ShieldType::Standard, $systems->shieldType);
+        $this->assertSame(SensorType::VRS, $systems->sensorType);
+        $this->assertSame(ShieldType::Beta, $systems->shieldType);
         $this->assertSame(NavTier::Tier1, $systems->navTier);
         $this->assertSame(100.0, $systems->powerMax);
         $this->assertSame(100.0, $systems->shieldsMax); // Standard shield capacity

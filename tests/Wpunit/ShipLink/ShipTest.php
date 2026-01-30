@@ -193,7 +193,7 @@ class ShipTest extends WPTestCase
     public function test_process_scan_route_succeeds(): void
     {
         $model = $this->createModel();
-        $model->sensorType = SensorType::SRS; // 12 ly range
+        $model->sensorType = SensorType::VRS; // 12 ly range
         $model->powerFullAt = new DateTimeImmutable('-1 hour'); // Full power
         $ship = $this->createShip($model);
 
@@ -208,7 +208,7 @@ class ShipTest extends WPTestCase
     public function test_process_scan_route_fails_out_of_range(): void
     {
         $model = $this->createModel();
-        $model->sensorType = SensorType::SRH; // Only 6 ly range
+        $model->sensorType = SensorType::ACU; // Only 6 ly range
         $ship = $this->createShip($model);
 
         $action = new Action(ActionType::ScanRoute, ['distance' => 10.0]);
@@ -329,8 +329,8 @@ class ShipTest extends WPTestCase
         $model->ownerId = 1;
         $model->coreType = CoreType::EpochS;
         $model->driveType = DriveType::DR5;
-        $model->sensorType = SensorType::SRS;
-        $model->shieldType = ShieldType::Standard;
+        $model->sensorType = SensorType::VRS;
+        $model->shieldType = ShieldType::Beta;
         $model->navTier = NavTier::Tier1;
         $model->powerFullAt = new DateTimeImmutable();
         $model->powerMax = 100.0;

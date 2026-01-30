@@ -117,7 +117,7 @@ class ShipModelTest extends WPTestCase
     public function test_damage_shields_adjusts_full_at(): void
     {
         $model = $this->createModel();
-        $model->shieldType = ShieldType::Standard; // 10/hour regen
+        $model->shieldType = ShieldType::Beta; // 10/hour regen
         $model->shieldsMax = 100.0;
 
         $now = new DateTimeImmutable();
@@ -256,8 +256,8 @@ class ShipModelTest extends WPTestCase
         $model->ownerId = 1;
         $model->coreType = CoreType::EpochS;
         $model->driveType = DriveType::DR5;
-        $model->sensorType = SensorType::SRS;
-        $model->shieldType = ShieldType::Standard;
+        $model->sensorType = SensorType::VRS;
+        $model->shieldType = ShieldType::Beta;
         $model->navTier = NavTier::Tier1;
         $model->powerFullAt = null;
         $model->powerMax = 100.0;

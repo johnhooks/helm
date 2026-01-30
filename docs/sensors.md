@@ -40,7 +40,7 @@ Scouts push into unknown space, discovering routes for others to follow.
 
 **Ideal sensors:** Long-range
 **Ideal core:** Epoch-R (fast regen for frequent scanning)
-**Ideal drive:** DR-7 Boost (cover ground quickly)
+**Ideal drive:** DR-705 Boost (cover ground quickly)
 
 *"First to arrive, first to file the route, first to move on."*
 
@@ -55,25 +55,25 @@ Surveyors thoroughly document what's in each system - planets, resources, opport
 
 **Ideal sensors:** High-resolution
 **Ideal core:** Epoch-E (patient, long-lasting)
-**Ideal drive:** DR-3 Economy (in no hurry)
+**Ideal drive:** DR-305 Economy (in no hurry)
 
 *"The scout found the system. I found the platinum deposits."*
 
 ## Sensor Types
 
-The first generation of sensor arrays are the **SR series** - standardized packages with different optimization profiles.
+First-generation sensors come from three competing manufacturers, each optimizing for different use cases. All are Mk I (first generation) - future upgrades will be Mk II, III, etc.
 
 | Model | Base Range | Survey Speed | Accuracy | Character |
 |-------|------------|--------------|----------|-----------|
-| SR-L (Long-range) | 20 ly | 2x time | 60% | *"What's out there?"* |
-| SR-S (Standard) | 12 ly | 1x | 70% | *"Jack of all trades."* |
-| SR-H (High-res) | 6 ly | 0.5x time | 85% | *"What's down there?"* |
+| DSC Mk I | 20 ly | 2x time | 60% | *"What's out there?"* |
+| VRS Mk I | 12 ly | 1x | 70% | *"Jack of all trades."* |
+| ACU Mk I | 6 ly | 0.5x time | 85% | *"What's down there?"* |
 
 *Starting values subject to balancing.*
 
-Effective range scales with core output. At full power, you get base range. In efficiency mode (70% output), your SR-S sees 8.4 ly instead of 12 ly. This creates meaningful tradeoffs when conserving power.
+Effective range scales with core output. At full power, you get base range. In efficiency mode (70% output), your VRS Mk I sees 8.4 ly instead of 12 ly. This creates meaningful tradeoffs when conserving power.
 
-### SR-L (Long-range)
+### DSC Mk I (DeepScan)
 
 Optimized for distance. Can detect and scan toward stars that other sensors can't reach.
 
@@ -81,7 +81,7 @@ Optimized for distance. Can detect and scan toward stars that other sensors can'
 - System surveys: Slow and basic
 - Good for: Scouts, frontier exploration, route discovery
 
-### SR-H (High-resolution)
+### ACU Mk I (Acuity)
 
 Optimized for detail. Produces thorough surveys quickly.
 
@@ -89,7 +89,7 @@ Optimized for detail. Produces thorough surveys quickly.
 - System surveys: Fast and comprehensive
 - Good for: Surveyors, resource hunting, thorough exploration
 
-### SR-S (Standard)
+### VRS Mk I (Versa)
 
 The baseline. Adequate at both roles.
 

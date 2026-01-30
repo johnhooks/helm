@@ -64,8 +64,9 @@ class ShipModel {
 
     // Component configuration (from post meta)
     public string $coreType;       // "Epoch-R", "Epoch-S", "Epoch-E"
-    public string $driveType;      // "DR-7", "DR-5", "DR-3"
-    public string $sensorType;     // "SR-L", "SR-S", "SR-H"
+    public string $driveType;      // "DR-705", "DR-505", "DR-305"
+    public string $sensorType;     // "DSC", "VRS", "ACU"
+    public string $shieldType;     // "Aegis Alpha", "Aegis Beta", "Aegis Gamma"
     public int $navTier;           // 1-5
 
     // State (from helm_ship_systems table, mutated during processing)

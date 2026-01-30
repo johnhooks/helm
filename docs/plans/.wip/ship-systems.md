@@ -1,6 +1,6 @@
 # Ship Systems Architecture Plan
 
-Status: Work in Progress
+Status: Core architecture complete. Action processing layer remaining.
 
 ## Overview
 
@@ -57,32 +57,38 @@ created_at, updated_at
 Hardware configurations are int-backed PHP enums with config methods:
 
 ### CoreType (Warp Cores)
-| Type | Core Life | Regen Rate | Jump Cost |
-|------|-----------|------------|-----------|
-| Epoch-E (Endurance) | 1000 ly | 5/hr | 0.75x |
-| Epoch-S (Standard) | 750 ly | 10/hr | 1.0x |
-| Epoch-R (Rapid) | 500 ly | 20/hr | 1.5x |
+| Type | Core Life | Regen Rate | Jump Cost | Base Output |
+|------|-----------|------------|-----------|-------------|
+| Epoch-E (Endurance) | 1000 ly | 5/hr | 0.75x | 0.9x |
+| Epoch-S (Standard) | 750 ly | 10/hr | 1.0x | 1.0x |
+| Epoch-R (Rapid) | 500 ly | 20/hr | 1.5x | 1.1x |
+
+Base output affects all systems that scale with power (drive range, sensor range).
 
 ### DriveType (Propulsion)
-| Type | Speed | Decay |
-|------|-------|-------|
-| DR-3 (Economy) | 0.5x | 0.75x |
-| DR-5 (Standard) | 1.0x | 1.0x |
-| DR-7 (Boost) | 2.0x | 1.5x |
+| Type | Amplitude (Speed) | Consumption (Power Appetite) | Sustain (Range) |
+|------|-------------------|------------------------------|-----------------|
+| DR-305 (Economy) | 0.5x | 0.6x | 10 ly |
+| DR-505 (Standard) | 1.0x | 1.0x | 7 ly |
+| DR-705 (Boost) | 2.0x | 1.5x | 5 ly |
+
+Performance ratio = min(1.0, coreOutput / consumption). Hungry drives underperform when underpowered.
 
 ### SensorType
+Different manufacturers, all Mk I (first generation):
 | Type | Range | Survey Duration | Success Chance |
 |------|-------|-----------------|----------------|
-| SR-L (Long-range) | 20 ly | 2.0x | 0.6 |
-| SR-S (Standard) | 12 ly | 1.0x | 0.7 |
-| SR-H (High-res) | 6 ly | 0.5x | 0.85 |
+| DSC Mk I (DeepScan) | 20 ly | 2.0x | 0.6 |
+| VRS Mk I (Versa) | 12 ly | 1.0x | 0.7 |
+| ACU Mk I (Acuity) | 6 ly | 0.5x | 0.85 |
 
 ### ShieldType
+Aegis series with Greek letter designations:
 | Type | Capacity | Regen Rate |
 |------|----------|------------|
-| Light | 50 | 20/hr |
-| Standard | 100 | 10/hr |
-| Heavy | 200 | 5/hr |
+| Aegis Alpha | 50 | 20/hr |
+| Aegis Beta | 100 | 10/hr |
+| Aegis Gamma | 200 | 5/hr |
 
 ### NavTier (1-5)
 Higher tiers → better skill/efficiency for route discovery.
@@ -93,16 +99,17 @@ Each ship system has a contract interface:
 
 ```
 Contracts/
-├── PowerSystem    # power regen, consumption, core life
-├── Propulsion     # jump duration, speed, decay multipliers
-├── Sensors        # scan range, power costs, survey duration
+├── PowerMetrics   # read-only power data (output multiplier, regen rate)
+├── PowerSystem    # extends PowerMetrics, adds mutations (consume, etc.)
+├── Propulsion     # jump duration, range, performance ratio
+├── Sensors        # scan range, success chance, survey duration
 ├── Shields        # shield regen, damage absorption
 ├── Hull           # integrity, damage, repair
 ├── Navigation     # tier, skill, efficiency, position
 └── ShipLink       # main interface, orchestrates systems
 ```
 
-Systems interact through interfaces. Propulsion can ask PowerSystem for current power. Sensors can consume power through PowerSystem.
+Systems that need power data receive `PowerMetrics` (read-only). Only Ship holds `PowerSystem` for mutations. This prevents systems from accidentally consuming resources.
 
 ## Action System
 
@@ -195,7 +202,7 @@ class ShipModel {
 }
 ```
 
-### ShipRepository
+### ShipSystemsRepository
 Loads from CPT + systems table. Saves back to both.
 
 ### ShipFactory
@@ -282,36 +289,59 @@ src/Helm/ShipLink/
 │   ├── ShieldType.php
 │   └── NavTier.php
 ├── Contracts/
-│   ├── PowerSystem.php
+│   ├── PowerMetrics.php      # read-only power interface
+│   ├── PowerSystem.php       # extends PowerMetrics
 │   ├── Propulsion.php
 │   ├── Sensors.php
 │   ├── Shields.php
 │   ├── Hull.php
 │   ├── Navigation.php
 │   └── ShipLink.php
+├── System/
+│   ├── Power.php
+│   ├── Propulsion.php
+│   ├── Sensors.php
+│   ├── Shields.php
+│   ├── Hull.php
+│   └── Navigation.php
 ├── Action.php
 ├── ActionResult.php
 ├── ActionStatus.php
 ├── ActionType.php
+├── Provider.php
+├── Ship.php                  # ShipLink implementation
+├── ShipFactory.php
+├── ShipModel.php
+├── ShipSystems.php           # table row DTO
+├── ShipSystemsRepository.php
 └── SystemResult.php
+
+src/Helm/CLI/
+├── ShipCommand.php           # create, diagnostic, list
+└── DbCommand.php             # migrate, status, drop
 ```
 
-Schema updated in `src/Helm/Database/Schema.php`:
+Schema in `src/Helm/Database/Schema.php`:
 - `helm_ship_systems` table
 - `helm_ship_actions` table
 
-## Still To Build
+## Implementation Status
 
-- [ ] ShipModel class
-- [ ] ShipRepository (hybrid CPT + table loading/saving)
-- [ ] ShipFactory
-- [ ] ShipLink implementation
-- [ ] System implementations (PowerSystem, Propulsion, etc.)
-- [ ] ActionProcessor
-- [ ] ActionRepository
-- [ ] Action Scheduler integration
-- [ ] REST controllers
-- [ ] Provider (DI wiring)
+**Completed:**
+- [x] ShipModel class
+- [x] ShipSystemsRepository (hybrid CPT + table loading/saving)
+- [x] ShipFactory (builds ShipLink with DI-wired systems)
+- [x] Ship (ShipLink implementation)
+- [x] System implementations (Power, Propulsion, Sensors, Shields, Hull, Navigation)
+- [x] Provider (DI wiring)
+- [x] CLI commands (create, diagnostic, list)
+- [x] Database schema (helm_ship_systems, helm_ship_actions tables)
+
+**Still To Build:**
+- [ ] ActionProcessor (orchestrates load → build → process → save)
+- [ ] ActionRepository (persistence for helm_ship_actions)
+- [ ] Action Scheduler integration (time-based actions)
+- [ ] REST controllers (ship API endpoints)
 
 ## Design Decisions
 

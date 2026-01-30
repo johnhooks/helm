@@ -33,9 +33,9 @@ enum DriveType: int
     public function label(): string
     {
         return match ($this) {
-            self::DR3 => __('DR-3 Economy', 'helm'),
-            self::DR5 => __('DR-5 Standard', 'helm'),
-            self::DR7 => __('DR-7 Boost', 'helm'),
+            self::DR3 => __('DR-305 Economy', 'helm'),
+            self::DR5 => __('DR-505 Standard', 'helm'),
+            self::DR7 => __('DR-705 Boost', 'helm'),
         };
     }
 
