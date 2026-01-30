@@ -25,7 +25,8 @@ final class ScanInput
         public readonly float $chance = 1.0,
         public readonly float $skill = 0.5,
         public readonly float $efficiency = 0.5,
-    ) {}
+    ) {
+    }
 
     /**
      * Get the distance between from and to nodes.

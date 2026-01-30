@@ -17,7 +17,8 @@ final class StarPost
 {
     public function __construct(
         private readonly WP_Post $post,
-    ) {}
+    ) {
+    }
 
     /**
      * Get the WordPress post ID.
@@ -67,7 +68,7 @@ final class StarPost
 
         // Get constellation from taxonomy
         $constellations = wp_get_post_terms($postId, PostTypeRegistry::TAXONOMY_CONSTELLATION);
-        if (! empty($constellations) && ! is_wp_error($constellations)) {
+        if (is_array($constellations) && $constellations !== []) {
             $properties['constellation'] = $constellations[0]->name;
         }
 

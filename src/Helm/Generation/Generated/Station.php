@@ -36,7 +36,8 @@ final class Station
         public readonly float $orbitAu,
         public readonly ?string $orbitsPlanet = null,
         public readonly array $services = [],
-    ) {}
+    ) {
+    }
 
     /**
      * Create from array data.

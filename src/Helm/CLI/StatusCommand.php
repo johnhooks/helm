@@ -24,7 +24,8 @@ class StatusCommand
         private readonly StarRepository $starRepository,
         private readonly PlanetRepository $planetRepository,
         private readonly ShipRepository $shipRepository,
-    ) {}
+    ) {
+    }
 
     /**
      * Show Helm status.
@@ -47,6 +48,9 @@ class StatusCommand
      *     wp helm status --format=json
      *
      * @when after_wp_load
+     *
+     * @param array<string> $args
+     * @param array<string, string> $assoc_args
      */
     public function __invoke(array $args, array $assoc_args): void
     {

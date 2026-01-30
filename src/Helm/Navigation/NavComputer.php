@@ -40,7 +40,8 @@ final class NavComputer
         private readonly NodeGenerator $generator,
         private readonly NodeRepository $nodeRepository,
         private readonly EdgeRepository $edgeRepository,
-    ) {}
+    ) {
+    }
 
     /**
      * Perform a navigation scan.

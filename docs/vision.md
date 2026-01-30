@@ -203,6 +203,28 @@ Keep discoveries private:
 - Advantage: first mover on valuable nodes
 ```
 
+### Routes as Trade Assets
+
+Charted routes have economic value beyond the nodes they connect:
+
+```
+- A safe path between markets (no ambushes, cleared hazards)
+- Fuel-efficient routes (fewer jumps, shorter distances)
+- Exclusive access to chokepoint waypoints
+- "Toll road" potential for high-traffic corridors
+```
+
+Route ownership creates strategic possibilities:
+
+| Asset | Value |
+|-------|-------|
+| Trade route | Connects resource-rich and resource-poor systems |
+| Clean corridor | Verified safe passage (events cleared) |
+| Shortcut | Fewer jumps than public alternatives |
+| Chokepoint | Controls access to a region |
+
+Routes can be sold outright, licensed for use, or kept secret for competitive advantage.
+
 ## Objects and Ownership
 
 Origin tracks all ownership.
@@ -365,6 +387,21 @@ Origin Alpha                    Origin Beta
 Each Origin is a sovereign economy. Federation happens through negotiated trade deals, not global consensus.
 
 But this is future work. For now: single Origin, solid foundation.
+
+## Deferred: Multi-Crew Ships
+
+The architecture supports multiple users operating a single ship—WordPress roles map to crew positions, the Abilities API could handle crew actions, async state means crew don't need to be online simultaneously.
+
+Whether this is *fun* gameplay is unknown. Multi-crew games face hard problems:
+
+- **Coordination tax**: Getting people online together
+- **Role asymmetry**: Is every station equally engaging?
+- **Pacing**: Someone's always waiting on someone else
+- **Solo fallback**: What happens when you're alone?
+
+**Current goal**: Playable solo ship. The backend supports crew interaction, but we're not designing for it yet. If multi-crew emerges, it might be AI crew members (using the Abilities API) rather than human players.
+
+This is a design bet we're deferring until we have something playable.
 
 ## Development Philosophy
 

@@ -25,7 +25,8 @@ class StarCommand
         private readonly PlanetRepository $planetRepository,
         private readonly SystemGenerator $systemGenerator,
         private readonly Origin $origin,
-    ) {}
+    ) {
+    }
 
     /**
      * Seed stars from the catalog to the database.
@@ -53,6 +54,9 @@ class StarCommand
      *     wp helm star seed --fresh
      *
      * @when after_wp_load
+     *
+     * @param array<string> $args
+     * @param array<string, string> $assoc_args
      */
     public function seed(array $args, array $assoc_args): void
     {
@@ -78,7 +82,8 @@ class StarCommand
 
         WP_CLI::log(sprintf('Seeding %d stars from catalog...', $total));
 
-        $progress = WP_CLI\Utils\make_progress_bar('Seeding stars', $total);
+        /** @var \cli\progress\Bar $progress */
+        $progress = \WP_CLI\Utils\make_progress_bar('Seeding stars', $total);
         $created = 0;
         $skipped = 0;
         $errors = 0;
@@ -132,6 +137,9 @@ class StarCommand
      *     wp helm star generate 42 --dry-run
      *
      * @when after_wp_load
+     *
+     * @param array<string> $args
+     * @param array<string, string> $assoc_args
      */
     public function generate(array $args, array $assoc_args): void
     {
@@ -140,14 +148,12 @@ class StarCommand
 
         if ($postId <= 0) {
             WP_CLI::error('Please provide a valid star post ID');
-            return;
         }
 
         // Get the star from post ID
         $starPost = $this->repository->getByPostId($postId);
         if ($starPost === null) {
             WP_CLI::error(sprintf("Star post %d not found", $postId));
-            return;
         }
 
         $star = $starPost->toStar();
@@ -155,7 +161,6 @@ class StarCommand
         // Check origin is initialized
         if (! $this->origin->isInitialized()) {
             WP_CLI::error('Origin not initialized. Run: wp helm origin init');
-            return;
         }
 
         // Dry run - just output JSON
@@ -166,7 +171,7 @@ class StarCommand
 
         // Check if planets already exist
         $existingPlanets = $this->planetRepository->forStarPostId($postId);
-        if (! empty($existingPlanets)) {
+        if ($existingPlanets !== []) {
             WP_CLI::warning(sprintf(
                 "Star %s already has %d planets. Delete them first to regenerate.",
                 $star->displayName(),
@@ -198,7 +203,8 @@ class StarCommand
             return;
         }
 
-        $progress = WP_CLI\Utils\make_progress_bar('Deleting stars', $count);
+        /** @var \cli\progress\Bar $progress */
+        $progress = \WP_CLI\Utils\make_progress_bar('Deleting stars', $count);
 
         foreach ($posts as $postId) {
             wp_delete_post($postId, true);
@@ -252,7 +258,7 @@ class StarCommand
 
         $count = 0;
         foreach ($contents->planets as $planet) {
-            $this->planetRepository->save($planet, $postId);
+            $this->planetRepository->saveGenerated($planet, $star->id, $postId);
             $count++;
         }
 

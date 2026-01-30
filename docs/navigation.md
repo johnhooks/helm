@@ -195,17 +195,54 @@ When computation fails, you can:
   - First discoverer gets credit?
   - Both add to traversal count?
 
-## Deferred (Node Events)
+## Deferred (Discovery Events)
 
-First-traveler bonuses/penalties - revisit after core navigation works:
+Discovery is gameplay, not a loading screen. Revisit after core navigation works.
 
-| Event Type | Uses | Effect |
-|------------|------|--------|
-| Derelict ship | 1-3 | Salvage loot |
-| Resource cache | 5-10 | Bonus resources |
-| Pirate ambush | 3-5 | Combat encounter |
-| Anomaly | 1 | Unique discovery |
-| Clear space | ∞ | Nothing special |
+### Design Intent
+
+The act of scanning and traversing unknown space should carry risk and reward. Unlike traditional space games where travel is safe and destinations are dangerous, Helm makes the journey itself meaningful. A navigator isn't just plotting courses—they're making risk assessments.
+
+### Event Triggers
+
+Events can trigger at two points:
+
+**During Scan** (revealing waypoints)
+- Scan toward unknown space → chance of detecting something
+- "Something" isn't always good
+- Failed scans might ping hostile attention or damage sensors
+
+**During Traversal** (jumping to a node)
+- First visitor to a waypoint may encounter events
+- Events are consumed (limited uses) or permanent
+- Risk/reward decision: take the charted route or explore?
+
+### Event Types
+
+| Event Type | Uses | Effect | Risk/Reward |
+|------------|------|--------|-------------|
+| Derelict ship | 1-3 | Salvage loot, data logs | Low risk, moderate reward |
+| Resource cache | 5-10 | Bonus resources | No risk, low reward |
+| Pirate ambush | 3-5 | Combat encounter | High risk, variable reward |
+| Anomaly | 1 | Unique discovery, artifacts | Unknown risk, high reward |
+| Distress signal | 1 | Rescue scenario, reputation | Time cost, reputation reward |
+| Sensor ghost | ∞ | False positive, wasted scan | Time cost, no reward |
+| Radiation spike | ∞ | System damage if unprepared | Avoidable with preparation |
+| Clear space | ∞ | Nothing special | Safe passage |
+
+### Probability Factors
+
+Event probability could be influenced by:
+- Distance from charted space (further = more events)
+- Corridor difficulty (harder corridors = more hazards)
+- Scan depth (deeper scans reveal event signatures)
+- Ship sensors (better equipment = better warnings)
+
+### Strategic Implications
+
+- **Scouts vs Traders**: Some ships optimize for first-contact, others for safe routes
+- **Route value**: A "clean" route (no ambushes) is worth more than an uncleared one
+- **Information asymmetry**: Knowing what's at a waypoint before others do has value
 
 ## Data Model
 

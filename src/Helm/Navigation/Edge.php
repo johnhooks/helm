@@ -23,7 +23,8 @@ final class Edge
         public readonly int $traversalCount = 0,
         public readonly int $algorithmVersion = 1,
         public readonly ?string $createdAt = null,
-    ) {}
+    ) {
+    }
 
     /**
      * Is this edge well-traveled enough to be publicly visible?
@@ -68,6 +69,8 @@ final class Edge
 
     /**
      * Create from database row.
+     *
+     * @param array<string, mixed>|object $row
      */
     public static function fromRow(array|object $row): self
     {
@@ -91,6 +94,8 @@ final class Edge
      * Convert to array for database insertion.
      *
      * Ensures node_a_id < node_b_id for consistency.
+     *
+     * @return array<string, mixed>
      */
     public function toRow(): array
     {

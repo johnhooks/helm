@@ -151,7 +151,7 @@ final class EdgeRepository
     ): Edge {
         // Check if edge already exists
         $existing = $this->getBetween($nodeA, $nodeB);
-        if ($existing) {
+        if ($existing !== null) {
             return $existing;
         }
 
@@ -188,7 +188,7 @@ final class EdgeRepository
     public function incrementTraversalBetween(int $nodeA, int $nodeB): void
     {
         $edge = $this->getBetween($nodeA, $nodeB);
-        if ($edge) {
+        if ($edge !== null) {
             $this->incrementTraversal($edge->id);
         }
     }

@@ -17,7 +17,8 @@ final class PlanetPost
 {
     public function __construct(
         private readonly WP_Post $post,
-    ) {}
+    ) {
+    }
 
     /**
      * Get the WordPress post ID.
@@ -87,7 +88,7 @@ final class PlanetPost
         // Get planet type from taxonomy
         $type = Planet::TYPE_TERRESTRIAL;
         $types = wp_get_post_terms($postId, PostTypeRegistry::TAXONOMY_PLANET_TYPE);
-        if (! empty($types) && ! is_wp_error($types)) {
+        if (is_array($types) && $types !== []) {
             $type = $types[0]->slug;
         }
 
@@ -101,8 +102,8 @@ final class PlanetPost
             habitable: (bool) get_post_meta($postId, PostTypeRegistry::META_PLANET_HABITABLE, true),
             moons: (int) get_post_meta($postId, PostTypeRegistry::META_PLANET_MOONS, true),
             name: $this->post->post_title !== $this->planetId() ? $this->post->post_title : null,
-            radiusEarth: ($r = get_post_meta($postId, PostTypeRegistry::META_PLANET_RADIUS, true)) ? (float) $r : null,
-            massEarth: ($m = get_post_meta($postId, PostTypeRegistry::META_PLANET_MASS, true)) ? (float) $m : null,
+            radiusEarth: ($r = get_post_meta($postId, PostTypeRegistry::META_PLANET_RADIUS, true)) !== '' && $r !== false ? (float) $r : null,
+            massEarth: ($m = get_post_meta($postId, PostTypeRegistry::META_PLANET_MASS, true)) !== '' && $m !== false ? (float) $m : null,
             confirmed: (bool) get_post_meta($postId, PostTypeRegistry::META_PLANET_CONFIRMED, true),
         );
     }

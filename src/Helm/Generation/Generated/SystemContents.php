@@ -27,7 +27,8 @@ final class SystemContents
         public readonly array $asteroidBelts = [],
         public readonly array $stations = [],
         public readonly array $anomalies = [],
-    ) {}
+    ) {
+    }
 
     /**
      * Generate a content hash for verification.
@@ -104,10 +105,10 @@ final class SystemContents
      */
     public function isEmpty(): bool
     {
-        return empty($this->planets)
-            && empty($this->asteroidBelts)
-            && empty($this->stations)
-            && empty($this->anomalies);
+        return $this->planets === []
+            && $this->asteroidBelts === []
+            && $this->stations === []
+            && $this->anomalies === [];
     }
 
     /**

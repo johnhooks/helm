@@ -96,8 +96,8 @@ final class ShipRepository
             'post_type' => PostTypeRegistry::POST_TYPE_SHIP,
             'post_status' => 'publish',
             'post_title' => $ship->name,
-            'post_date' => gmdate('Y-m-d H:i:s', $ship->createdAt ?: time()),
-            'post_date_gmt' => gmdate('Y-m-d H:i:s', $ship->createdAt ?: time()),
+            'post_date' => gmdate('Y-m-d H:i:s', $ship->createdAt !== 0 ? $ship->createdAt : time()),
+            'post_date_gmt' => gmdate('Y-m-d H:i:s', $ship->createdAt !== 0 ? $ship->createdAt : time()),
         ], true);
 
         if (is_wp_error($postId)) {
@@ -119,8 +119,8 @@ final class ShipRepository
         wp_update_post([
             'ID' => $postId,
             'post_title' => $ship->name,
-            'post_modified' => gmdate('Y-m-d H:i:s', $ship->updatedAt ?: time()),
-            'post_modified_gmt' => gmdate('Y-m-d H:i:s', $ship->updatedAt ?: time()),
+            'post_modified' => gmdate('Y-m-d H:i:s', $ship->updatedAt !== 0 ? $ship->updatedAt : time()),
+            'post_modified_gmt' => gmdate('Y-m-d H:i:s', $ship->updatedAt !== 0 ? $ship->updatedAt : time()),
         ]);
 
         $this->saveMeta($postId, $ship);
@@ -204,7 +204,7 @@ final class ShipRepository
             'update_post_term_cache' => false,
         ]);
 
-        if (empty($query->posts)) {
+        if ($query->posts === []) {
             return null;
         }
 

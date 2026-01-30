@@ -38,7 +38,8 @@ final class Anomaly
         public readonly float $locationAu,
         public readonly array $reward,
         public readonly int $difficulty = 50,
-    ) {}
+    ) {
+    }
 
     /**
      * Create from array data.

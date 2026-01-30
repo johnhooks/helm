@@ -21,7 +21,8 @@ final class StarBatchGenerator
     public function __construct(
         private readonly StarCatalog $catalog,
         private readonly StarRepository $repository,
-    ) {}
+    ) {
+    }
 
     /**
      * Schedule the first batch of star generation.
@@ -117,6 +118,7 @@ final class StarBatchGenerator
      * Run generation synchronously (for CLI or testing).
      *
      * @param callable|null $onProgress Called after each batch with (processed, total)
+     * @return array{status: string, total: int, processed: int, batch_size: int, started_at: int, completed_at: int|null, errors: array<array{star_id: string, error: string, time: int}>}
      */
     public function runSync(
         int $batchSize = self::DEFAULT_BATCH_SIZE,
@@ -177,7 +179,7 @@ final class StarBatchGenerator
     /**
      * Get current generation progress.
      *
-     * @return array{status: string, total: int, processed: int, batch_size: int, started_at: int|null, completed_at: int|null, errors: array}
+     * @return array{status: string, total: int, processed: int, batch_size: int, started_at: int|null, completed_at: int|null, errors: array<array{star_id: string, error: string, time: int}>}
      */
     public function getProgress(): array
     {
@@ -198,6 +200,8 @@ final class StarBatchGenerator
 
     /**
      * Update generation progress.
+     *
+     * @param array{status: string, total: int, processed: int, batch_size: int, started_at: int|null, completed_at: int|null, errors: array<array{star_id: string, error: string, time: int}>} $progress
      */
     private function updateProgress(array $progress): void
     {

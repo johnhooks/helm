@@ -14,7 +14,8 @@ class OriginCommand
 {
     public function __construct(
         private readonly Origin $origin,
-    ) {}
+    ) {
+    }
 
     /**
      * Initialize a new Origin (game universe).
@@ -42,6 +43,9 @@ class OriginCommand
      *     wp helm origin init production --seed=my-secret-seed-123
      *
      * @when after_wp_load
+     *
+     * @param array<string> $args
+     * @param array<string, string> $assoc_args
      */
     public function init(array $args, array $assoc_args): void
     {
@@ -53,9 +57,8 @@ class OriginCommand
             WP_CLI::error(sprintf(
                 "Origin already initialized (id: %s, created: %s). Cannot reinitialize.",
                 $config->id,
-                date('Y-m-d H:i:s', $config->createdAt)
+                wp_date('Y-m-d H:i:s', $config->createdAt)
             ));
-            return;
         }
 
         $config = $this->origin->initialize($id, $seed);
@@ -64,7 +67,7 @@ class OriginCommand
         WP_CLI::log('');
         WP_CLI::log(sprintf('  ID:           %s', $config->id));
         WP_CLI::log(sprintf('  Master Seed:  %s', substr($config->masterSeed, 0, 16) . '...'));
-        WP_CLI::log(sprintf('  Created:      %s', date('Y-m-d H:i:s', $config->createdAt)));
+        WP_CLI::log(sprintf('  Created:      %s', wp_date('Y-m-d H:i:s', $config->createdAt)));
         WP_CLI::log('');
         WP_CLI::log('You can now generate stars and planets.');
     }
@@ -83,6 +86,9 @@ class OriginCommand
      *     wp helm origin status --show-seed
      *
      * @when after_wp_load
+     *
+     * @param array<string> $args
+     * @param array<string, string> $assoc_args
      */
     public function status(array $args, array $assoc_args): void
     {
@@ -107,7 +113,7 @@ class OriginCommand
         }
 
         WP_CLI::log(sprintf('  Known Space Threshold: %d ly', $config->knownSpaceThreshold));
-        WP_CLI::log(sprintf('  Created:               %s', date('Y-m-d H:i:s', $config->createdAt)));
+        WP_CLI::log(sprintf('  Created:               %s', wp_date('Y-m-d H:i:s', $config->createdAt)));
         WP_CLI::log('');
     }
 }

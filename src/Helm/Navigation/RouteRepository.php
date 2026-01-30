@@ -184,7 +184,7 @@ final class RouteRepository
 
         // Check if route should become public
         $route = $this->get($routeId);
-        if ($route && $route->shouldBecomePublic()) {
+        if ($route !== null && $route->shouldBecomePublic()) {
             $this->makePublic($routeId);
         }
     }

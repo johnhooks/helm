@@ -20,12 +20,6 @@ final class NodeGenerator
     public const ALGORITHM_VERSION = 1;
 
     /**
-     * How far along the path to place waypoints (0.0-1.0).
-     * 0.4 means 40% of the way from start to destination.
-     */
-    private const BASE_PROGRESS = 0.4;
-
-    /**
      * Maximum perpendicular scatter as fraction of distance.
      * 0.1 means up to 10% of the total distance off the direct line.
      */
@@ -33,7 +27,8 @@ final class NodeGenerator
 
     public function __construct(
         private readonly Origin $origin,
-    ) {}
+    ) {
+    }
 
     /**
      * Compute the next waypoint between two nodes.

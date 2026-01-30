@@ -96,7 +96,7 @@ final class Origin
     {
         $data = get_option(self::OPTION_NAME);
 
-        if (! is_array($data) || empty($data)) {
+        if (! is_array($data) || $data === []) {
             return null;
         }
 

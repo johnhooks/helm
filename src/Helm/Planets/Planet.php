@@ -52,7 +52,8 @@ final class Planet
         public readonly ?float $orbitalPeriodDays = null,
         public readonly ?float $equilibriumTempK = null,
         public readonly bool $confirmed = false,
-    ) {}
+    ) {
+    }
 
     /**
      * Create from array data.

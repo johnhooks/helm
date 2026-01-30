@@ -13,7 +13,8 @@ final class DiscoveryRepository
 {
     public function __construct(
         private readonly \wpdb $wpdb,
-    ) {}
+    ) {
+    }
 
     /**
      * Save a discovery.
@@ -96,7 +97,7 @@ final class DiscoveryRepository
 
         return array_map(
             fn(array $row) => Discovery::fromRow($row),
-            $rows ?: []
+            $rows ?? []
         );
     }
 
@@ -119,7 +120,7 @@ final class DiscoveryRepository
 
         return array_map(
             fn(array $row) => Discovery::fromRow($row),
-            $rows ?: []
+            $rows ?? []
         );
     }
 
@@ -142,7 +143,7 @@ final class DiscoveryRepository
 
         return array_map(
             fn(array $row) => Discovery::fromRow($row),
-            $rows ?: []
+            $rows ?? []
         );
     }
 

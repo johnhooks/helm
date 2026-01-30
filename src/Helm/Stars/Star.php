@@ -62,10 +62,13 @@ final class Star
         public readonly float $dec,
         public readonly array $properties = [],
         public readonly array $confirmedPlanets = [],
-    ) {}
+    ) {
+    }
 
     /**
      * Create from catalog data array.
+     *
+     * @param array<string, mixed> $data
      */
     public static function fromArray(string $id, array $data): self
     {

@@ -468,7 +468,7 @@ final class SystemGenerator
             $orbitsPlanet = null;
             $orbitAu = 0.0;
 
-            if (! empty($planets) && $rng->chance(600)) {
+            if ($planets !== [] && $rng->chance(600)) {
                 // 60% chance to orbit a planet
                 $planet = $rng->pick($planets);
                 $orbitsPlanet = $planet->id;
@@ -748,7 +748,7 @@ final class SystemGenerator
      */
     private function findBeltLocation(array $planets, SeededRandom $rng): float
     {
-        if (empty($planets)) {
+        if ($planets === []) {
             return $rng->between(20, 50) / 10; // 2.0 to 5.0 AU
         }
 
@@ -798,12 +798,12 @@ final class SystemGenerator
         }
 
         // Increase for sun-like stars
-        if (in_array($star->spectralClass(), ['F', 'G', 'K'])) {
+        if (in_array($star->spectralClass(), ['F', 'G', 'K'], true)) {
             $chance += 100;
         }
 
         // Decrease for very hot or very dim stars
-        if (in_array($star->spectralClass(), ['O', 'B', 'M'])) {
+        if (in_array($star->spectralClass(), ['O', 'B', 'M'], true)) {
             $chance -= 100;
         }
 
@@ -851,7 +851,7 @@ final class SystemGenerator
         ];
 
         foreach ($additional as $service) {
-            if (! in_array($service, $services) && $rng->chance(300)) {
+            if (! in_array($service, $services, true) && $rng->chance(300)) {
                 $services[] = $service;
             }
         }

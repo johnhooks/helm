@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Helm\Planets;
 
+use Helm\Generation\Generated\Planet as GeneratedPlanet;
 use Helm\PostTypes\PostTypeRegistry;
 use Helm\Stars\StarRepository;
 use WP_Post;
@@ -16,7 +17,8 @@ final class PlanetRepository
 {
     public function __construct(
         private readonly StarRepository $starRepository,
-    ) {}
+    ) {
+    }
 
     /**
      * Get a planet by its unique ID.
@@ -70,6 +72,22 @@ final class PlanetRepository
     }
 
     /**
+     * Save a Generated Planet as a CPT.
+     *
+     * Creates a new post or updates existing one if planet ID already exists.
+     */
+    public function saveGenerated(GeneratedPlanet $planet, string $starId, int $starPostId): PlanetPost
+    {
+        $existing = $this->get($planet->id);
+
+        if ($existing !== null) {
+            return $this->updateGenerated($existing->postId(), $planet, $starId);
+        }
+
+        return $this->createGenerated($planet, $starId, $starPostId);
+    }
+
+    /**
      * Create a new planet post.
      */
     private function create(Planet $planet, ?int $starPostId = null): PlanetPost
@@ -103,6 +121,31 @@ final class PlanetRepository
     }
 
     /**
+     * Create a new planet post from a generated planet.
+     */
+    private function createGenerated(GeneratedPlanet $planet, string $starId, int $starPostId): PlanetPost
+    {
+        $postId = wp_insert_post([
+            'post_type' => PostTypeRegistry::POST_TYPE_PLANET,
+            'post_status' => 'publish',
+            'post_title' => $planet->name ?? $planet->id,
+            'post_parent' => $starPostId,
+        ], true);
+
+        if (is_wp_error($postId)) {
+            throw new \RuntimeException(
+                sprintf('Failed to create planet post: %s', $postId->get_error_message())
+            );
+        }
+
+        $this->saveGeneratedMeta($postId, $planet, $starId);
+        $this->saveGeneratedTaxonomies($postId, $planet);
+
+        $post = get_post($postId);
+        return PlanetPost::fromPost($post);
+    }
+
+    /**
      * Update an existing planet post.
      */
     private function update(int $postId, Planet $planet): PlanetPost
@@ -114,6 +157,23 @@ final class PlanetRepository
 
         $this->saveMeta($postId, $planet);
         $this->saveTaxonomies($postId, $planet);
+
+        $post = get_post($postId);
+        return PlanetPost::fromPost($post);
+    }
+
+    /**
+     * Update an existing planet post from a generated planet.
+     */
+    private function updateGenerated(int $postId, GeneratedPlanet $planet, string $starId): PlanetPost
+    {
+        wp_update_post([
+            'ID' => $postId,
+            'post_title' => $planet->name ?? $planet->id,
+        ]);
+
+        $this->saveGeneratedMeta($postId, $planet, $starId);
+        $this->saveGeneratedTaxonomies($postId, $planet);
 
         $post = get_post($postId);
         return PlanetPost::fromPost($post);
@@ -140,9 +200,44 @@ final class PlanetRepository
             update_post_meta($postId, PostTypeRegistry::META_PLANET_MASS, $planet->massEarth);
         }
 
-        if (! empty($planet->resources)) {
+        if ($planet->resources !== []) {
             update_post_meta($postId, PostTypeRegistry::META_PLANET_RESOURCES, $planet->resources);
         }
+    }
+
+    /**
+     * Save generated planet metadata.
+     */
+    private function saveGeneratedMeta(int $postId, GeneratedPlanet $planet, string $starId): void
+    {
+        update_post_meta($postId, PostTypeRegistry::META_PLANET_ID, $planet->id);
+        update_post_meta($postId, PostTypeRegistry::META_PLANET_STAR_ID, $starId);
+        update_post_meta($postId, PostTypeRegistry::META_PLANET_ORBIT_AU, $planet->orbitAu);
+        update_post_meta($postId, PostTypeRegistry::META_PLANET_ORBIT_INDEX, $planet->orbitIndex);
+        update_post_meta($postId, PostTypeRegistry::META_PLANET_HABITABLE, $planet->habitable ? '1' : '0');
+        update_post_meta($postId, PostTypeRegistry::META_PLANET_CONFIRMED, $planet->confirmed ? '1' : '0');
+        update_post_meta($postId, PostTypeRegistry::META_PLANET_MOONS, $planet->moons);
+
+        if ($planet->radiusEarth !== null) {
+            update_post_meta($postId, PostTypeRegistry::META_PLANET_RADIUS, $planet->radiusEarth);
+        }
+
+        if ($planet->massEarth !== null) {
+            update_post_meta($postId, PostTypeRegistry::META_PLANET_MASS, $planet->massEarth);
+        }
+
+        if ($planet->resources !== []) {
+            update_post_meta($postId, PostTypeRegistry::META_PLANET_RESOURCES, $planet->resources);
+        }
+    }
+
+    /**
+     * Save generated planet taxonomies.
+     */
+    private function saveGeneratedTaxonomies(int $postId, GeneratedPlanet $planet): void
+    {
+        // Set planet type taxonomy
+        wp_set_object_terms($postId, $planet->type, PostTypeRegistry::TAXONOMY_PLANET_TYPE);
     }
 
     /**

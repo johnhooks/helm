@@ -48,7 +48,8 @@ final class Ship
         public readonly array $artifacts = [],
         public readonly int $createdAt = 0,
         public readonly int $updatedAt = 0,
-    ) {}
+    ) {
+    }
 
     /**
      * Create from database row.

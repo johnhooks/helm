@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Helm\Database;
 
-
 /**
  * Centralized database schema management.
  *
@@ -181,8 +180,8 @@ final class Schema
 
                 // Filter out DESCRIBE queries (used by dbDelta to check schema)
                 if (
-                    empty($error['error_str'])
-                    || empty($error['query'])
+                    ($error['error_str'] ?? '') === ''
+                    || ($error['query'] ?? '') === ''
                     || str_starts_with($error['query'], 'DESCRIBE ')
                 ) {
                     continue;

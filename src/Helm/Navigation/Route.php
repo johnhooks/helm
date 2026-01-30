@@ -17,6 +17,9 @@ final class Route
 
     public const PUBLIC_THRESHOLD = 5;
 
+    /**
+     * @param array<int> $path Node IDs in order
+     */
     public function __construct(
         public readonly int $id,
         public readonly int $startNodeId,
@@ -30,7 +33,8 @@ final class Route
         public readonly ?string $name = null,
         public readonly int $algorithmVersion = 1,
         public readonly ?string $createdAt = null,
-    ) {}
+    ) {
+    }
 
     /**
      * Is this route publicly visible?
@@ -58,6 +62,8 @@ final class Route
 
     /**
      * Get the path as node IDs.
+     *
+     * @return array<int>
      */
     public function nodeIds(): array
     {
@@ -80,6 +86,8 @@ final class Route
 
     /**
      * Create from database row.
+     *
+     * @param array<string, mixed>|object $row
      */
     public static function fromRow(array|object $row): self
     {
@@ -110,6 +118,8 @@ final class Route
 
     /**
      * Convert to array for database insertion.
+     *
+     * @return array<string, mixed>
      */
     public function toRow(): array
     {
@@ -129,6 +139,8 @@ final class Route
 
     /**
      * Create a new route from a completed path.
+     *
+     * @param array<int> $path Node IDs in order
      */
     public static function create(
         array $path,

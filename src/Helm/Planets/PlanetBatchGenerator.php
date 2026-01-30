@@ -27,7 +27,8 @@ final class PlanetBatchGenerator
         private readonly PlanetRepository $planetRepository,
         private readonly SystemGenerator $systemGenerator,
         private readonly Origin $origin,
-    ) {}
+    ) {
+    }
 
     /**
      * Schedule planet generation for all stars.
@@ -187,6 +188,7 @@ final class PlanetBatchGenerator
      * Run generation synchronously (for CLI or testing).
      *
      * @param callable|null $onProgress Called after each batch with (starsProcessed, totalStars, planetsCreated)
+     * @return array{status: string, total_stars: int, stars_processed: int, planets_created: int, batch_size: int, started_at: int, completed_at: int|null, errors: array<array{star_id: string, error: string, time: int}>}
      */
     public function runSync(
         int $batchSize = self::DEFAULT_BATCH_SIZE,
@@ -283,7 +285,7 @@ final class PlanetBatchGenerator
     /**
      * Get current generation progress.
      *
-     * @return array{status: string, total_stars: int, stars_processed: int, planets_created: int, batch_size: int, started_at: int|null, completed_at: int|null, errors: array}
+     * @return array{status: string, total_stars: int, stars_processed: int, planets_created: int, batch_size: int, started_at: int|null, completed_at: int|null, errors: array<array{star_id: string, error: string, time: int}>}
      */
     public function getProgress(): array
     {
@@ -305,6 +307,8 @@ final class PlanetBatchGenerator
 
     /**
      * Update generation progress.
+     *
+     * @param array{status: string, total_stars: int, stars_processed: int, planets_created: int, batch_size: int, started_at: int|null, completed_at: int|null, errors: array<array{star_id: string, error: string, time: int}>} $progress
      */
     private function updateProgress(array $progress): void
     {

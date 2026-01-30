@@ -23,7 +23,8 @@ final class StarCatalog
 
     public function __construct(
         private readonly string $catalogPath,
-    ) {}
+    ) {
+    }
 
     /**
      * Get a star by its catalog ID (e.g., 'HIP_70890', 'SOL').
@@ -67,6 +68,7 @@ final class StarCatalog
     {
         $this->ensureLoaded();
 
+        /** @var array<string, Star> $sorted */
         $sorted = $this->stars;
         uasort($sorted, fn(Star $a, Star $b) => $a->distanceLy <=> $b->distanceLy);
 

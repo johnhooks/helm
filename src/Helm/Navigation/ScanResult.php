@@ -23,7 +23,8 @@ final class ScanResult
         public readonly array $edges,
         public readonly bool $complete,
         public readonly bool $failed = false,
-    ) {}
+    ) {
+    }
 
     /**
      * Create a successful scan result.

@@ -29,7 +29,8 @@ final class AsteroidBelt
         public readonly float $outerAu,
         public readonly int $density = 50,
         public readonly array $resources = [],
-    ) {}
+    ) {
+    }
 
     /**
      * Create from array data.

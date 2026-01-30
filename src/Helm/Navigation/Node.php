@@ -22,7 +22,8 @@ final class Node
         public readonly ?string $hash = null,
         public readonly int $algorithmVersion = 1,
         public readonly ?string $createdAt = null,
-    ) {}
+    ) {
+    }
 
     /**
      * Is this node a star (has a star system)?
@@ -54,6 +55,8 @@ final class Node
 
     /**
      * Get coordinates as array.
+     *
+     * @return array{float, float, float}
      */
     public function coordinates(): array
     {
@@ -62,6 +65,8 @@ final class Node
 
     /**
      * Create from database row.
+     *
+     * @param array<string, mixed>|object $row
      */
     public static function fromRow(array|object $row): self
     {
@@ -83,6 +88,8 @@ final class Node
 
     /**
      * Convert to array for database insertion.
+     *
+     * @return array<string, mixed>
      */
     public function toRow(): array
     {

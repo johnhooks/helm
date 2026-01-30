@@ -59,7 +59,7 @@ final class SeededRandom
      */
     public function pick(array $items): mixed
     {
-        if (empty($items)) {
+        if ($items === []) {
             throw new \InvalidArgumentException('Cannot pick from empty array');
         }
 
@@ -78,7 +78,7 @@ final class SeededRandom
      */
     public function pickWeighted(array $weightedItems): mixed
     {
-        if (empty($weightedItems)) {
+        if ($weightedItems === []) {
             throw new \InvalidArgumentException('Cannot pick from empty array');
         }
 

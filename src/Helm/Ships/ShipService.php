@@ -14,7 +14,8 @@ final class ShipService
 
     public function __construct(
         private readonly ShipRepository $repository,
-    ) {}
+    ) {
+    }
 
     /**
      * Create a new ship.

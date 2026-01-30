@@ -21,7 +21,9 @@ final class Provider extends ServiceProvider
     public function boot(): void
     {
         // Create tables on plugin activation
-        register_activation_hook(HELM_FILE, [Schema::class, 'createTables']);
+        register_activation_hook(HELM_FILE, static function (bool $network_wide): void {
+            Schema::createTables();
+        });
 
         // Check for schema upgrades on admin init
         add_action('admin_init', [$this, 'maybeUpgradeSchema']);

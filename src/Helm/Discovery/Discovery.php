@@ -18,7 +18,8 @@ final class Discovery
         public readonly string $contentsHash,
         public readonly bool $isFirst,
         public readonly int $discoveredAt,
-    ) {}
+    ) {
+    }
 
     /**
      * Create from database row.

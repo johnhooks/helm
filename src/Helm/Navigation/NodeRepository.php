@@ -107,7 +107,9 @@ final class NodeRepository
                 FROM %i
                 HAVING dist_squared <= %f
                 ORDER BY dist_squared",
-                $x, $y, $z,
+                $x,
+                $y,
+                $z,
                 Schema::table(Schema::TABLE_NAV_NODES),
                 $maxDistanceSquared
             ),
@@ -168,7 +170,7 @@ final class NodeRepository
         // If hash provided, check for existing waypoint
         if ($hash !== null) {
             $existing = $this->getByHash($hash);
-            if ($existing) {
+            if ($existing !== null) {
                 return $existing;
             }
         }

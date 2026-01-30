@@ -132,11 +132,11 @@ final class StarRepository
             update_post_meta($postId, PostTypeRegistry::META_STAR_LUMINOSITY, $star->luminosity());
         }
 
-        if (! empty($star->properties)) {
+        if ($star->properties !== []) {
             update_post_meta($postId, PostTypeRegistry::META_STAR_PROPERTIES, $star->properties);
         }
 
-        if (! empty($star->confirmedPlanets)) {
+        if ($star->confirmedPlanets !== []) {
             update_post_meta($postId, PostTypeRegistry::META_STAR_CONFIRMED_PLANETS, $star->confirmedPlanets);
         }
     }

@@ -9,6 +9,9 @@ parameters:
 
     scanFiles:
         - vendor/php-stubs/wordpress-stubs/wordpress-stubs.php
+        - vendor/php-stubs/wp-cli-stubs/wp-cli-stubs.php
+        - vendor/php-stubs/wp-cli-stubs/wp-cli-commands-stubs.php
+        - vendor/php-stubs/wp-cli-stubs/wp-cli-i18n-stubs.php
         - vendor/woocommerce/action-scheduler/functions.php
 
     # Treat PHPDoc types as uncertain to allow defensive runtime checks.

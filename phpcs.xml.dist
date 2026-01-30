@@ -26,7 +26,11 @@
         <!-- Exceptions don't need escaping -->
         <exclude name="WordPress.Security.EscapeOutput.ExceptionNotEscaped"/>
     </rule>
-    <rule ref="WordPress.DB"/>
+    <rule ref="WordPress.DB">
+        <!-- We use %i placeholder for table names (WP 6.2+) which PHPCS doesn't recognize -->
+        <exclude name="WordPress.DB.PreparedSQL.InterpolatedNotPrepared"/>
+        <exclude name="WordPress.DB.PreparedSQL.NotPrepared"/>
+    </rule>
     <rule ref="WordPress.DateTime.RestrictedFunctions"/>
     <rule ref="WordPress.PHP.DevelopmentFunctions"/>
     <rule ref="WordPress.PHP.DiscouragedPHPFunctions"/>

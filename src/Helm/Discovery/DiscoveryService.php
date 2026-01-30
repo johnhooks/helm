@@ -15,7 +15,8 @@ final class DiscoveryService
     public function __construct(
         private readonly DiscoveryRepository $repository,
         private readonly Origin $origin,
-    ) {}
+    ) {
+    }
 
     /**
      * Record a discovery.

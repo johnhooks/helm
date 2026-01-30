@@ -17,7 +17,8 @@ final class ShipPost
 {
     public function __construct(
         private readonly WP_Post $post,
-    ) {}
+    ) {
+    }
 
     /**
      * Get the WordPress post ID.
