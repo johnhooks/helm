@@ -21,6 +21,7 @@ use Helm\Planets\Provider as PlanetsProvider;
 use Helm\PostTypes\Provider as PostTypesProvider;
 use Helm\Ships\Provider as ShipsProvider;
 use Helm\Stars\Provider as StarsProvider;
+use Helm\View\Provider as ViewProvider;
 
 /**
  * Helm - Space Exploration on WordPress.
@@ -49,6 +50,7 @@ final class Helm
     private array $serviceProviders = [
         ConfigProvider::class,     // Load config early
         DatabaseProvider::class,   // Database tables (must be before domains that use them)
+        ViewProvider::class,       // View rendering (before PostTypes which uses it)
         PostTypesProvider::class,  // Must be early - registers CPTs
         NavigationProvider::class, // Navigation graph (nodes, edges, routes)
         OriginProvider::class,

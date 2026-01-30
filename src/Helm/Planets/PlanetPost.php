@@ -77,6 +77,34 @@ final class PlanetPost
     }
 
     /**
+     * Get the planet type.
+     */
+    public function type(): string
+    {
+        $types = wp_get_post_terms($this->post->ID, PostTypeRegistry::TAXONOMY_PLANET_TYPE);
+        if (is_array($types) && $types !== []) {
+            return $types[0]->slug;
+        }
+        return Planet::TYPE_TERRESTRIAL;
+    }
+
+    /**
+     * Get the orbital distance in AU.
+     */
+    public function orbitAu(): float
+    {
+        return (float) get_post_meta($this->post->ID, PostTypeRegistry::META_PLANET_ORBIT_AU, true);
+    }
+
+    /**
+     * Check if the planet is habitable.
+     */
+    public function isHabitable(): bool
+    {
+        return (bool) get_post_meta($this->post->ID, PostTypeRegistry::META_PLANET_HABITABLE, true);
+    }
+
+    /**
      * Convert to Planet value object.
      */
     public function toPlanet(): Planet
