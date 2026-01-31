@@ -1,0 +1,67 @@
+@import "../../styles/index.css";
+
+/* =============================================================================
+   SYSTEM GRID
+   A grid container for SystemCell components with cross-cell alignment
+   ============================================================================= */
+
+.helm-system-grid {
+  display: grid;
+  font-family: var(--helm-ui-font-family);
+}
+
+/* Column variants */
+.helm-system-grid--cols-1 { grid-template-columns: 1fr; }
+.helm-system-grid--cols-2 { grid-template-columns: repeat(2, 1fr); }
+.helm-system-grid--cols-3 { grid-template-columns: repeat(3, 1fr); }
+.helm-system-grid--cols-4 { grid-template-columns: repeat(4, 1fr); }
+.helm-system-grid--cols-5 { grid-template-columns: repeat(5, 1fr); }
+.helm-system-grid--cols-6 { grid-template-columns: repeat(6, 1fr); }
+
+/* Gap variants */
+.helm-system-grid--gap-sm { gap: 12px; }
+.helm-system-grid--gap-md { gap: 20px; }
+.helm-system-grid--gap-lg { gap: 32px; }
+
+/* =============================================================================
+   SYSTEM CELL
+   A cell containing an optional indicator and content (typically a Readout)
+   ============================================================================= */
+
+.helm-system-cell {
+  display: grid;
+  align-items: center;
+}
+
+/* Row layout: indicator left, content right */
+.helm-system-cell--row {
+  grid-template-columns: auto 1fr;
+  gap: 16px;
+}
+
+/* Column layout: indicator top, content bottom */
+.helm-system-cell--column {
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto;
+  gap: 12px;
+  justify-items: center;
+  text-align: center;
+}
+
+/* Indicator container */
+.helm-system-cell__indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+}
+
+/* Content container */
+.helm-system-cell__content {
+  min-width: 0;
+}
+
+/* Column layout: center the readout */
+.helm-system-cell--column .helm-system-cell__content {
+  width: 100%;
+}

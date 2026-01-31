@@ -34,9 +34,6 @@ export type { TitleBarProps } from "./components/title-bar";
 export { Title } from "./components/title";
 export type { TitleProps } from "./components/title";
 
-export { Widget } from "./components/widget";
-export type { WidgetProps } from "./components/widget";
-
 export { Placeholder } from "./components/placeholder";
 export type { PlaceholderProps } from "./components/placeholder";
 
@@ -54,3 +51,6 @@ export type { StatusBadgeProps } from "./components/status-badge";
 
 export { Readout } from "./components/readout";
 export type { ReadoutProps } from "./components/readout";
+
+export { SystemGrid, SystemCell } from "./components/system-grid";
+export type { SystemGridProps, SystemCellProps } from "./components/system-grid";

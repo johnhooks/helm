@@ -1,19 +1,25 @@
-import type { CSSProperties } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import "./title-bar.css";
 
 export interface TitleBarProps {
-  /** Bar label */
-  label: string;
-  /** Alignment of label */
-  align?: "left" | "right";
-  /** Visual tone */
-  tone?: "accent" | "neutral";
-  /** Surface tone */
-  surface?: "neutral" | "base" | "accent" | "muted" | "danger";
-  /** Size variant */
-  size?: "sm" | "md";
-  /** Edge side for squared join */
-  edge?: "left" | "right" | "none";
+  /** Panel title */
+  title: string;
+  /** Optional subtitle or secondary info */
+  subtitle?: string;
+  /** Right-side content (typically a StatusBadge) */
+  children?: ReactNode;
+  /** Color tone for the title and border */
+  tone?:
+    | "neutral"
+    | "accent"
+    | "orange"
+    | "gold"
+    | "peach"
+    | "blue"
+    | "sky"
+    | "lilac"
+    | "violet"
+    | "danger";
   /** Additional CSS class names */
   className?: string;
   /** Inline styles */
@@ -23,34 +29,36 @@ export interface TitleBarProps {
 }
 
 export function TitleBar({
-  label,
-  align = "left",
-  tone = "accent",
-  surface,
-  size = "md",
-  edge = "none",
+  title,
+  subtitle,
+  children,
+  tone = "gold",
   className = "",
   style,
   "data-testid": testId,
 }: TitleBarProps) {
-  const resolvedSurface = surface ?? (tone === "accent" ? "accent" : "neutral");
-
   const classNames = [
-    "helm-titlebar",
-    "helm-surface",
-    `helm-surface--${resolvedSurface}`,
-    `helm-titlebar--${align}`,
-    `helm-titlebar--${tone}`,
-    `helm-titlebar--${size}`,
-    `helm-titlebar--edge-${edge}`,
+    "helm-title-bar",
+    `helm-title-bar--${tone}`,
     className,
   ]
     .filter(Boolean)
     .join(" ");
 
   return (
-    <div className={classNames} style={style} data-testid={testId}>
-      <span className="helm-titlebar__label">{label}</span>
-    </div>
+    <header className={classNames} style={style} data-testid={testId}>
+      <div className="helm-title-bar__content">
+        <h2 className="helm-title-bar__title">
+          {title}
+          {subtitle && (
+            <>
+              <span className="helm-title-bar__separator"> — </span>
+              <span className="helm-title-bar__subtitle">{subtitle}</span>
+            </>
+          )}
+        </h2>
+      </div>
+      {children && <div className="helm-title-bar__actions">{children}</div>}
+    </header>
   );
 }
