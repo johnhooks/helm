@@ -26,87 +26,63 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    edge: "left",
-    layout: "compact",
-    children: (
-      <>
+    children: null,
+  },
+  render: () => (
+    <div style={{ width: 120 }}>
+      <ButtonPanel edge="left" layout="compact">
         <Button surface="accent">Power</Button>
         <Button surface="accent">Shields</Button>
         <Button surface="accent">Warp</Button>
-      </>
-    ),
-  },
-  decorators: [
-    (Story) => (
-      <div style={{ width: 120 }}>
-        <Story />
-      </div>
-    ),
-  ],
+      </ButtonPanel>
+    </div>
+  ),
 };
 
 export const RightEdge: Story = {
   args: {
-    edge: "right",
-    layout: "compact",
-    children: (
-      <>
+    children: null,
+  },
+  render: () => (
+    <div style={{ width: 120 }}>
+      <ButtonPanel edge="right" layout="compact">
         <Button surface="base">Navigation</Button>
         <Button surface="base">Sensors</Button>
         <Button surface="base">Comms</Button>
-      </>
-    ),
-  },
-  decorators: [
-    (Story) => (
-      <div style={{ width: 120 }}>
-        <Story />
-      </div>
-    ),
-  ],
+      </ButtonPanel>
+    </div>
+  ),
 };
 
 export const SpaceLayout: Story = {
   args: {
-    edge: "left",
-    layout: "space",
-    children: (
-      <>
+    children: null,
+  },
+  render: () => (
+    <div style={{ width: 120, height: 300 }}>
+      <ButtonPanel edge="left" layout="space">
         <Button surface="accent">Top</Button>
         <Button surface="accent">Middle</Button>
         <Button surface="accent">Bottom</Button>
-      </>
-    ),
-  },
-  decorators: [
-    (Story) => (
-      <div style={{ width: 120, height: 300 }}>
-        <Story />
-      </div>
-    ),
-  ],
+      </ButtonPanel>
+    </div>
+  ),
 };
 
 export const StretchLayout: Story = {
   args: {
-    edge: "left",
-    layout: "stretch",
-    children: (
-      <>
+    children: null,
+  },
+  render: () => (
+    <div style={{ width: 120, height: 300 }}>
+      <ButtonPanel edge="left" layout="stretch">
         <Button surface="accent">Power</Button>
         <Button surface="accent">Shields</Button>
         <Button surface="accent">Warp</Button>
         <Button surface="accent">Impulse</Button>
-      </>
-    ),
-  },
-  decorators: [
-    (Story) => (
-      <div style={{ width: 120, height: 300 }}>
-        <Story />
-      </div>
-    ),
-  ],
+      </ButtonPanel>
+    </div>
+  ),
 };
 
 export const AllLayouts: Story = {

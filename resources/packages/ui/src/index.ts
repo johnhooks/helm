@@ -61,6 +61,9 @@ export type { PanelProps } from "./components/panel";
 export { LcarsFrame, LcarsHeaderChip } from "./components/lcars-frame";
 export type { LcarsFrameProps, LcarsTab, LcarsHeaderChipProps } from "./components/lcars-frame";
 
+export { LcarsModal } from "./components/lcars-modal";
+export type { LcarsModalProps } from "./components/lcars-modal";
+
 export { ProgressBar } from "./components/progress-bar";
 export type { ProgressBarProps } from "./components/progress-bar";
 

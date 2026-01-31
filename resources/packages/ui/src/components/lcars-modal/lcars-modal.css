@@ -1,0 +1,88 @@
+@import "../../styles/index.css";
+
+/* =============================================================================
+   LCARS MODAL - Bordered panel style using WordPress Modal
+   ============================================================================= */
+
+/* Overlay */
+.helm-lcars-modal__overlay.components-modal__screen-overlay {
+  background: rgba(0, 0, 0, 0.85);
+}
+
+/* Modal frame */
+.helm-lcars-modal.components-modal__frame {
+  --modal-color: var(--helm-ui-color-gold);
+
+  background: #0a0a0a;
+  border: 2px solid var(--modal-color);
+  border-radius: 16px;
+  box-shadow: 0 0 40px color-mix(in srgb, var(--modal-color) 20%, transparent);
+  padding: 0;
+  font-family: var(--helm-ui-font-family);
+  max-height: calc(100vh - 48px);
+  overflow: hidden;
+}
+
+/* Size variants */
+.helm-lcars-modal--small.components-modal__frame {
+  width: min(400px, calc(100vw - 48px));
+}
+
+.helm-lcars-modal--medium.components-modal__frame {
+  width: min(560px, calc(100vw - 48px));
+}
+
+.helm-lcars-modal--large.components-modal__frame {
+  width: min(800px, calc(100vw - 48px));
+}
+
+/* Tones */
+.helm-lcars-modal--neutral.components-modal__frame { --modal-color: var(--helm-ui-color-muted); }
+.helm-lcars-modal--accent.components-modal__frame { --modal-color: var(--helm-ui-color-accent); }
+.helm-lcars-modal--orange.components-modal__frame { --modal-color: var(--helm-ui-color-orange); }
+.helm-lcars-modal--gold.components-modal__frame { --modal-color: var(--helm-ui-color-gold); }
+.helm-lcars-modal--peach.components-modal__frame { --modal-color: var(--helm-ui-color-peach); }
+.helm-lcars-modal--blue.components-modal__frame { --modal-color: var(--helm-ui-color-blue); }
+.helm-lcars-modal--sky.components-modal__frame { --modal-color: var(--helm-ui-color-sky); }
+.helm-lcars-modal--lilac.components-modal__frame { --modal-color: var(--helm-ui-color-lilac); }
+.helm-lcars-modal--violet.components-modal__frame { --modal-color: var(--helm-ui-color-violet); }
+.helm-lcars-modal--danger.components-modal__frame { --modal-color: #ff6b6b; }
+
+/* Hide WordPress default content padding */
+.helm-lcars-modal .components-modal__content {
+  padding: 0;
+  margin: 0;
+}
+
+/* =============================================================================
+   INNER LAYOUT
+   ============================================================================= */
+
+.helm-lcars-modal__inner {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* =============================================================================
+   CONTENT
+   ============================================================================= */
+
+.helm-lcars-modal__content {
+  color: var(--helm-ui-color-text);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* =============================================================================
+   FOOTER
+   ============================================================================= */
+
+.helm-lcars-modal__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid #333;
+}
