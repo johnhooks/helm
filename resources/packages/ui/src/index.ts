@@ -63,3 +63,6 @@ export type { LcarsFrameProps } from "./components/lcars-frame";
 
 export { ProgressBar } from "./components/progress-bar";
 export type { ProgressBarProps } from "./components/progress-bar";
+
+export { Countdown, formatTime } from "./components/countdown";
+export type { CountdownProps } from "./components/countdown";

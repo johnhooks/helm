@@ -1,0 +1,139 @@
+@import "../../styles/index.css";
+
+/* =============================================================================
+   COUNTDOWN - Time display with optional indicator
+   Shares styling patterns with Readout
+   ============================================================================= */
+
+.helm-countdown {
+  --countdown-color: var(--helm-ui-color-accent);
+
+  display: flex;
+  font-family: var(--helm-ui-font-family);
+}
+
+/* Tones - same as Readout */
+.helm-countdown--neutral { --countdown-color: var(--helm-ui-color-muted); }
+.helm-countdown--accent { --countdown-color: var(--helm-ui-color-accent); }
+.helm-countdown--orange { --countdown-color: var(--helm-ui-color-orange); }
+.helm-countdown--gold { --countdown-color: var(--helm-ui-color-gold); }
+.helm-countdown--peach { --countdown-color: var(--helm-ui-color-peach); }
+.helm-countdown--blue { --countdown-color: var(--helm-ui-color-blue); }
+.helm-countdown--sky { --countdown-color: var(--helm-ui-color-sky); }
+.helm-countdown--lilac { --countdown-color: var(--helm-ui-color-lilac); }
+.helm-countdown--violet { --countdown-color: var(--helm-ui-color-violet); }
+.helm-countdown--danger { --countdown-color: #ff6b6b; }
+
+/* =============================================================================
+   LAYOUT VARIANTS
+   ============================================================================= */
+
+.helm-countdown--row {
+  align-items: center;
+  gap: 12px;
+}
+
+.helm-countdown--column {
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+
+/* =============================================================================
+   INDICATOR
+   ============================================================================= */
+
+.helm-countdown__indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* =============================================================================
+   CONTENT
+   ============================================================================= */
+
+.helm-countdown__content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.helm-countdown--column .helm-countdown__content {
+  align-items: center;
+}
+
+/* =============================================================================
+   LABEL - matches Readout label style
+   ============================================================================= */
+
+.helm-countdown__label {
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--countdown-color);
+}
+
+.helm-countdown--sm .helm-countdown__label { font-size: 9px; }
+.helm-countdown--md .helm-countdown__label { font-size: 10px; }
+.helm-countdown--lg .helm-countdown__label { font-size: 11px; }
+
+/* =============================================================================
+   TIME - matches Readout value style
+   ============================================================================= */
+
+.helm-countdown__time {
+  font-weight: 700;
+  color: var(--countdown-color);
+  font-variant-numeric: tabular-nums;
+}
+
+.helm-countdown--sm .helm-countdown__time { font-size: 20px; }
+.helm-countdown--md .helm-countdown__time { font-size: 28px; }
+.helm-countdown--lg .helm-countdown__time { font-size: 38px; }
+
+/* =============================================================================
+   PROGRESS - subtle percentage display
+   ============================================================================= */
+
+.helm-countdown__progress {
+  font-weight: 400;
+  color: var(--helm-ui-color-muted);
+}
+
+.helm-countdown--sm .helm-countdown__progress { font-size: 10px; }
+.helm-countdown--md .helm-countdown__progress { font-size: 11px; }
+.helm-countdown--lg .helm-countdown__progress { font-size: 12px; }
+
+/* =============================================================================
+   ACTIVE STATE - pulsing animation
+   ============================================================================= */
+
+.helm-countdown--active .helm-countdown__time {
+  animation: countdown-pulse 2s ease-in-out infinite;
+}
+
+.helm-countdown--active .helm-countdown__indicator {
+  animation: countdown-indicator-pulse 2s ease-in-out infinite;
+}
+
+@keyframes countdown-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+@keyframes countdown-indicator-pulse {
+  0%, 100% {
+    opacity: 1;
+    filter: drop-shadow(0 0 4px var(--countdown-color));
+  }
+  50% {
+    opacity: 0.8;
+    filter: drop-shadow(0 0 12px var(--countdown-color));
+  }
+}
