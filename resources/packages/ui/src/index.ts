@@ -39,3 +39,6 @@ export type { WidgetProps } from "./components/widget";
 
 export { Placeholder } from "./components/placeholder";
 export type { PlaceholderProps } from "./components/placeholder";
+
+export { SelectControl } from "./components/select-control";
+export type { SelectControlProps, SelectOption } from "./components/select-control";
