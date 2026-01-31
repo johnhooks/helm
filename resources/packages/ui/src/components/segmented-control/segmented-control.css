@@ -1,0 +1,138 @@
+@import "../../styles/index.css";
+
+.helm-segmented {
+  display: inline-flex;
+  background: var(--helm-ui-color-surface);
+  border: 1px solid var(--helm-ui-color-border);
+  border-radius: var(--helm-ui-radius-md);
+  padding: 3px;
+  gap: 2px;
+}
+
+.helm-segmented--full {
+  display: flex;
+  width: 100%;
+}
+
+.helm-segmented--full .helm-segmented__option {
+  flex: 1;
+}
+
+.helm-segmented--full .helm-segmented__label {
+  width: 100%;
+}
+
+.helm-segmented--disabled {
+  opacity: 0.5;
+}
+
+/* Option (label wrapping the radio) */
+.helm-segmented__option {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+.helm-segmented__option--disabled {
+  cursor: not-allowed;
+}
+
+/* Visually hidden radio input */
+.helm-segmented__input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Label/segment appearance */
+.helm-segmented__label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--helm-ui-font-family);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--helm-ui-color-muted);
+  background: transparent;
+  border-radius: calc(var(--helm-ui-radius-md) - 4px);
+  transition:
+    background-color 160ms ease,
+    color 160ms ease;
+}
+
+.helm-segmented--sm .helm-segmented__label {
+  height: 26px;
+  padding: 0 12px;
+  font-size: 11px;
+}
+
+.helm-segmented--md .helm-segmented__label {
+  height: 30px;
+  padding: 0 16px;
+  font-size: 12px;
+}
+
+/* Hover state (inactive) */
+.helm-segmented__option:not(.helm-segmented__option--disabled):hover .helm-segmented__label {
+  color: var(--helm-ui-color-text);
+  background: var(--helm-ui-color-surface-2);
+}
+
+/* Focus state */
+.helm-segmented__input:focus-visible + .helm-segmented__label {
+  outline: 2px solid var(--helm-ui-color-focus);
+  outline-offset: 1px;
+}
+
+/* Active/checked state - base styles */
+.helm-segmented__input:checked + .helm-segmented__label {
+  color: var(--helm-ui-color-bg);
+}
+
+/* Surface colors for active state */
+.helm-segmented--accent .helm-segmented__input:checked + .helm-segmented__label {
+  background: var(--helm-ui-color-accent);
+}
+
+.helm-segmented--orange .helm-segmented__input:checked + .helm-segmented__label {
+  background: var(--helm-ui-color-orange);
+}
+
+.helm-segmented--gold .helm-segmented__input:checked + .helm-segmented__label {
+  background: var(--helm-ui-color-gold);
+}
+
+.helm-segmented--blue .helm-segmented__input:checked + .helm-segmented__label {
+  background: var(--helm-ui-color-blue);
+}
+
+.helm-segmented--sky .helm-segmented__input:checked + .helm-segmented__label {
+  background: var(--helm-ui-color-sky);
+}
+
+.helm-segmented--success .helm-segmented__input:checked + .helm-segmented__label {
+  background: var(--helm-ui-color-success);
+}
+
+.helm-segmented--lilac .helm-segmented__input:checked + .helm-segmented__label {
+  background: var(--helm-ui-color-lilac);
+}
+
+.helm-segmented--violet .helm-segmented__input:checked + .helm-segmented__label {
+  background: var(--helm-ui-color-violet);
+}
+
+/* Hover on active */
+.helm-segmented__option:not(.helm-segmented__option--disabled) .helm-segmented__input:checked:hover + .helm-segmented__label {
+  filter: brightness(0.92);
+}

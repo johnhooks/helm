@@ -42,3 +42,9 @@ export type { PlaceholderProps } from "./components/placeholder";
 
 export { SelectControl } from "./components/select-control";
 export type { SelectControlProps, SelectOption } from "./components/select-control";
+
+export { Toggle } from "./components/toggle";
+export type { ToggleProps } from "./components/toggle";
+
+export { SegmentedControl } from "./components/segmented-control";
+export type { SegmentedControlProps, SegmentedOption } from "./components/segmented-control";

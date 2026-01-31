@@ -1,0 +1,166 @@
+@import "../../styles/index.css";
+
+.helm-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.helm-toggle--label-left {
+  flex-direction: row-reverse;
+}
+
+.helm-toggle--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Visually hidden but accessible checkbox */
+.helm-toggle__input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Track */
+.helm-toggle__track {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  background: var(--helm-ui-color-surface-2);
+  border: 1px solid var(--helm-ui-color-border);
+  border-radius: 999px;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease;
+}
+
+.helm-toggle--sm .helm-toggle__track {
+  width: 36px;
+  height: 20px;
+}
+
+.helm-toggle--md .helm-toggle__track {
+  width: 44px;
+  height: 24px;
+}
+
+/* Thumb */
+.helm-toggle__thumb {
+  position: absolute;
+  background: var(--helm-ui-color-muted);
+  border-radius: 50%;
+  transition:
+    transform 160ms ease,
+    background-color 160ms ease;
+}
+
+.helm-toggle--sm .helm-toggle__thumb {
+  width: 14px;
+  height: 14px;
+  left: 2px;
+}
+
+.helm-toggle--md .helm-toggle__thumb {
+  width: 18px;
+  height: 18px;
+  left: 2px;
+}
+
+/* Checked state - thumb moves right */
+.helm-toggle__input:checked + .helm-toggle__track .helm-toggle__thumb {
+  background: var(--helm-ui-color-bg);
+}
+
+.helm-toggle--sm .helm-toggle__input:checked + .helm-toggle__track .helm-toggle__thumb {
+  transform: translateX(16px);
+}
+
+.helm-toggle--md .helm-toggle__input:checked + .helm-toggle__track .helm-toggle__thumb {
+  transform: translateX(20px);
+}
+
+/* Track colors when checked */
+.helm-toggle__input:checked + .helm-toggle__track--accent {
+  background: var(--helm-ui-color-accent);
+  border-color: var(--helm-ui-color-accent);
+}
+
+.helm-toggle__input:checked + .helm-toggle__track--orange {
+  background: var(--helm-ui-color-orange);
+  border-color: var(--helm-ui-color-orange);
+}
+
+.helm-toggle__input:checked + .helm-toggle__track--gold {
+  background: var(--helm-ui-color-gold);
+  border-color: var(--helm-ui-color-gold);
+}
+
+.helm-toggle__input:checked + .helm-toggle__track--blue {
+  background: var(--helm-ui-color-blue);
+  border-color: var(--helm-ui-color-blue);
+}
+
+.helm-toggle__input:checked + .helm-toggle__track--sky {
+  background: var(--helm-ui-color-sky);
+  border-color: var(--helm-ui-color-sky);
+}
+
+.helm-toggle__input:checked + .helm-toggle__track--success {
+  background: var(--helm-ui-color-success);
+  border-color: var(--helm-ui-color-success);
+}
+
+.helm-toggle__input:checked + .helm-toggle__track--lilac {
+  background: var(--helm-ui-color-lilac);
+  border-color: var(--helm-ui-color-lilac);
+}
+
+.helm-toggle__input:checked + .helm-toggle__track--violet {
+  background: var(--helm-ui-color-violet);
+  border-color: var(--helm-ui-color-violet);
+}
+
+/* Focus state */
+.helm-toggle__input:focus-visible + .helm-toggle__track {
+  outline: 2px solid var(--helm-ui-color-focus);
+  outline-offset: 2px;
+}
+
+/* Hover state */
+.helm-toggle:not(.helm-toggle--disabled):hover .helm-toggle__track {
+  border-color: var(--helm-ui-color-muted);
+}
+
+.helm-toggle:not(.helm-toggle--disabled) .helm-toggle__input:checked:hover + .helm-toggle__track {
+  filter: brightness(0.9);
+}
+
+/* Label */
+.helm-toggle__label {
+  font-family: var(--helm-ui-font-family);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--helm-ui-color-text);
+}
+
+.helm-toggle--sm .helm-toggle__label {
+  font-size: 12px;
+}
+
+.helm-toggle--md .helm-toggle__label {
+  font-size: 13px;
+}
+
+.helm-toggle--disabled .helm-toggle__label {
+  color: var(--helm-ui-color-muted);
+}
