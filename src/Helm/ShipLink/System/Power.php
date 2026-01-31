@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Helm\ShipLink\System;
 
 use DateTimeImmutable;
+use Helm\ShipLink\Components\PowerMode;
 use Helm\ShipLink\Contracts\PowerSystem;
 use Helm\ShipLink\ShipModel;
 
@@ -30,7 +31,7 @@ final class Power implements PowerSystem
 
     public function getRegenRate(): float
     {
-        return $this->model->coreType->regenRate();
+        return $this->model->coreType->regenRate() * $this->model->powerMode->regenMultiplier();
     }
 
     public function consume(float $amount): bool
@@ -70,8 +71,21 @@ final class Power implements PowerSystem
 
     public function getOutputMultiplier(): float
     {
-        // Core's base output, will be multiplied by power mode when implemented
-        // outputMultiplier = coreType.baseOutput × powerMode.outputMultiplier
-        return $this->model->coreType->baseOutput();
+        return $this->model->coreType->baseOutput() * $this->model->powerMode->outputMultiplier();
+    }
+
+    public function getPowerMode(): PowerMode
+    {
+        return $this->model->powerMode;
+    }
+
+    public function setPowerMode(PowerMode $mode): void
+    {
+        $this->model->powerMode = $mode;
+    }
+
+    public function getDecayMultiplier(): float
+    {
+        return $this->model->powerMode->decayMultiplier();
     }
 }

@@ -8,6 +8,7 @@ use DateTimeImmutable;
 use Helm\ShipLink\Components\CoreType;
 use Helm\ShipLink\Components\DriveType;
 use Helm\ShipLink\Components\NavTier;
+use Helm\ShipLink\Components\PowerMode;
 use Helm\ShipLink\Components\SensorType;
 use Helm\ShipLink\Components\ShieldType;
 
@@ -28,6 +29,7 @@ final class ShipSystems
         public readonly SensorType $sensorType,
         public readonly ShieldType $shieldType,
         public readonly NavTier $navTier,
+        public readonly PowerMode $powerMode,
         public readonly ?DateTimeImmutable $powerFullAt,
         public readonly float $powerMax,
         public readonly ?DateTimeImmutable $shieldsFullAt,
@@ -57,6 +59,7 @@ final class ShipSystems
             sensorType: SensorType::from((int) $row['sensor_type']),
             shieldType: ShieldType::from((int) $row['shield_type']),
             navTier: NavTier::from((int) $row['nav_tier']),
+            powerMode: PowerMode::from((int) ($row['power_mode'] ?? PowerMode::Normal->value)),
             powerFullAt: self::parseDateTime($row['power_full_at'] ?? null),
             powerMax: (float) $row['power_max'],
             shieldsFullAt: self::parseDateTime($row['shields_full_at'] ?? null),
@@ -86,6 +89,7 @@ final class ShipSystems
             'sensor_type' => $this->sensorType->value,
             'shield_type' => $this->shieldType->value,
             'nav_tier' => $this->navTier->value,
+            'power_mode' => $this->powerMode->value,
             'power_full_at' => $this->powerFullAt?->format('Y-m-d H:i:s'),
             'power_max' => $this->powerMax,
             'shields_full_at' => $this->shieldsFullAt?->format('Y-m-d H:i:s'),
@@ -115,6 +119,7 @@ final class ShipSystems
             sensorType: SensorType::VRS,
             shieldType: $shieldType,
             navTier: NavTier::Tier1,
+            powerMode: PowerMode::Normal,
             powerFullAt: $now, // Start with full power
             powerMax: 100.0,
             shieldsFullAt: $now, // Start with full shields

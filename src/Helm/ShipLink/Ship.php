@@ -188,11 +188,12 @@ final class Ship implements ShipLink
      */
     private function calculateJumpCoreCost(float $distance): float
     {
-        // Core cost = distance × core multiplier × drive decay contribution
-        // This will expand as we add power modes
+        // Core cost = distance × core multiplier × drive decay × power mode decay
+        // Efficiency mode (decay = 0) means no core cost - safe harbor
         return $distance
             * $this->model->coreType->jumpCostMultiplier()
-            * $this->propulsionSystem->getCoreDecayMultiplier();
+            * $this->propulsionSystem->getCoreDecayMultiplier()
+            * $this->powerSystem->getDecayMultiplier();
     }
 
     /**

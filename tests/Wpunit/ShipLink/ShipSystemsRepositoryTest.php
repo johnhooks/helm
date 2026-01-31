@@ -8,6 +8,7 @@ use Helm\Database\Schema;
 use Helm\ShipLink\Components\CoreType;
 use Helm\ShipLink\Components\DriveType;
 use Helm\ShipLink\Components\NavTier;
+use Helm\ShipLink\Components\PowerMode;
 use Helm\ShipLink\Components\SensorType;
 use Helm\ShipLink\Components\ShieldType;
 use Helm\ShipLink\ShipSystems;
@@ -90,6 +91,7 @@ class ShipSystemsRepositoryTest extends WPTestCase
             sensorType: SensorType::VRS,
             shieldType: ShieldType::Beta,
             navTier: NavTier::Tier1,
+            powerMode: PowerMode::Normal,
             powerFullAt: null,
             powerMax: 100.0,
             shieldsFullAt: null,
@@ -126,6 +128,7 @@ class ShipSystemsRepositoryTest extends WPTestCase
             sensorType: $systems->sensorType,
             shieldType: $systems->shieldType,
             navTier: $systems->navTier,
+            powerMode: $systems->powerMode,
             powerFullAt: $systems->powerFullAt,
             powerMax: $systems->powerMax,
             shieldsFullAt: $systems->shieldsFullAt,
@@ -176,6 +179,7 @@ class ShipSystemsRepositoryTest extends WPTestCase
             sensorType: $systems->sensorType,
             shieldType: $systems->shieldType,
             navTier: $systems->navTier,
+            powerMode: $systems->powerMode,
             powerFullAt: $systems->powerFullAt,
             powerMax: $systems->powerMax,
             shieldsFullAt: $systems->shieldsFullAt,
@@ -284,6 +288,7 @@ class ShipSystemsRepositoryTest extends WPTestCase
             sensorType: $systems->sensorType,
             shieldType: $systems->shieldType,
             navTier: $systems->navTier,
+            powerMode: $systems->powerMode,
             powerFullAt: $systems->powerFullAt,
             powerMax: $systems->powerMax,
             shieldsFullAt: $systems->shieldsFullAt,

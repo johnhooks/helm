@@ -12,6 +12,7 @@ use Helm\ShipLink\ActionType;
 use Helm\ShipLink\Components\CoreType;
 use Helm\ShipLink\Components\DriveType;
 use Helm\ShipLink\Components\NavTier;
+use Helm\ShipLink\Components\PowerMode;
 use Helm\ShipLink\Components\SensorType;
 use Helm\ShipLink\Components\ShieldType;
 use Helm\ShipLink\Contracts\ShipLink;
@@ -332,6 +333,7 @@ class ShipTest extends WPTestCase
         $model->sensorType = SensorType::VRS;
         $model->shieldType = ShieldType::Beta;
         $model->navTier = NavTier::Tier1;
+        $model->powerMode = PowerMode::Normal;
         $model->powerFullAt = new DateTimeImmutable();
         $model->powerMax = 100.0;
         $model->shieldsFullAt = new DateTimeImmutable();

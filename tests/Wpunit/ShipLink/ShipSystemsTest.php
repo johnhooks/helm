@@ -8,6 +8,7 @@ use DateTimeImmutable;
 use Helm\ShipLink\Components\CoreType;
 use Helm\ShipLink\Components\DriveType;
 use Helm\ShipLink\Components\NavTier;
+use Helm\ShipLink\Components\PowerMode;
 use Helm\ShipLink\Components\SensorType;
 use Helm\ShipLink\Components\ShieldType;
 use Helm\ShipLink\ShipSystems;
@@ -100,6 +101,7 @@ class ShipSystemsTest extends WPTestCase
             sensorType: SensorType::DSC,
             shieldType: ShieldType::Gamma,
             navTier: NavTier::Tier5,
+            powerMode: PowerMode::Normal,
             powerFullAt: $now,
             powerMax: 100.0,
             shieldsFullAt: $now,

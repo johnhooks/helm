@@ -9,6 +9,7 @@ use Helm\Ships\ShipPost;
 use Helm\ShipLink\Components\CoreType;
 use Helm\ShipLink\Components\DriveType;
 use Helm\ShipLink\Components\NavTier;
+use Helm\ShipLink\Components\PowerMode;
 use Helm\ShipLink\Components\SensorType;
 use Helm\ShipLink\Components\ShieldType;
 
@@ -31,6 +32,7 @@ final class ShipModel
     public SensorType $sensorType;
     public ShieldType $shieldType;
     public NavTier $navTier;
+    public PowerMode $powerMode;
 
     // Regenerating resources
     public ?DateTimeImmutable $powerFullAt;
@@ -71,6 +73,7 @@ final class ShipModel
         $model->sensorType = $systems->sensorType;
         $model->shieldType = $systems->shieldType;
         $model->navTier = $systems->navTier;
+        $model->powerMode = $systems->powerMode;
         $model->powerFullAt = $systems->powerFullAt;
         $model->powerMax = $systems->powerMax;
         $model->shieldsFullAt = $systems->shieldsFullAt;
@@ -99,6 +102,7 @@ final class ShipModel
             sensorType: $this->sensorType,
             shieldType: $this->shieldType,
             navTier: $this->navTier,
+            powerMode: $this->powerMode,
             powerFullAt: $this->powerFullAt,
             powerMax: $this->powerMax,
             shieldsFullAt: $this->shieldsFullAt,
@@ -132,8 +136,8 @@ final class ShipModel
             return $this->powerMax;
         }
 
-        // Power regenerates at core's regen rate per hour
-        $regenRate = $this->coreType->regenRate();
+        // Power regenerates at core's regen rate × power mode multiplier per hour
+        $regenRate = $this->coreType->regenRate() * $this->powerMode->regenMultiplier();
         $secondsUntilFull = $this->powerFullAt->getTimestamp() - $now->getTimestamp();
         $hoursUntilFull = $secondsUntilFull / 3600.0;
         $powerNeeded = $hoursUntilFull * $regenRate;
@@ -181,7 +185,7 @@ final class ShipModel
         }
 
         // Calculate when power will be full again
-        $regenRate = $this->coreType->regenRate();
+        $regenRate = $this->coreType->regenRate() * $this->powerMode->regenMultiplier();
         $hoursToFull = $deficit / $regenRate;
         $secondsToFull = (int) ceil($hoursToFull * 3600);
 

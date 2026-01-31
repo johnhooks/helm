@@ -315,6 +315,7 @@ CREATE TABLE {$prefix}helm_ship_systems (
     sensor_type smallint(5) unsigned NOT NULL DEFAULT 1,
     shield_type smallint(5) unsigned NOT NULL DEFAULT 1,
     nav_tier smallint(5) unsigned NOT NULL DEFAULT 1,
+    power_mode smallint(5) unsigned NOT NULL DEFAULT 2,
     power_full_at datetime DEFAULT NULL,
     power_max float NOT NULL DEFAULT 100.0,
     shields_full_at datetime DEFAULT NULL,

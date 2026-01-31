@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Helm\ShipLink\Contracts;
 
 use DateTimeImmutable;
+use Helm\ShipLink\Components\PowerMode;
 
 /**
  * Power system contract.
@@ -69,9 +70,29 @@ interface PowerSystem extends PowerMetrics
      *
      * This is the core's effective output, combining:
      * - Core type's base output
-     * - Power mode multiplier (when implemented)
+     * - Power mode multiplier
      *
      * Used by other systems to scale their capabilities.
      */
     public function getOutputMultiplier(): float;
+
+    /**
+     * Get current power mode.
+     */
+    public function getPowerMode(): PowerMode;
+
+    /**
+     * Set power mode.
+     *
+     * Mode is locked during actions - cannot change while an action is in progress.
+     */
+    public function setPowerMode(PowerMode $mode): void;
+
+    /**
+     * Get current decay multiplier.
+     *
+     * Used by Ship to calculate core life cost for jumps.
+     * Returns 0 in Efficiency mode (safe harbor).
+     */
+    public function getDecayMultiplier(): float;
 }
