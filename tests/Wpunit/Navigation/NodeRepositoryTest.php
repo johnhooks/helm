@@ -244,6 +244,56 @@ class NodeRepositoryTest extends WPTestCase
         $this->assertNull($result);
     }
 
+    public function test_get_many_returns_multiple_nodes(): void
+    {
+        $starPostId1 = $this->factory()->post->create(['post_type' => 'helm_star']);
+        $starPostId2 = $this->factory()->post->create(['post_type' => 'helm_star']);
+        $starPostId3 = $this->factory()->post->create(['post_type' => 'helm_star']);
+
+        $node1 = $this->repository->create(1.0, 0.0, 0.0, starPostId: $starPostId1);
+        $node2 = $this->repository->create(2.0, 0.0, 0.0, starPostId: $starPostId2);
+        $node3 = $this->repository->create(3.0, 0.0, 0.0, starPostId: $starPostId3);
+
+        $result = $this->repository->getMany([$node1->id, $node2->id, $node3->id]);
+
+        $this->assertCount(3, $result);
+        $this->assertArrayHasKey($node1->id, $result);
+        $this->assertArrayHasKey($node2->id, $result);
+        $this->assertArrayHasKey($node3->id, $result);
+    }
+
+    public function test_get_many_returns_indexed_by_node_id(): void
+    {
+        $starPostId1 = $this->factory()->post->create(['post_type' => 'helm_star']);
+        $starPostId2 = $this->factory()->post->create(['post_type' => 'helm_star']);
+
+        $node1 = $this->repository->create(1.0, 0.0, 0.0, starPostId: $starPostId1);
+        $node2 = $this->repository->create(2.0, 0.0, 0.0, starPostId: $starPostId2);
+
+        $result = $this->repository->getMany([$node1->id, $node2->id]);
+
+        $this->assertSame($node1->id, $result[$node1->id]->id);
+        $this->assertSame($node2->id, $result[$node2->id]->id);
+    }
+
+    public function test_get_many_returns_empty_for_empty_input(): void
+    {
+        $result = $this->repository->getMany([]);
+
+        $this->assertEmpty($result);
+    }
+
+    public function test_get_many_skips_nonexistent_ids(): void
+    {
+        $starPostId = $this->factory()->post->create(['post_type' => 'helm_star']);
+        $node = $this->repository->create(1.0, 0.0, 0.0, starPostId: $starPostId);
+
+        $result = $this->repository->getMany([$node->id, 99999, 88888]);
+
+        $this->assertCount(1, $result);
+        $this->assertArrayHasKey($node->id, $result);
+    }
+
     public function test_node_from_row_handles_null_star_post_id(): void
     {
         $row = [

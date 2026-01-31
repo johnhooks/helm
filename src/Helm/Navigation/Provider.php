@@ -8,6 +8,7 @@ use Helm\lucatume\DI52\ServiceProvider;
 use Helm\Origin\Origin;
 use Helm\Stars\Star;
 use Helm\Stars\StarPost;
+use Helm\Stars\StarRepository;
 
 /**
  * Navigation service provider.
@@ -38,6 +39,7 @@ final class Provider extends ServiceProvider
             $this->container->get(NodeRepository::class),
             $this->container->get(EdgeRepository::class),
             $this->container->get(RouteRepository::class),
+            $this->container->get(StarRepository::class),
         ));
     }
 

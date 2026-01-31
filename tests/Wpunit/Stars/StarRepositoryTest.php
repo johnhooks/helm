@@ -324,4 +324,74 @@ class StarRepositoryTest extends WPTestCase
         $this->assertEqualsWithDelta(0.0, $node2->x, 0.0001);
         $this->assertEqualsWithDelta(10.0, $node2->y, 0.0001);
     }
+
+    public function test_find_by_post_ids_returns_multiple_stars(): void
+    {
+        $star1 = $this->tester->haveStar(['id' => 'BATCH_1']);
+        $star2 = $this->tester->haveStar(['id' => 'BATCH_2']);
+        $star3 = $this->tester->haveStar(['id' => 'BATCH_3']);
+
+        $result = $this->repository->findByPostIds([
+            $star1->postId(),
+            $star2->postId(),
+            $star3->postId(),
+        ]);
+
+        $this->assertCount(3, $result);
+        $this->assertArrayHasKey($star1->postId(), $result);
+        $this->assertArrayHasKey($star2->postId(), $result);
+        $this->assertArrayHasKey($star3->postId(), $result);
+    }
+
+    public function test_find_by_post_ids_returns_indexed_by_post_id(): void
+    {
+        $star1 = $this->tester->haveStar(['id' => 'INDEX_1']);
+        $star2 = $this->tester->haveStar(['id' => 'INDEX_2']);
+
+        $result = $this->repository->findByPostIds([
+            $star1->postId(),
+            $star2->postId(),
+        ]);
+
+        $this->assertSame($star1->postId(), $result[$star1->postId()]->postId());
+        $this->assertSame($star2->postId(), $result[$star2->postId()]->postId());
+    }
+
+    public function test_find_by_post_ids_returns_empty_for_empty_input(): void
+    {
+        $result = $this->repository->findByPostIds([]);
+
+        $this->assertEmpty($result);
+    }
+
+    public function test_find_by_post_ids_skips_nonexistent_ids(): void
+    {
+        $star = $this->tester->haveStar(['id' => 'SKIP_TEST']);
+
+        $result = $this->repository->findByPostIds([
+            $star->postId(),
+            99999,
+            88888,
+        ]);
+
+        $this->assertCount(1, $result);
+        $this->assertArrayHasKey($star->postId(), $result);
+    }
+
+    public function test_find_by_post_ids_preserves_star_data(): void
+    {
+        $star = $this->tester->haveStar([
+            'id' => 'PRESERVE_TEST',
+            'name' => 'Test Star',
+            'spectralType' => 'K5V',
+            'distanceLy' => 12.5,
+        ]);
+
+        $result = $this->repository->findByPostIds([$star->postId()]);
+
+        $this->assertCount(1, $result);
+        $retrieved = $result[$star->postId()];
+        $this->assertSame('Test Star', $retrieved->displayName());
+        $this->assertSame('PRESERVE_TEST', $retrieved->catalogId());
+    }
 }

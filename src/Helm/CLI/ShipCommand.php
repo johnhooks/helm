@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace Helm\CLI;
 
+use Helm\Navigation\EdgeRepository;
+use Helm\Navigation\NavigationService;
+use Helm\Navigation\NodeRepository;
 use Helm\PostTypes\PostTypeRegistry;
 use Helm\ShipLink\Contracts\ShipLink;
 use Helm\ShipLink\ShipFactory;
 use Helm\ShipLink\ShipSystemsRepository;
 use Helm\Ships\ShipPost;
+use Helm\Stars\StarPost;
 use WP_CLI;
 
 /**
@@ -19,6 +23,9 @@ class ShipCommand
     public function __construct(
         private readonly ShipFactory $factory,
         private readonly ShipSystemsRepository $systemsRepository,
+        private readonly NodeRepository $nodeRepository,
+        private readonly EdgeRepository $edgeRepository,
+        private readonly NavigationService $navigationService,
     ) {
     }
 
@@ -143,6 +150,182 @@ class ShipCommand
         }
 
         $this->outputDiagnostic($ship, $shipPost);
+    }
+
+    /**
+     * Show astrometrics - nearby stars within sensor range.
+     *
+     * ## OPTIONS
+     *
+     * <post-id>
+     * : The WordPress post ID of the ship.
+     *
+     * [--format=<format>]
+     * : Output format. Options: table, json. Default: table.
+     *
+     * ## EXAMPLES
+     *
+     *     # Show nearby stars for ship 42
+     *     wp helm ship astro 42
+     *
+     *     # Get astrometrics as JSON
+     *     wp helm ship astro 42 --format=json
+     *
+     * @when after_wp_load
+     *
+     * @param array<string> $args
+     * @param array<string, string> $assoc_args
+     */
+    public function astro(array $args, array $assoc_args): void
+    {
+        $postId = (int) ($args[0] ?? 0);
+        $format = $assoc_args['format'] ?? 'table';
+
+        if ($postId <= 0) {
+            WP_CLI::error('Please provide a valid ship post ID');
+        }
+
+        $shipPost = ShipPost::fromId($postId);
+        if ($shipPost === null) {
+            WP_CLI::error(sprintf('Ship post %d not found', $postId));
+        }
+
+        try {
+            $ship = $this->factory->build($postId);
+        } catch (\InvalidArgumentException $e) {
+            WP_CLI::error($e->getMessage());
+        }
+
+        $model = $ship->getModel();
+        $positionNodeId = $ship->navigation()->getCurrentPosition();
+
+        if ($positionNodeId === null) {
+            WP_CLI::error('Ship has no known position. Assign to a node first.');
+        }
+
+        $sensorRange = $ship->sensors()->getRange();
+
+        // Get nearby stars with batch-loaded relations (no N+1)
+        $nearbyStars = $this->navigationService->getNearbyStars($positionNodeId, $sensorRange);
+
+        // Get current location name
+        $currentNode = $this->nodeRepository->get($positionNodeId);
+        $currentLocationName = 'Unknown';
+        if ($currentNode !== null) {
+            if ($currentNode->isStar() && $currentNode->starPostId !== null) {
+                $currentStarPost = StarPost::fromId($currentNode->starPostId);
+                if ($currentStarPost !== null) {
+                    $currentLocationName = $currentStarPost->displayName();
+                }
+            } else {
+                $currentLocationName = sprintf('Waypoint #%d', $currentNode->id);
+            }
+        }
+
+        // Convert to display format (already sorted by distance)
+        $stars = array_map(fn($nearby) => [
+            'node_id' => $nearby->node->id,
+            'name' => $nearby->star->displayName(),
+            'distance' => $nearby->distance,
+            'has_route' => $nearby->hasRoute,
+        ], $nearbyStars);
+
+        if ($format === 'json') {
+            $this->outputAstroJson($model->name, $currentLocationName, $currentNode->id, $sensorRange, $stars);
+            return;
+        }
+
+        $this->outputAstroTable($model->name, $currentLocationName, $currentNode->id, $sensorRange, $ship, $stars);
+    }
+
+    /**
+     * Output astrometrics as formatted table.
+     *
+     * @param array<array{node_id: int, name: string, distance: float, has_route: bool}> $stars
+     */
+    private function outputAstroTable(
+        string $shipName,
+        string $locationName,
+        int $nodeId,
+        float $sensorRange,
+        ShipLink $ship,
+        array $stars
+    ): void {
+        $sensors = $ship->sensors();
+        $power = $ship->power();
+
+        WP_CLI::log('');
+        WP_CLI::log(WP_CLI::colorize('%G═══════════════════════════════════════════════════════════════%n'));
+        WP_CLI::log(WP_CLI::colorize('%G  ASTROMETRICS: %W' . $shipName . '%n'));
+        WP_CLI::log(WP_CLI::colorize('%G═══════════════════════════════════════════════════════════════%n'));
+        WP_CLI::log('');
+
+        WP_CLI::log(WP_CLI::colorize('%Y▸ POSITION%n'));
+        WP_CLI::log(sprintf('  Location:     %s (Node #%d)', $locationName, $nodeId));
+        WP_CLI::log(
+            sprintf(
+                '  Sensor Range: %.2f ly (%s × %.2f output)',
+                $sensorRange,
+                $ship->getModel()->sensorType->label(),
+                $power->getOutputMultiplier()
+            )
+        );
+        WP_CLI::log('');
+
+        WP_CLI::log(WP_CLI::colorize('%Y▸ NEARBY STARS%n'));
+
+        if ($stars === []) {
+            WP_CLI::log('  No stars within sensor range.');
+        } else {
+            foreach ($stars as $star) {
+                $routeIndicator = $star['has_route']
+                    ? WP_CLI::colorize('%G[route]%n')
+                    : WP_CLI::colorize('%Y[no route]%n');
+
+                WP_CLI::log(
+                    sprintf(
+                        '  %4d  %-20s %6.2f ly  %s',
+                        $star['node_id'],
+                        $star['name'],
+                        $star['distance'],
+                        $routeIndicator
+                    )
+                );
+            }
+        }
+
+        WP_CLI::log('');
+        WP_CLI::log(WP_CLI::colorize('%G═══════════════════════════════════════════════════════════════%n'));
+    }
+
+    /**
+     * Output astrometrics as JSON.
+     *
+     * @param array<array{node_id: int, name: string, distance: float, has_route: bool}> $stars
+     */
+    private function outputAstroJson(
+        string $shipName,
+        string $locationName,
+        int $nodeId,
+        float $sensorRange,
+        array $stars
+    ): void {
+        $data = [
+            'ship' => $shipName,
+            'position' => [
+                'name' => $locationName,
+                'node_id' => $nodeId,
+            ],
+            'sensor_range' => $sensorRange,
+            'nearby_stars' => array_map(fn($s) => [
+                'node_id' => $s['node_id'],
+                'name' => $s['name'],
+                'distance_ly' => round($s['distance'], 2),
+                'route_known' => $s['has_route'],
+            ], $stars),
+        ];
+
+        WP_CLI::log(json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
     }
 
     /**
@@ -448,5 +631,298 @@ class ShipCommand
             return '%C'; // Cyan (orange-ish in some terminals)
         }
         return '%R'; // Red
+    }
+
+    /**
+     * Jump to a node (god mode - instant teleport).
+     *
+     * ## OPTIONS
+     *
+     * <post-id>
+     * : The WordPress post ID of the ship.
+     *
+     * --target=<node-id>
+     * : The target node ID to jump to.
+     *
+     * ## EXAMPLES
+     *
+     *     # Jump ship 1 to node 5 (Proxima Centauri)
+     *     wp helm ship jump 1 --target=5
+     *
+     * @when after_wp_load
+     *
+     * @param array<string> $args
+     * @param array<string, string> $assoc_args
+     */
+    public function jump(array $args, array $assoc_args): void
+    {
+        $postId = (int) ($args[0] ?? 0);
+        $targetNodeId = (int) ($assoc_args['target'] ?? 0);
+
+        if ($postId <= 0) {
+            WP_CLI::error('Please provide a valid ship post ID');
+        }
+
+        if ($targetNodeId <= 0) {
+            WP_CLI::error('Please provide a target node ID with --target=<node-id>');
+        }
+
+        $shipPost = ShipPost::fromId($postId);
+        if ($shipPost === null) {
+            WP_CLI::error(sprintf('Ship post %d not found', $postId));
+        }
+
+        try {
+            $ship = $this->factory->build($postId);
+        } catch (\InvalidArgumentException $e) {
+            WP_CLI::error($e->getMessage());
+        }
+
+        $model = $ship->getModel();
+        $currentNodeId = $ship->navigation()->getCurrentPosition();
+
+        // Get target node
+        $targetNode = $this->nodeRepository->get($targetNodeId);
+        if ($targetNode === null) {
+            WP_CLI::error(sprintf('Target node %d not found', $targetNodeId));
+        }
+
+        // Get target name
+        $targetName = sprintf('Node #%d', $targetNodeId);
+        if ($targetNode->isStar() && $targetNode->starPostId !== null) {
+            $targetStarPost = StarPost::fromId($targetNode->starPostId);
+            if ($targetStarPost !== null) {
+                $targetName = $targetStarPost->displayName();
+            }
+        }
+
+        // Calculate distance (if we have a current position)
+        $distance = 0.0;
+        if ($currentNodeId !== null) {
+            $currentNode = $this->nodeRepository->get($currentNodeId);
+            if ($currentNode !== null) {
+                $distance = $currentNode->distanceTo($targetNode);
+            }
+        }
+
+        // Calculate what it WOULD cost in normal play
+        $propulsion = $ship->propulsion();
+        $power = $ship->power();
+
+        $coreCost = $distance
+            * $model->coreType->jumpCostMultiplier()
+            * $propulsion->getCoreDecayMultiplier()
+            * $power->getDecayMultiplier();
+        $duration = $propulsion->getJumpDuration($distance);
+        $maxRange = $propulsion->getMaxRange();
+        $hasRoute = $currentNodeId !== null && $this->edgeRepository->exists($currentNodeId, $targetNodeId);
+
+        // Create route using navigation system (god mode = skill 1.0, efficiency 1.0)
+        $scanResult = null;
+        $waypointsCreated = 0;
+        $edgesCreated = 0;
+
+        if ($currentNodeId !== null && !$hasRoute) {
+            $scanResult = $this->navigationService->scan(
+                fromNodeId: $currentNodeId,
+                toNodeId: $targetNodeId,
+                skill: 1.0,
+                efficiency: 1.0,
+            );
+
+            if (!$scanResult->failed) {
+                // Count waypoints (nodes that aren't stars)
+                foreach ($scanResult->nodes as $node) {
+                    if (!$node->isStar()) {
+                        $waypointsCreated++;
+                    }
+                }
+                $edgesCreated = count($scanResult->edges);
+            }
+        }
+
+        // Execute the jump (god mode - no checks)
+        $ship->navigation()->setPosition($targetNodeId);
+
+        // Save state
+        $this->systemsRepository->save($model->toSystems());
+
+        // Output
+        WP_CLI::log('');
+        WP_CLI::log(WP_CLI::colorize('%G═══════════════════════════════════════════════════════════════%n'));
+        WP_CLI::log(WP_CLI::colorize('%G  JUMP COMPLETE (GOD MODE)%n'));
+        WP_CLI::log(WP_CLI::colorize('%G═══════════════════════════════════════════════════════════════%n'));
+        WP_CLI::log('');
+        WP_CLI::log(sprintf('  Ship:        %s', $model->name));
+        WP_CLI::log(sprintf('  Destination: %s (Node #%d)', $targetName, $targetNodeId));
+        WP_CLI::log(sprintf('  Distance:    %.2f ly', $distance));
+        WP_CLI::log('');
+
+        if ($scanResult !== null && !$scanResult->failed) {
+            WP_CLI::log(WP_CLI::colorize('%Y▸ ROUTE DISCOVERED:%n'));
+            WP_CLI::log(sprintf('  Waypoints:   %d', $waypointsCreated));
+            WP_CLI::log(sprintf('  Edges:       %d', $edgesCreated));
+            WP_CLI::log(sprintf('  Complete:    %s', $scanResult->complete ? 'Yes' : 'Partial'));
+            WP_CLI::log('');
+        } elseif ($hasRoute) {
+            WP_CLI::log(WP_CLI::colorize('%Y▸ ROUTE:%n'));
+            WP_CLI::log('  Using existing route');
+            WP_CLI::log('');
+        }
+
+        WP_CLI::log(WP_CLI::colorize('%Y▸ NORMAL PLAY WOULD REQUIRE:%n'));
+        WP_CLI::log(sprintf('  In range:    %s (max %.2f ly)', $distance <= $maxRange ? 'Yes' : WP_CLI::colorize('%RNo%n'), $maxRange));
+        WP_CLI::log(sprintf('  Core cost:   %.2f ly', $coreCost));
+        WP_CLI::log(sprintf('  Duration:    %s', $this->formatDuration($duration)));
+        WP_CLI::log('');
+        WP_CLI::log(WP_CLI::colorize('%G═══════════════════════════════════════════════════════════════%n'));
+    }
+
+    /**
+     * Scan for a route to a target node (god mode - instant).
+     *
+     * ## OPTIONS
+     *
+     * <post-id>
+     * : The WordPress post ID of the ship.
+     *
+     * --target=<node-id>
+     * : The target node ID to scan for a route to.
+     *
+     * ## EXAMPLES
+     *
+     *     # Scan for route from ship 1's position to node 5
+     *     wp helm ship scan-route 1 --target=5
+     *
+     * @when after_wp_load
+     *
+     * @param array<string> $args
+     * @param array<string, string> $assoc_args
+     */
+    public function scanRoute(array $args, array $assoc_args): void
+    {
+        $postId = (int) ($args[0] ?? 0);
+        $targetNodeId = (int) ($assoc_args['target'] ?? 0);
+
+        if ($postId <= 0) {
+            WP_CLI::error('Please provide a valid ship post ID');
+        }
+
+        if ($targetNodeId <= 0) {
+            WP_CLI::error('Please provide a target node ID with --target=<node-id>');
+        }
+
+        $shipPost = ShipPost::fromId($postId);
+        if ($shipPost === null) {
+            WP_CLI::error(sprintf('Ship post %d not found', $postId));
+        }
+
+        try {
+            $ship = $this->factory->build($postId);
+        } catch (\InvalidArgumentException $e) {
+            WP_CLI::error($e->getMessage());
+        }
+
+        $model = $ship->getModel();
+        $currentNodeId = $ship->navigation()->getCurrentPosition();
+
+        if ($currentNodeId === null) {
+            WP_CLI::error('Ship has no known position. Use jump command first.');
+        }
+
+        $currentNode = $this->nodeRepository->get($currentNodeId);
+        if ($currentNode === null) {
+            WP_CLI::error(sprintf('Current node %d not found', $currentNodeId));
+        }
+
+        $targetNode = $this->nodeRepository->get($targetNodeId);
+        if ($targetNode === null) {
+            WP_CLI::error(sprintf('Target node %d not found', $targetNodeId));
+        }
+
+        // Get names
+        $currentName = sprintf('Node #%d', $currentNodeId);
+        if ($currentNode->isStar() && $currentNode->starPostId !== null) {
+            $currentStarPost = StarPost::fromId($currentNode->starPostId);
+            if ($currentStarPost !== null) {
+                $currentName = $currentStarPost->displayName();
+            }
+        }
+
+        $targetName = sprintf('Node #%d', $targetNodeId);
+        if ($targetNode->isStar() && $targetNode->starPostId !== null) {
+            $targetStarPost = StarPost::fromId($targetNode->starPostId);
+            if ($targetStarPost !== null) {
+                $targetName = $targetStarPost->displayName();
+            }
+        }
+
+        $distance = $currentNode->distanceTo($targetNode);
+        $sensors = $ship->sensors();
+        $sensorRange = $sensors->getRange();
+        $inRange = $distance <= $sensorRange;
+
+        // Check if route already exists
+        $routeExists = $this->edgeRepository->exists($currentNodeId, $targetNodeId);
+
+        // Calculate what it would cost
+        $powerCost = $sensors->getRouteScanCost($distance);
+        $duration = $sensors->getRouteScanDuration($distance);
+        $successChance = $sensors->getScanSuccessChance();
+
+        // Output header
+        WP_CLI::log('');
+        WP_CLI::log(WP_CLI::colorize('%G═══════════════════════════════════════════════════════════════%n'));
+        WP_CLI::log(WP_CLI::colorize('%G  ROUTE SCAN (GOD MODE)%n'));
+        WP_CLI::log(WP_CLI::colorize('%G═══════════════════════════════════════════════════════════════%n'));
+        WP_CLI::log('');
+        WP_CLI::log(sprintf('  Ship:     %s', $model->name));
+        WP_CLI::log(sprintf('  From:     %s', $currentName));
+        WP_CLI::log(sprintf('  To:       %s', $targetName));
+        WP_CLI::log(sprintf('  Distance: %.2f ly', $distance));
+        WP_CLI::log('');
+
+        if ($routeExists) {
+            WP_CLI::log(WP_CLI::colorize('%Y▸ ROUTE ALREADY KNOWN%n'));
+            WP_CLI::log('  No scan needed - route already discovered.');
+        } else {
+            // Create the edge (god mode - instant discovery)
+            $this->edgeRepository->create(
+                $currentNodeId,
+                $targetNodeId,
+                $distance,
+                $shipPost->shipId(),
+            );
+
+            WP_CLI::log(WP_CLI::colorize('%Y▸ ROUTE DISCOVERED%n'));
+            WP_CLI::log(sprintf('  In range:       %s (sensor range %.2f ly)', $inRange ? 'Yes' : WP_CLI::colorize('%RNo - would fail%n'), $sensorRange));
+            WP_CLI::log(sprintf('  Success chance: %.0f%%', $successChance * 100));
+        }
+
+        WP_CLI::log('');
+        WP_CLI::log(WP_CLI::colorize('%Y▸ NORMAL PLAY WOULD REQUIRE:%n'));
+        WP_CLI::log(sprintf('  Power cost: %.1f units', $powerCost));
+        WP_CLI::log(sprintf('  Duration:   %s', $this->formatDuration($duration)));
+        WP_CLI::log('');
+        WP_CLI::log(WP_CLI::colorize('%G═══════════════════════════════════════════════════════════════%n'));
+    }
+
+    /**
+     * Format duration in human readable form.
+     */
+    private function formatDuration(int $seconds): string
+    {
+        if ($seconds < 60) {
+            return sprintf('%d seconds', $seconds);
+        }
+        if ($seconds < 3600) {
+            $minutes = (int) floor($seconds / 60);
+            $secs = $seconds % 60;
+            return $secs > 0 ? sprintf('%d min %d sec', $minutes, $secs) : sprintf('%d min', $minutes);
+        }
+
+        $hours = (int) floor($seconds / 3600);
+        $minutes = (int) floor(($seconds % 3600) / 60);
+        return $minutes > 0 ? sprintf('%d hr %d min', $hours, $minutes) : sprintf('%d hr', $hours);
     }
 }

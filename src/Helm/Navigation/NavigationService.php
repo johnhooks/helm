@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Helm\Navigation;
 
 use Helm\Core\ErrorCode;
+use Helm\Stars\StarRepository;
 
 /**
  * Graph operations for navigation.
@@ -19,6 +20,7 @@ final class NavigationService
         private readonly NodeRepository $nodeRepository,
         private readonly EdgeRepository $edgeRepository,
         private readonly RouteRepository $routeRepository,
+        private readonly StarRepository $starRepository,
     ) {
     }
 
@@ -169,5 +171,66 @@ final class NavigationService
             pow($toNode->y - $fromNode->y, 2) +
             pow($toNode->z - $fromNode->z, 2)
         );
+    }
+
+    /**
+     * Get nearby stars with full info, batch loaded.
+     *
+     * Returns stars within range of a given node, with star info
+     * and route status pre-loaded to avoid N+1 queries.
+     *
+     * @param int $fromNodeId The node to search from
+     * @param float $range Maximum distance in light-years
+     * @return NearbyStar[] Sorted by distance
+     */
+    public function getNearbyStars(int $fromNodeId, float $range): array
+    {
+        $fromNode = $this->nodeRepository->get($fromNodeId);
+        if ($fromNode === null) {
+            return [];
+        }
+
+        // 1. Get all nodes within range
+        $nearbyNodes = $this->nodeRepository->neighborsOf($fromNode, $range);
+
+        // Filter to star nodes only
+        $starNodes = array_filter($nearbyNodes, fn(Node $n) => $n->isStar());
+
+        if ($starNodes === []) {
+            return [];
+        }
+
+        // 2. Batch load stars
+        $starPostIds = array_map(fn(Node $n) => $n->starPostId, $starNodes);
+        $starMap = $this->starRepository->findByPostIds($starPostIds);
+
+        // 3. Batch load edges from this node
+        $edges = $this->edgeRepository->fromNode($fromNodeId);
+        $connectedNodeIds = [];
+        foreach ($edges as $edge) {
+            $connectedNodeIds[$edge->nodeAId] = true;
+            $connectedNodeIds[$edge->nodeBId] = true;
+        }
+
+        // 4. Build result with all data
+        $results = [];
+        foreach ($starNodes as $node) {
+            $star = $starMap[$node->starPostId] ?? null;
+            if ($star === null) {
+                continue;
+            }
+
+            $results[] = new NearbyStar(
+                node: $node,
+                star: $star,
+                distance: $fromNode->distanceTo($node),
+                hasRoute: isset($connectedNodeIds[$node->id]),
+            );
+        }
+
+        // 5. Sort by distance
+        usort($results, fn(NearbyStar $a, NearbyStar $b) => $a->distance <=> $b->distance);
+
+        return $results;
     }
 }

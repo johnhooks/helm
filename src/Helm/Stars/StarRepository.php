@@ -49,6 +49,37 @@ final class StarRepository
     }
 
     /**
+     * Get multiple stars by post IDs (batch load).
+     *
+     * @param int[] $postIds
+     * @return array<int, StarPost> Map of postId => StarPost
+     */
+    public function findByPostIds(array $postIds): array
+    {
+        if ($postIds === []) {
+            return [];
+        }
+
+        $query = new WP_Query([
+            'post_type' => PostTypeRegistry::POST_TYPE_STAR,
+            'post_status' => 'publish',
+            'post__in' => $postIds,
+            'posts_per_page' => count($postIds),
+            'orderby' => 'post__in',
+            'no_found_rows' => true,
+            'update_post_meta_cache' => true,
+            'update_post_term_cache' => true,
+        ]);
+
+        $map = [];
+        foreach ($query->posts as $post) {
+            $map[$post->ID] = StarPost::fromPost($post);
+        }
+
+        return $map;
+    }
+
+    /**
      * Save a Star as a CPT.
      *
      * Creates a new post or updates existing one if catalog ID already exists.

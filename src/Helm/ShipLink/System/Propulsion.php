@@ -19,7 +19,7 @@ final class Propulsion implements PropulsionContract
     /**
      * Base jump duration in seconds per light-year at 1.0x amplitude.
      */
-    private const BASE_SECONDS_PER_LY = 60;
+    private const BASE_SECONDS_PER_LY = 3600;
 
     public function __construct(
         private ShipModel $model,

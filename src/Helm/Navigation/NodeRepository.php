@@ -31,6 +31,40 @@ final class NodeRepository
     }
 
     /**
+     * Find multiple nodes by ID.
+     *
+     * @param int[] $ids
+     * @return Node[] Indexed by node ID
+     */
+    public function getMany(array $ids): array
+    {
+        global $wpdb;
+
+        if ($ids === []) {
+            return [];
+        }
+
+        $placeholders = implode(',', array_fill(0, count($ids), '%d'));
+
+        $rows = $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT * FROM %i WHERE id IN ($placeholders)",
+                Schema::table(Schema::TABLE_NAV_NODES),
+                ...$ids
+            ),
+            ARRAY_A
+        );
+
+        $nodes = [];
+        foreach ($rows as $row) {
+            $node = Node::fromRow($row);
+            $nodes[$node->id] = $node;
+        }
+
+        return $nodes;
+    }
+
+    /**
      * Find a node by star post ID.
      */
     public function getByStarPostId(int $starPostId): ?Node
@@ -91,6 +125,9 @@ final class NodeRepository
     /**
      * Find nodes within a distance from a point.
      *
+     * Uses bounding box pre-filter with the coords index,
+     * then refines with actual spherical distance.
+     *
      * @return Node[]
      */
     public function withinDistance(float $x, float $y, float $z, float $maxDistance): array
@@ -100,17 +137,28 @@ final class NodeRepository
         // Use squared distance to avoid sqrt in query
         $maxDistanceSquared = $maxDistance * $maxDistance;
 
+        // Bounding box filter uses the coords index
+        // HAVING then refines to spherical distance
         $rows = $wpdb->get_results(
             $wpdb->prepare(
                 "SELECT *,
                     POWER(x - %f, 2) + POWER(y - %f, 2) + POWER(z - %f, 2) AS dist_squared
                 FROM %i
+                WHERE x BETWEEN %f AND %f
+                  AND y BETWEEN %f AND %f
+                  AND z BETWEEN %f AND %f
                 HAVING dist_squared <= %f
                 ORDER BY dist_squared",
                 $x,
                 $y,
                 $z,
                 Schema::table(Schema::TABLE_NAV_NODES),
+                $x - $maxDistance,
+                $x + $maxDistance,
+                $y - $maxDistance,
+                $y + $maxDistance,
+                $z - $maxDistance,
+                $z + $maxDistance,
                 $maxDistanceSquared
             ),
             ARRAY_A

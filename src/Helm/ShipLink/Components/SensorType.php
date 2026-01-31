@@ -42,9 +42,9 @@ enum SensorType: int
     public function range(): float
     {
         return match ($this) {
-            self::DSC => 20.0,
-            self::VRS => 12.0,
-            self::ACU => 6.0,
+            self::DSC => 7.0,
+            self::VRS => 5.0,
+            self::ACU => 3.0,
         };
     }
 

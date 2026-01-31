@@ -7,6 +7,9 @@ namespace Helm\CLI;
 use Helm\Config\Config;
 use Helm\Generation\SystemGenerator;
 use Helm\lucatume\DI52\ServiceProvider;
+use Helm\Navigation\EdgeRepository;
+use Helm\Navigation\NavigationService;
+use Helm\Navigation\NodeRepository;
 use Helm\Origin\Origin;
 use Helm\Planets\PlanetBatchGenerator;
 use Helm\Planets\PlanetRepository;
@@ -57,6 +60,9 @@ final class Provider extends ServiceProvider
             return new ShipCommand(
                 $this->container->get(ShipFactory::class),
                 $this->container->get(ShipSystemsRepository::class),
+                $this->container->get(NodeRepository::class),
+                $this->container->get(EdgeRepository::class),
+                $this->container->get(NavigationService::class),
             );
         });
 

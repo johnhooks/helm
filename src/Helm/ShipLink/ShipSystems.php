@@ -127,7 +127,7 @@ final class ShipSystems
             coreLife: $coreType->coreLife(),
             hullIntegrity: 100.0,
             hullMax: 100.0,
-            nodeId: null,
+            nodeId: 1, // Sol - all ships start at Origin
             cargo: [],
             currentActionId: null,
             createdAt: $now,
