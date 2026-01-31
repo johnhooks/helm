@@ -48,3 +48,9 @@ export type { ToggleProps } from "./components/toggle";
 
 export { SegmentedControl } from "./components/segmented-control";
 export type { SegmentedControlProps, SegmentedOption } from "./components/segmented-control";
+
+export { StatusBadge } from "./components/status-badge";
+export type { StatusBadgeProps } from "./components/status-badge";
+
+export { Readout } from "./components/readout";
+export type { ReadoutProps } from "./components/readout";

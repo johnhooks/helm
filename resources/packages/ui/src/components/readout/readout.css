@@ -1,0 +1,129 @@
+@import "../../styles/index.css";
+
+.helm-readout {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-family: var(--helm-ui-font-family);
+  margin: 0;
+}
+
+/* Tones */
+.helm-readout--neutral { --helm-readout-color: var(--helm-ui-color-muted); }
+.helm-readout--accent { --helm-readout-color: var(--helm-ui-color-accent); }
+.helm-readout--orange { --helm-readout-color: var(--helm-ui-color-orange); }
+.helm-readout--gold { --helm-readout-color: var(--helm-ui-color-gold); }
+.helm-readout--peach { --helm-readout-color: var(--helm-ui-color-peach); }
+.helm-readout--blue { --helm-readout-color: var(--helm-ui-color-blue); }
+.helm-readout--sky { --helm-readout-color: var(--helm-ui-color-sky); }
+.helm-readout--lilac { --helm-readout-color: var(--helm-ui-color-lilac); }
+.helm-readout--violet { --helm-readout-color: var(--helm-ui-color-violet); }
+
+/* Alignment */
+.helm-readout--left {
+  align-items: flex-start;
+  text-align: left;
+}
+
+.helm-readout--center {
+  align-items: center;
+  text-align: center;
+}
+
+.helm-readout--right {
+  align-items: flex-end;
+  text-align: right;
+}
+
+/* Label row */
+.helm-readout__label-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  line-height: 1;
+}
+
+/* Label - now uses the tone color */
+.helm-readout__label {
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--helm-readout-color);
+}
+
+.helm-readout--sm .helm-readout__label {
+  font-size: 9px;
+}
+
+.helm-readout--md .helm-readout__label {
+  font-size: 10px;
+}
+
+.helm-readout--lg .helm-readout__label {
+  font-size: 11px;
+}
+
+/* Unit */
+.helm-readout__unit {
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--helm-ui-color-muted);
+}
+
+.helm-readout--sm .helm-readout__unit {
+  font-size: 9px;
+}
+
+.helm-readout--md .helm-readout__unit {
+  font-size: 10px;
+}
+
+.helm-readout--lg .helm-readout__unit {
+  font-size: 11px;
+}
+
+/* Value row (dd element - reset default margin) */
+.helm-readout__value-row {
+  display: flex;
+  align-items: baseline;
+  line-height: 1;
+  margin: 0;
+}
+
+/* Value */
+.helm-readout__value {
+  font-weight: 700;
+  color: var(--helm-readout-color);
+}
+
+.helm-readout--sm .helm-readout__value {
+  font-size: 20px;
+}
+
+.helm-readout--md .helm-readout__value {
+  font-size: 28px;
+}
+
+.helm-readout--lg .helm-readout__value {
+  font-size: 38px;
+}
+
+/* Max */
+.helm-readout__max {
+  font-weight: 400;
+  color: var(--helm-ui-color-muted);
+  margin-left: 1px;
+}
+
+.helm-readout--sm .helm-readout__max {
+  font-size: 13px;
+}
+
+.helm-readout--md .helm-readout__max {
+  font-size: 16px;
+}
+
+.helm-readout--lg .helm-readout__max {
+  font-size: 22px;
+}

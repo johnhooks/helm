@@ -1,0 +1,151 @@
+@import "../../styles/index.css";
+
+.helm-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--helm-ui-font-family);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.helm-status-badge--sm {
+  font-size: 10px;
+  gap: 5px;
+}
+
+.helm-status-badge--md {
+  font-size: 11px;
+  gap: 6px;
+}
+
+/* Dot indicator */
+.helm-status-badge__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.helm-status-badge--sm .helm-status-badge__dot {
+  width: 6px;
+  height: 6px;
+}
+
+/* Pulse animation */
+.helm-status-badge__dot--pulse {
+  animation: helm-status-pulse 2s ease-in-out infinite;
+}
+
+@keyframes helm-status-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .helm-status-badge__dot--pulse {
+    animation: none;
+  }
+}
+
+/* Label */
+.helm-status-badge__label {
+  line-height: 1;
+}
+
+/* Tone colors */
+.helm-status-badge--neutral .helm-status-badge__dot {
+  background: var(--helm-ui-color-muted);
+}
+.helm-status-badge--neutral .helm-status-badge__label {
+  color: var(--helm-ui-color-muted);
+}
+
+.helm-status-badge--muted .helm-status-badge__dot {
+  background: var(--helm-ui-color-border);
+}
+.helm-status-badge--muted .helm-status-badge__label {
+  color: var(--helm-ui-color-border);
+}
+
+.helm-status-badge--accent .helm-status-badge__dot {
+  background: var(--helm-ui-color-accent);
+}
+.helm-status-badge--accent .helm-status-badge__label {
+  color: var(--helm-ui-color-accent);
+}
+
+.helm-status-badge--success .helm-status-badge__dot {
+  background: var(--helm-ui-color-success);
+}
+.helm-status-badge--success .helm-status-badge__label {
+  color: var(--helm-ui-color-success);
+}
+
+.helm-status-badge--warning .helm-status-badge__dot {
+  background: var(--helm-ui-color-warning);
+}
+.helm-status-badge--warning .helm-status-badge__label {
+  color: var(--helm-ui-color-warning);
+}
+
+.helm-status-badge--danger .helm-status-badge__dot {
+  background: var(--helm-ui-color-danger);
+}
+.helm-status-badge--danger .helm-status-badge__label {
+  color: var(--helm-ui-color-danger);
+}
+
+.helm-status-badge--info .helm-status-badge__dot {
+  background: var(--helm-ui-color-info);
+}
+.helm-status-badge--info .helm-status-badge__label {
+  color: var(--helm-ui-color-info);
+}
+
+.helm-status-badge--orange .helm-status-badge__dot {
+  background: var(--helm-ui-color-orange);
+}
+.helm-status-badge--orange .helm-status-badge__label {
+  color: var(--helm-ui-color-orange);
+}
+
+.helm-status-badge--gold .helm-status-badge__dot {
+  background: var(--helm-ui-color-gold);
+}
+.helm-status-badge--gold .helm-status-badge__label {
+  color: var(--helm-ui-color-gold);
+}
+
+.helm-status-badge--blue .helm-status-badge__dot {
+  background: var(--helm-ui-color-blue);
+}
+.helm-status-badge--blue .helm-status-badge__label {
+  color: var(--helm-ui-color-blue);
+}
+
+.helm-status-badge--sky .helm-status-badge__dot {
+  background: var(--helm-ui-color-sky);
+}
+.helm-status-badge--sky .helm-status-badge__label {
+  color: var(--helm-ui-color-sky);
+}
+
+.helm-status-badge--lilac .helm-status-badge__dot {
+  background: var(--helm-ui-color-lilac);
+}
+.helm-status-badge--lilac .helm-status-badge__label {
+  color: var(--helm-ui-color-lilac);
+}
+
+.helm-status-badge--violet .helm-status-badge__dot {
+  background: var(--helm-ui-color-violet);
+}
+.helm-status-badge--violet .helm-status-badge__label {
+  color: var(--helm-ui-color-violet);
+}
