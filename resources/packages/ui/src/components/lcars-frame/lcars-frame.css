@@ -1,0 +1,201 @@
+@import "../../styles/index.css";
+
+/* =============================================================================
+   LCARS FRAME - Classic Star Trek LCARS elbow design with button slots
+   ============================================================================= */
+
+.helm-lcars-frame {
+  --lcars-color: var(--helm-ui-color-gold);
+  --lcars-sidebar-width: 72px;
+  --lcars-header-height: 36px;
+  --lcars-gap: 3px;
+  --lcars-radius: 18px;
+  --lcars-button-height: 28px;
+
+  display: flex;
+  flex-direction: column;
+  font-family: var(--helm-ui-font-family);
+  container-type: inline-size;
+}
+
+/* Expanded mode when container is wide enough */
+@container (min-width: 600px) {
+  .helm-lcars-frame {
+    --lcars-sidebar-width: 110px;
+    --lcars-header-height: 44px;
+    --lcars-gap: 4px;
+    --lcars-radius: 22px;
+    --lcars-button-height: 36px;
+  }
+}
+
+/* Tones */
+.helm-lcars-frame--neutral { --lcars-color: var(--helm-ui-color-muted); }
+.helm-lcars-frame--accent { --lcars-color: var(--helm-ui-color-accent); }
+.helm-lcars-frame--orange { --lcars-color: var(--helm-ui-color-orange); }
+.helm-lcars-frame--gold { --lcars-color: var(--helm-ui-color-gold); }
+.helm-lcars-frame--peach { --lcars-color: var(--helm-ui-color-peach); }
+.helm-lcars-frame--blue { --lcars-color: var(--helm-ui-color-blue); }
+.helm-lcars-frame--sky { --lcars-color: var(--helm-ui-color-sky); }
+.helm-lcars-frame--lilac { --lcars-color: var(--helm-ui-color-lilac); }
+.helm-lcars-frame--violet { --lcars-color: var(--helm-ui-color-violet); }
+.helm-lcars-frame--danger { --lcars-color: #ff6b6b; }
+
+/* =============================================================================
+   HEADER ROW
+   ============================================================================= */
+
+.helm-lcars-frame__header {
+  display: flex;
+  gap: var(--lcars-gap);
+  height: var(--lcars-header-height);
+}
+
+.helm-lcars-frame__corner {
+  width: var(--lcars-sidebar-width);
+  background: var(--lcars-color);
+  border-radius: var(--lcars-radius) 0 0 0;
+}
+
+.helm-lcars-frame__header-bar {
+  flex: 1;
+  background: var(--lcars-color);
+  border-radius: 0 var(--lcars-radius) var(--lcars-radius) 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+}
+
+.helm-lcars-frame__title {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #000;
+}
+
+@container (min-width: 600px) {
+  .helm-lcars-frame__header-bar {
+    padding: 0 20px;
+  }
+
+  .helm-lcars-frame__title {
+    font-size: 14px;
+  }
+}
+
+.helm-lcars-frame__header-actions {
+  display: flex;
+  gap: 12px;
+}
+
+/* =============================================================================
+   BODY ROW
+   ============================================================================= */
+
+.helm-lcars-frame__body {
+  display: flex;
+  gap: var(--lcars-gap);
+  flex: 1;
+  margin-top: var(--lcars-gap);
+}
+
+.helm-lcars-frame__sidebar {
+  width: var(--lcars-sidebar-width);
+  display: flex;
+  flex-direction: column;
+  gap: var(--lcars-gap);
+}
+
+.helm-lcars-frame__sidebar-cap {
+  flex: 1;
+  min-height: 32px;
+  background: var(--lcars-color);
+  border-radius: 0 0 0 var(--lcars-radius);
+}
+
+.helm-lcars-frame__content {
+  flex: 1;
+  background: #0a0a0a;
+  border-radius: 0 8px 8px 0;
+  padding: 16px;
+}
+
+@container (min-width: 600px) {
+  .helm-lcars-frame__content {
+    border-radius: 0 12px 12px 0;
+    padding: 24px;
+  }
+}
+
+/* =============================================================================
+   SIDEBAR BUTTON STYLES (for buttons placed in sidebar slot)
+   ============================================================================= */
+
+.helm-lcars-frame__sidebar > button,
+.helm-lcars-frame__sidebar > .helm-lcars-button {
+  width: 100%;
+  height: var(--lcars-button-height);
+  background: var(--lcars-color);
+  border: none;
+  border-radius: 0;
+  padding: 4px 6px 3px;
+  font-family: var(--helm-ui-font-family);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #000;
+  cursor: pointer;
+  transition: filter 0.15s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: flex-end;
+}
+
+@container (min-width: 600px) {
+  .helm-lcars-frame__sidebar > button,
+  .helm-lcars-frame__sidebar > .helm-lcars-button {
+    padding: 6px 8px 4px;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+  }
+}
+
+.helm-lcars-frame__sidebar > button:hover,
+.helm-lcars-frame__sidebar > .helm-lcars-button:hover {
+  filter: brightness(1.2);
+}
+
+.helm-lcars-frame__sidebar > button:active,
+.helm-lcars-frame__sidebar > .helm-lcars-button:active {
+  filter: brightness(0.9);
+}
+
+/* Subtext styling for buttons with data-subtext attribute */
+.helm-lcars-frame__sidebar > button::before {
+  content: attr(data-subtext);
+  display: block;
+  font-size: 7px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  opacity: 0.5;
+  margin-bottom: 1px;
+  margin-top: auto;
+}
+
+.helm-lcars-frame__sidebar > button:not([data-subtext])::before {
+  content: none;
+}
+
+@container (min-width: 600px) {
+  .helm-lcars-frame__sidebar > button::before {
+    font-size: 8px;
+  }
+}

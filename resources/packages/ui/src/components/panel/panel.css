@@ -1,0 +1,86 @@
+@import "../../styles/index.css";
+
+/* =============================================================================
+   PANEL - LCARS-inspired container component
+   ============================================================================= */
+
+.helm-panel {
+  font-family: var(--helm-ui-font-family);
+  --helm-panel-color: var(--helm-ui-color-muted);
+}
+
+/* Tones */
+.helm-panel--neutral { --helm-panel-color: var(--helm-ui-color-muted); }
+.helm-panel--accent { --helm-panel-color: var(--helm-ui-color-accent); }
+.helm-panel--orange { --helm-panel-color: var(--helm-ui-color-orange); }
+.helm-panel--gold { --helm-panel-color: var(--helm-ui-color-gold); }
+.helm-panel--peach { --helm-panel-color: var(--helm-ui-color-peach); }
+.helm-panel--blue { --helm-panel-color: var(--helm-ui-color-blue); }
+.helm-panel--sky { --helm-panel-color: var(--helm-ui-color-sky); }
+.helm-panel--lilac { --helm-panel-color: var(--helm-ui-color-lilac); }
+.helm-panel--violet { --helm-panel-color: var(--helm-ui-color-violet); }
+.helm-panel--danger { --helm-panel-color: #ff6b6b; }
+
+/* Padding */
+.helm-panel--padding-none { --helm-panel-padding: 0; }
+.helm-panel--padding-sm { --helm-panel-padding: 16px; }
+.helm-panel--padding-md { --helm-panel-padding: 24px; }
+.helm-panel--padding-lg { --helm-panel-padding: 32px; }
+
+/* =============================================================================
+   DEFAULT - Simple dark container with rounded corners
+   ============================================================================= */
+
+.helm-panel--default {
+  background: #0a0a0a;
+  border-radius: 12px;
+  padding: var(--helm-panel-padding);
+}
+
+/* =============================================================================
+   BORDERED - Adds a subtle border accent
+   ============================================================================= */
+
+.helm-panel--bordered {
+  background: #0a0a0a;
+  border-radius: 12px;
+  padding: var(--helm-panel-padding);
+  border: 1px solid var(--helm-panel-color);
+  box-shadow: 0 0 20px color-mix(in srgb, var(--helm-panel-color) 15%, transparent);
+}
+
+/* =============================================================================
+   INSET - Recessed appearance for nested panels
+   ============================================================================= */
+
+.helm-panel--inset {
+  background: #050505;
+  border-radius: 8px;
+  padding: var(--helm-panel-padding);
+  border: 1px solid #1a1a1a;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* =============================================================================
+   BRACKET - Vertical bars on sides (like holding brackets)
+   ============================================================================= */
+
+.helm-panel--bracket {
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+}
+
+.helm-panel__bracket-left,
+.helm-panel__bracket-right {
+  width: 8px;
+  background: var(--helm-panel-color);
+  border-radius: 4px;
+}
+
+.helm-panel__bracket-content {
+  flex: 1;
+  background: #0a0a0a;
+  border-radius: 8px;
+  padding: var(--helm-panel-padding);
+}

@@ -1,0 +1,120 @@
+@import "../../styles/index.css";
+
+/* =============================================================================
+   PROGRESS BAR
+   ============================================================================= */
+
+.helm-progress-bar {
+  --progress-color: var(--helm-ui-color-accent);
+  --progress-track: #1a1a1a;
+  --progress-value: 0%;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--helm-ui-font-family);
+}
+
+/* Tones */
+.helm-progress-bar--neutral { --progress-color: var(--helm-ui-color-muted); }
+.helm-progress-bar--accent { --progress-color: var(--helm-ui-color-accent); }
+.helm-progress-bar--orange { --progress-color: var(--helm-ui-color-orange); }
+.helm-progress-bar--gold { --progress-color: var(--helm-ui-color-gold); }
+.helm-progress-bar--peach { --progress-color: var(--helm-ui-color-peach); }
+.helm-progress-bar--blue { --progress-color: var(--helm-ui-color-blue); }
+.helm-progress-bar--sky { --progress-color: var(--helm-ui-color-sky); }
+.helm-progress-bar--lilac { --progress-color: var(--helm-ui-color-lilac); }
+.helm-progress-bar--violet { --progress-color: var(--helm-ui-color-violet); }
+.helm-progress-bar--danger { --progress-color: #ff6b6b; }
+.helm-progress-bar--success { --progress-color: #4ade80; }
+
+/* =============================================================================
+   TRACK & FILL
+   ============================================================================= */
+
+.helm-progress-bar__track {
+  flex: 1;
+  background: var(--progress-track);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.helm-progress-bar--sm .helm-progress-bar__track { height: 4px; }
+.helm-progress-bar--md .helm-progress-bar__track { height: 8px; }
+.helm-progress-bar--lg .helm-progress-bar__track { height: 12px; }
+
+.helm-progress-bar__fill {
+  height: 100%;
+  width: var(--progress-value);
+  background: var(--progress-color);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+/* =============================================================================
+   VALUE DISPLAY
+   ============================================================================= */
+
+.helm-progress-bar__value {
+  font-weight: 700;
+  color: var(--progress-color);
+  min-width: 3em;
+  text-align: right;
+}
+
+.helm-progress-bar--sm .helm-progress-bar__value { font-size: 10px; }
+.helm-progress-bar--md .helm-progress-bar__value { font-size: 12px; }
+.helm-progress-bar--lg .helm-progress-bar__value { font-size: 14px; }
+
+/* =============================================================================
+   ACTIVE STATE - pulsing glow animation
+   ============================================================================= */
+
+.helm-progress-bar--active .helm-progress-bar__fill {
+  animation: progress-pulse 2s ease-in-out infinite;
+}
+
+.helm-progress-bar--active .helm-progress-bar__value {
+  animation: progress-value-pulse 2s ease-in-out infinite;
+}
+
+@keyframes progress-pulse {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 8px var(--progress-color);
+  }
+  50% {
+    opacity: 0.7;
+    box-shadow: 0 0 16px var(--progress-color), 0 0 24px var(--progress-color);
+  }
+}
+
+@keyframes progress-value-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+/* =============================================================================
+   INDETERMINATE STATE
+   ============================================================================= */
+
+.helm-progress-bar--indeterminate .helm-progress-bar__fill {
+  width: 30%;
+  animation: progress-indeterminate 1.5s ease-in-out infinite;
+}
+
+@keyframes progress-indeterminate {
+  0% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(200%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}

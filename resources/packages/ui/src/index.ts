@@ -54,3 +54,12 @@ export type { ReadoutProps } from "./components/readout";
 
 export { SystemGrid, SystemCell } from "./components/system-grid";
 export type { SystemGridProps, SystemCellProps } from "./components/system-grid";
+
+export { Panel } from "./components/panel";
+export type { PanelProps } from "./components/panel";
+
+export { LcarsFrame } from "./components/lcars-frame";
+export type { LcarsFrameProps } from "./components/lcars-frame";
+
+export { ProgressBar } from "./components/progress-bar";
+export type { ProgressBarProps } from "./components/progress-bar";
