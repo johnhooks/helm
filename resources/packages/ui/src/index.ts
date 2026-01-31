@@ -58,8 +58,8 @@ export type { SystemGridProps, SystemCellProps } from "./components/system-grid"
 export { Panel } from "./components/panel";
 export type { PanelProps } from "./components/panel";
 
-export { LcarsFrame } from "./components/lcars-frame";
-export type { LcarsFrameProps } from "./components/lcars-frame";
+export { LcarsFrame, LcarsHeaderChip } from "./components/lcars-frame";
+export type { LcarsFrameProps, LcarsTab, LcarsHeaderChipProps } from "./components/lcars-frame";
 
 export { ProgressBar } from "./components/progress-bar";
 export type { ProgressBarProps } from "./components/progress-bar";

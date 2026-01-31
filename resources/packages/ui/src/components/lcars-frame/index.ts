@@ -1,2 +1,2 @@
-export { LcarsFrame } from "./lcars-frame";
-export type { LcarsFrameProps } from "./lcars-frame";
+export { LcarsFrame, LcarsHeaderChip } from "./lcars-frame";
+export type { LcarsFrameProps, LcarsTab, LcarsHeaderChipProps } from "./lcars-frame";

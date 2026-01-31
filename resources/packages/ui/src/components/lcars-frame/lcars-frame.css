@@ -87,7 +87,26 @@
 
 .helm-lcars-frame__header-actions {
   display: flex;
-  gap: 12px;
+  gap: 8px;
+}
+
+/* =============================================================================
+   HEADER CHIP - wrapper for items in header bar
+   ============================================================================= */
+
+.helm-lcars-header-chip {
+  background: #000;
+  border-radius: 999px;
+  padding: 4px 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+@container (min-width: 600px) {
+  .helm-lcars-header-chip {
+    padding: 5px 12px;
+  }
 }
 
 /* =============================================================================
@@ -109,7 +128,6 @@
 }
 
 .helm-lcars-frame__sidebar-cap {
-  flex: 1;
   min-height: 32px;
   background: var(--lcars-color);
   border-radius: 0 0 0 var(--lcars-radius);
@@ -130,13 +148,14 @@
 }
 
 /* =============================================================================
-   SIDEBAR BUTTON STYLES (for buttons placed in sidebar slot)
+   TAB BUTTON STYLES
+   Buttons stretch to fill available vertical space like classic LCARS
    ============================================================================= */
 
-.helm-lcars-frame__sidebar > button,
-.helm-lcars-frame__sidebar > .helm-lcars-button {
+.helm-lcars-frame__sidebar > button[role="tab"] {
+  flex: 1;
+  min-height: var(--lcars-button-height);
   width: 100%;
-  height: var(--lcars-button-height);
   background: var(--lcars-color);
   border: none;
   border-radius: 0;
@@ -148,7 +167,7 @@
   text-transform: uppercase;
   color: #000;
   cursor: pointer;
-  transition: filter 0.15s ease;
+  transition: filter 0.15s ease, opacity 0.15s ease;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -160,26 +179,44 @@
 }
 
 @container (min-width: 600px) {
-  .helm-lcars-frame__sidebar > button,
-  .helm-lcars-frame__sidebar > .helm-lcars-button {
+  .helm-lcars-frame__sidebar > button[role="tab"] {
     padding: 6px 8px 4px;
     font-size: 10px;
     letter-spacing: 0.08em;
   }
 }
 
-.helm-lcars-frame__sidebar > button:hover,
-.helm-lcars-frame__sidebar > .helm-lcars-button:hover {
+.helm-lcars-frame__sidebar > button[role="tab"]:hover {
   filter: brightness(1.2);
 }
 
-.helm-lcars-frame__sidebar > button:active,
-.helm-lcars-frame__sidebar > .helm-lcars-button:active {
+.helm-lcars-frame__sidebar > button[role="tab"]:active {
   filter: brightness(0.9);
 }
 
+/* Focus visible for keyboard navigation */
+.helm-lcars-frame__sidebar > button[role="tab"]:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: -2px;
+}
+
+/* Inactive tabs are slightly dimmed */
+.helm-lcars-frame__sidebar > button[role="tab"][aria-selected="false"] {
+  opacity: 0.65;
+}
+
+.helm-lcars-frame__sidebar > button[role="tab"][aria-selected="false"]:hover {
+  opacity: 0.85;
+}
+
+/* Active tab styling */
+.helm-lcars-frame__sidebar > button[role="tab"][aria-selected="true"] {
+  opacity: 1;
+  filter: brightness(1.1);
+}
+
 /* Subtext styling for buttons with data-subtext attribute */
-.helm-lcars-frame__sidebar > button::before {
+.helm-lcars-frame__sidebar > button[role="tab"]::before {
   content: attr(data-subtext);
   display: block;
   font-size: 7px;
@@ -190,12 +227,13 @@
   margin-top: auto;
 }
 
-.helm-lcars-frame__sidebar > button:not([data-subtext])::before {
+.helm-lcars-frame__sidebar > button[role="tab"]:not([data-subtext])::before,
+.helm-lcars-frame__sidebar > button[role="tab"][data-subtext=""]::before {
   content: none;
 }
 
 @container (min-width: 600px) {
-  .helm-lcars-frame__sidebar > button::before {
+  .helm-lcars-frame__sidebar > button[role="tab"]::before {
     font-size: 8px;
   }
 }
