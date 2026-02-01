@@ -55,7 +55,16 @@ export function LcarsModal({
       __experimentalHideHeader
     >
       <div className="helm-lcars-modal__inner" data-testid={testId}>
-        <TitleBar title={title} tone={tone} />
+        <TitleBar title={title} tone={tone}>
+          <button
+            type="button"
+            className="helm-lcars-modal__close"
+            onClick={onRequestClose}
+            aria-label="Close modal"
+          >
+            ×
+          </button>
+        </TitleBar>
 
         <div className="helm-lcars-modal__content">{children}</div>
 

@@ -65,6 +65,31 @@
 }
 
 /* =============================================================================
+   CLOSE BUTTON - Black circle style
+   ============================================================================= */
+
+.helm-lcars-modal__close {
+  width: 28px;
+  height: 28px;
+  background: #000;
+  border: none;
+  border-radius: 50%;
+  color: var(--modal-color);
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.15s ease;
+}
+
+.helm-lcars-modal__close:hover {
+  opacity: 0.8;
+}
+
+/* =============================================================================
    CONTENT
    ============================================================================= */
 
@@ -83,6 +108,4 @@
   justify-content: flex-end;
   gap: 8px;
   margin-top: 24px;
-  padding-top: 16px;
-  border-top: 1px solid #333;
 }
