@@ -6,7 +6,6 @@ node_modules/
 /tests/_output/
 /coverage/
 .idea
-.storybook
 *.cache
 .phpunit.cache
 .phpunit.result.cache

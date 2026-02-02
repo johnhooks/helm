@@ -1,0 +1,5 @@
+/* Set background for story canvas using design system token */
+body,
+.sb-show-main {
+  background: var(--helm-ui-color-bg) !important;
+}
