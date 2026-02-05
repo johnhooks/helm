@@ -23,13 +23,13 @@ final class Resolver implements ActionHandler
         $targetNodeId = $result['to_node_id'] ?? $action->get('target_node_id');
         $coreCost = $result['core_cost'] ?? 0.0;
 
-        // Execute the jump
-        $systems = $ship->getRecord();
-        $currentCoreLife = $systems->core_life;
+        // Execute the jump - core_life on systems (component), node_id on state
+        $config = $ship->getSystems();
+        $currentCoreLife = $config->core_life;
         $newCoreLife = max(0.0, $currentCoreLife - $coreCost);
 
-        $systems->node_id = $targetNodeId;
-        $systems->core_life = $newCoreLife;
+        $ship->getState()->node_id = $targetNodeId;
+        $config->core_life = $newCoreLife;
 
         // Update action result with final values
         $result['remaining_core_life'] = $newCoreLife;

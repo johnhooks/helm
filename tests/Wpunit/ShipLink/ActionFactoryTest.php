@@ -13,6 +13,7 @@ use Helm\ShipLink\ActionRepository;
 use Helm\ShipLink\ActionStatus;
 use Helm\ShipLink\ActionType;
 use Helm\ShipLink\Models\Action;
+use Helm\ShipLink\ShipStateRepository;
 use Helm\ShipLink\ShipSystemsRepository;
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use Tests\Support\WpunitTester;
@@ -26,6 +27,7 @@ class ActionFactoryTest extends WPTestCase
 {
     private ActionFactory $factory;
     private ActionRepository $actionRepository;
+    private ShipStateRepository $stateRepository;
     private ShipSystemsRepository $systemsRepository;
     private NodeRepository $nodeRepository;
     private EdgeRepository $edgeRepository;
@@ -38,6 +40,7 @@ class ActionFactoryTest extends WPTestCase
 
         $this->factory = helm(ActionFactory::class);
         $this->actionRepository = helm(ActionRepository::class);
+        $this->stateRepository = helm(ShipStateRepository::class);
         $this->systemsRepository = helm(ShipSystemsRepository::class);
         $this->nodeRepository = helm(NodeRepository::class);
         $this->edgeRepository = helm(EdgeRepository::class);
@@ -118,9 +121,9 @@ class ActionFactoryTest extends WPTestCase
             'target_node_id' => $node2->id,
         ]);
 
-        $systems = $this->systemsRepository->find($ship->postId());
+        $state = $this->stateRepository->find($ship->postId());
 
-        $this->assertSame($action->id, $systems->current_action_id);
+        $this->assertSame($action->id, $state->current_action_id);
     }
 
     public function test_throws_when_ship_has_current_action(): void
@@ -175,8 +178,8 @@ class ActionFactoryTest extends WPTestCase
         }
 
         // Ship should have no current action
-        $systems = $this->systemsRepository->find($ship->postId());
-        $this->assertNull($systems->current_action_id);
+        $state = $this->stateRepository->find($ship->postId());
+        $this->assertNull($state->current_action_id);
 
         // No action records should exist for this ship
         $actions = $this->actionRepository->findForShip($ship->postId());

@@ -9,12 +9,11 @@ use Helm\Navigation\EdgeRepository;
 use Helm\Navigation\NodeRepository;
 use Helm\ShipLink\ActionProcessor;
 use Helm\ShipLink\ActionRepository;
-use Helm\ShipLink\ActionResolver;
 use Helm\ShipLink\ActionStatus;
 use Helm\ShipLink\ActionType;
 use Helm\ShipLink\Models\Action;
 use Helm\ShipLink\ProcessingResult;
-use Helm\ShipLink\ShipSystemsRepository;
+use Helm\ShipLink\ShipStateRepository;
 use Tests\Support\WpunitTester;
 
 /**
@@ -26,7 +25,7 @@ class ActionProcessorTest extends \Codeception\TestCase\WPTestCase
 {
     private ActionRepository $repository;
     private ActionProcessor $processor;
-    private ShipSystemsRepository $systemsRepository;
+    private ShipStateRepository $stateRepository;
     private NodeRepository $nodeRepository;
     private EdgeRepository $edgeRepository;
 
@@ -37,7 +36,7 @@ class ActionProcessorTest extends \Codeception\TestCase\WPTestCase
         $this->tester->haveOrigin();
 
         $this->repository = new ActionRepository();
-        $this->systemsRepository = new ShipSystemsRepository();
+        $this->stateRepository = new ShipStateRepository();
         $this->nodeRepository = helm(NodeRepository::class);
         $this->edgeRepository = helm(EdgeRepository::class);
 
@@ -79,7 +78,7 @@ class ActionProcessorTest extends \Codeception\TestCase\WPTestCase
             'params' => ['target_node_id' => $node2->id],
         ]);
         $this->repository->insert($action);
-        $this->systemsRepository->updateCurrentAction($ship->postId(), $action->id);
+        $this->stateRepository->updateCurrentAction($ship->postId(), $action->id);
 
         // Process
         $result = $this->processor->processReady();
@@ -137,7 +136,7 @@ class ActionProcessorTest extends \Codeception\TestCase\WPTestCase
             'deferred_until' => new DateTimeImmutable('-1 minute'),
         ]);
         $this->repository->insert($action);
-        $this->systemsRepository->updateCurrentAction($ship->postId(), $action->id);
+        $this->stateRepository->updateCurrentAction($ship->postId(), $action->id);
 
         // Process
         $result = $this->processor->processReady();
@@ -171,7 +170,7 @@ class ActionProcessorTest extends \Codeception\TestCase\WPTestCase
                 'params' => ['target_node_id' => $node2->id],
             ]);
             $this->repository->insert($action);
-            $this->systemsRepository->updateCurrentAction($ship->postId(), $action->id);
+            $this->stateRepository->updateCurrentAction($ship->postId(), $action->id);
         }
 
         // Process with limit of 1
@@ -192,7 +191,7 @@ class ActionProcessorTest extends \Codeception\TestCase\WPTestCase
             'params' => [],
         ]);
         $this->repository->insert($action);
-        $this->systemsRepository->updateCurrentAction($ship->postId(), $action->id);
+        $this->stateRepository->updateCurrentAction($ship->postId(), $action->id);
 
         // Process
         $result = $this->processor->processReady();

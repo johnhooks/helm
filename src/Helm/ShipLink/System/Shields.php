@@ -7,6 +7,7 @@ namespace Helm\ShipLink\System;
 use DateTimeImmutable;
 use Helm\Lib\Date;
 use Helm\ShipLink\Contracts\Shields as ShieldsContract;
+use Helm\ShipLink\Models\ShipState;
 use Helm\ShipLink\Models\ShipSystems;
 
 /**
@@ -18,11 +19,12 @@ use Helm\ShipLink\Models\ShipSystems;
  * current strength based on regen rate.
  *
  * This system is read-only - it reports state and calculates values.
- * Ship is responsible for all mutations to ShipSystems.
+ * Ship is responsible for all mutations to ShipState.
  */
 final class Shields implements ShieldsContract
 {
     public function __construct(
+        private ShipState $state,
         private ShipSystems $systems,
     ) {
     }
@@ -31,25 +33,25 @@ final class Shields implements ShieldsContract
     {
         $now ??= Date::now();
 
-        if ($this->systems->shields_full_at === null) {
-            return $this->systems->shields_max;
+        if ($this->state->shields_full_at === null) {
+            return $this->state->shields_max;
         }
 
-        if ($now >= $this->systems->shields_full_at) {
-            return $this->systems->shields_max;
+        if ($now >= $this->state->shields_full_at) {
+            return $this->state->shields_max;
         }
 
         $regenRate = $this->getRegenRate();
-        $secondsUntilFull = $this->systems->shields_full_at->getTimestamp() - $now->getTimestamp();
+        $secondsUntilFull = $this->state->shields_full_at->getTimestamp() - $now->getTimestamp();
         $hoursUntilFull = $secondsUntilFull / 3600.0;
         $shieldsNeeded = $hoursUntilFull * $regenRate;
 
-        return max(0.0, $this->systems->shields_max - $shieldsNeeded);
+        return max(0.0, $this->state->shields_max - $shieldsNeeded);
     }
 
     public function getMaxStrength(): float
     {
-        return $this->systems->shields_max;
+        return $this->state->shields_max;
     }
 
     public function getRegenRate(): float
@@ -64,7 +66,7 @@ final class Shields implements ShieldsContract
 
     public function getFullAt(): ?DateTimeImmutable
     {
-        return $this->systems->shields_full_at;
+        return $this->state->shields_full_at;
     }
 
     public function calculateShieldsFullAtAfterDamage(float $amount, ?DateTimeImmutable $now = null): DateTimeImmutable
@@ -73,7 +75,7 @@ final class Shields implements ShieldsContract
 
         $current = $this->getCurrentStrength($now);
         $newLevel = max(0.0, $current - $amount);
-        $deficit = $this->systems->shields_max - $newLevel;
+        $deficit = $this->state->shields_max - $newLevel;
 
         if ($deficit <= 0) {
             return $now;

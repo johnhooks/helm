@@ -17,6 +17,10 @@ final class Provider extends ServiceProvider
 {
     public function register(): void
     {
+        $this->container->singleton(ShipStateRepository::class, function () {
+            return new ShipStateRepository();
+        });
+
         $this->container->singleton(ShipSystemsRepository::class, function () {
             return new ShipSystemsRepository();
         });
@@ -27,6 +31,7 @@ final class Provider extends ServiceProvider
 
         $this->container->singleton(ShipFactory::class, function () {
             return new ShipFactory(
+                $this->container->get(ShipStateRepository::class),
                 $this->container->get(ShipSystemsRepository::class),
                 $this->container->get(NavigationService::class),
             );
@@ -40,6 +45,7 @@ final class Provider extends ServiceProvider
             return new ActionFactory(
                 $this->container,
                 $this->container->get(ActionRepository::class),
+                $this->container->get(ShipStateRepository::class),
                 $this->container->get(ShipSystemsRepository::class),
                 $this->container->get(ShipFactory::class),
             );
@@ -49,6 +55,7 @@ final class Provider extends ServiceProvider
             return new ActionResolver(
                 $this->container,
                 $this->container->get(ActionRepository::class),
+                $this->container->get(ShipStateRepository::class),
                 $this->container->get(ShipSystemsRepository::class),
                 $this->container->get(ShipFactory::class),
             );

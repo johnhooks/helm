@@ -20,6 +20,7 @@ final class Schema
     public const TABLE_NAV_EDGES = 'helm_nav_edges';
     public const TABLE_NAV_ROUTES = 'helm_nav_routes';
     public const TABLE_SHIP_SYSTEMS = 'helm_ship_systems';
+    public const TABLE_SHIP_STATE = 'helm_ship_state';
     public const TABLE_SHIP_ACTIONS = 'helm_ship_actions';
 
     /**
@@ -31,6 +32,7 @@ final class Schema
         self::TABLE_NAV_EDGES,
         self::TABLE_NAV_ROUTES,
         self::TABLE_SHIP_SYSTEMS,
+        self::TABLE_SHIP_STATE,
         self::TABLE_SHIP_ACTIONS,
     ];
 
@@ -63,6 +65,7 @@ final class Schema
              . self::getNavEdgesTableSql($prefix, $charsetCollate)
              . self::getNavRoutesTableSql($prefix, $charsetCollate)
              . self::getShipSystemsTableSql($prefix, $charsetCollate)
+             . self::getShipStateTableSql($prefix, $charsetCollate)
              . self::getShipActionsTableSql($prefix, $charsetCollate);
 
         // Run dbDelta with error handling
@@ -296,14 +299,10 @@ CREATE TABLE {$prefix}helm_nav_routes (
     }
 
     /**
-     * Ship systems state table SQL.
+     * Ship systems table SQL.
      *
-     * Stores rapidly-changing ship state separately from the Ship CPT.
-     * Component configuration stays in post meta; operational state lives here.
-     * Credits are stored on the user, not the ship.
-     *
-     * Regenerating resources (power, shields) use "full_at" timestamps -
-     * current value is calculated from time remaining until full.
+     * Component configuration: what's installed on the ship.
+     * Core life is a property of the physical warp core, not operational state.
      */
     private static function getShipSystemsTableSql(string $prefix, string $charsetCollate): string
     {
@@ -311,16 +310,38 @@ CREATE TABLE {$prefix}helm_nav_routes (
 CREATE TABLE {$prefix}helm_ship_systems (
     ship_post_id bigint(20) unsigned NOT NULL,
     core_type smallint(5) unsigned NOT NULL DEFAULT 1,
+    core_life float NOT NULL DEFAULT 750.0,
     drive_type smallint(5) unsigned NOT NULL DEFAULT 1,
     sensor_type smallint(5) unsigned NOT NULL DEFAULT 1,
     shield_type smallint(5) unsigned NOT NULL DEFAULT 1,
     nav_tier smallint(5) unsigned NOT NULL DEFAULT 1,
+    created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY  (ship_post_id),
+    KEY core_life (core_life)
+) {$charsetCollate};
+";
+    }
+
+    /**
+     * Ship state table SQL.
+     *
+     * Operational state that changes constantly: power, location, hull, cargo.
+     * Credits are stored on the user, not the ship.
+     *
+     * Regenerating resources (power, shields) use "full_at" timestamps -
+     * current value is calculated from time remaining until full.
+     */
+    private static function getShipStateTableSql(string $prefix, string $charsetCollate): string
+    {
+        return "
+CREATE TABLE {$prefix}helm_ship_state (
+    ship_post_id bigint(20) unsigned NOT NULL,
     power_mode smallint(5) unsigned NOT NULL DEFAULT 2,
     power_full_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     power_max float NOT NULL DEFAULT 100.0,
     shields_full_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     shields_max float NOT NULL DEFAULT 100.0,
-    core_life float NOT NULL DEFAULT 750.0,
     hull_integrity float NOT NULL DEFAULT 100.0,
     hull_max float NOT NULL DEFAULT 100.0,
     node_id bigint(20) unsigned DEFAULT NULL,
@@ -330,7 +351,6 @@ CREATE TABLE {$prefix}helm_ship_systems (
     updated_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY  (ship_post_id),
     KEY node_id (node_id),
-    KEY core_life (core_life),
     KEY current_action_id (current_action_id)
 ) {$charsetCollate};
 ";

@@ -26,7 +26,8 @@ final class ShipActionsController
 
     public function __construct(
         private readonly ActionFactory $actionFactory,
-    ) {}
+    ) {
+    }
 
     /**
      * Register REST routes.

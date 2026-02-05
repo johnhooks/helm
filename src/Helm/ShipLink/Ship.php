@@ -13,16 +13,17 @@ use Helm\ShipLink\Contracts\Sensors;
 use Helm\ShipLink\Contracts\Shields;
 use Helm\ShipLink\Contracts\ShipLink;
 use Helm\ShipLink\Models\Action;
+use Helm\ShipLink\Models\ShipState;
 use Helm\ShipLink\Models\ShipSystems;
 use Helm\Ships\ShipPost;
 
 /**
  * Ship implementation of ShipLink.
  *
- * This is the main starship interface and the ONLY mutator of ShipSystems.
+ * This is the main starship interface and the ONLY mutator of ShipState/ShipSystems.
  * Systems are read-only - they report state and calculate values.
  * Ship orchestrates by gathering data from systems, making decisions,
- * and applying mutations directly to ShipSystems.
+ * and applying mutations directly to ShipState (operational) or ShipSystems (component).
  *
  * All systems are injected via constructor - use ShipFactory to build.
  */
@@ -30,6 +31,7 @@ final class Ship implements ShipLink
 {
     public function __construct(
         private ShipPost $post,
+        private ShipState $state,
         private ShipSystems $systems,
         private PowerSystem $powerSystem,
         private Propulsion $propulsionSystem,
@@ -41,7 +43,12 @@ final class Ship implements ShipLink
     ) {
     }
 
-    public function getRecord(): ShipSystems
+    public function getState(): ShipState
+    {
+        return $this->state;
+    }
+
+    public function getSystems(): ShipSystems
     {
         return $this->systems;
     }
@@ -185,9 +192,9 @@ final class Ship implements ShipLink
             ));
         }
 
-        // 5. Ship mutates directly
+        // 5. Ship mutates directly - core_life on systems (component), node_id on state
         $this->systems->core_life = max(0.0, $this->systems->core_life - $coreCost);
-        $this->systems->node_id = $targetNodeId;
+        $this->state->node_id = $targetNodeId;
 
         // 6. Return result
         $result = new ActionResult();
@@ -239,8 +246,8 @@ final class Ship implements ShipLink
             ));
         }
 
-        // Ship mutates directly - calculate and apply new power_full_at
-        $this->systems->power_full_at = $this->powerSystem->calculatePowerFullAtAfterConsumption($powerCost);
+        // Ship mutates state directly - power_full_at is operational state
+        $this->state->power_full_at = $this->powerSystem->calculatePowerFullAtAfterConsumption($powerCost);
 
         $duration = $this->sensorSystem->getRouteScanDuration($distance);
 
@@ -270,8 +277,8 @@ final class Ship implements ShipLink
             ));
         }
 
-        // Ship mutates directly
-        $this->systems->power_full_at = $this->powerSystem->calculatePowerFullAtAfterConsumption($powerCost);
+        // Ship mutates state directly
+        $this->state->power_full_at = $this->powerSystem->calculatePowerFullAtAfterConsumption($powerCost);
 
         $result = new ActionResult();
         return $result->add('survey', SystemResult::from([
@@ -294,8 +301,8 @@ final class Ship implements ShipLink
             ));
         }
 
-        // Ship mutates directly
-        $this->systems->power_full_at = $this->powerSystem->calculatePowerFullAtAfterConsumption($powerCost);
+        // Ship mutates state directly
+        $this->state->power_full_at = $this->powerSystem->calculatePowerFullAtAfterConsumption($powerCost);
 
         $result = new ActionResult();
         return $result->add('planet_scan', SystemResult::from([
@@ -353,12 +360,12 @@ final class Ship implements ShipLink
         $direction = $action->params['direction'] ?? 'load'; // load or unload
 
         if ($direction === 'load') {
-            // Ship mutates directly using cargo's calculation
-            $this->systems->cargo = $this->cargoSystem->calculateCargoAfterAdd($resource, $quantity);
+            // Ship mutates state directly using cargo's calculation
+            $this->state->cargo = $this->cargoSystem->calculateCargoAfterAdd($resource, $quantity);
         } else {
-            // Ship mutates directly using cargo's calculation
+            // Ship mutates state directly using cargo's calculation
             $cargoResult = $this->cargoSystem->calculateCargoAfterRemove($resource, $quantity);
-            $this->systems->cargo = $cargoResult['cargo'];
+            $this->state->cargo = $cargoResult['cargo'];
             $quantity = $cargoResult['removed'];
         }
 
@@ -379,10 +386,10 @@ final class Ship implements ShipLink
 
         $before = $this->hullSystem->getIntegrity();
 
-        // Ship mutates directly using hull's calculation
-        $this->systems->hull_integrity = $this->hullSystem->calculateIntegrityAfterRepair($amount);
+        // Ship mutates state directly using hull's calculation
+        $this->state->hull_integrity = $this->hullSystem->calculateIntegrityAfterRepair($amount);
 
-        $after = $this->systems->hull_integrity;
+        $after = $this->state->hull_integrity;
 
         $result = new ActionResult();
         return $result->add('repair', SystemResult::from([

@@ -6,6 +6,7 @@ namespace Helm\ShipLink\Contracts;
 
 use Helm\ShipLink\Models\Action;
 use Helm\ShipLink\ActionResult;
+use Helm\ShipLink\Models\ShipState;
 use Helm\ShipLink\Models\ShipSystems;
 
 /**
@@ -17,9 +18,14 @@ use Helm\ShipLink\Models\ShipSystems;
 interface ShipLink
 {
     /**
-     * Get the underlying systems record.
+     * Get the ship's operational state record.
      */
-    public function getRecord(): ShipSystems;
+    public function getState(): ShipState;
+
+    /**
+     * Get the ship's systems record.
+     */
+    public function getSystems(): ShipSystems;
 
     /**
      * Get the ship ID (post ID).

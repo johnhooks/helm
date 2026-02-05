@@ -22,6 +22,7 @@ final class ActionFactory
     public function __construct(
         private readonly Container $container,
         private readonly ActionRepository $actionRepository,
+        private readonly ShipStateRepository $stateRepository,
         private readonly ShipSystemsRepository $systemsRepository,
         private readonly ShipFactory $shipFactory,
     ) {
@@ -69,9 +70,9 @@ final class ActionFactory
         Transaction::begin();
 
         try {
-            // Lock the ship row first - fails fast if another transaction has it
+            // Lock the ship state row first - fails fast if another transaction has it
             try {
-                $currentActionId = $this->systemsRepository->lockForUpdate($shipPostId);
+                $currentActionId = $this->stateRepository->lockForUpdate($shipPostId);
             } catch (\RuntimeException $e) {
                 throw new ActionException(
                     ErrorCode::ActionInProgress,
@@ -94,7 +95,7 @@ final class ActionFactory
                 );
             }
 
-            $this->systemsRepository->updateCurrentAction($shipPostId, $action->id);
+            $this->stateRepository->updateCurrentAction($shipPostId, $action->id);
 
             // Deferred actions stay in DB - cron will pick them up when ready
             // Immediate actions are resolved inline
@@ -135,8 +136,9 @@ final class ActionFactory
 
         $action->fulfill();
         $this->actionRepository->update($action);
-        $this->systemsRepository->update($ship->getRecord());
-        $this->systemsRepository->updateCurrentAction($action->ship_post_id, null);
+        $this->stateRepository->update($ship->getState());
+        $this->systemsRepository->update($ship->getSystems());
+        $this->stateRepository->updateCurrentAction($action->ship_post_id, null);
 
         return $action;
     }

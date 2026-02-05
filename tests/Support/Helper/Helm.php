@@ -12,7 +12,9 @@ use Helm\Origin\Origin;
 use Helm\Planets\Planet;
 use Helm\Planets\PlanetRepository;
 use Helm\PostTypes\PostTypeRegistry;
+use Helm\ShipLink\Models\ShipState;
 use Helm\ShipLink\Models\ShipSystems;
+use Helm\ShipLink\ShipStateRepository;
 use Helm\ShipLink\ShipSystemsRepository;
 use Helm\Ships\ShipPost;
 use Helm\Stars\Star;
@@ -211,22 +213,32 @@ class Helm extends Module
 
         update_post_meta($postId, PostTypeRegistry::META_SHIP_ID, $data['id']);
 
-        // Create systems record (creates defaults)
+        // Create state record (operational state)
+        /** @var ShipStateRepository $stateRepository */
+        $stateRepository = helm(ShipStateRepository::class);
+        $state = $stateRepository->findOrCreate($postId);
+
+        // Apply state overrides
+        if (array_key_exists('node_id', $data)) {
+            $state->node_id = $data['node_id'];
+        }
+
+        if (array_key_exists('current_action_id', $data)) {
+            $state->current_action_id = $data['current_action_id'];
+        }
+
+        if ($state->isDirty()) {
+            $stateRepository->update($state);
+        }
+
+        // Create systems record (component config)
         /** @var ShipSystemsRepository $systemsRepository */
         $systemsRepository = helm(ShipSystemsRepository::class);
         $systems = $systemsRepository->findOrCreate($postId);
 
-        // Apply any system overrides
-        if (array_key_exists('node_id', $data)) {
-            $systems->node_id = $data['node_id'];
-        }
-
+        // Apply config overrides
         if (array_key_exists('core_life', $data)) {
             $systems->core_life = (float) $data['core_life'];
-        }
-
-        if (array_key_exists('current_action_id', $data)) {
-            $systems->current_action_id = $data['current_action_id'];
         }
 
         if ($systems->isDirty()) {

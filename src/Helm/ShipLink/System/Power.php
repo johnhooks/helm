@@ -8,6 +8,7 @@ use DateTimeImmutable;
 use Helm\Lib\Date;
 use Helm\ShipLink\Components\PowerMode;
 use Helm\ShipLink\Contracts\PowerSystem;
+use Helm\ShipLink\Models\ShipState;
 use Helm\ShipLink\Models\ShipSystems;
 
 /**
@@ -21,11 +22,12 @@ use Helm\ShipLink\Models\ShipSystems;
  * we calculate current power based on regen rate.
  *
  * This system is read-only - it reports state and calculates values.
- * Ship is responsible for all mutations to ShipSystems.
+ * Ship is responsible for all mutations to ShipState/ShipSystems.
  */
 final class Power implements PowerSystem
 {
     public function __construct(
+        private ShipState $state,
         private ShipSystems $systems,
     ) {
     }
@@ -34,31 +36,31 @@ final class Power implements PowerSystem
     {
         $now ??= Date::now();
 
-        if ($this->systems->power_full_at === null) {
-            return $this->systems->power_max;
+        if ($this->state->power_full_at === null) {
+            return $this->state->power_max;
         }
 
-        if ($now >= $this->systems->power_full_at) {
-            return $this->systems->power_max;
+        if ($now >= $this->state->power_full_at) {
+            return $this->state->power_max;
         }
 
         // Power regenerates at core's regen rate × power mode multiplier per hour
         $regenRate = $this->getRegenRate();
-        $secondsUntilFull = $this->systems->power_full_at->getTimestamp() - $now->getTimestamp();
+        $secondsUntilFull = $this->state->power_full_at->getTimestamp() - $now->getTimestamp();
         $hoursUntilFull = $secondsUntilFull / 3600.0;
         $powerNeeded = $hoursUntilFull * $regenRate;
 
-        return max(0.0, $this->systems->power_max - $powerNeeded);
+        return max(0.0, $this->state->power_max - $powerNeeded);
     }
 
     public function getMaxPower(): float
     {
-        return $this->systems->power_max;
+        return $this->state->power_max;
     }
 
     public function getRegenRate(): float
     {
-        return $this->systems->core_type->regenRate() * $this->systems->power_mode->regenMultiplier();
+        return $this->systems->core_type->regenRate() * $this->state->power_mode->regenMultiplier();
     }
 
     public function hasAvailable(float $amount): bool
@@ -78,22 +80,22 @@ final class Power implements PowerSystem
 
     public function getFullAt(): ?DateTimeImmutable
     {
-        return $this->systems->power_full_at;
+        return $this->state->power_full_at;
     }
 
     public function getOutputMultiplier(): float
     {
-        return $this->systems->core_type->baseOutput() * $this->systems->power_mode->outputMultiplier();
+        return $this->systems->core_type->baseOutput() * $this->state->power_mode->outputMultiplier();
     }
 
     public function getPowerMode(): PowerMode
     {
-        return $this->systems->power_mode;
+        return $this->state->power_mode;
     }
 
     public function getDecayMultiplier(): float
     {
-        return $this->systems->power_mode->decayMultiplier();
+        return $this->state->power_mode->decayMultiplier();
     }
 
     public function calculatePowerFullAtAfterConsumption(float $amount, ?DateTimeImmutable $now = null): DateTimeImmutable
@@ -102,7 +104,7 @@ final class Power implements PowerSystem
 
         $current = $this->getCurrentPower($now);
         $newLevel = max(0.0, $current - $amount);
-        $deficit = $this->systems->power_max - $newLevel;
+        $deficit = $this->state->power_max - $newLevel;
 
         if ($deficit <= 0) {
             return $now;

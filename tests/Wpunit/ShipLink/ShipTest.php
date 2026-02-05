@@ -13,8 +13,10 @@ use Helm\ShipLink\Components\CoreType;
 use Helm\ShipLink\Components\DriveType;
 use Helm\ShipLink\Components\SensorType;
 use Helm\ShipLink\Contracts\ShipLink;
+use Helm\ShipLink\Models\ShipState;
 use Helm\ShipLink\Models\ShipSystems;
 use Helm\ShipLink\ShipFactory;
+use Helm\ShipLink\ShipStateRepository;
 use Helm\ShipLink\ShipSystemsRepository;
 use Helm\Ships\ShipPost;
 use lucatume\WPBrowser\TestCase\WPTestCase;
@@ -28,6 +30,7 @@ use Tests\Support\WpunitTester;
 class ShipTest extends WPTestCase
 {
     private ShipFactory $factory;
+    private ShipStateRepository $stateRepository;
     private ShipSystemsRepository $systemsRepository;
     private NodeRepository $nodeRepository;
     private EdgeRepository $edgeRepository;
@@ -38,17 +41,26 @@ class ShipTest extends WPTestCase
         $this->tester->haveOrigin();
 
         $this->factory = helm(ShipFactory::class);
+        $this->stateRepository = helm(ShipStateRepository::class);
         $this->systemsRepository = helm(ShipSystemsRepository::class);
         $this->nodeRepository = helm(NodeRepository::class);
         $this->edgeRepository = helm(EdgeRepository::class);
     }
 
-    public function test_get_record_returns_systems(): void
+    public function test_get_state_returns_ship_state(): void
     {
         $shipPost = $this->tester->haveShip();
         $ship = $this->factory->build($shipPost->postId());
 
-        $this->assertInstanceOf(ShipSystems::class, $ship->getRecord());
+        $this->assertInstanceOf(ShipState::class, $ship->getState());
+    }
+
+    public function test_get_config_returns_ship_systems(): void
+    {
+        $shipPost = $this->tester->haveShip();
+        $ship = $this->factory->build($shipPost->postId());
+
+        $this->assertInstanceOf(ShipSystems::class, $ship->getSystems());
     }
 
     public function test_get_id_returns_post_id(): void
@@ -70,9 +82,9 @@ class ShipTest extends WPTestCase
     public function test_process_fails_when_destroyed(): void
     {
         $shipPost = $this->tester->haveShip();
-        $systems = $this->systemsRepository->find($shipPost->postId());
-        $systems->hull_integrity = 0.0;
-        $this->systemsRepository->update($systems);
+        $state = $this->stateRepository->find($shipPost->postId());
+        $state->hull_integrity = 0.0;
+        $this->stateRepository->update($state);
 
         $ship = $this->factory->build($shipPost->postId());
 
@@ -106,9 +118,9 @@ class ShipTest extends WPTestCase
     public function test_can_process_returns_false_when_destroyed(): void
     {
         $shipPost = $this->tester->haveShip();
-        $systems = $this->systemsRepository->find($shipPost->postId());
-        $systems->hull_integrity = 0.0;
-        $this->systemsRepository->update($systems);
+        $state = $this->stateRepository->find($shipPost->postId());
+        $state->hull_integrity = 0.0;
+        $this->stateRepository->update($state);
 
         $ship = $this->factory->build($shipPost->postId());
 
@@ -127,8 +139,11 @@ class ShipTest extends WPTestCase
         $shipPost = $this->tester->haveShip();
         $systems = $this->systemsRepository->find($shipPost->postId());
         $systems->core_life = 100.0;
-        $systems->node_id = $nodeA->id;
         $this->systemsRepository->update($systems);
+
+        $state = $this->stateRepository->find($shipPost->postId());
+        $state->node_id = $nodeA->id;
+        $this->stateRepository->update($state);
 
         $ship = $this->factory->build($shipPost->postId());
 
@@ -139,7 +154,7 @@ class ShipTest extends WPTestCase
         $jumpResult = $result->get('jump');
         $this->assertNotNull($jumpResult);
         $this->assertSame(5.0, $jumpResult->get('distance'));
-        $this->assertSame($nodeB->id, $ship->getRecord()->node_id);
+        $this->assertSame($nodeB->id, $ship->getState()->node_id);
     }
 
     public function test_process_jump_consumes_core_life(): void
@@ -154,8 +169,11 @@ class ShipTest extends WPTestCase
         $systems->core_type = CoreType::EpochS; // 1.0x jump cost
         $systems->drive_type = DriveType::DR5; // 1.0x consumption
         $systems->core_life = 100.0;
-        $systems->node_id = $nodeA->id;
         $this->systemsRepository->update($systems);
+
+        $state = $this->stateRepository->find($shipPost->postId());
+        $state->node_id = $nodeA->id;
+        $this->stateRepository->update($state);
 
         $ship = $this->factory->build($shipPost->postId());
 
@@ -163,7 +181,7 @@ class ShipTest extends WPTestCase
         $ship->process($action);
 
         // 5 * 1.0 * 1.0 = 5 core consumed
-        $this->assertSame(95.0, $ship->getRecord()->core_life);
+        $this->assertSame(95.0, $ship->getSystems()->core_life);
     }
 
     public function test_process_jump_fails_without_route(): void
@@ -173,9 +191,9 @@ class ShipTest extends WPTestCase
         $nodeB = $this->nodeRepository->create(x: 10.0, y: 0.0, z: 0.0);
 
         $shipPost = $this->tester->haveShip();
-        $systems = $this->systemsRepository->find($shipPost->postId());
-        $systems->node_id = $nodeA->id;
-        $this->systemsRepository->update($systems);
+        $state = $this->stateRepository->find($shipPost->postId());
+        $state->node_id = $nodeA->id;
+        $this->stateRepository->update($state);
 
         $ship = $this->factory->build($shipPost->postId());
 
@@ -197,8 +215,11 @@ class ShipTest extends WPTestCase
         $shipPost = $this->tester->haveShip();
         $systems = $this->systemsRepository->find($shipPost->postId());
         $systems->core_life = 1.0; // Not enough for 5 ly jump (costs 5 core)
-        $systems->node_id = $nodeA->id;
         $this->systemsRepository->update($systems);
+
+        $state = $this->stateRepository->find($shipPost->postId());
+        $state->node_id = $nodeA->id;
+        $this->stateRepository->update($state);
 
         $ship = $this->factory->build($shipPost->postId());
 
@@ -216,8 +237,11 @@ class ShipTest extends WPTestCase
         $shipPost = $this->tester->haveShip();
         $systems = $this->systemsRepository->find($shipPost->postId());
         $systems->sensor_type = SensorType::VRS; // 12 ly range
-        $systems->power_full_at = new DateTimeImmutable('-1 hour'); // Full power
         $this->systemsRepository->update($systems);
+
+        $state = $this->stateRepository->find($shipPost->postId());
+        $state->power_full_at = new DateTimeImmutable('-1 hour'); // Full power
+        $this->stateRepository->update($state);
 
         $ship = $this->factory->build($shipPost->postId());
 
@@ -249,10 +273,10 @@ class ShipTest extends WPTestCase
     public function test_process_repair_increases_hull(): void
     {
         $shipPost = $this->tester->haveShip();
-        $systems = $this->systemsRepository->find($shipPost->postId());
-        $systems->hull_integrity = 50.0;
-        $systems->hull_max = 100.0;
-        $this->systemsRepository->update($systems);
+        $state = $this->stateRepository->find($shipPost->postId());
+        $state->hull_integrity = 50.0;
+        $state->hull_max = 100.0;
+        $this->stateRepository->update($state);
 
         $ship = $this->factory->build($shipPost->postId());
 
@@ -260,15 +284,15 @@ class ShipTest extends WPTestCase
         $result = $ship->process($action);
 
         $this->assertFalse($result->hasErrors());
-        $this->assertSame(75.0, $ship->getRecord()->hull_integrity);
+        $this->assertSame(75.0, $ship->getState()->hull_integrity);
     }
 
     public function test_process_transfer_adds_cargo(): void
     {
         $shipPost = $this->tester->haveShip();
-        $systems = $this->systemsRepository->find($shipPost->postId());
-        $systems->cargo = [];
-        $this->systemsRepository->update($systems);
+        $state = $this->stateRepository->find($shipPost->postId());
+        $state->cargo = [];
+        $this->stateRepository->update($state);
 
         $ship = $this->factory->build($shipPost->postId());
 
@@ -286,9 +310,9 @@ class ShipTest extends WPTestCase
     public function test_process_transfer_removes_cargo(): void
     {
         $shipPost = $this->tester->haveShip();
-        $systems = $this->systemsRepository->find($shipPost->postId());
-        $systems->cargo = ['ore' => 100];
-        $this->systemsRepository->update($systems);
+        $state = $this->stateRepository->find($shipPost->postId());
+        $state->cargo = ['ore' => 100];
+        $this->stateRepository->update($state);
 
         $ship = $this->factory->build($shipPost->postId());
 
@@ -306,10 +330,10 @@ class ShipTest extends WPTestCase
     public function test_power_system_reports_current_power(): void
     {
         $shipPost = $this->tester->haveShip();
-        $systems = $this->systemsRepository->find($shipPost->postId());
-        $systems->power_full_at = new DateTimeImmutable('-1 hour');
-        $systems->power_max = 100.0;
-        $this->systemsRepository->update($systems);
+        $state = $this->stateRepository->find($shipPost->postId());
+        $state->power_full_at = new DateTimeImmutable('-1 hour');
+        $state->power_max = 100.0;
+        $this->stateRepository->update($state);
 
         $ship = $this->factory->build($shipPost->postId());
 
@@ -320,10 +344,10 @@ class ShipTest extends WPTestCase
     public function test_shields_system_reports_current_strength(): void
     {
         $shipPost = $this->tester->haveShip();
-        $systems = $this->systemsRepository->find($shipPost->postId());
-        $systems->shields_full_at = new DateTimeImmutable('-1 hour');
-        $systems->shields_max = 100.0;
-        $this->systemsRepository->update($systems);
+        $state = $this->stateRepository->find($shipPost->postId());
+        $state->shields_full_at = new DateTimeImmutable('-1 hour');
+        $state->shields_max = 100.0;
+        $this->stateRepository->update($state);
 
         $ship = $this->factory->build($shipPost->postId());
 
@@ -333,10 +357,10 @@ class ShipTest extends WPTestCase
     public function test_hull_system_reports_integrity(): void
     {
         $shipPost = $this->tester->haveShip();
-        $systems = $this->systemsRepository->find($shipPost->postId());
-        $systems->hull_integrity = 75.0;
-        $systems->hull_max = 100.0;
-        $this->systemsRepository->update($systems);
+        $state = $this->stateRepository->find($shipPost->postId());
+        $state->hull_integrity = 75.0;
+        $state->hull_max = 100.0;
+        $this->stateRepository->update($state);
 
         $ship = $this->factory->build($shipPost->postId());
 
@@ -349,9 +373,9 @@ class ShipTest extends WPTestCase
         $node = $this->nodeRepository->create(x: 0.0, y: 0.0, z: 0.0);
 
         $shipPost = $this->tester->haveShip();
-        $systems = $this->systemsRepository->find($shipPost->postId());
-        $systems->node_id = $node->id;
-        $this->systemsRepository->update($systems);
+        $state = $this->stateRepository->find($shipPost->postId());
+        $state->node_id = $node->id;
+        $this->stateRepository->update($state);
 
         $ship = $this->factory->build($shipPost->postId());
 

@@ -16,6 +16,7 @@ use Helm\ShipLink\ActionStatus;
 use Helm\ShipLink\ActionType;
 use Helm\ShipLink\Contracts\ShipLink;
 use Helm\ShipLink\ShipFactory;
+use Helm\ShipLink\ShipStateRepository;
 use Helm\ShipLink\ShipSystemsRepository;
 use Helm\Ships\ShipPost;
 use Helm\Stars\StarPost;
@@ -28,6 +29,7 @@ class ShipCommand
 {
     public function __construct(
         private readonly ShipFactory $factory,
+        private readonly ShipStateRepository $stateRepository,
         private readonly ShipSystemsRepository $systemsRepository,
         private readonly NodeRepository $nodeRepository,
         private readonly EdgeRepository $edgeRepository,
@@ -94,8 +96,9 @@ class ShipCommand
         $shipId = wp_generate_uuid4();
         update_post_meta($postId, PostTypeRegistry::META_SHIP_ID, $shipId);
 
-        // Create systems record with defaults
+        // Create both records with defaults
         $this->systemsRepository->findOrCreate($postId);
+        $this->stateRepository->findOrCreate($postId);
 
         WP_CLI::success(sprintf(
             'Created ship "%s" (Post ID: %d, Ship ID: %s)',
@@ -273,7 +276,7 @@ class ShipCommand
             sprintf(
                 '  Sensor Range: %.2f ly (%s × %.2f output)',
                 $sensorRange,
-                $ship->getRecord()->sensor_type->label(),
+                $ship->getSystems()->sensor_type->label(),
                 $power->getOutputMultiplier()
             )
         );
@@ -407,7 +410,7 @@ class ShipCommand
      */
     private function outputDiagnostic(ShipLink $ship, ShipPost $shipPost): void
     {
-        $record = $ship->getRecord();
+        $config = $ship->getSystems();
 
         WP_CLI::log('');
         WP_CLI::log(WP_CLI::colorize('%G═══════════════════════════════════════════════════════════════%n'));
@@ -424,11 +427,11 @@ class ShipCommand
 
         // Modules
         WP_CLI::log(WP_CLI::colorize('%Y▸ INSTALLED MODULES%n'));
-        WP_CLI::log(sprintf('  Core:       %s', $record->core_type->label()));
-        WP_CLI::log(sprintf('  Drive:      %s', $record->drive_type->label()));
-        WP_CLI::log(sprintf('  Sensors:    %s', $record->sensor_type->label()));
-        WP_CLI::log(sprintf('  Shields:    %s', $record->shield_type->label()));
-        WP_CLI::log(sprintf('  Nav Comp:   %s', $record->nav_tier->label()));
+        WP_CLI::log(sprintf('  Core:       %s', $config->core_type->label()));
+        WP_CLI::log(sprintf('  Drive:      %s', $config->drive_type->label()));
+        WP_CLI::log(sprintf('  Sensors:    %s', $config->sensor_type->label()));
+        WP_CLI::log(sprintf('  Shields:    %s', $config->shield_type->label()));
+        WP_CLI::log(sprintf('  Nav Comp:   %s', $config->nav_tier->label()));
         WP_CLI::log('');
 
         // Power System
@@ -451,13 +454,13 @@ class ShipCommand
 
         // Core Life
         WP_CLI::log(WP_CLI::colorize('%Y▸ CORE LIFE%n'));
-        $corePercent = $record->core_type->coreLife() > 0
-            ? ($power->getCoreLife() / $record->core_type->coreLife()) * 100
+        $corePercent = $config->core_type->coreLife() > 0
+            ? ($power->getCoreLife() / $config->core_type->coreLife()) * 100
             : 0;
         WP_CLI::log(WP_CLI::colorize(sprintf(
             '  Remaining:  %.1f / %.1f ly (%s%.0f%%%s)',
             $power->getCoreLife(),
-            $record->core_type->coreLife(),
+            $config->core_type->coreLife(),
             $this->getColorForPercent($corePercent),
             $corePercent,
             '%n'
@@ -524,11 +527,12 @@ class ShipCommand
         WP_CLI::log('');
 
         // Cargo
+        $state = $ship->getState();
         WP_CLI::log(WP_CLI::colorize('%Y▸ CARGO%n'));
-        if ($record->cargo === []) {
+        if ($state->cargo === []) {
             WP_CLI::log('  (empty)');
         } else {
-            foreach ($record->cargo as $resource => $quantity) {
+            foreach ($state->cargo as $resource => $quantity) {
                 WP_CLI::log(sprintf('  %s: %d', ucfirst($resource), $quantity));
             }
         }
@@ -542,7 +546,8 @@ class ShipCommand
      */
     private function outputJson(ShipLink $ship, ShipPost $shipPost): void
     {
-        $record = $ship->getRecord();
+        $config = $ship->getSystems();
+        $state = $ship->getState();
         $power = $ship->power();
         $propulsion = $ship->propulsion();
         $sensors = $ship->sensors();
@@ -559,24 +564,24 @@ class ShipCommand
             ],
             'modules' => [
                 'core' => [
-                    'type' => $record->core_type->slug(),
-                    'label' => $record->core_type->label(),
+                    'type' => $config->core_type->slug(),
+                    'label' => $config->core_type->label(),
                 ],
                 'drive' => [
-                    'type' => $record->drive_type->slug(),
-                    'label' => $record->drive_type->label(),
+                    'type' => $config->drive_type->slug(),
+                    'label' => $config->drive_type->label(),
                 ],
                 'sensors' => [
-                    'type' => $record->sensor_type->slug(),
-                    'label' => $record->sensor_type->label(),
+                    'type' => $config->sensor_type->slug(),
+                    'label' => $config->sensor_type->label(),
                 ],
                 'shields' => [
-                    'type' => $record->shield_type->slug(),
-                    'label' => $record->shield_type->label(),
+                    'type' => $config->shield_type->slug(),
+                    'label' => $config->shield_type->label(),
                 ],
                 'nav_computer' => [
-                    'tier' => $record->nav_tier->value,
-                    'label' => $record->nav_tier->label(),
+                    'tier' => $config->nav_tier->value,
+                    'label' => $config->nav_tier->label(),
                 ],
             ],
             'power' => [
@@ -587,7 +592,7 @@ class ShipCommand
             ],
             'core_life' => [
                 'remaining' => $power->getCoreLife(),
-                'max' => $record->core_type->coreLife(),
+                'max' => $config->core_type->coreLife(),
                 'depleted' => $power->isDepleted(),
             ],
             'propulsion' => [
@@ -617,7 +622,7 @@ class ShipCommand
                 'skill' => $nav->getSkill(),
                 'efficiency' => $nav->getEfficiency(),
             ],
-            'cargo' => $record->cargo,
+            'cargo' => $state->cargo,
         ];
 
         WP_CLI::log(json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
@@ -685,7 +690,8 @@ class ShipCommand
             WP_CLI::error($e->getMessage());
         }
 
-        $record = $ship->getRecord();
+        $state = $ship->getState();
+        $config = $ship->getSystems();
         $currentNodeId = $ship->navigation()->getCurrentPosition();
 
         // Get target node
@@ -717,7 +723,7 @@ class ShipCommand
         $power = $ship->power();
 
         $coreCost = $distance
-            * $record->core_type->jumpCostMultiplier()
+            * $config->core_type->jumpCostMultiplier()
             * $propulsion->getCoreDecayMultiplier()
             * $power->getDecayMultiplier();
         $duration = $propulsion->getJumpDuration($distance);
@@ -749,11 +755,11 @@ class ShipCommand
         }
 
         // Execute the jump (god mode - no checks)
-        // Mutate the systems record directly (CLI has god-mode access)
-        $record->node_id = $targetNodeId;
+        // Mutate the state record directly (CLI has god-mode access)
+        $state->node_id = $targetNodeId;
 
         // Save state
-        $this->systemsRepository->save($record);
+        $this->stateRepository->save($state);
 
         // Output
         WP_CLI::log('');
@@ -1174,7 +1180,7 @@ class ShipCommand
         $this->actionRepository->update($action);
 
         // Clear ship's current action
-        $this->systemsRepository->updateCurrentAction($postId, null);
+        $this->stateRepository->updateCurrentAction($postId, null);
 
         WP_CLI::success('Action cancelled.');
     }

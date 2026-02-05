@@ -14,6 +14,7 @@ use Helm\ShipLink\ActionResolver;
 use Helm\ShipLink\ActionStatus;
 use Helm\ShipLink\ActionType;
 use Helm\ShipLink\Models\Action;
+use Helm\ShipLink\ShipStateRepository;
 use Helm\ShipLink\ShipSystemsRepository;
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use Tests\Support\WpunitTester;
@@ -27,6 +28,7 @@ class ActionResolverTest extends WPTestCase
 {
     private ActionResolver $resolver;
     private ActionRepository $actionRepository;
+    private ShipStateRepository $stateRepository;
     private ShipSystemsRepository $systemsRepository;
     private NodeRepository $nodeRepository;
     private EdgeRepository $edgeRepository;
@@ -39,6 +41,7 @@ class ActionResolverTest extends WPTestCase
 
         $this->resolver = helm(ActionResolver::class);
         $this->actionRepository = helm(ActionRepository::class);
+        $this->stateRepository = helm(ShipStateRepository::class);
         $this->systemsRepository = helm(ShipSystemsRepository::class);
         $this->nodeRepository = helm(NodeRepository::class);
         $this->edgeRepository = helm(EdgeRepository::class);
@@ -102,7 +105,7 @@ class ActionResolverTest extends WPTestCase
 
         $action->start();
         $this->actionRepository->update($action);
-        $this->systemsRepository->updateCurrentAction($ship->postId(), $action->id);
+        $this->stateRepository->updateCurrentAction($ship->postId(), $action->id);
 
         // Running actions are now resolved directly (skipping claim step)
         $result = $this->resolver->resolve($action->id);
@@ -159,7 +162,7 @@ class ActionResolverTest extends WPTestCase
         $this->actionRepository->insert($action);
 
         // Set current action on ship
-        $this->systemsRepository->updateCurrentAction($ship->postId(), $action->id);
+        $this->stateRepository->updateCurrentAction($ship->postId(), $action->id);
 
         $result = $this->resolver->resolve($action->id);
 
@@ -188,12 +191,12 @@ class ActionResolverTest extends WPTestCase
             'params' => ['target_node_id' => $node2->id],
         ]);
         $this->actionRepository->insert($action);
-        $this->systemsRepository->updateCurrentAction($ship->postId(), $action->id);
+        $this->stateRepository->updateCurrentAction($ship->postId(), $action->id);
 
         $this->resolver->resolve($action->id);
 
-        $systems = $this->systemsRepository->find($ship->postId());
-        $this->assertNull($systems->current_action_id);
+        $state = $this->stateRepository->find($ship->postId());
+        $this->assertNull($state->current_action_id);
     }
 
     public function test_marks_action_failed_when_no_resolver(): void
@@ -207,7 +210,7 @@ class ActionResolverTest extends WPTestCase
             'params' => [],
         ]);
         $this->actionRepository->insert($action);
-        $this->systemsRepository->updateCurrentAction($ship->postId(), $action->id);
+        $this->stateRepository->updateCurrentAction($ship->postId(), $action->id);
 
         try {
             $this->resolver->resolve($action->id);
@@ -233,7 +236,7 @@ class ActionResolverTest extends WPTestCase
             'params' => [],
         ]);
         $this->actionRepository->insert($action);
-        $this->systemsRepository->updateCurrentAction($ship->postId(), $action->id);
+        $this->stateRepository->updateCurrentAction($ship->postId(), $action->id);
 
         try {
             $this->resolver->resolve($action->id);
@@ -241,8 +244,8 @@ class ActionResolverTest extends WPTestCase
             // Expected
         }
 
-        $systems = $this->systemsRepository->find($ship->postId());
-        $this->assertNull($systems->current_action_id);
+        $state = $this->stateRepository->find($ship->postId());
+        $this->assertNull($state->current_action_id);
     }
 
     public function test_stores_result_data_on_success(): void
@@ -274,7 +277,7 @@ class ActionResolverTest extends WPTestCase
             ],
         ]);
         $this->actionRepository->insert($action);
-        $this->systemsRepository->updateCurrentAction($ship->postId(), $action->id);
+        $this->stateRepository->updateCurrentAction($ship->postId(), $action->id);
 
         $this->resolver->resolve($action->id);
 
@@ -309,12 +312,12 @@ class ActionResolverTest extends WPTestCase
             'params' => ['target_node_id' => $node2->id],
         ]);
         $this->actionRepository->insert($action);
-        $this->systemsRepository->updateCurrentAction($ship->postId(), $action->id);
+        $this->stateRepository->updateCurrentAction($ship->postId(), $action->id);
 
         $this->resolver->resolve($action->id);
 
         // Ship should have moved to target node
-        $systems = $this->systemsRepository->find($ship->postId());
-        $this->assertSame($node2->id, $systems->node_id);
+        $state = $this->stateRepository->find($ship->postId());
+        $this->assertSame($node2->id, $state->node_id);
     }
 }

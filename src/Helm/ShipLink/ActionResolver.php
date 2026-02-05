@@ -22,6 +22,7 @@ final class ActionResolver
     public function __construct(
         private readonly Container $container,
         private readonly ActionRepository $actionRepository,
+        private readonly ShipStateRepository $stateRepository,
         private readonly ShipSystemsRepository $systemsRepository,
         private readonly ShipFactory $shipFactory,
     ) {
@@ -73,7 +74,7 @@ final class ActionResolver
                 __('This action type is not available', 'helm')
             );
             $this->fail($actionId, $error);
-            $this->systemsRepository->updateCurrentAction($action->ship_post_id, null);
+            $this->stateRepository->updateCurrentAction($action->ship_post_id, null);
             throw $error;
         }
 
@@ -86,13 +87,14 @@ final class ActionResolver
         Transaction::begin();
 
         try {
-            // Resolver mutates action.result and ship systems
+            // Resolver mutates action.result and ship state/systems
             $resolver->handle($action, $ship);
 
             $action->fulfill();
             $this->actionRepository->update($action);
-            $this->systemsRepository->update($ship->getRecord());
-            $this->systemsRepository->updateCurrentAction($action->ship_post_id, null);
+            $this->stateRepository->update($ship->getState());
+            $this->systemsRepository->update($ship->getSystems());
+            $this->stateRepository->updateCurrentAction($action->ship_post_id, null);
 
             Transaction::commit();
 
@@ -100,13 +102,13 @@ final class ActionResolver
         } catch (ActionException $e) {
             Transaction::rollback();
             $this->fail($actionId, $e);
-            $this->systemsRepository->updateCurrentAction($action->ship_post_id, null);
+            $this->stateRepository->updateCurrentAction($action->ship_post_id, null);
             throw $e;
         } catch (\Throwable $e) {
             Transaction::rollback();
             $error = new ActionException(ErrorCode::ActionFailed, __('Action failed unexpectedly', 'helm'), $e);
             $this->fail($actionId, $error);
-            $this->systemsRepository->updateCurrentAction($action->ship_post_id, null);
+            $this->stateRepository->updateCurrentAction($action->ship_post_id, null);
             throw $error;
         }
     }

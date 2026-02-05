@@ -9,6 +9,7 @@ use Helm\Navigation\NavigationService;
 use Helm\Navigation\Node;
 use Helm\Navigation\ScanResult;
 use Helm\ShipLink\Contracts\Navigation as NavigationContract;
+use Helm\ShipLink\Models\ShipState;
 use Helm\ShipLink\Models\ShipSystems;
 
 /**
@@ -17,7 +18,7 @@ use Helm\ShipLink\Models\ShipSystems;
  * The ship's nav computer - delegates graph operations to NavigationService.
  *
  * This system is read-only - it reports state and calculates values.
- * Ship is responsible for all mutations to ShipSystems.
+ * Ship is responsible for all mutations to ShipState.
  */
 final class Navigation implements NavigationContract
 {
@@ -27,6 +28,7 @@ final class Navigation implements NavigationContract
     private const HOP_DECAY_FACTOR = 0.9;
 
     public function __construct(
+        private ShipState $state,
         private ShipSystems $systems,
         private readonly NavigationService $navService,
     ) {
@@ -57,7 +59,7 @@ final class Navigation implements NavigationContract
 
     public function getCurrentPosition(): ?int
     {
-        return $this->systems->node_id;
+        return $this->state->node_id;
     }
 
     public function hasRouteTo(int $nodeId): bool
