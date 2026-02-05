@@ -5,11 +5,15 @@ declare(strict_types=1);
 namespace Tests\Support\Helper;
 
 use Codeception\Module;
+use Codeception\TestInterface;
+use Helm\Database\Transaction;
 use Helm\Generation\PlanetType;
 use Helm\Origin\Origin;
 use Helm\Planets\Planet;
 use Helm\Planets\PlanetRepository;
 use Helm\PostTypes\PostTypeRegistry;
+use Helm\ShipLink\Models\ShipSystems;
+use Helm\ShipLink\ShipSystemsRepository;
 use Helm\Ships\ShipPost;
 use Helm\Stars\Star;
 use Helm\Stars\StarRepository;
@@ -24,6 +28,16 @@ use Helm\Stars\StarRepository;
  */
 class Helm extends Module
 {
+    /**
+     * Reset Transaction state after each test.
+     *
+     * Ensures the static savepoint stack doesn't leak between tests.
+     */
+    public function _after(TestInterface $test): void
+    {
+        Transaction::reset();
+    }
+
 
     /**
      * Initialize Origin for testing.
@@ -169,6 +183,7 @@ class Helm extends Module
      * Create a ship in the database.
      *
      * @param array<string, mixed> $attributes Ship attributes to override defaults
+     *                                         Supports: id, name, ownerId, node_id, core_life
      * @return ShipPost
      */
     public function haveShip(array $attributes = []): ShipPost
@@ -177,6 +192,69 @@ class Helm extends Module
             'id' => 'SHIP_' . uniqid(),
             'name' => 'Test Ship',
             'ownerId' => 1, // Default to admin user
+        ];
+
+        $data = array_merge($defaults, $attributes);
+
+        $postId = wp_insert_post([
+            'post_type' => PostTypeRegistry::POST_TYPE_SHIP,
+            'post_status' => 'publish',
+            'post_title' => $data['name'],
+            'post_author' => $data['ownerId'],
+        ], true);
+
+        if (is_wp_error($postId)) {
+            throw new \RuntimeException(
+                sprintf('Failed to create ship post: %s', $postId->get_error_message())
+            );
+        }
+
+        update_post_meta($postId, PostTypeRegistry::META_SHIP_ID, $data['id']);
+
+        // Create systems record (creates defaults)
+        /** @var ShipSystemsRepository $systemsRepository */
+        $systemsRepository = helm(ShipSystemsRepository::class);
+        $systems = $systemsRepository->findOrCreate($postId);
+
+        // Apply any system overrides
+        if (array_key_exists('node_id', $data)) {
+            $systems->node_id = $data['node_id'];
+        }
+
+        if (array_key_exists('core_life', $data)) {
+            $systems->core_life = (float) $data['core_life'];
+        }
+
+        if (array_key_exists('current_action_id', $data)) {
+            $systems->current_action_id = $data['current_action_id'];
+        }
+
+        if ($systems->isDirty()) {
+            $systemsRepository->update($systems);
+        }
+
+        $shipPost = ShipPost::fromId($postId);
+        if ($shipPost === null) {
+            throw new \RuntimeException('Failed to load ship post after creation');
+        }
+
+        return $shipPost;
+    }
+
+    /**
+     * Create a ship post without initializing systems.
+     *
+     * Use this for repository tests that need to control systems creation manually.
+     *
+     * @param array<string, mixed> $attributes Ship attributes to override defaults
+     * @return ShipPost
+     */
+    public function haveShipPost(array $attributes = []): ShipPost
+    {
+        $defaults = [
+            'id' => 'SHIP_' . uniqid(),
+            'name' => 'Test Ship',
+            'ownerId' => 1,
         ];
 
         $data = array_merge($defaults, $attributes);

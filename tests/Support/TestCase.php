@@ -53,24 +53,4 @@ class TestCase extends WPTestCase
         return $prefix . '_' . uniqid();
     }
 
-    /**
-     * Clean up Helm tables after test.
-     */
-    protected function cleanupHelmTables(): void
-    {
-        global $wpdb;
-
-        // Legacy tables (ships now uses CPT, origin uses wp_options)
-        $tables = [
-            $wpdb->prefix . 'helm_discoveries',
-            $wpdb->prefix . 'helm_systems',
-        ];
-
-        foreach ($tables as $table) {
-            $wpdb->query("TRUNCATE TABLE IF EXISTS {$table}");
-        }
-
-        // Clean up Origin option
-        delete_option('helm_origin');
-    }
 }

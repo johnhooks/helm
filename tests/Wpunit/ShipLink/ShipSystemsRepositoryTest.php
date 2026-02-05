@@ -11,7 +11,7 @@ use Helm\ShipLink\Components\NavTier;
 use Helm\ShipLink\Components\PowerMode;
 use Helm\ShipLink\Components\SensorType;
 use Helm\ShipLink\Components\ShieldType;
-use Helm\ShipLink\ShipSystems;
+use Helm\ShipLink\Models\ShipSystems;
 use Helm\ShipLink\ShipSystemsRepository;
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use Tests\Support\WpunitTester;
@@ -40,7 +40,7 @@ class ShipSystemsRepositoryTest extends WPTestCase
 
     public function test_insert_and_find(): void
     {
-        $shipPost = $this->tester->haveShip();
+        $shipPost = $this->tester->haveShipPost();
         $postId = $shipPost->postId();
 
         $systems = ShipSystems::defaults($postId);
@@ -49,13 +49,13 @@ class ShipSystemsRepositoryTest extends WPTestCase
         $found = $this->repository->find($postId);
 
         $this->assertNotNull($found);
-        $this->assertSame($postId, $found->shipPostId);
-        $this->assertSame(CoreType::EpochS, $found->coreType);
+        $this->assertSame($postId, $found->ship_post_id);
+        $this->assertSame(CoreType::EpochS, $found->core_type);
     }
 
     public function test_exists_returns_correct_value(): void
     {
-        $shipPost = $this->tester->haveShip();
+        $shipPost = $this->tester->haveShipPost();
         $postId = $shipPost->postId();
 
         $this->assertFalse($this->repository->exists($postId));
@@ -67,7 +67,7 @@ class ShipSystemsRepositoryTest extends WPTestCase
 
     public function test_find_or_create_creates_when_missing(): void
     {
-        $shipPost = $this->tester->haveShip();
+        $shipPost = $this->tester->haveShipPost();
         $postId = $shipPost->postId();
 
         $this->assertFalse($this->repository->exists($postId));
@@ -80,81 +80,46 @@ class ShipSystemsRepositoryTest extends WPTestCase
 
     public function test_find_or_create_returns_existing(): void
     {
-        $shipPost = $this->tester->haveShip();
+        $shipPost = $this->tester->haveShipPost();
         $postId = $shipPost->postId();
 
         // Create with custom core type
-        $custom = new ShipSystems(
-            shipPostId: $postId,
-            coreType: CoreType::EpochR,
-            driveType: DriveType::DR5,
-            sensorType: SensorType::VRS,
-            shieldType: ShieldType::Beta,
-            navTier: NavTier::Tier1,
-            powerMode: PowerMode::Normal,
-            powerFullAt: null,
-            powerMax: 100.0,
-            shieldsFullAt: null,
-            shieldsMax: 100.0,
-            coreLife: 500.0,
-            hullIntegrity: 100.0,
-            hullMax: 100.0,
-            nodeId: null,
-            cargo: [],
-            currentActionId: null,
-            createdAt: new \DateTimeImmutable(),
-            updatedAt: new \DateTimeImmutable(),
-        );
+        $custom = ShipSystems::defaults($postId);
+        $custom->core_type = CoreType::EpochR;
         $this->repository->insert($custom);
 
         $found = $this->repository->findOrCreate($postId);
 
-        $this->assertSame(CoreType::EpochR, $found->coreType);
+        $this->assertSame(CoreType::EpochR, $found->core_type);
     }
 
     public function test_update_modifies_record(): void
     {
-        $shipPost = $this->tester->haveShip();
+        $shipPost = $this->tester->haveShipPost();
         $postId = $shipPost->postId();
 
         $systems = ShipSystems::defaults($postId);
         $this->repository->insert($systems);
 
-        // Create modified version
-        $modified = new ShipSystems(
-            shipPostId: $postId,
-            coreType: $systems->coreType,
-            driveType: $systems->driveType,
-            sensorType: $systems->sensorType,
-            shieldType: $systems->shieldType,
-            navTier: $systems->navTier,
-            powerMode: $systems->powerMode,
-            powerFullAt: $systems->powerFullAt,
-            powerMax: $systems->powerMax,
-            shieldsFullAt: $systems->shieldsFullAt,
-            shieldsMax: $systems->shieldsMax,
-            coreLife: 250.0, // Changed
-            hullIntegrity: 50.0, // Changed
-            hullMax: $systems->hullMax,
-            nodeId: 42, // Changed
-            cargo: ['ore' => 100], // Changed
-            currentActionId: $systems->currentActionId,
-            createdAt: $systems->createdAt,
-            updatedAt: $systems->updatedAt,
-        );
-        $this->repository->update($modified);
+        // Reload and modify
+        $systems = $this->repository->find($postId);
+        $systems->core_life = 250.0;
+        $systems->hull_integrity = 50.0;
+        $systems->node_id = 42;
+        $systems->cargo = ['ore' => 100];
+        $this->repository->update($systems);
 
         $found = $this->repository->find($postId);
 
-        $this->assertSame(250.0, $found->coreLife);
-        $this->assertSame(50.0, $found->hullIntegrity);
-        $this->assertSame(42, $found->nodeId);
+        $this->assertSame(250.0, $found->core_life);
+        $this->assertSame(50.0, $found->hull_integrity);
+        $this->assertSame(42, $found->node_id);
         $this->assertSame(['ore' => 100], $found->cargo);
     }
 
     public function test_save_inserts_new_record(): void
     {
-        $shipPost = $this->tester->haveShip();
+        $shipPost = $this->tester->haveShipPost();
         $postId = $shipPost->postId();
 
         $systems = ShipSystems::defaults($postId);
@@ -166,42 +131,24 @@ class ShipSystemsRepositoryTest extends WPTestCase
 
     public function test_save_updates_existing_record(): void
     {
-        $shipPost = $this->tester->haveShip();
+        $shipPost = $this->tester->haveShipPost();
         $postId = $shipPost->postId();
 
         $systems = ShipSystems::defaults($postId);
         $this->repository->save($systems);
 
-        $modified = new ShipSystems(
-            shipPostId: $postId,
-            coreType: $systems->coreType,
-            driveType: $systems->driveType,
-            sensorType: $systems->sensorType,
-            shieldType: $systems->shieldType,
-            navTier: $systems->navTier,
-            powerMode: $systems->powerMode,
-            powerFullAt: $systems->powerFullAt,
-            powerMax: $systems->powerMax,
-            shieldsFullAt: $systems->shieldsFullAt,
-            shieldsMax: $systems->shieldsMax,
-            coreLife: 100.0,
-            hullIntegrity: $systems->hullIntegrity,
-            hullMax: $systems->hullMax,
-            nodeId: $systems->nodeId,
-            cargo: $systems->cargo,
-            currentActionId: $systems->currentActionId,
-            createdAt: $systems->createdAt,
-            updatedAt: $systems->updatedAt,
-        );
-        $this->repository->save($modified);
+        // Reload to get a non-new model, then modify and save
+        $systems = $this->repository->find($postId);
+        $systems->core_life = 100.0;
+        $this->repository->save($systems);
 
         $found = $this->repository->find($postId);
-        $this->assertSame(100.0, $found->coreLife);
+        $this->assertSame(100.0, $found->core_life);
     }
 
     public function test_delete_removes_record(): void
     {
-        $shipPost = $this->tester->haveShip();
+        $shipPost = $this->tester->haveShipPost();
         $postId = $shipPost->postId();
 
         $this->repository->insert(ShipSystems::defaults($postId));
@@ -215,9 +162,9 @@ class ShipSystemsRepositoryTest extends WPTestCase
 
     public function test_at_node_returns_ships_at_location(): void
     {
-        $ship1 = $this->tester->haveShip();
-        $ship2 = $this->tester->haveShip();
-        $ship3 = $this->tester->haveShip();
+        $ship1 = $this->tester->haveShipPost();
+        $ship2 = $this->tester->haveShipPost();
+        $ship3 = $this->tester->haveShipPost();
 
         $postId1 = $ship1->postId();
         $postId2 = $ship2->postId();
@@ -237,7 +184,7 @@ class ShipSystemsRepositoryTest extends WPTestCase
 
     public function test_update_node_id(): void
     {
-        $shipPost = $this->tester->haveShip();
+        $shipPost = $this->tester->haveShipPost();
         $postId = $shipPost->postId();
 
         $this->repository->insert(ShipSystems::defaults($postId));
@@ -245,12 +192,12 @@ class ShipSystemsRepositoryTest extends WPTestCase
         $this->repository->updateNodeId($postId, 42);
 
         $found = $this->repository->find($postId);
-        $this->assertSame(42, $found->nodeId);
+        $this->assertSame(42, $found->node_id);
     }
 
     public function test_update_current_action(): void
     {
-        $shipPost = $this->tester->haveShip();
+        $shipPost = $this->tester->haveShipPost();
         $postId = $shipPost->postId();
 
         $this->repository->insert(ShipSystems::defaults($postId));
@@ -258,15 +205,15 @@ class ShipSystemsRepositoryTest extends WPTestCase
         $this->repository->updateCurrentAction($postId, 99);
 
         $found = $this->repository->find($postId);
-        $this->assertSame(99, $found->currentActionId);
+        $this->assertSame(99, $found->current_action_id);
     }
 
     public function test_count_returns_total(): void
     {
         $this->assertSame(0, $this->repository->count());
 
-        $ship1 = $this->tester->haveShip();
-        $ship2 = $this->tester->haveShip();
+        $ship1 = $this->tester->haveShipPost();
+        $ship2 = $this->tester->haveShipPost();
 
         $this->repository->insert(ShipSystems::defaults($ship1->postId()));
         $this->assertSame(1, $this->repository->count());
@@ -281,27 +228,7 @@ class ShipSystemsRepositoryTest extends WPTestCase
     private function insertWithNode(int $postId, int $nodeId): void
     {
         $systems = ShipSystems::defaults($postId);
-        $modified = new ShipSystems(
-            shipPostId: $postId,
-            coreType: $systems->coreType,
-            driveType: $systems->driveType,
-            sensorType: $systems->sensorType,
-            shieldType: $systems->shieldType,
-            navTier: $systems->navTier,
-            powerMode: $systems->powerMode,
-            powerFullAt: $systems->powerFullAt,
-            powerMax: $systems->powerMax,
-            shieldsFullAt: $systems->shieldsFullAt,
-            shieldsMax: $systems->shieldsMax,
-            coreLife: $systems->coreLife,
-            hullIntegrity: $systems->hullIntegrity,
-            hullMax: $systems->hullMax,
-            nodeId: $nodeId,
-            cargo: $systems->cargo,
-            currentActionId: $systems->currentActionId,
-            createdAt: $systems->createdAt,
-            updatedAt: $systems->updatedAt,
-        );
-        $this->repository->insert($modified);
+        $systems->node_id = $nodeId;
+        $this->repository->insert($systems);
     }
 }

@@ -4,10 +4,16 @@ declare(strict_types=1);
 
 namespace Helm\CLI;
 
+use Helm\Core\ErrorCode;
 use Helm\Navigation\EdgeRepository;
 use Helm\Navigation\NavigationService;
 use Helm\Navigation\NodeRepository;
 use Helm\PostTypes\PostTypeRegistry;
+use Helm\ShipLink\ActionException;
+use Helm\ShipLink\ActionFactory;
+use Helm\ShipLink\ActionRepository;
+use Helm\ShipLink\ActionStatus;
+use Helm\ShipLink\ActionType;
 use Helm\ShipLink\Contracts\ShipLink;
 use Helm\ShipLink\ShipFactory;
 use Helm\ShipLink\ShipSystemsRepository;
@@ -26,6 +32,8 @@ class ShipCommand
         private readonly NodeRepository $nodeRepository,
         private readonly EdgeRepository $edgeRepository,
         private readonly NavigationService $navigationService,
+        private readonly ActionFactory $actionFactory,
+        private readonly ActionRepository $actionRepository,
     ) {
     }
 
@@ -196,7 +204,6 @@ class ShipCommand
             WP_CLI::error($e->getMessage());
         }
 
-        $model = $ship->getModel();
         $positionNodeId = $ship->navigation()->getCurrentPosition();
 
         if ($positionNodeId === null) {
@@ -231,11 +238,11 @@ class ShipCommand
         ], $nearbyStars);
 
         if ($format === 'json') {
-            $this->outputAstroJson($model->name, $currentLocationName, $currentNode->id, $sensorRange, $stars);
+            $this->outputAstroJson($ship->getName(), $currentLocationName, $currentNode->id, $sensorRange, $stars);
             return;
         }
 
-        $this->outputAstroTable($model->name, $currentLocationName, $currentNode->id, $sensorRange, $ship, $stars);
+        $this->outputAstroTable($ship->getName(), $currentLocationName, $currentNode->id, $sensorRange, $ship, $stars);
     }
 
     /**
@@ -266,7 +273,7 @@ class ShipCommand
             sprintf(
                 '  Sensor Range: %.2f ly (%s × %.2f output)',
                 $sensorRange,
-                $ship->getModel()->sensorType->label(),
+                $ship->getRecord()->sensor_type->label(),
                 $power->getOutputMultiplier()
             )
         );
@@ -381,9 +388,9 @@ class ShipCommand
                 'ID' => $post->ID,
                 'Name' => $post->post_title,
                 'Owner' => $post->post_author,
-                'Core' => $systems?->coreType->label() ?? 'N/A',
-                'Drive' => $systems?->driveType->label() ?? 'N/A',
-                'Core Life' => $systems !== null ? sprintf('%.1f ly', $systems->coreLife) : 'N/A',
+                'Core' => $systems?->core_type->label() ?? 'N/A',
+                'Drive' => $systems?->drive_type->label() ?? 'N/A',
+                'Core Life' => $systems !== null ? sprintf('%.1f ly', $systems->core_life) : 'N/A',
             ];
         }
 
@@ -400,28 +407,28 @@ class ShipCommand
      */
     private function outputDiagnostic(ShipLink $ship, ShipPost $shipPost): void
     {
-        $model = $ship->getModel();
+        $record = $ship->getRecord();
 
         WP_CLI::log('');
         WP_CLI::log(WP_CLI::colorize('%G═══════════════════════════════════════════════════════════════%n'));
-        WP_CLI::log(WP_CLI::colorize('%G  SHIP DIAGNOSTIC: %W' . $model->name . '%n'));
+        WP_CLI::log(WP_CLI::colorize('%G  SHIP DIAGNOSTIC: %W' . $ship->getName() . '%n'));
         WP_CLI::log(WP_CLI::colorize('%G═══════════════════════════════════════════════════════════════%n'));
         WP_CLI::log('');
 
         // Identity
         WP_CLI::log(WP_CLI::colorize('%Y▸ IDENTITY%n'));
-        WP_CLI::log(sprintf('  Post ID:    %d', $model->postId));
+        WP_CLI::log(sprintf('  Post ID:    %d', $ship->getId()));
         WP_CLI::log(sprintf('  Ship ID:    %s', $shipPost->shipId()));
-        WP_CLI::log(sprintf('  Owner:      %d', $model->ownerId));
+        WP_CLI::log(sprintf('  Owner:      %d', $ship->getOwnerId()));
         WP_CLI::log('');
 
         // Modules
         WP_CLI::log(WP_CLI::colorize('%Y▸ INSTALLED MODULES%n'));
-        WP_CLI::log(sprintf('  Core:       %s', $model->coreType->label()));
-        WP_CLI::log(sprintf('  Drive:      %s', $model->driveType->label()));
-        WP_CLI::log(sprintf('  Sensors:    %s', $model->sensorType->label()));
-        WP_CLI::log(sprintf('  Shields:    %s', $model->shieldType->label()));
-        WP_CLI::log(sprintf('  Nav Comp:   %s', $model->navTier->label()));
+        WP_CLI::log(sprintf('  Core:       %s', $record->core_type->label()));
+        WP_CLI::log(sprintf('  Drive:      %s', $record->drive_type->label()));
+        WP_CLI::log(sprintf('  Sensors:    %s', $record->sensor_type->label()));
+        WP_CLI::log(sprintf('  Shields:    %s', $record->shield_type->label()));
+        WP_CLI::log(sprintf('  Nav Comp:   %s', $record->nav_tier->label()));
         WP_CLI::log('');
 
         // Power System
@@ -444,13 +451,13 @@ class ShipCommand
 
         // Core Life
         WP_CLI::log(WP_CLI::colorize('%Y▸ CORE LIFE%n'));
-        $corePercent = $model->coreType->coreLife() > 0
-            ? ($power->getCoreLife() / $model->coreType->coreLife()) * 100
+        $corePercent = $record->core_type->coreLife() > 0
+            ? ($power->getCoreLife() / $record->core_type->coreLife()) * 100
             : 0;
         WP_CLI::log(WP_CLI::colorize(sprintf(
             '  Remaining:  %.1f / %.1f ly (%s%.0f%%%s)',
             $power->getCoreLife(),
-            $model->coreType->coreLife(),
+            $record->core_type->coreLife(),
             $this->getColorForPercent($corePercent),
             $corePercent,
             '%n'
@@ -504,7 +511,7 @@ class ShipCommand
             $hullPercent,
             '%n'
         )));
-        WP_CLI::log(WP_CLI::colorize(sprintf('  Status:     %s', $model->isDestroyed() ? '%RDESTROYED%n' : '%GINTACT%n')));
+        WP_CLI::log(WP_CLI::colorize(sprintf('  Status:     %s', $hull->isDestroyed() ? '%RDESTROYED%n' : '%GINTACT%n')));
         WP_CLI::log('');
 
         // Navigation
@@ -518,10 +525,10 @@ class ShipCommand
 
         // Cargo
         WP_CLI::log(WP_CLI::colorize('%Y▸ CARGO%n'));
-        if ($model->cargo === []) {
+        if ($record->cargo === []) {
             WP_CLI::log('  (empty)');
         } else {
-            foreach ($model->cargo as $resource => $quantity) {
+            foreach ($record->cargo as $resource => $quantity) {
                 WP_CLI::log(sprintf('  %s: %d', ucfirst($resource), $quantity));
             }
         }
@@ -535,7 +542,7 @@ class ShipCommand
      */
     private function outputJson(ShipLink $ship, ShipPost $shipPost): void
     {
-        $model = $ship->getModel();
+        $record = $ship->getRecord();
         $power = $ship->power();
         $propulsion = $ship->propulsion();
         $sensors = $ship->sensors();
@@ -545,31 +552,31 @@ class ShipCommand
 
         $data = [
             'identity' => [
-                'post_id' => $model->postId,
+                'post_id' => $ship->getId(),
                 'ship_id' => $shipPost->shipId(),
-                'name' => $model->name,
-                'owner_id' => $model->ownerId,
+                'name' => $ship->getName(),
+                'owner_id' => $ship->getOwnerId(),
             ],
             'modules' => [
                 'core' => [
-                    'type' => $model->coreType->slug(),
-                    'label' => $model->coreType->label(),
+                    'type' => $record->core_type->slug(),
+                    'label' => $record->core_type->label(),
                 ],
                 'drive' => [
-                    'type' => $model->driveType->slug(),
-                    'label' => $model->driveType->label(),
+                    'type' => $record->drive_type->slug(),
+                    'label' => $record->drive_type->label(),
                 ],
                 'sensors' => [
-                    'type' => $model->sensorType->slug(),
-                    'label' => $model->sensorType->label(),
+                    'type' => $record->sensor_type->slug(),
+                    'label' => $record->sensor_type->label(),
                 ],
                 'shields' => [
-                    'type' => $model->shieldType->slug(),
-                    'label' => $model->shieldType->label(),
+                    'type' => $record->shield_type->slug(),
+                    'label' => $record->shield_type->label(),
                 ],
                 'nav_computer' => [
-                    'tier' => $model->navTier->value,
-                    'label' => $model->navTier->label(),
+                    'tier' => $record->nav_tier->value,
+                    'label' => $record->nav_tier->label(),
                 ],
             ],
             'power' => [
@@ -580,7 +587,7 @@ class ShipCommand
             ],
             'core_life' => [
                 'remaining' => $power->getCoreLife(),
-                'max' => $model->coreType->coreLife(),
+                'max' => $record->core_type->coreLife(),
                 'depleted' => $power->isDepleted(),
             ],
             'propulsion' => [
@@ -603,14 +610,14 @@ class ShipCommand
                 'integrity' => $hull->getIntegrity(),
                 'max' => $hull->getMaxIntegrity(),
                 'percent' => $hull->getIntegrityPercent(),
-                'destroyed' => $model->isDestroyed(),
+                'destroyed' => $hull->isDestroyed(),
             ],
             'navigation' => [
                 'position_node_id' => $nav->getCurrentPosition(),
                 'skill' => $nav->getSkill(),
                 'efficiency' => $nav->getEfficiency(),
             ],
-            'cargo' => $model->cargo,
+            'cargo' => $record->cargo,
         ];
 
         WP_CLI::log(json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
@@ -678,7 +685,7 @@ class ShipCommand
             WP_CLI::error($e->getMessage());
         }
 
-        $model = $ship->getModel();
+        $record = $ship->getRecord();
         $currentNodeId = $ship->navigation()->getCurrentPosition();
 
         // Get target node
@@ -710,7 +717,7 @@ class ShipCommand
         $power = $ship->power();
 
         $coreCost = $distance
-            * $model->coreType->jumpCostMultiplier()
+            * $record->core_type->jumpCostMultiplier()
             * $propulsion->getCoreDecayMultiplier()
             * $power->getDecayMultiplier();
         $duration = $propulsion->getJumpDuration($distance);
@@ -742,10 +749,11 @@ class ShipCommand
         }
 
         // Execute the jump (god mode - no checks)
-        $ship->navigation()->setPosition($targetNodeId);
+        // Mutate the systems record directly (CLI has god-mode access)
+        $record->node_id = $targetNodeId;
 
         // Save state
-        $this->systemsRepository->save($model->toSystems());
+        $this->systemsRepository->save($record);
 
         // Output
         WP_CLI::log('');
@@ -753,7 +761,7 @@ class ShipCommand
         WP_CLI::log(WP_CLI::colorize('%G  JUMP COMPLETE (GOD MODE)%n'));
         WP_CLI::log(WP_CLI::colorize('%G═══════════════════════════════════════════════════════════════%n'));
         WP_CLI::log('');
-        WP_CLI::log(sprintf('  Ship:        %s', $model->name));
+        WP_CLI::log(sprintf('  Ship:        %s', $ship->getName()));
         WP_CLI::log(sprintf('  Destination: %s (Node #%d)', $targetName, $targetNodeId));
         WP_CLI::log(sprintf('  Distance:    %.2f ly', $distance));
         WP_CLI::log('');
@@ -823,7 +831,6 @@ class ShipCommand
             WP_CLI::error($e->getMessage());
         }
 
-        $model = $ship->getModel();
         $currentNodeId = $ship->navigation()->getCurrentPosition();
 
         if ($currentNodeId === null) {
@@ -876,7 +883,7 @@ class ShipCommand
         WP_CLI::log(WP_CLI::colorize('%G  ROUTE SCAN (GOD MODE)%n'));
         WP_CLI::log(WP_CLI::colorize('%G═══════════════════════════════════════════════════════════════%n'));
         WP_CLI::log('');
-        WP_CLI::log(sprintf('  Ship:     %s', $model->name));
+        WP_CLI::log(sprintf('  Ship:     %s', $ship->getName()));
         WP_CLI::log(sprintf('  From:     %s', $currentName));
         WP_CLI::log(sprintf('  To:       %s', $targetName));
         WP_CLI::log(sprintf('  Distance: %.2f ly', $distance));
@@ -905,6 +912,271 @@ class ShipCommand
         WP_CLI::log(sprintf('  Duration:   %s', $this->formatDuration($duration)));
         WP_CLI::log('');
         WP_CLI::log(WP_CLI::colorize('%G═══════════════════════════════════════════════════════════════%n'));
+    }
+
+    /**
+     * Initiate travel to a star (real async jump).
+     *
+     * This queues a jump action that will complete after the travel duration.
+     * The ship cannot perform other actions while traveling.
+     *
+     * ## OPTIONS
+     *
+     * <post-id>
+     * : The WordPress post ID of the ship.
+     *
+     * --target=<node-id>
+     * : The target node ID to travel to.
+     *
+     * ## EXAMPLES
+     *
+     *     # Start travel from ship 1 to node 5 (Proxima Centauri)
+     *     wp helm ship travel 1 --target=5
+     *
+     * @when after_wp_load
+     *
+     * @param array<string> $args
+     * @param array<string, string> $assoc_args
+     */
+    public function travel(array $args, array $assoc_args): void
+    {
+        $postId = (int) ($args[0] ?? 0);
+        $targetNodeId = (int) ($assoc_args['target'] ?? 0);
+
+        if ($postId <= 0) {
+            WP_CLI::error('Please provide a valid ship post ID');
+        }
+
+        if ($targetNodeId <= 0) {
+            WP_CLI::error('Please provide a target node ID with --target=<node-id>');
+        }
+
+        $shipPost = ShipPost::fromId($postId);
+        if ($shipPost === null) {
+            WP_CLI::error(sprintf('Ship post %d not found', $postId));
+        }
+
+        // Get target node info
+        $targetNode = $this->nodeRepository->get($targetNodeId);
+        if ($targetNode === null) {
+            WP_CLI::error(sprintf('Target node %d not found', $targetNodeId));
+        }
+
+        $targetName = sprintf('Node #%d', $targetNodeId);
+        if ($targetNode->isStar() && $targetNode->starPostId !== null) {
+            $targetStarPost = StarPost::fromId($targetNode->starPostId);
+            if ($targetStarPost !== null) {
+                $targetName = $targetStarPost->displayName();
+            }
+        }
+
+        // Get current position for output before dispatching
+        $ship = $this->factory->build($postId);
+        $currentNodeId = $ship->navigation()->getCurrentPosition();
+        $currentName = 'Unknown';
+        if ($currentNodeId !== null) {
+            $currentNode = $this->nodeRepository->get($currentNodeId);
+            if ($currentNode !== null && $currentNode->isStar() && $currentNode->starPostId !== null) {
+                $currentStarPost = StarPost::fromId($currentNode->starPostId);
+                if ($currentStarPost !== null) {
+                    $currentName = $currentStarPost->displayName();
+                }
+            }
+        }
+
+        // Calculate distance
+        $distance = 0.0;
+        if ($currentNodeId !== null) {
+            $currentNode = $this->nodeRepository->get($currentNodeId);
+            if ($currentNode !== null) {
+                $distance = $currentNode->distanceTo($targetNode);
+            }
+        }
+
+        // Dispatch the jump action
+        try {
+            $result = $this->actionFactory->create($postId, ActionType::Jump, ['target_node_id' => $targetNodeId]);
+        } catch (ActionException $e) {
+            WP_CLI::error($e->getMessage());
+        }
+
+        $remainingSeconds = 0;
+        if ($result->deferred_until !== null) {
+            $remainingSeconds = max(0, $result->deferred_until->getTimestamp() - time());
+        }
+
+        WP_CLI::log('');
+        WP_CLI::log(WP_CLI::colorize('%G═══════════════════════════════════════════════════════════════%n'));
+        WP_CLI::log(WP_CLI::colorize('%G  JUMP INITIATED%n'));
+        WP_CLI::log(WP_CLI::colorize('%G═══════════════════════════════════════════════════════════════%n'));
+        WP_CLI::log('');
+        WP_CLI::log(sprintf('  Ship:        %s', $shipPost->name()));
+        WP_CLI::log(sprintf('  From:        %s', $currentName));
+        WP_CLI::log(sprintf('  To:          %s (Node #%d)', $targetName, $targetNodeId));
+        WP_CLI::log(sprintf('  Distance:    %.2f ly', $distance));
+        WP_CLI::log('');
+        WP_CLI::log(WP_CLI::colorize('%Y▸ TRAVEL TIME%n'));
+        WP_CLI::log(sprintf('  Duration:    %s', $this->formatDuration($remainingSeconds)));
+        WP_CLI::log(sprintf('  Arrives at:  %s', $result->deferred_until?->format('Y-m-d H:i:s') ?? 'unknown'));
+        WP_CLI::log(sprintf('  Action ID:   %d', $result->id));
+        WP_CLI::log('');
+        WP_CLI::log(WP_CLI::colorize('%G═══════════════════════════════════════════════════════════════%n'));
+        WP_CLI::log('');
+        WP_CLI::log('Use "wp helm ship status ' . $postId . '" to check travel progress.');
+    }
+
+    /**
+     * Show ship status including any in-progress actions.
+     *
+     * ## OPTIONS
+     *
+     * <post-id>
+     * : The WordPress post ID of the ship.
+     *
+     * ## EXAMPLES
+     *
+     *     # Check status of ship 1
+     *     wp helm ship status 1
+     *
+     * @when after_wp_load
+     *
+     * @param array<string> $args
+     * @param array<string, string> $assoc_args
+     */
+    public function status(array $args, array $assoc_args): void
+    {
+        $postId = (int) ($args[0] ?? 0);
+
+        if ($postId <= 0) {
+            WP_CLI::error('Please provide a valid ship post ID');
+        }
+
+        $shipPost = ShipPost::fromId($postId);
+        if ($shipPost === null) {
+            WP_CLI::error(sprintf('Ship post %d not found', $postId));
+        }
+
+        try {
+            $ship = $this->factory->build($postId);
+        } catch (\InvalidArgumentException $e) {
+            WP_CLI::error($e->getMessage());
+        }
+
+        $currentNodeId = $ship->navigation()->getCurrentPosition();
+
+        // Get current location name
+        $currentName = 'Unknown';
+        if ($currentNodeId !== null) {
+            $currentNode = $this->nodeRepository->get($currentNodeId);
+            if ($currentNode !== null && $currentNode->isStar() && $currentNode->starPostId !== null) {
+                $currentStarPost = StarPost::fromId($currentNode->starPostId);
+                if ($currentStarPost !== null) {
+                    $currentName = $currentStarPost->displayName();
+                }
+            }
+        }
+
+        // Check for current action
+        $currentAction = $this->actionRepository->findCurrentForShip($postId);
+
+        WP_CLI::log('');
+        WP_CLI::log(WP_CLI::colorize('%G═══════════════════════════════════════════════════════════════%n'));
+        WP_CLI::log(WP_CLI::colorize('%G  SHIP STATUS: %W' . $ship->getName() . '%n'));
+        WP_CLI::log(WP_CLI::colorize('%G═══════════════════════════════════════════════════════════════%n'));
+        WP_CLI::log('');
+        WP_CLI::log(sprintf('  Location:   %s (Node #%d)', $currentName, $currentNodeId ?? 0));
+        WP_CLI::log(sprintf('  Core Life:  %.1f ly remaining', $ship->power()->getCoreLife()));
+        WP_CLI::log('');
+
+        if ($currentAction === null) {
+            WP_CLI::log(WP_CLI::colorize('%Y▸ STATUS: %GIDLE%n'));
+            WP_CLI::log('  Ship is ready for commands.');
+        } else {
+            $remaining = null;
+            if ($currentAction->deferred_until !== null) {
+                $remaining = max(0, $currentAction->deferred_until->getTimestamp() - time());
+            }
+
+            $actionLabel = $currentAction->type->label();
+            $statusColor = $currentAction->status->value === 'pending' ? '%Y' : '%C';
+
+            WP_CLI::log(WP_CLI::colorize('%Y▸ CURRENT ACTION%n'));
+            WP_CLI::log(sprintf('  Type:       %s', $actionLabel));
+            WP_CLI::log(WP_CLI::colorize(sprintf('  Status:     %s%s%%n', $statusColor, ucfirst($currentAction->status->value))));
+
+            if ($currentAction->type === ActionType::Jump) {
+                $targetNodeId = $currentAction->params['target_node_id'] ?? null;
+                if ($targetNodeId !== null) {
+                    $targetNode = $this->nodeRepository->get($targetNodeId);
+                    $targetName = sprintf('Node #%d', $targetNodeId);
+                    if ($targetNode !== null && $targetNode->isStar() && $targetNode->starPostId !== null) {
+                        $targetStarPost = StarPost::fromId($targetNode->starPostId);
+                        if ($targetStarPost !== null) {
+                            $targetName = $targetStarPost->displayName();
+                        }
+                    }
+                    WP_CLI::log(sprintf('  Target:     %s', $targetName));
+                }
+            }
+
+            if ($remaining !== null && $currentAction->deferred_until !== null) {
+                WP_CLI::log(sprintf('  Remaining:  %s', $this->formatDuration($remaining)));
+                WP_CLI::log(sprintf('  Completes:  %s', $currentAction->deferred_until->format('Y-m-d H:i:s')));
+            }
+
+            WP_CLI::log(sprintf('  Action ID:  %d', $currentAction->id));
+        }
+
+        WP_CLI::log('');
+        WP_CLI::log(WP_CLI::colorize('%G═══════════════════════════════════════════════════════════════%n'));
+    }
+
+    /**
+     * Cancel an in-progress action (e.g., cancel travel).
+     *
+     * ## OPTIONS
+     *
+     * <post-id>
+     * : The WordPress post ID of the ship.
+     *
+     * ## EXAMPLES
+     *
+     *     # Cancel travel for ship 1
+     *     wp helm ship cancel 1
+     *
+     * @when after_wp_load
+     *
+     * @param array<string> $args
+     * @param array<string, string> $assoc_args
+     */
+    public function cancel(array $args, array $assoc_args): void
+    {
+        $postId = (int) ($args[0] ?? 0);
+
+        if ($postId <= 0) {
+            WP_CLI::error('Please provide a valid ship post ID');
+        }
+
+        $shipPost = ShipPost::fromId($postId);
+        if ($shipPost === null) {
+            WP_CLI::error(sprintf('Ship post %d not found', $postId));
+        }
+
+        $action = $this->actionRepository->findCurrentForShip($postId);
+
+        if ($action === null || $action->status !== ActionStatus::Pending) {
+            WP_CLI::warning('No pending action to cancel.');
+            return;
+        }
+
+        // Mark as failed (cancelled)
+        $action->fail(ErrorCode::ActionCancelled->error(__('Action was cancelled', 'helm')));
+        $this->actionRepository->update($action);
+
+        // Clear ship's current action
+        $this->systemsRepository->updateCurrentAction($postId, null);
+
+        WP_CLI::success('Action cancelled.');
     }
 
     /**

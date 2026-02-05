@@ -316,9 +316,9 @@ CREATE TABLE {$prefix}helm_ship_systems (
     shield_type smallint(5) unsigned NOT NULL DEFAULT 1,
     nav_tier smallint(5) unsigned NOT NULL DEFAULT 1,
     power_mode smallint(5) unsigned NOT NULL DEFAULT 2,
-    power_full_at datetime DEFAULT NULL,
+    power_full_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     power_max float NOT NULL DEFAULT 100.0,
-    shields_full_at datetime DEFAULT NULL,
+    shields_full_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     shields_max float NOT NULL DEFAULT 100.0,
     core_life float NOT NULL DEFAULT 750.0,
     hull_integrity float NOT NULL DEFAULT 100.0,
@@ -347,6 +347,11 @@ CREATE TABLE {$prefix}helm_ship_systems (
      * - fulfilled: completed successfully
      * - partial: completed with partial results
      * - failed: completed with error
+     *
+     * Queue columns:
+     * - deferred_until: when action becomes ready for processing
+     * - processing_at: timestamp lock for concurrent workers (NULL = available)
+     * - attempts: retry counter for failed processing attempts
      */
     private static function getShipActionsTableSql(string $prefix, string $charsetCollate): string
     {
@@ -354,18 +359,19 @@ CREATE TABLE {$prefix}helm_ship_systems (
 CREATE TABLE {$prefix}helm_ship_actions (
     id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
     ship_post_id bigint(20) unsigned NOT NULL,
-    action_type varchar(50) NOT NULL,
-    params longtext DEFAULT NULL,
-    status varchar(20) NOT NULL DEFAULT 'pending',
+    action_type varchar(32) NOT NULL,
+    params JSON DEFAULT NULL,
+    status varchar(16) NOT NULL DEFAULT 'pending',
     deferred_until datetime DEFAULT NULL,
-    result longtext DEFAULT NULL,
+    processing_at datetime DEFAULT NULL,
+    attempts tinyint(3) unsigned NOT NULL DEFAULT 0,
+    result JSON DEFAULT NULL,
     created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY  (id),
     KEY ship_post_id (ship_post_id),
-    KEY status (status),
-    KEY deferred_until (deferred_until),
-    KEY ship_status (ship_post_id,status)
+    KEY ship_status (ship_post_id,status),
+    KEY idx_ready (status,deferred_until,processing_at)
 ) {$charsetCollate};
 ";
     }

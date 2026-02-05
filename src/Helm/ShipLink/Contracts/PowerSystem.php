@@ -13,10 +13,9 @@ use Helm\ShipLink\Components\PowerMode;
  * Manages ship power (regenerating tactical resource) and core life
  * (finite strategic resource consumed on jumps).
  *
- * Extends PowerMetrics to provide read-only access to output values
- * for other systems.
+ * This is a read-only interface - Ship is responsible for all mutations.
  */
-interface PowerSystem extends PowerMetrics
+interface PowerSystem
 {
     /**
      * Get current available power units.
@@ -34,14 +33,7 @@ interface PowerSystem extends PowerMetrics
     public function getRegenRate(): float;
 
     /**
-     * Consume power for an operation.
-     *
-     * @return bool True if power was available and consumed, false if insufficient.
-     */
-    public function consume(float $amount): bool;
-
-    /**
-     * Check if enough power is available without consuming.
+     * Check if enough power is available.
      */
     public function hasAvailable(float $amount): bool;
 
@@ -49,11 +41,6 @@ interface PowerSystem extends PowerMetrics
      * Get remaining core life in light-years.
      */
     public function getCoreLife(): float;
-
-    /**
-     * Consume core life (called during jumps).
-     */
-    public function consumeCoreLife(float $lightyears): void;
 
     /**
      * Check if core is depleted (ship is derelict).
@@ -82,17 +69,21 @@ interface PowerSystem extends PowerMetrics
     public function getPowerMode(): PowerMode;
 
     /**
-     * Set power mode.
-     *
-     * Mode is locked during actions - cannot change while an action is in progress.
-     */
-    public function setPowerMode(PowerMode $mode): void;
-
-    /**
      * Get current decay multiplier.
      *
      * Used by Ship to calculate core life cost for jumps.
      * Returns 0 in Efficiency mode (safe harbor).
      */
     public function getDecayMultiplier(): float;
+
+    /**
+     * Calculate what powerFullAt should be after consuming power.
+     *
+     * Used by Ship to determine the new timestamp when mutating.
+     *
+     * @param float $amount Power to consume
+     * @param DateTimeImmutable|null $now Current time (defaults to now)
+     * @return DateTimeImmutable New powerFullAt value
+     */
+    public function calculatePowerFullAtAfterConsumption(float $amount, ?DateTimeImmutable $now = null): DateTimeImmutable;
 }

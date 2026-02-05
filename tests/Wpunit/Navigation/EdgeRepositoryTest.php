@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Wpunit\Navigation;
 
-use Helm\Database\Schema;
 use Helm\Navigation\Edge;
 use Helm\Navigation\EdgeRepository;
 use Helm\Navigation\NodeRepository;
@@ -25,11 +24,6 @@ class EdgeRepositoryTest extends WPTestCase
 
         $this->edgeRepository = helm(EdgeRepository::class);
         $this->nodeRepository = helm(NodeRepository::class);
-
-        // Ensure tables exist
-        if (! Schema::tablesExist()) {
-            Schema::createTables();
-        }
     }
 
     private function createStarNode(float $x = 0.0, float $y = 0.0, float $z = 0.0): \Helm\Navigation\Node

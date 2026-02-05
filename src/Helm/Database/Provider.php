@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Helm\Database;
 
 use Helm\lucatume\DI52\ServiceProvider;
+use Helm\StellarWP\Models\Config as ModelsConfig;
 
 /**
  * Database service provider.
@@ -16,6 +17,9 @@ final class Provider extends ServiceProvider
     public function register(): void
     {
         $this->container->singleton(Schema::class);
+
+        // Configure StellarWP Models library
+        ModelsConfig::setHookPrefix('helm');
     }
 
     public function boot(): void

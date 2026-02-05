@@ -9,12 +9,15 @@ use Helm\Navigation\NavigationService;
 use Helm\Navigation\Node;
 use Helm\Navigation\ScanResult;
 use Helm\ShipLink\Contracts\Navigation as NavigationContract;
-use Helm\ShipLink\ShipModel;
+use Helm\ShipLink\Models\ShipSystems;
 
 /**
  * Navigation system implementation.
  *
  * The ship's nav computer - delegates graph operations to NavigationService.
+ *
+ * This system is read-only - it reports state and calculates values.
+ * Ship is responsible for all mutations to ShipSystems.
  */
 final class Navigation implements NavigationContract
 {
@@ -24,24 +27,24 @@ final class Navigation implements NavigationContract
     private const HOP_DECAY_FACTOR = 0.9;
 
     public function __construct(
-        private ShipModel $model,
+        private ShipSystems $systems,
         private readonly NavigationService $navService,
     ) {
     }
 
     public function getTier(): int
     {
-        return $this->model->navTier->value;
+        return $this->systems->nav_tier->value;
     }
 
     public function getSkill(): float
     {
-        return $this->model->navTier->skill();
+        return $this->systems->nav_tier->skill();
     }
 
     public function getEfficiency(): float
     {
-        return $this->model->navTier->efficiency();
+        return $this->systems->nav_tier->efficiency();
     }
 
     public function getDiscoveryProbability(int $hopDepth): float
@@ -54,7 +57,7 @@ final class Navigation implements NavigationContract
 
     public function getCurrentPosition(): ?int
     {
-        return $this->model->nodeId;
+        return $this->systems->node_id;
     }
 
     public function hasRouteTo(int $nodeId): bool
@@ -111,10 +114,5 @@ final class Navigation implements NavigationContract
         }
 
         return $this->navService->getConnectedNodes($currentPosition);
-    }
-
-    public function setPosition(int $nodeId): void
-    {
-        $this->model->nodeId = $nodeId;
     }
 }

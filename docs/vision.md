@@ -27,6 +27,16 @@ Nothing is instant.
 
 Your ship works while you sleep. You check in to see results, make decisions, set new courses. This is not a game that demands your attention. It rewards patience.
 
+### The Universe Doesn't Wait
+
+Actions are not guaranteed to resolve in the order they were issued. The game state can change between when you give a command and when it executes.
+
+- Tried to fire on a player who already jumped out? Failure.
+- Tried to dock at a destroyed station? Failure.
+- Tried to buy cargo someone else bought? Failure.
+
+Every action is re-validated at execution time. The command you gave says "I want to do this." The universe decides if it's still possible. Timing matters. This creates emergent gameplay.
+
 ### Discovery is the Gameplay
 
 The universe is a graph of nodes connected by edges.

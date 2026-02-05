@@ -10,15 +10,16 @@ Controller / Worker
        ▼
 ActionProcessor (orchestrates)
        │
-       ├── ShipRepo::find(id) → ShipModel
-       │
-       ├── ShipFactory::build(model) → ShipLink
+       ├── ShipFactory::build(postId) → ShipLink
+       │       └── Loads ShipPost (identity) + ShipSystems (state)
+       │       └── Builds and wires all System classes
        │
        ├── ShipLink::process(Action) → ActionResult
-       │       └── Internal systems mutate model
+       │       └── Systems provide read-only queries and calculations
+       │       └── Ship mutates ShipSystems directly
        │       └── Each system contributes to result
        │
-       ├── ShipRepo::save(model)
+       ├── ShipSystemsRepository::save(systems)
        │
        └── Maybe queue follow-up action
        │
@@ -32,15 +33,18 @@ ActionResult returned to caller
 
 Ship data is split between two storage mechanisms:
 
-**Ship CPT (wp_posts + meta)** - Rarely-changing data, WordPress integration
+**Ship CPT (wp_posts + meta)** - Identity and WordPress integration
 - Post title → ship name
 - Post content → captain's log / description
 - Post author → owner user ID
 - Comments → crew notes, event log
-- Meta: component configuration (core_type, drive_type, sensor_type, nav_tier)
+- Meta: ship UUID
 
-**Ship Systems Table (helm_ship_systems)** - Frequently-changing state
+**Ship Systems Table (helm_ship_systems)** - All mutable state
+- Component configuration (core_type, drive_type, sensor_type, etc.)
 - power_full_at, power_max, core_life
+- shields_full_at, shields_max
+- hull_integrity, hull_max
 - node_id (current position)
 - cargo
 - current_action_id
@@ -48,52 +52,72 @@ Ship data is split between two storage mechanisms:
 **User Meta** - Player-level data
 - credits (economy is per-player, not per-ship)
 
-This split gives us WordPress admin integration (descriptions, comments, revisions) while keeping operational state in a fast, typed custom table.
+This split gives us WordPress admin integration while keeping operational state in a fast, typed custom table with dirty tracking.
 
-### ShipModel
+### ShipPost
 
-Combines data from both sources. Mutable for direct state changes.
+Immutable identity wrapper for the WordPress CPT:
 
 ```php
-class ShipModel {
-    // Identity (from CPT)
-    public int $postId;
-    public string $shipId;         // UUID
-    public string $name;
-    public int $ownerId;
+readonly class ShipPost {
+    public function postId(): int;
+    public function shipId(): string;  // UUID
+    public function name(): string;
+    public function ownerId(): int;
 
-    // Component configuration (from post meta)
-    public string $coreType;       // "Epoch-R", "Epoch-S", "Epoch-E"
-    public string $driveType;      // "DR-705", "DR-505", "DR-305"
-    public string $sensorType;     // "DSC", "VRS", "ACU"
-    public string $shieldType;     // "Aegis Alpha", "Aegis Beta", "Aegis Gamma"
-    public int $navTier;           // 1-5
+    public static function fromId(int $postId): ?self;
+}
+```
 
-    // State (from helm_ship_systems table, mutated during processing)
-    public int $powerFullAt;       // timestamp when power will be full
-    public float $powerMax;        // maximum power capacity
-    public float $coreLife;        // remaining light-years
-    public ?int $nodeId;           // current position
+### ShipSystems
+
+Pure data model for operational state. Extends `Database\Model` for dirty tracking. Contains NO domain logic - all behavior lives in System classes.
+
+```php
+class ShipSystems extends Model {
+    // Configuration (from enums)
+    public CoreType $coreType;
+    public DriveType $driveType;
+    public SensorType $sensorType;
+    public ShieldType $shieldType;
+    public NavTier $navTier;
+
+    // State (mutated by Ship during processing)
+    public PowerMode $powerMode;
+    public ?DateTimeImmutable $powerFullAt;
+    public float $powerMax;
+    public ?DateTimeImmutable $shieldsFullAt;
+    public float $shieldsMax;
+    public float $coreLife;
+    public float $hullIntegrity;
+    public float $hullMax;
+    public ?int $nodeId;
     public array $cargo;
     public ?int $currentActionId;
+
+    // Dirty tracking inherited from Model
+    public function isDirty(): bool;
+    public function getDirty(): array;
+    public function syncOriginal(): void;
 }
 ```
 
 ### ShipSystemsRepository
 
-Persistence layer for the `helm_ship_systems` table. Handles operational state.
+Persistence layer using dirty tracking for efficient partial updates.
 
 ```php
 class ShipSystemsRepository {
     public function find(int $shipPostId): ?ShipSystems;
     public function findOrCreate(int $shipPostId): ShipSystems;
-    public function save(ShipSystems $systems): bool;
+    public function save(ShipSystems $systems): bool;  // Uses getDirtyRow()
+    public function update(ShipSystems $systems): bool;
 }
 ```
 
 ### ShipFactory
 
-Builds a live ShipLink from model data. Wires all system dependencies.
+Builds a live ShipLink from post ID. Loads data and wires all system dependencies.
 
 ```php
 class ShipFactory {
@@ -102,66 +126,82 @@ class ShipFactory {
         private NavigationService $navigationService,
     ) {}
 
-    public function buildFromModel(ShipModel $model): ShipLink
+    public function build(int $shipPostId): ShipLink
     {
-        // Power system first - others depend on it
-        $power = new Power($model);
+        $shipPost = ShipPost::fromId($shipPostId);
+        $systems = $this->systemsRepository->findOrCreate($shipPostId);
+
+        return $this->buildFromParts($shipPost, $systems);
+    }
+
+    public function buildFromParts(ShipPost $post, ShipSystems $systems): ShipLink
+    {
+        // Power system first - others depend on it for power calculations
+        $power = new Power($systems);
 
         // Systems that need power metrics for calculations
-        $propulsion = new Propulsion($model, $power);  // PowerMetrics
-        $sensors = new Sensors($model, $power);        // PowerMetrics
+        $propulsion = new Propulsion($systems, $power);
+        $sensors = new Sensors($systems, $power);
 
         // Remaining systems
-        $navigation = new Navigation($model, $this->navigationService);
-        $shields = new Shields($model);
-        $hull = new Hull($model);
+        $navigation = new Navigation($systems, $this->navigationService);
+        $shields = new Shields($systems);
+        $hull = new Hull($systems);
+        $cargo = new Cargo($systems);
 
-        return new Ship($model, $power, $propulsion, $sensors, ...);
+        return new Ship(
+            post: $post,
+            systems: $systems,
+            powerSystem: $power,
+            propulsionSystem: $propulsion,
+            sensorSystem: $sensors,
+            navigationSystem: $navigation,
+            shieldSystem: $shields,
+            hullSystem: $hull,
+            cargoSystem: $cargo,
+        );
     }
 }
 ```
 
-Component types (CoreType, DriveType, etc.) are enums with behavior. The same system classes work with any component - behavior varies based on enum values.
+Component types (CoreType, DriveType, etc.) are enums with behavior. The same System classes work with any component - behavior varies based on enum values.
 
 ### ShipLink
 
 The starship interface. From outside, you talk to ShipLink - the internal systems are implementation details.
 
 - Receives actions
-- Delegates to internal systems
-- Systems mutate model directly
+- Gathers data from systems (read-only queries and calculations)
+- Ship mutates ShipSystems directly based on system calculations
 - Collects results from each system
 - Returns aggregate ActionResult
 
 ```php
-class ShipLink {
-    public function __construct(
-        private ShipModel $model,
-        private PowerSystemInterface $power,
-        private PropulsionInterface $propulsion,
-        private SensorInterface $sensors,
-        // ... other systems
-    ) {}
+interface ShipLink {
+    // Identity (from ShipPost)
+    public function getId(): int;
+    public function getName(): string;
+    public function getOwnerId(): int;
 
-    public function process(Action $action): ActionResult
-    {
-        $result = new ActionResult();
+    // Raw data access
+    public function getRecord(): ShipSystems;
 
-        // Dispatch to appropriate handler based on action type
-        // Systems interact through interfaces during processing
-        // Each system adds its outcome to result
+    // Action processing
+    public function process(Action $action): ActionResult;
+    public function canProcess(Action $action): bool;
 
-        return $result;
-    }
-
-    public function getModel(): ShipModel
-    {
-        return $this->model;
-    }
+    // System accessors
+    public function power(): PowerSystem;
+    public function propulsion(): Propulsion;
+    public function sensors(): Sensors;
+    public function navigation(): Navigation;
+    public function shields(): Shields;
+    public function hull(): Hull;
+    public function cargo(): Cargo;
 }
 ```
 
-ShipLink has no knowledge of persistence. It operates on the model it was given.
+ShipLink has no knowledge of persistence. It operates on the data it was given.
 
 ### ActionProcessor
 
@@ -170,375 +210,196 @@ Orchestrates the full flow: load → build → process → save.
 ```php
 class ActionProcessor {
     public function __construct(
-        private ShipRepository $repo,
         private ShipFactory $factory,
+        private ShipSystemsRepository $systemsRepo,
     ) {}
 
-    public function execute(int $ship_id, Action $action): ActionResult
+    public function execute(int $shipPostId, Action $action): ActionResult
     {
-        // Load
-        $model = $this->repo->find($ship_id);
-        if (!$model) {
-            return ActionResult::withError(
-                new WP_Error('ship_not_found', 'Ship not found')
-            );
-        }
+        // Build (loads data internally)
+        $ship = $this->factory->build($shipPostId);
 
-        // Build
-        $shipLink = $this->factory->build($model);
-
-        // Process
-        $result = $shipLink->process($action);
+        // Process (Ship mutates ShipSystems based on system calculations)
+        $result = $ship->process($action);
 
         // Don't save if critical errors
         if ($result->hasCriticalErrors()) {
             return $result;
         }
 
-        // Save mutated model
-        $this->repo->save($shipLink->getModel());
+        // Save mutated state (only dirty fields updated)
+        $this->systemsRepo->save($ship->getRecord());
 
         return $result;
     }
 }
 ```
 
-## System Interfaces
+## System Architecture
 
-Each ship system has an interface. Systems receive the model and any dependencies they need.
+### Systems = Read-Only Query Objects
 
-### PowerMetrics (Read-Only)
+Systems are **read-only** - they query state and calculate values but **never mutate**.
+Ship is the **single mutator** of ShipSystems.
 
-Systems that need power data receive `PowerMetrics` - a read-only interface:
+```
+┌────────────────────────────────────────┐
+│ ShipSystems (Pure Data Model)          │
+│ - Properties only                      │
+│ - Dirty tracking                       │
+│ - No domain methods                    │
+└────────────────────────────────────────┘
+              │
+              ▼
+┌────────────────────────────────────────┐
+│ Systems (Read-Only)                    │
+│ - Query: getCurrentPower(), isDepleted()│
+│ - Calculate: calculateIntegrityAfter() │
+│ - NO mutation methods                  │
+└────────────────────────────────────────┘
+              │
+              ▼
+┌────────────────────────────────────────┐
+│ Ship (Single Mutator)                  │
+│ - Gathers data from Systems            │
+│ - Validates and decides                │
+│ - Mutates ShipSystems directly         │
+└────────────────────────────────────────┘
+```
+
+### System Implementation Example
+
+Systems only read from ShipSystems and provide calculations:
 
 ```php
-interface PowerMetrics {
-    public function getOutputMultiplier(): float;
-    public function getRegenRate(): float;
+final class Hull implements HullContract {
+    public function __construct(private ShipSystems $systems) {}
+
+    // Read-only query
+    public function getIntegrity(): float {
+        return $this->systems->hullIntegrity;
+    }
+
+    public function isDestroyed(): bool {
+        return $this->systems->hullIntegrity <= 0.0;
+    }
+
+    // Calculation - returns what the new value would be
+    public function calculateIntegrityAfterRepair(float $amount): float {
+        return min($this->systems->hullMax, $this->systems->hullIntegrity + $amount);
+    }
 }
 ```
 
-This prevents systems from accidentally consuming power or core life. Only Ship orchestrates mutations.
+### Ship as Orchestrator
 
-### PowerSystem (Full Access)
-
-Extends PowerMetrics with mutation methods. Only Ship holds this interface.
+Ship gathers from systems, validates, and mutates:
 
 ```php
-interface PowerSystem extends PowerMetrics {
-    public function getCurrentPower(): float;
-    public function consume(float $amount): bool;
-    public function getCoreLife(): float;
-    public function consumeCoreLife(float $amount): void;
+final class Ship {
+    private function processRepair(Action $action): ActionResult {
+        $amount = $action->params['amount'];
+
+        // System calculates the result
+        $newIntegrity = $this->hullSystem->calculateIntegrityAfterRepair($amount);
+
+        // Ship mutates directly
+        $this->systems->hullIntegrity = $newIntegrity;
+
+        return $result;
+    }
 }
 ```
 
-### Propulsion
+### Cross-System Dependencies
 
-Calculates range and duration based on drive specs and power output:
-
-```php
-interface Propulsion {
-    public function getMaxRange(): float;      // sustain × output × perf ratio
-    public function canReach(float $distance): bool;
-    public function getJumpDuration(float $distance): int;
-    public function getPerformanceRatio(): float;
-}
-```
-
-### Sensors
-
-Calculates scan range based on sensor specs and power output:
+Systems that need data from other systems receive the system interface:
 
 ```php
-interface Sensors {
-    public function getRange(): float;         // base × output multiplier
-    public function canScan(float $distance): bool;
-    public function getRouteScanCost(float $distance): float;
-}
-```
-
-### Dependency Injection
-
-Systems receive PowerMetrics for calculations:
-
-```php
-class Propulsion implements PropulsionContract {
+final class Propulsion implements PropulsionContract {
     public function __construct(
-        private ShipModel $model,
-        private PowerMetrics $powerMetrics,  // read-only
+        private ShipSystems $systems,
+        private PowerSystem $power,  // For getOutputMultiplier()
     ) {}
 
-    public function getMaxRange(): float
-    {
-        return $this->model->driveType->sustain()
-            * $this->powerMetrics->getOutputMultiplier()
+    public function getMaxRange(): float {
+        return $this->systems->driveType->sustain()
+            * $this->power->getOutputMultiplier()
             * $this->getPerformanceRatio();
     }
 }
 ```
 
+Since systems are read-only, there's no risk of Propulsion accidentally mutating power state.
+
 ## Actions and Results
 
 ### Action
 
-Actions carry intent and parameters. They have a `type` discriminator.
+Actions carry intent and parameters:
 
 ```php
 class Action {
-    public string $type;
+    public ActionType $type;
     public array $params;
 
-    public static function scan(int $target, int $depth = 1): self
-    {
-        return new self('scan_route', [
-            'target' => $target,
-            'depth' => $depth,
-        ]);
-    }
-
-    public static function jump(int $destination): self
-    {
-        return new self('jump', [
-            'destination' => $destination,
-        ]);
+    public static function jump(int $targetNodeId): self {
+        return new self(ActionType::Jump, ['target_node_id' => $targetNodeId]);
     }
 }
 ```
 
 ### ActionResult
 
-Collects outcomes from each system involved in processing.
+Collects outcomes from each system involved in processing:
 
 ```php
 class ActionResult {
     /** @var array<string, SystemResult|WP_Error> */
     private array $outcomes = [];
 
-    public function add(string $system, SystemResult|WP_Error $outcome): void
-    {
-        $this->outcomes[$system] = $outcome;
-    }
-
-    public function hasErrors(): bool
-    {
-        foreach ($this->outcomes as $outcome) {
-            if (is_wp_error($outcome)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public function hasCriticalErrors(): bool
-    {
-        foreach ($this->outcomes as $outcome) {
-            if (is_wp_error($outcome) && $outcome->get_error_data('critical')) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public function getErrors(): array
-    {
-        return array_filter($this->outcomes, 'is_wp_error');
-    }
-
-    public function get(string $system): SystemResult|WP_Error|null
-    {
-        return $this->outcomes[$system] ?? null;
-    }
-
-    public function toArray(): array
-    {
-        // Serialize for REST response
-    }
-
-    public static function withError(WP_Error $error): self
-    {
-        $result = new self();
-        $result->add('processor', $error);
-        return $result;
-    }
+    public function add(string $system, SystemResult|WP_Error $outcome): self;
+    public function hasErrors(): bool;
+    public function hasCriticalErrors(): bool;
+    public function get(string $system): SystemResult|WP_Error|null;
 }
 ```
 
-Example result from a scan action:
+## Design Principles
 
-```php
-$result->get('power');   // PowerResult{consumed: 20, remaining: 45}
-$result->get('sensors'); // SensorResult{queued: true, completes_at: 1706486400}
-$result->get('nav');     // WP_Error('target_out_of_range', '...')
-```
+### ShipSystems = Pure Data
 
-## Action Queue (Action Scheduler)
+ShipSystems contains NO domain logic. All behavior lives in System classes:
+- Easier to test systems in isolation
+- Clear separation of concerns
+- Adding a column = change model, changing behavior = change system
 
-Some actions complete immediately. Others take real time and must be queued.
+### Systems Own Their Domain
 
-### Queuing an Action
+Each System is responsible for:
+- Reading its relevant properties from ShipSystems
+- Computing derived values (current power from timestamps, etc.)
+- Providing `calculate*` methods that return what mutations would produce
+- Providing state checks (isDestroyed, isDepleted, etc.)
 
-```php
-// In ShipLink::process() or ActionProcessor
-if ($action->requiresTime()) {
-    $completes_at = time() + $duration;
-
-    as_schedule_single_action(
-        $completes_at,
-        'helm_complete_ship_action',
-        [
-            'ship_id' => $this->model->id,
-            'action_id' => $action_record_id,
-        ],
-        'helm-ships'
-    );
-
-    return ActionResult::queued($completes_at);
-}
-```
-
-### Worker Handles Completion
-
-```php
-add_action('helm_complete_ship_action', function(int $ship_id, int $action_id) {
-    $action_record = get_action_record($action_id);
-
-    $result = helm(ActionProcessor::class)->complete(
-        $ship_id,
-        $action_record
-    );
-
-    // Handle result - maybe notify player, queue follow-up
-});
-```
-
-### Action Records
-
-Active/pending actions are stored separately from the ship model:
-
-```php
-// Could be custom table or CPT
-class ActionRecord {
-    public int $id;
-    public int $ship_id;
-    public string $type;
-    public array $params;
-    public int $started_at;
-    public int $completes_at;
-    public string $status;  // 'pending', 'processing', 'completed', 'failed'
-}
-```
-
-## Multi-Ship Scenarios
-
-For combat, trade, or co-op, a higher-level processor orchestrates multiple ShipLinks:
-
-```php
-class TradeProcessor {
-    public function execute(
-        int $seller_id,
-        int $buyer_id,
-        TradeAction $action
-    ): TradeResult {
-        // Load both
-        $seller_model = $this->repo->find($seller_id);
-        $buyer_model = $this->repo->find($buyer_id);
-
-        // Build both
-        $seller = $this->factory->build($seller_model);
-        $buyer = $this->factory->build($buyer_model);
-
-        // Validate
-        if (!$seller->canTrade($action)) {
-            return TradeResult::error('seller_cannot_trade');
-        }
-        if (!$buyer->canAfford($action)) {
-            return TradeResult::error('buyer_cannot_afford');
-        }
-
-        // Execute on both
-        $seller_result = $seller->processSale($action);
-        $buyer_result = $buyer->processPurchase($action);
-
-        // Save both
-        $this->repo->save($seller->getModel());
-        $this->repo->save($buyer->getModel());
-
-        return new TradeResult($seller_result, $buyer_result);
-    }
-}
-```
-
-Each ShipLink remains isolated. The processor coordinates.
-
-## REST Controller Example
-
-```php
-class ShipActionsController {
-    public function scan(WP_REST_Request $request): WP_REST_Response|WP_Error
-    {
-        $ship_id = $request->get_param('ship_id');
-        $user_id = get_current_user_id();
-
-        // Verify ownership
-        $ship = helm(ShipRepository::class)->find($ship_id);
-        if (!$ship || $ship->owner_id !== $user_id) {
-            return new WP_Error('forbidden', 'Not your ship', ['status' => 403]);
-        }
-
-        // Build action
-        $action = Action::scan(
-            target: $request->get_param('target'),
-            depth: $request->get_param('depth') ?? 1,
-        );
-
-        // Process
-        $result = helm(ActionProcessor::class)->execute($ship_id, $action);
-
-        if ($result->hasCriticalErrors()) {
-            $error = $result->getErrors()[0];
-            return new WP_Error(
-                $error->get_error_code(),
-                $error->get_error_message(),
-                ['status' => 400]
-            );
-        }
-
-        return new WP_REST_Response($result->toArray(), 200);
-    }
-}
-```
-
-## Design Decisions
-
-### State Lives in Model
-
-Systems mutate `ShipModel` directly during processing. No delta tracking (yet).
-
-If we need change history later, we can:
-- Wrap model in a change-tracking proxy
-- Have systems return deltas instead of mutating
-- Add event sourcing
-
-Interfaces isolate this decision.
+Ship uses system calculations to decide what to mutate.
 
 ### ShipLink Has No Persistence Knowledge
 
-ShipLink operates on the model it receives. It doesn't know about repositories, databases, or saving. The `ActionProcessor` handles persistence.
-
-This means:
+ShipLink operates on the data it receives. It doesn't know about repositories or databases. The caller handles persistence:
 - ShipLink is testable without database
 - Factory can build ShipLink from any source
 - Persistence strategy can change without affecting ShipLink
 
-### Systems Interact Through Interfaces
+### Dirty Tracking for Efficiency
 
-When propulsion needs to check power, it calls `PowerSystemInterface::getCurrentPower()`, not `$this->model->power_full_at`.
-
-This means:
-- Systems are decoupled
-- Can mock systems for testing
-- Power implementation can change without affecting propulsion
+ShipSystems extends `Database\Model` with dirty tracking:
+```php
+$systems->hullIntegrity = 50.0;
+if ($systems->isDirty()) {
+    $repo->update($systems);  // Only updates hull_integrity column
+}
+```
 
 ### Errors as WP_Error
 

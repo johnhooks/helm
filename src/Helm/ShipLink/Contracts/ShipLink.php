@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Helm\ShipLink\Contracts;
 
-use Helm\ShipLink\Action;
+use Helm\ShipLink\Models\Action;
 use Helm\ShipLink\ActionResult;
-use Helm\ShipLink\ShipModel;
+use Helm\ShipLink\Models\ShipSystems;
 
 /**
  * ShipLink contract - the starship interface.
@@ -17,14 +17,19 @@ use Helm\ShipLink\ShipModel;
 interface ShipLink
 {
     /**
-     * Get the underlying ship model.
+     * Get the underlying systems record.
      */
-    public function getModel(): ShipModel;
+    public function getRecord(): ShipSystems;
 
     /**
-     * Get the ship ID.
+     * Get the ship ID (post ID).
      */
     public function getId(): int;
+
+    /**
+     * Get the ship name.
+     */
+    public function getName(): string;
 
     /**
      * Get the owner's user ID.
@@ -73,4 +78,9 @@ interface ShipLink
      * Access the hull system.
      */
     public function hull(): Hull;
+
+    /**
+     * Access the cargo system.
+     */
+    public function cargo(): Cargo;
 }

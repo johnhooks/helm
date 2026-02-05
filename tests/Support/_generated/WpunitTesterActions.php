@@ -1,4 +1,4 @@
-<?php  //[STAMP] e0c0c40f277938cc731b2951cd183669
+<?php  //[STAMP] 43f6b56f592f90a3e542917c8752d423
 // phpcs:ignoreFile
 namespace Tests\Support\_generated;
 
@@ -2003,11 +2003,28 @@ trait WpunitTesterActions
      * Create a ship in the database.
      *
      * @param array<string, mixed> $attributes Ship attributes to override defaults
+     *                                         Supports: id, name, ownerId, node_id, core_life
      * @return ShipPost
      * @see \Tests\Support\Helper\Helm::haveShip()
      */
     public function haveShip(array $attributes = []): \Helm\Ships\ShipPost {
         return $this->getScenario()->runStep(new \Codeception\Step\Action('haveShip', func_get_args()));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * Create a ship post without initializing systems.
+     *
+     * Use this for repository tests that need to control systems creation manually.
+     *
+     * @param array<string, mixed> $attributes Ship attributes to override defaults
+     * @return ShipPost
+     * @see \Tests\Support\Helper\Helm::haveShipPost()
+     */
+    public function haveShipPost(array $attributes = []): \Helm\Ships\ShipPost {
+        return $this->getScenario()->runStep(new \Codeception\Step\Action('haveShipPost', func_get_args()));
     }
 
  

@@ -4,6 +4,13 @@ declare(strict_types=1);
 
 namespace Helm\ShipLink;
 
+use Helm\ShipLink\Actions\Jump\Handler as JumpHandler;
+use Helm\ShipLink\Actions\Jump\Resolver as JumpResolver;
+use Helm\ShipLink\Actions\Jump\Validator as JumpValidator;
+use Helm\ShipLink\Actions\ScanRoute\Handler as ScanRouteHandler;
+use Helm\ShipLink\Actions\ScanRoute\Resolver as ScanRouteResolver;
+use Helm\ShipLink\Actions\ScanRoute\Validator as ScanRouteValidator;
+
 /**
  * Action types that can be processed by ShipLink.
  */
@@ -48,6 +55,48 @@ enum ActionType: string
             self::Sell,
             self::Transfer,
             self::Upgrade => false,
+        };
+    }
+
+    /**
+     * Get the validator class for this action type.
+     *
+     * @return class-string<\Helm\ShipLink\Contracts\ActionValidator>|null
+     */
+    public function getValidatorClass(): ?string
+    {
+        return match ($this) {
+            self::Jump => JumpValidator::class,
+            self::ScanRoute => ScanRouteValidator::class,
+            default => null,
+        };
+    }
+
+    /**
+     * Get the handler class for this action type.
+     *
+     * @return class-string<\Helm\ShipLink\Contracts\ActionHandler>|null
+     */
+    public function getHandlerClass(): ?string
+    {
+        return match ($this) {
+            self::Jump => JumpHandler::class,
+            self::ScanRoute => ScanRouteHandler::class,
+            default => null,
+        };
+    }
+
+    /**
+     * Get the resolver class for this action type.
+     *
+     * @return class-string<\Helm\ShipLink\Contracts\ActionHandler>|null
+     */
+    public function getResolverClass(): ?string
+    {
+        return match ($this) {
+            self::Jump => JumpResolver::class,
+            self::ScanRoute => ScanRouteResolver::class,
+            default => null,
         };
     }
 

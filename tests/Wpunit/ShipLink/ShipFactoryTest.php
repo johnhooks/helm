@@ -7,10 +7,8 @@ namespace Tests\Wpunit\ShipLink;
 use Helm\ShipLink\Contracts\ShipLink;
 use Helm\ShipLink\Ship;
 use Helm\ShipLink\ShipFactory;
-use Helm\ShipLink\ShipModel;
-use Helm\ShipLink\ShipSystems;
+use Helm\ShipLink\Models\ShipSystems;
 use Helm\ShipLink\ShipSystemsRepository;
-use Helm\Ships\ShipPost;
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use Tests\Support\WpunitTester;
 
@@ -55,7 +53,7 @@ class ShipFactoryTest extends WPTestCase
 
     public function test_build_creates_systems_if_missing(): void
     {
-        $shipPost = $this->tester->haveShip();
+        $shipPost = $this->tester->haveShipPost();
         $postId = $shipPost->postId();
 
         $this->assertFalse($this->systemsRepository->exists($postId));
@@ -71,7 +69,7 @@ class ShipFactoryTest extends WPTestCase
 
         $shipLink = $this->factory->buildFromPost($shipPost);
 
-        $this->assertSame('From Post', $shipLink->getModel()->name);
+        $this->assertSame('From Post', $shipLink->getName());
     }
 
     public function test_build_from_parts(): void
@@ -82,23 +80,8 @@ class ShipFactoryTest extends WPTestCase
 
         $shipLink = $this->factory->buildFromParts($shipPost, $systems);
 
-        $this->assertSame('From Parts', $shipLink->getModel()->name);
-        $this->assertSame(750.0, $shipLink->getModel()->coreLife); // Default from EpochS
-    }
-
-    public function test_build_from_model(): void
-    {
-        $shipPost = $this->tester->haveShip();
-        $postId = $shipPost->postId();
-        $systems = ShipSystems::defaults($postId);
-        $model = ShipModel::fromParts($shipPost, $systems);
-
-        // Modify model
-        $model->coreLife = 100.0;
-
-        $shipLink = $this->factory->buildFromModel($model);
-
-        $this->assertSame(100.0, $shipLink->getModel()->coreLife);
+        $this->assertSame('From Parts', $shipLink->getName());
+        $this->assertSame(750.0, $shipLink->getRecord()->core_life); // Default from EpochS
     }
 
     public function test_ship_link_has_all_systems(): void

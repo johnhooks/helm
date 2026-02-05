@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Wpunit\Stars;
 
-use Helm\Database\Schema;
 use Helm\Navigation\NodeRepository;
 use Helm\Stars\Star;
 use Helm\Stars\StarCatalog;
@@ -27,6 +26,7 @@ class StarRepositoryTest extends WPTestCase
     public function _before(): void
     {
         parent::_before();
+
         $this->repository = helm(StarRepository::class);
         $this->catalog = helm(StarCatalog::class);
     }
@@ -191,11 +191,6 @@ class StarRepositoryTest extends WPTestCase
 
     public function test_saving_star_creates_nav_node(): void
     {
-        // Ensure tables exist
-        if (! Schema::tablesExist()) {
-            Schema::createTables();
-        }
-
         $nodeRepository = helm(NodeRepository::class);
 
         // Create a star
@@ -216,10 +211,6 @@ class StarRepositoryTest extends WPTestCase
 
     public function test_nav_node_has_correct_coordinates(): void
     {
-        if (! Schema::tablesExist()) {
-            Schema::createTables();
-        }
-
         $nodeRepository = helm(NodeRepository::class);
 
         // Star at RA=90°, Dec=0°, Distance=10 ly
@@ -241,10 +232,6 @@ class StarRepositoryTest extends WPTestCase
 
     public function test_sol_nav_node_is_at_origin(): void
     {
-        if (! Schema::tablesExist()) {
-            Schema::createTables();
-        }
-
         $nodeRepository = helm(NodeRepository::class);
 
         $sol = $this->catalog->sol();
@@ -260,10 +247,6 @@ class StarRepositoryTest extends WPTestCase
 
     public function test_saving_same_star_twice_does_not_duplicate_nav_node(): void
     {
-        if (! Schema::tablesExist()) {
-            Schema::createTables();
-        }
-
         $nodeRepository = helm(NodeRepository::class);
 
         $star = new Star(
@@ -292,10 +275,6 @@ class StarRepositoryTest extends WPTestCase
 
     public function test_multiple_stars_create_separate_nav_nodes(): void
     {
-        if (! Schema::tablesExist()) {
-            Schema::createTables();
-        }
-
         $nodeRepository = helm(NodeRepository::class);
 
         $star1Post = $this->tester->haveStar([

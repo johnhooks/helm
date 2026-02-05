@@ -4,15 +4,18 @@ declare(strict_types=1);
 
 namespace Helm\ShipLink\System;
 
-use Helm\ShipLink\Contracts\PowerMetrics;
+use Helm\ShipLink\Contracts\PowerSystem;
 use Helm\ShipLink\Contracts\Propulsion as PropulsionContract;
-use Helm\ShipLink\ShipModel;
+use Helm\ShipLink\Models\ShipSystems;
 
 /**
  * Propulsion system implementation.
  *
  * Calculates jump range and duration based on drive specs and power output.
  * No hard-coded limits - range emerges from the power economics.
+ *
+ * This system is read-only - it reports state and calculates values.
+ * Ship is responsible for all mutations to ShipSystems.
  */
 final class Propulsion implements PropulsionContract
 {
@@ -22,8 +25,8 @@ final class Propulsion implements PropulsionContract
     private const BASE_SECONDS_PER_LY = 3600;
 
     public function __construct(
-        private ShipModel $model,
-        private PowerMetrics $powerMetrics,
+        private ShipSystems $systems,
+        private PowerSystem $power,
     ) {
     }
 
@@ -38,14 +41,14 @@ final class Propulsion implements PropulsionContract
 
     public function getCoreDecayMultiplier(): float
     {
-        return $this->model->driveType->consumption();
+        return $this->systems->drive_type->consumption();
     }
 
     public function getMaxRange(): float
     {
         // maxRange = sustain × outputMultiplier × performanceRatio
         return $this->getSustain()
-            * $this->powerMetrics->getOutputMultiplier()
+            * $this->power->getOutputMultiplier()
             * $this->getPerformanceRatio();
     }
 
@@ -58,7 +61,7 @@ final class Propulsion implements PropulsionContract
     {
         // Core cost = distance × core type multiplier × drive consumption
         return $distanceLy
-            * $this->model->coreType->jumpCostMultiplier()
+            * $this->systems->core_type->jumpCostMultiplier()
             * $this->getCoreDecayMultiplier();
     }
 
@@ -66,18 +69,18 @@ final class Propulsion implements PropulsionContract
     {
         // performanceRatio = min(1.0, outputMultiplier / consumption)
         // When underpowered, drive underperforms
-        $ratio = $this->powerMetrics->getOutputMultiplier() / $this->getConsumption();
+        $ratio = $this->power->getOutputMultiplier() / $this->getConsumption();
         return min(1.0, $ratio);
     }
 
     public function getSustain(): float
     {
-        return $this->model->driveType->sustain();
+        return $this->systems->drive_type->sustain();
     }
 
     public function getConsumption(): float
     {
-        return $this->model->driveType->consumption();
+        return $this->systems->drive_type->consumption();
     }
 
     /**
@@ -87,8 +90,8 @@ final class Propulsion implements PropulsionContract
      */
     private function getEffectiveAmplitude(): float
     {
-        return $this->model->driveType->amplitude()
-            * $this->powerMetrics->getOutputMultiplier()
+        return $this->systems->drive_type->amplitude()
+            * $this->power->getOutputMultiplier()
             * $this->getPerformanceRatio();
     }
 }

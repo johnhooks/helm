@@ -13,6 +13,8 @@ use Helm\Navigation\ScanResult;
  *
  * Handles route computation and nav computer capabilities.
  * Delegates graph operations to NavigationService.
+ *
+ * This is a read-only interface - Ship is responsible for all mutations.
  */
 interface Navigation
 {
@@ -76,11 +78,4 @@ interface Navigation
      * @return array<array{node: Node, distance: float}> Connected nodes
      */
     public function getConnectedNodes(): array;
-
-    /**
-     * Set ship position (called by Ship during jump execution).
-     *
-     * @param int $nodeId New position node ID
-     */
-    public function setPosition(int $nodeId): void;
 }

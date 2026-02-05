@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace Helm\ShipLink;
 
 use Helm\Navigation\NavigationService;
-use Helm\ShipLink\Contracts\ShipLink as ShipLinkContract;
+use Helm\ShipLink\Models\ShipSystems;
+use Helm\ShipLink\System\Cargo;
 use Helm\ShipLink\System\Hull;
 use Helm\ShipLink\System\Navigation;
 use Helm\ShipLink\System\Power;
@@ -17,8 +18,8 @@ use Helm\Ships\ShipPost;
 /**
  * Factory for building ShipLink instances.
  *
- * Loads data from CPT and systems table, combines into ShipModel,
- * and constructs a configured ShipLink with all systems wired together.
+ * Loads data from CPT and systems table, and constructs a configured
+ * ShipLink with all systems wired together.
  *
  * This is the only place that knows how to construct and wire Ship systems.
  */
@@ -31,11 +32,11 @@ final class ShipFactory
     }
 
     /**
-     * Build a ShipLink from a ship post ID.
+     * Build a Ship from a ship post ID.
      *
      * @throws \InvalidArgumentException If ship post not found
      */
-    public function build(int $shipPostId): ShipLinkContract
+    public function build(int $shipPostId): Ship
     {
         $shipPost = ShipPost::fromId($shipPostId);
 
@@ -47,55 +48,45 @@ final class ShipFactory
     }
 
     /**
-     * Build a ShipLink from a ShipPost.
+     * Build a Ship from a ShipPost.
      */
-    public function buildFromPost(ShipPost $shipPost): ShipLinkContract
+    public function buildFromPost(ShipPost $shipPost): Ship
     {
         $systems = $this->systemsRepository->findOrCreate($shipPost->postId());
-        $model = ShipModel::fromParts($shipPost, $systems);
 
-        return $this->buildFromModel($model);
+        return $this->buildFromParts($shipPost, $systems);
     }
 
     /**
-     * Build a ShipLink from existing parts.
+     * Build a Ship from existing parts.
      *
      * Useful when you already have loaded the post and systems.
      */
-    public function buildFromParts(ShipPost $shipPost, ShipSystems $systems): ShipLinkContract
+    public function buildFromParts(ShipPost $shipPost, ShipSystems $systems): Ship
     {
-        $model = ShipModel::fromParts($shipPost, $systems);
+        // Build power system first - other systems depend on it for calculations
+        $power = new Power($systems);
 
-        return $this->buildFromModel($model);
-    }
-
-    /**
-     * Build a ShipLink from a ShipModel directly.
-     *
-     * Useful for testing or when you've already built the model.
-     */
-    public function buildFromModel(ShipModel $model): ShipLinkContract
-    {
-        // Build power system first - other systems depend on it
-        $power = new Power($model);
-
-        // Build systems that need core output readings
-        $propulsion = new Propulsion($model, $power);
-        $sensors = new Sensors($model, $power);
+        // Build systems that need power readings
+        $propulsion = new Propulsion($systems, $power);
+        $sensors = new Sensors($systems, $power);
 
         // Build remaining systems
-        $navigation = new Navigation($model, $this->navigationService);
-        $shields = new Shields($model);
-        $hull = new Hull($model);
+        $navigation = new Navigation($systems, $this->navigationService);
+        $shields = new Shields($systems);
+        $hull = new Hull($systems);
+        $cargo = new Cargo($systems);
 
         return new Ship(
-            model: $model,
+            post: $shipPost,
+            systems: $systems,
             powerSystem: $power,
             propulsionSystem: $propulsion,
             sensorSystem: $sensors,
             navigationSystem: $navigation,
             shieldSystem: $shields,
             hullSystem: $hull,
+            cargoSystem: $cargo,
         );
     }
 }

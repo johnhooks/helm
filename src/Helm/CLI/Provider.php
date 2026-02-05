@@ -13,6 +13,9 @@ use Helm\Navigation\NodeRepository;
 use Helm\Origin\Origin;
 use Helm\Planets\PlanetBatchGenerator;
 use Helm\Planets\PlanetRepository;
+use Helm\ShipLink\ActionFactory;
+use Helm\ShipLink\ActionProcessor;
+use Helm\ShipLink\ActionRepository;
 use Helm\ShipLink\ShipFactory;
 use Helm\ShipLink\ShipSystemsRepository;
 use Helm\Stars\StarBatchGenerator;
@@ -63,10 +66,19 @@ final class Provider extends ServiceProvider
                 $this->container->get(NodeRepository::class),
                 $this->container->get(EdgeRepository::class),
                 $this->container->get(NavigationService::class),
+                $this->container->get(ActionFactory::class),
+                $this->container->get(ActionRepository::class),
             );
         });
 
         $this->container->singleton(DbCommand::class, fn () => new DbCommand());
+
+        $this->container->singleton(ActionCommand::class, function () {
+            return new ActionCommand(
+                $this->container->get(ActionProcessor::class),
+                $this->container->get(ActionRepository::class),
+            );
+        });
     }
 
     public function boot(): void
@@ -88,5 +100,6 @@ final class Provider extends ServiceProvider
         WP_CLI::add_command('helm status', $this->container->get(StatusCommand::class));
         WP_CLI::add_command('helm ship', $this->container->get(ShipCommand::class));
         WP_CLI::add_command('helm db', $this->container->get(DbCommand::class));
+        WP_CLI::add_command('helm action', $this->container->get(ActionCommand::class));
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Helm\ShipLink;
 
+use Helm\ShipLink\Contracts\Cargo;
 use Helm\ShipLink\Contracts\Hull;
 use Helm\ShipLink\Contracts\Navigation;
 use Helm\ShipLink\Contracts\PowerSystem;
@@ -11,54 +12,66 @@ use Helm\ShipLink\Contracts\Propulsion;
 use Helm\ShipLink\Contracts\Sensors;
 use Helm\ShipLink\Contracts\Shields;
 use Helm\ShipLink\Contracts\ShipLink;
+use Helm\ShipLink\Models\Action;
+use Helm\ShipLink\Models\ShipSystems;
+use Helm\Ships\ShipPost;
 
 /**
  * Ship implementation of ShipLink.
  *
- * This is the main starship interface. It holds the mutable model
- * and provides access to all ship systems.
+ * This is the main starship interface and the ONLY mutator of ShipSystems.
+ * Systems are read-only - they report state and calculate values.
+ * Ship orchestrates by gathering data from systems, making decisions,
+ * and applying mutations directly to ShipSystems.
  *
  * All systems are injected via constructor - use ShipFactory to build.
  */
 final class Ship implements ShipLink
 {
     public function __construct(
-        private ShipModel $model,
+        private ShipPost $post,
+        private ShipSystems $systems,
         private PowerSystem $powerSystem,
         private Propulsion $propulsionSystem,
         private Sensors $sensorSystem,
         private Navigation $navigationSystem,
         private Shields $shieldSystem,
         private Hull $hullSystem,
+        private Cargo $cargoSystem,
     ) {
     }
 
-    public function getModel(): ShipModel
+    public function getRecord(): ShipSystems
     {
-        return $this->model;
+        return $this->systems;
     }
 
     public function getId(): int
     {
-        return $this->model->postId;
+        return $this->post->postId();
+    }
+
+    public function getName(): string
+    {
+        return $this->post->name();
     }
 
     public function getOwnerId(): int
     {
-        return $this->model->ownerId;
+        return $this->post->ownerId();
     }
 
     public function process(Action $action): ActionResult
     {
-        // Basic validation
-        if ($this->model->isDestroyed()) {
+        // Basic validation - use Systems for state checks
+        if ($this->hullSystem->isDestroyed()) {
             return ActionResult::withError('ship', new \WP_Error(
                 'ship_destroyed',
                 __('Ship is destroyed and cannot perform actions.', 'helm')
             ));
         }
 
-        if ($this->model->isCoreDepeleted()) {
+        if ($this->powerSystem->isDepleted()) {
             return ActionResult::withError('power', new \WP_Error(
                 'core_depleted',
                 __('Core is depleted. Ship is derelict.', 'helm')
@@ -83,7 +96,7 @@ final class Ship implements ShipLink
 
     public function canProcess(Action $action): bool
     {
-        if ($this->model->isDestroyed() || $this->model->isCoreDepeleted()) {
+        if ($this->hullSystem->isDestroyed() || $this->powerSystem->isDepleted()) {
             return false;
         }
 
@@ -121,10 +134,15 @@ final class Ship implements ShipLink
         return $this->hullSystem;
     }
 
+    public function cargo(): Cargo
+    {
+        return $this->cargoSystem;
+    }
+
     /**
      * Process a jump action.
      *
-     * Ship orchestrates: gathers route info, calculates costs, executes via systems.
+     * Ship orchestrates: gathers data from systems, validates, mutates directly.
      */
     private function processJump(Action $action): ActionResult
     {
@@ -137,7 +155,7 @@ final class Ship implements ShipLink
             ));
         }
 
-        // 1. Navigation system validates graph and gets route info
+        // 1. Navigation system reports route info
         $routeInfo = $this->navigationSystem->getRouteInfo($targetNodeId);
         if (is_wp_error($routeInfo)) {
             return ActionResult::withError('navigation', $routeInfo);
@@ -145,7 +163,7 @@ final class Ship implements ShipLink
 
         $distance = $routeInfo->distance;
 
-        // 2. Check propulsion can handle the distance
+        // 2. Propulsion reports if it can reach
         if (!$this->propulsionSystem->canReach($distance)) {
             return ActionResult::withError('propulsion', new \WP_Error(
                 'out_of_range',
@@ -154,7 +172,7 @@ final class Ship implements ShipLink
             ));
         }
 
-        // 3. Calculate costs (Ship orchestrates, gathering from systems)
+        // 3. Calculate costs (gathering from systems)
         $coreCost = $this->calculateJumpCoreCost($distance);
         $duration = $this->propulsionSystem->getJumpDuration($distance);
 
@@ -167,9 +185,9 @@ final class Ship implements ShipLink
             ));
         }
 
-        // 5. Execute via system calls
-        $this->powerSystem->consumeCoreLife($coreCost);
-        $this->navigationSystem->setPosition($targetNodeId);
+        // 5. Ship mutates directly
+        $this->systems->core_life = max(0.0, $this->systems->core_life - $coreCost);
+        $this->systems->node_id = $targetNodeId;
 
         // 6. Return result
         $result = new ActionResult();
@@ -191,7 +209,7 @@ final class Ship implements ShipLink
         // Core cost = distance × core multiplier × drive decay × power mode decay
         // Efficiency mode (decay = 0) means no core cost - safe harbor
         return $distance
-            * $this->model->coreType->jumpCostMultiplier()
+            * $this->systems->core_type->jumpCostMultiplier()
             * $this->propulsionSystem->getCoreDecayMultiplier()
             * $this->powerSystem->getDecayMultiplier();
     }
@@ -203,6 +221,7 @@ final class Ship implements ShipLink
     {
         $distance = $action->params['distance'] ?? 0.0;
 
+        // Sensors report if scan is possible
         if (!$this->sensorSystem->canScan($distance)) {
             return ActionResult::withError('sensors', new \WP_Error(
                 'out_of_range',
@@ -211,12 +230,17 @@ final class Ship implements ShipLink
         }
 
         $powerCost = $this->sensorSystem->getRouteScanCost($distance);
-        if (!$this->powerSystem->consume($powerCost)) {
+
+        // Power reports if enough available
+        if (!$this->powerSystem->hasAvailable($powerCost)) {
             return ActionResult::withError('power', new \WP_Error(
                 'insufficient_power',
                 __('Insufficient power for scan.', 'helm')
             ));
         }
+
+        // Ship mutates directly - calculate and apply new power_full_at
+        $this->systems->power_full_at = $this->powerSystem->calculatePowerFullAtAfterConsumption($powerCost);
 
         $duration = $this->sensorSystem->getRouteScanDuration($distance);
 
@@ -239,12 +263,15 @@ final class Ship implements ShipLink
         $hours = $duration / 3600.0;
         $powerCost = $this->sensorSystem->getSurveyCostPerHour() * $hours;
 
-        if (!$this->powerSystem->consume($powerCost)) {
+        if (!$this->powerSystem->hasAvailable($powerCost)) {
             return ActionResult::withError('power', new \WP_Error(
                 'insufficient_power',
                 __('Insufficient power for survey.', 'helm')
             ));
         }
+
+        // Ship mutates directly
+        $this->systems->power_full_at = $this->powerSystem->calculatePowerFullAtAfterConsumption($powerCost);
 
         $result = new ActionResult();
         return $result->add('survey', SystemResult::from([
@@ -260,12 +287,15 @@ final class Ship implements ShipLink
     {
         $powerCost = 5.0; // Base cost for planet scan
 
-        if (!$this->powerSystem->consume($powerCost)) {
+        if (!$this->powerSystem->hasAvailable($powerCost)) {
             return ActionResult::withError('power', new \WP_Error(
                 'insufficient_power',
                 __('Insufficient power for planet scan.', 'helm')
             ));
         }
+
+        // Ship mutates directly
+        $this->systems->power_full_at = $this->powerSystem->calculatePowerFullAtAfterConsumption($powerCost);
 
         $result = new ActionResult();
         return $result->add('planet_scan', SystemResult::from([
@@ -323,14 +353,17 @@ final class Ship implements ShipLink
         $direction = $action->params['direction'] ?? 'load'; // load or unload
 
         if ($direction === 'load') {
-            $this->model->addCargo($resource, $quantity);
+            // Ship mutates directly using cargo's calculation
+            $this->systems->cargo = $this->cargoSystem->calculateCargoAfterAdd($resource, $quantity);
         } else {
-            $removed = $this->model->removeCargo($resource, $quantity);
-            $quantity = $removed;
+            // Ship mutates directly using cargo's calculation
+            $cargoResult = $this->cargoSystem->calculateCargoAfterRemove($resource, $quantity);
+            $this->systems->cargo = $cargoResult['cargo'];
+            $quantity = $cargoResult['removed'];
         }
 
-        $result = new ActionResult();
-        return $result->add('transfer', SystemResult::from([
+        $actionResult = new ActionResult();
+        return $actionResult->add('transfer', SystemResult::from([
             'resource' => $resource,
             'quantity' => $quantity,
             'direction' => $direction,
@@ -345,8 +378,11 @@ final class Ship implements ShipLink
         $amount = $action->params['amount'] ?? 0.0;
 
         $before = $this->hullSystem->getIntegrity();
-        $this->hullSystem->repair($amount);
-        $after = $this->hullSystem->getIntegrity();
+
+        // Ship mutates directly using hull's calculation
+        $this->systems->hull_integrity = $this->hullSystem->calculateIntegrityAfterRepair($amount);
+
+        $after = $this->systems->hull_integrity;
 
         $result = new ActionResult();
         return $result->add('repair', SystemResult::from([

@@ -8,6 +8,7 @@
     "require": {
         "php": ">=8.1",
         "lucatume/di52": "^4.0",
+        "stellarwp/models": "^2.0",
         "woocommerce/action-scheduler": "^3.8"
     },
     "require-dev": {
@@ -77,7 +78,7 @@
             "delete_vendor_packages": false,
             "packages": [
                 "lucatume/di52",
-                "woocommerce/action-scheduler"
+                "stellarwp/models"
             ]
         }
     }

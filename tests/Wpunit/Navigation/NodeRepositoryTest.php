@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Wpunit\Navigation;
 
-use Helm\Database\Schema;
 use Helm\Navigation\Node;
 use Helm\Navigation\NodeRepository;
 use lucatume\WPBrowser\TestCase\WPTestCase;
@@ -22,11 +21,6 @@ class NodeRepositoryTest extends WPTestCase
         parent::_before();
 
         $this->repository = helm(NodeRepository::class);
-
-        // Ensure tables exist
-        if (! Schema::tablesExist()) {
-            Schema::createTables();
-        }
     }
 
     public function test_can_create_star_node(): void

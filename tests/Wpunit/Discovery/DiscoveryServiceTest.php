@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Wpunit\Discovery;
 
-use Helm\Database\Schema;
 use Helm\Discovery\Discovery;
 use Helm\Discovery\DiscoveryRepository;
 use Helm\Discovery\DiscoveryService;
@@ -33,11 +32,6 @@ class DiscoveryServiceTest extends WPTestCase
         $this->repository = helm(DiscoveryRepository::class);
         $this->service = helm(DiscoveryService::class);
         $this->origin = helm(Origin::class);
-
-        // Ensure tables exist (normally handled by plugin activation)
-        if (! Schema::tablesExist()) {
-            Schema::createTables();
-        }
 
         // Initialize origin for tests
         $this->tester->haveOrigin('test-origin', 'test-seed');

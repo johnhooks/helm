@@ -4,14 +4,17 @@ declare(strict_types=1);
 
 namespace Helm\ShipLink\System;
 
-use Helm\ShipLink\Contracts\PowerMetrics;
+use Helm\ShipLink\Contracts\PowerSystem;
 use Helm\ShipLink\Contracts\Sensors as SensorsContract;
-use Helm\ShipLink\ShipModel;
+use Helm\ShipLink\Models\ShipSystems;
 
 /**
  * Sensor system implementation.
  *
  * Calculates scan range based on sensor specs and power output.
+ *
+ * This system is read-only - it reports state and calculates values.
+ * Ship is responsible for all mutations to ShipSystems.
  */
 final class Sensors implements SensorsContract
 {
@@ -31,20 +34,20 @@ final class Sensors implements SensorsContract
     private const BASE_SCAN_SECONDS_PER_LY = 30;
 
     public function __construct(
-        private ShipModel $model,
-        private PowerMetrics $powerMetrics,
+        private ShipSystems $systems,
+        private PowerSystem $power,
     ) {
     }
 
     public function getRange(): float
     {
         // effectiveRange = baseRange × outputMultiplier
-        return $this->getBaseRange() * $this->getOutputMultiplier();
+        return $this->getBaseRange() * $this->power->getOutputMultiplier();
     }
 
     public function getBaseRange(): float
     {
-        return $this->model->sensorType->range();
+        return $this->systems->sensor_type->range();
     }
 
     public function canScan(float $distanceLy): bool
@@ -70,19 +73,11 @@ final class Sensors implements SensorsContract
 
     public function getSurveyDurationMultiplier(): float
     {
-        return $this->model->sensorType->surveyDurationMultiplier();
+        return $this->systems->sensor_type->surveyDurationMultiplier();
     }
 
     public function getScanSuccessChance(): float
     {
-        return $this->model->sensorType->scanSuccessChance();
-    }
-
-    /**
-     * Get current power output multiplier.
-     */
-    private function getOutputMultiplier(): float
-    {
-        return $this->powerMetrics->getOutputMultiplier();
+        return $this->systems->sensor_type->scanSuccessChance();
     }
 }

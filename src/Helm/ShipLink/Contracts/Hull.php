@@ -9,6 +9,8 @@ namespace Helm\ShipLink\Contracts;
  *
  * Hull integrity represents structural damage. Unlike shields and power,
  * hull does not regenerate - it must be repaired.
+ *
+ * This is a read-only interface - Ship is responsible for all mutations.
  */
 interface Hull
 {
@@ -28,16 +30,6 @@ interface Hull
     public function getIntegrityPercent(): float;
 
     /**
-     * Apply damage to hull.
-     */
-    public function damage(float $amount): void;
-
-    /**
-     * Repair hull (at station/with resources).
-     */
-    public function repair(float $amount): void;
-
-    /**
      * Check if hull is destroyed (integrity <= 0).
      */
     public function isDestroyed(): bool;
@@ -46,4 +38,20 @@ interface Hull
      * Check if hull is critical (below threshold).
      */
     public function isCritical(float $threshold = 0.25): bool;
+
+    /**
+     * Calculate new integrity after taking damage.
+     *
+     * @param float $amount Damage amount
+     * @return float New integrity value (clamped to 0)
+     */
+    public function calculateIntegrityAfterDamage(float $amount): float;
+
+    /**
+     * Calculate new integrity after repair.
+     *
+     * @param float $amount Repair amount
+     * @return float New integrity value (clamped to max)
+     */
+    public function calculateIntegrityAfterRepair(float $amount): float;
 }

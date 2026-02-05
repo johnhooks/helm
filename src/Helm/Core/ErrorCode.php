@@ -14,17 +14,34 @@ namespace Helm\Core;
  */
 enum ErrorCode: string
 {
+    // Action errors
+    case ActionNotFound = 'action.not_found';
+    case ActionNotReady = 'action.not_ready';
+    case ActionClaimFailed = 'action.claim_failed';
+    case ActionInProgress = 'action.in_progress';
+    case ActionNoCreator = 'action.no_creator';
+    case ActionNoResolver = 'action.no_resolver';
+    case ActionInsertFailed = 'action.insert_failed';
+    case ActionFailed = 'action.failed';
+    case ActionCancelled = 'action.cancelled';
+
     // Navigation errors
     case NavigationInvalidNode = 'navigation.invalid_node';
     case NavigationInvalidTarget = 'navigation.invalid_target';
+    case NavigationMissingTarget = 'navigation.missing_target';
     case NavigationNoRoute = 'navigation.no_route';
+    case NavigationRouteLost = 'navigation.route_lost';
+    case NavigationAlreadyAtTarget = 'navigation.already_at_target';
     case NavigationBeyondRange = 'navigation.beyond_range';
     case NavigationInsufficientFuel = 'navigation.insufficient_fuel';
     case NavigationScanFailed = 'navigation.scan_failed';
 
     // Ship errors
     case ShipNotFound = 'ship.not_found';
+    case ShipNoPosition = 'ship.no_position';
     case ShipInvalidState = 'ship.invalid_state';
+    case ShipInsufficientCore = 'ship.insufficient_core';
+    case ShipSystemsNotFound = 'ship.systems_not_found';
 
     // Star errors
     case StarNotFound = 'star.not_found';
