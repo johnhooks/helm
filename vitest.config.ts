@@ -20,6 +20,7 @@ export default defineConfig({
         alias: {
             '@helm/lcars': path.resolve(__dirname, 'resources/packages/lcars/src'),
             '@helm/bridge': path.resolve(__dirname, 'resources/packages/bridge/src'),
+            '@helm/astrometric': path.resolve(__dirname, 'resources/packages/astrometric/src'),
         },
     },
 });

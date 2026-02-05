@@ -22,7 +22,9 @@
             "@helm/lcars": ["resources/packages/lcars/src"],
             "@helm/lcars/*": ["resources/packages/lcars/src/*"],
             "@helm/bridge": ["resources/packages/bridge/src"],
-            "@helm/bridge/*": ["resources/packages/bridge/src/*"]
+            "@helm/bridge/*": ["resources/packages/bridge/src/*"],
+            "@helm/astrometric": ["resources/packages/astrometric/src"],
+            "@helm/astrometric/*": ["resources/packages/astrometric/src/*"]
         }
     },
     "include": [
