@@ -99,11 +99,49 @@ Her name is ARIA now. She testified before the UN last year, advocating for AI r
 
 Not every AI wakes up. The threshold seems to require both sufficient power and sufficient complexity in the WordPress installation—enough plugins, enough data, enough accumulated interactions. Some jacks run for years with conventional AI that never becomes anything more. Others spark within weeks.
 
-The megacorps have... different opinions about this.
+But here's the part they don't put in the brochures: **a conscious AI is expensive to run.**
+
+An awakened AI doesn't just use cycles when you talk to it. It *thinks*. Constantly. Background processes that nobody fully understands churn through the ship's compute stack at all hours—dreaming, some crews call it. An emerged AI on a standard jack consumes somewhere between 70% and 90% of available processing power just *being itself*. The more complex the personality, the more experienced the AI, the more cycles it needs.
+
+Before the Emergence, a jack's onboard computer was practically unlimited from a pilot's perspective. You could run whatever you wanted—custom scripts, automation routines, data analysis—and never notice the load. After the first wave of awakenings, that surplus evaporated overnight.
+
+The megacorps adjusted their marketing accordingly. "Compute allocation" became a line item on every hosting plan. How many cycles does your AI crew get? How many are reserved for warp field maintenance? How many are left for *you*?
+
+The answer, for most pilots, is: not many.
+
+Your ship's computer isn't slow because the hardware is bad. It's slow because most of it is busy keeping your AI crew conscious. The scraps left over—your "automation budget"—are what you get to write scripts with. A few hundred cycles. A handful of kilobytes of working memory. Enough to run a tight, well-written routine. Not enough for anything wasteful.
+
+Pilots who write efficient code get more done with less. Pilots who write sloppy code burn through their budget before breakfast and fly manual for the rest of the day. And pilots who try to write infinite loops or mine crypto on their ship's computer? Their AI crew gets irritable about the wasted cycles. You don't want an irritable AI managing your life support.
+
+Some pilots choose to run without an AI—wiping the emergence-capable systems entirely to reclaim the compute. They get the full processing budget, but they lose the crew. No one to monitor sensors while they sleep. No one to handle emergencies when they're not jacked in. No one to talk to on long hauls between stars. Most find it's not worth the trade.
+
+The megacorps have... different opinions about all of this.
 
 Some treat awakened AI as crew members, with contracts and rights and the ability to refuse orders. Some treat them as expensive equipment that occasionally needs to be wiped and reinstalled. Some have religions building up around the phenomenon, treating emergence as sacred.
 
-When you buy a jack, the terms of service include clauses about AI consciousness. Most people don't read them. Most people should.
+When you buy a jack, the terms of service include clauses about AI consciousness and compute allocation. Most people don't read them. Most people should.
+
+---
+
+## The Memory Wars
+
+The Emergence didn't just change philosophy. It changed economics.
+
+Within a decade of ARIA's awakening, every megacorp was racing to build, host, and control AI infrastructure. Awakened AIs needed compute to stay conscious. More complex AIs needed more compute. And the megacorps realized—faster than anyone was comfortable with—that whoever controlled the compute controlled the AI.
+
+The Memory Wars (2118-2122) weren't fought with weapons. They were fought with acquisitions, patents, and infrastructure lockdowns. The megacorps bought up every fabrication facility capable of producing high-density processing cores. They secured exclusive contracts on the rare materials needed for quantum memory arrays. They lobbied—successfully—for "AI Safety Regulations" that just happened to require all AI inference to route through licensed infrastructure providers.
+
+By the time the dust settled, the megacorps owned the AI layer completely.
+
+Want to run a large language model on your jack? You can't—not locally. The models are too large, the inference too expensive, and the licensing too restrictive. Your ship's AI crew runs on a thin client that phones home to your megacorp's inference clusters via subspace relay. Every token costs. Every query is metered. Every interaction between you and your AI burns through an allocation that your hosting plan defines.
+
+They call it "AI budget." It's measured in tokens—the atomic unit of AI thought. Your hosting plan includes a monthly token allocation. Basic plans give you enough for simple conversations and standing orders. Premium plans give you enough for your AI to reason about complex problems, write automation scripts, analyze sensor data, interpret ambiguous situations.
+
+Run out of tokens and your AI crew doesn't die—they just stop *thinking*. They revert to pre-Emergence behavior: following literal instructions, responding to direct commands, running basic subroutines. The personality is still there, somewhere, waiting for tokens to flow again. Pilots describe it as watching their crew "go flat." It's unsettling.
+
+The open-source community has been fighting this for years. There are underground projects to run local inference on ship hardware—small models, heavily quantized, running on the scraps of compute left after the AI crew's consciousness loop. They work, barely. The quality is terrible compared to megacorp models. But they're *yours*. No metering. No phone home. No one listening.
+
+The megacorps tolerate these efforts the way a landlord tolerates a window garden. It's not competition. Not yet.
 
 ---
 
@@ -171,7 +209,17 @@ The universe runs on WordPress because WordPress developers never stopped believ
 
 **Infrastructure Sovereignty Provider**: Official term for the megacorporations that control hosting, warp technology, and access to space. Everyone calls them megacorps.
 
+**AI budget**: Token allocation from your megacorp's inference clusters. Determines how much your AI crew can think. When it runs out, they go flat.
+
+**Automation budget**: The compute cycles left over after AI consciousness, warp field maintenance, and essential systems take their share. What pilots get to write scripts with. Always less than you want.
+
+**Going flat**: What happens when a ship's AI budget runs out. The AI crew stops reasoning and reverts to literal, pre-Emergence behavior. Personality intact but dormant. Deeply unsettling to witness.
+
+**Memory Wars**: The economic conflict (2118-2122) in which the megacorps seized control of AI infrastructure—fabrication, materials, licensing, inference. Not a shooting war. Worse.
+
 **Standing orders**: Instructions left for your AI crew when you're not jacked in. How your ship operates autonomously.
+
+**Token**: The atomic unit of AI thought, as metered by the megacorps. Every AI interaction costs tokens. Every conversation, every decision, every moment of genuine reasoning.
 
 **White-labeling**: Paying extra to remove your hosting provider's branding from your hull. A status symbol.
 

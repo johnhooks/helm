@@ -144,11 +144,104 @@ Star System Contents (generated):
 └── Comet: [water_ice, ammonia_ice, nitrogen_ice]
 ```
 
-Resources are infinite at location. Scarcity is:
-- **Location** - Rare resources in few places
-- **Time** - Mining takes hours
-- **Distance** - Good resources far from stations
+### Asteroid Belt Types & Resources
+
+Belts are classified by composition, which determines available resources:
+
+```
+Rocky Belts:    iron, nickel, copper
+Metallic Belts: iron, nickel, titanium, platinum, rare_earth
+Icy Belts:      water, ice, hydrogen
+Mixed Belts:    iron, nickel, water, ice
+```
+
+Metallic belts are the most valuable (platinum, rare earths). Icy belts provide fuel and life support materials. Mixed belts offer variety but nothing rare.
+
+### Belt Depletion
+
+Asteroid belts are finite. Each belt has a **resource count** that decrements as anyone mines it. The count is shared — all players mining the same belt drain the same pool.
+
+Belts never fully deplete. Instead, extraction follows a **diminishing returns curve**:
+
+```
+extraction_time = base_time * (initial_count / current_count)
+```
+
+A belt at half capacity takes twice as long per haul. At 10%, ten times as long. The math makes depleted belts increasingly not worth the time, but a desperate ship can always squeeze something out.
+
+```
+FRESH BELT (count: 10000)
+├── Extraction time: 4 hours per load
+├── Worth it: absolutely
+└── Competition: probably
+
+HALF-DEPLETED (count: 5000)
+├── Extraction time: 8 hours per load
+├── Worth it: still decent
+└── Competition: thinning out
+
+DEPLETED (count: 1000)
+├── Extraction time: 40 hours per load
+├── Worth it: only if you're stuck
+└── Competition: none — everyone moved on
+```
+
+This creates natural exploration pressure. Core system belts near Sol are mined out over months and years. Fresh belts are always further out. Discovery has permanent economic value.
+
+### Mining Modes
+
+Two ways to extract resources, with different risk/reward profiles:
+
+**Ship Mining (solo, mobile)**
+- Ship pulls up to a belt, mines directly
+- Limited to one cargo hold per run
+- Can cloak — low risk, low yield
+- Good for: solo players, quick runs, maintaining your ship
+
+**Platform Mining (infrastructure, persistent)**
+- Deploy a mining platform at a belt
+- Platform mines continuously while you're away
+- Visible to anyone scanning the system — must be defended
+- Requires logistics: collect resources, transport them
+- Much higher total yield over time
+- Good for: groups, long-term investment, supply chains
+
+```
+SHIP MINING
+├── Risk: low (cloak and run)
+├── Yield: one cargo load
+├── Setup: none
+└── Best for: maintenance resources, quick grabs
+
+PLATFORM MINING
+├── Risk: high (visible, stealable)
+├── Yield: continuous accumulation
+├── Setup: deploy platform, return to collect
+└── Best for: serious resource operations, groups
+```
+
+### Planet Mining
+
+Planets require bootstrapping — a ship can't just land there. Mining a planet requires building infrastructure first:
+
+1. Mine asteroid belts for raw materials
+2. Build orbital platform components
+3. Deploy orbital platform at planet
+4. Build surface extraction equipment
+5. Deploy to planet surface
+
+Each step takes time and resources from the previous step. Planet mining is the long game — belts are where everyone starts.
+
+### Scarcity Model
+
+Resources are finite and unevenly distributed:
+
+- **Depletion** - Belts run down over time as players mine them
+- **Location** - Rare resources appear in few systems
+- **Distance** - Rich belts are far from stations and safety
+- **Time** - Mining takes hours, transport takes more
 - **Cargo** - Can't carry infinite amounts
+- **Geography** - Random distribution creates natural clusters and dead zones
 
 ## Cargo System
 
@@ -742,16 +835,19 @@ The Helm economy:
 6. **Blueprints** - Gate advanced production
 
 Scarcity drivers:
+- **Depletion** - Belts run down, planets require bootstrapping
 - **Location** - Rare resources in few places
 - **Time** - Everything takes hours
 - **Distance** - Good stuff far from markets
 - **Knowledge** - Finding the good spots
+- **Geography** - Random distribution creates natural clusters
 
 Player roles emerge:
-- **Miners** - Extract and sell raw
-- **Industrialists** - Manufacture goods
-- **Traders** - Arbitrage between stations
-- **Explorers** - Find new resource locations
+- **Miners** - Extract and sell raw (ship or platform)
+- **Industrialists** - Manufacture goods, build infrastructure
+- **Traders** - Arbitrage between stations, haul platform output
+- **Explorers** - Find new belts before they're depleted
+- **Logistics** - Transport platform output to markets
 
 It's Eve, but:
 - On WordPress
