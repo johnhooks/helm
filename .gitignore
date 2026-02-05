@@ -1,16 +1,35 @@
+# Dependencies
 /vendor/
 /vendor/vendor-prefixed/
 node_modules/
+
+# Build artifacts
 /build/
 /tmp/
+artifacts
+bin/strauss.phar
+
+# Test output
 /tests/_output/
 /tests/Support/_generated/*
 !/tests/Support/_generated/.gitkeep
 /coverage/
-.idea
+
+# Cache
 *.cache
 .phpunit.cache
 .phpunit.result.cache
-artifacts
-bin/strauss.phar
+
+# IDEs and editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Working drafts
 docs/plans/.wip/
