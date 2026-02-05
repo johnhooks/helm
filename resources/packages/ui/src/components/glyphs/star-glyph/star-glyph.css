@@ -1,0 +1,120 @@
+@import "../../../styles/index.css";
+
+.helm-star-glyph {
+	display: inline-block;
+	border-radius: 50%;
+	flex-shrink: 0;
+}
+
+/* Sizes */
+.helm-star-glyph--xxs {
+	width: 5px;
+	height: 5px;
+}
+
+.helm-star-glyph--xs {
+	width: 8px;
+	height: 8px;
+}
+
+.helm-star-glyph--sm {
+	width: 12px;
+	height: 12px;
+}
+
+.helm-star-glyph--md {
+	width: 18px;
+	height: 18px;
+}
+
+.helm-star-glyph--lg {
+	width: 28px;
+	height: 28px;
+}
+
+.helm-star-glyph--xl {
+	width: 40px;
+	height: 40px;
+}
+
+.helm-star-glyph--xxl {
+	width: 56px;
+	height: 56px;
+}
+
+/* Spectral classes - main sequence colors */
+.helm-star-glyph--O {
+	background: #9bb0ff;
+}
+
+.helm-star-glyph--B {
+	background: #aabfff;
+}
+
+.helm-star-glyph--A {
+	background: #cad7ff;
+}
+
+.helm-star-glyph--F {
+	background: #f8f7ff;
+}
+
+.helm-star-glyph--G {
+	background: #fff4ea;
+}
+
+.helm-star-glyph--K {
+	background: #ffd2a1;
+}
+
+.helm-star-glyph--M {
+	background: #ffcc6f;
+}
+
+/* Stellar type modifiers */
+.helm-star-glyph--mainSequence {
+	/* Default, no modifier needed */
+}
+
+.helm-star-glyph--giant {
+	box-shadow: 0 0 8px 2px currentColor;
+}
+
+.helm-star-glyph--whiteDwarf {
+	background: #f0f0ff;
+	box-shadow: 0 0 4px 1px #f0f0ff;
+}
+
+.helm-star-glyph--neutron {
+	background: var(--helm-ui-color-ice);
+	box-shadow:
+		0 0 2px 1px var(--helm-ui-color-ice),
+		inset 0 0 2px 1px #fff;
+}
+
+.helm-star-glyph--pulsar {
+	background: var(--helm-ui-color-violet);
+	box-shadow: 0 0 6px 2px var(--helm-ui-color-violet);
+	animation: pulsar-glow 3s ease-in-out infinite;
+}
+
+.helm-star-glyph--brownDwarf {
+	background: #8b4513;
+	opacity: 0.8;
+}
+
+/* Slow, gentle glow rather than harsh blinking */
+@keyframes pulsar-glow {
+	0%, 100% {
+		box-shadow: 0 0 6px 2px var(--helm-ui-color-violet);
+	}
+	50% {
+		box-shadow: 0 0 12px 4px var(--helm-ui-color-violet);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.helm-star-glyph--pulsar {
+		animation: none;
+	}
+}

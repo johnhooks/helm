@@ -160,11 +160,19 @@ function rollResources(SeededRandom $rng, string $planetType): array
 Resource presence by planet type:
 
 | Planet Type | Common Resources | Uncommon | Rare |
-|------------|------------------|----------|------|
-| Rocky | iron, silicon, nickel | copper, aluminum | rare earths |
-| Ice | water, ammonia, methane | nitrogen | helium-3 |
-| Gas Giant | hydrogen, helium | deuterium | exotic gases |
-| Asteroid | iron, nickel, cobalt | platinum, gold | artifacts |
+|-------------|------------------|----------|------|
+| terrestrial | iron, silicon, nickel | copper, aluminum | rare earths |
+| superEarth | iron, silicon, titanium | rare earths, platinum | exotic metals |
+| desert | iron, silicon, copper | aluminum, lithium | rare earths |
+| ocean | water, salt, organics | deuterium, minerals | aquatic life |
+| toxic | sulfur, carbon, nitrogen | exotic gases, acids | strange matter |
+| molten | iron, nickel, magma metals | titanium, chromium | neutronium traces |
+| gasGiant | hydrogen, helium | deuterium, ammonia | exotic gases |
+| iceGiant | water, ammonia, methane | nitrogen, deuterium | helium-3 |
+| hotJupiter | hydrogen, exotic gases | plasma metals | strange matter |
+| frozen | water, ammonia, methane | nitrogen, CO2 | ancient organics |
+| dwarf | iron, nickel, ice | platinum, cobalt | artifacts |
+| asteroid | iron, nickel, cobalt | platinum, gold | artifacts |
 
 ### Layer 3: Stations and Settlements
 
@@ -224,73 +232,163 @@ function generateAnomalies(SeededRandom $rng, Star $star): array
 
 ## Star Type Influences
 
-The star's real properties shape what gets generated.
+The star's real properties shape what gets generated. See `astronomy.md` for detailed descriptions of each type.
 
-### Hot Stars (O, B, A classes)
+### Planet Count by Spectral Class
 
-```
-Characteristics:
-- Young, energetic
-- High radiation
-- Short-lived
-
-Generation influence:
-- Few planets (not enough time to form)
-- Rocky/molten worlds common
-- No stations (too hazardous)
-- Exotic materials more likely
-- High-risk exploration
+```php
+const PLANET_COUNT_RANGE = [
+    'O' => [0, 2],    // Very few, most destroyed
+    'B' => [0, 3],    // Few, young systems
+    'A' => [1, 5],    // Moderate
+    'F' => [2, 8],    // Good variety
+    'G' => [3, 10],   // Rich systems (Sol-like)
+    'K' => [2, 8],    // Common, stable
+    'M' => [1, 6],    // Close-in systems
+];
 ```
 
-### Sun-like Stars (F, G classes)
+### Planet Type Probability by Spectral Class
 
+Percentages indicate chance when rolling a planet at that orbital position.
+
+**Inner System (< frost line):**
+
+| Type | O | B | A | F | G | K | M |
+|------|---|---|---|---|---|---|---|
+| molten | 60 | 40 | 20 | 10 | 5 | 5 | 10 |
+| terrestrial | 10 | 20 | 30 | 35 | 40 | 35 | 30 |
+| desert | 15 | 20 | 25 | 25 | 20 | 25 | 25 |
+| toxic | 10 | 15 | 15 | 15 | 15 | 15 | 15 |
+| ocean | 0 | 0 | 5 | 10 | 15 | 15 | 10 |
+| superEarth | 5 | 5 | 5 | 5 | 5 | 5 | 10 |
+
+**Outer System (> frost line):**
+
+| Type | O | B | A | F | G | K | M |
+|------|---|---|---|---|---|---|---|
+| gasGiant | 20 | 25 | 30 | 35 | 35 | 30 | 25 |
+| iceGiant | 15 | 20 | 25 | 25 | 25 | 30 | 30 |
+| hotJupiter | 30 | 20 | 10 | 5 | 5 | 5 | 10 |
+| frozen | 20 | 25 | 25 | 25 | 25 | 25 | 25 |
+| dwarf | 15 | 10 | 10 | 10 | 10 | 10 | 10 |
+
+**Ringed modifier:** Any gas giant, ice giant, or frozen planet has 20% chance of rings.
+
+### Planet Type Definitions
+
+```php
+const PLANET_TYPES = [
+    // Rocky inner worlds
+    'terrestrial',  // Earth-like rocky, potential habitability
+    'superEarth',   // Large rocky, high gravity
+    'desert',       // Arid, mineral-rich
+    'ocean',        // Water-covered
+    'toxic',        // Venus-like, hostile atmosphere
+    'molten',       // Lava world, extreme heat
+
+    // Outer system
+    'gasGiant',     // Jupiter-like, hydrogen/helium
+    'iceGiant',     // Neptune-like, volatile ices
+    'hotJupiter',   // Gas giant in close orbit
+    'frozen',       // Ice world
+    'dwarf',        // Small body
+    'ringed',       // Modifier: has ring system
+];
 ```
-Characteristics:
-- Stable, moderate temperature
-- Long-lived
-- "Goldilocks" zone possible
 
-Generation influence:
-- More planets on average
-- Diverse planet types
-- Habitable worlds possible
-- Stations more common
-- Balanced resources
+### Stellar Type Generation
+
+Most stars from catalogs are main sequence. Exotic objects are determined by catalog data or generated for fictional systems.
+
+```php
+const STELLAR_TYPES = [
+    'mainSequence',  // Normal star (default)
+    'giant',         // Expanded, late-life
+    'whiteDwarf',    // Dead star remnant
+    'neutron',       // Collapsed massive star
+    'pulsar',        // Rotating neutron star
+    'brownDwarf',    // Failed star
+];
 ```
 
-### Cool Stars (K, M classes - red dwarfs)
+**Stellar type affects planet generation:**
 
+| Stellar Type | Planet Generation |
+|--------------|-------------------|
+| mainSequence | Normal rules |
+| giant | Fewer planets, expanded orbits, some destroyed |
+| whiteDwarf | Only distant remnant planets, ancient |
+| neutron | No planets, debris only |
+| pulsar | No planets, radiation hazard |
+| brownDwarf | Few small planets, very cold |
+
+### Binary System Generation
+
+Binary stars are flagged in catalog data or generated with probability based on spectral class.
+
+```php
+const BINARY_PROBABILITY = [
+    'O' => 0.70,  // Most O stars are binary
+    'B' => 0.60,
+    'A' => 0.50,
+    'F' => 0.45,
+    'G' => 0.45,
+    'K' => 0.35,
+    'M' => 0.25,
+];
 ```
-Characteristics:
-- Very long-lived
-- Low luminosity
-- Most common star type
 
-Generation influence:
-- Planets in close orbits
-- Tidally locked worlds
-- Ice planets common
-- Mining operations likely
-- Different resource profile
+**Binary system structure:**
+
+```php
+function generateBinarySystem(Star $primary, SeededRandom $rng): BinarySystem
+{
+    // Secondary star is usually cooler
+    $secondaryClass = $this->rollSecondaryClass($rng, $primary->spectralClass);
+
+    // Determine separation
+    $separation = $rng->pick(['close', 'medium', 'wide']);
+
+    return new BinarySystem(
+        primary: $primary,
+        secondary: new Star(spectralClass: $secondaryClass),
+        separation: $separation,
+        // Close binaries: only circumbinary (P-type) planets
+        // Wide binaries: each star can have S-type planets
+        planets: $this->generateBinaryPlanets($rng, $separation),
+    );
+}
 ```
 
-### Exotic Objects
+### Hazard Ratings
 
-```
-Neutron stars:
-- Extreme hazards
-- Exotic materials (neutronium?)
-- No planets, but unique rewards
+Systems have a hazard rating affecting ship damage and operation difficulty.
 
-White dwarfs:
-- Dead systems
-- Remnant planets
-- Ancient artifacts possible
+```php
+function calculateHazardRating(Star $star): int
+{
+    $base = match($star->spectralClass) {
+        'O' => 8,
+        'B' => 6,
+        'A' => 3,
+        'F' => 1,
+        'G' => 1,
+        'K' => 1,
+        'M' => 2,  // Flare stars
+    };
 
-Black holes:
-- Maximum danger
-- Maximum mystery
-- Rare, valuable discoveries
+    $modifier = match($star->stellarType) {
+        'mainSequence' => 0,
+        'giant' => +2,
+        'whiteDwarf' => +1,
+        'neutron' => +8,
+        'pulsar' => +10,
+        'brownDwarf' => -1,
+    };
+
+    return clamp($base + $modifier, 1, 10);
+}
 ```
 
 ## Interstellar Space
@@ -605,43 +703,73 @@ $contents = $generator->generate($star);
     "star": {
         "id": "HIP_8102",
         "name": "Tau Ceti",
-        "type": "G8V"
+        "spectralClass": "G",
+        "stellarType": "mainSequence",
+        "hazardRating": 1
     },
     "planets": [
         {
             "name": "Tau Ceti I",
-            "type": "rocky",
+            "type": "desert",
             "orbit_au": 0.4,
-            "resources": ["iron", "silicon"]
+            "resources": ["iron", "silicon", "copper"]
         },
         {
             "name": "Tau Ceti II",
-            "type": "super_earth",
-            "orbit_au": 0.85,
-            "resources": ["water", "carbon", "rare_earths"]
+            "type": "terrestrial",
+            "orbit_au": 0.7,
+            "habitable": true,
+            "resources": ["iron", "water", "organics"]
         },
         {
             "name": "Tau Ceti III",
-            "type": "ice_giant",
-            "orbit_au": 3.2,
-            "resources": ["hydrogen", "helium", "deuterium"]
+            "type": "ocean",
+            "orbit_au": 1.1,
+            "habitable": true,
+            "resources": ["water", "salt", "deuterium"]
+        },
+        {
+            "name": "Tau Ceti IV",
+            "type": "superEarth",
+            "orbit_au": 1.8,
+            "resources": ["iron", "titanium", "rare_earths"]
+        },
+        {
+            "name": "Tau Ceti V",
+            "type": "gasGiant",
+            "orbit_au": 5.2,
+            "ringed": true,
+            "resources": ["hydrogen", "helium", "deuterium"],
+            "moons": 4
+        },
+        {
+            "name": "Tau Ceti VI",
+            "type": "iceGiant",
+            "orbit_au": 12.0,
+            "resources": ["water", "ammonia", "methane"]
+        },
+        {
+            "name": "Tau Ceti VII",
+            "type": "frozen",
+            "orbit_au": 25.0,
+            "resources": ["water", "nitrogen"]
         }
     ],
-    "asteroid_belts": [
+    "asteroidBelts": [
         {
-            "orbit_au": 1.8,
-            "resources": ["nickel", "platinum"]
+            "orbit_au": 2.8,
+            "resources": ["nickel", "platinum", "cobalt"]
         }
     ],
     "stations": [
         {
             "name": "Tau Ceti Station",
             "type": "trading_post",
-            "services": ["trade", "refuel"]
+            "services": ["trade", "refuel", "repair"]
         }
     ],
     "anomalies": [],
-    "discovery_cache": {
+    "discoveryCache": {
         "credits": 5000,
         "items": ["navigation_data_epsilon_eridani"],
         "reputation": 25
@@ -650,6 +778,77 @@ $contents = $generator->generate($star);
 
 $hash = hash('sha256', json_encode($contents));
 // This hash is now canonical for Tau Ceti in this origin
+```
+
+## Example: Binary System (Alpha Centauri)
+
+```php
+{
+    "system": {
+        "id": "HIP_71683",
+        "name": "Alpha Centauri",
+        "type": "binary",
+        "separation": "wide"
+    },
+    "stars": [
+        {
+            "id": "HIP_71683_A",
+            "name": "Alpha Centauri A",
+            "spectralClass": "G",
+            "stellarType": "mainSequence"
+        },
+        {
+            "id": "HIP_71681_B",
+            "name": "Alpha Centauri B",
+            "spectralClass": "K",
+            "stellarType": "mainSequence"
+        }
+    ],
+    "planets": [
+        {
+            "name": "Alpha Centauri A I",
+            "orbits": "HIP_71683_A",
+            "orbitType": "S-type",
+            "type": "terrestrial",
+            "orbit_au": 0.9
+        },
+        {
+            "name": "Alpha Centauri B I",
+            "orbits": "HIP_71681_B",
+            "orbitType": "S-type",
+            "type": "desert",
+            "orbit_au": 0.5
+        }
+    ]
+}
+```
+
+## Example: Exotic System (Pulsar)
+
+```php
+{
+    "star": {
+        "id": "PSR_J0737",
+        "name": "PSR J0737-3039",
+        "spectralClass": null,
+        "stellarType": "pulsar",
+        "hazardRating": 10
+    },
+    "planets": [],
+    "debrisFields": [
+        {
+            "type": "supernova_remnant",
+            "resources": ["neutronium", "exotic_matter"]
+        }
+    ],
+    "anomalies": [
+        {
+            "type": "radiation_zone",
+            "danger": 10,
+            "scanReward": "pulsar_timing_data"
+        }
+    ]
+}
 ```
 
 ## Summary

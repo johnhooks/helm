@@ -69,3 +69,10 @@ export type { ProgressBarProps } from "./components/progress-bar";
 
 export { Countdown, formatTime } from "./components/countdown";
 export type { CountdownProps } from "./components/countdown";
+
+// Glyphs
+export { PlanetGlyph, PLANET_TYPES } from "./components/glyphs";
+export type { PlanetGlyphProps, PlanetType } from "./components/glyphs";
+
+export { StarGlyph, SPECTRAL_CLASSES, STELLAR_TYPES } from "./components/glyphs";
+export type { StarGlyphProps, SpectralClass, StellarType } from "./components/glyphs";

@@ -1,0 +1,95 @@
+@import "../../../styles/index.css";
+
+.helm-planet-glyph {
+	display: inline-block;
+	border-radius: 50%;
+	flex-shrink: 0;
+}
+
+/* Sizes */
+.helm-planet-glyph--xxs {
+	width: 5px;
+	height: 5px;
+}
+
+.helm-planet-glyph--xs {
+	width: 8px;
+	height: 8px;
+}
+
+.helm-planet-glyph--sm {
+	width: 12px;
+	height: 12px;
+}
+
+.helm-planet-glyph--md {
+	width: 18px;
+	height: 18px;
+}
+
+.helm-planet-glyph--lg {
+	width: 28px;
+	height: 28px;
+}
+
+.helm-planet-glyph--xl {
+	width: 40px;
+	height: 40px;
+}
+
+.helm-planet-glyph--xxl {
+	width: 56px;
+	height: 56px;
+}
+
+/* Planet types - solid colors from LCARS palette */
+.helm-planet-glyph--terrestrial {
+	background: var(--helm-ui-color-peach);
+}
+
+.helm-planet-glyph--superEarth {
+	background: var(--helm-ui-color-gold);
+}
+
+.helm-planet-glyph--gasGiant {
+	background: var(--helm-ui-color-sunset);
+}
+
+.helm-planet-glyph--iceGiant {
+	background: var(--helm-ui-color-ice);
+}
+
+.helm-planet-glyph--hotJupiter {
+	background: var(--helm-ui-color-orange);
+}
+
+.helm-planet-glyph--dwarf {
+	background: var(--helm-ui-color-muted);
+}
+
+.helm-planet-glyph--molten {
+	background: var(--helm-ui-color-danger);
+}
+
+.helm-planet-glyph--frozen {
+	background: var(--helm-ui-color-sky);
+}
+
+.helm-planet-glyph--ocean {
+	background: var(--helm-ui-color-blue);
+}
+
+.helm-planet-glyph--desert {
+	background: var(--helm-ui-color-gold);
+}
+
+.helm-planet-glyph--toxic {
+	background: var(--helm-ui-color-hopbush);
+}
+
+.helm-planet-glyph--ringed {
+	background: var(--helm-ui-color-peach);
+	box-shadow:
+		inset 0 0 0 1px var(--helm-ui-color-bg),
+		0 0 0 2px var(--helm-ui-color-peach);
+}
