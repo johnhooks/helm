@@ -19,6 +19,7 @@ use Helm\Navigation\Provider as NavigationProvider;
 use Helm\Origin\Provider as OriginProvider;
 use Helm\Planets\Provider as PlanetsProvider;
 use Helm\PostTypes\Provider as PostTypesProvider;
+use Helm\Rest\Provider as RestProvider;
 use Helm\ShipLink\Provider as ShipLinkProvider;
 use Helm\Stars\Provider as StarsProvider;
 use Helm\View\Provider as ViewProvider;
@@ -48,18 +49,19 @@ final class Helm
      * @var class-string[]
      */
     private array $serviceProviders = [
-        ConfigProvider::class,     // Load config early
-        DatabaseProvider::class,   // Database tables (must be before domains that use them)
-        ViewProvider::class,       // View rendering (before PostTypes which uses it)
-        PostTypesProvider::class,  // Must be early - registers CPTs
-        NavigationProvider::class, // Navigation graph (nodes, edges, routes)
-        OriginProvider::class,
-        StarsProvider::class,
-        PlanetsProvider::class,
-        GenerationProvider::class,
-        DiscoveryProvider::class,
-        ShipLinkProvider::class,  // After Navigation (depends on it)
         CLIProvider::class,
+        ConfigProvider::class,
+        DatabaseProvider::class,
+        DiscoveryProvider::class,
+        GenerationProvider::class,
+        NavigationProvider::class,
+        OriginProvider::class,
+        PlanetsProvider::class,
+        PostTypesProvider::class,
+        RestProvider::class,
+        ShipLinkProvider::class,
+        StarsProvider::class,
+        ViewProvider::class,
     ];
 
     /**

@@ -19,7 +19,7 @@ enum ErrorCode: string
     case ActionNotReady = 'action.not_ready';
     case ActionClaimFailed = 'action.claim_failed';
     case ActionInProgress = 'action.in_progress';
-    case ActionNoCreator = 'action.no_creator';
+    case ActionNoHandler = 'action.no_handler';
     case ActionNoResolver = 'action.no_resolver';
     case ActionInsertFailed = 'action.insert_failed';
     case ActionFailed = 'action.failed';
@@ -67,6 +67,43 @@ enum ErrorCode: string
     public function error(string $message, mixed $data = null): \WP_Error
     {
         return new \WP_Error($this->code(), $message, $data);
+    }
+
+    /**
+     * Get the HTTP status code for this error.
+     */
+    public function httpStatus(): int
+    {
+        return match ($this) {
+            // Not found
+            self::ShipNotFound,
+            self::ActionNotFound,
+            self::StarNotFound,
+            self::ShipSystemsNotFound => 404,
+
+            // Conflict
+            self::ActionInProgress => 409,
+
+            // Server error
+            self::ActionInsertFailed => 500,
+
+            // Unprocessable (validation)
+            self::NavigationInvalidNode,
+            self::NavigationInvalidTarget,
+            self::NavigationMissingTarget,
+            self::NavigationNoRoute,
+            self::NavigationAlreadyAtTarget,
+            self::NavigationBeyondRange,
+            self::NavigationInsufficientFuel,
+            self::NavigationScanFailed,
+            self::NavigationRouteLost,
+            self::ShipNoPosition,
+            self::ShipInvalidState,
+            self::ShipInsufficientCore => 422,
+
+            // Bad request (default)
+            default => 400,
+        };
     }
 
     /**

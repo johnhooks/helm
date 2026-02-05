@@ -41,7 +41,7 @@ final class ActionFactory
 
         if ($validatorClass === null || $handlerClass === null) {
             throw new ActionException(
-                ErrorCode::ActionNoCreator,
+                ErrorCode::ActionNoHandler,
                 __('This action type is not available', 'helm')
             );
         }

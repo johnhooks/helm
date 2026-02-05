@@ -52,7 +52,7 @@ class ActionFactoryTest extends WPTestCase
             $this->factory->create($ship->postId(), ActionType::Survey, []);
             $this->fail('Expected ActionException was not thrown');
         } catch (ActionException $e) {
-            $this->assertSame(ErrorCode::ActionNoCreator, $e->errorCode);
+            $this->assertSame(ErrorCode::ActionNoHandler, $e->errorCode);
         }
     }
 

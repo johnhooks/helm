@@ -219,6 +219,10 @@ final class ActionRepository
     {
         global $wpdb;
 
+        $now = Date::now();
+        $action->created_at = $now;
+        $action->updated_at = $now;
+
         $table = $wpdb->prefix . Schema::TABLE_SHIP_ACTIONS;
         $row = $this->serialize($action->toArray(), $action);
 
@@ -244,6 +248,9 @@ final class ActionRepository
         if ($dirty === []) {
             return true;
         }
+
+        $action->updated_at = Date::now();
+        $dirty = $action->getDirty();
 
         $row = $this->serialize($dirty, $action);
         $table = $wpdb->prefix . Schema::TABLE_SHIP_ACTIONS;

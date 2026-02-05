@@ -7,6 +7,7 @@ namespace Helm\ShipLink;
 use BackedEnum;
 use DateTimeImmutable;
 use Helm\Database\Schema;
+use Helm\Lib\Date;
 use Helm\ShipLink\Models\ShipSystems;
 use Helm\StellarWP\Models\Model;
 
@@ -86,6 +87,10 @@ final class ShipSystemsRepository
     {
         global $wpdb;
 
+        $now = Date::now();
+        $systems->created_at = $now;
+        $systems->updated_at = $now;
+
         $table = $wpdb->prefix . Schema::TABLE_SHIP_SYSTEMS;
         $row = $this->serialize($systems->toArray(), $systems);
 
@@ -112,6 +117,9 @@ final class ShipSystemsRepository
         if ($dirty === []) {
             return true; // Nothing to update
         }
+
+        $systems->updated_at = Date::now();
+        $dirty = $systems->getDirty();
 
         $row = $this->serialize($dirty, $systems);
         $table = $wpdb->prefix . Schema::TABLE_SHIP_SYSTEMS;

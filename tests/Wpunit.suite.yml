@@ -9,6 +9,7 @@ modules:
         - Asserts
         - WPLoader
         - \Tests\Support\Helper\Helm
+        - \Tests\Support\Helper\Rest
     config:
         WPLoader:
             wpRootFolder: "%WP_ROOT_FOLDER%"

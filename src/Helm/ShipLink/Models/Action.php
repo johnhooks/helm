@@ -81,7 +81,6 @@ final class Action extends Model
 
             'created_at' => (new ModelPropertyDefinition())
                 ->type(DateTimeImmutable::class)
-                ->readonly()
                 ->castWith(static fn ($v) => self::castDateTime($v)),
 
             'updated_at' => (new ModelPropertyDefinition())

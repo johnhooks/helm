@@ -4,6 +4,8 @@ node_modules/
 /build/
 /tmp/
 /tests/_output/
+/tests/Support/_generated/*
+!/tests/Support/_generated/.gitkeep
 /coverage/
 .idea
 *.cache

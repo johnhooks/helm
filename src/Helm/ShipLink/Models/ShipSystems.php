@@ -127,10 +127,8 @@ final class ShipSystems extends Model
                 ->nullable()
                 ->default(null),
 
-            // Timestamps (managed by database - DEFAULT CURRENT_TIMESTAMP)
             'created_at' => (new ModelPropertyDefinition())
                 ->type(DateTimeImmutable::class)
-                ->readonly()
                 ->castWith(static fn ($v) => self::castDateTime($v)),
             'updated_at' => (new ModelPropertyDefinition())
                 ->type(DateTimeImmutable::class)

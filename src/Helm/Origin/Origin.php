@@ -86,6 +86,12 @@ final class Origin
     public function reset(): void
     {
         delete_option(self::OPTION_NAME);
+
+        // Force-clear WP object cache. After a test transaction rollback
+        // the DB row may be gone but delete_option() only clears cache
+        // when the DB delete succeeds. This ensures a clean state.
+        wp_cache_delete(self::OPTION_NAME, 'options');
+
         $this->config = null;
     }
 
