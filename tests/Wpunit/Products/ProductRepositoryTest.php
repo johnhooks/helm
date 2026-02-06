@@ -238,4 +238,68 @@ class ProductRepositoryTest extends WPTestCase
         $this->assertSame(1.0, $found->mult_a);
         $this->assertSame(1.0, $found->mult_b);
     }
+
+    public function test_findByIds_returns_multiple_products(): void
+    {
+        $product1 = $this->tester->haveProduct([
+            'slug' => 'batch_1',
+            'type' => 'resource',
+            'label' => 'Batch One',
+        ]);
+
+        $product2 = $this->tester->haveProduct([
+            'slug' => 'batch_2',
+            'type' => 'resource',
+            'label' => 'Batch Two',
+        ]);
+
+        $product3 = $this->tester->haveProduct([
+            'slug' => 'batch_3',
+            'type' => 'resource',
+            'label' => 'Batch Three',
+        ]);
+
+        $products = $this->repository->findByIds([$product1->id, $product2->id, $product3->id]);
+
+        $this->assertCount(3, $products);
+        $this->assertSame('Batch One', $products[$product1->id]->label);
+        $this->assertSame('Batch Two', $products[$product2->id]->label);
+        $this->assertSame('Batch Three', $products[$product3->id]->label);
+    }
+
+    public function test_findByIds_returns_empty_for_empty_array(): void
+    {
+        $products = $this->repository->findByIds([]);
+
+        $this->assertSame([], $products);
+    }
+
+    public function test_findByIds_ignores_missing_ids(): void
+    {
+        $product = $this->tester->haveProduct([
+            'slug' => 'exists',
+            'type' => 'resource',
+            'label' => 'Exists',
+        ]);
+
+        $products = $this->repository->findByIds([$product->id, 999999, 888888]);
+
+        $this->assertCount(1, $products);
+        $this->assertArrayHasKey($product->id, $products);
+        $this->assertArrayNotHasKey(999999, $products);
+    }
+
+    public function test_findByIds_indexed_by_product_id(): void
+    {
+        $product = $this->tester->haveProduct([
+            'slug' => 'indexed_test',
+            'type' => 'resource',
+            'label' => 'Indexed',
+        ]);
+
+        $products = $this->repository->findByIds([$product->id]);
+
+        $this->assertArrayHasKey($product->id, $products);
+        $this->assertSame($product->id, $products[$product->id]->id);
+    }
 }

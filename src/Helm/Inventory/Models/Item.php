@@ -2,31 +2,37 @@
 
 declare(strict_types=1);
 
-namespace Helm\ShipLink\Models;
+namespace Helm\Inventory\Models;
 
 use DateTimeImmutable;
+use Helm\Inventory\LocationType;
 use Helm\StellarWP\Models\Model;
 use Helm\StellarWP\Models\ModelPropertyDefinition;
 
 /**
- * Ship component instance from the helm_ship_components table.
+ * Inventory item from the helm_inventory table.
  *
- * Represents a specific physical component that exists in the game world.
- * References a Product for its blueprint stats.
+ * Tracks all items owned by users - both fitted and stored.
+ * - slot IS NULL = loose item (cargo/storage)
+ * - slot = 'core' etc = fitted in that slot
+ *
+ * Lifecycle data (life, usage_count) is stored inline for components.
+ * Meta stores provenance (created_by, origin, origin_ref, owner_history).
  *
  * @property int $id
+ * @property int $user_id
  * @property int $product_id
- * @property ?int $life
+ * @property LocationType $location_type
+ * @property int|null $location_id
+ * @property string|null $slot
+ * @property int $quantity
+ * @property int|null $life
  * @property int $usage_count
- * @property float $condition
- * @property ?int $created_by
- * @property ?array $owner_history
- * @property ?string $origin
- * @property ?int $origin_ref
+ * @property array|null $meta
  * @property DateTimeImmutable $created_at
  * @property DateTimeImmutable $updated_at
  */
-final class ShipComponent extends Model
+final class Item extends Model
 {
     /**
      * @inheritDoc
@@ -38,28 +44,45 @@ final class ShipComponent extends Model
                 ->type('int')
                 ->readonly(),
 
+            'user_id' => (new ModelPropertyDefinition())
+                ->type('int')
+                ->required()
+                ->readonly(),
+
             'product_id' => (new ModelPropertyDefinition())
                 ->type('int')
-                ->required(),
+                ->required()
+                ->readonly(),
+
+            'location_type' => (new ModelPropertyDefinition())
+                ->type(LocationType::class)
+                ->required()
+                ->castWith(static fn ($v) => $v instanceof LocationType ? $v : LocationType::from((int) $v)),
+
+            'location_id' => (new ModelPropertyDefinition())
+                ->type('int')
+                ->nullable(),
+
+            'slot' => (new ModelPropertyDefinition())
+                ->type('string')
+                ->nullable(),
+
+            'quantity' => (new ModelPropertyDefinition())
+                ->type('int')
+                ->default(1),
 
             'life' => (new ModelPropertyDefinition())
                 ->type('int')
+                ->nullable()
                 ->castWith(static fn ($v) => $v === null || $v === '' ? null : (int) $v),
 
             'usage_count' => (new ModelPropertyDefinition())
                 ->type('int')
                 ->default(0),
 
-            'condition' => (new ModelPropertyDefinition())
-                ->type('float')
-                ->default(1.0),
-
-            'created_by' => (new ModelPropertyDefinition())
-                ->type('int')
-                ->castWith(static fn ($v) => $v === null || $v === '' ? null : (int) $v),
-
-            'owner_history' => (new ModelPropertyDefinition())
+            'meta' => (new ModelPropertyDefinition())
                 ->type('array')
+                ->nullable()
                 ->castWith(static function ($v) {
                     if (is_array($v)) {
                         return $v;
@@ -70,14 +93,6 @@ final class ShipComponent extends Model
                     }
                     return null;
                 }),
-
-            'origin' => (new ModelPropertyDefinition())
-                ->type('string')
-                ->castWith(static fn ($v) => $v === null || $v === '' ? null : (string) $v),
-
-            'origin_ref' => (new ModelPropertyDefinition())
-                ->type('int')
-                ->castWith(static fn ($v) => $v === null || $v === '' ? null : (int) $v),
 
             'created_at' => (new ModelPropertyDefinition())
                 ->type(DateTimeImmutable::class)

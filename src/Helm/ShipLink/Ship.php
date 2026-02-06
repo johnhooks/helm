@@ -363,19 +363,17 @@ final class Ship implements ShipLink
         $direction = $action->params['direction'] ?? 'load'; // load or unload
 
         if ($direction === 'load') {
-            // Ship mutates state directly using cargo's calculation
-            $this->state->cargo = $this->cargoSystem->calculateCargoAfterAdd($resource, $quantity);
+            $newQuantity = $this->cargoSystem->add($resource, $quantity);
         } else {
-            // Ship mutates state directly using cargo's calculation
-            $cargoResult = $this->cargoSystem->calculateCargoAfterRemove($resource, $quantity);
-            $this->state->cargo = $cargoResult['cargo'];
-            $quantity = $cargoResult['removed'];
+            $quantity = $this->cargoSystem->remove($resource, $quantity);
+            $newQuantity = $this->cargoSystem->quantity($resource);
         }
 
         $actionResult = new ActionResult();
         return $actionResult->add('transfer', SystemResult::from([
             'resource' => $resource,
             'quantity' => $quantity,
+            'new_quantity' => $newQuantity,
             'direction' => $direction,
         ]));
     }

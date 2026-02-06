@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Helm\ShipLink;
 
-use Helm\ShipLink\Models\ShipComponent;
+use Helm\Inventory\Models\Item;
 
 /**
  * Aggregates all fitted components for a ship, keyed by slot.
@@ -121,7 +121,7 @@ final class Loadout
      *
      * Used by the save path in ActionFactory/Resolver to persist changes.
      *
-     * @return array<ShipComponent>
+     * @return array<Item>
      */
     public function dirtyComponents(): array
     {

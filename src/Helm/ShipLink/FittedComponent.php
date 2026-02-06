@@ -4,33 +4,31 @@ declare(strict_types=1);
 
 namespace Helm\ShipLink;
 
+use Helm\Inventory\Models\Item;
 use Helm\Products\Models\Product;
-use Helm\ShipLink\Models\ShipFitting;
-use Helm\ShipLink\Models\ShipComponent;
 
 /**
- * A component fully composed from its three table rows.
+ * A component fully composed from its two table rows.
  *
- * Combines ShipComponent (instance), Product (catalog), and ShipFitting (slot)
+ * Combines Item (inventory instance with lifecycle) and Product (catalog)
  * into a single read-friendly object.
  */
 final class FittedComponent
 {
     public function __construct(
-        private readonly ShipComponent $component,
+        private readonly Item $item,
         private readonly Product $product,
-        private readonly ShipFitting $fitting,
     ) {
     }
 
     public function id(): int
     {
-        return $this->component->id;
+        return $this->item->id;
     }
 
     public function slot(): ShipFittingSlot
     {
-        return $this->fitting->slot;
+        return ShipFittingSlot::from($this->item->slot);
     }
 
     public function slug(): string
@@ -45,7 +43,7 @@ final class FittedComponent
 
     public function life(): ?int
     {
-        return $this->component->life;
+        return $this->item->life;
     }
 
     public function hp(): ?int
@@ -55,12 +53,25 @@ final class FittedComponent
 
     public function usageCount(): int
     {
-        return $this->component->usage_count;
+        return $this->item->usage_count;
     }
 
+    /**
+     * Compute condition as life/hp.
+     *
+     * Returns 1.0 if hp is null (component doesn't track health).
+     */
     public function condition(): float
     {
-        return $this->component->condition;
+        if ($this->product->hp === null || $this->product->hp === 0) {
+            return 1.0;
+        }
+
+        if ($this->item->life === null) {
+            return 1.0;
+        }
+
+        return $this->item->life / $this->product->hp;
     }
 
     /**
@@ -68,9 +79,9 @@ final class FittedComponent
      *
      * Ship uses this to apply mutations (e.g. decrement core life).
      */
-    public function component(): ShipComponent
+    public function component(): Item
     {
-        return $this->component;
+        return $this->item;
     }
 
     /**
@@ -79,13 +90,5 @@ final class FittedComponent
     public function product(): Product
     {
         return $this->product;
-    }
-
-    /**
-     * Get the fitting (pivot row).
-     */
-    public function fitting(): ShipFitting
-    {
-        return $this->fitting;
     }
 }

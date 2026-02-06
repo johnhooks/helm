@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Helm\Rest;
 
 use Helm\Core\ErrorCode;
-use Helm\ShipLink\Models\ShipState;
-use Helm\ShipLink\ShipStateRepository;
+use Helm\ShipLink\Ship;
+use Helm\ShipLink\ShipFactory;
 use Helm\Ships\ShipPost;
 use WP_Error;
 use WP_REST_Request;
@@ -16,6 +16,7 @@ use WP_REST_Response;
  * REST controller for ship state.
  *
  * GET /helm/v1/ships/{id} - Ship operational state
+ * GET /helm/v1/ships/{id}/cargo - Ship cargo hold
  *
  * For ship metadata (name, owner, etc.), use /wp/v2/ships/{id}.
  */
@@ -24,7 +25,7 @@ final class ShipController
     private const NAMESPACE = 'helm/v1';
 
     public function __construct(
-        private readonly ShipStateRepository $stateRepository,
+        private readonly ShipFactory $shipFactory,
     ) {
     }
 
@@ -39,6 +40,16 @@ final class ShipController
             [
                 'methods'             => 'GET',
                 'callback'            => [$this, 'show'],
+                'permission_callback' => [$this, 'permissions'],
+            ]
+        );
+
+        register_rest_route(
+            self::NAMESPACE,
+            '/ships/(?P<id>\d+)/cargo',
+            [
+                'methods'             => 'GET',
+                'callback'            => [$this, 'cargo'],
                 'permission_callback' => [$this, 'permissions'],
             ]
         );
@@ -89,9 +100,22 @@ final class ShipController
     public function show(WP_REST_Request $request)
     {
         $shipPostId = (int) $request->get_param('id');
-        $state = $this->stateRepository->findOrCreate($shipPostId);
+        $ship = $this->shipFactory->build($shipPostId);
 
-        return new WP_REST_Response($this->serializeState($state));
+        return new WP_REST_Response($this->serializeShip($ship));
+    }
+
+    /**
+     * Get ship cargo.
+     *
+     * @param WP_REST_Request<array<string, mixed>> $request
+     */
+    public function cargo(WP_REST_Request $request): WP_REST_Response
+    {
+        $shipPostId = (int) $request->get_param('id');
+        $ship = $this->shipFactory->build($shipPostId);
+
+        return new WP_REST_Response($ship->cargo()->all());
     }
 
     /**
@@ -99,14 +123,16 @@ final class ShipController
      *
      * @return array<string, mixed>
      */
-    private function serializeState(ShipState $state): array
+    private function serializeShip(Ship $ship): array
     {
+        $state = $ship->getState();
+
         return [
             'node_id'           => $state->node_id,
             'power_full_at'     => $state->power_full_at?->format('c'),
             'shields_full_at'   => $state->shields_full_at?->format('c'),
             'hull_integrity'    => $state->hull_integrity,
-            'cargo'             => $state->cargo,
+            'cargo'             => $ship->cargo()->all(),
             'current_action_id' => $state->current_action_id,
         ];
     }

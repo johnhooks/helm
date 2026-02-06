@@ -13,7 +13,9 @@ use Helm\StellarWP\Models\ModelPropertyDefinition;
  * Ship operational state from the helm_ship_state table.
  *
  * This is a pure data model holding state that changes constantly:
- * power, shields, hull, location, cargo, current action.
+ * power, shields, hull, location, current action.
+ *
+ * Cargo is tracked in helm_inventory (location_type=Ship, slot=NULL).
  *
  * @property int $ship_post_id
  * @property PowerMode $power_mode
@@ -24,7 +26,6 @@ use Helm\StellarWP\Models\ModelPropertyDefinition;
  * @property float $hull_integrity
  * @property float $hull_max
  * @property int|null $node_id
- * @property array<string, int> $cargo
  * @property int|null $current_action_id
  * @property DateTimeImmutable $created_at
  * @property DateTimeImmutable $updated_at
@@ -77,12 +78,6 @@ final class ShipState extends Model
                 ->type('int')
                 ->nullable(),
 
-            // Cargo
-            'cargo' => (new ModelPropertyDefinition())
-                ->type('array')
-                ->castWith(static fn ($v) => self::castJson($v))
-                ->default(static fn () => []),
-
             // Current action
             'current_action_id' => (new ModelPropertyDefinition())
                 ->type('int')
@@ -131,29 +126,5 @@ final class ShipState extends Model
 
         $dt = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $value);
         return $dt !== false ? $dt : null;
-    }
-
-    /**
-     * Cast a value to array (from JSON).
-     *
-     * @return array<string, int>
-     */
-    private static function castJson(mixed $json): array
-    {
-        if (is_array($json)) {
-            /** @var array<string, int> */
-            return $json;
-        }
-
-        if ($json === null || $json === '') {
-            return [];
-        }
-
-        if (!is_string($json)) {
-            return [];
-        }
-
-        /** @var array<string, int> */
-        return json_decode($json, true, 512, JSON_THROW_ON_ERROR) ?? [];
     }
 }

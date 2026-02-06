@@ -142,7 +142,7 @@ class ShipSystemsControllerTest extends WPRestApiTestCase
 
         $this->assertSame(750, $core['life']);
         $this->assertSame(0, $core['usage_count']);
-        $this->assertSame(1.0, $core['condition']);
+        $this->assertEquals(1.0, $core['condition']); // assertEquals handles int/float comparison
     }
 
     public function test_response_has_embeddable_product_links(): void

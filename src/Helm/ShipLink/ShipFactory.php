@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Helm\ShipLink;
 
+use Helm\Inventory\InventoryRepository;
 use Helm\Navigation\NavigationService;
+use Helm\Products\ProductRepository;
 use Helm\ShipLink\Models\ShipState;
 use Helm\ShipLink\System\Cargo;
 use Helm\ShipLink\System\Hull;
@@ -29,6 +31,8 @@ final class ShipFactory
         private readonly ShipStateRepository $stateRepository,
         private readonly LoadoutFactory $loadoutFactory,
         private readonly NavigationService $navigationService,
+        private readonly InventoryRepository $inventoryRepository,
+        private readonly ProductRepository $productRepository,
     ) {
     }
 
@@ -77,7 +81,12 @@ final class ShipFactory
         $navigation = new Navigation($state, $loadout, $this->navigationService);
         $shields = new Shields($state, $loadout);
         $hull = new Hull($state);
-        $cargo = new Cargo($state);
+        $cargo = new Cargo(
+            $this->inventoryRepository,
+            $this->productRepository,
+            $shipPost->postId(),
+            $shipPost->ownerId(),
+        );
 
         return new Ship(
             post: $shipPost,

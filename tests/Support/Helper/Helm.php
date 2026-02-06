@@ -8,19 +8,18 @@ use Codeception\Module;
 use Codeception\TestInterface;
 use Helm\Database\Transaction;
 use Helm\Generation\PlanetType;
+use Helm\Inventory\InventoryRepository;
+use Helm\Inventory\LocationType;
+use Helm\Inventory\Models\Item;
 use Helm\Origin\Origin;
 use Helm\Planets\Planet;
 use Helm\Planets\PlanetRepository;
 use Helm\PostTypes\PostTypeRegistry;
 use Helm\Products\Models\Product;
 use Helm\Products\ProductRepository;
-use Helm\ShipLink\ShipFittingRepository;
-use Helm\ShipLink\ShipFittingSlot;
 use Helm\ShipLink\LoadoutFactory;
-use Helm\ShipLink\Models\ShipFitting;
-use Helm\ShipLink\Models\ShipComponent;
+use Helm\ShipLink\ShipFittingSlot;
 use Helm\ShipLink\ShipStateRepository;
-use Helm\ShipLink\ShipComponentRepository;
 use Helm\Ships\ShipPost;
 use Helm\Stars\Star;
 use Helm\Stars\StarRepository;
@@ -236,7 +235,7 @@ class Helm extends Module
             $stateRepository->update($state);
         }
 
-        // Create default loadout (components + fittings)
+        // Create default loadout (components in inventory)
         /** @var LoadoutFactory $loadoutFactory */
         $loadoutFactory = helm(LoadoutFactory::class);
         $loadout = $loadoutFactory->buildDefaults($postId, $data['ownerId']);
@@ -246,9 +245,9 @@ class Helm extends Module
             $coreComponent = $loadout->core()->component();
             $coreComponent->life = (int) $data['core_life'];
 
-            /** @var ShipComponentRepository $componentRepository */
-            $componentRepository = helm(ShipComponentRepository::class);
-            $componentRepository->update($coreComponent);
+            /** @var InventoryRepository $inventoryRepository */
+            $inventoryRepository = helm(InventoryRepository::class);
+            $inventoryRepository->update($coreComponent);
         }
 
         $shipPost = ShipPost::fromId($postId);
@@ -355,48 +354,105 @@ class Helm extends Module
     }
 
     /**
-     * Create a ship component in the database.
+     * Create a component inventory item in the database.
+     *
+     * Components are inventory items with lifecycle data (life, usage_count).
      *
      * @param array<string, mixed> $attributes
      */
-    public function haveComponent(array $attributes = []): ShipComponent
+    public function haveComponent(array $attributes = []): Item
     {
         $defaults = [
+            'user_id' => 1,
             'product_id' => 1,
+            'location_type' => LocationType::Personal,
+            'location_id' => null,
+            'slot' => null,
             'life' => null,
             'usage_count' => 0,
-            'condition' => 1.0,
-            'origin' => 'starter',
+            'meta' => ['origin' => 'starter'],
         ];
 
         $data = array_merge($defaults, $attributes);
 
-        $component = new ShipComponent($data);
+        $item = new Item($data);
 
-        /** @var ShipComponentRepository $repository */
-        $repository = helm(ShipComponentRepository::class);
-        $id = $repository->insert($component);
+        /** @var InventoryRepository $repository */
+        $repository = helm(InventoryRepository::class);
+        $id = $repository->insert($item);
 
         // Refetch to get the model with ID set
-        return $id !== false ? ($repository->find($id) ?? $component) : $component;
+        return $id !== false ? ($repository->find($id) ?? $item) : $item;
     }
 
     /**
-     * Create a fitting (slot assignment) in the database.
+     * Create a fitted inventory item (component in a slot).
+     *
+     * @param int $userId Owner of the item
+     * @param int $productId The product ID
+     * @param ShipFittingSlot|string $slot The slot to fit into
+     * @param LocationType $locationType Location type (defaults to Ship)
+     * @param int $locationId The location ID (e.g., ship post ID)
+     * @param int|null $life Component life (HP remaining)
      */
-    public function haveFitting(int $shipPostId, int $componentId, ShipFittingSlot|string $slot): ShipFitting
-    {
-        $fitting = new ShipFitting([
-            'ship_post_id' => $shipPostId,
-            'component_id' => $componentId,
-            'slot' => $slot instanceof ShipFittingSlot ? $slot : ShipFittingSlot::from($slot),
+    public function haveFitting(
+        int $userId,
+        int $productId,
+        ShipFittingSlot|string $slot,
+        LocationType $locationType,
+        int $locationId,
+        ?int $life = null
+    ): Item {
+        $slotValue = $slot instanceof ShipFittingSlot ? $slot->value : $slot;
+
+        $item = new Item([
+            'user_id' => $userId,
+            'product_id' => $productId,
+            'location_type' => $locationType,
+            'location_id' => $locationId,
+            'slot' => $slotValue,
+            'life' => $life,
+            'usage_count' => 0,
+            'meta' => ['origin' => 'test'],
         ]);
 
-        /** @var ShipFittingRepository $repository */
-        $repository = helm(ShipFittingRepository::class);
-        $repository->install($fitting);
+        /** @var InventoryRepository $repository */
+        $repository = helm(InventoryRepository::class);
+        $itemId = $repository->insert($item);
 
-        return $fitting;
+        // Refetch to get the model with ID set
+        return $itemId !== false ? ($repository->find($itemId) ?? $item) : $item;
+    }
+
+    /**
+     * Create an inventory item (loose item, not fitted).
+     *
+     * @param array<string, mixed> $attributes
+     */
+    public function haveInventoryItem(array $attributes = []): Item
+    {
+        $defaults = [
+            'user_id' => 1,
+            'product_id' => 1,
+            'location_type' => LocationType::Personal,
+            'location_id' => null,
+            'slot' => null,
+            'quantity' => 1,
+            'life' => null,
+            'usage_count' => 0,
+            'meta' => null,
+        ];
+
+        $data = array_merge($defaults, $attributes);
+
+        $item = new Item($data);
+
+        /** @var InventoryRepository $repository */
+        $repository = helm(InventoryRepository::class);
+        $itemId = $repository->insert($item);
+
+        // Refetch to get the model with ID set
+        return $itemId !== false ? ($repository->find($itemId) ?? $item) : $item;
     }
 
     /**

@@ -530,12 +530,11 @@ class ShipCommand
         WP_CLI::log('');
 
         // Cargo
-        $state = $ship->getState();
         WP_CLI::log(WP_CLI::colorize('%Y▸ CARGO%n'));
-        if ($state->cargo === []) {
+        if ($ship->cargo()->isEmpty()) {
             WP_CLI::log('  (empty)');
         } else {
-            foreach ($state->cargo as $resource => $quantity) {
+            foreach ($ship->cargo()->all() as $resource => $quantity) {
                 WP_CLI::log(sprintf('  %s: %d', ucfirst($resource), $quantity));
             }
         }
@@ -550,7 +549,6 @@ class ShipCommand
     private function outputJson(ShipLink $ship, ShipPost $shipPost): void
     {
         $loadout = $ship->getLoadout();
-        $state = $ship->getState();
         $power = $ship->power();
         $propulsion = $ship->propulsion();
         $sensors = $ship->sensors();
@@ -625,7 +623,7 @@ class ShipCommand
                 'skill' => $nav->getSkill(),
                 'efficiency' => $nav->getEfficiency(),
             ],
-            'cargo' => $state->cargo,
+            'cargo' => $ship->cargo()->all(),
         ];
 
         WP_CLI::log(json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));

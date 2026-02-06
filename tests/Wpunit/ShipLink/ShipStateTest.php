@@ -54,7 +54,6 @@ class ShipStateTest extends WPTestCase
             'hull_integrity' => 85.0,
             'hull_max' => 100.0,
             'node_id' => 42,
-            'cargo' => '{"ore":50,"fuel":25}',
             'current_action_id' => 99,
             'created_at' => '2025-01-01 00:00:00',
             'updated_at' => '2025-01-15 12:00:00',
@@ -67,7 +66,6 @@ class ShipStateTest extends WPTestCase
         $this->assertInstanceOf(DateTimeImmutable::class, $state->power_full_at);
         $this->assertSame(85.0, $state->hull_integrity);
         $this->assertSame(42, $state->node_id);
-        $this->assertSame(['ore' => 50, 'fuel' => 25], $state->cargo);
         $this->assertSame(99, $state->current_action_id);
     }
 
@@ -83,7 +81,6 @@ class ShipStateTest extends WPTestCase
             'hull_integrity' => 100.0,
             'hull_max' => 100.0,
             'node_id' => null,
-            'cargo' => null,
             'current_action_id' => null,
             'created_at' => '2025-01-01 00:00:00',
             'updated_at' => '2025-01-01 00:00:00',
@@ -94,7 +91,6 @@ class ShipStateTest extends WPTestCase
         $this->assertNull($state->power_full_at);
         $this->assertNull($state->shields_full_at);
         $this->assertNull($state->node_id);
-        $this->assertSame([], $state->cargo);
         $this->assertNull($state->current_action_id);
     }
 
@@ -109,7 +105,6 @@ class ShipStateTest extends WPTestCase
         $this->assertSame(100.0, $state->hull_integrity);
         $this->assertSame(100.0, $state->hull_max);
         $this->assertSame(1, $state->node_id); // Sol
-        $this->assertSame([], $state->cargo);
         $this->assertNull($state->current_action_id);
     }
 

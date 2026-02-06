@@ -8,20 +8,19 @@ namespace Helm\ShipLink\Contracts;
  * Cargo system contract.
  *
  * Manages the ship's cargo hold - resources collected, traded, or transported.
- *
- * This is a read-only interface - Ship is responsible for all mutations.
+ * Cargo is stored in inventory (location_type=Ship, slot=NULL).
  */
 interface Cargo
 {
     /**
-     * Get quantity of a specific resource.
+     * Get quantity of a specific resource by slug.
      */
-    public function quantity(string $resource): int;
+    public function quantity(string $resourceSlug): int;
 
     /**
      * Get all cargo contents.
      *
-     * @return array<string, int>
+     * @return array<string, int> Map of resource slug => quantity
      */
     public function all(): array;
 
@@ -33,7 +32,7 @@ interface Cargo
     /**
      * Check if ship has at least this much of a resource.
      */
-    public function has(string $resource, int $quantity): bool;
+    public function has(string $resourceSlug, int $quantity): bool;
 
     /**
      * Check if cargo hold is empty.
@@ -41,20 +40,20 @@ interface Cargo
     public function isEmpty(): bool;
 
     /**
-     * Calculate new cargo after adding resources.
+     * Add resources to cargo.
      *
-     * @param string $resource Resource type
+     * @param string $resourceSlug Resource product slug
      * @param int $quantity Amount to add
-     * @return array<string, int> New cargo state
+     * @return int New total quantity of this resource
      */
-    public function calculateCargoAfterAdd(string $resource, int $quantity): array;
+    public function add(string $resourceSlug, int $quantity): int;
 
     /**
-     * Calculate new cargo after removing resources.
+     * Remove resources from cargo.
      *
-     * @param string $resource Resource type
-     * @param int $quantity Amount to remove
-     * @return array{cargo: array<string, int>, removed: int} New cargo state and actual amount removed
+     * @param string $resourceSlug Resource product slug
+     * @param int $quantity Amount to remove (will not go below 0)
+     * @return int Amount actually removed
      */
-    public function calculateCargoAfterRemove(string $resource, int $quantity): array;
+    public function remove(string $resourceSlug, int $quantity): int;
 }

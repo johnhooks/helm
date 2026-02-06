@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Helm\Rest;
 
+use Helm\Inventory\InventoryRepository;
 use Helm\lucatume\DI52\ServiceProvider;
 use Helm\Products\ProductRepository;
 use Helm\ShipLink\ActionFactory;
-use Helm\ShipLink\ShipFittingRepository;
-use Helm\ShipLink\ShipStateRepository;
+use Helm\ShipLink\ShipFactory;
 
 /**
  * Service provider for REST API controllers.
@@ -31,13 +31,13 @@ final class Provider extends ServiceProvider
 
         $this->container->singleton(ShipController::class, function () {
             return new ShipController(
-                $this->container->get(ShipStateRepository::class),
+                $this->container->get(ShipFactory::class),
             );
         });
 
         $this->container->singleton(ShipSystemsController::class, function () {
             return new ShipSystemsController(
-                $this->container->get(ShipFittingRepository::class),
+                $this->container->get(InventoryRepository::class),
             );
         });
     }

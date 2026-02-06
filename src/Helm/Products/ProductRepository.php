@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Helm\Products;
 
-use DateTimeImmutable;
 use Helm\Database\Schema;
 use Helm\Lib\Date;
+use Helm\Lib\HydratesModels;
 use Helm\Products\Models\Product;
 use Helm\StellarWP\Models\Model;
 
@@ -15,6 +15,8 @@ use Helm\StellarWP\Models\Model;
  */
 final class ProductRepository
 {
+    use HydratesModels;
+
     /**
      * Find a product by ID.
      */
@@ -74,6 +76,40 @@ final class ProductRepository
         }
 
         return $this->hydrate($row);
+    }
+
+    /**
+     * Find multiple products by ID.
+     *
+     * @param array<int> $ids
+     * @return array<int, Product> Indexed by product ID
+     */
+    public function findByIds(array $ids): array
+    {
+        if ($ids === []) {
+            return [];
+        }
+
+        global $wpdb;
+
+        $table = $wpdb->prefix . Schema::TABLE_PRODUCTS;
+        $placeholders = implode(',', array_fill(0, count($ids), '%d'));
+
+        $rows = $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT * FROM {$table} WHERE id IN ({$placeholders})",
+                ...$ids
+            ),
+            ARRAY_A
+        );
+
+        $products = [];
+        foreach ($rows as $row) {
+            $product = $this->hydrate($row);
+            $products[$product->id] = $product;
+        }
+
+        return $products;
     }
 
     /**
@@ -156,7 +192,7 @@ final class ProductRepository
         $product->updated_at = $now;
 
         $table = $wpdb->prefix . Schema::TABLE_PRODUCTS;
-        $row = $this->serialize($product->toArray(), $product);
+        $row = $this->serializeToDbRow($product->toArray(), $product);
 
         $result = $wpdb->insert($table, $row);
 
@@ -206,36 +242,7 @@ final class ProductRepository
      */
     private function hydrate(array $row): Product
     {
-        $model = Product::fromData(
-            $row,
-            Model::BUILD_MODE_IGNORE_MISSING | Model::BUILD_MODE_IGNORE_EXTRA
-        );
-        $model->syncOriginal();
-
-        return $model;
-    }
-
-    /**
-     * Serialize model values for database storage.
-     *
-     * @param array<string, mixed> $values
-     * @return array<string, mixed>
-     */
-    private function serialize(array $values, Product $model): array
-    {
-        $row = [];
-
-        foreach ($values as $key => $value) {
-            if ($key === 'id' || !$model->isSet($key)) {
-                continue;
-            }
-
-            $row[$key] = match (true) {
-                $value instanceof DateTimeImmutable => $value->format('Y-m-d H:i:s'),
-                default => $value,
-            };
-        }
-
-        return $row;
+        /** @var Product */
+        return $this->hydrateModel(Product::class, $row);
     }
 }

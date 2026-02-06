@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace Tests\Wpunit\ShipLink;
 
+use Helm\Inventory\Models\Item;
 use Helm\Products\Models\Product;
 use Helm\ShipLink\FittedComponent;
-use Helm\ShipLink\ShipFittingSlot;
 use Helm\ShipLink\Loadout;
 use Helm\ShipLink\LoadoutFactory;
-use Helm\ShipLink\Models\ShipFitting;
-use Helm\ShipLink\Models\ShipComponent;
+use Helm\ShipLink\ShipFittingSlot;
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use Tests\Support\WpunitTester;
 
@@ -186,8 +185,7 @@ class LoadoutTest extends WPTestCase
         $this->assertSame(750, $core->hp());
         $this->assertSame(0, $core->usageCount());
         $this->assertSame(1.0, $core->condition());
-        $this->assertInstanceOf(ShipComponent::class, $core->component());
-        $this->assertInstanceOf(ShipFitting::class, $core->fitting());
+        $this->assertInstanceOf(Item::class, $core->component());
     }
 
     public function test_buildDefaults_creates_all_slots(): void
@@ -207,8 +205,8 @@ class LoadoutTest extends WPTestCase
         $shipPost = $this->tester->haveShipPost();
         $loadout = $this->loadoutFactory->buildDefaults($shipPost->postId(), 1);
 
-        $this->assertSame('starter', $loadout->core()->component()->origin);
-        $this->assertSame('starter', $loadout->drive()->component()->origin);
+        $this->assertSame('starter', $loadout->core()->component()->meta['origin']);
+        $this->assertSame('starter', $loadout->drive()->component()->meta['origin']);
     }
 
     public function test_build_roundtrip(): void
@@ -225,5 +223,31 @@ class LoadoutTest extends WPTestCase
         $this->assertSame('vrs_mk1', $loadout->sensor()->slug());
         $this->assertSame('aegis_beta', $loadout->shield()->slug());
         $this->assertSame('nav_tier_1', $loadout->nav()->slug());
+    }
+
+    public function test_condition_computed_from_life_and_hp(): void
+    {
+        $shipPost = $this->tester->haveShip();
+        $loadout = $this->loadoutFactory->build($shipPost->postId());
+
+        $core = $loadout->core();
+
+        // life=750, hp=750 → condition=1.0
+        $this->assertSame(1.0, $core->condition());
+
+        // Mutate to half life
+        $core->component()->life = 375;
+        $this->assertSame(0.5, $core->condition());
+    }
+
+    public function test_condition_returns_1_when_no_hp(): void
+    {
+        $shipPost = $this->tester->haveShip();
+        $loadout = $this->loadoutFactory->build($shipPost->postId());
+
+        // Drive has no HP (null)
+        $drive = $loadout->drive();
+        $this->assertNull($drive->hp());
+        $this->assertSame(1.0, $drive->condition());
     }
 }

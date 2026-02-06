@@ -7,6 +7,7 @@ namespace Helm\ShipLink;
 use Helm\Core\ErrorCode;
 use Helm\Lib\Date;
 use Helm\Database\Transaction;
+use Helm\Inventory\InventoryRepository;
 use Helm\ShipLink\Contracts\ActionHandler;
 use Helm\ShipLink\Models\Action;
 use Helm\lucatume\DI52\Container;
@@ -23,7 +24,7 @@ final class ActionResolver
         private readonly Container $container,
         private readonly ActionRepository $actionRepository,
         private readonly ShipStateRepository $stateRepository,
-        private readonly ShipComponentRepository $componentRepository,
+        private readonly InventoryRepository $inventoryRepository,
         private readonly ShipFactory $shipFactory,
     ) {
     }
@@ -95,7 +96,7 @@ final class ActionResolver
             $this->stateRepository->update($ship->getState());
 
             foreach ($ship->getLoadout()->dirtyComponents() as $component) {
-                $this->componentRepository->update($component);
+                $this->inventoryRepository->update($component);
             }
 
             $this->stateRepository->updateCurrentAction($action->ship_post_id, null);

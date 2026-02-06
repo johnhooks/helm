@@ -97,14 +97,12 @@ class ShipStateRepositoryTest extends WPTestCase
         $state = $this->repository->find($postId);
         $state->hull_integrity = 50.0;
         $state->node_id = 42;
-        $state->cargo = ['ore' => 100];
         $this->repository->update($state);
 
         $found = $this->repository->find($postId);
 
         $this->assertSame(50.0, $found->hull_integrity);
         $this->assertSame(42, $found->node_id);
-        $this->assertSame(['ore' => 100], $found->cargo);
     }
 
     public function test_save_inserts_new_record(): void

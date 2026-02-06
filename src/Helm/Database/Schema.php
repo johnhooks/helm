@@ -20,8 +20,7 @@ final class Schema
     public const TABLE_NAV_EDGES = 'helm_nav_edges';
     public const TABLE_NAV_ROUTES = 'helm_nav_routes';
     public const TABLE_PRODUCTS = 'helm_products';
-    public const TABLE_SHIP_COMPONENTS = 'helm_ship_components';
-    public const TABLE_SHIP_FITTINGS = 'helm_ship_fittings';
+    public const TABLE_INVENTORY = 'helm_inventory';
     public const TABLE_SHIP_STATE = 'helm_ship_state';
     public const TABLE_SHIP_ACTIONS = 'helm_ship_actions';
 
@@ -34,8 +33,7 @@ final class Schema
         self::TABLE_NAV_EDGES,
         self::TABLE_NAV_ROUTES,
         self::TABLE_PRODUCTS,
-        self::TABLE_SHIP_COMPONENTS,
-        self::TABLE_SHIP_FITTINGS,
+        self::TABLE_INVENTORY,
         self::TABLE_SHIP_STATE,
         self::TABLE_SHIP_ACTIONS,
     ];
@@ -44,7 +42,7 @@ final class Schema
      * Current schema version.
      * Increment when making schema changes.
      */
-    public const VERSION = 4;
+    public const VERSION = 2;
 
     /**
      * Option key for stored schema version.
@@ -69,8 +67,7 @@ final class Schema
              . self::getNavEdgesTableSql($prefix, $charsetCollate)
              . self::getNavRoutesTableSql($prefix, $charsetCollate)
              . self::getProductsTableSql($prefix, $charsetCollate)
-             . self::getShipComponentsTableSql($prefix, $charsetCollate)
-             . self::getShipFittingsTableSql($prefix, $charsetCollate)
+             . self::getInventoryTableSql($prefix, $charsetCollate)
              . self::getShipStateTableSql($prefix, $charsetCollate)
              . self::getShipActionsTableSql($prefix, $charsetCollate);
 
@@ -338,48 +335,36 @@ CREATE TABLE {$prefix}helm_products (
     }
 
     /**
-     * Ship components table SQL.
+     * Inventory table SQL.
      *
-     * Individual component instances with lifecycle data.
-     * Each row is a specific component that exists in the game world.
+     * Tracks all items owned by users - both fitted and stored.
+     * - slot IS NULL = loose item (cargo/storage)
+     * - slot = 'core' etc = fitted in that slot
+     *
+     * Lifecycle data (life, usage_count) is stored inline for components.
+     * Meta stores provenance (created_by, origin, origin_ref, owner_history).
      */
-    private static function getShipComponentsTableSql(string $prefix, string $charsetCollate): string
+    private static function getInventoryTableSql(string $prefix, string $charsetCollate): string
     {
         return "
-CREATE TABLE {$prefix}helm_ship_components (
+CREATE TABLE {$prefix}helm_inventory (
     id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+    user_id bigint(20) unsigned NOT NULL,
     product_id bigint(20) unsigned NOT NULL,
+    location_type tinyint unsigned NOT NULL,
+    location_id bigint(20) unsigned DEFAULT NULL,
+    slot varchar(20) DEFAULT NULL,
+    quantity int unsigned NOT NULL DEFAULT 1,
     life int(10) unsigned DEFAULT NULL,
     usage_count int(10) unsigned NOT NULL DEFAULT 0,
-    `condition` float NOT NULL DEFAULT 1.0,
-    created_by bigint(20) unsigned DEFAULT NULL,
-    owner_history JSON DEFAULT NULL,
-    origin varchar(20) DEFAULT NULL,
-    origin_ref bigint(20) unsigned DEFAULT NULL,
+    meta JSON DEFAULT NULL,
     created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY  (id),
-    KEY product_id (product_id)
-) {$charsetCollate};
-";
-    }
-
-    /**
-     * Ship fittings table SQL.
-     *
-     * Pivot table mapping component instances to ship slots.
-     * Each ship slot can hold one component, each component can be in one slot.
-     */
-    private static function getShipFittingsTableSql(string $prefix, string $charsetCollate): string
-    {
-        return "
-CREATE TABLE {$prefix}helm_ship_fittings (
-    ship_post_id bigint(20) unsigned NOT NULL,
-    component_id bigint(20) unsigned NOT NULL,
-    slot varchar(20) NOT NULL,
-    installed_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY  (ship_post_id,slot),
-    UNIQUE KEY component_id (component_id)
+    KEY user_id (user_id),
+    KEY product_id (product_id),
+    KEY location (location_type,location_id),
+    UNIQUE KEY fitted_slot (location_type,location_id,slot)
 ) {$charsetCollate};
 ";
     }
@@ -387,7 +372,8 @@ CREATE TABLE {$prefix}helm_ship_fittings (
     /**
      * Ship state table SQL.
      *
-     * Operational state that changes constantly: power, location, hull, cargo.
+     * Operational state that changes constantly: power, location, hull.
+     * Cargo is tracked in helm_inventory (location_type=Ship, slot=NULL).
      * Credits are stored on the user, not the ship.
      *
      * Regenerating resources (power, shields) use "full_at" timestamps -
@@ -406,7 +392,6 @@ CREATE TABLE {$prefix}helm_ship_state (
     hull_integrity float NOT NULL DEFAULT 100.0,
     hull_max float NOT NULL DEFAULT 100.0,
     node_id bigint(20) unsigned DEFAULT NULL,
-    cargo longtext DEFAULT NULL,
     current_action_id bigint(20) unsigned DEFAULT NULL,
     created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

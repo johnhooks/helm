@@ -41,11 +41,18 @@ class ShipControllerTest extends WPRestApiTestCase
         return rest_do_request($request);
     }
 
+    private function getCargo(int $shipId): \WP_REST_Response
+    {
+        $request = new \WP_REST_Request('GET', "/helm/v1/ships/{$shipId}/cargo");
+        return rest_do_request($request);
+    }
+
     public function test_register_routes(): void
     {
         $routes = rest_get_server()->get_routes();
 
         $this->assertArrayHasKey('/helm/v1/ships/(?P<id>\\d+)', $routes);
+        $this->assertArrayHasKey('/helm/v1/ships/(?P<id>\\d+)/cargo', $routes);
     }
 
     public function test_requires_authentication(): void
@@ -121,5 +128,57 @@ class ShipControllerTest extends WPRestApiTestCase
 
         $data = $response->get_data();
         $this->assertSame([], $data['cargo']);
+    }
+
+    public function test_cargo_endpoint_returns_empty_array(): void
+    {
+        $ship = $this->createShip();
+
+        wp_set_current_user($this->ownerId);
+        $response = $this->getCargo($ship->postId());
+
+        $this->assertSame(200, $response->get_status());
+        $this->assertSame([], $response->get_data());
+    }
+
+    public function test_cargo_endpoint_returns_resources(): void
+    {
+        $this->tester->haveProduct(['slug' => 'ore', 'type' => 'resource', 'label' => 'Ore']);
+        $this->tester->haveProduct(['slug' => 'fuel', 'type' => 'resource', 'label' => 'Fuel']);
+        $ship = $this->createShip();
+
+        // Add cargo via the Ship object
+        $shipFactory = helm(\Helm\ShipLink\ShipFactory::class);
+        $shipObj = $shipFactory->build($ship->postId());
+        $shipObj->cargo()->add('ore', 100);
+        $shipObj->cargo()->add('fuel', 50);
+
+        wp_set_current_user($this->ownerId);
+        $response = $this->getCargo($ship->postId());
+
+        $this->assertSame(200, $response->get_status());
+        $data = $response->get_data();
+        $this->assertSame(100, $data['ore']);
+        $this->assertSame(50, $data['fuel']);
+    }
+
+    public function test_cargo_endpoint_requires_authentication(): void
+    {
+        $ship = $this->createShip();
+
+        wp_set_current_user(0);
+        $response = $this->getCargo($ship->postId());
+
+        $this->assertErrorResponse('rest_not_logged_in', $response, 401);
+    }
+
+    public function test_cargo_endpoint_rejects_non_owner(): void
+    {
+        $ship = $this->createShip();
+
+        wp_set_current_user($this->otherId);
+        $response = $this->getCargo($ship->postId());
+
+        $this->assertErrorResponse('rest_forbidden', $response, 403);
     }
 }

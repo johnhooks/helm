@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace Helm\Rest;
 
 use Helm\Core\ErrorCode;
-use Helm\ShipLink\ShipFittingRepository;
+use Helm\Inventory\InventoryRepository;
+use Helm\Inventory\LocationType;
 use Helm\Ships\ShipPost;
 use WP_Error;
 use WP_REST_Request;
@@ -22,9 +23,10 @@ final class ShipSystemsController
 {
     private const NAMESPACE = 'helm/v1';
     private const LINK_REL_PRODUCT = 'helm:product';
+    private const LINK_REL_INVENTORY = 'helm:inventory';
 
     public function __construct(
-        private readonly ShipFittingRepository $fittingRepository,
+        private readonly InventoryRepository $inventoryRepository,
     ) {
     }
 
@@ -90,8 +92,8 @@ final class ShipSystemsController
     {
         $shipPostId = (int) $request->get_param('id');
 
-        // Lightweight query - only fittings + components, no products
-        $systems = $this->fittingRepository->findFittedByShip($shipPostId);
+        // Lightweight query - only inventory + components, no products
+        $systems = $this->inventoryRepository->findFittedByLocation(LocationType::Ship, $shipPostId);
 
         $response = new WP_REST_Response($systems);
 
@@ -105,9 +107,10 @@ final class ShipSystemsController
             );
         }
 
-        // Add self and ship links
+        // Add self, ship, and inventory links
         $response->add_link('self', rest_url(self::NAMESPACE . '/ships/' . $shipPostId . '/systems'));
         $response->add_link('ship', rest_url(self::NAMESPACE . '/ships/' . $shipPostId), ['embeddable' => true]);
+        $response->add_link(self::LINK_REL_INVENTORY, rest_url(self::NAMESPACE . '/inventory'), ['embeddable' => true]);
 
         return $response;
     }

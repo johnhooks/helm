@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace Helm\ShipLink;
 
-use BackedEnum;
-use DateTimeImmutable;
 use Helm\Database\Schema;
 use Helm\Lib\Date;
+use Helm\Lib\HydratesModels;
 use Helm\ShipLink\Models\ShipState;
-use Helm\StellarWP\Models\Model;
 
 /**
  * Repository for ship state table operations.
@@ -18,6 +16,8 @@ use Helm\StellarWP\Models\Model;
  */
 final class ShipStateRepository
 {
+    use HydratesModels;
+
     /**
      * Find ship state by post ID.
      */
@@ -92,7 +92,7 @@ final class ShipStateRepository
         $state->updated_at = $now;
 
         $table = $wpdb->prefix . Schema::TABLE_SHIP_STATE;
-        $row = $this->serialize($state->toArray(), $state);
+        $row = $this->serializeToDbRow($state->toArray(), $state);
 
         $result = $wpdb->insert($table, $row);
 
@@ -121,7 +121,7 @@ final class ShipStateRepository
         $state->updated_at = Date::now();
         $dirty = $state->getDirty();
 
-        $row = $this->serialize($dirty, $state);
+        $row = $this->serializeToDbRow($dirty, $state);
         $table = $wpdb->prefix . Schema::TABLE_SHIP_STATE;
 
         $result = $wpdb->update(
@@ -288,38 +288,7 @@ final class ShipStateRepository
      */
     private function hydrate(array $row): ShipState
     {
-        $model = ShipState::fromData(
-            $row,
-            Model::BUILD_MODE_IGNORE_MISSING | Model::BUILD_MODE_IGNORE_EXTRA
-        );
-        $model->syncOriginal();
-
-        return $model;
-    }
-
-    /**
-     * Serialize model values for database storage.
-     *
-     * @param array<string, mixed> $values
-     * @return array<string, mixed>
-     */
-    private function serialize(array $values, ShipState $model): array
-    {
-        $row = [];
-
-        foreach ($values as $key => $value) {
-            if (!$model->isSet($key)) {
-                continue;
-            }
-
-            $row[$key] = match (true) {
-                $value instanceof BackedEnum => $value->value,
-                $value instanceof DateTimeImmutable => $value->format('Y-m-d H:i:s'),
-                is_array($value) => json_encode($value, JSON_THROW_ON_ERROR),
-                default => $value,
-            };
-        }
-
-        return $row;
+        /** @var ShipState */
+        return $this->hydrateModel(ShipState::class, $row);
     }
 }

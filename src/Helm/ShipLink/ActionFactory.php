@@ -6,6 +6,7 @@ namespace Helm\ShipLink;
 
 use Helm\Core\ErrorCode;
 use Helm\Database\Transaction;
+use Helm\Inventory\InventoryRepository;
 use Helm\ShipLink\Contracts\ActionHandler;
 use Helm\ShipLink\Contracts\ActionValidator;
 use Helm\ShipLink\Models\Action;
@@ -23,7 +24,7 @@ final class ActionFactory
         private readonly Container $container,
         private readonly ActionRepository $actionRepository,
         private readonly ShipStateRepository $stateRepository,
-        private readonly ShipComponentRepository $componentRepository,
+        private readonly InventoryRepository $inventoryRepository,
         private readonly ShipFactory $shipFactory,
     ) {
     }
@@ -139,7 +140,7 @@ final class ActionFactory
         $this->stateRepository->update($ship->getState());
 
         foreach ($ship->getLoadout()->dirtyComponents() as $component) {
-            $this->componentRepository->update($component);
+            $this->inventoryRepository->update($component);
         }
 
         $this->stateRepository->updateCurrentAction($action->ship_post_id, null);

@@ -14,7 +14,6 @@ use Helm\ShipLink\Loadout;
 use Helm\ShipLink\Models\ShipState;
 use Helm\ShipLink\ShipFactory;
 use Helm\ShipLink\ShipStateRepository;
-use Helm\ShipLink\ShipComponentRepository;
 use Helm\Ships\ShipPost;
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use Tests\Support\WpunitTester;
@@ -28,7 +27,6 @@ class ShipTest extends WPTestCase
 {
     private ShipFactory $factory;
     private ShipStateRepository $stateRepository;
-    private ShipComponentRepository $componentRepository;
     private NodeRepository $nodeRepository;
     private EdgeRepository $edgeRepository;
 
@@ -39,7 +37,6 @@ class ShipTest extends WPTestCase
 
         $this->factory = helm(ShipFactory::class);
         $this->stateRepository = helm(ShipStateRepository::class);
-        $this->componentRepository = helm(ShipComponentRepository::class);
         $this->nodeRepository = helm(NodeRepository::class);
         $this->edgeRepository = helm(EdgeRepository::class);
     }
@@ -269,11 +266,14 @@ class ShipTest extends WPTestCase
 
     public function test_process_transfer_adds_cargo(): void
     {
-        $shipPost = $this->tester->haveShip();
-        $state = $this->stateRepository->find($shipPost->postId());
-        $state->cargo = [];
-        $this->stateRepository->update($state);
+        // Create a resource product for the test
+        $this->tester->haveProduct([
+            'slug' => 'ore',
+            'type' => 'resource',
+            'label' => 'Ore',
+        ]);
 
+        $shipPost = $this->tester->haveShip();
         $ship = $this->factory->build($shipPost->postId());
 
         $action = new Action(['type' => ActionType::Transfer, 'params' => [
@@ -289,12 +289,18 @@ class ShipTest extends WPTestCase
 
     public function test_process_transfer_removes_cargo(): void
     {
-        $shipPost = $this->tester->haveShip();
-        $state = $this->stateRepository->find($shipPost->postId());
-        $state->cargo = ['ore' => 100];
-        $this->stateRepository->update($state);
+        // Create a resource product for the test
+        $this->tester->haveProduct([
+            'slug' => 'ore',
+            'type' => 'resource',
+            'label' => 'Ore',
+        ]);
 
+        $shipPost = $this->tester->haveShip();
         $ship = $this->factory->build($shipPost->postId());
+
+        // Add cargo first using the cargo system
+        $ship->cargo()->add('ore', 100);
 
         $action = new Action(['type' => ActionType::Transfer, 'params' => [
             'resource' => 'ore',

@@ -14,6 +14,7 @@ use Helm\Config\Provider as ConfigProvider;
 use Helm\Database\Provider as DatabaseProvider;
 use Helm\Discovery\Provider as DiscoveryProvider;
 use Helm\Generation\Provider as GenerationProvider;
+use Helm\Inventory\Provider as InventoryProvider;
 use Helm\lucatume\DI52\Container;
 use Helm\Navigation\Provider as NavigationProvider;
 use Helm\Origin\Provider as OriginProvider;
@@ -55,6 +56,7 @@ final class Helm
         DatabaseProvider::class,
         DiscoveryProvider::class,
         GenerationProvider::class,
+        InventoryProvider::class,
         NavigationProvider::class,
         OriginProvider::class,
         PlanetsProvider::class,

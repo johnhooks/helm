@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Helm\ShipLink;
 
-use BackedEnum;
 use DateTimeImmutable;
 use Helm\Database\Schema;
 use Helm\Database\Transaction;
 use Helm\Lib\Date;
+use Helm\Lib\HydratesModels;
 use Helm\ShipLink\Models\Action;
 use Helm\StellarWP\Models\Model;
 
@@ -19,6 +19,12 @@ use Helm\StellarWP\Models\Model;
  */
 final class ActionRepository
 {
+    use HydratesModels;
+
+    /**
+     * Column mapping for property names to database columns.
+     */
+    private const COLUMN_MAP = ['type' => 'action_type'];
     /**
      * Find an action by ID.
      */
@@ -224,7 +230,7 @@ final class ActionRepository
         $action->updated_at = $now;
 
         $table = $wpdb->prefix . Schema::TABLE_SHIP_ACTIONS;
-        $row = $this->serialize($action->toArray(), $action);
+        $row = $this->serializeToDbRow($action->toArray(), $action, self::COLUMN_MAP);
 
         $result = $wpdb->insert($table, $row);
 
@@ -252,7 +258,7 @@ final class ActionRepository
         $action->updated_at = Date::now();
         $dirty = $action->getDirty();
 
-        $row = $this->serialize($dirty, $action);
+        $row = $this->serializeToDbRow($dirty, $action, self::COLUMN_MAP);
         $table = $wpdb->prefix . Schema::TABLE_SHIP_ACTIONS;
 
         $result = $wpdb->update(
@@ -461,40 +467,5 @@ final class ActionRepository
         $model->syncOriginal();
 
         return $model;
-    }
-
-    /**
-     * Serialize model values for database storage.
-     *
-     * @param array<string, mixed> $values
-     * @return array<string, mixed>
-     */
-    private function serialize(array $values, Action $model): array
-    {
-        $row = [];
-
-        foreach ($values as $key => $value) {
-            // Skip unset properties - let database defaults apply
-            if (!$model->isSet($key)) {
-                continue;
-            }
-
-            // Skip id on insert (auto-increment)
-            if ($key === 'id' && $value === null) {
-                continue;
-            }
-
-            // Map model property name to DB column name
-            $columnName = $key === 'type' ? 'action_type' : $key;
-
-            $row[$columnName] = match (true) {
-                $value instanceof BackedEnum => $value->value,
-                $value instanceof DateTimeImmutable => $value->format('Y-m-d H:i:s'),
-                is_array($value) => json_encode($value, JSON_THROW_ON_ERROR),
-                default => $value,
-            };
-        }
-
-        return $row;
     }
 }
