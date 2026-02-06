@@ -77,6 +77,28 @@ final class ProductRepository
     }
 
     /**
+     * Find all products.
+     *
+     * @return array<Product>
+     */
+    public function findAll(): array
+    {
+        global $wpdb;
+
+        $table = $wpdb->prefix . Schema::TABLE_PRODUCTS;
+
+        $rows = $wpdb->get_results(
+            "SELECT * FROM {$table} ORDER BY type, slug, version",
+            ARRAY_A
+        );
+
+        return array_map(
+            fn (array $row) => $this->hydrate($row),
+            $rows
+        );
+    }
+
+    /**
      * Find all products of a given type.
      *
      * @return array<Product>

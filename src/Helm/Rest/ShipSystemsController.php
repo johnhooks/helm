@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace Helm\Rest;
 
 use Helm\Core\ErrorCode;
-use Helm\ShipLink\FittedComponent;
-use Helm\ShipLink\LoadoutFactory;
+use Helm\ShipLink\ShipFittingRepository;
 use Helm\Ships\ShipPost;
 use WP_Error;
 use WP_REST_Request;
@@ -15,14 +14,17 @@ use WP_REST_Response;
 /**
  * REST controller for ship systems (loadout).
  *
- * GET /helm/v1/ships/{id}/systems - Ship loadout (fitted systems)
+ * GET /helm/v1/ships/{id}/systems - Ship fitted components
+ *
+ * Supports ?_embed to inline linked products via the products endpoint.
  */
 final class ShipSystemsController
 {
     private const NAMESPACE = 'helm/v1';
+    private const LINK_REL_PRODUCT = 'helm:product';
 
     public function __construct(
-        private readonly LoadoutFactory $loadoutFactory,
+        private readonly ShipFittingRepository $fittingRepository,
     ) {
     }
 
@@ -63,7 +65,7 @@ final class ShipSystemsController
         if ($ship === null) {
             return ErrorCode::ShipNotFound->error(
                 __('Ship not found.', 'helm'),
-                ['status' => 404]
+                ['status' => ErrorCode::ShipNotFound->httpStatus()]
             );
         }
 
@@ -79,7 +81,7 @@ final class ShipSystemsController
     }
 
     /**
-     * Get ship systems (loadout).
+     * Get ship systems (fitted components).
      *
      * @param WP_REST_Request<array<string, mixed>> $request
      * @return WP_REST_Response|WP_Error
@@ -87,39 +89,26 @@ final class ShipSystemsController
     public function index(WP_REST_Request $request)
     {
         $shipPostId = (int) $request->get_param('id');
-        $loadout = $this->loadoutFactory->build($shipPostId);
 
-        $systems = [];
+        // Lightweight query - only fittings + components, no products
+        $systems = $this->fittingRepository->findFittedByShip($shipPostId);
 
-        foreach (['core', 'drive', 'sensor', 'shield', 'nav'] as $slotName) {
-            $fitted = $loadout->slot($slotName);
-            if ($fitted !== null) {
-                $systems[] = $this->serializeFittedComponent($fitted);
-            }
+        $response = new WP_REST_Response($systems);
+
+        // Add embeddable links for each unique product
+        $productIds = array_unique(array_column($systems, 'product_id'));
+        foreach ($productIds as $productId) {
+            $response->add_link(
+                self::LINK_REL_PRODUCT,
+                rest_url(self::NAMESPACE . '/products/' . $productId),
+                ['embeddable' => true]
+            );
         }
 
-        // Equipment slots
-        foreach ($loadout->equipment() as $fitted) {
-            $systems[] = $this->serializeFittedComponent($fitted);
-        }
+        // Add self and ship links
+        $response->add_link('self', rest_url(self::NAMESPACE . '/ships/' . $shipPostId . '/systems'));
+        $response->add_link('ship', rest_url(self::NAMESPACE . '/ships/' . $shipPostId), ['embeddable' => true]);
 
-        return new WP_REST_Response($systems);
-    }
-
-    /**
-     * Serialize a fitted component for JSON response.
-     *
-     * @return array<string, mixed>
-     */
-    private function serializeFittedComponent(FittedComponent $fitted): array
-    {
-        return [
-            'id'          => $fitted->id(),
-            'product_id'  => $fitted->component()->product_id,
-            'slot'        => $fitted->slot()->value,
-            'life'        => $fitted->life(),
-            'usage_count' => $fitted->usageCount(),
-            'condition'   => $fitted->condition(),
-        ];
+        return $response;
     }
 }

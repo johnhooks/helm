@@ -40,6 +40,53 @@ final class ShipFittingRepository
     }
 
     /**
+     * Find fitted component summary for a ship.
+     *
+     * Lightweight query for REST responses - joins fittings with components
+     * but not products. Returns raw arrays, not model objects.
+     *
+     * @return array<array{id: int, product_id: int, slot: string, life: int|null, usage_count: int, condition: float}>
+     */
+    public function findFittedByShip(int $shipPostId): array
+    {
+        global $wpdb;
+
+        $fittingsTable = $wpdb->prefix . Schema::TABLE_SHIP_FITTINGS;
+        $componentsTable = $wpdb->prefix . Schema::TABLE_SHIP_COMPONENTS;
+
+        $rows = $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT
+                    c.id,
+                    c.product_id,
+                    f.slot,
+                    c.life,
+                    c.usage_count,
+                    c.`condition`
+                FROM {$fittingsTable} f
+                JOIN {$componentsTable} c ON c.id = f.component_id
+                WHERE f.ship_post_id = %d
+                ORDER BY f.slot",
+                $shipPostId
+            ),
+            ARRAY_A
+        );
+
+        // Cast types for consistency
+        return array_map(
+            fn (array $row) => [
+                'id' => (int) $row['id'],
+                'product_id' => (int) $row['product_id'],
+                'slot' => $row['slot'],
+                'life' => $row['life'] !== null ? (int) $row['life'] : null,
+                'usage_count' => (int) $row['usage_count'],
+                'condition' => (float) $row['condition'],
+            ],
+            $rows
+        );
+    }
+
+    /**
      * Find a fitting by ship and slot.
      */
     public function findBySlot(int $shipPostId, ShipFittingSlot|string $slot): ?ShipFitting

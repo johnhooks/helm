@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace Helm\Rest;
 
 use Helm\lucatume\DI52\ServiceProvider;
+use Helm\Products\ProductRepository;
 use Helm\ShipLink\ActionFactory;
-use Helm\ShipLink\LoadoutFactory;
+use Helm\ShipLink\ShipFittingRepository;
 use Helm\ShipLink\ShipStateRepository;
 
 /**
@@ -16,6 +17,12 @@ final class Provider extends ServiceProvider
 {
     public function register(): void
     {
+        $this->container->singleton(ProductsController::class, function () {
+            return new ProductsController(
+                $this->container->get(ProductRepository::class),
+            );
+        });
+
         $this->container->singleton(ShipActionsController::class, function () {
             return new ShipActionsController(
                 $this->container->get(ActionFactory::class),
@@ -30,7 +37,7 @@ final class Provider extends ServiceProvider
 
         $this->container->singleton(ShipSystemsController::class, function () {
             return new ShipSystemsController(
-                $this->container->get(LoadoutFactory::class),
+                $this->container->get(ShipFittingRepository::class),
             );
         });
     }
@@ -38,6 +45,10 @@ final class Provider extends ServiceProvider
     public function boot(): void
     {
         add_action('rest_api_init', function (): void {
+            /** @var ProductsController $productsController */
+            $productsController = $this->container->get(ProductsController::class);
+            $productsController->register();
+
             /** @var ShipActionsController $actionsController */
             $actionsController = $this->container->get(ShipActionsController::class);
             $actionsController->register();

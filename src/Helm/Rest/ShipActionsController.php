@@ -80,7 +80,7 @@ final class ShipActionsController
         if ($ship === null) {
             return ErrorCode::ShipNotFound->error(
                 __('Ship not found.', 'helm'),
-                ['status' => 404]
+                ['status' => ErrorCode::ShipNotFound->httpStatus()]
             );
         }
 

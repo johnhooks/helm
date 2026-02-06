@@ -145,6 +145,63 @@ class ShipSystemsControllerTest extends WPRestApiTestCase
         $this->assertSame(1.0, $core['condition']);
     }
 
+    public function test_response_has_embeddable_product_links(): void
+    {
+        $ship = $this->createShip();
+
+        wp_set_current_user($this->ownerId);
+        $response = $this->getSystems($ship->postId());
+
+        $links = $response->get_links();
+
+        // Should have self link
+        $this->assertArrayHasKey('self', $links);
+
+        // Should have ship link (embeddable)
+        $this->assertArrayHasKey('ship', $links);
+        $this->assertTrue($links['ship'][0]['attributes']['embeddable'] ?? false);
+
+        // Should have product links (embeddable)
+        $this->assertArrayHasKey('helm:product', $links);
+        $productLinks = $links['helm:product'];
+        $this->assertCount(5, $productLinks); // 5 unique products for default loadout
+
+        // All product links should be embeddable
+        foreach ($productLinks as $link) {
+            $this->assertTrue($link['attributes']['embeddable'] ?? false);
+        }
+    }
+
+    public function test_product_links_match_system_product_ids(): void
+    {
+        $ship = $this->createShip();
+
+        wp_set_current_user($this->ownerId);
+        $response = $this->getSystems($ship->postId());
+
+        $data = $response->get_data();
+        $links = $response->get_links();
+
+        // Get product IDs from systems
+        $productIds = array_unique(array_column($data, 'product_id'));
+
+        // Get product IDs from links
+        $productLinks = $links['helm:product'];
+        $linkedProductIds = [];
+        foreach ($productLinks as $link) {
+            // Extract ID from URL like .../products/123
+            preg_match('/\/products\/(\d+)$/', $link['href'], $matches);
+            if (isset($matches[1])) {
+                $linkedProductIds[] = (int) $matches[1];
+            }
+        }
+
+        // Should match
+        sort($productIds);
+        sort($linkedProductIds);
+        $this->assertSame($productIds, $linkedProductIds);
+    }
+
     /**
      * Find a system by slot in the response array.
      *

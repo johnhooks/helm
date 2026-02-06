@@ -43,6 +43,9 @@ enum ErrorCode: string
     case ShipInsufficientCore = 'ship.insufficient_core';
     case ShipSystemsNotFound = 'ship.systems_not_found';
 
+    // Product errors
+    case ProductNotFound = 'product.not_found';
+
     // Star errors
     case StarNotFound = 'star.not_found';
 
@@ -79,7 +82,8 @@ enum ErrorCode: string
             self::ShipNotFound,
             self::ActionNotFound,
             self::StarNotFound,
-            self::ShipSystemsNotFound => 404,
+            self::ShipSystemsNotFound,
+            self::ProductNotFound => 404,
 
             // Conflict
             self::ActionInProgress => 409,
