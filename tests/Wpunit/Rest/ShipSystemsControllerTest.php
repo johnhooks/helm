@@ -118,7 +118,7 @@ class ShipSystemsControllerTest extends WPRestApiTestCase
 
         $expectedFields = [
             'id',
-            'type_id',
+            'product_id',
             'slot',
             'life',
             'usage_count',

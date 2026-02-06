@@ -9,13 +9,13 @@ use Helm\StellarWP\Models\Model;
 use Helm\StellarWP\Models\ModelPropertyDefinition;
 
 /**
- * Ship system component instance from the helm_ship_systems table.
+ * Ship component instance from the helm_ship_components table.
  *
  * Represents a specific physical component that exists in the game world.
- * References a SystemType for its blueprint stats.
+ * References a Product for its blueprint stats.
  *
  * @property int $id
- * @property int $type_id
+ * @property int $product_id
  * @property ?int $life
  * @property int $usage_count
  * @property float $condition
@@ -26,7 +26,7 @@ use Helm\StellarWP\Models\ModelPropertyDefinition;
  * @property DateTimeImmutable $created_at
  * @property DateTimeImmutable $updated_at
  */
-final class ShipSystem extends Model
+final class ShipComponent extends Model
 {
     /**
      * @inheritDoc
@@ -38,7 +38,7 @@ final class ShipSystem extends Model
                 ->type('int')
                 ->readonly(),
 
-            'type_id' => (new ModelPropertyDefinition())
+            'product_id' => (new ModelPropertyDefinition())
                 ->type('int')
                 ->required(),
 

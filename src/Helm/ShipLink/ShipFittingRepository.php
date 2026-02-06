@@ -4,21 +4,20 @@ declare(strict_types=1);
 
 namespace Helm\ShipLink;
 
-use DateTimeImmutable;
 use Helm\Database\Schema;
 use Helm\Lib\Date;
-use Helm\ShipLink\Models\Fitting;
+use Helm\ShipLink\Models\ShipFitting;
 use Helm\StellarWP\Models\Model;
 
 /**
  * Repository for ship fitting pivot table operations.
  */
-final class FittingRepository
+final class ShipFittingRepository
 {
     /**
      * Find all fittings for a ship.
      *
-     * @return array<Fitting>
+     * @return array<ShipFitting>
      */
     public function findForShip(int $shipPostId): array
     {
@@ -43,11 +42,11 @@ final class FittingRepository
     /**
      * Find a fitting by ship and slot.
      */
-    public function findBySlot(int $shipPostId, FittingSlot|string $slot): ?Fitting
+    public function findBySlot(int $shipPostId, ShipFittingSlot|string $slot): ?ShipFitting
     {
         global $wpdb;
 
-        $slotValue = $slot instanceof FittingSlot ? $slot->value : $slot;
+        $slotValue = $slot instanceof ShipFittingSlot ? $slot->value : $slot;
         $table = $wpdb->prefix . Schema::TABLE_SHIP_FITTINGS;
 
         $row = $wpdb->get_row(
@@ -69,7 +68,7 @@ final class FittingRepository
     /**
      * Install a component into a ship slot.
      */
-    public function install(Fitting $fitting): bool
+    public function install(ShipFitting $fitting): bool
     {
         global $wpdb;
 
@@ -79,7 +78,7 @@ final class FittingRepository
 
         $result = $wpdb->insert($table, [
             'ship_post_id' => $fitting->ship_post_id,
-            'system_id' => $fitting->system_id,
+            'component_id' => $fitting->component_id,
             'slot' => $fitting->slot->value,
             'installed_at' => $fitting->installed_at->format('Y-m-d H:i:s'),
         ]);
@@ -94,11 +93,11 @@ final class FittingRepository
     /**
      * Uninstall a component from a ship slot.
      */
-    public function uninstall(int $shipPostId, FittingSlot|string $slot): bool
+    public function uninstall(int $shipPostId, ShipFittingSlot|string $slot): bool
     {
         global $wpdb;
 
-        $slotValue = $slot instanceof FittingSlot ? $slot->value : $slot;
+        $slotValue = $slot instanceof ShipFittingSlot ? $slot->value : $slot;
         $table = $wpdb->prefix . Schema::TABLE_SHIP_FITTINGS;
 
         $result = $wpdb->delete($table, [
@@ -128,9 +127,9 @@ final class FittingRepository
      *
      * @param array<string, mixed> $row
      */
-    private function hydrate(array $row): Fitting
+    private function hydrate(array $row): ShipFitting
     {
-        $model = Fitting::fromData(
+        $model = ShipFitting::fromData(
             $row,
             Model::BUILD_MODE_IGNORE_MISSING | Model::BUILD_MODE_IGNORE_EXTRA
         );

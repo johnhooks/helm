@@ -41,7 +41,7 @@ final class Propulsion implements PropulsionContract
 
     public function getCoreDecayMultiplier(): float
     {
-        return $this->loadout->drive()->type()->mult_b ?? 0.0;
+        return $this->loadout->drive()->product()->mult_b ?? 0.0;
     }
 
     public function getMaxRange(): float
@@ -61,7 +61,7 @@ final class Propulsion implements PropulsionContract
     {
         // Core cost = distance × core type multiplier × drive consumption
         return $distanceLy
-            * ($this->loadout->core()->type()->mult_b ?? 0.0)
+            * ($this->loadout->core()->product()->mult_b ?? 0.0)
             * $this->getCoreDecayMultiplier();
     }
 
@@ -75,12 +75,12 @@ final class Propulsion implements PropulsionContract
 
     public function getSustain(): float
     {
-        return $this->loadout->drive()->type()->range ?? 0.0;
+        return $this->loadout->drive()->product()->range ?? 0.0;
     }
 
     public function getConsumption(): float
     {
-        return $this->loadout->drive()->type()->mult_b ?? 0.0;
+        return $this->loadout->drive()->product()->mult_b ?? 0.0;
     }
 
     /**
@@ -90,7 +90,7 @@ final class Propulsion implements PropulsionContract
      */
     private function getEffectiveAmplitude(): float
     {
-        return ($this->loadout->drive()->type()->mult_c ?? 0.0)
+        return ($this->loadout->drive()->product()->mult_c ?? 0.0)
             * $this->power->getOutputMultiplier()
             * $this->getPerformanceRatio();
     }

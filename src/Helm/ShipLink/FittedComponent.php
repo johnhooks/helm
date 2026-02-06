@@ -4,22 +4,22 @@ declare(strict_types=1);
 
 namespace Helm\ShipLink;
 
-use Helm\ShipLink\Models\Fitting;
-use Helm\ShipLink\Models\ShipSystem;
-use Helm\ShipLink\Models\SystemType;
+use Helm\Products\Models\Product;
+use Helm\ShipLink\Models\ShipFitting;
+use Helm\ShipLink\Models\ShipComponent;
 
 /**
  * A component fully composed from its three table rows.
  *
- * Combines ShipSystem (instance), SystemType (catalog), and Fitting (slot)
+ * Combines ShipComponent (instance), Product (catalog), and ShipFitting (slot)
  * into a single read-friendly object.
  */
-final class FittedSystem
+final class FittedComponent
 {
     public function __construct(
-        private readonly ShipSystem $component,
-        private readonly SystemType $systemType,
-        private readonly Fitting $fitting,
+        private readonly ShipComponent $component,
+        private readonly Product $product,
+        private readonly ShipFitting $fitting,
     ) {
     }
 
@@ -28,19 +28,19 @@ final class FittedSystem
         return $this->component->id;
     }
 
-    public function slot(): FittingSlot
+    public function slot(): ShipFittingSlot
     {
         return $this->fitting->slot;
     }
 
     public function slug(): string
     {
-        return $this->systemType->slug;
+        return $this->product->slug;
     }
 
     public function label(): string
     {
-        return $this->systemType->label;
+        return $this->product->label;
     }
 
     public function life(): ?int
@@ -50,7 +50,7 @@ final class FittedSystem
 
     public function hp(): ?int
     {
-        return $this->systemType->hp;
+        return $this->product->hp;
     }
 
     public function usageCount(): int
@@ -68,23 +68,23 @@ final class FittedSystem
      *
      * Ship uses this to apply mutations (e.g. decrement core life).
      */
-    public function component(): ShipSystem
+    public function component(): ShipComponent
     {
         return $this->component;
     }
 
     /**
-     * Get the system type (catalog row).
+     * Get the product (catalog row).
      */
-    public function type(): SystemType
+    public function product(): Product
     {
-        return $this->systemType;
+        return $this->product;
     }
 
     /**
      * Get the fitting (pivot row).
      */
-    public function fitting(): Fitting
+    public function fitting(): ShipFitting
     {
         return $this->fitting;
     }

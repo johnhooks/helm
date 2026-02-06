@@ -56,7 +56,7 @@ final class Shields implements ShieldsContract
 
     public function getRegenRate(): float
     {
-        return $this->loadout->shield()->type()->rate ?? 0.0;
+        return $this->loadout->shield()->product()->rate ?? 0.0;
     }
 
     public function isDepleted(): bool

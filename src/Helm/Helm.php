@@ -18,6 +18,7 @@ use Helm\lucatume\DI52\Container;
 use Helm\Navigation\Provider as NavigationProvider;
 use Helm\Origin\Provider as OriginProvider;
 use Helm\Planets\Provider as PlanetsProvider;
+use Helm\Products\Provider as ProductsProvider;
 use Helm\PostTypes\Provider as PostTypesProvider;
 use Helm\Rest\Provider as RestProvider;
 use Helm\ShipLink\Provider as ShipLinkProvider;
@@ -58,6 +59,7 @@ final class Helm
         OriginProvider::class,
         PlanetsProvider::class,
         PostTypesProvider::class,
+        ProductsProvider::class,
         RestProvider::class,
         ShipLinkProvider::class,
         StarsProvider::class,

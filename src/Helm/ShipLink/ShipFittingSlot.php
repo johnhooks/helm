@@ -10,7 +10,7 @@ namespace Helm\ShipLink;
  * Each slot can hold one component. Required slots (core, drive, sensor,
  * shield, nav) must always be filled. Equipment slots are optional.
  */
-enum FittingSlot: string
+enum ShipFittingSlot: string
 {
     case Core = 'core';
     case Drive = 'drive';
@@ -41,7 +41,7 @@ enum FittingSlot: string
     /**
      * Get all required slots.
      *
-     * @return array<FittingSlot>
+     * @return array<ShipFittingSlot>
      */
     public static function required(): array
     {
@@ -57,7 +57,7 @@ enum FittingSlot: string
     /**
      * Get all equipment slots.
      *
-     * @return array<FittingSlot>
+     * @return array<ShipFittingSlot>
      */
     public static function equipment(): array
     {

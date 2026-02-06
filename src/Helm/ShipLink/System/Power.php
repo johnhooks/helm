@@ -60,7 +60,7 @@ final class Power implements PowerSystem
 
     public function getRegenRate(): float
     {
-        return ($this->loadout->core()->type()->rate ?? 0.0) * $this->state->power_mode->regenMultiplier();
+        return ($this->loadout->core()->product()->rate ?? 0.0) * $this->state->power_mode->regenMultiplier();
     }
 
     public function hasAvailable(float $amount): bool
@@ -85,7 +85,7 @@ final class Power implements PowerSystem
 
     public function getOutputMultiplier(): float
     {
-        return ($this->loadout->core()->type()->mult_a ?? 0.0) * $this->state->power_mode->outputMultiplier();
+        return ($this->loadout->core()->product()->mult_a ?? 0.0) * $this->state->power_mode->outputMultiplier();
     }
 
     public function getPowerMode(): PowerMode

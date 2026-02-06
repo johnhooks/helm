@@ -21,22 +21,12 @@ final class Provider extends ServiceProvider
             return new ShipStateRepository();
         });
 
-        $this->container->singleton(SystemTypeRepository::class, function () {
-            return new SystemTypeRepository();
+        $this->container->singleton(ShipComponentRepository::class, function () {
+            return new ShipComponentRepository();
         });
 
-        $this->container->singleton(ShipSystemRepository::class, function () {
-            return new ShipSystemRepository();
-        });
-
-        $this->container->singleton(FittingRepository::class, function () {
-            return new FittingRepository();
-        });
-
-        $this->container->singleton(SystemTypeSeeder::class, function () {
-            return new SystemTypeSeeder(
-                $this->container->get(SystemTypeRepository::class),
-            );
+        $this->container->singleton(ShipFittingRepository::class, function () {
+            return new ShipFittingRepository();
         });
 
         $this->container->singleton(ActionRepository::class, function () {
@@ -45,9 +35,9 @@ final class Provider extends ServiceProvider
 
         $this->container->singleton(LoadoutFactory::class, function () {
             return new LoadoutFactory(
-                $this->container->get(SystemTypeRepository::class),
-                $this->container->get(ShipSystemRepository::class),
-                $this->container->get(FittingRepository::class),
+                $this->container->get(\Helm\Products\ProductRepository::class),
+                $this->container->get(ShipComponentRepository::class),
+                $this->container->get(ShipFittingRepository::class),
             );
         });
 
@@ -68,7 +58,7 @@ final class Provider extends ServiceProvider
                 $this->container,
                 $this->container->get(ActionRepository::class),
                 $this->container->get(ShipStateRepository::class),
-                $this->container->get(ShipSystemRepository::class),
+                $this->container->get(ShipComponentRepository::class),
                 $this->container->get(ShipFactory::class),
             );
         });
@@ -78,7 +68,7 @@ final class Provider extends ServiceProvider
                 $this->container,
                 $this->container->get(ActionRepository::class),
                 $this->container->get(ShipStateRepository::class),
-                $this->container->get(ShipSystemRepository::class),
+                $this->container->get(ShipComponentRepository::class),
                 $this->container->get(ShipFactory::class),
             );
         });

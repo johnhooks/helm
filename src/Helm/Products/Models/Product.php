@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace Helm\ShipLink\Models;
+namespace Helm\Products\Models;
 
 use DateTimeImmutable;
 use Helm\StellarWP\Models\Model;
 use Helm\StellarWP\Models\ModelPropertyDefinition;
 
 /**
- * System type catalog row from the helm_system_types table.
+ * Product catalog row from the helm_products table.
  *
  * Defines a component blueprint: what stats it has, how much space it takes,
- * and its maximum hit points. Individual instances reference a SystemType
- * via type_id.
+ * and its maximum hit points. Individual instances reference a Product
+ * via product_id.
  *
  * Generic stat columns - each component type uses a subset:
  * | Type   | rate  | range   | capacity | chance  | mult_a   | mult_b      | mult_c    |
@@ -41,7 +41,7 @@ use Helm\StellarWP\Models\ModelPropertyDefinition;
  * @property DateTimeImmutable $created_at
  * @property DateTimeImmutable $updated_at
  */
-final class SystemType extends Model
+final class Product extends Model
 {
     /**
      * @inheritDoc

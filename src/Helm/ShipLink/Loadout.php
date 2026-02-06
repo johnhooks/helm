@@ -4,21 +4,20 @@ declare(strict_types=1);
 
 namespace Helm\ShipLink;
 
-use Helm\ShipLink\Models\ShipSystem;
+use Helm\ShipLink\Models\ShipComponent;
 
 /**
- * Aggregates all fitted systems for a ship, keyed by slot.
+ * Aggregates all fitted components for a ship, keyed by slot.
  *
- * Replaces the old ShipSystems model as the single point of access
- * for component data within Ship and System classes.
+ * The single point of access for component data within Ship and System classes.
  */
 final class Loadout
 {
-    /** @var array<string, FittedSystem> */
+    /** @var array<string, FittedComponent> */
     private array $slots;
 
     /**
-     * @param array<string, FittedSystem> $slots Keyed by slot value string
+     * @param array<string, FittedComponent> $slots Keyed by slot value string
      */
     public function __construct(array $slots)
     {
@@ -28,53 +27,53 @@ final class Loadout
     /**
      * @throws \RuntimeException If core slot is not fitted
      */
-    public function core(): FittedSystem
+    public function core(): FittedComponent
     {
-        return $this->requireSlot(FittingSlot::Core);
+        return $this->requireSlot(ShipFittingSlot::Core);
     }
 
     /**
      * @throws \RuntimeException If drive slot is not fitted
      */
-    public function drive(): FittedSystem
+    public function drive(): FittedComponent
     {
-        return $this->requireSlot(FittingSlot::Drive);
+        return $this->requireSlot(ShipFittingSlot::Drive);
     }
 
     /**
      * @throws \RuntimeException If sensor slot is not fitted
      */
-    public function sensor(): FittedSystem
+    public function sensor(): FittedComponent
     {
-        return $this->requireSlot(FittingSlot::Sensor);
+        return $this->requireSlot(ShipFittingSlot::Sensor);
     }
 
     /**
      * @throws \RuntimeException If shield slot is not fitted
      */
-    public function shield(): FittedSystem
+    public function shield(): FittedComponent
     {
-        return $this->requireSlot(FittingSlot::Shield);
+        return $this->requireSlot(ShipFittingSlot::Shield);
     }
 
     /**
      * @throws \RuntimeException If nav slot is not fitted
      */
-    public function nav(): FittedSystem
+    public function nav(): FittedComponent
     {
-        return $this->requireSlot(FittingSlot::Nav);
+        return $this->requireSlot(ShipFittingSlot::Nav);
     }
 
     /**
      * Get equipment slots.
      *
-     * @return array<FittedSystem>
+     * @return array<FittedComponent>
      */
     public function equipment(): array
     {
         $equipment = [];
 
-        foreach (FittingSlot::equipment() as $slot) {
+        foreach (ShipFittingSlot::equipment() as $slot) {
             $key = $slot->value;
             if (isset($this->slots[$key])) {
                 $equipment[] = $this->slots[$key];
@@ -85,11 +84,11 @@ final class Loadout
     }
 
     /**
-     * Get a fitted system by slot, or null if empty.
+     * Get a fitted component by slot, or null if empty.
      */
-    public function slot(FittingSlot|string $slot): ?FittedSystem
+    public function slot(ShipFittingSlot|string $slot): ?FittedComponent
     {
-        $key = $slot instanceof FittingSlot ? $slot->value : $slot;
+        $key = $slot instanceof ShipFittingSlot ? $slot->value : $slot;
         return $this->slots[$key] ?? null;
     }
 
@@ -101,7 +100,7 @@ final class Loadout
         $total = 0;
 
         foreach ($this->slots as $fitted) {
-            $total += $fitted->type()->footprint;
+            $total += $fitted->product()->footprint;
         }
 
         return $total;
@@ -122,7 +121,7 @@ final class Loadout
      *
      * Used by the save path in ActionFactory/Resolver to persist changes.
      *
-     * @return array<ShipSystem>
+     * @return array<ShipComponent>
      */
     public function dirtyComponents(): array
     {
@@ -142,7 +141,7 @@ final class Loadout
      *
      * @throws \RuntimeException
      */
-    private function requireSlot(FittingSlot $slot): FittedSystem
+    private function requireSlot(ShipFittingSlot $slot): FittedComponent
     {
         $key = $slot->value;
         if (!isset($this->slots[$key])) {

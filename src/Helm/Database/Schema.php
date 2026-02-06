@@ -19,8 +19,8 @@ final class Schema
     public const TABLE_NAV_NODES = 'helm_nav_nodes';
     public const TABLE_NAV_EDGES = 'helm_nav_edges';
     public const TABLE_NAV_ROUTES = 'helm_nav_routes';
-    public const TABLE_SYSTEM_TYPES = 'helm_system_types';
-    public const TABLE_SHIP_SYSTEMS = 'helm_ship_systems';
+    public const TABLE_PRODUCTS = 'helm_products';
+    public const TABLE_SHIP_COMPONENTS = 'helm_ship_components';
     public const TABLE_SHIP_FITTINGS = 'helm_ship_fittings';
     public const TABLE_SHIP_STATE = 'helm_ship_state';
     public const TABLE_SHIP_ACTIONS = 'helm_ship_actions';
@@ -33,8 +33,8 @@ final class Schema
         self::TABLE_NAV_NODES,
         self::TABLE_NAV_EDGES,
         self::TABLE_NAV_ROUTES,
-        self::TABLE_SYSTEM_TYPES,
-        self::TABLE_SHIP_SYSTEMS,
+        self::TABLE_PRODUCTS,
+        self::TABLE_SHIP_COMPONENTS,
         self::TABLE_SHIP_FITTINGS,
         self::TABLE_SHIP_STATE,
         self::TABLE_SHIP_ACTIONS,
@@ -44,7 +44,7 @@ final class Schema
      * Current schema version.
      * Increment when making schema changes.
      */
-    public const VERSION = 3;
+    public const VERSION = 4;
 
     /**
      * Option key for stored schema version.
@@ -68,8 +68,8 @@ final class Schema
              . self::getNavNodesTableSql($prefix, $charsetCollate)
              . self::getNavEdgesTableSql($prefix, $charsetCollate)
              . self::getNavRoutesTableSql($prefix, $charsetCollate)
-             . self::getSystemTypesTableSql($prefix, $charsetCollate)
-             . self::getShipSystemsTableSql($prefix, $charsetCollate)
+             . self::getProductsTableSql($prefix, $charsetCollate)
+             . self::getShipComponentsTableSql($prefix, $charsetCollate)
              . self::getShipFittingsTableSql($prefix, $charsetCollate)
              . self::getShipStateTableSql($prefix, $charsetCollate)
              . self::getShipActionsTableSql($prefix, $charsetCollate);
@@ -305,15 +305,15 @@ CREATE TABLE {$prefix}helm_nav_routes (
     }
 
     /**
-     * System types table SQL.
+     * Products table SQL.
      *
      * Catalog of component definitions, seeded from JSON.
      * Versioned so balance changes create new rows while old components keep their reference.
      */
-    private static function getSystemTypesTableSql(string $prefix, string $charsetCollate): string
+    private static function getProductsTableSql(string $prefix, string $charsetCollate): string
     {
         return "
-CREATE TABLE {$prefix}helm_system_types (
+CREATE TABLE {$prefix}helm_products (
     id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
     slug varchar(64) NOT NULL,
     type varchar(32) NOT NULL,
@@ -338,17 +338,17 @@ CREATE TABLE {$prefix}helm_system_types (
     }
 
     /**
-     * Ship systems table SQL.
+     * Ship components table SQL.
      *
      * Individual component instances with lifecycle data.
      * Each row is a specific component that exists in the game world.
      */
-    private static function getShipSystemsTableSql(string $prefix, string $charsetCollate): string
+    private static function getShipComponentsTableSql(string $prefix, string $charsetCollate): string
     {
         return "
-CREATE TABLE {$prefix}helm_ship_systems (
+CREATE TABLE {$prefix}helm_ship_components (
     id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-    type_id bigint(20) unsigned NOT NULL,
+    product_id bigint(20) unsigned NOT NULL,
     life int(10) unsigned DEFAULT NULL,
     usage_count int(10) unsigned NOT NULL DEFAULT 0,
     `condition` float NOT NULL DEFAULT 1.0,
@@ -359,7 +359,7 @@ CREATE TABLE {$prefix}helm_ship_systems (
     created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY  (id),
-    KEY type_id (type_id)
+    KEY product_id (product_id)
 ) {$charsetCollate};
 ";
     }
@@ -375,11 +375,11 @@ CREATE TABLE {$prefix}helm_ship_systems (
         return "
 CREATE TABLE {$prefix}helm_ship_fittings (
     ship_post_id bigint(20) unsigned NOT NULL,
-    system_id bigint(20) unsigned NOT NULL,
+    component_id bigint(20) unsigned NOT NULL,
     slot varchar(20) NOT NULL,
     installed_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY  (ship_post_id,slot),
-    UNIQUE KEY system_id (system_id)
+    UNIQUE KEY component_id (component_id)
 ) {$charsetCollate};
 ";
     }

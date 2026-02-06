@@ -44,12 +44,12 @@ final class Navigation implements NavigationContract
 
     public function getSkill(): float
     {
-        return $this->loadout->nav()->type()->mult_a ?? 0.0;
+        return $this->loadout->nav()->product()->mult_a ?? 0.0;
     }
 
     public function getEfficiency(): float
     {
-        return $this->loadout->nav()->type()->mult_b ?? 0.0;
+        return $this->loadout->nav()->product()->mult_b ?? 0.0;
     }
 
     public function getDiscoveryProbability(int $hopDepth): float

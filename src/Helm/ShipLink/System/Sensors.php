@@ -47,7 +47,7 @@ final class Sensors implements SensorsContract
 
     public function getBaseRange(): float
     {
-        return $this->loadout->sensor()->type()->range ?? 0.0;
+        return $this->loadout->sensor()->product()->range ?? 0.0;
     }
 
     public function canScan(float $distanceLy): bool
@@ -73,11 +73,11 @@ final class Sensors implements SensorsContract
 
     public function getSurveyDurationMultiplier(): float
     {
-        return $this->loadout->sensor()->type()->mult_a ?? 0.0;
+        return $this->loadout->sensor()->product()->mult_a ?? 0.0;
     }
 
     public function getScanSuccessChance(): float
     {
-        return $this->loadout->sensor()->type()->chance ?? 0.0;
+        return $this->loadout->sensor()->product()->chance ?? 0.0;
     }
 }

@@ -726,7 +726,7 @@ class ShipCommand
         $power = $ship->power();
 
         $coreCost = $distance
-            * ($loadout->core()->type()->mult_b ?? 0.0)
+            * ($loadout->core()->product()->mult_b ?? 0.0)
             * $propulsion->getCoreDecayMultiplier()
             * $power->getDecayMultiplier();
         $duration = $propulsion->getJumpDuration($distance);

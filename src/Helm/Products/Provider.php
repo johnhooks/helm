@@ -1,0 +1,34 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Helm\Products;
+
+use Helm\lucatume\DI52\ServiceProvider;
+
+/**
+ * Service provider for the Products domain.
+ *
+ * Products are universal catalog items that can be used by ships,
+ * stations, gates, and other entities.
+ */
+final class Provider extends ServiceProvider
+{
+    public function register(): void
+    {
+        $this->container->singleton(ProductRepository::class, function () {
+            return new ProductRepository();
+        });
+
+        $this->container->singleton(ProductSeeder::class, function () {
+            return new ProductSeeder(
+                $this->container->get(ProductRepository::class),
+            );
+        });
+    }
+
+    public function boot(): void
+    {
+        // Products provider has no boot actions currently
+    }
+}

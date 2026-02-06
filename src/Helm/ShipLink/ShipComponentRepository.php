@@ -7,22 +7,22 @@ namespace Helm\ShipLink;
 use DateTimeImmutable;
 use Helm\Database\Schema;
 use Helm\Lib\Date;
-use Helm\ShipLink\Models\ShipSystem;
+use Helm\ShipLink\Models\ShipComponent;
 use Helm\StellarWP\Models\Model;
 
 /**
- * Repository for ship system component instances.
+ * Repository for ship component instances.
  */
-final class ShipSystemRepository
+final class ShipComponentRepository
 {
     /**
-     * Find a ship system by ID.
+     * Find a ship component by ID.
      */
-    public function find(int $id): ?ShipSystem
+    public function find(int $id): ?ShipComponent
     {
         global $wpdb;
 
-        $table = $wpdb->prefix . Schema::TABLE_SHIP_SYSTEMS;
+        $table = $wpdb->prefix . Schema::TABLE_SHIP_COMPONENTS;
 
         $row = $wpdb->get_row(
             $wpdb->prepare(
@@ -40,20 +40,20 @@ final class ShipSystemRepository
     }
 
     /**
-     * Insert a new ship system component.
+     * Insert a new ship component.
      *
      * @return int|false The inserted ID on success, false on failure
      */
-    public function insert(ShipSystem $system): int|false
+    public function insert(ShipComponent $component): int|false
     {
         global $wpdb;
 
         $now = Date::now();
-        $system->created_at = $now;
-        $system->updated_at = $now;
+        $component->created_at = $now;
+        $component->updated_at = $now;
 
-        $table = $wpdb->prefix . Schema::TABLE_SHIP_SYSTEMS;
-        $row = $this->serialize($system->toArray(), $system);
+        $table = $wpdb->prefix . Schema::TABLE_SHIP_COMPONENTS;
+        $row = $this->serialize($component->toArray(), $component);
 
         $result = $wpdb->insert($table, $row);
 
@@ -65,47 +65,47 @@ final class ShipSystemRepository
     }
 
     /**
-     * Update an existing ship system component.
+     * Update an existing ship component.
      *
      * Uses dirty tracking for efficient partial updates.
      */
-    public function update(ShipSystem $system): bool
+    public function update(ShipComponent $component): bool
     {
         global $wpdb;
 
-        $dirty = $system->getDirty();
+        $dirty = $component->getDirty();
 
         if ($dirty === []) {
             return true;
         }
 
-        $system->updated_at = Date::now();
-        $dirty = $system->getDirty();
+        $component->updated_at = Date::now();
+        $dirty = $component->getDirty();
 
-        $row = $this->serialize($dirty, $system);
-        $table = $wpdb->prefix . Schema::TABLE_SHIP_SYSTEMS;
+        $row = $this->serialize($dirty, $component);
+        $table = $wpdb->prefix . Schema::TABLE_SHIP_COMPONENTS;
 
         $result = $wpdb->update(
             $table,
             $row,
-            ['id' => $system->id]
+            ['id' => $component->id]
         );
 
         if ($result !== false) {
-            $system->syncOriginal();
+            $component->syncOriginal();
         }
 
         return $result !== false;
     }
 
     /**
-     * Delete a ship system component.
+     * Delete a ship component.
      */
     public function delete(int $id): bool
     {
         global $wpdb;
 
-        $table = $wpdb->prefix . Schema::TABLE_SHIP_SYSTEMS;
+        $table = $wpdb->prefix . Schema::TABLE_SHIP_COMPONENTS;
 
         $result = $wpdb->delete($table, ['id' => $id]);
 
@@ -117,9 +117,9 @@ final class ShipSystemRepository
      *
      * @param array<string, mixed> $row
      */
-    private function hydrate(array $row): ShipSystem
+    private function hydrate(array $row): ShipComponent
     {
-        $model = ShipSystem::fromData(
+        $model = ShipComponent::fromData(
             $row,
             Model::BUILD_MODE_IGNORE_MISSING | Model::BUILD_MODE_IGNORE_EXTRA
         );
@@ -134,7 +134,7 @@ final class ShipSystemRepository
      * @param array<string, mixed> $values
      * @return array<string, mixed>
      */
-    private function serialize(array $values, ShipSystem $model): array
+    private function serialize(array $values, ShipComponent $model): array
     {
         $row = [];
 

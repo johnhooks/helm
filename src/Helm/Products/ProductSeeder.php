@@ -2,29 +2,29 @@
 
 declare(strict_types=1);
 
-namespace Helm\ShipLink;
+namespace Helm\Products;
 
 /**
- * Seeds the system_types table from JSON data files.
+ * Seeds the products table from JSON data files.
  *
- * Reads all JSON files from data/system-types/ and upserts into
- * helm_system_types. Idempotent - safe to run on every activation.
+ * Reads all JSON files from data/products/ and upserts into
+ * helm_products. Idempotent - safe to run on every activation.
  */
-final class SystemTypeSeeder
+final class ProductSeeder
 {
     public function __construct(
-        private readonly SystemTypeRepository $repository,
+        private readonly ProductRepository $repository,
     ) {
     }
 
     /**
-     * Seed all system types from JSON files.
+     * Seed all products from JSON files.
      *
-     * @return int Number of types seeded (inserted, not counting existing)
+     * @return int Number of products seeded (inserted, not counting existing)
      */
     public function seed(): int
     {
-        $dataDir = dirname(__DIR__, 3) . '/data/system-types';
+        $dataDir = dirname(__DIR__, 3) . '/data/products';
 
         if (!is_dir($dataDir)) {
             return 0;

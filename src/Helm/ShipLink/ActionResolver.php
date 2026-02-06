@@ -23,7 +23,7 @@ final class ActionResolver
         private readonly Container $container,
         private readonly ActionRepository $actionRepository,
         private readonly ShipStateRepository $stateRepository,
-        private readonly ShipSystemRepository $shipSystemRepository,
+        private readonly ShipComponentRepository $componentRepository,
         private readonly ShipFactory $shipFactory,
     ) {
     }
@@ -95,7 +95,7 @@ final class ActionResolver
             $this->stateRepository->update($ship->getState());
 
             foreach ($ship->getLoadout()->dirtyComponents() as $component) {
-                $this->shipSystemRepository->update($component);
+                $this->componentRepository->update($component);
             }
 
             $this->stateRepository->updateCurrentAction($action->ship_post_id, null);

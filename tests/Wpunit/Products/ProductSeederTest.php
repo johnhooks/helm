@@ -2,25 +2,25 @@
 
 declare(strict_types=1);
 
-namespace Tests\Wpunit\ShipLink;
+namespace Tests\Wpunit\Products;
 
-use Helm\ShipLink\SystemTypeRepository;
-use Helm\ShipLink\SystemTypeSeeder;
+use Helm\Products\ProductRepository;
+use Helm\Products\ProductSeeder;
 use lucatume\WPBrowser\TestCase\WPTestCase;
 
 /**
- * @covers \Helm\ShipLink\SystemTypeSeeder
+ * @covers \Helm\Products\ProductSeeder
  */
-class SystemTypeSeederTest extends WPTestCase
+class ProductSeederTest extends WPTestCase
 {
-    private SystemTypeSeeder $seeder;
-    private SystemTypeRepository $repository;
+    private ProductSeeder $seeder;
+    private ProductRepository $repository;
 
     public function _before(): void
     {
         parent::_before();
-        $this->repository = helm(SystemTypeRepository::class);
-        $this->seeder = new SystemTypeSeeder($this->repository);
+        $this->repository = helm(ProductRepository::class);
+        $this->seeder = new ProductSeeder($this->repository);
     }
 
     public function test_seed_returns_count(): void
@@ -50,11 +50,11 @@ class SystemTypeSeederTest extends WPTestCase
         $this->assertCount(count($uniqueSlugs), $slugs, 'Duplicate slugs found');
     }
 
-    public function test_seeded_types_have_correct_data(): void
+    public function test_seeded_products_have_correct_data(): void
     {
         $this->seeder->seed();
 
-        // Verify a core type
+        // Verify a core product
         $epochS = $this->repository->findBySlug('epoch_s');
         $this->assertNotNull($epochS);
         $this->assertSame('core', $epochS->type);
@@ -65,7 +65,7 @@ class SystemTypeSeederTest extends WPTestCase
         $this->assertSame(1.0, $epochS->mult_a);
         $this->assertSame(1.0, $epochS->mult_b);
 
-        // Verify a drive type
+        // Verify a drive product
         $dr505 = $this->repository->findBySlug('dr_505');
         $this->assertNotNull($dr505);
         $this->assertSame('drive', $dr505->type);
@@ -74,21 +74,21 @@ class SystemTypeSeederTest extends WPTestCase
         $this->assertSame(1.0, $dr505->mult_b);
         $this->assertSame(1.0, $dr505->mult_c);
 
-        // Verify a sensor type
+        // Verify a sensor product
         $vrs = $this->repository->findBySlug('vrs_mk1');
         $this->assertNotNull($vrs);
         $this->assertSame('sensor', $vrs->type);
         $this->assertSame(5.0, $vrs->range);
         $this->assertSame(0.7, $vrs->chance);
 
-        // Verify a shield type
+        // Verify a shield product
         $aegisBeta = $this->repository->findBySlug('aegis_beta');
         $this->assertNotNull($aegisBeta);
         $this->assertSame('shield', $aegisBeta->type);
         $this->assertSame(10.0, $aegisBeta->rate);
         $this->assertSame(100.0, $aegisBeta->capacity);
 
-        // Verify a nav type
+        // Verify a nav product
         $navTier1 = $this->repository->findBySlug('nav_tier_1');
         $this->assertNotNull($navTier1);
         $this->assertSame('nav', $navTier1->type);

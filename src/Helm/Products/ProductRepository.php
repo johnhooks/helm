@@ -2,27 +2,27 @@
 
 declare(strict_types=1);
 
-namespace Helm\ShipLink;
+namespace Helm\Products;
 
 use DateTimeImmutable;
 use Helm\Database\Schema;
 use Helm\Lib\Date;
-use Helm\ShipLink\Models\SystemType;
+use Helm\Products\Models\Product;
 use Helm\StellarWP\Models\Model;
 
 /**
- * Repository for system type catalog table operations.
+ * Repository for product catalog table operations.
  */
-final class SystemTypeRepository
+final class ProductRepository
 {
     /**
-     * Find a system type by ID.
+     * Find a product by ID.
      */
-    public function find(int $id): ?SystemType
+    public function find(int $id): ?Product
     {
         global $wpdb;
 
-        $table = $wpdb->prefix . Schema::TABLE_SYSTEM_TYPES;
+        $table = $wpdb->prefix . Schema::TABLE_PRODUCTS;
 
         $row = $wpdb->get_row(
             $wpdb->prepare(
@@ -40,15 +40,15 @@ final class SystemTypeRepository
     }
 
     /**
-     * Find a system type by slug, optionally at a specific version.
+     * Find a product by slug, optionally at a specific version.
      *
      * Returns the latest version if version is null.
      */
-    public function findBySlug(string $slug, ?int $version = null): ?SystemType
+    public function findBySlug(string $slug, ?int $version = null): ?Product
     {
         global $wpdb;
 
-        $table = $wpdb->prefix . Schema::TABLE_SYSTEM_TYPES;
+        $table = $wpdb->prefix . Schema::TABLE_PRODUCTS;
 
         if ($version !== null) {
             $row = $wpdb->get_row(
@@ -77,15 +77,15 @@ final class SystemTypeRepository
     }
 
     /**
-     * Find all system types of a given type.
+     * Find all products of a given type.
      *
-     * @return array<SystemType>
+     * @return array<Product>
      */
     public function findAllByType(string $type): array
     {
         global $wpdb;
 
-        $table = $wpdb->prefix . Schema::TABLE_SYSTEM_TYPES;
+        $table = $wpdb->prefix . Schema::TABLE_PRODUCTS;
 
         $rows = $wpdb->get_results(
             $wpdb->prepare(
@@ -108,7 +108,7 @@ final class SystemTypeRepository
     {
         global $wpdb;
 
-        $table = $wpdb->prefix . Schema::TABLE_SYSTEM_TYPES;
+        $table = $wpdb->prefix . Schema::TABLE_PRODUCTS;
 
         $version = $wpdb->get_var(
             $wpdb->prepare(
@@ -121,20 +121,20 @@ final class SystemTypeRepository
     }
 
     /**
-     * Insert a new system type.
+     * Insert a new product.
      *
      * @return int|false The inserted ID on success, false on failure
      */
-    public function insert(SystemType $type): int|false
+    public function insert(Product $product): int|false
     {
         global $wpdb;
 
         $now = Date::now();
-        $type->created_at = $now;
-        $type->updated_at = $now;
+        $product->created_at = $now;
+        $product->updated_at = $now;
 
-        $table = $wpdb->prefix . Schema::TABLE_SYSTEM_TYPES;
-        $row = $this->serialize($type->toArray(), $type);
+        $table = $wpdb->prefix . Schema::TABLE_PRODUCTS;
+        $row = $this->serialize($product->toArray(), $product);
 
         $result = $wpdb->insert($table, $row);
 
@@ -146,13 +146,13 @@ final class SystemTypeRepository
     }
 
     /**
-     * Upsert a system type for seeding.
+     * Upsert a product for seeding.
      *
-     * Finds by slug+version, inserts if missing. Returns the system type.
+     * Finds by slug+version, inserts if missing. Returns the product.
      *
      * @param array<string, mixed> $data
      */
-    public function upsert(array $data): SystemType
+    public function upsert(array $data): Product
     {
         $slug = $data['slug'];
         $version = $data['version'] ?? 1;
@@ -162,19 +162,19 @@ final class SystemTypeRepository
             return $existing;
         }
 
-        $type = SystemType::fromData(
+        $product = Product::fromData(
             $data,
             Model::BUILD_MODE_IGNORE_MISSING | Model::BUILD_MODE_IGNORE_EXTRA
         );
-        $id = $this->insert($type);
+        $id = $this->insert($product);
 
         if ($id === false) {
             // Insert failed, return the model without ID
-            return $type;
+            return $product;
         }
 
         // Refetch to get the full model with ID
-        return $this->find($id) ?? $type;
+        return $this->find($id) ?? $product;
     }
 
     /**
@@ -182,9 +182,9 @@ final class SystemTypeRepository
      *
      * @param array<string, mixed> $row
      */
-    private function hydrate(array $row): SystemType
+    private function hydrate(array $row): Product
     {
-        $model = SystemType::fromData(
+        $model = Product::fromData(
             $row,
             Model::BUILD_MODE_IGNORE_MISSING | Model::BUILD_MODE_IGNORE_EXTRA
         );
@@ -199,7 +199,7 @@ final class SystemTypeRepository
      * @param array<string, mixed> $values
      * @return array<string, mixed>
      */
-    private function serialize(array $values, SystemType $model): array
+    private function serialize(array $values, Product $model): array
     {
         $row = [];
 

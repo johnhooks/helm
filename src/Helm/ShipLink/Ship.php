@@ -216,7 +216,7 @@ final class Ship implements ShipLink
         // Core cost = distance × core multiplier × drive decay × power mode decay
         // Efficiency mode (decay = 0) means no core cost - safe harbor
         // mult_b is the jump cost multiplier for cores
-        $jumpCostMultiplier = $this->loadout->core()->type()->mult_b ?? 1.0;
+        $jumpCostMultiplier = $this->loadout->core()->product()->mult_b ?? 1.0;
 
         return $distance
             * $jumpCostMultiplier

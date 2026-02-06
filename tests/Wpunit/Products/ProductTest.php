@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-namespace Tests\Wpunit\ShipLink;
+namespace Tests\Wpunit\Products;
 
-use Helm\ShipLink\Models\SystemType;
+use Helm\Products\Models\Product;
 use Helm\StellarWP\Models\Model;
 use lucatume\WPBrowser\TestCase\WPTestCase;
 
 /**
- * @covers \Helm\ShipLink\Models\SystemType
+ * @covers \Helm\Products\Models\Product
  */
-class SystemTypeTest extends WPTestCase
+class ProductTest extends WPTestCase
 {
     public function test_can_construct_with_attributes(): void
     {
-        $type = new SystemType([
+        $product = new Product([
             'slug' => 'epoch_s',
             'type' => 'core',
             'label' => 'Epoch-S Standard',
@@ -27,15 +27,15 @@ class SystemTypeTest extends WPTestCase
             'mult_b' => 1.0,
         ]);
 
-        $this->assertSame('epoch_s', $type->slug);
-        $this->assertSame('core', $type->type);
-        $this->assertSame('Epoch-S Standard', $type->label);
-        $this->assertSame(1, $type->version);
-        $this->assertSame(750, $type->hp);
-        $this->assertSame(25, $type->footprint);
-        $this->assertSame(10.0, $type->rate);
-        $this->assertSame(1.0, $type->mult_a);
-        $this->assertSame(1.0, $type->mult_b);
+        $this->assertSame('epoch_s', $product->slug);
+        $this->assertSame('core', $product->type);
+        $this->assertSame('Epoch-S Standard', $product->label);
+        $this->assertSame(1, $product->version);
+        $this->assertSame(750, $product->hp);
+        $this->assertSame(25, $product->footprint);
+        $this->assertSame(10.0, $product->rate);
+        $this->assertSame(1.0, $product->mult_a);
+        $this->assertSame(1.0, $product->mult_b);
     }
 
     public function test_fromData_casts_database_values(): void
@@ -59,23 +59,23 @@ class SystemTypeTest extends WPTestCase
             'updated_at' => '2025-01-01 00:00:00',
         ];
 
-        $type = SystemType::fromData($row, Model::BUILD_MODE_IGNORE_MISSING | Model::BUILD_MODE_IGNORE_EXTRA);
+        $product = Product::fromData($row, Model::BUILD_MODE_IGNORE_MISSING | Model::BUILD_MODE_IGNORE_EXTRA);
 
-        $this->assertSame(5, $type->id);
-        $this->assertSame('dr_505', $type->slug);
-        $this->assertSame('drive', $type->type);
-        $this->assertSame(1, $type->version);
-        $this->assertNull($type->hp);
-        $this->assertSame(30, $type->footprint);
-        $this->assertSame(7.0, $type->range);
-        $this->assertSame(1.0, $type->mult_a);
-        $this->assertSame(1.0, $type->mult_b);
-        $this->assertSame(1.0, $type->mult_c);
+        $this->assertSame(5, $product->id);
+        $this->assertSame('dr_505', $product->slug);
+        $this->assertSame('drive', $product->type);
+        $this->assertSame(1, $product->version);
+        $this->assertNull($product->hp);
+        $this->assertSame(30, $product->footprint);
+        $this->assertSame(7.0, $product->range);
+        $this->assertSame(1.0, $product->mult_a);
+        $this->assertSame(1.0, $product->mult_b);
+        $this->assertSame(1.0, $product->mult_c);
     }
 
     public function test_nullable_floats_cast_correctly(): void
     {
-        $type = SystemType::fromData([
+        $product = Product::fromData([
             'slug' => 'test',
             'type' => 'core',
             'label' => 'Test',
@@ -84,65 +84,65 @@ class SystemTypeTest extends WPTestCase
             'capacity' => null,
         ], Model::BUILD_MODE_IGNORE_MISSING | Model::BUILD_MODE_IGNORE_EXTRA);
 
-        $this->assertSame(5.0, $type->rate);
-        $this->assertNull($type->range);
-        $this->assertNull($type->capacity);
+        $this->assertSame(5.0, $product->rate);
+        $this->assertNull($product->range);
+        $this->assertNull($product->capacity);
     }
 
     public function test_hp_null_for_non_core_types(): void
     {
-        $type = new SystemType([
+        $product = new Product([
             'slug' => 'test_drive',
             'type' => 'drive',
             'label' => 'Test Drive',
             'hp' => null,
         ]);
 
-        $this->assertNull($type->hp);
+        $this->assertNull($product->hp);
     }
 
     public function test_version_defaults_to_one(): void
     {
-        $type = new SystemType([
+        $product = new Product([
             'slug' => 'test',
             'type' => 'core',
             'label' => 'Test',
         ]);
 
-        $this->assertSame(1, $type->version);
+        $this->assertSame(1, $product->version);
     }
 
     public function test_footprint_defaults_to_zero(): void
     {
-        $type = new SystemType([
+        $product = new Product([
             'slug' => 'test',
             'type' => 'core',
             'label' => 'Test',
         ]);
 
-        $this->assertSame(0, $type->footprint);
+        $this->assertSame(0, $product->footprint);
     }
 
     public function test_all_stat_columns_nullable(): void
     {
-        $type = new SystemType([
+        $product = new Product([
             'slug' => 'minimal',
             'type' => 'equipment',
             'label' => 'Minimal',
         ]);
 
-        $this->assertNull($type->rate);
-        $this->assertNull($type->range);
-        $this->assertNull($type->capacity);
-        $this->assertNull($type->chance);
-        $this->assertNull($type->mult_a);
-        $this->assertNull($type->mult_b);
-        $this->assertNull($type->mult_c);
+        $this->assertNull($product->rate);
+        $this->assertNull($product->range);
+        $this->assertNull($product->capacity);
+        $this->assertNull($product->chance);
+        $this->assertNull($product->mult_a);
+        $this->assertNull($product->mult_b);
+        $this->assertNull($product->mult_c);
     }
 
     public function test_core_stat_columns(): void
     {
-        $type = new SystemType([
+        $product = new Product([
             'slug' => 'test_core',
             'type' => 'core',
             'label' => 'Test Core',
@@ -152,14 +152,14 @@ class SystemTypeTest extends WPTestCase
             'mult_b' => 1.0,     // jump_cost_multiplier
         ]);
 
-        $this->assertSame(10.0, $type->rate);
-        $this->assertSame(1.0, $type->mult_a);
-        $this->assertSame(1.0, $type->mult_b);
+        $this->assertSame(10.0, $product->rate);
+        $this->assertSame(1.0, $product->mult_a);
+        $this->assertSame(1.0, $product->mult_b);
     }
 
     public function test_drive_stat_columns(): void
     {
-        $type = new SystemType([
+        $product = new Product([
             'slug' => 'test_drive',
             'type' => 'drive',
             'label' => 'Test Drive',
@@ -169,15 +169,15 @@ class SystemTypeTest extends WPTestCase
             'mult_c' => 1.0,     // amplitude
         ]);
 
-        $this->assertSame(7.0, $type->range);
-        $this->assertSame(1.0, $type->mult_a);
-        $this->assertSame(1.0, $type->mult_b);
-        $this->assertSame(1.0, $type->mult_c);
+        $this->assertSame(7.0, $product->range);
+        $this->assertSame(1.0, $product->mult_a);
+        $this->assertSame(1.0, $product->mult_b);
+        $this->assertSame(1.0, $product->mult_c);
     }
 
     public function test_sensor_stat_columns(): void
     {
-        $type = new SystemType([
+        $product = new Product([
             'slug' => 'test_sensor',
             'type' => 'sensor',
             'label' => 'Test Sensor',
@@ -186,14 +186,14 @@ class SystemTypeTest extends WPTestCase
             'mult_a' => 1.0,     // survey_duration_multiplier
         ]);
 
-        $this->assertSame(5.0, $type->range);
-        $this->assertSame(0.7, $type->chance);
-        $this->assertSame(1.0, $type->mult_a);
+        $this->assertSame(5.0, $product->range);
+        $this->assertSame(0.7, $product->chance);
+        $this->assertSame(1.0, $product->mult_a);
     }
 
     public function test_shield_stat_columns(): void
     {
-        $type = new SystemType([
+        $product = new Product([
             'slug' => 'test_shield',
             'type' => 'shield',
             'label' => 'Test Shield',
@@ -201,13 +201,13 @@ class SystemTypeTest extends WPTestCase
             'capacity' => 100.0, // max_capacity
         ]);
 
-        $this->assertSame(10.0, $type->rate);
-        $this->assertSame(100.0, $type->capacity);
+        $this->assertSame(10.0, $product->rate);
+        $this->assertSame(100.0, $product->capacity);
     }
 
     public function test_nav_stat_columns(): void
     {
-        $type = new SystemType([
+        $product = new Product([
             'slug' => 'test_nav',
             'type' => 'nav',
             'label' => 'Test Nav',
@@ -215,7 +215,7 @@ class SystemTypeTest extends WPTestCase
             'mult_b' => 0.5,     // efficiency
         ]);
 
-        $this->assertSame(0.3, $type->mult_a);
-        $this->assertSame(0.5, $type->mult_b);
+        $this->assertSame(0.3, $product->mult_a);
+        $this->assertSame(0.5, $product->mult_b);
     }
 }

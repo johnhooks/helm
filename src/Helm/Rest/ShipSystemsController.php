@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Helm\Rest;
 
 use Helm\Core\ErrorCode;
-use Helm\ShipLink\FittedSystem;
+use Helm\ShipLink\FittedComponent;
 use Helm\ShipLink\LoadoutFactory;
 use Helm\Ships\ShipPost;
 use WP_Error;
@@ -94,28 +94,28 @@ final class ShipSystemsController
         foreach (['core', 'drive', 'sensor', 'shield', 'nav'] as $slotName) {
             $fitted = $loadout->slot($slotName);
             if ($fitted !== null) {
-                $systems[] = $this->serializeFittedSystem($fitted);
+                $systems[] = $this->serializeFittedComponent($fitted);
             }
         }
 
         // Equipment slots
         foreach ($loadout->equipment() as $fitted) {
-            $systems[] = $this->serializeFittedSystem($fitted);
+            $systems[] = $this->serializeFittedComponent($fitted);
         }
 
         return new WP_REST_Response($systems);
     }
 
     /**
-     * Serialize a fitted system for JSON response.
+     * Serialize a fitted component for JSON response.
      *
      * @return array<string, mixed>
      */
-    private function serializeFittedSystem(FittedSystem $fitted): array
+    private function serializeFittedComponent(FittedComponent $fitted): array
     {
         return [
             'id'          => $fitted->id(),
-            'type_id'     => $fitted->component()->type_id,
+            'product_id'  => $fitted->component()->product_id,
             'slot'        => $fitted->slot()->value,
             'life'        => $fitted->life(),
             'usage_count' => $fitted->usageCount(),

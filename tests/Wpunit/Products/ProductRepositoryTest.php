@@ -2,31 +2,30 @@
 
 declare(strict_types=1);
 
-namespace Tests\Wpunit\ShipLink;
+namespace Tests\Wpunit\Products;
 
-use Helm\ShipLink\Models\SystemType;
-use Helm\ShipLink\SystemTypeRepository;
+use Helm\Products\ProductRepository;
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use Tests\Support\WpunitTester;
 
 /**
- * @covers \Helm\ShipLink\SystemTypeRepository
+ * @covers \Helm\Products\ProductRepository
  *
  * @property WpunitTester $tester
  */
-class SystemTypeRepositoryTest extends WPTestCase
+class ProductRepositoryTest extends WPTestCase
 {
-    private SystemTypeRepository $repository;
+    private ProductRepository $repository;
 
     public function _before(): void
     {
         parent::_before();
-        $this->repository = helm(SystemTypeRepository::class);
+        $this->repository = helm(ProductRepository::class);
     }
 
     public function test_insert_and_find(): void
     {
-        $type = $this->tester->haveSystemType([
+        $product = $this->tester->haveProduct([
             'slug' => 'test_core',
             'type' => 'core',
             'label' => 'Test Core',
@@ -37,12 +36,12 @@ class SystemTypeRepositoryTest extends WPTestCase
             'mult_b' => 0.75,
         ]);
 
-        $this->assertGreaterThan(0, $type->id);
+        $this->assertGreaterThan(0, $product->id);
 
-        $found = $this->repository->find($type->id);
+        $found = $this->repository->find($product->id);
 
         $this->assertNotNull($found);
-        $this->assertSame($type->id, $found->id);
+        $this->assertSame($product->id, $found->id);
         $this->assertSame('test_core', $found->slug);
         $this->assertSame('core', $found->type);
         $this->assertSame('Test Core', $found->label);
@@ -62,14 +61,14 @@ class SystemTypeRepositoryTest extends WPTestCase
 
     public function test_findBySlug_returns_latest_version(): void
     {
-        $this->tester->haveSystemType([
+        $this->tester->haveProduct([
             'slug' => 'versioned_core',
             'type' => 'core',
             'label' => 'Version 1',
             'version' => 1,
         ]);
 
-        $this->tester->haveSystemType([
+        $this->tester->haveProduct([
             'slug' => 'versioned_core',
             'type' => 'core',
             'label' => 'Version 2',
@@ -85,14 +84,14 @@ class SystemTypeRepositoryTest extends WPTestCase
 
     public function test_findBySlug_with_specific_version(): void
     {
-        $this->tester->haveSystemType([
+        $this->tester->haveProduct([
             'slug' => 'spec_core',
             'type' => 'core',
             'label' => 'V1',
             'version' => 1,
         ]);
 
-        $this->tester->haveSystemType([
+        $this->tester->haveProduct([
             'slug' => 'spec_core',
             'type' => 'core',
             'label' => 'V2',
@@ -114,7 +113,7 @@ class SystemTypeRepositoryTest extends WPTestCase
 
     public function test_findAllByType(): void
     {
-        // Seeded types should exist. Let's check for cores.
+        // Seeded products should exist. Let's check for cores.
         $cores = $this->repository->findAllByType('core');
 
         $this->assertNotEmpty($cores);
@@ -125,14 +124,14 @@ class SystemTypeRepositoryTest extends WPTestCase
 
     public function test_latestVersionOf(): void
     {
-        $this->tester->haveSystemType([
+        $this->tester->haveProduct([
             'slug' => 'latest_test',
             'type' => 'drive',
             'label' => 'V1',
             'version' => 1,
         ]);
 
-        $this->tester->haveSystemType([
+        $this->tester->haveProduct([
             'slug' => 'latest_test',
             'type' => 'drive',
             'label' => 'V3',
@@ -153,7 +152,7 @@ class SystemTypeRepositoryTest extends WPTestCase
 
     public function test_upsert_inserts_new(): void
     {
-        $type = $this->repository->upsert([
+        $product = $this->repository->upsert([
             'slug' => 'upsert_new',
             'type' => 'sensor',
             'label' => 'New Upsert',
@@ -161,13 +160,13 @@ class SystemTypeRepositoryTest extends WPTestCase
             'range' => 5.0,
         ]);
 
-        $this->assertGreaterThan(0, $type->id);
-        $this->assertSame('upsert_new', $type->slug);
+        $this->assertGreaterThan(0, $product->id);
+        $this->assertSame('upsert_new', $product->slug);
     }
 
     public function test_upsert_returns_existing(): void
     {
-        $original = $this->tester->haveSystemType([
+        $original = $this->tester->haveProduct([
             'slug' => 'upsert_existing',
             'type' => 'core',
             'label' => 'Original',
@@ -185,9 +184,9 @@ class SystemTypeRepositoryTest extends WPTestCase
         $this->assertSame('Original', $found->label);
     }
 
-    public function test_seeded_types_exist(): void
+    public function test_seeded_products_exist(): void
     {
-        // Verify bootstrap seeded the standard types
+        // Verify bootstrap seeded the standard products
         $epochS = $this->repository->findBySlug('epoch_s');
         $this->assertNotNull($epochS);
         $this->assertSame('core', $epochS->type);
@@ -212,19 +211,19 @@ class SystemTypeRepositoryTest extends WPTestCase
 
     public function test_insert_sets_timestamps(): void
     {
-        $type = $this->tester->haveSystemType([
+        $product = $this->tester->haveProduct([
             'slug' => 'timestamp_test',
             'type' => 'core',
             'label' => 'Timestamp Test',
         ]);
 
-        $this->assertNotNull($type->created_at);
-        $this->assertNotNull($type->updated_at);
+        $this->assertNotNull($product->created_at);
+        $this->assertNotNull($product->updated_at);
     }
 
     public function test_roundtrip_preserves_stats(): void
     {
-        $type = $this->tester->haveSystemType([
+        $product = $this->tester->haveProduct([
             'slug' => 'roundtrip_stats',
             'type' => 'core',
             'label' => 'Roundtrip',
@@ -233,7 +232,7 @@ class SystemTypeRepositoryTest extends WPTestCase
             'mult_b' => 1.0,
         ]);
 
-        $found = $this->repository->find($type->id);
+        $found = $this->repository->find($product->id);
 
         $this->assertSame(10.0, $found->rate);
         $this->assertSame(1.0, $found->mult_a);

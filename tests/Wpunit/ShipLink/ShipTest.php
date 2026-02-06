@@ -14,7 +14,7 @@ use Helm\ShipLink\Loadout;
 use Helm\ShipLink\Models\ShipState;
 use Helm\ShipLink\ShipFactory;
 use Helm\ShipLink\ShipStateRepository;
-use Helm\ShipLink\ShipSystemRepository;
+use Helm\ShipLink\ShipComponentRepository;
 use Helm\Ships\ShipPost;
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use Tests\Support\WpunitTester;
@@ -28,7 +28,7 @@ class ShipTest extends WPTestCase
 {
     private ShipFactory $factory;
     private ShipStateRepository $stateRepository;
-    private ShipSystemRepository $shipSystemRepository;
+    private ShipComponentRepository $componentRepository;
     private NodeRepository $nodeRepository;
     private EdgeRepository $edgeRepository;
 
@@ -39,7 +39,7 @@ class ShipTest extends WPTestCase
 
         $this->factory = helm(ShipFactory::class);
         $this->stateRepository = helm(ShipStateRepository::class);
-        $this->shipSystemRepository = helm(ShipSystemRepository::class);
+        $this->componentRepository = helm(ShipComponentRepository::class);
         $this->nodeRepository = helm(NodeRepository::class);
         $this->edgeRepository = helm(EdgeRepository::class);
     }
