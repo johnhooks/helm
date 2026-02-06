@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://helm.okaywp.com/resources/schemas/core.json",
+  "title": "Core System Types",
+  "description": "Schema for core component seed data. Cores are the ship's power plant and determine light-year capacity.",
+  "type": "object",
+  "required": ["items"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "items": {
+      "type": "array",
+      "items": {
+        "allOf": [
+          { "$ref": "https://helm.okaywp.com/resources/schemas/system-type.json" },
+          {
+            "type": "object",
+            "properties": {
+              "type": { "const": "core" },
+              "hp": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "Light-year capacity. Required for cores."
+              },
+              "rate": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Power regeneration rate (units/hour)."
+              },
+              "mult_a": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Base power output multiplier."
+              },
+              "mult_b": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Jump cost multiplier. Lower = more efficient."
+              }
+            },
+            "required": ["hp", "rate", "mult_a", "mult_b"]
+          }
+        ]
+      }
+    }
+  },
+  "additionalProperties": false
+}

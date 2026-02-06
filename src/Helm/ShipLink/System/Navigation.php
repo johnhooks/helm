@@ -9,8 +9,8 @@ use Helm\Navigation\NavigationService;
 use Helm\Navigation\Node;
 use Helm\Navigation\ScanResult;
 use Helm\ShipLink\Contracts\Navigation as NavigationContract;
+use Helm\ShipLink\Loadout;
 use Helm\ShipLink\Models\ShipState;
-use Helm\ShipLink\Models\ShipSystems;
 
 /**
  * Navigation system implementation.
@@ -29,24 +29,27 @@ final class Navigation implements NavigationContract
 
     public function __construct(
         private ShipState $state,
-        private ShipSystems $systems,
+        private Loadout $loadout,
         private readonly NavigationService $navService,
     ) {
     }
 
     public function getTier(): int
     {
-        return $this->systems->nav_tier->value;
+        // Extract tier from slug (e.g. nav_tier_1 → 1)
+        $slug = $this->loadout->nav()->slug();
+        $parts = explode('_', $slug);
+        return (int) end($parts);
     }
 
     public function getSkill(): float
     {
-        return $this->systems->nav_tier->skill();
+        return $this->loadout->nav()->type()->mult_a ?? 0.0;
     }
 
     public function getEfficiency(): float
     {
-        return $this->systems->nav_tier->efficiency();
+        return $this->loadout->nav()->type()->mult_b ?? 0.0;
     }
 
     public function getDiscoveryProbability(int $hopDepth): float

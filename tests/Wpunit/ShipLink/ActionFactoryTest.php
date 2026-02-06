@@ -14,7 +14,6 @@ use Helm\ShipLink\ActionStatus;
 use Helm\ShipLink\ActionType;
 use Helm\ShipLink\Models\Action;
 use Helm\ShipLink\ShipStateRepository;
-use Helm\ShipLink\ShipSystemsRepository;
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use Tests\Support\WpunitTester;
 
@@ -28,7 +27,6 @@ class ActionFactoryTest extends WPTestCase
     private ActionFactory $factory;
     private ActionRepository $actionRepository;
     private ShipStateRepository $stateRepository;
-    private ShipSystemsRepository $systemsRepository;
     private NodeRepository $nodeRepository;
     private EdgeRepository $edgeRepository;
 
@@ -41,7 +39,6 @@ class ActionFactoryTest extends WPTestCase
         $this->factory = helm(ActionFactory::class);
         $this->actionRepository = helm(ActionRepository::class);
         $this->stateRepository = helm(ShipStateRepository::class);
-        $this->systemsRepository = helm(ShipSystemsRepository::class);
         $this->nodeRepository = helm(NodeRepository::class);
         $this->edgeRepository = helm(EdgeRepository::class);
     }
@@ -69,7 +66,7 @@ class ActionFactoryTest extends WPTestCase
 
         $this->edgeRepository->create($node1->id, $node2->id, 5.0);
 
-        $ship = $this->tester->haveShip(['node_id' => $node1->id, 'core_life' => 1000.0]);
+        $ship = $this->tester->haveShip(['node_id' => $node1->id, 'core_life' => 1000]);
 
         $action = $this->factory->create($ship->postId(), ActionType::Jump, [
             'target_node_id' => $node2->id,
@@ -92,7 +89,7 @@ class ActionFactoryTest extends WPTestCase
 
         $this->edgeRepository->create($node1->id, $node2->id, 5.0);
 
-        $ship = $this->tester->haveShip(['node_id' => $node1->id, 'core_life' => 1000.0]);
+        $ship = $this->tester->haveShip(['node_id' => $node1->id, 'core_life' => 1000]);
 
         $action = $this->factory->create($ship->postId(), ActionType::Jump, [
             'target_node_id' => $node2->id,
@@ -115,7 +112,7 @@ class ActionFactoryTest extends WPTestCase
 
         $this->edgeRepository->create($node1->id, $node2->id, 5.0);
 
-        $ship = $this->tester->haveShip(['node_id' => $node1->id, 'core_life' => 1000.0]);
+        $ship = $this->tester->haveShip(['node_id' => $node1->id, 'core_life' => 1000]);
 
         $action = $this->factory->create($ship->postId(), ActionType::Jump, [
             'target_node_id' => $node2->id,
@@ -139,7 +136,7 @@ class ActionFactoryTest extends WPTestCase
         // Ship already has a current action
         $ship = $this->tester->haveShip([
             'node_id' => $node1->id,
-            'core_life' => 1000.0,
+            'core_life' => 1000,
             'current_action_id' => 999,
         ]);
 
@@ -196,7 +193,7 @@ class ActionFactoryTest extends WPTestCase
 
         $this->edgeRepository->create($node1->id, $node2->id, 5.0);
 
-        $ship = $this->tester->haveShip(['node_id' => $node1->id, 'core_life' => 1000.0]);
+        $ship = $this->tester->haveShip(['node_id' => $node1->id, 'core_life' => 1000]);
 
         $action = $this->factory->create($ship->postId(), ActionType::Jump, [
             'target_node_id' => $node2->id,

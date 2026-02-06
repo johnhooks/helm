@@ -53,12 +53,12 @@ final class Action extends Model
             'params' => (new ModelPropertyDefinition())
                 ->type('array')
                 ->castWith(static fn ($v) => self::castJson($v))
-                ->default([]),
+                ->default(static fn () => []),
 
             'status' => (new ModelPropertyDefinition())
                 ->type(ActionStatus::class)
-                ->castWith(static fn ($v) => ActionStatus::from($v))
-                ->default(ActionStatus::Pending),
+                ->castWith(static fn ($v) => $v instanceof ActionStatus ? $v : ActionStatus::from($v))
+                ->default(static fn () => ActionStatus::Pending),
 
             'deferred_until' => (new ModelPropertyDefinition())
                 ->type(DateTimeImmutable::class)

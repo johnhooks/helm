@@ -14,7 +14,6 @@ use Helm\ShipLink\Contracts\Shields;
 use Helm\ShipLink\Contracts\ShipLink;
 use Helm\ShipLink\Models\Action;
 use Helm\ShipLink\Models\ShipState;
-use Helm\ShipLink\Models\ShipSystems;
 use Helm\Ships\ShipPost;
 
 /**
@@ -32,7 +31,7 @@ final class Ship implements ShipLink
     public function __construct(
         private ShipPost $post,
         private ShipState $state,
-        private ShipSystems $systems,
+        private Loadout $loadout,
         private PowerSystem $powerSystem,
         private Propulsion $propulsionSystem,
         private Sensors $sensorSystem,
@@ -48,9 +47,9 @@ final class Ship implements ShipLink
         return $this->state;
     }
 
-    public function getSystems(): ShipSystems
+    public function getLoadout(): Loadout
     {
-        return $this->systems;
+        return $this->loadout;
     }
 
     public function getId(): int
@@ -192,8 +191,9 @@ final class Ship implements ShipLink
             ));
         }
 
-        // 5. Ship mutates directly - core_life on systems (component), node_id on state
-        $this->systems->core_life = max(0.0, $this->systems->core_life - $coreCost);
+        // 5. Ship mutates directly - core life on component, node_id on state
+        $coreComponent = $this->loadout->core()->component();
+        $coreComponent->life = max(0, (int) (($coreComponent->life ?? 0) - ceil($coreCost)));
         $this->state->node_id = $targetNodeId;
 
         // 6. Return result
@@ -215,8 +215,11 @@ final class Ship implements ShipLink
     {
         // Core cost = distance × core multiplier × drive decay × power mode decay
         // Efficiency mode (decay = 0) means no core cost - safe harbor
+        // mult_b is the jump cost multiplier for cores
+        $jumpCostMultiplier = $this->loadout->core()->type()->mult_b ?? 1.0;
+
         return $distance
-            * $this->systems->core_type->jumpCostMultiplier()
+            * $jumpCostMultiplier
             * $this->propulsionSystem->getCoreDecayMultiplier()
             * $this->powerSystem->getDecayMultiplier();
     }

@@ -6,7 +6,7 @@ namespace Helm\ShipLink\System;
 
 use Helm\ShipLink\Contracts\PowerSystem;
 use Helm\ShipLink\Contracts\Sensors as SensorsContract;
-use Helm\ShipLink\Models\ShipSystems;
+use Helm\ShipLink\Loadout;
 
 /**
  * Sensor system implementation.
@@ -14,7 +14,7 @@ use Helm\ShipLink\Models\ShipSystems;
  * Calculates scan range based on sensor specs and power output.
  *
  * This system is read-only - it reports state and calculates values.
- * Ship is responsible for all mutations to ShipSystems.
+ * Ship is responsible for all mutations to components.
  */
 final class Sensors implements SensorsContract
 {
@@ -34,7 +34,7 @@ final class Sensors implements SensorsContract
     private const BASE_SCAN_SECONDS_PER_LY = 30;
 
     public function __construct(
-        private ShipSystems $systems,
+        private Loadout $loadout,
         private PowerSystem $power,
     ) {
     }
@@ -47,7 +47,7 @@ final class Sensors implements SensorsContract
 
     public function getBaseRange(): float
     {
-        return $this->systems->sensor_type->range();
+        return $this->loadout->sensor()->type()->range ?? 0.0;
     }
 
     public function canScan(float $distanceLy): bool
@@ -73,11 +73,11 @@ final class Sensors implements SensorsContract
 
     public function getSurveyDurationMultiplier(): float
     {
-        return $this->systems->sensor_type->surveyDurationMultiplier();
+        return $this->loadout->sensor()->type()->mult_a ?? 0.0;
     }
 
     public function getScanSuccessChance(): float
     {
-        return $this->systems->sensor_type->scanSuccessChance();
+        return $this->loadout->sensor()->type()->chance ?? 0.0;
     }
 }

@@ -16,9 +16,9 @@ use Helm\Planets\PlanetRepository;
 use Helm\ShipLink\ActionFactory;
 use Helm\ShipLink\ActionProcessor;
 use Helm\ShipLink\ActionRepository;
+use Helm\ShipLink\LoadoutFactory;
 use Helm\ShipLink\ShipFactory;
 use Helm\ShipLink\ShipStateRepository;
-use Helm\ShipLink\ShipSystemsRepository;
 use Helm\Stars\StarBatchGenerator;
 use Helm\Stars\StarCatalog;
 use Helm\Stars\StarRepository;
@@ -64,7 +64,7 @@ final class Provider extends ServiceProvider
             return new ShipCommand(
                 $this->container->get(ShipFactory::class),
                 $this->container->get(ShipStateRepository::class),
-                $this->container->get(ShipSystemsRepository::class),
+                $this->container->get(LoadoutFactory::class),
                 $this->container->get(NodeRepository::class),
                 $this->container->get(EdgeRepository::class),
                 $this->container->get(NavigationService::class),

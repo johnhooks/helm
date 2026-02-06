@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Tests\Wpunit\ShipLink;
 
 use Helm\ShipLink\Contracts\ShipLink;
+use Helm\ShipLink\Loadout;
+use Helm\ShipLink\LoadoutFactory;
 use Helm\ShipLink\Ship;
 use Helm\ShipLink\ShipFactory;
 use Helm\ShipLink\Models\ShipState;
-use Helm\ShipLink\Models\ShipSystems;
 use Helm\ShipLink\ShipStateRepository;
-use Helm\ShipLink\ShipSystemsRepository;
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use Tests\Support\WpunitTester;
 
@@ -23,7 +23,7 @@ class ShipFactoryTest extends WPTestCase
 {
     private ShipFactory $factory;
     private ShipStateRepository $stateRepository;
-    private ShipSystemsRepository $systemsRepository;
+    private LoadoutFactory $loadoutFactory;
 
     public function _before(): void
     {
@@ -31,7 +31,7 @@ class ShipFactoryTest extends WPTestCase
         $this->tester->haveOrigin();
 
         $this->stateRepository = helm(ShipStateRepository::class);
-        $this->systemsRepository = helm(ShipSystemsRepository::class);
+        $this->loadoutFactory = helm(LoadoutFactory::class);
         $this->factory = helm(ShipFactory::class);
     }
 
@@ -55,18 +55,15 @@ class ShipFactoryTest extends WPTestCase
         $this->factory->build(99999);
     }
 
-    public function test_build_creates_state_and_systems_if_missing(): void
+    public function test_build_loads_state_and_loadout(): void
     {
-        $shipPost = $this->tester->haveShipPost();
+        $shipPost = $this->tester->haveShip();
         $postId = $shipPost->postId();
 
-        $this->assertFalse($this->stateRepository->exists($postId));
-        $this->assertFalse($this->systemsRepository->exists($postId));
+        $ship = $this->factory->build($postId);
 
-        $this->factory->build($postId);
-
-        $this->assertTrue($this->stateRepository->exists($postId));
-        $this->assertTrue($this->systemsRepository->exists($postId));
+        $this->assertInstanceOf(ShipState::class, $ship->getState());
+        $this->assertInstanceOf(Loadout::class, $ship->getLoadout());
     }
 
     public function test_build_from_post(): void
@@ -82,13 +79,14 @@ class ShipFactoryTest extends WPTestCase
     {
         $shipPost = $this->tester->haveShip(['name' => 'From Parts']);
         $postId = $shipPost->postId();
-        $state = ShipState::defaults($postId);
-        $systems = ShipSystems::defaults($postId);
+        $state = $this->stateRepository->findOrCreate($postId);
+        $loadout = $this->loadoutFactory->build($postId);
 
-        $shipLink = $this->factory->buildFromParts($shipPost, $state, $systems);
+        $shipLink = $this->factory->buildFromParts($shipPost, $state, $loadout);
 
         $this->assertSame('From Parts', $shipLink->getName());
-        $this->assertSame(750.0, $shipLink->getSystems()->core_life); // Default from EpochS
+        // Default loadout: Epoch-S core with 750 hp
+        $this->assertSame(750, $shipLink->getLoadout()->core()->life());
     }
 
     public function test_ship_link_has_all_systems(): void

@@ -15,7 +15,6 @@ use Helm\ShipLink\ActionStatus;
 use Helm\ShipLink\ActionType;
 use Helm\ShipLink\Models\Action;
 use Helm\ShipLink\ShipStateRepository;
-use Helm\ShipLink\ShipSystemsRepository;
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use Tests\Support\WpunitTester;
 
@@ -29,7 +28,6 @@ class ActionResolverTest extends WPTestCase
     private ActionResolver $resolver;
     private ActionRepository $actionRepository;
     private ShipStateRepository $stateRepository;
-    private ShipSystemsRepository $systemsRepository;
     private NodeRepository $nodeRepository;
     private EdgeRepository $edgeRepository;
 
@@ -42,7 +40,6 @@ class ActionResolverTest extends WPTestCase
         $this->resolver = helm(ActionResolver::class);
         $this->actionRepository = helm(ActionRepository::class);
         $this->stateRepository = helm(ShipStateRepository::class);
-        $this->systemsRepository = helm(ShipSystemsRepository::class);
         $this->nodeRepository = helm(NodeRepository::class);
         $this->edgeRepository = helm(EdgeRepository::class);
     }
@@ -92,7 +89,7 @@ class ActionResolverTest extends WPTestCase
 
         $ship = $this->tester->haveShip([
             'node_id' => $node1->id,
-            'core_life' => 1000.0,
+            'core_life' => 1000,
         ]);
 
         // Create action that's already Running (pre-claimed by ActionProcessor)
@@ -149,7 +146,7 @@ class ActionResolverTest extends WPTestCase
 
         $ship = $this->tester->haveShip([
             'node_id' => $node1->id,
-            'core_life' => 1000.0,
+            'core_life' => 1000,
             'current_action_id' => null,
         ]);
 
@@ -182,7 +179,7 @@ class ActionResolverTest extends WPTestCase
 
         $ship = $this->tester->haveShip([
             'node_id' => $node1->id,
-            'core_life' => 1000.0,
+            'core_life' => 1000,
         ]);
 
         $action = new Action([
@@ -260,7 +257,7 @@ class ActionResolverTest extends WPTestCase
 
         $ship = $this->tester->haveShip([
             'node_id' => $node1->id,
-            'core_life' => 1000.0,
+            'core_life' => 1000,
         ]);
 
         // In production, Handler pre-populates result. Simulate that here.
@@ -303,7 +300,7 @@ class ActionResolverTest extends WPTestCase
 
         $ship = $this->tester->haveShip([
             'node_id' => $node1->id,
-            'core_life' => 1000.0,
+            'core_life' => 1000,
         ]);
 
         $action = new Action([

@@ -6,7 +6,7 @@ namespace Helm\ShipLink\System;
 
 use Helm\ShipLink\Contracts\PowerSystem;
 use Helm\ShipLink\Contracts\Propulsion as PropulsionContract;
-use Helm\ShipLink\Models\ShipSystems;
+use Helm\ShipLink\Loadout;
 
 /**
  * Propulsion system implementation.
@@ -15,7 +15,7 @@ use Helm\ShipLink\Models\ShipSystems;
  * No hard-coded limits - range emerges from the power economics.
  *
  * This system is read-only - it reports state and calculates values.
- * Ship is responsible for all mutations to ShipSystems.
+ * Ship is responsible for all mutations to components.
  */
 final class Propulsion implements PropulsionContract
 {
@@ -25,7 +25,7 @@ final class Propulsion implements PropulsionContract
     private const BASE_SECONDS_PER_LY = 3600;
 
     public function __construct(
-        private ShipSystems $systems,
+        private Loadout $loadout,
         private PowerSystem $power,
     ) {
     }
@@ -41,7 +41,7 @@ final class Propulsion implements PropulsionContract
 
     public function getCoreDecayMultiplier(): float
     {
-        return $this->systems->drive_type->consumption();
+        return $this->loadout->drive()->type()->mult_b ?? 0.0;
     }
 
     public function getMaxRange(): float
@@ -61,7 +61,7 @@ final class Propulsion implements PropulsionContract
     {
         // Core cost = distance × core type multiplier × drive consumption
         return $distanceLy
-            * $this->systems->core_type->jumpCostMultiplier()
+            * ($this->loadout->core()->type()->mult_b ?? 0.0)
             * $this->getCoreDecayMultiplier();
     }
 
@@ -75,12 +75,12 @@ final class Propulsion implements PropulsionContract
 
     public function getSustain(): float
     {
-        return $this->systems->drive_type->sustain();
+        return $this->loadout->drive()->type()->range ?? 0.0;
     }
 
     public function getConsumption(): float
     {
-        return $this->systems->drive_type->consumption();
+        return $this->loadout->drive()->type()->mult_b ?? 0.0;
     }
 
     /**
@@ -90,7 +90,7 @@ final class Propulsion implements PropulsionContract
      */
     private function getEffectiveAmplitude(): float
     {
-        return $this->systems->drive_type->amplitude()
+        return ($this->loadout->drive()->type()->mult_c ?? 0.0)
             * $this->power->getOutputMultiplier()
             * $this->getPerformanceRatio();
     }

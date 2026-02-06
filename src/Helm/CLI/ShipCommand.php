@@ -15,9 +15,9 @@ use Helm\ShipLink\ActionRepository;
 use Helm\ShipLink\ActionStatus;
 use Helm\ShipLink\ActionType;
 use Helm\ShipLink\Contracts\ShipLink;
+use Helm\ShipLink\LoadoutFactory;
 use Helm\ShipLink\ShipFactory;
 use Helm\ShipLink\ShipStateRepository;
-use Helm\ShipLink\ShipSystemsRepository;
 use Helm\Ships\ShipPost;
 use Helm\Stars\StarPost;
 use WP_CLI;
@@ -30,7 +30,7 @@ class ShipCommand
     public function __construct(
         private readonly ShipFactory $factory,
         private readonly ShipStateRepository $stateRepository,
-        private readonly ShipSystemsRepository $systemsRepository,
+        private readonly LoadoutFactory $loadoutFactory,
         private readonly NodeRepository $nodeRepository,
         private readonly EdgeRepository $edgeRepository,
         private readonly NavigationService $navigationService,
@@ -96,9 +96,9 @@ class ShipCommand
         $shipId = wp_generate_uuid4();
         update_post_meta($postId, PostTypeRegistry::META_SHIP_ID, $shipId);
 
-        // Create both records with defaults
-        $this->systemsRepository->findOrCreate($postId);
+        // Create state and default loadout
         $this->stateRepository->findOrCreate($postId);
+        $this->loadoutFactory->buildDefaults($postId, $ownerId);
 
         WP_CLI::success(sprintf(
             'Created ship "%s" (Post ID: %d, Ship ID: %s)',
@@ -276,7 +276,7 @@ class ShipCommand
             sprintf(
                 '  Sensor Range: %.2f ly (%s × %.2f output)',
                 $sensorRange,
-                $ship->getSystems()->sensor_type->label(),
+                $ship->getLoadout()->sensor()->label(),
                 $power->getOutputMultiplier()
             )
         );
@@ -385,15 +385,17 @@ class ShipCommand
         $rows = [];
         foreach ($posts as $post) {
             $shipPost = ShipPost::fromPost($post);
-            $systems = $this->systemsRepository->find($post->ID);
+            $loadout = $this->loadoutFactory->build($post->ID);
+            $core = $loadout->slot('core');
+            $drive = $loadout->slot('drive');
 
             $rows[] = [
                 'ID' => $post->ID,
                 'Name' => $post->post_title,
                 'Owner' => $post->post_author,
-                'Core' => $systems?->core_type->label() ?? 'N/A',
-                'Drive' => $systems?->drive_type->label() ?? 'N/A',
-                'Core Life' => $systems !== null ? sprintf('%.1f ly', $systems->core_life) : 'N/A',
+                'Core' => $core?->label() ?? 'N/A',
+                'Drive' => $drive?->label() ?? 'N/A',
+                'Core Life' => $core !== null ? sprintf('%d ly', $core->life() ?? 0) : 'N/A',
             ];
         }
 
@@ -410,7 +412,7 @@ class ShipCommand
      */
     private function outputDiagnostic(ShipLink $ship, ShipPost $shipPost): void
     {
-        $config = $ship->getSystems();
+        $loadout = $ship->getLoadout();
 
         WP_CLI::log('');
         WP_CLI::log(WP_CLI::colorize('%G═══════════════════════════════════════════════════════════════%n'));
@@ -427,11 +429,11 @@ class ShipCommand
 
         // Modules
         WP_CLI::log(WP_CLI::colorize('%Y▸ INSTALLED MODULES%n'));
-        WP_CLI::log(sprintf('  Core:       %s', $config->core_type->label()));
-        WP_CLI::log(sprintf('  Drive:      %s', $config->drive_type->label()));
-        WP_CLI::log(sprintf('  Sensors:    %s', $config->sensor_type->label()));
-        WP_CLI::log(sprintf('  Shields:    %s', $config->shield_type->label()));
-        WP_CLI::log(sprintf('  Nav Comp:   %s', $config->nav_tier->label()));
+        WP_CLI::log(sprintf('  Core:       %s', $loadout->core()->label()));
+        WP_CLI::log(sprintf('  Drive:      %s', $loadout->drive()->label()));
+        WP_CLI::log(sprintf('  Sensors:    %s', $loadout->sensor()->label()));
+        WP_CLI::log(sprintf('  Shields:    %s', $loadout->shield()->label()));
+        WP_CLI::log(sprintf('  Nav Comp:   %s', $loadout->nav()->label()));
         WP_CLI::log('');
 
         // Power System
@@ -454,13 +456,14 @@ class ShipCommand
 
         // Core Life
         WP_CLI::log(WP_CLI::colorize('%Y▸ CORE LIFE%n'));
-        $corePercent = $config->core_type->coreLife() > 0
-            ? ($power->getCoreLife() / $config->core_type->coreLife()) * 100
+        $maxCoreLife = $loadout->core()->hp() ?? 0;
+        $corePercent = $maxCoreLife > 0
+            ? ($power->getCoreLife() / $maxCoreLife) * 100
             : 0;
         WP_CLI::log(WP_CLI::colorize(sprintf(
-            '  Remaining:  %.1f / %.1f ly (%s%.0f%%%s)',
+            '  Remaining:  %.1f / %d ly (%s%.0f%%%s)',
             $power->getCoreLife(),
-            $config->core_type->coreLife(),
+            $maxCoreLife,
             $this->getColorForPercent($corePercent),
             $corePercent,
             '%n'
@@ -546,7 +549,7 @@ class ShipCommand
      */
     private function outputJson(ShipLink $ship, ShipPost $shipPost): void
     {
-        $config = $ship->getSystems();
+        $loadout = $ship->getLoadout();
         $state = $ship->getState();
         $power = $ship->power();
         $propulsion = $ship->propulsion();
@@ -564,24 +567,24 @@ class ShipCommand
             ],
             'modules' => [
                 'core' => [
-                    'type' => $config->core_type->slug(),
-                    'label' => $config->core_type->label(),
+                    'type' => $loadout->core()->slug(),
+                    'label' => $loadout->core()->label(),
                 ],
                 'drive' => [
-                    'type' => $config->drive_type->slug(),
-                    'label' => $config->drive_type->label(),
+                    'type' => $loadout->drive()->slug(),
+                    'label' => $loadout->drive()->label(),
                 ],
                 'sensors' => [
-                    'type' => $config->sensor_type->slug(),
-                    'label' => $config->sensor_type->label(),
+                    'type' => $loadout->sensor()->slug(),
+                    'label' => $loadout->sensor()->label(),
                 ],
                 'shields' => [
-                    'type' => $config->shield_type->slug(),
-                    'label' => $config->shield_type->label(),
+                    'type' => $loadout->shield()->slug(),
+                    'label' => $loadout->shield()->label(),
                 ],
                 'nav_computer' => [
-                    'tier' => $config->nav_tier->value,
-                    'label' => $config->nav_tier->label(),
+                    'tier' => $nav->getTier(),
+                    'label' => $loadout->nav()->label(),
                 ],
             ],
             'power' => [
@@ -592,7 +595,7 @@ class ShipCommand
             ],
             'core_life' => [
                 'remaining' => $power->getCoreLife(),
-                'max' => $config->core_type->coreLife(),
+                'max' => $loadout->core()->hp() ?? 0,
                 'depleted' => $power->isDepleted(),
             ],
             'propulsion' => [
@@ -691,7 +694,7 @@ class ShipCommand
         }
 
         $state = $ship->getState();
-        $config = $ship->getSystems();
+        $loadout = $ship->getLoadout();
         $currentNodeId = $ship->navigation()->getCurrentPosition();
 
         // Get target node
@@ -723,7 +726,7 @@ class ShipCommand
         $power = $ship->power();
 
         $coreCost = $distance
-            * $config->core_type->jumpCostMultiplier()
+            * ($loadout->core()->type()->mult_b ?? 0.0)
             * $propulsion->getCoreDecayMultiplier()
             * $power->getDecayMultiplier();
         $duration = $propulsion->getJumpDuration($distance);

@@ -6,7 +6,6 @@ namespace Helm\ShipLink;
 
 use Helm\Navigation\NavigationService;
 use Helm\ShipLink\Models\ShipState;
-use Helm\ShipLink\Models\ShipSystems;
 use Helm\ShipLink\System\Cargo;
 use Helm\ShipLink\System\Hull;
 use Helm\ShipLink\System\Navigation;
@@ -19,7 +18,7 @@ use Helm\Ships\ShipPost;
 /**
  * Factory for building ShipLink instances.
  *
- * Loads data from CPT, state table, and systems table, then constructs
+ * Loads data from CPT, state table, and loadout, then constructs
  * a configured ShipLink with all systems wired together.
  *
  * This is the only place that knows how to construct and wire Ship systems.
@@ -28,7 +27,7 @@ final class ShipFactory
 {
     public function __construct(
         private readonly ShipStateRepository $stateRepository,
-        private readonly ShipSystemsRepository $systemsRepository,
+        private readonly LoadoutFactory $loadoutFactory,
         private readonly NavigationService $navigationService,
     ) {
     }
@@ -55,35 +54,35 @@ final class ShipFactory
     public function buildFromPost(ShipPost $shipPost): Ship
     {
         $state = $this->stateRepository->findOrCreate($shipPost->postId());
-        $systems = $this->systemsRepository->findOrCreate($shipPost->postId());
+        $loadout = $this->loadoutFactory->build($shipPost->postId());
 
-        return $this->buildFromParts($shipPost, $state, $systems);
+        return $this->buildFromParts($shipPost, $state, $loadout);
     }
 
     /**
      * Build a Ship from existing parts.
      *
-     * Useful when you already have loaded the post, state, and systems.
+     * Useful when you already have loaded the post, state, and loadout.
      */
-    public function buildFromParts(ShipPost $shipPost, ShipState $state, ShipSystems $systems): Ship
+    public function buildFromParts(ShipPost $shipPost, ShipState $state, Loadout $loadout): Ship
     {
-        // Build power system first - needs state (power_full_at etc.) + config (core_type)
-        $power = new Power($state, $systems);
+        // Build power system first - needs state (power_full_at etc.) + loadout (core stats)
+        $power = new Power($state, $loadout);
 
-        // Build systems that need power readings + config
-        $propulsion = new Propulsion($systems, $power);
-        $sensors = new Sensors($systems, $power);
+        // Build systems that need power readings + loadout
+        $propulsion = new Propulsion($loadout, $power);
+        $sensors = new Sensors($loadout, $power);
 
         // Build remaining systems
-        $navigation = new Navigation($state, $systems, $this->navigationService);
-        $shields = new Shields($state, $systems);
+        $navigation = new Navigation($state, $loadout, $this->navigationService);
+        $shields = new Shields($state, $loadout);
         $hull = new Hull($state);
         $cargo = new Cargo($state);
 
         return new Ship(
             post: $shipPost,
             state: $state,
-            systems: $systems,
+            loadout: $loadout,
             powerSystem: $power,
             propulsionSystem: $propulsion,
             sensorSystem: $sensors,

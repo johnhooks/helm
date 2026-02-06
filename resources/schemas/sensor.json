@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://helm.okaywp.com/resources/schemas/sensor.json",
+  "title": "Sensor System Types",
+  "description": "Schema for sensor component seed data. Sensors determine scan range, survey speed, and detection accuracy.",
+  "type": "object",
+  "required": ["items"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "items": {
+      "type": "array",
+      "items": {
+        "allOf": [
+          { "$ref": "https://helm.okaywp.com/resources/schemas/system-type.json" },
+          {
+            "type": "object",
+            "properties": {
+              "type": { "const": "sensor" },
+              "range": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Maximum scan range (light-years)."
+              },
+              "chance": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "description": "Base probability of scan success (0.0 to 1.0)."
+              },
+              "mult_a": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Survey duration multiplier. Lower = faster surveys."
+              }
+            },
+            "required": ["range", "chance", "mult_a"]
+          }
+        ]
+      }
+    }
+  },
+  "additionalProperties": false
+}

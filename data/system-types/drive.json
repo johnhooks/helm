@@ -1,0 +1,38 @@
+{
+  "$schema": "https://helm.okaywp.com/resources/schemas/drive.json",
+  "items": [
+    {
+      "slug": "dr_305",
+      "type": "drive",
+      "label": "DR-305 Economy",
+      "version": 1,
+      "footprint": 20,
+      "range": 10.0,
+      "mult_a": 0.5,
+      "mult_b": 0.6,
+      "mult_c": 0.5
+    },
+    {
+      "slug": "dr_505",
+      "type": "drive",
+      "label": "DR-505 Standard",
+      "version": 1,
+      "footprint": 30,
+      "range": 7.0,
+      "mult_a": 1.0,
+      "mult_b": 1.0,
+      "mult_c": 1.0
+    },
+    {
+      "slug": "dr_705",
+      "type": "drive",
+      "label": "DR-705 Boost",
+      "version": 1,
+      "footprint": 45,
+      "range": 5.0,
+      "mult_a": 2.0,
+      "mult_b": 1.5,
+      "mult_c": 2.0
+    }
+  ]
+}

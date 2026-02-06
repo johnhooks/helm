@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://helm.okaywp.com/resources/schemas/system-type.json",
+  "title": "System Type",
+  "description": "Base schema for a system type catalog entry.",
+  "type": "object",
+  "required": ["slug", "type", "label", "version"],
+  "properties": {
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "description": "Unique identifier for this component. Lowercase, underscores."
+    },
+    "type": {
+      "type": "string",
+      "enum": ["core", "drive", "sensor", "shield", "nav", "equipment"],
+      "description": "Component category."
+    },
+    "label": {
+      "type": "string",
+      "description": "Human-readable display name."
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1,
+      "default": 1,
+      "description": "Balance version. New versions create new rows; old components keep their reference."
+    },
+    "hp": {
+      "type": ["integer", "null"],
+      "minimum": 0,
+      "description": "Maximum hit points / life capacity. Cores use this as light-year capacity. Null for types without degradation."
+    },
+    "footprint": {
+      "type": "integer",
+      "minimum": 0,
+      "default": 0,
+      "description": "Internal space consumed (m^3). Reduces cargo capacity."
+    },
+    "rate": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "description": "Per-time rate value (e.g., regeneration per hour)."
+    },
+    "range": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "description": "Distance value in light-years."
+    },
+    "capacity": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "description": "Maximum capacity value."
+    },
+    "chance": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Probability value (0.0 to 1.0)."
+    },
+    "mult_a": {
+      "type": ["number", "null"],
+      "description": "Multiplier A (meaning varies by component type)."
+    },
+    "mult_b": {
+      "type": ["number", "null"],
+      "description": "Multiplier B (meaning varies by component type)."
+    },
+    "mult_c": {
+      "type": ["number", "null"],
+      "description": "Multiplier C (meaning varies by component type)."
+    }
+  },
+  "additionalProperties": false
+}

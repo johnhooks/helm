@@ -23,7 +23,7 @@ final class ActionFactory
         private readonly Container $container,
         private readonly ActionRepository $actionRepository,
         private readonly ShipStateRepository $stateRepository,
-        private readonly ShipSystemsRepository $systemsRepository,
+        private readonly ShipSystemRepository $shipSystemRepository,
         private readonly ShipFactory $shipFactory,
     ) {
     }
@@ -137,7 +137,11 @@ final class ActionFactory
         $action->fulfill();
         $this->actionRepository->update($action);
         $this->stateRepository->update($ship->getState());
-        $this->systemsRepository->update($ship->getSystems());
+
+        foreach ($ship->getLoadout()->dirtyComponents() as $component) {
+            $this->shipSystemRepository->update($component);
+        }
+
         $this->stateRepository->updateCurrentAction($action->ship_post_id, null);
 
         return $action;

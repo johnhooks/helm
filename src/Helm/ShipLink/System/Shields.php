@@ -7,8 +7,8 @@ namespace Helm\ShipLink\System;
 use DateTimeImmutable;
 use Helm\Lib\Date;
 use Helm\ShipLink\Contracts\Shields as ShieldsContract;
+use Helm\ShipLink\Loadout;
 use Helm\ShipLink\Models\ShipState;
-use Helm\ShipLink\Models\ShipSystems;
 
 /**
  * Shield system implementation.
@@ -25,7 +25,7 @@ final class Shields implements ShieldsContract
 {
     public function __construct(
         private ShipState $state,
-        private ShipSystems $systems,
+        private Loadout $loadout,
     ) {
     }
 
@@ -56,7 +56,7 @@ final class Shields implements ShieldsContract
 
     public function getRegenRate(): float
     {
-        return $this->systems->shield_type->regenRate();
+        return $this->loadout->shield()->type()->rate ?? 0.0;
     }
 
     public function isDepleted(): bool

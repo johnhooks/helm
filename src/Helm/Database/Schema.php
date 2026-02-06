@@ -19,7 +19,9 @@ final class Schema
     public const TABLE_NAV_NODES = 'helm_nav_nodes';
     public const TABLE_NAV_EDGES = 'helm_nav_edges';
     public const TABLE_NAV_ROUTES = 'helm_nav_routes';
+    public const TABLE_SYSTEM_TYPES = 'helm_system_types';
     public const TABLE_SHIP_SYSTEMS = 'helm_ship_systems';
+    public const TABLE_SHIP_FITTINGS = 'helm_ship_fittings';
     public const TABLE_SHIP_STATE = 'helm_ship_state';
     public const TABLE_SHIP_ACTIONS = 'helm_ship_actions';
 
@@ -31,7 +33,9 @@ final class Schema
         self::TABLE_NAV_NODES,
         self::TABLE_NAV_EDGES,
         self::TABLE_NAV_ROUTES,
+        self::TABLE_SYSTEM_TYPES,
         self::TABLE_SHIP_SYSTEMS,
+        self::TABLE_SHIP_FITTINGS,
         self::TABLE_SHIP_STATE,
         self::TABLE_SHIP_ACTIONS,
     ];
@@ -40,7 +44,7 @@ final class Schema
      * Current schema version.
      * Increment when making schema changes.
      */
-    public const VERSION = 1;
+    public const VERSION = 3;
 
     /**
      * Option key for stored schema version.
@@ -64,7 +68,9 @@ final class Schema
              . self::getNavNodesTableSql($prefix, $charsetCollate)
              . self::getNavEdgesTableSql($prefix, $charsetCollate)
              . self::getNavRoutesTableSql($prefix, $charsetCollate)
+             . self::getSystemTypesTableSql($prefix, $charsetCollate)
              . self::getShipSystemsTableSql($prefix, $charsetCollate)
+             . self::getShipFittingsTableSql($prefix, $charsetCollate)
              . self::getShipStateTableSql($prefix, $charsetCollate)
              . self::getShipActionsTableSql($prefix, $charsetCollate);
 
@@ -299,26 +305,81 @@ CREATE TABLE {$prefix}helm_nav_routes (
     }
 
     /**
+     * System types table SQL.
+     *
+     * Catalog of component definitions, seeded from JSON.
+     * Versioned so balance changes create new rows while old components keep their reference.
+     */
+    private static function getSystemTypesTableSql(string $prefix, string $charsetCollate): string
+    {
+        return "
+CREATE TABLE {$prefix}helm_system_types (
+    id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+    slug varchar(64) NOT NULL,
+    type varchar(32) NOT NULL,
+    label varchar(128) NOT NULL,
+    version smallint(5) unsigned NOT NULL DEFAULT 1,
+    hp int(10) unsigned DEFAULT NULL,
+    footprint smallint(5) unsigned NOT NULL DEFAULT 0,
+    rate float DEFAULT NULL,
+    `range` float DEFAULT NULL,
+    capacity float DEFAULT NULL,
+    chance float DEFAULT NULL,
+    mult_a float DEFAULT NULL,
+    mult_b float DEFAULT NULL,
+    mult_c float DEFAULT NULL,
+    created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY  (id),
+    UNIQUE KEY slug_version (slug,version),
+    KEY type (type)
+) {$charsetCollate};
+";
+    }
+
+    /**
      * Ship systems table SQL.
      *
-     * Component configuration: what's installed on the ship.
-     * Core life is a property of the physical warp core, not operational state.
+     * Individual component instances with lifecycle data.
+     * Each row is a specific component that exists in the game world.
      */
     private static function getShipSystemsTableSql(string $prefix, string $charsetCollate): string
     {
         return "
 CREATE TABLE {$prefix}helm_ship_systems (
-    ship_post_id bigint(20) unsigned NOT NULL,
-    core_type smallint(5) unsigned NOT NULL DEFAULT 1,
-    core_life float NOT NULL DEFAULT 750.0,
-    drive_type smallint(5) unsigned NOT NULL DEFAULT 1,
-    sensor_type smallint(5) unsigned NOT NULL DEFAULT 1,
-    shield_type smallint(5) unsigned NOT NULL DEFAULT 1,
-    nav_tier smallint(5) unsigned NOT NULL DEFAULT 1,
+    id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+    type_id bigint(20) unsigned NOT NULL,
+    life int(10) unsigned DEFAULT NULL,
+    usage_count int(10) unsigned NOT NULL DEFAULT 0,
+    `condition` float NOT NULL DEFAULT 1.0,
+    created_by bigint(20) unsigned DEFAULT NULL,
+    owner_history JSON DEFAULT NULL,
+    origin varchar(20) DEFAULT NULL,
+    origin_ref bigint(20) unsigned DEFAULT NULL,
     created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY  (ship_post_id),
-    KEY core_life (core_life)
+    updated_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY  (id),
+    KEY type_id (type_id)
+) {$charsetCollate};
+";
+    }
+
+    /**
+     * Ship fittings table SQL.
+     *
+     * Pivot table mapping component instances to ship slots.
+     * Each ship slot can hold one component, each component can be in one slot.
+     */
+    private static function getShipFittingsTableSql(string $prefix, string $charsetCollate): string
+    {
+        return "
+CREATE TABLE {$prefix}helm_ship_fittings (
+    ship_post_id bigint(20) unsigned NOT NULL,
+    system_id bigint(20) unsigned NOT NULL,
+    slot varchar(20) NOT NULL,
+    installed_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY  (ship_post_id,slot),
+    UNIQUE KEY system_id (system_id)
 ) {$charsetCollate};
 ";
     }

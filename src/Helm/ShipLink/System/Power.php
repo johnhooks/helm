@@ -8,8 +8,8 @@ use DateTimeImmutable;
 use Helm\Lib\Date;
 use Helm\ShipLink\Components\PowerMode;
 use Helm\ShipLink\Contracts\PowerSystem;
+use Helm\ShipLink\Loadout;
 use Helm\ShipLink\Models\ShipState;
-use Helm\ShipLink\Models\ShipSystems;
 
 /**
  * Power system implementation.
@@ -22,13 +22,13 @@ use Helm\ShipLink\Models\ShipSystems;
  * we calculate current power based on regen rate.
  *
  * This system is read-only - it reports state and calculates values.
- * Ship is responsible for all mutations to ShipState/ShipSystems.
+ * Ship is responsible for all mutations to ShipState/components.
  */
 final class Power implements PowerSystem
 {
     public function __construct(
         private ShipState $state,
-        private ShipSystems $systems,
+        private Loadout $loadout,
     ) {
     }
 
@@ -60,7 +60,7 @@ final class Power implements PowerSystem
 
     public function getRegenRate(): float
     {
-        return $this->systems->core_type->regenRate() * $this->state->power_mode->regenMultiplier();
+        return ($this->loadout->core()->type()->rate ?? 0.0) * $this->state->power_mode->regenMultiplier();
     }
 
     public function hasAvailable(float $amount): bool
@@ -70,12 +70,12 @@ final class Power implements PowerSystem
 
     public function getCoreLife(): float
     {
-        return $this->systems->core_life;
+        return (float) ($this->loadout->core()->life() ?? 0);
     }
 
     public function isDepleted(): bool
     {
-        return $this->systems->core_life <= 0.0;
+        return $this->getCoreLife() <= 0.0;
     }
 
     public function getFullAt(): ?DateTimeImmutable
@@ -85,7 +85,7 @@ final class Power implements PowerSystem
 
     public function getOutputMultiplier(): float
     {
-        return $this->systems->core_type->baseOutput() * $this->state->power_mode->outputMultiplier();
+        return ($this->loadout->core()->type()->mult_a ?? 0.0) * $this->state->power_mode->outputMultiplier();
     }
 
     public function getPowerMode(): PowerMode

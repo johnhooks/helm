@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://helm.okaywp.com/resources/schemas/drive.json",
+  "title": "Drive System Types",
+  "description": "Schema for drive component seed data. Drives determine jump range, speed, and fuel consumption.",
+  "type": "object",
+  "required": ["items"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "items": {
+      "type": "array",
+      "items": {
+        "allOf": [
+          { "$ref": "https://helm.okaywp.com/resources/schemas/system-type.json" },
+          {
+            "type": "object",
+            "properties": {
+              "type": { "const": "drive" },
+              "range": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Maximum jump range / sustain (light-years)."
+              },
+              "mult_a": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Speed multiplier. Higher = faster jumps."
+              },
+              "mult_b": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Core consumption multiplier. Lower = less core consumed per jump."
+              },
+              "mult_c": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Drive amplitude factor."
+              }
+            },
+            "required": ["range", "mult_a", "mult_b", "mult_c"]
+          }
+        ]
+      }
+    }
+  },
+  "additionalProperties": false
+}

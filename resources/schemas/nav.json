@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://helm.okaywp.com/resources/schemas/nav.json",
+  "title": "Nav Computer System Types",
+  "description": "Schema for navigation computer component seed data. Nav computers improve route planning skill and efficiency.",
+  "type": "object",
+  "required": ["items"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "items": {
+      "type": "array",
+      "items": {
+        "allOf": [
+          { "$ref": "https://helm.okaywp.com/resources/schemas/system-type.json" },
+          {
+            "type": "object",
+            "properties": {
+              "type": { "const": "nav" },
+              "mult_a": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "description": "Navigation skill factor (0.0 to 1.0)."
+              },
+              "mult_b": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "description": "Route efficiency factor (0.0 to 1.0)."
+              }
+            },
+            "required": ["mult_a", "mult_b"]
+          }
+        ]
+      }
+    }
+  },
+  "additionalProperties": false
+}

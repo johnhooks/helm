@@ -12,10 +12,15 @@ use Helm\Origin\Origin;
 use Helm\Planets\Planet;
 use Helm\Planets\PlanetRepository;
 use Helm\PostTypes\PostTypeRegistry;
-use Helm\ShipLink\Models\ShipState;
-use Helm\ShipLink\Models\ShipSystems;
+use Helm\ShipLink\FittingRepository;
+use Helm\ShipLink\FittingSlot;
+use Helm\ShipLink\LoadoutFactory;
+use Helm\ShipLink\Models\Fitting;
+use Helm\ShipLink\Models\ShipSystem;
+use Helm\ShipLink\Models\SystemType;
 use Helm\ShipLink\ShipStateRepository;
-use Helm\ShipLink\ShipSystemsRepository;
+use Helm\ShipLink\ShipSystemRepository;
+use Helm\ShipLink\SystemTypeRepository;
 use Helm\Ships\ShipPost;
 use Helm\Stars\Star;
 use Helm\Stars\StarRepository;
@@ -182,7 +187,7 @@ class Helm extends Module
     }
 
     /**
-     * Create a ship in the database.
+     * Create a ship in the database with default loadout.
      *
      * @param array<string, mixed> $attributes Ship attributes to override defaults
      *                                         Supports: id, name, ownerId, node_id, core_life
@@ -231,18 +236,19 @@ class Helm extends Module
             $stateRepository->update($state);
         }
 
-        // Create systems record (component config)
-        /** @var ShipSystemsRepository $systemsRepository */
-        $systemsRepository = helm(ShipSystemsRepository::class);
-        $systems = $systemsRepository->findOrCreate($postId);
+        // Create default loadout (components + fittings)
+        /** @var LoadoutFactory $loadoutFactory */
+        $loadoutFactory = helm(LoadoutFactory::class);
+        $loadout = $loadoutFactory->buildDefaults($postId, $data['ownerId']);
 
-        // Apply config overrides
+        // Apply core_life override if specified
         if (array_key_exists('core_life', $data)) {
-            $systems->core_life = (float) $data['core_life'];
-        }
+            $coreComponent = $loadout->core()->component();
+            $coreComponent->life = (int) $data['core_life'];
 
-        if ($systems->isDirty()) {
-            $systemsRepository->update($systems);
+            /** @var ShipSystemRepository $shipSystemRepository */
+            $shipSystemRepository = helm(ShipSystemRepository::class);
+            $shipSystemRepository->update($coreComponent);
         }
 
         $shipPost = ShipPost::fromId($postId);
@@ -311,6 +317,86 @@ class Helm extends Module
             $ships[] = $this->haveShip($attrs);
         }
         return $ships;
+    }
+
+    /**
+     * Create a system type in the database.
+     *
+     * @param array<string, mixed> $attributes
+     */
+    public function haveSystemType(array $attributes = []): SystemType
+    {
+        $defaults = [
+            'slug' => 'test_type_' . uniqid(),
+            'type' => 'core',
+            'label' => 'Test System Type',
+            'version' => 1,
+            'hp' => 100,
+            'footprint' => 10,
+            'rate' => null,
+            'range' => null,
+            'capacity' => null,
+            'chance' => null,
+            'mult_a' => null,
+            'mult_b' => null,
+            'mult_c' => null,
+        ];
+
+        $data = array_merge($defaults, $attributes);
+
+        $type = new SystemType($data);
+
+        /** @var SystemTypeRepository $repository */
+        $repository = helm(SystemTypeRepository::class);
+        $id = $repository->insert($type);
+
+        // Refetch to get the model with ID set
+        return $id !== false ? ($repository->find($id) ?? $type) : $type;
+    }
+
+    /**
+     * Create a ship system component in the database.
+     *
+     * @param array<string, mixed> $attributes
+     */
+    public function haveComponent(array $attributes = []): ShipSystem
+    {
+        $defaults = [
+            'type_id' => 1,
+            'life' => null,
+            'usage_count' => 0,
+            'condition' => 1.0,
+            'origin' => 'starter',
+        ];
+
+        $data = array_merge($defaults, $attributes);
+
+        $component = new ShipSystem($data);
+
+        /** @var ShipSystemRepository $repository */
+        $repository = helm(ShipSystemRepository::class);
+        $id = $repository->insert($component);
+
+        // Refetch to get the model with ID set
+        return $id !== false ? ($repository->find($id) ?? $component) : $component;
+    }
+
+    /**
+     * Create a fitting (slot assignment) in the database.
+     */
+    public function haveFitting(int $shipPostId, int $systemId, FittingSlot|string $slot): Fitting
+    {
+        $fitting = new Fitting([
+            'ship_post_id' => $shipPostId,
+            'system_id' => $systemId,
+            'slot' => $slot instanceof FittingSlot ? $slot : FittingSlot::from($slot),
+        ]);
+
+        /** @var FittingRepository $repository */
+        $repository = helm(FittingRepository::class);
+        $repository->install($fitting);
+
+        return $fitting;
     }
 
     /**

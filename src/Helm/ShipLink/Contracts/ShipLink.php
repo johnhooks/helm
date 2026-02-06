@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Helm\ShipLink\Contracts;
 
+use Helm\ShipLink\Loadout;
 use Helm\ShipLink\Models\Action;
 use Helm\ShipLink\ActionResult;
 use Helm\ShipLink\Models\ShipState;
-use Helm\ShipLink\Models\ShipSystems;
 
 /**
  * ShipLink contract - the starship interface.
@@ -23,9 +23,9 @@ interface ShipLink
     public function getState(): ShipState;
 
     /**
-     * Get the ship's systems record.
+     * Get the ship's loadout (fitted components).
      */
-    public function getSystems(): ShipSystems;
+    public function getLoadout(): Loadout;
 
     /**
      * Get the ship ID (post ID).

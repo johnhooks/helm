@@ -46,7 +46,7 @@ class ResolverTest extends WPTestCase
 
         $this->edgeRepository->create($node1->id, $node2->id, 5.0);
 
-        $initialCore = 1000.0;
+        $initialCore = 1000;
         $coreCost = 10.0;
         $shipPost = $this->tester->haveShip(['node_id' => $node1->id, 'core_life' => $initialCore]);
         $ship = $this->shipFactory->build($shipPost->postId());
@@ -75,7 +75,8 @@ class ResolverTest extends WPTestCase
         // Final values added
         $this->assertArrayHasKey('remaining_core_life', $action->result);
         $this->assertArrayHasKey('core_before', $action->result);
-        $this->assertSame($initialCore - $coreCost, $action->result['remaining_core_life']);
+        // core_life is now int; ceil(10.0) = 10, so 1000 - 10 = 990
+        $this->assertSame($initialCore - (int) ceil($coreCost), $action->result['remaining_core_life']);
         $this->assertSame($initialCore, $action->result['core_before']);
     }
 
@@ -88,7 +89,7 @@ class ResolverTest extends WPTestCase
         $node2 = $this->nodeRepository->getByStarPostId($star2->postId());
 
         // Ship has less core than the cost
-        $shipPost = $this->tester->haveShip(['node_id' => $node1->id, 'core_life' => 10.0]);
+        $shipPost = $this->tester->haveShip(['node_id' => $node1->id, 'core_life' => 10]);
         $ship = $this->shipFactory->build($shipPost->postId());
 
         $action = new Action([
@@ -106,7 +107,7 @@ class ResolverTest extends WPTestCase
 
         $this->resolver->handle($action, $ship);
 
-        // Core should floor at 0, not go negative
-        $this->assertSame(0.0, $action->result['remaining_core_life']);
+        // Core should floor at 0, not go negative (int)
+        $this->assertSame(0, $action->result['remaining_core_life']);
     }
 }

@@ -45,8 +45,8 @@ final class ShipState extends Model
             // Power state
             'power_mode' => (new ModelPropertyDefinition())
                 ->type(PowerMode::class)
-                ->castWith(static fn ($v) => PowerMode::from((int) $v))
-                ->default(PowerMode::Normal),
+                ->castWith(static fn ($v) => $v instanceof PowerMode ? $v : PowerMode::from((int) $v))
+                ->default(static fn () => PowerMode::Normal),
             'power_full_at' => (new ModelPropertyDefinition())
                 ->type(DateTimeImmutable::class)
                 ->nullable()
@@ -81,7 +81,7 @@ final class ShipState extends Model
             'cargo' => (new ModelPropertyDefinition())
                 ->type('array')
                 ->castWith(static fn ($v) => self::castJson($v))
-                ->default([]),
+                ->default(static fn () => []),
 
             // Current action
             'current_action_id' => (new ModelPropertyDefinition())

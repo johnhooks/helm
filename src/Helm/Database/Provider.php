@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Helm\Database;
 
 use Helm\lucatume\DI52\ServiceProvider;
+use Helm\ShipLink\SystemTypeSeeder;
 use Helm\StellarWP\Models\Config as ModelsConfig;
 
 /**
@@ -25,8 +26,9 @@ final class Provider extends ServiceProvider
     public function boot(): void
     {
         // Create tables on plugin activation
-        register_activation_hook(HELM_FILE, static function (bool $network_wide): void {
+        register_activation_hook(HELM_FILE, function (bool $network_wide): void {
             Schema::createTables();
+            $this->container->get(SystemTypeSeeder::class)->seed();
         });
 
         // Check for schema upgrades on admin init
@@ -40,6 +42,7 @@ final class Provider extends ServiceProvider
     {
         if (Schema::needsUpgrade()) {
             Schema::createTables();
+            $this->container->get(SystemTypeSeeder::class)->seed();
         }
     }
 }

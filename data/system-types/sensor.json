@@ -1,0 +1,35 @@
+{
+  "$schema": "https://helm.okaywp.com/resources/schemas/sensor.json",
+  "items": [
+    {
+      "slug": "dsc_mk1",
+      "type": "sensor",
+      "label": "DSC Mk I",
+      "version": 1,
+      "footprint": 40,
+      "range": 7.0,
+      "chance": 0.6,
+      "mult_a": 2.0
+    },
+    {
+      "slug": "vrs_mk1",
+      "type": "sensor",
+      "label": "VRS Mk I",
+      "version": 1,
+      "footprint": 25,
+      "range": 5.0,
+      "chance": 0.7,
+      "mult_a": 1.0
+    },
+    {
+      "slug": "acu_mk1",
+      "type": "sensor",
+      "label": "ACU Mk I",
+      "version": 1,
+      "footprint": 15,
+      "range": 3.0,
+      "chance": 0.85,
+      "mult_a": 0.5
+    }
+  ]
+}
