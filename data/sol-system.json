@@ -97,9 +97,9 @@
                 "radius_earth": 0.383,
                 "mass_earth": 0.055,
                 "resources": {
-                    "iron": 85,
-                    "nickel": 60,
-                    "titanium": 30
+                    "iron_ore": 85,
+                    "nickel_ore": 60,
+                    "titanium_ore": 30
                 },
                 "habitable": false,
                 "moons": 0,
@@ -115,9 +115,9 @@
                 "radius_earth": 0.949,
                 "mass_earth": 0.815,
                 "resources": {
-                    "iron": 70,
-                    "copper": 45,
-                    "rare_earth": 25
+                    "iron_ore": 70,
+                    "copper_ore": 45,
+                    "rare_earth_ore": 25
                 },
                 "habitable": false,
                 "moons": 0,
@@ -134,10 +134,10 @@
                 "mass_earth": 1.0,
                 "equilibrium_temp_k": 255,
                 "resources": {
-                    "water": 100,
-                    "iron": 65,
-                    "copper": 50,
-                    "organics": 90
+                    "water_ice": 100,
+                    "iron_ore": 65,
+                    "copper_ore": 50,
+                    "biomass": 90
                 },
                 "habitable": true,
                 "moons": 1,
@@ -153,9 +153,9 @@
                 "radius_earth": 0.532,
                 "mass_earth": 0.107,
                 "resources": {
-                    "iron": 80,
-                    "water": 15,
-                    "rare_earth": 35
+                    "iron_ore": 80,
+                    "water_ice": 15,
+                    "rare_earth_ore": 35
                 },
                 "habitable": false,
                 "moons": 2,
@@ -207,8 +207,8 @@
                 "resources": {
                     "hydrogen": 70,
                     "helium": 50,
-                    "water": 60,
-                    "ice": 75
+                    "water_ice": 60,
+                    "methane_ice": 75
                 },
                 "habitable": false,
                 "moons": 28,
@@ -226,8 +226,8 @@
                 "resources": {
                     "hydrogen": 65,
                     "helium": 45,
-                    "water": 55,
-                    "ice": 70
+                    "water_ice": 55,
+                    "ammonia_ice": 70
                 },
                 "habitable": false,
                 "moons": 16,
@@ -243,10 +243,10 @@
                 "outer_au": 3.3,
                 "density": 40,
                 "resources": {
-                    "iron": 75,
-                    "nickel": 60,
-                    "platinum": 25,
-                    "rare_earth": 40
+                    "iron_ore": 75,
+                    "nickel_ore": 60,
+                    "platinum_ore": 25,
+                    "rare_earth_ore": 40
                 }
             },
             {
@@ -257,8 +257,8 @@
                 "outer_au": 55,
                 "density": 20,
                 "resources": {
-                    "ice": 90,
-                    "water": 70,
+                    "nitrogen_ice": 90,
+                    "water_ice": 70,
                     "hydrogen": 30
                 }
             }

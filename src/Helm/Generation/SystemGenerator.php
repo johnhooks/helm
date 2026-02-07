@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace Helm\Generation;
 
-use Helm\Generation\Generated\Anomaly;
 use Helm\Generation\Generated\AsteroidBelt;
 use Helm\Generation\Generated\Planet;
-use Helm\Generation\Generated\Station;
 use Helm\Generation\Generated\SystemContents;
 use Helm\Origin\SeededRandom;
 use Helm\Stars\Star;
@@ -18,69 +16,14 @@ use Helm\Stars\Star;
  * Generates star system contents deterministically.
  *
  * Given the same star and master seed, always produces identical results.
+ *
+ * Note: Stations and anomalies are NOT generated here.
+ * - Stations are placed deliberately (Sol, megacorp empire, player-built outposts)
+ * - Anomalies are event-driven (narrative engine for dynamic storytelling)
  */
 final class SystemGenerator
 {
-    public const ALGORITHM_VERSION = 2;
-
-    /**
-     * Resource types that can appear on planets and belts.
-     */
-    private const RESOURCES = [
-        'iron', 'nickel', 'copper', 'titanium',
-        'water', 'ice', 'hydrogen', 'helium',
-        'rare_earth', 'platinum', 'uranium',
-        'crystals', 'organics',
-    ];
-
-    /**
-     * Station name prefixes.
-     */
-    private const STATION_PREFIXES = [
-        'Alpha', 'Beta', 'Gamma', 'Delta', 'Epsilon',
-        'Omega', 'Nova', 'Prime', 'Central', 'Outer',
-    ];
-
-    /**
-     * Station name suffixes.
-     */
-    private const STATION_SUFFIXES = [
-        'Station', 'Outpost', 'Hub', 'Depot', 'Base',
-        'Port', 'Dock', 'Platform', 'Complex', 'Terminal',
-    ];
-
-    /**
-     * Anomaly descriptions by type.
-     *
-     * @var array<string, array<string>>
-     */
-    private const ANOMALY_DESCRIPTIONS = [
-        'derelict' => [
-            'Abandoned cargo vessel drifting in orbit',
-            'Derelict mining ship with power signatures',
-            'Ancient spacecraft of unknown origin',
-        ],
-        'signal' => [
-            'Repeating signal from unknown source',
-            'Encrypted transmission beacon',
-            'Distress signal, origin unclear',
-        ],
-        'artifact' => [
-            'Unusual energy readings from debris field',
-            'Object exhibiting impossible properties',
-            'Fragment of advanced technology',
-        ],
-        'phenomenon' => [
-            'Gravitational anomaly detected',
-            'Unusual radiation pattern',
-            'Spatial distortion readings',
-        ],
-        'wreckage' => [
-            'Debris field from recent engagement',
-            'Scattered wreckage with salvageable parts',
-            'Remains of destroyed station',
-        ],
-    ];
+    public const ALGORITHM_VERSION = 1;
 
     /**
      * Generate system contents for a star.
@@ -97,16 +40,17 @@ final class SystemGenerator
 
         $planets = $this->generatePlanets($star, $rng);
         $belts = $this->generateAsteroidBelts($star, $rng, $planets);
-        $stations = $this->generateStations($star, $rng, $planets);
-        $anomalies = $this->generateAnomalies($star, $rng);
+
+        // Stations are placed deliberately (Sol, megacorp systems, player-built)
+        // Anomalies are event-driven (narrative engine, not static generation)
 
         return new SystemContents(
             starId: $star->id,
             algorithmVersion: self::ALGORITHM_VERSION,
             planets: $planets,
             asteroidBelts: $belts,
-            stations: $stations,
-            anomalies: $anomalies,
+            stations: [],
+            anomalies: [],
         );
     }
 
@@ -407,12 +351,18 @@ final class SystemGenerator
     {
         $belts = [];
 
-        // 60% chance of at least one belt
-        if (! $rng->chance(600)) {
+        // 35% chance of at least one belt
+        if (! $rng->chance(350)) {
             return $belts;
         }
 
-        $beltCount = $rng->between(1, 2);
+        // Most systems with belts have 1, fewer have 2, rare to have 3
+        $roll = $rng->between(1, 100);
+        $beltCount = match (true) {
+            $roll <= 60 => 1,  // 60%
+            $roll <= 90 => 2,  // 30%
+            default => 3,      // 10%
+        };
 
         for ($i = 0; $i < $beltCount; $i++) {
             // Place belt between planets or at outer edge
@@ -427,115 +377,19 @@ final class SystemGenerator
                 AsteroidBeltType::Mixed,
             ]);
 
+            $density = $rng->between(20, 80);
+
             $belts[] = new AsteroidBelt(
                 id: $star->id . '_BELT' . ($i + 1),
                 type: $type,
                 innerAu: round($innerAu, 2),
                 outerAu: round($outerAu, 2),
-                density: $rng->between(20, 80),
-                resources: $this->generateBeltResources($type, $rng),
+                density: $density,
+                resources: $this->generateBeltResources($type, $density, $rng),
             );
         }
 
         return $belts;
-    }
-
-    /**
-     * Generate stations.
-     *
-     * @param array<Planet> $planets
-     * @return array<Station>
-     */
-    private function generateStations(Star $star, SeededRandom $rng, array $planets): array
-    {
-        $stations = [];
-
-        // Station probability based on star properties
-        // Brighter, more hospitable stars have higher chance
-        $stationChance = $this->calculateStationChance($star);
-
-        if (! $rng->chance($stationChance)) {
-            return $stations;
-        }
-
-        $stationCount = $rng->between(1, 3);
-
-        for ($i = 0; $i < $stationCount; $i++) {
-            $type = $rng->pick([
-                StationType::Trading,
-                StationType::Mining,
-                StationType::Research,
-                StationType::Refueling,
-            ]);
-
-            // Determine location
-            $orbitsPlanet = null;
-            $orbitAu = 0.0;
-
-            if ($planets !== [] && $rng->chance(600)) {
-                // 60% chance to orbit a planet
-                $planet = $rng->pick($planets);
-                $orbitsPlanet = $planet->id;
-                $orbitAu = $planet->orbitAu;
-            } else {
-                // Otherwise orbit the star directly
-                $orbitAu = $rng->between(5, 50) / 10; // 0.5 to 5.0 AU
-            }
-
-            $stations[] = new Station(
-                id: $star->id . '_STN' . ($i + 1),
-                name: $this->generateStationName($star, $rng),
-                type: $type,
-                orbitAu: round($orbitAu, 2),
-                orbitsPlanet: $orbitsPlanet,
-                services: $this->generateStationServices($type, $rng),
-            );
-        }
-
-        return $stations;
-    }
-
-    /**
-     * Generate anomalies.
-     *
-     * @return array<Anomaly>
-     */
-    private function generateAnomalies(Star $star, SeededRandom $rng): array
-    {
-        $anomalies = [];
-
-        // 5% base chance, can have multiple
-        if (! $rng->chance(50)) {
-            return $anomalies;
-        }
-
-        $anomalyCount = $rng->between(1, 2);
-
-        for ($i = 0; $i < $anomalyCount; $i++) {
-            $type = $rng->pick([
-                AnomalyType::Derelict,
-                AnomalyType::Signal,
-                AnomalyType::Artifact,
-                AnomalyType::Phenomenon,
-                AnomalyType::Wreckage,
-            ]);
-
-            $descriptions = self::ANOMALY_DESCRIPTIONS[$type->value];
-
-            $reward = $this->generateAnomalyReward($type, $rng);
-
-            $anomalies[] = new Anomaly(
-                id: $star->id . '_ANOM' . ($i + 1),
-                type: $type,
-                description: $rng->pick($descriptions),
-                locationAu: $rng->between(1, 100) / 10, // 0.1 to 10.0 AU
-                rewardType: $reward['type'],
-                rewardValue: $reward['value'],
-                difficulty: $rng->between(20, 80),
-            );
-        }
-
-        return $anomalies;
     }
 
     /**
@@ -573,6 +427,11 @@ final class SystemGenerator
      */
     private function determinePlanetType(Star $star, float $au, SeededRandom $rng): PlanetType
     {
+        // ~1% chance of a mystery planet (gives ~5% of systems with one)
+        if ($rng->chance(10)) {
+            return $rng->pick([PlanetType::Anomalous, PlanetType::Void]);
+        }
+
         $innerHz = $this->innerHabitableZone($star);
         $outerHz = $innerHz * 1.5;
 
@@ -656,30 +515,146 @@ final class SystemGenerator
     /**
      * Generate resources for a planet.
      *
+     * Uses rarity-based weighted selection: common resources are much more likely
+     * to appear than rare ones.
+     *
      * @return array<string, int>
      */
     private function generatePlanetResources(PlanetType $type, SeededRandom $rng): array
     {
-        $resources = [];
-        $resourceCount = $rng->between(1, 4);
-
         $available = match ($type) {
-            PlanetType::Terrestrial, PlanetType::SuperEarth => ['iron', 'copper', 'titanium', 'rare_earth', 'water', 'organics'],
-            PlanetType::GasGiant => ['hydrogen', 'helium'],
-            PlanetType::HotJupiter => ['hydrogen', 'helium'], // Mostly gas, some exotic chemistry
-            PlanetType::IceGiant, PlanetType::Frozen => ['water', 'ice', 'hydrogen', 'helium'],
-            PlanetType::MiniNeptune => ['water', 'hydrogen', 'helium', 'ice'],
-            PlanetType::Molten => ['iron', 'nickel', 'titanium', 'platinum'],
-            PlanetType::Dwarf => ['iron', 'nickel', 'ice'],
+            PlanetType::Terrestrial, PlanetType::SuperEarth => [
+                ResourceType::IronOre, ResourceType::CopperOre,
+                ResourceType::TitaniumOre, ResourceType::RareEarthOre,
+                ResourceType::WaterIce, ResourceType::Biomass, ResourceType::Proteins,
+            ],
+            PlanetType::GasGiant => [
+                ResourceType::Hydrogen, ResourceType::Helium,
+                ResourceType::Deuterium, ResourceType::Helium3,
+            ],
+            PlanetType::HotJupiter => [
+                ResourceType::Hydrogen, ResourceType::Helium, ResourceType::ExoticGas,
+            ],
+            PlanetType::IceGiant, PlanetType::Frozen => [
+                ResourceType::WaterIce, ResourceType::AmmoniaIce,
+                ResourceType::MethaneIce, ResourceType::NitrogenIce,
+                ResourceType::Hydrogen, ResourceType::Helium,
+            ],
+            PlanetType::MiniNeptune => [
+                ResourceType::WaterIce, ResourceType::Hydrogen,
+                ResourceType::Helium, ResourceType::Nitrogen,
+            ],
+            PlanetType::Molten => [
+                ResourceType::IronOre, ResourceType::NickelOre, ResourceType::TitaniumOre,
+                ResourceType::PlatinumOre, ResourceType::GoldOre, ResourceType::UraniumOre,
+            ],
+            PlanetType::Dwarf => [
+                ResourceType::IronOre, ResourceType::NickelOre,
+                ResourceType::WaterIce, ResourceType::Crystals,
+            ],
+            PlanetType::Rogue => [
+                ResourceType::WaterIce, ResourceType::NitrogenIce,
+                ResourceType::MethaneIce, ResourceType::IronOre,
+            ],
+            PlanetType::Anomalous => [
+                ResourceType::ExoticOre, ResourceType::ExoticGas,
+                ResourceType::Crystals, ResourceType::RareCompounds,
+            ],
+            PlanetType::Void => [
+                ResourceType::ExoticOre, ResourceType::ExoticGas,
+                ResourceType::AlienTissue, ResourceType::Crystals,
+            ],
         };
 
-        $shuffled = $rng->shuffle($available);
+        // Use weighted random selection based on rarity
+        $resourceCount = $rng->between(1, 4);
+        $selected = $this->weightedResourceSelection($available, $resourceCount, $rng);
 
-        for ($i = 0; $i < min($resourceCount, count($shuffled)); $i++) {
-            $resources[$shuffled[$i]] = $rng->between(10, 100);
+        // Deposit size scales with planet type (larger planets = larger deposits)
+        [$minDeposit, $maxDeposit] = $this->depositRangeForPlanetType($type);
+
+        $resources = [];
+        foreach ($selected as $resource) {
+            $resources[$resource->value] = $rng->between($minDeposit, $maxDeposit);
         }
 
         return $resources;
+    }
+
+    /**
+     * Get deposit size range based on planet type.
+     *
+     * Larger planets have larger deposits. Gas giants have massive gas reserves,
+     * while dwarf planets have modest mineral deposits.
+     *
+     * @return array{int, int} [min, max]
+     */
+    private function depositRangeForPlanetType(PlanetType $type): array
+    {
+        return match ($type) {
+            // Gas planets - massive reserves
+            PlanetType::GasGiant => [60, 100],
+            PlanetType::HotJupiter => [70, 100],
+            PlanetType::IceGiant => [50, 90],
+            PlanetType::MiniNeptune => [40, 80],
+
+            // Large rocky planets
+            PlanetType::SuperEarth => [40, 80],
+
+            // Earth-sized
+            PlanetType::Terrestrial => [30, 70],
+            PlanetType::Frozen => [30, 60],
+            PlanetType::Molten => [35, 75], // Dense, mineral-rich
+
+            // Small bodies
+            PlanetType::Dwarf => [15, 40],
+
+            // Special types - unpredictable
+            PlanetType::Rogue => [20, 60],
+            PlanetType::Anomalous => [30, 80],
+            PlanetType::Void => [40, 100], // Rings hold riches
+        };
+    }
+
+    /**
+     * Select resources using weighted random selection.
+     *
+     * Common resources (weight 100) are 50x more likely to be selected than
+     * very rare ones (weight 2).
+     *
+     * @param array<ResourceType> $available
+     * @param int $count
+     * @return array<ResourceType>
+     */
+    private function weightedResourceSelection(array $available, int $count, SeededRandom $rng): array
+    {
+        $selected = [];
+        $remaining = $available;
+
+        for ($i = 0; $i < $count && $remaining !== []; $i++) {
+            // Calculate total weight
+            $totalWeight = 0;
+            foreach ($remaining as $resource) {
+                $totalWeight += $resource->rarity()->spawnWeight();
+            }
+
+            // Pick a random point in the weight range
+            $roll = $rng->between(1, $totalWeight);
+
+            // Find the resource at that point
+            $cumulative = 0;
+            foreach ($remaining as $index => $resource) {
+                $cumulative += $resource->rarity()->spawnWeight();
+                if ($roll <= $cumulative) {
+                    $selected[] = $resource;
+                    unset($remaining[$index]);
+                    $remaining = array_values($remaining); // Re-index
+                    break;
+                }
+            }
+        }
+
+        return $selected;
     }
 
     /**
@@ -693,6 +668,9 @@ final class SystemGenerator
             PlanetType::MiniNeptune => $rng->between(1, 5),
             PlanetType::Terrestrial, PlanetType::SuperEarth => $rng->between(0, 2),
             PlanetType::Dwarf, PlanetType::Molten, PlanetType::Frozen => $rng->between(0, 1),
+            PlanetType::Rogue => $rng->between(0, 3),
+            PlanetType::Anomalous => $rng->between(0, 1),
+            PlanetType::Void => 0, // Rings only, no moons
         };
     }
 
@@ -713,6 +691,9 @@ final class SystemGenerator
             PlanetType::Dwarf => $rng->between(20, 50) / 100, // 0.2-0.5 R⊕
             PlanetType::Molten => $rng->between(40, 100) / 100, // 0.4-1.0 R⊕
             PlanetType::Frozen => $rng->between(30, 80) / 100, // 0.3-0.8 R⊕
+            PlanetType::Rogue => $rng->between(30, 150) / 100, // 0.3-1.5 R⊕ (varied)
+            PlanetType::Anomalous => $rng->between(50, 200) / 100, // 0.5-2.0 R⊕ (unpredictable)
+            PlanetType::Void => $rng->between(200, 500) / 100, // 2.0-5.0 R⊕ (large, ringed)
         };
 
         return round($radius, 2);
@@ -735,6 +716,9 @@ final class SystemGenerator
             PlanetType::Dwarf => $rng->between(1, 30) / 100, // 0.01-0.3 M⊕
             PlanetType::Molten => $rng->between(20, 150) / 100, // 0.2-1.5 M⊕
             PlanetType::Frozen => $rng->between(5, 50) / 100, // 0.05-0.5 M⊕
+            PlanetType::Rogue => $rng->between(10, 200) / 100, // 0.1-2 M⊕ (varied)
+            PlanetType::Anomalous => $rng->between(50, 300) / 100, // 0.5-3 M⊕ (unpredictable)
+            PlanetType::Void => $rng->between(100, 1000) / 100, // 1-10 M⊕ (dense?)
         };
 
         return round($mass, 2);
@@ -759,134 +743,47 @@ final class SystemGenerator
     /**
      * Generate resources for an asteroid belt.
      *
+     * Uses rarity-based spawn rates: common resources (weight 100) have ~60% chance,
+     * scaling down to very rare (weight 2) at ~1.2% chance.
+     * Deposit sizes scale with belt density.
+     *
      * @return array<string, int>
      */
-    private function generateBeltResources(AsteroidBeltType $type, SeededRandom $rng): array
+    private function generateBeltResources(AsteroidBeltType $type, int $density, SeededRandom $rng): array
     {
         $resources = [];
 
         $available = match ($type) {
-            AsteroidBeltType::Rocky => ['iron', 'nickel', 'copper'],
-            AsteroidBeltType::Metallic => ['iron', 'nickel', 'titanium', 'platinum', 'rare_earth'],
-            AsteroidBeltType::Icy => ['water', 'ice', 'hydrogen'],
-            AsteroidBeltType::Mixed => ['iron', 'nickel', 'water', 'ice'],
+            AsteroidBeltType::Rocky => [
+                ResourceType::IronOre, ResourceType::NickelOre, ResourceType::CopperOre,
+            ],
+            AsteroidBeltType::Metallic => [
+                ResourceType::IronOre, ResourceType::NickelOre, ResourceType::TitaniumOre,
+                ResourceType::PlatinumOre, ResourceType::RareEarthOre, ResourceType::GoldOre,
+            ],
+            AsteroidBeltType::Icy => [
+                ResourceType::WaterIce, ResourceType::AmmoniaIce, ResourceType::MethaneIce,
+                ResourceType::Hydrogen, ResourceType::NitrogenIce,
+            ],
+            AsteroidBeltType::Mixed => [
+                ResourceType::IronOre, ResourceType::NickelOre,
+                ResourceType::WaterIce, ResourceType::Crystals,
+            ],
         };
 
+        // Deposit size scales with density (20-80 density → deposits scale proportionally)
+        // Sparse belt (20): 20-50, Dense belt (80): 50-100
+        $minDeposit = (int) (20 + ($density - 20) * 0.5);  // 20 → 20, 80 → 50
+        $maxDeposit = (int) (50 + ($density - 20) * 0.83); // 20 → 50, 80 → 100
+
         foreach ($available as $resource) {
-            if ($rng->chance(600)) { // 60% chance for each resource
-                $resources[$resource] = $rng->between(20, 100);
+            // Rarity-weighted chance: common=60%, uncommon=24%, rare=6%, very_rare=1.2%
+            $spawnChance = $resource->rarity()->spawnWeight() * 6;
+            if ($rng->chance($spawnChance)) {
+                $resources[$resource->value] = $rng->between($minDeposit, $maxDeposit);
             }
         }
 
         return $resources;
-    }
-
-    /**
-     * Calculate station spawn chance (per mille).
-     */
-    private function calculateStationChance(Star $star): int
-    {
-        // Base 30% chance
-        $chance = 300;
-
-        // Increase for brighter stars
-        $luminosity = $star->properties['luminosity_solar'] ?? 1.0;
-        if ($luminosity > 0.5) {
-            $chance += 100;
-        }
-
-        // Increase for sun-like stars
-        if (in_array($star->spectralClass(), ['F', 'G', 'K'], true)) {
-            $chance += 100;
-        }
-
-        // Decrease for very hot or very dim stars
-        if (in_array($star->spectralClass(), ['O', 'B', 'M'], true)) {
-            $chance -= 100;
-        }
-
-        return max(100, min(700, $chance)); // 10% to 70%
-    }
-
-    /**
-     * Generate a station name.
-     */
-    private function generateStationName(Star $star, SeededRandom $rng): string
-    {
-        $prefix = $rng->pick(self::STATION_PREFIXES);
-        $suffix = $rng->pick(self::STATION_SUFFIXES);
-
-        // Sometimes include star name
-        if ($star->name !== null && $rng->chance(300)) {
-            return $star->name . ' ' . $suffix;
-        }
-
-        return $prefix . ' ' . $suffix;
-    }
-
-    /**
-     * Generate services for a station.
-     *
-     * @return array<StationService>
-     */
-    private function generateStationServices(StationType $type, SeededRandom $rng): array
-    {
-        // Base services by type
-        $services = match ($type) {
-            StationType::Trading => [StationService::Trade],
-            StationType::Mining => [StationService::Trade],
-            StationType::Research => [StationService::Missions],
-            StationType::Refueling => [StationService::Refuel],
-            StationType::Military => [],
-        };
-
-        // Add random additional services
-        $additional = [
-            StationService::Repair,
-            StationService::Refuel,
-            StationService::Upgrade,
-            StationService::Missions,
-        ];
-
-        foreach ($additional as $service) {
-            if (! in_array($service, $services, true) && $rng->chance(300)) {
-                $services[] = $service;
-            }
-        }
-
-        return $services;
-    }
-
-    /**
-     * Generate reward for an anomaly.
-     *
-     * @return array{type: AnomalyReward, value: mixed}
-     */
-    private function generateAnomalyReward(AnomalyType $type, SeededRandom $rng): array
-    {
-        return match ($type) {
-            AnomalyType::Derelict => [
-                'type' => AnomalyReward::Resources,
-                'value' => [
-                    $rng->pick(self::RESOURCES) => $rng->between(50, 200),
-                ],
-            ],
-            AnomalyType::Signal => [
-                'type' => AnomalyReward::Data,
-                'value' => $rng->between(100, 500),
-            ],
-            AnomalyType::Artifact => [
-                'type' => AnomalyReward::Artifact,
-                'value' => 'artifact_' . $rng->between(1, 100),
-            ],
-            AnomalyType::Phenomenon => [
-                'type' => AnomalyReward::Technology,
-                'value' => $rng->between(1, 5),
-            ],
-            AnomalyType::Wreckage => [
-                'type' => AnomalyReward::Credits,
-                'value' => $rng->between(1000, 10000),
-            ],
-        };
     }
 }

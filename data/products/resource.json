@@ -1,0 +1,149 @@
+{
+  "$schema": "https://helm.okaywp.com/resources/schemas/resource.json",
+  "items": [
+    {
+      "slug": "iron_ore",
+      "type": "resource",
+      "label": "Iron Ore",
+      "version": 1
+    },
+    {
+      "slug": "nickel_ore",
+      "type": "resource",
+      "label": "Nickel Ore",
+      "version": 1
+    },
+    {
+      "slug": "copper_ore",
+      "type": "resource",
+      "label": "Copper Ore",
+      "version": 1
+    },
+    {
+      "slug": "titanium_ore",
+      "type": "resource",
+      "label": "Titanium Ore",
+      "version": 1
+    },
+    {
+      "slug": "platinum_ore",
+      "type": "resource",
+      "label": "Platinum Ore",
+      "version": 1
+    },
+    {
+      "slug": "gold_ore",
+      "type": "resource",
+      "label": "Gold Ore",
+      "version": 1
+    },
+    {
+      "slug": "rare_earth_ore",
+      "type": "resource",
+      "label": "Rare Earth Ore",
+      "version": 1
+    },
+    {
+      "slug": "uranium_ore",
+      "type": "resource",
+      "label": "Uranium Ore",
+      "version": 1
+    },
+    {
+      "slug": "exotic_ore",
+      "type": "resource",
+      "label": "Exotic Ore",
+      "version": 1
+    },
+    {
+      "slug": "hydrogen",
+      "type": "resource",
+      "label": "Hydrogen",
+      "version": 1
+    },
+    {
+      "slug": "helium",
+      "type": "resource",
+      "label": "Helium",
+      "version": 1
+    },
+    {
+      "slug": "nitrogen",
+      "type": "resource",
+      "label": "Nitrogen",
+      "version": 1
+    },
+    {
+      "slug": "deuterium",
+      "type": "resource",
+      "label": "Deuterium",
+      "version": 1
+    },
+    {
+      "slug": "helium_3",
+      "type": "resource",
+      "label": "Helium-3",
+      "version": 1
+    },
+    {
+      "slug": "exotic_gas",
+      "type": "resource",
+      "label": "Exotic Gas",
+      "version": 1
+    },
+    {
+      "slug": "water_ice",
+      "type": "resource",
+      "label": "Water Ice",
+      "version": 1
+    },
+    {
+      "slug": "ammonia_ice",
+      "type": "resource",
+      "label": "Ammonia Ice",
+      "version": 1
+    },
+    {
+      "slug": "methane_ice",
+      "type": "resource",
+      "label": "Methane Ice",
+      "version": 1
+    },
+    {
+      "slug": "nitrogen_ice",
+      "type": "resource",
+      "label": "Nitrogen Ice",
+      "version": 1
+    },
+    {
+      "slug": "biomass",
+      "type": "resource",
+      "label": "Biomass",
+      "version": 1
+    },
+    {
+      "slug": "proteins",
+      "type": "resource",
+      "label": "Proteins",
+      "version": 1
+    },
+    {
+      "slug": "rare_compounds",
+      "type": "resource",
+      "label": "Rare Compounds",
+      "version": 1
+    },
+    {
+      "slug": "alien_tissue",
+      "type": "resource",
+      "label": "Alien Tissue",
+      "version": 1
+    },
+    {
+      "slug": "crystals",
+      "type": "resource",
+      "label": "Crystals",
+      "version": 1
+    }
+  ]
+}

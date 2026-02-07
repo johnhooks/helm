@@ -130,6 +130,42 @@ class MiningCalculator
 }
 ```
 
+### Mining Laser Calibration
+
+Mining lasers must be calibrated for a specific resource type. Calibration is non-trivial — it takes **24 hours** to recalibrate for a different resource.
+
+```
+CALIBRATION STATE (stored in mining laser component meta)
+
+calibrated_for: 'iron_ore'              // Current calibration
+calibration_started_at: null            // Set when recalibration begins
+
+During recalibration:
+calibrated_for: 'platinum_ore'          // Target resource
+calibration_started_at: '2026-02-06T...' // When started
+```
+
+**Implications:**
+
+- First mining action ever: 24h calibration + mining time
+- Switching resources: 24h recalibration + mining time
+- Mining same resource: just mining time
+
+This creates meaningful specialization:
+- Players commit to resource types
+- Scout for belts matching your calibration before traveling
+- Only recalibrate for high-value targets (platinum, rare_earth)
+- Multiple ships = multiple calibrations
+
+**Mine action params:**
+```php
+[
+    'belt_id' => 'SOL_BELT1',
+    'resource' => 'iron_ore',
+    'duration_hours' => 6,  // optional, 4-12 range
+]
+```
+
 ### Mining Locations
 
 Not all locations have all resources:

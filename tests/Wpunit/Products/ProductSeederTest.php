@@ -29,8 +29,8 @@ class ProductSeederTest extends WPTestCase
         $count = $this->seeder->seed();
 
         // Seeder returns total items processed, not just new inserts
-        // With 5 data files: 3 cores + 3 drives + 3 sensors + 3 shields + 5 navs = 17
-        $this->assertSame(17, $count);
+        // With 6 data files: 3 cores + 3 drives + 3 sensors + 3 shields + 5 navs + 24 resources = 41
+        $this->assertSame(41, $count);
     }
 
     public function test_seed_is_idempotent(): void
@@ -106,6 +106,7 @@ class ProductSeederTest extends WPTestCase
         $this->assertNotEmpty($this->repository->findAllByType('sensor'));
         $this->assertNotEmpty($this->repository->findAllByType('shield'));
         $this->assertNotEmpty($this->repository->findAllByType('nav'));
+        $this->assertNotEmpty($this->repository->findAllByType('resource'));
     }
 
     public function test_seed_counts_by_type(): void
@@ -118,5 +119,29 @@ class ProductSeederTest extends WPTestCase
         $this->assertCount(3, $this->repository->findAllByType('sensor'));
         $this->assertCount(3, $this->repository->findAllByType('shield'));
         $this->assertCount(5, $this->repository->findAllByType('nav'));
+        $this->assertCount(24, $this->repository->findAllByType('resource'));
+    }
+
+    public function test_seeded_resources_have_correct_data(): void
+    {
+        $this->seeder->seed();
+
+        // Verify a common ore
+        $ironOre = $this->repository->findBySlug('iron_ore');
+        $this->assertNotNull($ironOre);
+        $this->assertSame('resource', $ironOre->type);
+        $this->assertSame('Iron Ore', $ironOre->label);
+
+        // Verify a rare gas
+        $helium3 = $this->repository->findBySlug('helium_3');
+        $this->assertNotNull($helium3);
+        $this->assertSame('resource', $helium3->type);
+        $this->assertSame('Helium-3', $helium3->label);
+
+        // Verify exotic resource
+        $alienTissue = $this->repository->findBySlug('alien_tissue');
+        $this->assertNotNull($alienTissue);
+        $this->assertSame('resource', $alienTissue->type);
+        $this->assertSame('Alien Tissue', $alienTissue->label);
     }
 }
