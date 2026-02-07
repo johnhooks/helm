@@ -44,7 +44,7 @@ final class Schema
      * Current schema version.
      * Increment when making schema changes.
      */
-    public const VERSION = 3;
+    public const VERSION = 1;
 
     /**
      * Option key for stored schema version.
@@ -238,7 +238,7 @@ CREATE TABLE {$prefix}helm_discoveries (
         return "
 CREATE TABLE {$prefix}helm_nav_nodes (
     id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-    star_post_id bigint(20) unsigned DEFAULT NULL,
+    type tinyint unsigned NOT NULL DEFAULT 2,
     x double NOT NULL,
     y double NOT NULL,
     z double NOT NULL,
@@ -246,8 +246,8 @@ CREATE TABLE {$prefix}helm_nav_nodes (
     algorithm_version smallint(5) unsigned NOT NULL DEFAULT 1,
     created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY  (id),
-    UNIQUE KEY star_post_id (star_post_id),
     UNIQUE KEY hash (hash),
+    KEY type (type),
     KEY coords (x,y,z)
 ) {$charsetCollate};
 ";

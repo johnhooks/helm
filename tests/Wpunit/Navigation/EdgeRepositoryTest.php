@@ -7,6 +7,7 @@ namespace Tests\Wpunit\Navigation;
 use Helm\Navigation\Edge;
 use Helm\Navigation\EdgeRepository;
 use Helm\Navigation\NodeRepository;
+use Helm\Navigation\NodeType;
 use lucatume\WPBrowser\TestCase\WPTestCase;
 
 /**
@@ -28,8 +29,7 @@ class EdgeRepositoryTest extends WPTestCase
 
     private function createStarNode(float $x = 0.0, float $y = 0.0, float $z = 0.0): \Helm\Navigation\Node
     {
-        $starPostId = $this->factory()->post->create(['post_type' => 'helm_star']);
-        return $this->nodeRepository->create($x, $y, $z, starPostId: $starPostId);
+        return $this->nodeRepository->create($x, $y, $z, type: NodeType::System);
     }
 
     public function test_can_create_edge(): void

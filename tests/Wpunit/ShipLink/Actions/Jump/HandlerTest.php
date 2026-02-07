@@ -43,8 +43,8 @@ class HandlerTest extends WPTestCase
         $star1 = $this->tester->haveStar(['id' => 'JUMP_FROM', 'distanceLy' => 0.0]);
         $star2 = $this->tester->haveStar(['id' => 'JUMP_TO', 'distanceLy' => 5.0]);
 
-        $node1 = $this->nodeRepository->getByStarPostId($star1->postId());
-        $node2 = $this->nodeRepository->getByStarPostId($star2->postId());
+        $node1 = $this->tester->getNodeForStar($star1);
+        $node2 = $this->tester->getNodeForStar($star2);
 
         $this->edgeRepository->create($node1->id, $node2->id, 5.0);
 
@@ -67,8 +67,8 @@ class HandlerTest extends WPTestCase
         $star1 = $this->tester->haveStar(['id' => 'DEFER_FROM', 'distanceLy' => 0.0]);
         $star2 = $this->tester->haveStar(['id' => 'DEFER_TO', 'distanceLy' => 5.0]);
 
-        $node1 = $this->nodeRepository->getByStarPostId($star1->postId());
-        $node2 = $this->nodeRepository->getByStarPostId($star2->postId());
+        $node1 = $this->tester->getNodeForStar($star1);
+        $node2 = $this->tester->getNodeForStar($star2);
 
         $this->edgeRepository->create($node1->id, $node2->id, 5.0);
 
@@ -93,8 +93,8 @@ class HandlerTest extends WPTestCase
         $star1 = $this->tester->haveStar(['id' => 'CALC_FROM', 'distanceLy' => 0.0]);
         $star2 = $this->tester->haveStar(['id' => 'CALC_TO', 'distanceLy' => 5.0]);
 
-        $node1 = $this->nodeRepository->getByStarPostId($star1->postId());
-        $node2 = $this->nodeRepository->getByStarPostId($star2->postId());
+        $node1 = $this->tester->getNodeForStar($star1);
+        $node2 = $this->tester->getNodeForStar($star2);
 
         $this->edgeRepository->create($node1->id, $node2->id, 5.0);
 
@@ -127,9 +127,9 @@ class HandlerTest extends WPTestCase
         $star2 = $this->tester->haveStar(['id' => 'DIST_NEAR', 'distanceLy' => 2.0]);
         $star3 = $this->tester->haveStar(['id' => 'DIST_FAR', 'distanceLy' => 10.0]);
 
-        $node1 = $this->nodeRepository->getByStarPostId($star1->postId());
-        $node2 = $this->nodeRepository->getByStarPostId($star2->postId());
-        $node3 = $this->nodeRepository->getByStarPostId($star3->postId());
+        $node1 = $this->tester->getNodeForStar($star1);
+        $node2 = $this->tester->getNodeForStar($star2);
+        $node3 = $this->tester->getNodeForStar($star3);
 
         $this->edgeRepository->create($node1->id, $node2->id, 2.0);
         $this->edgeRepository->create($node1->id, $node3->id, 10.0);

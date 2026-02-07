@@ -59,8 +59,8 @@ class ActionProcessorTest extends \Codeception\TestCase\WPTestCase
         $star1 = $this->tester->haveStar(['id' => 'PROC_FROM', 'distanceLy' => 0.0]);
         $star2 = $this->tester->haveStar(['id' => 'PROC_TO', 'distanceLy' => 5.0]);
 
-        $node1 = $this->nodeRepository->getByStarPostId($star1->postId());
-        $node2 = $this->nodeRepository->getByStarPostId($star2->postId());
+        $node1 = $this->tester->getNodeForStar($star1);
+        $node2 = $this->tester->getNodeForStar($star2);
 
         // Create edge between nodes
         $this->edgeRepository->create($node1->id, $node2->id, 5.0);
@@ -117,8 +117,8 @@ class ActionProcessorTest extends \Codeception\TestCase\WPTestCase
         $star1 = $this->tester->haveStar(['id' => 'PAST_FROM', 'distanceLy' => 0.0]);
         $star2 = $this->tester->haveStar(['id' => 'PAST_TO', 'distanceLy' => 5.0]);
 
-        $node1 = $this->nodeRepository->getByStarPostId($star1->postId());
-        $node2 = $this->nodeRepository->getByStarPostId($star2->postId());
+        $node1 = $this->tester->getNodeForStar($star1);
+        $node2 = $this->tester->getNodeForStar($star2);
 
         $this->edgeRepository->create($node1->id, $node2->id, 5.0);
 
@@ -153,8 +153,8 @@ class ActionProcessorTest extends \Codeception\TestCase\WPTestCase
             $star1 = $this->tester->haveStar(['id' => "LIMIT_FROM_{$i}", 'distanceLy' => 0.0]);
             $star2 = $this->tester->haveStar(['id' => "LIMIT_TO_{$i}", 'distanceLy' => 5.0]);
 
-            $node1 = $this->nodeRepository->getByStarPostId($star1->postId());
-            $node2 = $this->nodeRepository->getByStarPostId($star2->postId());
+            $node1 = $this->tester->getNodeForStar($star1);
+            $node2 = $this->tester->getNodeForStar($star2);
 
             $this->edgeRepository->create($node1->id, $node2->id, 5.0);
 

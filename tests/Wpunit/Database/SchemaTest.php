@@ -91,7 +91,7 @@ class SchemaTest extends WPTestCase
         );
 
         $this->assertContains('id', $columns);
-        $this->assertContains('star_post_id', $columns);
+        $this->assertContains('type', $columns);
         $this->assertContains('x', $columns);
         $this->assertContains('y', $columns);
         $this->assertContains('z', $columns);

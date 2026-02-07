@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Helm\CLI;
 
+use Helm\Celestials\CelestialService;
 use Helm\Config\Config;
 use Helm\Generation\SystemGenerator;
 use Helm\lucatume\DI52\ServiceProvider;
@@ -70,6 +71,7 @@ final class Provider extends ServiceProvider
                 $this->container->get(NavigationService::class),
                 $this->container->get(ActionFactory::class),
                 $this->container->get(ActionRepository::class),
+                $this->container->get(CelestialService::class),
             );
         });
 

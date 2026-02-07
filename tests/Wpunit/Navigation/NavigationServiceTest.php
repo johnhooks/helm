@@ -61,7 +61,7 @@ class NavigationServiceTest extends WPTestCase
         );
 
         $starPost = $this->starRepository->save($star);
-        $node = $this->nodeRepository->getByStarPostId($starPost->postId());
+        $node = $this->tester->getNodeForStar($starPost);
 
         // Update node coordinates (they're generated from ra/dec by default)
         $updatedNode = new Node(
@@ -69,7 +69,7 @@ class NavigationServiceTest extends WPTestCase
             x: $x,
             y: $y,
             z: $z,
-            starPostId: $node->starPostId,
+            type: $node->type,
             hash: $node->hash,
             algorithmVersion: $node->algorithmVersion,
         );
@@ -356,7 +356,7 @@ class NavigationServiceTest extends WPTestCase
 
         // Should only include the star, not the waypoint
         $this->assertCount(1, $nearby);
-        $this->assertTrue($nearby[0]->node->isStar());
+        $this->assertTrue($nearby[0]->node->isSystem());
     }
 
     public function test_get_nearby_stars_batch_loads_stars(): void

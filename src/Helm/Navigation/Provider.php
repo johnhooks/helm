@@ -48,6 +48,7 @@ final class Provider extends ServiceProvider
             $this->container->get(EdgeRepository::class),
             $this->container->get(RouteRepository::class),
             $this->container->get(StarRepository::class),
+            $this->container->get(CelestialRepository::class),
         ));
     }
 
@@ -101,7 +102,7 @@ final class Provider extends ServiceProvider
             x: $x,
             y: $y,
             z: $z,
-            starPostId: $starPost->postId(),
+            type: NodeType::System,
         );
 
         // Create the celestial link
@@ -129,6 +130,7 @@ final class Provider extends ServiceProvider
 
         $starRepository = $this->container->get(StarRepository::class);
         $nodeRepository = $this->container->get(NodeRepository::class);
+        $celestialRepository = $this->container->get(CelestialRepository::class);
 
         // Find other stars in the same system
         $siblings = $starRepository->findBySystemId($systemId);
@@ -139,8 +141,13 @@ final class Provider extends ServiceProvider
                 continue;
             }
 
-            // Check if sibling has a node
-            $siblingNode = $nodeRepository->getByStarPostId($siblingPost->postId());
+            // Check if sibling has a node via celestials
+            $celestial = $celestialRepository->findByContent(CelestialType::Star, $siblingPost->postId());
+            if ($celestial === null) {
+                continue;
+            }
+
+            $siblingNode = $nodeRepository->get($celestial->nodeId);
             if ($siblingNode === null) {
                 continue;
             }

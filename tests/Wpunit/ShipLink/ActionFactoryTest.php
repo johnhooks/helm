@@ -61,8 +61,8 @@ class ActionFactoryTest extends WPTestCase
         $star1 = $this->tester->haveStar(['id' => 'FACTORY_FROM', 'distanceLy' => 0.0]);
         $star2 = $this->tester->haveStar(['id' => 'FACTORY_TO', 'distanceLy' => 5.0]);
 
-        $node1 = $this->nodeRepository->getByStarPostId($star1->postId());
-        $node2 = $this->nodeRepository->getByStarPostId($star2->postId());
+        $node1 = $this->tester->getNodeForStar($star1);
+        $node2 = $this->tester->getNodeForStar($star2);
 
         $this->edgeRepository->create($node1->id, $node2->id, 5.0);
 
@@ -84,8 +84,8 @@ class ActionFactoryTest extends WPTestCase
         $star1 = $this->tester->haveStar(['id' => 'PERSIST_FROM', 'distanceLy' => 0.0]);
         $star2 = $this->tester->haveStar(['id' => 'PERSIST_TO', 'distanceLy' => 5.0]);
 
-        $node1 = $this->nodeRepository->getByStarPostId($star1->postId());
-        $node2 = $this->nodeRepository->getByStarPostId($star2->postId());
+        $node1 = $this->tester->getNodeForStar($star1);
+        $node2 = $this->tester->getNodeForStar($star2);
 
         $this->edgeRepository->create($node1->id, $node2->id, 5.0);
 
@@ -107,8 +107,8 @@ class ActionFactoryTest extends WPTestCase
         $star1 = $this->tester->haveStar(['id' => 'CURRENT_FROM', 'distanceLy' => 0.0]);
         $star2 = $this->tester->haveStar(['id' => 'CURRENT_TO', 'distanceLy' => 5.0]);
 
-        $node1 = $this->nodeRepository->getByStarPostId($star1->postId());
-        $node2 = $this->nodeRepository->getByStarPostId($star2->postId());
+        $node1 = $this->tester->getNodeForStar($star1);
+        $node2 = $this->tester->getNodeForStar($star2);
 
         $this->edgeRepository->create($node1->id, $node2->id, 5.0);
 
@@ -128,8 +128,8 @@ class ActionFactoryTest extends WPTestCase
         $star1 = $this->tester->haveStar(['id' => 'BUSY_FROM', 'distanceLy' => 0.0]);
         $star2 = $this->tester->haveStar(['id' => 'BUSY_TO', 'distanceLy' => 5.0]);
 
-        $node1 = $this->nodeRepository->getByStarPostId($star1->postId());
-        $node2 = $this->nodeRepository->getByStarPostId($star2->postId());
+        $node1 = $this->tester->getNodeForStar($star1);
+        $node2 = $this->tester->getNodeForStar($star2);
 
         $this->edgeRepository->create($node1->id, $node2->id, 5.0);
 
@@ -188,8 +188,8 @@ class ActionFactoryTest extends WPTestCase
         $star1 = $this->tester->haveStar(['id' => 'CRON_FROM', 'distanceLy' => 0.0]);
         $star2 = $this->tester->haveStar(['id' => 'CRON_TO', 'distanceLy' => 5.0]);
 
-        $node1 = $this->nodeRepository->getByStarPostId($star1->postId());
-        $node2 = $this->nodeRepository->getByStarPostId($star2->postId());
+        $node1 = $this->tester->getNodeForStar($star1);
+        $node2 = $this->tester->getNodeForStar($star2);
 
         $this->edgeRepository->create($node1->id, $node2->id, 5.0);
 

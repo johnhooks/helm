@@ -19,6 +19,42 @@ final class CelestialService
     }
 
     /**
+     * Get the primary star at a node, if any.
+     *
+     * For binary/multi-star systems, returns the primary star
+     * (the one with is_primary=true). Falls back to the first star found.
+     */
+    public function getStarAtNode(int $nodeId): ?StarPost
+    {
+        $celestials = $this->repository->findByNodeIdAndType($nodeId, CelestialType::Star);
+        if ($celestials === []) {
+            return null;
+        }
+
+        // Single star — fast path
+        if (count($celestials) === 1) {
+            return StarPost::fromId($celestials[0]->contentId);
+        }
+
+        // Multiple stars — find the primary
+        $fallback = null;
+        foreach ($celestials as $celestial) {
+            $starPost = StarPost::fromId($celestial->contentId);
+            if ($starPost === null) {
+                continue;
+            }
+
+            if ($starPost->toStar()->isPrimary()) {
+                return $starPost;
+            }
+
+            $fallback ??= $starPost;
+        }
+
+        return $fallback;
+    }
+
+    /**
      * Get all content at a node.
      *
      * @param bool $embed Whether to include full post data

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Wpunit\Stars;
 
-use Helm\Navigation\NodeRepository;
 use Helm\Stars\Star;
 use Helm\Stars\StarCatalog;
 use Helm\Stars\StarPost;
@@ -191,8 +190,6 @@ class StarRepositoryTest extends WPTestCase
 
     public function test_saving_star_creates_nav_node(): void
     {
-        $nodeRepository = helm(NodeRepository::class);
-
         // Create a star
         $starPost = $this->tester->haveStar([
             'id' => 'NAV_TEST_1',
@@ -202,17 +199,15 @@ class StarRepositoryTest extends WPTestCase
         ]);
 
         // Should have created a corresponding nav_node
-        $node = $nodeRepository->getByStarPostId($starPost->postId());
+        $node = $this->tester->getNodeForStar($starPost);
 
         $this->assertNotNull($node, 'Nav node should be created when star is saved');
-        $this->assertSame($starPost->postId(), $node->starPostId);
-        $this->assertTrue($node->isStar());
+        $this->assertTrue($node->isSystem());
+        $this->assertFalse($node->isWaypoint());
     }
 
     public function test_nav_node_has_correct_coordinates(): void
     {
-        $nodeRepository = helm(NodeRepository::class);
-
         // Star at RA=90°, Dec=0°, Distance=10 ly
         // Should be at (0, 10, 0)
         $starPost = $this->tester->haveStar([
@@ -222,7 +217,7 @@ class StarRepositoryTest extends WPTestCase
             'dec' => 0.0,
         ]);
 
-        $node = $nodeRepository->getByStarPostId($starPost->postId());
+        $node = $this->tester->getNodeForStar($starPost);
 
         $this->assertNotNull($node);
         $this->assertEqualsWithDelta(0.0, $node->x, 0.0001);
@@ -232,12 +227,10 @@ class StarRepositoryTest extends WPTestCase
 
     public function test_sol_nav_node_is_at_origin(): void
     {
-        $nodeRepository = helm(NodeRepository::class);
-
         $sol = $this->catalog->sol();
         $solPost = $this->repository->save($sol);
 
-        $node = $nodeRepository->getByStarPostId($solPost->postId());
+        $node = $this->tester->getNodeForStar($solPost);
 
         $this->assertNotNull($node);
         $this->assertSame(0.0, $node->x);
@@ -247,8 +240,6 @@ class StarRepositoryTest extends WPTestCase
 
     public function test_saving_same_star_twice_does_not_duplicate_nav_node(): void
     {
-        $nodeRepository = helm(NodeRepository::class);
-
         $star = new Star(
             id: 'NAV_DUP_TEST',
             name: null,
@@ -266,8 +257,8 @@ class StarRepositoryTest extends WPTestCase
         $this->assertSame($starPost1->postId(), $starPost2->postId());
 
         // Should only have one nav_node
-        $node1 = $nodeRepository->getByStarPostId($starPost1->postId());
-        $node2 = $nodeRepository->getByStarPostId($starPost2->postId());
+        $node1 = $this->tester->getNodeForStar($starPost1);
+        $node2 = $this->tester->getNodeForStar($starPost2);
 
         $this->assertNotNull($node1);
         $this->assertSame($node1->id, $node2->id, 'Second save should not create duplicate nav_node');
@@ -275,8 +266,6 @@ class StarRepositoryTest extends WPTestCase
 
     public function test_multiple_stars_create_separate_nav_nodes(): void
     {
-        $nodeRepository = helm(NodeRepository::class);
-
         $star1Post = $this->tester->haveStar([
             'id' => 'MULTI_NAV_1',
             'distanceLy' => 5.0,
@@ -291,8 +280,8 @@ class StarRepositoryTest extends WPTestCase
             'dec' => 0.0,
         ]);
 
-        $node1 = $nodeRepository->getByStarPostId($star1Post->postId());
-        $node2 = $nodeRepository->getByStarPostId($star2Post->postId());
+        $node1 = $this->tester->getNodeForStar($star1Post);
+        $node2 = $this->tester->getNodeForStar($star2Post);
 
         $this->assertNotNull($node1);
         $this->assertNotNull($node2);

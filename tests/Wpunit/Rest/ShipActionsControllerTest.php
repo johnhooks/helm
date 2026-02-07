@@ -52,8 +52,8 @@ class ShipActionsControllerTest extends WPRestApiTestCase
         $star1 = $this->tester->haveStar(['id' => 'REST_FROM', 'distanceLy' => 0.0]);
         $star2 = $this->tester->haveStar(['id' => 'REST_TO', 'distanceLy' => 5.0]);
 
-        $node1 = $this->nodeRepository->getByStarPostId($star1->postId());
-        $node2 = $this->nodeRepository->getByStarPostId($star2->postId());
+        $node1 = $this->tester->getNodeForStar($star1);
+        $node2 = $this->tester->getNodeForStar($star2);
 
         $this->edgeRepository->create($node1->id, $node2->id, 5.0);
 

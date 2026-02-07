@@ -82,8 +82,8 @@ class ActionResolverTest extends WPTestCase
         $star1 = $this->tester->haveStar(['id' => 'PRECLAIM_FROM', 'distanceLy' => 0.0]);
         $star2 = $this->tester->haveStar(['id' => 'PRECLAIM_TO', 'distanceLy' => 5.0]);
 
-        $node1 = $this->nodeRepository->getByStarPostId($star1->postId());
-        $node2 = $this->nodeRepository->getByStarPostId($star2->postId());
+        $node1 = $this->tester->getNodeForStar($star1);
+        $node2 = $this->tester->getNodeForStar($star2);
 
         $this->edgeRepository->create($node1->id, $node2->id, 5.0);
 
@@ -139,8 +139,8 @@ class ActionResolverTest extends WPTestCase
         $star1 = $this->tester->haveStar(['id' => 'RESOLVE_FROM', 'distanceLy' => 0.0]);
         $star2 = $this->tester->haveStar(['id' => 'RESOLVE_TO', 'distanceLy' => 5.0]);
 
-        $node1 = $this->nodeRepository->getByStarPostId($star1->postId());
-        $node2 = $this->nodeRepository->getByStarPostId($star2->postId());
+        $node1 = $this->tester->getNodeForStar($star1);
+        $node2 = $this->tester->getNodeForStar($star2);
 
         $this->edgeRepository->create($node1->id, $node2->id, 5.0);
 
@@ -172,8 +172,8 @@ class ActionResolverTest extends WPTestCase
         $star1 = $this->tester->haveStar(['id' => 'CLEAR_FROM', 'distanceLy' => 0.0]);
         $star2 = $this->tester->haveStar(['id' => 'CLEAR_TO', 'distanceLy' => 5.0]);
 
-        $node1 = $this->nodeRepository->getByStarPostId($star1->postId());
-        $node2 = $this->nodeRepository->getByStarPostId($star2->postId());
+        $node1 = $this->tester->getNodeForStar($star1);
+        $node2 = $this->tester->getNodeForStar($star2);
 
         $this->edgeRepository->create($node1->id, $node2->id, 5.0);
 
@@ -250,8 +250,8 @@ class ActionResolverTest extends WPTestCase
         $star1 = $this->tester->haveStar(['id' => 'RESULT_FROM', 'distanceLy' => 0.0]);
         $star2 = $this->tester->haveStar(['id' => 'RESULT_TO', 'distanceLy' => 5.0]);
 
-        $node1 = $this->nodeRepository->getByStarPostId($star1->postId());
-        $node2 = $this->nodeRepository->getByStarPostId($star2->postId());
+        $node1 = $this->tester->getNodeForStar($star1);
+        $node2 = $this->tester->getNodeForStar($star2);
 
         $this->edgeRepository->create($node1->id, $node2->id, 5.0);
 
@@ -293,8 +293,8 @@ class ActionResolverTest extends WPTestCase
         $star1 = $this->tester->haveStar(['id' => 'EFFECTS_FROM', 'distanceLy' => 0.0]);
         $star2 = $this->tester->haveStar(['id' => 'EFFECTS_TO', 'distanceLy' => 5.0]);
 
-        $node1 = $this->nodeRepository->getByStarPostId($star1->postId());
-        $node2 = $this->nodeRepository->getByStarPostId($star2->postId());
+        $node1 = $this->tester->getNodeForStar($star1);
+        $node2 = $this->tester->getNodeForStar($star2);
 
         $this->edgeRepository->create($node1->id, $node2->id, 5.0);
 

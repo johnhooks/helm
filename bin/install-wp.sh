@@ -87,6 +87,12 @@ if ! wp plugin is-active helm --path="$WP_DIR" 2>/dev/null; then
 fi
 
 # ------------------------------------------------------------------
+# Ensure database tables exist (idempotent via dbDelta)
+# ------------------------------------------------------------------
+echo "Ensuring Helm database tables..."
+wp helm db migrate --path="$WP_DIR"
+
+# ------------------------------------------------------------------
 # Set up log directory
 # ------------------------------------------------------------------
 if [ ! -d /var/log/helm ]; then

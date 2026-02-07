@@ -15,7 +15,7 @@ final class EdgeInfo
         public readonly int $fromNodeId,
         public readonly int $toNodeId,
         public readonly float $distance,
-        public readonly ?int $targetStarPostId,
+        public readonly NodeType $targetNodeType,
     ) {
     }
 
@@ -32,7 +32,7 @@ final class EdgeInfo
             fromNodeId: $fromNodeId,
             toNodeId: $toNodeId,
             distance: $edge->distance,
-            targetStarPostId: $targetNode->starPostId,
+            targetNodeType: $targetNode->type,
         );
     }
 }

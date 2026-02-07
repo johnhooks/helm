@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Helm\Navigation;
 
+use Helm\Celestials\CelestialRepository;
+use Helm\Celestials\CelestialType;
 use Helm\Core\ErrorCode;
 use Helm\Stars\StarRepository;
 
@@ -21,6 +23,7 @@ final class NavigationService
         private readonly EdgeRepository $edgeRepository,
         private readonly RouteRepository $routeRepository,
         private readonly StarRepository $starRepository,
+        private readonly CelestialRepository $celestialRepository,
     ) {
     }
 
@@ -193,18 +196,31 @@ final class NavigationService
         // 1. Get all nodes within range
         $nearbyNodes = $this->nodeRepository->neighborsOf($fromNode, $range);
 
-        // Filter to star nodes only
-        $starNodes = array_filter($nearbyNodes, fn(Node $n) => $n->isStar());
+        // Filter to system nodes only
+        $systemNodes = array_filter($nearbyNodes, fn(Node $n) => $n->isSystem());
 
-        if ($starNodes === []) {
+        if ($systemNodes === []) {
             return [];
         }
 
-        // 2. Batch load stars
-        $starPostIds = array_map(fn(Node $n) => $n->starPostId, $starNodes);
+        // 2. Batch load star celestials for these nodes
+        $nodeIds = array_map(fn(Node $n) => $n->id, $systemNodes);
+        $celestials = $this->celestialRepository->findByNodeIds($nodeIds, CelestialType::Star);
+
+        // Build nodeId → contentId (first star) map
+        $nodeStarPostIds = [];
+        foreach ($celestials as $celestial) {
+            // Use the first star found per node
+            if (!isset($nodeStarPostIds[$celestial->nodeId])) {
+                $nodeStarPostIds[$celestial->nodeId] = $celestial->contentId;
+            }
+        }
+
+        // 3. Batch load star posts
+        $starPostIds = array_values($nodeStarPostIds);
         $starMap = $this->starRepository->findByPostIds($starPostIds);
 
-        // 3. Batch load edges from this node
+        // 4. Batch load edges from this node
         $edges = $this->edgeRepository->fromNode($fromNodeId);
         $connectedNodeIds = [];
         foreach ($edges as $edge) {
@@ -212,10 +228,15 @@ final class NavigationService
             $connectedNodeIds[$edge->nodeBId] = true;
         }
 
-        // 4. Build result with all data
+        // 5. Build result with all data
         $results = [];
-        foreach ($starNodes as $node) {
-            $star = $starMap[$node->starPostId] ?? null;
+        foreach ($systemNodes as $node) {
+            $starPostId = $nodeStarPostIds[$node->id] ?? null;
+            if ($starPostId === null) {
+                continue;
+            }
+
+            $star = $starMap[$starPostId] ?? null;
             if ($star === null) {
                 continue;
             }
@@ -228,7 +249,7 @@ final class NavigationService
             );
         }
 
-        // 5. Sort by distance
+        // 6. Sort by distance
         usort($results, fn(NearbyStar $a, NearbyStar $b) => $a->distance <=> $b->distance);
 
         return $results;

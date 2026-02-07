@@ -6,11 +6,15 @@ namespace Tests\Support\Helper;
 
 use Codeception\Module;
 use Codeception\TestInterface;
+use Helm\Celestials\CelestialRepository;
+use Helm\Celestials\CelestialType;
 use Helm\Database\Transaction;
 use Helm\Generation\PlanetType;
 use Helm\Inventory\InventoryRepository;
 use Helm\Inventory\LocationType;
 use Helm\Inventory\Models\Item;
+use Helm\Navigation\Node;
+use Helm\Navigation\NodeRepository;
 use Helm\Origin\Origin;
 use Helm\Planets\Planet;
 use Helm\Planets\PlanetRepository;
@@ -22,6 +26,7 @@ use Helm\ShipLink\ShipFittingSlot;
 use Helm\ShipLink\ShipStateRepository;
 use Helm\Ships\ShipPost;
 use Helm\Stars\Star;
+use Helm\Stars\StarPost;
 use Helm\Stars\StarRepository;
 
 /**
@@ -453,6 +458,15 @@ class Helm extends Module
 
         // Refetch to get the model with ID set
         return $itemId !== false ? ($repository->find($itemId) ?? $item) : $item;
+    }
+
+    /**
+     * Get the navigation node for a star post via celestials lookup.
+     */
+    public function getNodeForStar(StarPost $starPost): ?Node
+    {
+        $celestial = helm(CelestialRepository::class)->findByContent(CelestialType::Star, $starPost->postId());
+        return $celestial ? helm(NodeRepository::class)->get($celestial->nodeId) : null;
     }
 
     /**

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Helm\CLI;
 
+use Helm\Celestials\CelestialService;
 use Helm\Core\ErrorCode;
 use Helm\Navigation\EdgeRepository;
 use Helm\Navigation\NavigationService;
@@ -36,6 +37,7 @@ class ShipCommand
         private readonly NavigationService $navigationService,
         private readonly ActionFactory $actionFactory,
         private readonly ActionRepository $actionRepository,
+        private readonly CelestialService $celestialService,
     ) {
     }
 
@@ -222,11 +224,9 @@ class ShipCommand
         $currentNode = $this->nodeRepository->get($positionNodeId);
         $currentLocationName = 'Unknown';
         if ($currentNode !== null) {
-            if ($currentNode->isStar() && $currentNode->starPostId !== null) {
-                $currentStarPost = StarPost::fromId($currentNode->starPostId);
-                if ($currentStarPost !== null) {
-                    $currentLocationName = $currentStarPost->displayName();
-                }
+            $currentStarPost = $this->celestialService->getStarAtNode($currentNode->id);
+            if ($currentStarPost !== null) {
+                $currentLocationName = $currentStarPost->displayName();
             } else {
                 $currentLocationName = sprintf('Waypoint #%d', $currentNode->id);
             }
@@ -703,11 +703,9 @@ class ShipCommand
 
         // Get target name
         $targetName = sprintf('Node #%d', $targetNodeId);
-        if ($targetNode->isStar() && $targetNode->starPostId !== null) {
-            $targetStarPost = StarPost::fromId($targetNode->starPostId);
-            if ($targetStarPost !== null) {
-                $targetName = $targetStarPost->displayName();
-            }
+        $targetStarPost = $this->celestialService->getStarAtNode($targetNodeId);
+        if ($targetStarPost !== null) {
+            $targetName = $targetStarPost->displayName();
         }
 
         // Calculate distance (if we have a current position)
@@ -745,9 +743,9 @@ class ShipCommand
             );
 
             if (!$scanResult->failed) {
-                // Count waypoints (nodes that aren't stars)
+                // Count waypoints (nodes that aren't systems)
                 foreach ($scanResult->nodes as $node) {
-                    if (!$node->isStar()) {
+                    if ($node->isWaypoint()) {
                         $waypointsCreated++;
                     }
                 }
@@ -856,19 +854,15 @@ class ShipCommand
 
         // Get names
         $currentName = sprintf('Node #%d', $currentNodeId);
-        if ($currentNode->isStar() && $currentNode->starPostId !== null) {
-            $currentStarPost = StarPost::fromId($currentNode->starPostId);
-            if ($currentStarPost !== null) {
-                $currentName = $currentStarPost->displayName();
-            }
+        $currentStarPost = $this->celestialService->getStarAtNode($currentNodeId);
+        if ($currentStarPost !== null) {
+            $currentName = $currentStarPost->displayName();
         }
 
         $targetName = sprintf('Node #%d', $targetNodeId);
-        if ($targetNode->isStar() && $targetNode->starPostId !== null) {
-            $targetStarPost = StarPost::fromId($targetNode->starPostId);
-            if ($targetStarPost !== null) {
-                $targetName = $targetStarPost->displayName();
-            }
+        $targetStarPost = $this->celestialService->getStarAtNode($targetNodeId);
+        if ($targetStarPost !== null) {
+            $targetName = $targetStarPost->displayName();
         }
 
         $distance = $currentNode->distanceTo($targetNode);
@@ -970,11 +964,9 @@ class ShipCommand
         }
 
         $targetName = sprintf('Node #%d', $targetNodeId);
-        if ($targetNode->isStar() && $targetNode->starPostId !== null) {
-            $targetStarPost = StarPost::fromId($targetNode->starPostId);
-            if ($targetStarPost !== null) {
-                $targetName = $targetStarPost->displayName();
-            }
+        $targetStarPost = $this->celestialService->getStarAtNode($targetNodeId);
+        if ($targetStarPost !== null) {
+            $targetName = $targetStarPost->displayName();
         }
 
         // Get current position for output before dispatching
@@ -982,12 +974,9 @@ class ShipCommand
         $currentNodeId = $ship->navigation()->getCurrentPosition();
         $currentName = 'Unknown';
         if ($currentNodeId !== null) {
-            $currentNode = $this->nodeRepository->get($currentNodeId);
-            if ($currentNode !== null && $currentNode->isStar() && $currentNode->starPostId !== null) {
-                $currentStarPost = StarPost::fromId($currentNode->starPostId);
-                if ($currentStarPost !== null) {
-                    $currentName = $currentStarPost->displayName();
-                }
+            $currentStarPost = $this->celestialService->getStarAtNode($currentNodeId);
+            if ($currentStarPost !== null) {
+                $currentName = $currentStarPost->displayName();
             }
         }
 
@@ -1074,12 +1063,9 @@ class ShipCommand
         // Get current location name
         $currentName = 'Unknown';
         if ($currentNodeId !== null) {
-            $currentNode = $this->nodeRepository->get($currentNodeId);
-            if ($currentNode !== null && $currentNode->isStar() && $currentNode->starPostId !== null) {
-                $currentStarPost = StarPost::fromId($currentNode->starPostId);
-                if ($currentStarPost !== null) {
-                    $currentName = $currentStarPost->displayName();
-                }
+            $currentStarPost = $this->celestialService->getStarAtNode($currentNodeId);
+            if ($currentStarPost !== null) {
+                $currentName = $currentStarPost->displayName();
             }
         }
 
@@ -1114,13 +1100,10 @@ class ShipCommand
             if ($currentAction->type === ActionType::Jump) {
                 $targetNodeId = $currentAction->params['target_node_id'] ?? null;
                 if ($targetNodeId !== null) {
-                    $targetNode = $this->nodeRepository->get($targetNodeId);
                     $targetName = sprintf('Node #%d', $targetNodeId);
-                    if ($targetNode !== null && $targetNode->isStar() && $targetNode->starPostId !== null) {
-                        $targetStarPost = StarPost::fromId($targetNode->starPostId);
-                        if ($targetStarPost !== null) {
-                            $targetName = $targetStarPost->displayName();
-                        }
+                    $targetStarPost = $this->celestialService->getStarAtNode($targetNodeId);
+                    if ($targetStarPost !== null) {
+                        $targetName = $targetStarPost->displayName();
                     }
                     WP_CLI::log(sprintf('  Target:     %s', $targetName));
                 }

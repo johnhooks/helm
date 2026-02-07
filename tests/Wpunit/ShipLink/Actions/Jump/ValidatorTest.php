@@ -79,7 +79,7 @@ class ValidatorTest extends WPTestCase
     public function test_throws_when_already_at_target(): void
     {
         $star = $this->tester->haveStar(['id' => 'AT_TARGET', 'distanceLy' => 0.0]);
-        $node = $this->nodeRepository->getByStarPostId($star->postId());
+        $node = $this->tester->getNodeForStar($star);
 
         $shipPost = $this->tester->haveShip(['node_id' => $node->id]);
         $ship = $this->shipFactory->build($shipPost->postId());
@@ -103,8 +103,8 @@ class ValidatorTest extends WPTestCase
         $star1 = $this->tester->haveStar(['id' => 'NO_ROUTE_FROM', 'distanceLy' => 0.0]);
         $star2 = $this->tester->haveStar(['id' => 'NO_ROUTE_TO', 'distanceLy' => 5.0]);
 
-        $node1 = $this->nodeRepository->getByStarPostId($star1->postId());
-        $node2 = $this->nodeRepository->getByStarPostId($star2->postId());
+        $node1 = $this->tester->getNodeForStar($star1);
+        $node2 = $this->tester->getNodeForStar($star2);
 
         $shipPost = $this->tester->haveShip(['node_id' => $node1->id]);
         $ship = $this->shipFactory->build($shipPost->postId());
@@ -128,8 +128,8 @@ class ValidatorTest extends WPTestCase
         $star1 = $this->tester->haveStar(['id' => 'LOW_CORE_FROM', 'distanceLy' => 0.0]);
         $star2 = $this->tester->haveStar(['id' => 'LOW_CORE_TO', 'distanceLy' => 100.0]);
 
-        $node1 = $this->nodeRepository->getByStarPostId($star1->postId());
-        $node2 = $this->nodeRepository->getByStarPostId($star2->postId());
+        $node1 = $this->tester->getNodeForStar($star1);
+        $node2 = $this->tester->getNodeForStar($star2);
 
         $this->edgeRepository->create($node1->id, $node2->id, 100.0);
 
@@ -155,8 +155,8 @@ class ValidatorTest extends WPTestCase
         $star1 = $this->tester->haveStar(['id' => 'VALID_FROM', 'distanceLy' => 0.0]);
         $star2 = $this->tester->haveStar(['id' => 'VALID_TO', 'distanceLy' => 5.0]);
 
-        $node1 = $this->nodeRepository->getByStarPostId($star1->postId());
-        $node2 = $this->nodeRepository->getByStarPostId($star2->postId());
+        $node1 = $this->tester->getNodeForStar($star1);
+        $node2 = $this->tester->getNodeForStar($star2);
 
         $this->edgeRepository->create($node1->id, $node2->id, 5.0);
 

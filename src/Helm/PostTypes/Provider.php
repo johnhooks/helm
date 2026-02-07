@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Helm\PostTypes;
 
+use Helm\Celestials\CelestialRepository;
 use Helm\Discovery\DiscoveryService;
 use Helm\Generation\SystemGenerator;
 use Helm\lucatume\DI52\ServiceProvider;
@@ -41,6 +42,7 @@ final class Provider extends ServiceProvider
                 $this->container->get(PlanetRepository::class),
                 $this->container->get(DiscoveryService::class),
                 $this->container->get(NodeRepository::class),
+                $this->container->get(CelestialRepository::class),
                 $this->container->get(Origin::class),
             );
         });

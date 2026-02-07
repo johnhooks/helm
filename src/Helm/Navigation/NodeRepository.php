@@ -65,25 +65,6 @@ final class NodeRepository
     }
 
     /**
-     * Find a node by star post ID.
-     */
-    public function getByStarPostId(int $starPostId): ?Node
-    {
-        global $wpdb;
-
-        $row = $wpdb->get_row(
-            $wpdb->prepare(
-                "SELECT * FROM %i WHERE star_post_id = %d",
-                Schema::table(Schema::TABLE_NAV_NODES),
-                $starPostId
-            ),
-            ARRAY_A
-        );
-
-        return $row ? Node::fromRow($row) : null;
-    }
-
-    /**
      * Find a waypoint by hash.
      */
     public function getByHash(string $hash): ?Node
@@ -103,18 +84,19 @@ final class NodeRepository
     }
 
     /**
-     * Find all star nodes.
+     * Find all system nodes.
      *
      * @return Node[]
      */
-    public function allStars(): array
+    public function allSystems(): array
     {
         global $wpdb;
 
         $rows = $wpdb->get_results(
             $wpdb->prepare(
-                "SELECT * FROM %i WHERE star_post_id IS NOT NULL ORDER BY id",
-                Schema::table(Schema::TABLE_NAV_NODES)
+                "SELECT * FROM %i WHERE type = %d ORDER BY id",
+                Schema::table(Schema::TABLE_NAV_NODES),
+                NodeType::System->value
             ),
             ARRAY_A
         );
@@ -204,14 +186,14 @@ final class NodeRepository
     /**
      * Create a node.
      *
-     * For star nodes: provide starPostId
+     * For system nodes: provide type NodeType::System
      * For waypoints: provide hash
      */
     public function create(
         float $x,
         float $y,
         float $z,
-        ?int $starPostId = null,
+        NodeType $type = NodeType::Waypoint,
         ?string $hash = null,
         int $algorithmVersion = 1,
     ): Node {
@@ -228,7 +210,7 @@ final class NodeRepository
             x: $x,
             y: $y,
             z: $z,
-            starPostId: $starPostId,
+            type: $type,
             hash: $hash,
             algorithmVersion: $algorithmVersion,
         );
@@ -268,16 +250,17 @@ final class NodeRepository
     }
 
     /**
-     * Count star nodes.
+     * Count system nodes.
      */
-    public function countStars(): int
+    public function countSystems(): int
     {
         global $wpdb;
 
         return (int) $wpdb->get_var(
             $wpdb->prepare(
-                "SELECT COUNT(*) FROM %i WHERE star_post_id IS NOT NULL",
-                Schema::table(Schema::TABLE_NAV_NODES)
+                "SELECT COUNT(*) FROM %i WHERE type = %d",
+                Schema::table(Schema::TABLE_NAV_NODES),
+                NodeType::System->value
             )
         );
     }
@@ -291,8 +274,9 @@ final class NodeRepository
 
         return (int) $wpdb->get_var(
             $wpdb->prepare(
-                "SELECT COUNT(*) FROM %i WHERE star_post_id IS NULL",
-                Schema::table(Schema::TABLE_NAV_NODES)
+                "SELECT COUNT(*) FROM %i WHERE type = %d",
+                Schema::table(Schema::TABLE_NAV_NODES),
+                NodeType::Waypoint->value
             )
         );
     }

@@ -42,10 +42,10 @@ class BinaryStarGroupingTest extends WPTestCase
             'distanceLy' => 10.0,
         ]);
 
-        $node = $this->nodeRepository->getByStarPostId($starPost->postId());
+        $node = $this->tester->getNodeForStar($starPost);
 
         $this->assertNotNull($node);
-        $this->assertTrue($node->isStar());
+        $this->assertTrue($node->isSystem());
     }
 
     public function test_single_star_has_celestial_link(): void
@@ -85,8 +85,8 @@ class BinaryStarGroupingTest extends WPTestCase
             'properties' => [], // No system_id
         ]);
 
-        $node1 = $this->nodeRepository->getByStarPostId($star1->postId());
-        $node2 = $this->nodeRepository->getByStarPostId($star2->postId());
+        $node1 = $this->tester->getNodeForStar($star1);
+        $node2 = $this->tester->getNodeForStar($star2);
 
         // Each star should have its own node
         $this->assertNotNull($node1);
@@ -116,12 +116,8 @@ class BinaryStarGroupingTest extends WPTestCase
         ]);
 
         // First star should have a node
-        $node1 = $this->nodeRepository->getByStarPostId($star1->postId());
+        $node1 = $this->tester->getNodeForStar($star1);
         $this->assertNotNull($node1);
-
-        // Second star should NOT have its own node (shares with first)
-        $node2 = $this->nodeRepository->getByStarPostId($star2->postId());
-        $this->assertNull($node2);
 
         // Both stars should be linked to the same node via celestials
         $celestial1 = $this->celestialRepository->findByContent(CelestialType::Star, $star1->postId());
@@ -156,8 +152,8 @@ class BinaryStarGroupingTest extends WPTestCase
         ]);
 
         // Each star should have its own node
-        $node1 = $this->nodeRepository->getByStarPostId($star1->postId());
-        $node2 = $this->nodeRepository->getByStarPostId($star2->postId());
+        $node1 = $this->tester->getNodeForStar($star1);
+        $node2 = $this->tester->getNodeForStar($star2);
 
         $this->assertNotNull($node1);
         $this->assertNotNull($node2);
@@ -206,14 +202,9 @@ class BinaryStarGroupingTest extends WPTestCase
             'properties' => ['system_id' => $systemId],
         ]);
 
-        // Only primary should have a node
-        $node1 = $this->nodeRepository->getByStarPostId($star1->postId());
-        $node2 = $this->nodeRepository->getByStarPostId($star2->postId());
-        $node3 = $this->nodeRepository->getByStarPostId($star3->postId());
-
+        // Only primary should have its own node
+        $node1 = $this->tester->getNodeForStar($star1);
         $this->assertNotNull($node1);
-        $this->assertNull($node2);
-        $this->assertNull($node3);
 
         // All three stars should be linked to the same node
         $celestials = $this->celestialRepository->findByNodeId($node1->id);
@@ -247,7 +238,7 @@ class BinaryStarGroupingTest extends WPTestCase
             'properties' => ['system_id' => $systemId],
         ]);
 
-        $node = $this->nodeRepository->getByStarPostId($star1->postId());
+        $node = $this->tester->getNodeForStar($star1);
         $celestials = $this->celestialRepository->findByNodeIdAndType($node->id, CelestialType::Star);
 
         $this->assertCount(2, $celestials);

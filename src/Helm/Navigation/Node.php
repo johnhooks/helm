@@ -8,8 +8,8 @@ namespace Helm\Navigation;
  * A point in the navigation graph.
  *
  * Nodes can be either:
- * - Star nodes (star_post_id is set) - Entry/exit points for star systems
- * - Waypoints (star_post_id is null) - Intermediate navigation points
+ * - System nodes (type = System) - Created from star catalog data
+ * - Waypoints (type = Waypoint) - Algorithmically generated navigation points
  */
 final class Node
 {
@@ -18,7 +18,7 @@ final class Node
         public readonly float $x,
         public readonly float $y,
         public readonly float $z,
-        public readonly ?int $starPostId = null,
+        public readonly NodeType $type = NodeType::Waypoint,
         public readonly ?string $hash = null,
         public readonly int $algorithmVersion = 1,
         public readonly ?string $createdAt = null,
@@ -26,19 +26,19 @@ final class Node
     }
 
     /**
-     * Is this node a star (has a star system)?
+     * Is this node a star system?
      */
-    public function isStar(): bool
+    public function isSystem(): bool
     {
-        return $this->starPostId !== null;
+        return $this->type === NodeType::System;
     }
 
     /**
-     * Is this node a waypoint (no star system)?
+     * Is this node a waypoint?
      */
     public function isWaypoint(): bool
     {
-        return $this->starPostId === null;
+        return $this->type === NodeType::Waypoint;
     }
 
     /**
@@ -79,7 +79,7 @@ final class Node
             x: (float) $row['x'],
             y: (float) $row['y'],
             z: (float) $row['z'],
-            starPostId: $row['star_post_id'] !== null ? (int) $row['star_post_id'] : null,
+            type: NodeType::from((int) $row['type']),
             hash: $row['hash'] ?? null,
             algorithmVersion: (int) ($row['algorithm_version'] ?? 1),
             createdAt: $row['created_at'] ?? null,
@@ -94,7 +94,7 @@ final class Node
     public function toRow(): array
     {
         return [
-            'star_post_id' => $this->starPostId,
+            'type' => $this->type->value,
             'x' => $this->x,
             'y' => $this->y,
             'z' => $this->z,

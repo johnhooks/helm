@@ -39,8 +39,8 @@ class ResolverTest extends WPTestCase
         $star1 = $this->tester->haveStar(['id' => 'SCAN_FROM', 'distanceLy' => 0.0]);
         $star2 = $this->tester->haveStar(['id' => 'SCAN_TO', 'distanceLy' => 5.0]);
 
-        $node1 = $this->nodeRepository->getByStarPostId($star1->postId());
-        $node2 = $this->nodeRepository->getByStarPostId($star2->postId());
+        $node1 = $this->tester->getNodeForStar($star1);
+        $node2 = $this->tester->getNodeForStar($star2);
 
         $shipPost = $this->tester->haveShip(['node_id' => $node1->id]);
         $ship = $this->shipFactory->build($shipPost->postId());
@@ -82,8 +82,8 @@ class ResolverTest extends WPTestCase
         $star1 = $this->tester->haveStar(['id' => 'FAR_FROM', 'distanceLy' => 0.0]);
         $star2 = $this->tester->haveStar(['id' => 'FAR_TO', 'distanceLy' => 1000.0]);
 
-        $node1 = $this->nodeRepository->getByStarPostId($star1->postId());
-        $node2 = $this->nodeRepository->getByStarPostId($star2->postId());
+        $node1 = $this->tester->getNodeForStar($star1);
+        $node2 = $this->tester->getNodeForStar($star2);
 
         $shipPost = $this->tester->haveShip(['node_id' => $node1->id]);
         $ship = $this->shipFactory->build($shipPost->postId());

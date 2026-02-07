@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Helm\PostTypes;
 
+use Helm\Celestials\CelestialRepository;
+use Helm\Celestials\CelestialType;
 use Helm\Discovery\DiscoveryService;
 use Helm\Navigation\NodeRepository;
 use Helm\Origin\Origin;
@@ -24,6 +26,7 @@ final class StarMetaBoxes
         private readonly PlanetRepository $planetRepository,
         private readonly DiscoveryService $discoveryService,
         private readonly NodeRepository $nodeRepository,
+        private readonly CelestialRepository $celestialRepository,
         private readonly Origin $origin,
     ) {
     }
@@ -146,7 +149,8 @@ final class StarMetaBoxes
             return;
         }
 
-        $node = $this->nodeRepository->getByStarPostId($post->ID);
+        $celestial = $this->celestialRepository->findByContent(CelestialType::Star, $post->ID);
+        $node = $celestial !== null ? $this->nodeRepository->get($celestial->nodeId) : null;
 
         $this->view->render('admin/metaboxes/star-navigation', [
             'nodeId' => $node?->id,

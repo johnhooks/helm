@@ -198,6 +198,46 @@ final class CelestialRepository
     }
 
     /**
+     * Find celestials for multiple nodes, optionally filtered by type.
+     *
+     * @param int[] $nodeIds
+     * @return Celestial[] Flat array of celestials
+     */
+    public function findByNodeIds(array $nodeIds, ?CelestialType $type = null): array
+    {
+        global $wpdb;
+
+        if ($nodeIds === []) {
+            return [];
+        }
+
+        $placeholders = implode(',', array_fill(0, count($nodeIds), '%d'));
+        $table = Schema::table(Schema::TABLE_CELESTIALS);
+
+        if ($type !== null) {
+            $rows = $wpdb->get_results(
+                $wpdb->prepare(
+                    "SELECT * FROM %i WHERE node_id IN ($placeholders) AND content_type = %s ORDER BY id",
+                    $table,
+                    ...[...$nodeIds, $type->value]
+                ),
+                ARRAY_A
+            );
+        } else {
+            $rows = $wpdb->get_results(
+                $wpdb->prepare(
+                    "SELECT * FROM %i WHERE node_id IN ($placeholders) ORDER BY id",
+                    $table,
+                    ...$nodeIds
+                ),
+                ARRAY_A
+            );
+        }
+
+        return array_map(fn($row) => Celestial::fromRow($row), $rows);
+    }
+
+    /**
      * Count celestials by type.
      */
     public function countByType(CelestialType $type): int
