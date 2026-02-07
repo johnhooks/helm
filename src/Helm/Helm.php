@@ -9,6 +9,8 @@ if (! defined('ABSPATH')) {
     exit;
 }
 
+use Helm\Anomalies\Provider as AnomaliesProvider;
+use Helm\Celestials\Provider as CelestialsProvider;
 use Helm\CLI\Provider as CLIProvider;
 use Helm\Config\Provider as ConfigProvider;
 use Helm\Database\Provider as DatabaseProvider;
@@ -24,6 +26,7 @@ use Helm\PostTypes\Provider as PostTypesProvider;
 use Helm\Rest\Provider as RestProvider;
 use Helm\ShipLink\Provider as ShipLinkProvider;
 use Helm\Stars\Provider as StarsProvider;
+use Helm\Stations\Provider as StationsProvider;
 use Helm\View\Provider as ViewProvider;
 
 /**
@@ -65,6 +68,9 @@ final class Helm
         RestProvider::class,
         ShipLinkProvider::class,
         StarsProvider::class,
+        CelestialsProvider::class,
+        StationsProvider::class,
+        AnomaliesProvider::class,
         ViewProvider::class,
     ];
 

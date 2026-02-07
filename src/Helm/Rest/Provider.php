@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Helm\Rest;
 
+use Helm\Celestials\CelestialService;
 use Helm\Inventory\InventoryRepository;
 use Helm\lucatume\DI52\ServiceProvider;
+use Helm\Navigation\NodeRepository;
 use Helm\Products\ProductRepository;
 use Helm\ShipLink\ActionFactory;
 use Helm\ShipLink\ShipFactory;
@@ -40,6 +42,13 @@ final class Provider extends ServiceProvider
                 $this->container->get(InventoryRepository::class),
             );
         });
+
+        $this->container->singleton(CelestialsController::class, function () {
+            return new CelestialsController(
+                $this->container->get(NodeRepository::class),
+                $this->container->get(CelestialService::class),
+            );
+        });
     }
 
     public function boot(): void
@@ -60,6 +69,10 @@ final class Provider extends ServiceProvider
             /** @var ShipSystemsController $systemsController */
             $systemsController = $this->container->get(ShipSystemsController::class);
             $systemsController->register();
+
+            /** @var CelestialsController $celestialsController */
+            $celestialsController = $this->container->get(CelestialsController::class);
+            $celestialsController->register();
         });
     }
 }

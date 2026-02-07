@@ -26,6 +26,10 @@ final class Provider extends ServiceProvider
             return new PostTypeRegistry();
         });
 
+        $this->container->singleton(TaxonomySeeder::class, function () {
+            return new TaxonomySeeder();
+        });
+
         $this->container->singleton(AdminColumns::class, function () {
             return new AdminColumns();
         });

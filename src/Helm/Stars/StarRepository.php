@@ -163,6 +163,11 @@ final class StarRepository
             update_post_meta($postId, PostTypeRegistry::META_STAR_LUMINOSITY, $star->luminosity());
         }
 
+        $systemId = $star->properties['system_id'] ?? null;
+        if ($systemId !== null) {
+            update_post_meta($postId, PostTypeRegistry::META_STAR_SYSTEM_ID, $systemId);
+        }
+
         if ($star->properties !== []) {
             update_post_meta($postId, PostTypeRegistry::META_STAR_PROPERTIES, $star->properties);
         }
@@ -340,5 +345,31 @@ final class StarRepository
     public function exists(string $catalogId): bool
     {
         return $this->get($catalogId) !== null;
+    }
+
+    /**
+     * Find stars by system ID (for binary/multi-star systems).
+     *
+     * @return array<StarPost>
+     */
+    public function findBySystemId(string $systemId): array
+    {
+        global $wpdb;
+
+        $postIds = $wpdb->get_col(
+            $wpdb->prepare(
+                "SELECT post_id FROM {$wpdb->postmeta}
+                WHERE meta_key = %s
+                AND meta_value = %s",
+                PostTypeRegistry::META_STAR_SYSTEM_ID,
+                $systemId
+            )
+        );
+
+        if ($postIds === []) {
+            return [];
+        }
+
+        return $this->findByPostIds(array_map('intval', $postIds));
     }
 }

@@ -49,6 +49,15 @@ enum ErrorCode: string
     // Star errors
     case StarNotFound = 'star.not_found';
 
+    // Node errors
+    case NodeNotFound = 'node.not_found';
+
+    // Station errors
+    case StationNotFound = 'station.not_found';
+
+    // Anomaly errors
+    case AnomalyNotFound = 'anomaly.not_found';
+
     // Origin errors
     case OriginNotInitialized = 'origin.not_initialized';
     case OriginAlreadyInitialized = 'origin.already_initialized';
@@ -82,6 +91,9 @@ enum ErrorCode: string
             self::ShipNotFound,
             self::ActionNotFound,
             self::StarNotFound,
+            self::NodeNotFound,
+            self::StationNotFound,
+            self::AnomalyNotFound,
             self::ShipSystemsNotFound,
             self::ProductNotFound => 404,
 

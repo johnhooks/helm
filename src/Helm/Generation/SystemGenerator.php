@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Helm\Generation;
 
+use Helm\Generation\Generated\Anomaly;
 use Helm\Generation\Generated\AsteroidBelt;
 use Helm\Generation\Generated\Planet;
+use Helm\Generation\Generated\Station;
 use Helm\Generation\Generated\SystemContents;
 use Helm\Origin\SeededRandom;
 use Helm\Stars\Star;

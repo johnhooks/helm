@@ -70,6 +70,15 @@ if [ ! -d "$PLUGIN_DIR/vendor" ]; then
 fi
 
 # ------------------------------------------------------------------
+# Generate prefixed vendor dependencies
+# ------------------------------------------------------------------
+if [ ! -f "$PLUGIN_DIR/vendor/vendor-prefixed/autoload.php" ]; then
+  echo "Generating prefixed vendor dependencies..."
+  cd "$PLUGIN_DIR"
+  composer strauss
+fi
+
+# ------------------------------------------------------------------
 # Activate the plugin
 # ------------------------------------------------------------------
 if ! wp plugin is-active helm --path="$WP_DIR" 2>/dev/null; then

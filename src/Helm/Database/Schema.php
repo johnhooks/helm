@@ -19,6 +19,7 @@ final class Schema
     public const TABLE_NAV_NODES = 'helm_nav_nodes';
     public const TABLE_NAV_EDGES = 'helm_nav_edges';
     public const TABLE_NAV_ROUTES = 'helm_nav_routes';
+    public const TABLE_CELESTIALS = 'helm_celestials';
     public const TABLE_PRODUCTS = 'helm_products';
     public const TABLE_INVENTORY = 'helm_inventory';
     public const TABLE_SHIP_STATE = 'helm_ship_state';
@@ -32,6 +33,7 @@ final class Schema
         self::TABLE_NAV_NODES,
         self::TABLE_NAV_EDGES,
         self::TABLE_NAV_ROUTES,
+        self::TABLE_CELESTIALS,
         self::TABLE_PRODUCTS,
         self::TABLE_INVENTORY,
         self::TABLE_SHIP_STATE,
@@ -42,7 +44,7 @@ final class Schema
      * Current schema version.
      * Increment when making schema changes.
      */
-    public const VERSION = 2;
+    public const VERSION = 3;
 
     /**
      * Option key for stored schema version.
@@ -66,6 +68,7 @@ final class Schema
              . self::getNavNodesTableSql($prefix, $charsetCollate)
              . self::getNavEdgesTableSql($prefix, $charsetCollate)
              . self::getNavRoutesTableSql($prefix, $charsetCollate)
+             . self::getCelestialsTableSql($prefix, $charsetCollate)
              . self::getProductsTableSql($prefix, $charsetCollate)
              . self::getInventoryTableSql($prefix, $charsetCollate)
              . self::getShipStateTableSql($prefix, $charsetCollate)
@@ -297,6 +300,29 @@ CREATE TABLE {$prefix}helm_nav_routes (
     KEY start_end (start_node_id,end_node_id),
     KEY visibility (visibility),
     KEY discovered_by_ship_id (discovered_by_ship_id)
+) {$charsetCollate};
+";
+    }
+
+    /**
+     * Celestials pivot table SQL.
+     *
+     * Links navigation nodes to content (stars, stations, anomalies).
+     * Polymorphic: content_type determines which CPT table to join.
+     */
+    private static function getCelestialsTableSql(string $prefix, string $charsetCollate): string
+    {
+        return "
+CREATE TABLE {$prefix}helm_celestials (
+    id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+    node_id bigint(20) unsigned NOT NULL,
+    content_type varchar(32) NOT NULL,
+    content_id bigint(20) unsigned NOT NULL,
+    created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY  (id),
+    UNIQUE KEY node_content (node_id,content_type,content_id),
+    KEY node_id (node_id),
+    KEY content_lookup (content_type,content_id)
 ) {$charsetCollate};
 ";
     }

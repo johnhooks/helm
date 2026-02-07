@@ -92,7 +92,9 @@ class PostTypeRegistryTest extends WPTestCase
         $this->assertContains(PostTypeRegistry::POST_TYPE_STAR, $types);
         $this->assertContains(PostTypeRegistry::POST_TYPE_PLANET, $types);
         $this->assertContains(PostTypeRegistry::POST_TYPE_SHIP, $types);
-        $this->assertCount(3, $types);
+        $this->assertContains(PostTypeRegistry::POST_TYPE_STATION, $types);
+        $this->assertContains(PostTypeRegistry::POST_TYPE_ANOMALY, $types);
+        $this->assertCount(5, $types);
     }
 
     public function test_get_taxonomies_returns_all_taxonomies(): void
@@ -102,7 +104,9 @@ class PostTypeRegistryTest extends WPTestCase
         $this->assertContains(PostTypeRegistry::TAXONOMY_CONSTELLATION, $taxonomies);
         $this->assertContains(PostTypeRegistry::TAXONOMY_SPECTRAL_CLASS, $taxonomies);
         $this->assertContains(PostTypeRegistry::TAXONOMY_PLANET_TYPE, $taxonomies);
-        $this->assertCount(3, $taxonomies);
+        $this->assertContains(PostTypeRegistry::TAXONOMY_STATION_TYPE, $taxonomies);
+        $this->assertContains(PostTypeRegistry::TAXONOMY_ANOMALY_TYPE, $taxonomies);
+        $this->assertCount(5, $taxonomies);
     }
 
     public function test_meta_key_constants_are_prefixed(): void

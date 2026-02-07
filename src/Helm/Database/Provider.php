@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Helm\Database;
 
 use Helm\lucatume\DI52\ServiceProvider;
+use Helm\PostTypes\TaxonomySeeder;
 use Helm\Products\ProductSeeder;
 use Helm\StellarWP\Models\Config as ModelsConfig;
 
@@ -25,10 +26,11 @@ final class Provider extends ServiceProvider
 
     public function boot(): void
     {
-        // Create tables on plugin activation
+        // Create tables and seed data on plugin activation
         register_activation_hook(HELM_FILE, function (bool $network_wide): void {
             Schema::createTables();
             $this->container->get(ProductSeeder::class)->seed();
+            $this->container->get(TaxonomySeeder::class)->seed();
         });
 
         // Check for schema upgrades on admin init
@@ -43,6 +45,7 @@ final class Provider extends ServiceProvider
         if (Schema::needsUpgrade()) {
             Schema::createTables();
             $this->container->get(ProductSeeder::class)->seed();
+            $this->container->get(TaxonomySeeder::class)->seed();
         }
     }
 }

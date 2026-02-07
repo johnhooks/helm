@@ -16,11 +16,15 @@ final class PostTypeRegistry
     public const POST_TYPE_STAR = 'helm_star';
     public const POST_TYPE_PLANET = 'helm_planet';
     public const POST_TYPE_SHIP = 'helm_ship';
+    public const POST_TYPE_STATION = 'helm_station';
+    public const POST_TYPE_ANOMALY = 'helm_anomaly';
 
     // Taxonomies
     public const TAXONOMY_CONSTELLATION = 'helm_constellation';
     public const TAXONOMY_SPECTRAL_CLASS = 'helm_spectral_class';
     public const TAXONOMY_PLANET_TYPE = 'helm_planet_type';
+    public const TAXONOMY_STATION_TYPE = 'helm_station_type';
+    public const TAXONOMY_ANOMALY_TYPE = 'helm_anomaly_type';
 
     // Meta Keys - Stars
     public const META_STAR_CATALOG_ID = '_helm_star_id';
@@ -29,6 +33,7 @@ final class PostTypeRegistry
     public const META_STAR_RA = '_helm_ra';
     public const META_STAR_DEC = '_helm_dec';
     public const META_STAR_LUMINOSITY = '_helm_luminosity_solar';
+    public const META_STAR_SYSTEM_ID = '_helm_star_system_id';
     public const META_STAR_PROPERTIES = '_helm_star_properties';
     public const META_STAR_CONFIRMED_PLANETS = '_helm_confirmed_planets';
 
@@ -64,6 +69,8 @@ final class PostTypeRegistry
         $this->registerStarPostType();
         $this->registerPlanetPostType();
         $this->registerShipPostType();
+        $this->registerStationPostType();
+        $this->registerAnomalyPostType();
     }
 
     /**
@@ -74,6 +81,8 @@ final class PostTypeRegistry
         $this->registerConstellationTaxonomy();
         $this->registerSpectralClassTaxonomy();
         $this->registerPlanetTypeTaxonomy();
+        $this->registerStationTypeTaxonomy();
+        $this->registerAnomalyTypeTaxonomy();
     }
 
     /**
@@ -172,6 +181,70 @@ final class PostTypeRegistry
     }
 
     /**
+     * Register the Station post type.
+     */
+    private function registerStationPostType(): void
+    {
+        register_post_type(self::POST_TYPE_STATION, [
+            'labels' => [
+                'name' => __('Stations', 'helm'),
+                'singular_name' => __('Station', 'helm'),
+                'add_new' => __('Add New', 'helm'),
+                'add_new_item' => __('Add New Station', 'helm'),
+                'edit_item' => __('Edit Station', 'helm'),
+                'new_item' => __('New Station', 'helm'),
+                'view_item' => __('View Station', 'helm'),
+                'search_items' => __('Search Stations', 'helm'),
+                'not_found' => __('No stations found', 'helm'),
+                'not_found_in_trash' => __('No stations found in Trash', 'helm'),
+                'menu_name' => __('Stations', 'helm'),
+            ],
+            'public' => false,
+            'show_ui' => true,
+            'show_in_menu' => true,
+            'menu_position' => 32,
+            'menu_icon' => 'dashicons-store',
+            'supports' => ['title', 'author'],
+            'has_archive' => false,
+            'rewrite' => false,
+            'show_in_rest' => true,
+            'rest_base' => 'stations',
+        ]);
+    }
+
+    /**
+     * Register the Anomaly post type.
+     */
+    private function registerAnomalyPostType(): void
+    {
+        register_post_type(self::POST_TYPE_ANOMALY, [
+            'labels' => [
+                'name' => __('Anomalies', 'helm'),
+                'singular_name' => __('Anomaly', 'helm'),
+                'add_new' => __('Add New', 'helm'),
+                'add_new_item' => __('Add New Anomaly', 'helm'),
+                'edit_item' => __('Edit Anomaly', 'helm'),
+                'new_item' => __('New Anomaly', 'helm'),
+                'view_item' => __('View Anomaly', 'helm'),
+                'search_items' => __('Search Anomalies', 'helm'),
+                'not_found' => __('No anomalies found', 'helm'),
+                'not_found_in_trash' => __('No anomalies found in Trash', 'helm'),
+                'menu_name' => __('Anomalies', 'helm'),
+            ],
+            'public' => false,
+            'show_ui' => true,
+            'show_in_menu' => true,
+            'menu_position' => 33,
+            'menu_icon' => 'dashicons-visibility',
+            'supports' => ['title'],
+            'has_archive' => false,
+            'rewrite' => false,
+            'show_in_rest' => true,
+            'rest_base' => 'anomalies',
+        ]);
+    }
+
+    /**
      * Register the Constellation taxonomy.
      */
     private function registerConstellationTaxonomy(): void
@@ -253,6 +326,60 @@ final class PostTypeRegistry
     }
 
     /**
+     * Register the Station Type taxonomy.
+     */
+    private function registerStationTypeTaxonomy(): void
+    {
+        register_taxonomy(self::TAXONOMY_STATION_TYPE, self::POST_TYPE_STATION, [
+            'labels' => [
+                'name' => __('Station Types', 'helm'),
+                'singular_name' => __('Station Type', 'helm'),
+                'search_items' => __('Search Station Types', 'helm'),
+                'all_items' => __('All Station Types', 'helm'),
+                'edit_item' => __('Edit Station Type', 'helm'),
+                'update_item' => __('Update Station Type', 'helm'),
+                'add_new_item' => __('Add New Station Type', 'helm'),
+                'new_item_name' => __('New Station Type Name', 'helm'),
+                'menu_name' => __('Station Types', 'helm'),
+            ],
+            'public' => false,
+            'show_ui' => true,
+            'show_in_menu' => true,
+            'show_admin_column' => true,
+            'hierarchical' => false,
+            'rewrite' => false,
+            'show_in_rest' => true,
+        ]);
+    }
+
+    /**
+     * Register the Anomaly Type taxonomy.
+     */
+    private function registerAnomalyTypeTaxonomy(): void
+    {
+        register_taxonomy(self::TAXONOMY_ANOMALY_TYPE, self::POST_TYPE_ANOMALY, [
+            'labels' => [
+                'name' => __('Anomaly Types', 'helm'),
+                'singular_name' => __('Anomaly Type', 'helm'),
+                'search_items' => __('Search Anomaly Types', 'helm'),
+                'all_items' => __('All Anomaly Types', 'helm'),
+                'edit_item' => __('Edit Anomaly Type', 'helm'),
+                'update_item' => __('Update Anomaly Type', 'helm'),
+                'add_new_item' => __('Add New Anomaly Type', 'helm'),
+                'new_item_name' => __('New Anomaly Type Name', 'helm'),
+                'menu_name' => __('Anomaly Types', 'helm'),
+            ],
+            'public' => false,
+            'show_ui' => true,
+            'show_in_menu' => true,
+            'show_admin_column' => true,
+            'hierarchical' => false,
+            'rewrite' => false,
+            'show_in_rest' => true,
+        ]);
+    }
+
+    /**
      * Get all post type slugs.
      *
      * @return array<string>
@@ -263,6 +390,8 @@ final class PostTypeRegistry
             self::POST_TYPE_STAR,
             self::POST_TYPE_PLANET,
             self::POST_TYPE_SHIP,
+            self::POST_TYPE_STATION,
+            self::POST_TYPE_ANOMALY,
         ];
     }
 
@@ -277,6 +406,8 @@ final class PostTypeRegistry
             self::TAXONOMY_CONSTELLATION,
             self::TAXONOMY_SPECTRAL_CLASS,
             self::TAXONOMY_PLANET_TYPE,
+            self::TAXONOMY_STATION_TYPE,
+            self::TAXONOMY_ANOMALY_TYPE,
         ];
     }
 }
