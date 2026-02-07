@@ -43,6 +43,12 @@ final class Provider extends ServiceProvider
             );
         });
 
+        $this->container->singleton(NodesController::class, function () {
+            return new NodesController(
+                $this->container->get(NodeRepository::class),
+            );
+        });
+
         $this->container->singleton(CelestialsController::class, function () {
             return new CelestialsController(
                 $this->container->get(NodeRepository::class),
@@ -69,6 +75,10 @@ final class Provider extends ServiceProvider
             /** @var ShipSystemsController $systemsController */
             $systemsController = $this->container->get(ShipSystemsController::class);
             $systemsController->register();
+
+            /** @var NodesController $nodesController */
+            $nodesController = $this->container->get(NodesController::class);
+            $nodesController->register();
 
             /** @var CelestialsController $celestialsController */
             $celestialsController = $this->container->get(CelestialsController::class);

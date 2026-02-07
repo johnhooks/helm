@@ -65,6 +65,62 @@ final class NodeRepository
     }
 
     /**
+     * Paginate nodes with optional type filter.
+     *
+     * @return array{nodes: Node[], total: int}
+     */
+    public function paginate(?NodeType $type = null, int $page = 1, int $perPage = 100): array
+    {
+        global $wpdb;
+
+        $table = Schema::table(Schema::TABLE_NAV_NODES);
+        $offset = ($page - 1) * $perPage;
+
+        if ($type !== null) {
+            $rows = $wpdb->get_results(
+                $wpdb->prepare(
+                    "SELECT * FROM %i WHERE type = %d ORDER BY id LIMIT %d OFFSET %d",
+                    $table,
+                    $type->value,
+                    $perPage,
+                    $offset
+                ),
+                ARRAY_A
+            );
+
+            $total = (int) $wpdb->get_var(
+                $wpdb->prepare(
+                    "SELECT COUNT(*) FROM %i WHERE type = %d",
+                    $table,
+                    $type->value
+                )
+            );
+        } else {
+            $rows = $wpdb->get_results(
+                $wpdb->prepare(
+                    "SELECT * FROM %i ORDER BY id LIMIT %d OFFSET %d",
+                    $table,
+                    $perPage,
+                    $offset
+                ),
+                ARRAY_A
+            );
+
+            $total = (int) $wpdb->get_var(
+                $wpdb->prepare(
+                    "SELECT COUNT(*) FROM %i",
+                    $table
+                )
+            );
+        }
+
+        return [
+            'nodes' => array_map(fn($row) => Node::fromRow($row), $rows),
+            'total' => $total,
+        ];
+    }
+
+    /**
      * Find a waypoint by hash.
      */
     public function getByHash(string $hash): ?Node

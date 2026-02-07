@@ -40,6 +40,18 @@ use Helm\Stars\StarRepository;
 class Helm extends Module
 {
     /**
+     * Re-register post meta before each test.
+     *
+     * WP's test framework calls unregister_all_meta_keys() in tear_down(),
+     * which nukes all registered meta. This ensures REST-exposed meta
+     * survives across tests.
+     */
+    public function _before(TestInterface $test): void
+    {
+        helm(PostTypeRegistry::class)->registerMeta();
+    }
+
+    /**
      * Reset Transaction state after each test.
      *
      * Ensures the static savepoint stack doesn't leak between tests.

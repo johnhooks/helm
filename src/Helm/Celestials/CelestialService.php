@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace Helm\Celestials;
 
-use Helm\Anomalies\AnomalyPost;
 use Helm\Stars\StarPost;
-use Helm\Stations\StationPost;
+use WP_REST_Request;
 
 /**
  * Service for querying celestial contents at nodes.
@@ -55,135 +54,71 @@ final class CelestialService
     }
 
     /**
-     * Get all content at a node.
+     * Get all content at a node as full WP REST representations.
      *
-     * @param bool $embed Whether to include full post data
-     * @return array{stars: array<int, array<string, mixed>>, stations: array<int, array<string, mixed>>, anomalies: array<int, array<string, mixed>>}
+     * @return array<int, array<string, mixed>>
      */
-    public function getNodeContents(int $nodeId, bool $embed = false): array
+    public function getNodeContents(int $nodeId): array
     {
         $celestials = $this->repository->findByNodeId($nodeId);
 
-        $result = [
-            'stars' => [],
-            'stations' => [],
-            'anomalies' => [],
-        ];
-
+        $result = [];
         foreach ($celestials as $celestial) {
-            $data = $embed
-                ? $this->embedContent($celestial)
-                : $this->basicContent($celestial);
+            $data = $this->restRepresentation($celestial);
 
-            if ($data === null) {
-                continue;
+            if ($data !== null) {
+                $result[] = $data;
             }
-
-            match ($celestial->type) {
-                CelestialType::Star => $result['stars'][] = $data,
-                CelestialType::Station => $result['stations'][] = $data,
-                CelestialType::Anomaly => $result['anomalies'][] = $data,
-            };
         }
 
         return $result;
     }
 
     /**
-     * Get basic content reference.
+     * Get stars at a node as full WP REST representations.
      *
-     * @return array{id: int, name: string}|null
+     * @return array<int, array<string, mixed>>
      */
-    private function basicContent(Celestial $celestial): ?array
+    public function getNodeStars(int $nodeId): array
     {
-        $post = get_post($celestial->contentId);
-        if ($post === null) {
-            return null;
+        $celestials = $this->repository->findByNodeIdAndType($nodeId, CelestialType::Star);
+
+        $stars = [];
+        foreach ($celestials as $celestial) {
+            $data = $this->restRepresentation($celestial);
+
+            if ($data !== null) {
+                $stars[] = $data;
+            }
         }
 
-        return [
-            'id' => $celestial->contentId,
-            'name' => $post->post_title,
-        ];
+        return $stars;
     }
 
     /**
-     * Get embedded content with full data.
+     * Get the full WP REST representation for a celestial's content post.
+     *
+     * Dispatches an internal REST request to the post type's endpoint,
+     * returning the same data as /wp/v2/{rest_base}/{id}.
      *
      * @return array<string, mixed>|null
      */
-    private function embedContent(Celestial $celestial): ?array
+    private function restRepresentation(Celestial $celestial): ?array
     {
-        return match ($celestial->type) {
-            CelestialType::Star => $this->embedStar($celestial->contentId),
-            CelestialType::Station => $this->embedStation($celestial->contentId),
-            CelestialType::Anomaly => $this->embedAnomaly($celestial->contentId),
-        };
-    }
-
-    /**
-     * Embed star data.
-     *
-     * @return array<string, mixed>|null
-     */
-    private function embedStar(int $postId): ?array
-    {
-        $starPost = StarPost::fromId($postId);
-        if ($starPost === null) {
+        $postType = get_post_type_object($celestial->type->value);
+        if ($postType === null || ! $postType->show_in_rest) {
             return null;
         }
 
-        $star = $starPost->toStar();
+        $restBase = $postType->rest_base !== false ? $postType->rest_base : $postType->name;
+        $request = new WP_REST_Request('GET', "/wp/v2/{$restBase}/{$celestial->contentId}");
+        $request->set_param('context', 'view');
+        $response = rest_do_request($request);
 
-        return [
-            'id' => $postId,
-            'catalog_id' => $star->id,
-            'name' => $star->displayName(),
-            'spectral_type' => $star->spectralType,
-            'distance_ly' => $star->distanceLy,
-        ];
-    }
-
-    /**
-     * Embed station data.
-     *
-     * @return array<string, mixed>|null
-     */
-    private function embedStation(int $postId): ?array
-    {
-        $stationPost = StationPost::fromId($postId);
-        if ($stationPost === null) {
+        if ($response->is_error()) {
             return null;
         }
 
-        $station = $stationPost->toStation();
-
-        return [
-            'id' => $postId,
-            'name' => $station->name,
-            'type' => $station->type,
-            'owner_id' => $station->ownerId,
-        ];
-    }
-
-    /**
-     * Embed anomaly data.
-     *
-     * @return array<string, mixed>|null
-     */
-    private function embedAnomaly(int $postId): ?array
-    {
-        $anomalyPost = AnomalyPost::fromId($postId);
-        if ($anomalyPost === null) {
-            return null;
-        }
-
-        $anomaly = $anomalyPost->toAnomaly();
-
-        return [
-            'id' => $postId,
-            'name' => $anomaly->name,
-            'type' => $anomaly->type,
-        ];
+        return $response->get_data();
     }
 }

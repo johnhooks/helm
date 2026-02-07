@@ -15,6 +15,7 @@ use WP_REST_Response;
  * REST controller for celestials at nodes.
  *
  * GET /helm/v1/nodes/{id}/celestials - Get all celestial objects at a node
+ * GET /helm/v1/nodes/{id}/stars      - Get stars at a node
  */
 final class CelestialsController
 {
@@ -44,10 +45,22 @@ final class CelestialsController
                         'type'        => 'integer',
                         'required'    => true,
                     ],
-                    'embed' => [
-                        'description' => __('Include full object data.', 'helm'),
-                        'type'        => 'boolean',
-                        'default'     => false,
+                ],
+            ]
+        );
+
+        register_rest_route(
+            self::NAMESPACE,
+            '/nodes/(?P<id>\d+)/stars',
+            [
+                'methods'             => 'GET',
+                'callback'            => [$this, 'nodeStars'],
+                'permission_callback' => [$this, 'permissions'],
+                'args'                => [
+                    'id' => [
+                        'description' => __('Node ID.', 'helm'),
+                        'type'        => 'integer',
+                        'required'    => true,
                     ],
                 ],
             ]
@@ -81,7 +94,6 @@ final class CelestialsController
     public function index(WP_REST_Request $request)
     {
         $nodeId = (int) $request->get_param('id');
-        $embed = (bool) $request->get_param('embed');
 
         $node = $this->nodeRepository->get($nodeId);
         if ($node === null) {
@@ -91,13 +103,31 @@ final class CelestialsController
             );
         }
 
-        $contents = $this->celestialService->getNodeContents($nodeId, $embed);
+        return new WP_REST_Response(
+            $this->celestialService->getNodeContents($nodeId)
+        );
+    }
 
-        return new WP_REST_Response([
-            'node_id' => $nodeId,
-            'stars' => $contents['stars'],
-            'stations' => $contents['stations'],
-            'anomalies' => $contents['anomalies'],
-        ]);
+    /**
+     * Get stars at a node.
+     *
+     * @param WP_REST_Request<array<string, mixed>> $request
+     * @return WP_REST_Response|WP_Error
+     */
+    public function nodeStars(WP_REST_Request $request)
+    {
+        $nodeId = (int) $request->get_param('id');
+
+        $node = $this->nodeRepository->get($nodeId);
+        if ($node === null) {
+            return ErrorCode::NodeNotFound->error(
+                __('Node not found.', 'helm'),
+                ['status' => ErrorCode::NodeNotFound->httpStatus()]
+            );
+        }
+
+        return new WP_REST_Response(
+            $this->celestialService->getNodeStars($nodeId)
+        );
     }
 }

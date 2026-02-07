@@ -69,6 +69,7 @@ final class Provider extends ServiceProvider
         // Taxonomies must be registered before post types that use them
         $registry->registerTaxonomies();
         $registry->registerPostTypes();
+        $registry->registerMeta();
     }
 
     /**

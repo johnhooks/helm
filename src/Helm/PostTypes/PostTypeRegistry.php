@@ -109,7 +109,7 @@ final class PostTypeRegistry
             'show_in_menu' => true,
             'menu_position' => 30,
             'menu_icon' => 'dashicons-star-filled',
-            'supports' => ['title'],
+            'supports' => ['title', 'custom-fields'],
             'has_archive' => false,
             'rewrite' => false,
             'show_in_rest' => true,
@@ -376,6 +376,52 @@ final class PostTypeRegistry
             'hierarchical' => false,
             'rewrite' => false,
             'show_in_rest' => true,
+        ]);
+    }
+
+    /**
+     * Register post meta for REST API exposure.
+     */
+    public function registerMeta(): void
+    {
+        $this->registerStarMeta();
+    }
+
+    /**
+     * Register star post meta for REST API.
+     *
+     * Only fields needed by the frontend star map are exposed.
+     */
+    private function registerStarMeta(): void
+    {
+        register_post_meta(self::POST_TYPE_STAR, self::META_STAR_CATALOG_ID, [
+            'type'         => 'string',
+            'single'       => true,
+            'show_in_rest' => true,
+        ]);
+
+        register_post_meta(self::POST_TYPE_STAR, self::META_STAR_SPECTRAL_TYPE, [
+            'type'         => 'string',
+            'single'       => true,
+            'show_in_rest' => true,
+        ]);
+
+        register_post_meta(self::POST_TYPE_STAR, self::META_STAR_DISTANCE_LY, [
+            'type'         => 'number',
+            'single'       => true,
+            'show_in_rest' => true,
+        ]);
+
+        register_post_meta(self::POST_TYPE_STAR, self::META_STAR_PROPERTIES, [
+            'type'         => 'object',
+            'single'       => true,
+            'default'      => [],
+            'show_in_rest' => [
+                'schema' => [
+                    'type'                 => 'object',
+                    'additionalProperties' => true,
+                ],
+            ],
         ]);
     }
 
