@@ -26,7 +26,8 @@
         "storybook:build": "storybook build -o artifacts/storybook",
         "bench": "bun ./resources/packages/benchmark/benchmarks/nodes.ts",
         "bench:nodes": "bun ./resources/packages/benchmark/benchmarks/nodes.ts",
-        "bench:compare": "bun ./resources/packages/benchmark/benchmarks/compare.ts"
+        "bench:compare": "bun ./resources/packages/benchmark/benchmarks/compare.ts",
+        "prepare": "husky install"
     },
     "dependencies": {
         "@wordpress/api-fetch": "^7.0.0",
@@ -67,6 +68,8 @@
         "eslint-plugin-react": "^7.37.5",
         "eslint-plugin-react-hooks": "^7.0.1",
         "happy-dom": "^14.0.0",
+        "husky": "^8.0.3",
+        "lint-staged": "^15.5.2",
         "prettier": "^3.1.1",
         "sass": "^1.69.0",
         "storybook": "^10.2.0",
