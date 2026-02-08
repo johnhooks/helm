@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Helm\Rest;
 
+use Helm\Celestials\CelestialService;
+use Helm\Celestials\CelestialType;
+use Helm\Core\ErrorCode;
 use Helm\Navigation\Node;
 use Helm\Navigation\NodeRepository;
 use Helm\Navigation\NodeType;
@@ -14,7 +17,9 @@ use WP_REST_Response;
 /**
  * REST controller for navigation nodes.
  *
- * GET /helm/v1/nodes - List nodes with pagination
+ * GET /helm/v1/nodes              - List nodes with pagination
+ * GET /helm/v1/nodes/{id}         - Single node
+ * GET /helm/v1/nodes/{id}/stars   - Stars at a node
  */
 final class NodesController
 {
@@ -22,6 +27,7 @@ final class NodesController
 
     public function __construct(
         private readonly NodeRepository $nodeRepository,
+        private readonly CelestialService $celestialService,
     ) {
     }
 
@@ -55,6 +61,40 @@ final class NodesController
                         'default'     => 100,
                         'minimum'     => 1,
                         'maximum'     => 500,
+                    ],
+                ],
+            ]
+        );
+
+        register_rest_route(
+            self::NAMESPACE,
+            '/nodes/(?P<id>\d+)',
+            [
+                'methods'             => 'GET',
+                'callback'            => [$this, 'show'],
+                'permission_callback' => [$this, 'permissions'],
+                'args'                => [
+                    'id' => [
+                        'description' => __('Node ID.', 'helm'),
+                        'type'        => 'integer',
+                        'required'    => true,
+                    ],
+                ],
+            ]
+        );
+
+        register_rest_route(
+            self::NAMESPACE,
+            '/nodes/(?P<id>\d+)/stars',
+            [
+                'methods'             => 'GET',
+                'callback'            => [$this, 'nodeStars'],
+                'permission_callback' => [$this, 'permissions'],
+                'args'                => [
+                    'id' => [
+                        'description' => __('Node ID.', 'helm'),
+                        'type'        => 'integer',
+                        'required'    => true,
                     ],
                 ],
             ]
@@ -97,8 +137,13 @@ final class NodesController
         $total = $result['total'];
         $totalPages = (int) ceil($total / $perPage);
 
+        $embedStars = $this->shouldEmbedStars($request);
+        $starsByNode = $embedStars
+            ? $this->celestialService->serializeStarsForNodes(array_map(fn (Node $n) => $n->id, $result['nodes']))
+            : [];
+
         $data = array_map(
-            fn (Node $node) => $this->serializeNode($node),
+            fn (Node $node) => $this->serializeNode($node, $starsByNode[$node->id] ?? null),
             $result['nodes']
         );
 
@@ -110,13 +155,64 @@ final class NodesController
     }
 
     /**
+     * Get a single node.
+     *
+     * @param WP_REST_Request<array<string, mixed>> $request
+     * @return WP_REST_Response|WP_Error
+     */
+    public function show(WP_REST_Request $request)
+    {
+        $nodeId = (int) $request->get_param('id');
+
+        $node = $this->nodeRepository->get($nodeId);
+        if ($node === null) {
+            return ErrorCode::NodeNotFound->error(
+                __('Node not found.', 'helm'),
+                ['status' => ErrorCode::NodeNotFound->httpStatus()]
+            );
+        }
+
+        $embeddedStars = $this->shouldEmbedStars($request)
+            ? $this->celestialService->serializeStarsForNode($nodeId)
+            : null;
+
+        return new WP_REST_Response($this->serializeNode($node, $embeddedStars));
+    }
+
+    /**
+     * Get stars at a node.
+     *
+     * @param WP_REST_Request<array<string, mixed>> $request
+     * @return WP_REST_Response|WP_Error
+     */
+    public function nodeStars(WP_REST_Request $request)
+    {
+        $nodeId = (int) $request->get_param('id');
+
+        $node = $this->nodeRepository->get($nodeId);
+        if ($node === null) {
+            return ErrorCode::NodeNotFound->error(
+                __('Node not found.', 'helm'),
+                ['status' => ErrorCode::NodeNotFound->httpStatus()]
+            );
+        }
+
+        return new WP_REST_Response(
+            $this->celestialService->serializeStarsForNode($nodeId)
+        );
+    }
+
+    /**
      * Serialize a node for JSON response.
      *
+     * @param list<array<string, mixed>>|null $embeddedStars Serialized star records, or null.
      * @return array<string, mixed>
      */
-    private function serializeNode(Node $node): array
+    private function serializeNode(Node $node, ?array $embeddedStars = null): array
     {
-        return [
+        $embedKey = CelestialType::Star->embedKey();
+
+        $data = [
             'id'         => $node->id,
             'type'       => $this->typeToString($node->type),
             'x'          => $node->x,
@@ -127,14 +223,46 @@ final class NodesController
                 'self' => [
                     ['href' => rest_url(self::NAMESPACE . '/nodes/' . $node->id)],
                 ],
-                'helm:stars' => [
+                $embedKey => [
                     [
                         'href'       => rest_url(self::NAMESPACE . '/nodes/' . $node->id . '/stars'),
-                        'embeddable' => true,
+                        'embeddable' => $embeddedStars === null,
                     ],
                 ],
             ],
         ];
+
+        if ($embeddedStars !== null) {
+            $data['_embedded'][$embedKey] = $embeddedStars;
+        }
+
+        return $data;
+    }
+
+    /**
+     * Check if the request wants helm:stars embedded.
+     *
+     * @param WP_REST_Request<array<string, mixed>> $request
+     */
+    private function shouldEmbedStars(WP_REST_Request $request): bool
+    {
+        $embed = $request->get_param('_embed');
+        if ($embed === null || $embed === '' || $embed === false) {
+            return false;
+        }
+
+        // _embed=true or _embed (no value) means embed all
+        if ($embed === true || $embed === '1' || $embed === 'true') {
+            return true;
+        }
+
+        // _embed=helm:stars or _embed=helm:stars,wp:term
+        if (is_string($embed)) {
+            $targets = array_map('trim', explode(',', $embed));
+            return in_array(CelestialType::Star->embedKey(), $targets, true);
+        }
+
+        return false;
     }
 
     /**

@@ -54,6 +54,12 @@ function validateEmbedded(body: unknown): string | null {
 	if (stars.length === 0) {
 		return '_embedded["helm:stars"] is empty';
 	}
+	const star = stars[0] as Record<string, unknown>;
+	for (const key of ['id', 'post_type', 'title', 'catalog_id', 'spectral_class', 'x', 'y', 'z']) {
+		if (!(key in star)) {
+			return `missing field "${key}" on star`;
+		}
+	}
 	return null;
 }
 

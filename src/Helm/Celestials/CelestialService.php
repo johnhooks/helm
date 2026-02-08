@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace Helm\Celestials;
 
 use Helm\Stars\StarPost;
-use WP_REST_Request;
 
 /**
- * Service for querying celestial contents at nodes.
+ * Service for querying and serializing celestial contents at nodes.
  */
 final class CelestialService
 {
@@ -54,41 +53,24 @@ final class CelestialService
     }
 
     /**
-     * Get all content at a node as full WP REST representations.
+     * Serialize only stars at a single node (star summaries).
      *
-     * @return array<int, array<string, mixed>>
+     * @return list<array<string, mixed>>
      */
-    public function getNodeContents(int $nodeId): array
-    {
-        $celestials = $this->repository->findByNodeId($nodeId);
-
-        $result = [];
-        foreach ($celestials as $celestial) {
-            $data = $this->restRepresentation($celestial);
-
-            if ($data !== null) {
-                $result[] = $data;
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * Get stars at a node as full WP REST representations.
-     *
-     * @return array<int, array<string, mixed>>
-     */
-    public function getNodeStars(int $nodeId): array
+    public function serializeStarsForNode(int $nodeId): array
     {
         $celestials = $this->repository->findByNodeIdAndType($nodeId, CelestialType::Star);
+        if ($celestials === []) {
+            return [];
+        }
+
+        $this->primeCaches($celestials);
 
         $stars = [];
         foreach ($celestials as $celestial) {
-            $data = $this->restRepresentation($celestial);
-
-            if ($data !== null) {
-                $stars[] = $data;
+            $star = $this->serializeStar($celestial);
+            if ($star !== null) {
+                $stars[] = $star;
             }
         }
 
@@ -96,29 +78,77 @@ final class CelestialService
     }
 
     /**
-     * Get the full WP REST representation for a celestial's content post.
+     * Batch-serialize stars for multiple nodes, grouped by node ID.
      *
-     * Dispatches an internal REST request to the post type's endpoint,
-     * returning the same data as /wp/v2/{rest_base}/{id}.
+     * @param int[] $nodeIds
+     * @return array<int, list<array<string, mixed>>> Stars keyed by node ID.
+     */
+    public function serializeStarsForNodes(array $nodeIds): array
+    {
+        if ($nodeIds === []) {
+            return [];
+        }
+
+        $celestials = $this->repository->findByNodeIds($nodeIds, CelestialType::Star);
+        if ($celestials === []) {
+            return [];
+        }
+
+        $this->primeCaches($celestials);
+
+        $result = [];
+        foreach ($celestials as $celestial) {
+            $star = $this->serializeStar($celestial);
+            if ($star !== null) {
+                $result[$celestial->nodeId][] = $star;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Serialize a star to its lightweight summary.
      *
      * @return array<string, mixed>|null
      */
-    private function restRepresentation(Celestial $celestial): ?array
+    private function serializeStar(Celestial $celestial): ?array
     {
-        $postType = get_post_type_object($celestial->type->value);
-        if ($postType === null || ! $postType->show_in_rest) {
+        $starPost = StarPost::fromId($celestial->contentId);
+        if ($starPost === null) {
             return null;
         }
 
-        $restBase = $postType->rest_base !== false ? $postType->rest_base : $postType->name;
-        $request = new WP_REST_Request('GET', "/wp/v2/{$restBase}/{$celestial->contentId}");
-        $request->set_param('context', 'view');
-        $response = rest_do_request($request);
+        $star = $starPost->toStar();
+        [$x, $y, $z] = $star->cartesian3D();
 
-        if ($response->is_error()) {
-            return null;
+        return [
+            'id'             => $celestial->contentId,
+            'post_type'      => CelestialType::Star->value,
+            'title'          => $star->displayName(),
+            'node_id'        => $celestial->nodeId,
+            'catalog_id'     => $star->id,
+            'spectral_class' => $star->spectralClass(),
+            'x'              => $x,
+            'y'              => $y,
+            'z'              => $z,
+            'mass'           => $star->mass(),
+            'radius'         => $star->radius(),
+        ];
+    }
+
+    /**
+     * Prime WP post and meta caches for celestials in one query.
+     *
+     * @param Celestial[] $celestials
+     */
+    private function primeCaches(array $celestials): void
+    {
+        if ($celestials === []) {
+            return;
         }
 
-        return $response->get_data();
+        $postIds = array_map(fn (Celestial $c) => $c->contentId, $celestials);
+        _prime_post_caches($postIds, true, false);
     }
 }

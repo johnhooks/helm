@@ -24,6 +24,18 @@ enum CelestialType: string
     }
 
     /**
+     * Get the plural embed key for this celestial type (e.g. 'helm:stars').
+     */
+    public function embedKey(): string
+    {
+        return match ($this) {
+            self::Star    => 'helm:stars',
+            self::Station => 'helm:stations',
+            self::Anomaly => 'helm:anomalies',
+        };
+    }
+
+    /**
      * Create from a post type slug.
      */
     public static function fromPostType(string $postType): ?self
