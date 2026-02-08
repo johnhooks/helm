@@ -1,7 +1,7 @@
 /**
  * Helm UI Component Library
  *
- * @package @helm/ui
+ * @package
  */
 
 export { Button } from "./components/button";

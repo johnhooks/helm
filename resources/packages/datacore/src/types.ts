@@ -1,9 +1,13 @@
 import type { NavNode, Star } from '@helm/types';
 
-/** SQLite-compatible parameter types for binding. */
+/**
+ * SQLite-compatible parameter types for binding.
+ */
 export type SQLiteParam = number | string | Uint8Array | bigint | null;
 
-/** Thin wrapper around sendQuery/sendRun for domain modules. */
+/**
+ * Thin wrapper around sendQuery/sendRun for domain modules.
+ */
 export interface Connection {
 	query: <Row>(sql: string, params?: SQLiteParam[]) => Promise<Row[]>;
 	run: (sql: string, params?: SQLiteParam[]) => Promise<void>;
@@ -11,7 +15,9 @@ export interface Connection {
 	transaction: <T>(fn: () => Promise<T>) => Promise<T>;
 }
 
-/** SQLite-compatible value types returned from queries. */
+/**
+ * SQLite-compatible value types returned from queries.
+ */
 export type SQLiteValue = number | string | Uint8Array | bigint | null;
 
 // ---------------------------------------------------------------------------

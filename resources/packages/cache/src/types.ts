@@ -16,7 +16,9 @@ export interface SyncResult {
 	syncedAt: string;
 }
 
-/** Meta keys written by cache sync operations. */
+/**
+ * Meta keys written by cache sync operations.
+ */
 export const META_SYNCED_AT = 'cache.synced_at';
 export const META_NODE_COUNT = 'cache.node_count';
 export const META_STAR_COUNT = 'cache.star_count';

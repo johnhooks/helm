@@ -2,9 +2,13 @@ import type { CSSProperties, ReactNode } from "react";
 import "./panel.css";
 
 export interface PanelProps {
-  /** Panel content */
+  /**
+   * Panel content
+   */
   children: ReactNode;
-  /** Color tone for accents */
+  /**
+   * Color tone for accents
+   */
   tone?:
     | "neutral"
     | "accent"
@@ -16,15 +20,25 @@ export interface PanelProps {
     | "lilac"
     | "violet"
     | "danger";
-  /** Panel variant */
+  /**
+   * Panel variant
+   */
   variant?: "default" | "bordered" | "bracket" | "inset";
-  /** Padding size */
+  /**
+   * Padding size
+   */
   padding?: "none" | "sm" | "md" | "lg";
-  /** Additional CSS class names */
+  /**
+   * Additional CSS class names
+   */
   className?: string;
-  /** Inline styles */
+  /**
+   * Inline styles
+   */
   style?: CSSProperties;
-  /** Test ID for testing */
+  /**
+   * Test ID for testing
+   */
   "data-testid"?: string;
 }
 

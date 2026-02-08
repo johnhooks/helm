@@ -29,6 +29,7 @@ function nextId(): string {
  * The worker boots SQLite with OPFS persistence, then accepts
  * query, run, exec, and close messages over postMessage.
  *
+ * @param  options
  * @throws {HelmError} with code `helm.datacore.unsupported` if the browser lacks required APIs.
  */
 export async function createDatacore(options: DatacoreOptions = {}): Promise<Datacore> {
@@ -54,7 +55,9 @@ export async function createDatacore(options: DatacoreOptions = {}): Promise<Dat
 		const msg = event.data;
 
 		const req = pending.get(msg.id);
-		if (!req) return;
+		if (!req) {
+			return;
+		}
 		pending.delete(msg.id);
 
 		if (msg.type === 'error') {

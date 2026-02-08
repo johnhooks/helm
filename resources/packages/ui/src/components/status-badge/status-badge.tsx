@@ -2,9 +2,13 @@ import type { CSSProperties } from "react";
 import "./status-badge.css";
 
 export interface StatusBadgeProps {
-  /** Status label */
+  /**
+   * Status label
+   */
   children: string;
-  /** Surface tone */
+  /**
+   * Surface tone
+   */
   tone?:
     | "neutral"
     | "muted"
@@ -19,15 +23,25 @@ export interface StatusBadgeProps {
     | "sky"
     | "lilac"
     | "violet";
-  /** Size variant */
+  /**
+   * Size variant
+   */
   size?: "sm" | "md";
-  /** Show pulsing dot for active states */
+  /**
+   * Show pulsing dot for active states
+   */
   pulse?: boolean;
-  /** Additional CSS class names */
+  /**
+   * Additional CSS class names
+   */
   className?: string;
-  /** Inline styles */
+  /**
+   * Inline styles
+   */
   style?: CSSProperties;
-  /** Test ID for testing */
+  /**
+   * Test ID for testing
+   */
   "data-testid"?: string;
 }
 

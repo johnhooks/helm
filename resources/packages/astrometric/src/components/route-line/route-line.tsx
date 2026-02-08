@@ -9,17 +9,29 @@ import { getRouteColor } from "../../utils/colors";
 import { toVector3 } from "../../utils/coordinates";
 
 export interface RouteLineProps {
-  /** Route data */
+  /**
+   * Route data
+   */
   route: Route;
-  /** Start position */
+  /**
+   * Start position
+   */
   from: Position3D;
-  /** End position */
+  /**
+   * End position
+   */
   to: Position3D;
-  /** Whether this route is selected */
+  /**
+   * Whether this route is selected
+   */
   selected?: boolean;
-  /** Called when route is clicked */
+  /**
+   * Called when route is clicked
+   */
   onSelect?: () => void;
-  /** Called when hover state changes */
+  /**
+   * Called when hover state changes
+   */
   onHover?: (hovering: boolean) => void;
 }
 

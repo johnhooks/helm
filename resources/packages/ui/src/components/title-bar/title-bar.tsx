@@ -2,13 +2,21 @@ import type { CSSProperties, ReactNode } from "react";
 import "./title-bar.css";
 
 export interface TitleBarProps {
-  /** Panel title */
+  /**
+   * Panel title
+   */
   title: string;
-  /** Optional subtitle or secondary info */
+  /**
+   * Optional subtitle or secondary info
+   */
   subtitle?: string;
-  /** Right-side content (typically a StatusBadge) */
+  /**
+   * Right-side content (typically a StatusBadge)
+   */
   children?: ReactNode;
-  /** Color tone for the title and border */
+  /**
+   * Color tone for the title and border
+   */
   tone?:
     | "neutral"
     | "accent"
@@ -20,11 +28,17 @@ export interface TitleBarProps {
     | "lilac"
     | "violet"
     | "danger";
-  /** Additional CSS class names */
+  /**
+   * Additional CSS class names
+   */
   className?: string;
-  /** Inline styles */
+  /**
+   * Inline styles
+   */
   style?: CSSProperties;
-  /** Test ID for testing */
+  /**
+   * Test ID for testing
+   */
   "data-testid"?: string;
 }
 

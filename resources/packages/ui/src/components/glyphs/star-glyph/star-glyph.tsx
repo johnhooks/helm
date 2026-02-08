@@ -16,15 +16,25 @@ export type SpectralClass = (typeof SPECTRAL_CLASSES)[number];
 export type StellarType = (typeof STELLAR_TYPES)[number];
 
 export interface StarGlyphProps {
-	/** Spectral class (O=hottest blue, M=coolest red) */
+	/**
+	 * Spectral class (O=hottest blue, M=coolest red)
+	 */
 	spectralClass?: SpectralClass;
-	/** Stellar type for exotic stars */
+	/**
+	 * Stellar type for exotic stars
+	 */
 	stellarType?: StellarType;
-	/** Size variant */
+	/**
+	 * Size variant
+	 */
 	size?: "xxs" | "xs" | "sm" | "md" | "lg" | "xl" | "xxl";
-	/** Additional CSS class names */
+	/**
+	 * Additional CSS class names
+	 */
 	className?: string;
-	/** Inline styles */
+	/**
+	 * Inline styles
+	 */
 	style?: CSSProperties;
 }
 

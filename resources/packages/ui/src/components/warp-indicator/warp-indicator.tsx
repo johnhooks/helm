@@ -3,15 +3,25 @@ import type { CSSProperties } from "react";
 import "./warp-indicator.css";
 
 export interface WarpIndicatorProps {
-  /** Power level from 0-100 */
+  /**
+   * Power level from 0-100
+   */
   level?: number;
-  /** Size variant */
+  /**
+   * Size variant
+   */
   size?: "sm" | "md" | "lg" | "xl" | "2xl";
-  /** Number of segments */
+  /**
+   * Number of segments
+   */
   segments?: number;
-  /** Level transition duration in ms */
+  /**
+   * Level transition duration in ms
+   */
   transitionMs?: number;
-  /** Surface tone */
+  /**
+   * Surface tone
+   */
   tone?:
     | "neutral"
     | "base"
@@ -32,11 +42,17 @@ export interface WarpIndicatorProps {
     | "violet"
     | "plum"
     | "hopbush";
-  /** Additional CSS class names */
+  /**
+   * Additional CSS class names
+   */
   className?: string;
-  /** Inline styles */
+  /**
+   * Inline styles
+   */
   style?: CSSProperties;
-  /** Test ID for testing */
+  /**
+   * Test ID for testing
+   */
   "data-testid"?: string;
 }
 

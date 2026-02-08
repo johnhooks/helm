@@ -18,7 +18,9 @@ export interface BenchOptions {
 	iterations: number;
 	auth: string;
 	quiet?: boolean;
-	/** Validate the first response body. Return an error string to abort, or null if OK. */
+	/**
+	 * Validate the first response body. Return an error string to abort, or null if OK.
+	 */
 	validate?: (body: unknown) => string | null;
 }
 

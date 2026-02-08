@@ -14,7 +14,7 @@ function post(message: WorkerResponse): void {
 }
 
 function requireDb(): Database {
-	if (!database) throw new Error('Database not initialized');
+	if (!database) {throw new Error('Database not initialized');}
 	return database;
 }
 

@@ -1,6 +1,8 @@
 import type { HelmError } from './helm-error';
 
-/** Shape WordPress REST API returns for WP_Error responses. */
+/**
+ * Shape WordPress REST API returns for WP_Error responses.
+ */
 export interface WpRestErrorResponse {
 	code: string;
 	message: string;

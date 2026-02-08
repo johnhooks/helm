@@ -2,19 +2,33 @@ import type { CSSProperties } from "react";
 import "./progress-bar.css";
 
 export interface ProgressBarProps {
-  /** Current value (0-100 or custom range with min/max) */
+  /**
+   * Current value (0-100 or custom range with min/max)
+   */
   value: number;
-  /** Minimum value */
+  /**
+   * Minimum value
+   */
   min?: number;
-  /** Maximum value */
+  /**
+   * Maximum value
+   */
   max?: number;
-  /** Accessible label */
+  /**
+   * Accessible label
+   */
   label?: string;
-  /** Show value text */
+  /**
+   * Show value text
+   */
   showValue?: boolean;
-  /** Size variant */
+  /**
+   * Size variant
+   */
   size?: "sm" | "md" | "lg";
-  /** Color tone */
+  /**
+   * Color tone
+   */
   tone?:
     | "neutral"
     | "accent"
@@ -27,15 +41,25 @@ export interface ProgressBarProps {
     | "violet"
     | "danger"
     | "success";
-  /** Indeterminate state (for unknown progress) */
+  /**
+   * Indeterminate state (for unknown progress)
+   */
   indeterminate?: boolean;
-  /** Active/in-progress animation */
+  /**
+   * Active/in-progress animation
+   */
   active?: boolean;
-  /** Additional CSS class names */
+  /**
+   * Additional CSS class names
+   */
   className?: string;
-  /** Inline styles */
+  /**
+   * Inline styles
+   */
   style?: CSSProperties;
-  /** Test ID for testing */
+  /**
+   * Test ID for testing
+   */
   "data-testid"?: string;
 }
 

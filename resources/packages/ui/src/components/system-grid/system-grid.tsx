@@ -2,15 +2,25 @@ import type { CSSProperties, ReactNode } from "react";
 import "./system-grid.css";
 
 export interface SystemGridProps {
-  /** Number of columns */
+  /**
+   * Number of columns
+   */
   columns?: 1 | 2 | 3 | 4 | 5 | 6;
-  /** Gap between cells */
+  /**
+   * Gap between cells
+   */
   gap?: "sm" | "md" | "lg";
-  /** Children (SystemCell components) */
+  /**
+   * Children (SystemCell components)
+   */
   children: ReactNode;
-  /** Additional CSS class names */
+  /**
+   * Additional CSS class names
+   */
   className?: string;
-  /** Inline styles */
+  /**
+   * Inline styles
+   */
   style?: CSSProperties;
 }
 
@@ -38,15 +48,25 @@ export function SystemGrid({
 }
 
 export interface SystemCellProps {
-  /** Indicator element */
+  /**
+   * Indicator element
+   */
   indicator?: ReactNode;
-  /** Readout or other content */
+  /**
+   * Readout or other content
+   */
   children: ReactNode;
-  /** Layout direction */
+  /**
+   * Layout direction
+   */
   layout?: "row" | "column";
-  /** Additional CSS class names */
+  /**
+   * Additional CSS class names
+   */
   className?: string;
-  /** Inline styles */
+  /**
+   * Inline styles
+   */
   style?: CSSProperties;
 }
 

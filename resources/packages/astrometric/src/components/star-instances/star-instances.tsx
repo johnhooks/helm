@@ -46,8 +46,12 @@ export function StarInstances({
       const isConnected = connectedSystemIds.has(system.id);
       const isReachable = system.reachable !== false;
 
-      if (isConnected) return 1.0;
-      if (isReachable) return 0.5;
+      if (isConnected) {
+        return 1.0;
+      }
+      if (isReachable) {
+        return 0.5;
+      }
       return 0.2;
     },
     [connectedSystemIds]
@@ -55,7 +59,9 @@ export function StarInstances({
 
   // Initialize and update instance matrices
   useEffect(() => {
-    if (!meshRef.current) return;
+    if (!meshRef.current) {
+      return;
+    }
 
     const tempObj = new Object3D();
 
@@ -83,7 +89,9 @@ export function StarInstances({
   // Handle pointer move for hover detection
   const handlePointerMove = useCallback(
     (event: PointerEvent) => {
-      if (!meshRef.current) return;
+      if (!meshRef.current) {
+      return;
+    }
 
       const rect = gl.domElement.getBoundingClientRect();
       mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
@@ -114,7 +122,9 @@ export function StarInstances({
   // Handle click for selection
   const handleClick = useCallback(
     (event: MouseEvent) => {
-      if (!meshRef.current) return;
+      if (!meshRef.current) {
+      return;
+    }
 
       const rect = gl.domElement.getBoundingClientRect();
       mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
@@ -147,7 +157,9 @@ export function StarInstances({
 
   // Animate hovered/selected stars
   useFrame(() => {
-    if (!meshRef.current) return;
+    if (!meshRef.current) {
+      return;
+    }
 
     const tempObj = new Object3D();
 

@@ -13,17 +13,29 @@ import {
 import type { CameraInfo } from "../../types";
 
 export interface CameraControlsProps {
-  /** Enable/disable controls */
+  /**
+   * Enable/disable controls
+   */
   enabled?: boolean;
-  /** Initial camera distance */
+  /**
+   * Initial camera distance
+   */
   initialDistance?: number;
-  /** Minimum zoom distance */
+  /**
+   * Minimum zoom distance
+   */
   minDistance?: number;
-  /** Maximum zoom distance */
+  /**
+   * Maximum zoom distance
+   */
   maxDistance?: number;
-  /** Callback when camera moves */
+  /**
+   * Callback when camera moves
+   */
   onCameraChange?: (info: CameraInfo) => void;
-  /** Whether using orthographic camera */
+  /**
+   * Whether using orthographic camera
+   */
   isOrthographic?: boolean;
 }
 
@@ -51,7 +63,9 @@ export function CameraControls({
 
   // Handle camera change events
   const handleChange = () => {
-    if (!onCameraChange || !controlsRef.current) return;
+    if (!onCameraChange || !controlsRef.current) {
+      return;
+    }
 
     const distance = camera.position.length();
     const polarAngle = controlsRef.current.getPolarAngle();

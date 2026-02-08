@@ -5,11 +5,17 @@ import { Quaternion, Vector3 } from "three";
 import type { Position3D } from "../../types";
 
 export interface StarMapPivotProps {
-  /** Target position to align with +X axis on XZ plane */
+  /**
+   * Target position to align with +X axis on XZ plane
+   */
   alignTarget: Position3D | null;
-  /** Animation speed (0-1, higher = faster) */
+  /**
+   * Animation speed (0-1, higher = faster)
+   */
   animationSpeed?: number;
-  /** Children to rotate */
+  /**
+   * Children to rotate
+   */
   children: React.ReactNode;
 }
 
@@ -57,7 +63,9 @@ export function StarMapPivot({
 
   // Animate rotation each frame
   useFrame(() => {
-    if (!groupRef.current) return;
+    if (!groupRef.current) {
+      return;
+    }
 
     // Slerp toward target
     currentQuaternion.current.slerp(targetQuaternion.current, animationSpeed);

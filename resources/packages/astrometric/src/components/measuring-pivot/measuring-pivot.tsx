@@ -5,11 +5,17 @@ import { Quaternion, Vector3 } from "three";
 import type { Position3D } from "../../types";
 
 export interface MeasuringPivotProps {
-  /** Target position to align the measuring plane with */
+  /**
+   * Target position to align the measuring plane with
+   */
   alignTarget: Position3D | null;
-  /** Animation speed (0-1, higher = faster) */
+  /**
+   * Animation speed (0-1, higher = faster)
+   */
   animationSpeed?: number;
-  /** Children to rotate (the measuring rings) */
+  /**
+   * Children to rotate (the measuring rings)
+   */
   children: React.ReactNode;
 }
 
@@ -82,7 +88,9 @@ export function MeasuringPivot({
 
   // Animate rotation each frame
   useFrame(() => {
-    if (!groupRef.current) return;
+    if (!groupRef.current) {
+      return;
+    }
 
     // Slerp toward target
     currentQuaternion.current.slerp(targetQuaternion.current, animationSpeed);

@@ -5,9 +5,13 @@ import { DEFAULT_JUMP_BOUNDARY } from "../../constants";
 import { lcarsColors } from "../../utils/colors";
 
 export interface JumpBoundaryProps {
-  /** Radius in light-years */
+  /**
+   * Radius in light-years
+   */
   radius?: number;
-  /** Whether to animate (slow rotation) */
+  /**
+   * Whether to animate (slow rotation)
+   */
   animate?: boolean;
 }
 
@@ -18,7 +22,9 @@ export function JumpBoundary({
   const meshRef = useRef<Mesh>(null);
 
   useFrame((state) => {
-    if (!animate || !meshRef.current) return;
+    if (!animate || !meshRef.current) {
+      return;
+    }
 
     const time = state.clock.getElapsedTime();
     meshRef.current.rotation.y = time * 0.02;

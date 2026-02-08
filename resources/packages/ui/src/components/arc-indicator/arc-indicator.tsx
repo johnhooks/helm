@@ -2,11 +2,17 @@ import type { CSSProperties } from 'react';
 import './arc-indicator.css';
 
 export interface ArcIndicatorProps {
-	/** Level from 0-100 */
+	/**
+	 * Level from 0-100
+	 */
 	level?: number;
-	/** Size variant */
+	/**
+	 * Size variant
+	 */
 	size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
-	/** Surface tone */
+	/**
+	 * Surface tone
+	 */
 	tone?:
 		| 'neutral'
 		| 'base'
@@ -27,11 +33,17 @@ export interface ArcIndicatorProps {
 		| 'violet'
 		| 'plum'
 		| 'hopbush';
-	/** Additional CSS class names */
+	/**
+	 * Additional CSS class names
+	 */
 	className?: string;
-	/** Inline styles */
+	/**
+	 * Inline styles
+	 */
 	style?: CSSProperties;
-	/** Test ID for testing */
+	/**
+	 * Test ID for testing
+	 */
 	'data-testid'?: string;
 }
 

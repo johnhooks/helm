@@ -14,11 +14,17 @@ import {
 } from "../../constants";
 
 export interface BackgroundStarsProps {
-  /** Number of background stars */
+  /**
+   * Number of background stars
+   */
   count?: number;
-  /** Whether to animate (slow twinkle) */
+  /**
+   * Whether to animate (slow twinkle)
+   */
   animate?: boolean;
-  /** Thickness of the galactic disk (smaller = flatter) */
+  /**
+   * Thickness of the galactic disk (smaller = flatter)
+   */
   diskThickness?: number;
 }
 
@@ -32,8 +38,8 @@ function gaussianRandom(): number {
 }
 
 /**
- * Generate a position in a galactic disk distribution
- * Stars concentrate near the galactic plane (Y=0)
+ * Generate a position in a galactic disk distribution.
+ * Stars concentrate near the galactic plane (Y=0).
  */
 function randomGalacticPosition(
   minRadius: number,
@@ -126,7 +132,9 @@ export function BackgroundStars({
 
   // Animate twinkle by modulating colors
   useFrame((state) => {
-    if (!animate || !pointsRef.current) return;
+    if (!animate || !pointsRef.current) {
+      return;
+    }
 
     const time = state.clock.getElapsedTime();
     const colors = geometry.getAttribute("color");

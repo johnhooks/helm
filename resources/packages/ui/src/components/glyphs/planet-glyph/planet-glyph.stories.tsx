@@ -36,7 +36,9 @@ export const Default: Story = {
 	},
 };
 
-/** All planet types at each size */
+/**
+ * All planet types at each size
+ */
 export const AllTypes: Story = {
 	render: () => (
 		<Panel variant="inset" padding="lg" style={{ minWidth: 600 }}>
@@ -91,7 +93,9 @@ export const AllTypes: Story = {
 	),
 };
 
-/** Planet glyph as part of a survey readout row */
+/**
+ * Planet glyph as part of a survey readout row
+ */
 export const SurveyRow: Story = {
 	render: () => (
 		<Panel variant="default" padding="lg" style={{ minWidth: 500 }}>
@@ -144,18 +148,13 @@ export const SurveyRow: Story = {
 							<BarIndicator
 								level={planet.survey}
 								size="sm"
+								// eslint-disable-next-line no-nested-ternary
 								tone={planet.survey === 100 ? "success" : planet.survey > 0 ? "gold" : "muted"}
 								style={{ width: 60 }}
 							/>
 							<StatusBadge
 								tone={
-									planet.status === "habitable"
-										? "success"
-										: planet.status === "surveyed"
-											? "accent"
-											: planet.status === "scanning"
-												? "info"
-												: "muted"
+									({ habitable: "success", surveyed: "accent", scanning: "info" } as Record<string, "success" | "accent" | "info">)[planet.status] ?? "muted"
 								}
 								pulse={planet.status === "scanning"}
 								size="sm"
@@ -170,7 +169,9 @@ export const SurveyRow: Story = {
 	),
 };
 
-/** Planet detail card showing glyph with full stats */
+/**
+ * Planet detail card showing glyph with full stats
+ */
 export const PlanetCard: Story = {
 	render: () => (
 		<Panel variant="bordered" tone="peach" padding="lg" style={{ minWidth: 320 }}>
@@ -237,7 +238,9 @@ const planetSizeMap: Record<PlanetType, "xxs" | "xs" | "sm" | "md" | "lg" | "xl"
 	gasGiant: "xxl",
 };
 
-/** System overview showing all planets with relative sizes */
+/**
+ * System overview showing all planets with relative sizes
+ */
 export const SystemOverview: Story = {
 	render: () => {
 		const planets: Array<{ type: PlanetType; name: string; distance: string }> = [

@@ -3,7 +3,7 @@ import type { SpectralClass } from "../types";
 
 /**
  * LCARS color palette for Three.js
- * Colors derived from CSS tokens in @helm/ui
+ * Colors derived from CSS tokens in `@helm/ui`
  */
 export const lcarsColors = {
   bg: new Color("#0a0a0a"),

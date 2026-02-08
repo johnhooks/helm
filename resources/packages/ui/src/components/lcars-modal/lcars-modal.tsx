@@ -4,15 +4,25 @@ import { TitleBar } from "../title-bar";
 import "./lcars-modal.css";
 
 export interface LcarsModalProps {
-  /** Modal title */
+  /**
+   * Modal title
+   */
   title: string;
-  /** Called when modal should close */
+  /**
+   * Called when modal should close
+   */
   onRequestClose: () => void;
-  /** Main content */
+  /**
+   * Main content
+   */
   children: ReactNode;
-  /** Footer content (typically buttons) */
+  /**
+   * Footer content (typically buttons)
+   */
   footer?: ReactNode;
-  /** Color tone */
+  /**
+   * Color tone
+   */
   tone?:
     | "neutral"
     | "accent"
@@ -24,11 +34,17 @@ export interface LcarsModalProps {
     | "lilac"
     | "violet"
     | "danger";
-  /** Size variant */
+  /**
+   * Size variant
+   */
   size?: "small" | "medium" | "large";
-  /** Whether modal is open */
+  /**
+   * Whether modal is open
+   */
   isOpen?: boolean;
-  /** Test ID for testing */
+  /**
+   * Test ID for testing
+   */
   "data-testid"?: string;
 }
 

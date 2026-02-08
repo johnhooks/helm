@@ -8,15 +8,25 @@ import { getStarSystemColor } from "../../utils/colors";
 import { toVector3 } from "../../utils/coordinates";
 
 export interface LocalSystemProps {
-  /** Star system data */
+  /**
+   * Star system data
+   */
   system: StarSystem;
-  /** Whether this system is selected */
+  /**
+   * Whether this system is selected
+   */
   selected?: boolean;
-  /** Whether this system has routes connected */
+  /**
+   * Whether this system has routes connected
+   */
   connected?: boolean;
-  /** Called when system is clicked */
+  /**
+   * Called when system is clicked
+   */
   onSelect?: () => void;
-  /** Called when hover state changes */
+  /**
+   * Called when hover state changes
+   */
   onHover?: (hovering: boolean) => void;
 }
 
@@ -49,7 +59,9 @@ export function LocalSystem({
 
   // Handle hover animation
   useFrame(() => {
-    if (!meshRef.current) return;
+    if (!meshRef.current) {
+      return;
+    }
 
     // Scale up on hover
     const targetScale = hovered ? baseScale * 1.5 : baseScale;

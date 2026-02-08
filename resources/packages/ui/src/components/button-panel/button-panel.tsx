@@ -2,19 +2,33 @@ import type { CSSProperties, ReactNode } from "react";
 import "./button-panel.css";
 
 export interface ButtonPanelProps {
-  /** Edge location */
+  /**
+   * Edge location
+   */
   edge?: "left" | "right";
-  /** Layout behavior */
+  /**
+   * Layout behavior
+   */
   layout?: "compact" | "space" | "stretch";
-  /** Panel width */
+  /**
+   * Panel width
+   */
   width?: number | string;
-  /** Button stack */
+  /**
+   * Button stack
+   */
   children: ReactNode;
-  /** Additional CSS class names */
+  /**
+   * Additional CSS class names
+   */
   className?: string;
-  /** Inline styles */
+  /**
+   * Inline styles
+   */
   style?: CSSProperties;
-  /** Test ID for testing */
+  /**
+   * Test ID for testing
+   */
   "data-testid"?: string;
 }
 

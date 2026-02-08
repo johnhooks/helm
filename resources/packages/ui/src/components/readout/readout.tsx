@@ -2,15 +2,25 @@ import type { CSSProperties, ReactNode } from "react";
 import "./readout.css";
 
 export interface ReadoutProps {
-  /** Readout label */
+  /**
+   * Readout label
+   */
   label: string;
-  /** Primary value to display */
+  /**
+   * Primary value to display
+   */
   value: ReactNode;
-  /** Optional max value (displayed smaller and muted) */
+  /**
+   * Optional max value (displayed smaller and muted)
+   */
   max?: ReactNode;
-  /** Unit label */
+  /**
+   * Unit label
+   */
   unit?: string;
-  /** Color tone */
+  /**
+   * Color tone
+   */
   tone?:
     | "neutral"
     | "accent"
@@ -21,15 +31,25 @@ export interface ReadoutProps {
     | "sky"
     | "lilac"
     | "violet";
-  /** Size variant */
+  /**
+   * Size variant
+   */
   size?: "sm" | "md" | "lg";
-  /** Text alignment */
+  /**
+   * Text alignment
+   */
   align?: "left" | "center" | "right";
-  /** Additional CSS class names */
+  /**
+   * Additional CSS class names
+   */
   className?: string;
-  /** Inline styles */
+  /**
+   * Inline styles
+   */
   style?: CSSProperties;
-  /** Test ID for testing */
+  /**
+   * Test ID for testing
+   */
   "data-testid"?: string;
 }
 

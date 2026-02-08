@@ -9,30 +9,52 @@ import {
 import "./lcars-frame.css";
 
 export interface LcarsTab {
-  /** Unique identifier for the tab */
+  /**
+   * Unique identifier for the tab
+   */
   id: string;
-  /** Label displayed on the tab button */
+  /**
+   * Label displayed on the tab button
+   */
   label: string;
-  /** Optional LCARS-style subtext code */
+  /**
+   * Optional LCARS-style subtext code
+   */
   subtext?: string;
-  /** Content to display when tab is active */
+  /**
+   * Content to display when tab is active
+   */
   content: ReactNode;
 }
 
 export interface LcarsFrameProps {
-  /** Array of tab configurations */
+  /**
+   * Array of tab configurations
+   */
   tabs: LcarsTab[];
-  /** Currently active tab ID (controlled) */
+  /**
+   * Currently active tab ID (controlled)
+   */
   activeTab?: string;
-  /** Callback when active tab changes */
+  /**
+   * Callback when active tab changes
+   */
   onTabChange?: (tabId: string) => void;
-  /** Default active tab ID (uncontrolled) */
+  /**
+   * Default active tab ID (uncontrolled)
+   */
   defaultTab?: string;
-  /** Buttons/controls for the header bar */
+  /**
+   * Buttons/controls for the header bar
+   */
   headerActions?: ReactNode;
-  /** Title displayed in the header */
+  /**
+   * Title displayed in the header
+   */
   title?: string;
-  /** Color tone */
+  /**
+   * Color tone
+   */
   tone?:
     | "neutral"
     | "accent"
@@ -44,11 +66,17 @@ export interface LcarsFrameProps {
     | "lilac"
     | "violet"
     | "danger";
-  /** Additional CSS class names */
+  /**
+   * Additional CSS class names
+   */
   className?: string;
-  /** Inline styles */
+  /**
+   * Inline styles
+   */
   style?: CSSProperties;
-  /** Test ID for testing */
+  /**
+   * Test ID for testing
+   */
   "data-testid"?: string;
 }
 
@@ -168,7 +196,7 @@ export function LcarsFrame({
               <button
                 key={tab.id}
                 ref={(el) => {
-                  if (el) tabRefs.current.set(tab.id, el);
+                  if (el) {tabRefs.current.set(tab.id, el);}
                 }}
                 type="button"
                 role="tab"

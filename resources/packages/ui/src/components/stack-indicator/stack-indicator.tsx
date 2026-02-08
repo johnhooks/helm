@@ -2,13 +2,21 @@ import type { CSSProperties } from "react";
 import "./stack-indicator.css";
 
 export interface StackIndicatorProps {
-  /** Level from 0-100 */
+  /**
+   * Level from 0-100
+   */
   level?: number;
-  /** Size variant */
+  /**
+   * Size variant
+   */
   size?: "sm" | "md" | "lg" | "xl" | "2xl";
-  /** Number of segments */
+  /**
+   * Number of segments
+   */
   segments?: number;
-  /** Surface tone */
+  /**
+   * Surface tone
+   */
   tone?:
     | "neutral"
     | "base"
@@ -29,11 +37,17 @@ export interface StackIndicatorProps {
     | "violet"
     | "plum"
     | "hopbush";
-  /** Additional CSS class names */
+  /**
+   * Additional CSS class names
+   */
   className?: string;
-  /** Inline styles */
+  /**
+   * Inline styles
+   */
   style?: CSSProperties;
-  /** Test ID for testing */
+  /**
+   * Test ID for testing
+   */
   "data-testid"?: string;
 }
 

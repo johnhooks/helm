@@ -2,35 +2,65 @@ import type { CSSProperties, MouseEvent, ReactNode } from "react";
 import "./button.css";
 
 export interface ButtonProps {
-  /** Button label */
+  /**
+   * Button label
+   */
   children: ReactNode;
-  /** Secondary code (e.g., E-01) */
+  /**
+   * Secondary code (e.g., E-01)
+   */
   secondary?: string;
-  /** Visual style variant */
+  /**
+   * Visual style variant
+   */
   variant?: "primary" | "secondary" | "tertiary" | "ghost" | "danger";
-  /** Surface tone */
+  /**
+   * Surface tone
+   */
   surface?: "neutral" | "base" | "accent" | "muted" | "danger";
-  /** Size variant */
+  /**
+   * Size variant
+   */
   size?: "sm" | "md";
-  /** Edge alignment for stacked layouts */
+  /**
+   * Edge alignment for stacked layouts
+   */
   edge?: "left" | "right" | "none";
-  /** Full-width button for stacks */
+  /**
+   * Full-width button for stacks
+   */
   fullWidth?: boolean;
-  /** Square edges for stacked layouts */
+  /**
+   * Square edges for stacked layouts
+   */
   stacked?: boolean;
-  /** Whether button is disabled */
+  /**
+   * Whether button is disabled
+   */
   disabled?: boolean;
-  /** Click handler */
+  /**
+   * Click handler
+   */
   onClick?: (event: MouseEvent<HTMLButtonElement>) => void;
-  /** Button type */
+  /**
+   * Button type
+   */
   type?: "button" | "submit" | "reset";
-  /** Additional CSS class names */
+  /**
+   * Additional CSS class names
+   */
   className?: string;
-  /** Inline styles */
+  /**
+   * Inline styles
+   */
   style?: CSSProperties;
-  /** Test ID for testing */
+  /**
+   * Test ID for testing
+   */
   "data-testid"?: string;
-  /** Accessible label */
+  /**
+   * Accessible label
+   */
   "aria-label"?: string;
 }
 
@@ -51,17 +81,13 @@ export function Button({
   "data-testid": testId,
   "aria-label": ariaLabel,
 }: ButtonProps) {
-  const resolvedSurface =
-    surface ??
-    (variant === "primary"
-      ? "accent"
-      : variant === "danger"
-        ? "danger"
-        : variant === "tertiary"
-          ? "muted"
-          : variant === "ghost"
-            ? "base"
-            : "neutral");
+  const variantSurfaces: Record<string, ButtonProps["surface"]> = {
+    primary: "accent",
+    danger: "danger",
+    tertiary: "muted",
+    ghost: "base",
+  };
+  const resolvedSurface = surface ?? variantSurfaces[variant] ?? "neutral";
 
   const classNames = [
     "helm-button",

@@ -8,17 +8,29 @@ import {
 } from "three";
 
 export interface GalacticPlaneProps {
-  /** Radius of the sky sphere */
+  /**
+   * Radius of the sky sphere
+   */
   radius?: number;
-  /** Base opacity of the glow */
+  /**
+   * Base opacity of the glow
+   */
   opacity?: number;
-  /** Color of the galactic band */
+  /**
+   * Color of the galactic band
+   */
   color?: string;
-  /** How tight the band is (higher = thinner band) */
+  /**
+   * How tight the band is (higher = thinner band)
+   */
   bandTightness?: number;
-  /** Direction toward galactic core (brighter spot) - normalized vector on XZ plane */
+  /**
+   * Direction toward galactic core (brighter spot) - normalized vector on XZ plane
+   */
   coreDirection?: [number, number, number];
-  /** Intensity of the core glow (0-1) */
+  /**
+   * Intensity of the core glow (0-1)
+   */
   coreIntensity?: number;
 }
 

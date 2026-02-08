@@ -45,7 +45,9 @@ export const Default: Story = {
 	},
 };
 
-/** Spectral classes from hot (O) to cool (M) */
+/**
+ * Spectral classes from hot (O) to cool (M)
+ */
 export const SpectralClasses: Story = {
 	render: () => (
 		<Panel variant="inset" padding="lg" style={{ minWidth: 500 }}>
@@ -167,7 +169,9 @@ export const SpectralClasses: Story = {
 	),
 };
 
-/** Exotic stellar types */
+/**
+ * Exotic stellar types
+ */
 export const StellarTypes: Story = {
 	render: () => (
 		<Panel variant="inset" padding="lg" style={{ minWidth: 400 }}>
@@ -230,7 +234,9 @@ const spectralSizeMap: Record<SpectralClass, "xxs" | "xs" | "sm" | "md" | "lg" |
 	O: "xxl",
 };
 
-/** Stellar neighborhood with relative sizes */
+/**
+ * Stellar neighborhood with relative sizes
+ */
 export const StellarNeighborhood: Story = {
 	render: () => {
 		const stars: Array<{
@@ -331,7 +337,9 @@ export const StellarNeighborhood: Story = {
 	},
 };
 
-/** Exotic system with unusual stellar objects */
+/**
+ * Exotic system with unusual stellar objects
+ */
 export const ExoticSystem: Story = {
 	render: () => (
 		<Panel variant="bordered" tone="violet" padding="lg" style={{ minWidth: 500 }}>

@@ -2,17 +2,29 @@ import type { CSSProperties, ChangeEvent, ReactNode } from "react";
 import "./toggle.css";
 
 export interface ToggleProps {
-  /** Whether the toggle is on */
+  /**
+   * Whether the toggle is on
+   */
   checked?: boolean;
-  /** Default checked state for uncontrolled usage */
+  /**
+   * Default checked state for uncontrolled usage
+   */
   defaultChecked?: boolean;
-  /** Change handler */
+  /**
+   * Change handler
+   */
   onChange?: (checked: boolean, event: ChangeEvent<HTMLInputElement>) => void;
-  /** Visible label */
+  /**
+   * Visible label
+   */
   label?: ReactNode;
-  /** Label position */
+  /**
+   * Label position
+   */
   labelPosition?: "left" | "right";
-  /** Surface tone */
+  /**
+   * Surface tone
+   */
   surface?:
     | "accent"
     | "orange"
@@ -22,21 +34,37 @@ export interface ToggleProps {
     | "success"
     | "lilac"
     | "violet";
-  /** Size variant */
+  /**
+   * Size variant
+   */
   size?: "sm" | "md";
-  /** Whether toggle is disabled */
+  /**
+   * Whether toggle is disabled
+   */
   disabled?: boolean;
-  /** Input name for forms */
+  /**
+   * Input name for forms
+   */
   name?: string;
-  /** Input value for forms */
+  /**
+   * Input value for forms
+   */
   value?: string;
-  /** Additional CSS class names */
+  /**
+   * Additional CSS class names
+   */
   className?: string;
-  /** Inline styles */
+  /**
+   * Inline styles
+   */
   style?: CSSProperties;
-  /** Test ID for testing */
+  /**
+   * Test ID for testing
+   */
   "data-testid"?: string;
-  /** Accessible label when no visible label */
+  /**
+   * Accessible label when no visible label
+   */
   "aria-label"?: string;
 }
 

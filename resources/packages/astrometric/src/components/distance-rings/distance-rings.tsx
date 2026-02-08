@@ -5,11 +5,17 @@ import type { DistanceRing } from "../../types";
 import { DEFAULT_DISTANCE_RINGS } from "../../constants";
 
 export interface DistanceRingsProps {
-  /** Ring configurations */
+  /**
+   * Ring configurations
+   */
   rings?: DistanceRing[];
-  /** Whether to show distance labels */
+  /**
+   * Whether to show distance labels
+   */
   showLabels?: boolean;
-  /** Number of segments per ring */
+  /**
+   * Number of segments per ring
+   */
   segments?: number;
 }
 

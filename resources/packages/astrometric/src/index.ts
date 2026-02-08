@@ -1,7 +1,7 @@
 /**
- * @helm/astrometric - Three.js star field visualization
+ * Three.js star field visualization.
  *
- * @package @helm/astrometric
+ * @package
  */
 
 // Main component

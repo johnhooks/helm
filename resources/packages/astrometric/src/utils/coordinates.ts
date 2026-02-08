@@ -103,7 +103,9 @@ export function midpoint(a: Position3D, b: Position3D): Position3D {
  */
 export function normalize(position: Position3D): Position3D {
   const len = distanceFromOrigin(position);
-  if (len === 0) return { x: 0, y: 0, z: 0 };
+  if (len === 0) {
+    return { x: 0, y: 0, z: 0 };
+  }
   return {
     x: position.x / len,
     y: position.y / len,

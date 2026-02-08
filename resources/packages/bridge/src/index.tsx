@@ -3,7 +3,7 @@
  *
  * Main admin application.
  *
- * @package Helm
+ * @package
  */
 
 export {};

@@ -7,10 +7,14 @@ import type { SQLiteParam, SQLiteValue } from './types';
  * don't have to thread both through every function.
  */
 export interface Database {
-	/** wa-sqlite API object (from `SQLite.Factory(module)`). */
+	/**
+	 * wa-sqlite API object (from `SQLite.Factory(module)`).
+	 */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	sqlite3: any;
-	/** Database pointer returned by `sqlite3.open_v2()`. */
+	/**
+	 * Database pointer returned by `sqlite3.open_v2()`.
+	 */
 	db: number;
 }
 

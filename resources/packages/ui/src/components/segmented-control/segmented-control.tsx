@@ -8,17 +8,29 @@ export interface SegmentedOption {
 }
 
 export interface SegmentedControlProps {
-  /** Available options */
+  /**
+   * Available options
+   */
   options: SegmentedOption[];
-  /** Currently selected value */
+  /**
+   * Currently selected value
+   */
   value?: string;
-  /** Default value for uncontrolled usage */
+  /**
+   * Default value for uncontrolled usage
+   */
   defaultValue?: string;
-  /** Change handler */
+  /**
+   * Change handler
+   */
   onChange?: (value: string) => void;
-  /** Input name for forms (also used for radio group) */
+  /**
+   * Input name for forms (also used for radio group)
+   */
   name?: string;
-  /** Surface tone for active segment */
+  /**
+   * Surface tone for active segment
+   */
   surface?:
     | "accent"
     | "orange"
@@ -28,19 +40,33 @@ export interface SegmentedControlProps {
     | "success"
     | "lilac"
     | "violet";
-  /** Size variant */
+  /**
+   * Size variant
+   */
   size?: "sm" | "md";
-  /** Whether entire control is disabled */
+  /**
+   * Whether entire control is disabled
+   */
   disabled?: boolean;
-  /** Full width (segments expand equally) */
+  /**
+   * Full width (segments expand equally)
+   */
   fullWidth?: boolean;
-  /** Additional CSS class names */
+  /**
+   * Additional CSS class names
+   */
   className?: string;
-  /** Inline styles */
+  /**
+   * Inline styles
+   */
   style?: CSSProperties;
-  /** Test ID for testing */
+  /**
+   * Test ID for testing
+   */
   "data-testid"?: string;
-  /** Accessible label for the group */
+  /**
+   * Accessible label for the group
+   */
   "aria-label"?: string;
 }
 

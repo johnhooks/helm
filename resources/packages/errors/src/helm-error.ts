@@ -30,15 +30,21 @@ export class HelmError extends Error {
 		this.causes = options?.causes ?? [];
 	}
 
-	/** HTTP status extracted from data.status, if present. */
+	/**
+	 * HTTP status extracted from data.status, if present.
+	 */
 	get status(): number | undefined {
 		const s = this.data.status;
 		return typeof s === 'number' ? s : undefined;
 	}
 
-	/** Convert an unknown thrown value to a HelmError. */
+	/**
+	 * Convert an unknown thrown value to a HelmError.
+	 */
 	static from(error: unknown): HelmError {
-		if (HelmError.is(error)) return error;
+		if (HelmError.is(error)) {
+			return error;
+		}
 
 		if (isWpRestErrorResponse(error)) {
 			return new HelmError(error.code, error.message, {
@@ -54,12 +60,14 @@ export class HelmError extends Error {
 			});
 		}
 
-		const detail =
-			error instanceof Error
-				? error.message
-				: typeof error === 'string'
-					? error
-					: 'An unknown error occurred';
+		let detail: string;
+		if (error instanceof Error) {
+			detail = error.message;
+		} else if (typeof error === 'string') {
+			detail = error;
+		} else {
+			detail = 'An unknown error occurred';
+		}
 
 		return new HelmError('unknown', detail, { isSafe: false });
 	}
@@ -75,7 +83,9 @@ export class HelmError extends Error {
 		return new HelmError(code, detail, { isSafe: true, causes });
 	}
 
-	/** Type guard for HelmError instances. */
+	/**
+	 * Type guard for HelmError instances.
+	 */
 	static is(error: unknown): error is HelmError {
 		return error instanceof HelmError;
 	}

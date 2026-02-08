@@ -16,7 +16,9 @@ export interface SelectControlProps<
   IsMulti extends boolean = false,
   Group extends GroupBase<Option> = GroupBase<Option>,
 > extends Omit<ReactSelectProps<Option, IsMulti, Group>, "styles" | "theme"> {
-  /** Surface tone */
+  /**
+   * Surface tone
+   */
   surface?:
     | "neutral"
     | "base"
@@ -28,13 +30,21 @@ export interface SelectControlProps<
     | "sky"
     | "lilac"
     | "violet";
-  /** Size variant */
+  /**
+   * Size variant
+   */
   size?: "sm" | "md";
-  /** Additional CSS class names */
+  /**
+   * Additional CSS class names
+   */
   className?: string;
-  /** Inline styles for the container */
+  /**
+   * Inline styles for the container
+   */
   style?: CSSProperties;
-  /** Test ID for testing */
+  /**
+   * Test ID for testing
+   */
   "data-testid"?: string;
 }
 
@@ -150,6 +160,7 @@ export function SelectControl<
     }),
     option: (base, state) => ({
       ...base,
+      // eslint-disable-next-line no-nested-ternary
       background: state.isSelected
         ? "var(--helm-ui-color-accent)"
         : state.isFocused

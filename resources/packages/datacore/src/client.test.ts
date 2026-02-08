@@ -29,12 +29,16 @@ class MockWorker {
 		// no-op
 	}
 
-	/** Simulate receiving a message from the "worker". */
+	/**
+	 * Simulate receiving a message from the "worker".
+	 */
 	receive(data: WorkerResponse): void {
 		this.onmessage?.({ data } as MessageEvent);
 	}
 
-	/** Set a handler for messages posted TO the worker, replaying any queued messages. */
+	/**
+	 * Set a handler for messages posted TO the worker, replaying any queued messages.
+	 */
 	onPosted(handler: (msg: unknown) => void): void {
 		this.handler = handler;
 		for (const msg of this.queued) {

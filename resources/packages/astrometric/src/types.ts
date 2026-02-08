@@ -19,21 +19,37 @@ export type SpectralClass = "O" | "B" | "A" | "F" | "G" | "K" | "M";
  * A star system in the local neighborhood
  */
 export interface StarSystem {
-  /** Unique identifier */
+  /**
+   * Unique identifier
+   */
   id: string;
-  /** Display name */
+  /**
+   * Display name
+   */
   name: string;
-  /** Position relative to player (light-years) */
+  /**
+   * Position relative to player (light-years)
+   */
   position: Position3D;
-  /** Star spectral classification */
+  /**
+   * Star spectral classification
+   */
   spectralClass?: SpectralClass;
-  /** Whether player has visited this system */
+  /**
+   * Whether player has visited this system
+   */
   visited?: boolean;
-  /** Whether system is within jump range */
+  /**
+   * Whether system is within jump range
+   */
   reachable?: boolean;
-  /** Player's current location */
+  /**
+   * Player's current location
+   */
   isCurrent?: boolean;
-  /** Additional metadata */
+  /**
+   * Additional metadata
+   */
   data?: Record<string, unknown>;
 }
 
@@ -46,15 +62,25 @@ export type RouteStatus = "discovered" | "plotted" | "traveled" | "blocked";
  * A route connecting two star systems
  */
 export interface Route {
-  /** Unique identifier */
+  /**
+   * Unique identifier
+   */
   id: string;
-  /** Origin system ID */
+  /**
+   * Origin system ID
+   */
   from: string;
-  /** Destination system ID */
+  /**
+   * Destination system ID
+   */
   to: string;
-  /** Whether route is currently selected/active */
+  /**
+   * Whether route is currently selected/active
+   */
   active?: boolean;
-  /** Route discovery/travel status */
+  /**
+   * Route discovery/travel status
+   */
   status?: RouteStatus;
 }
 
@@ -62,11 +88,17 @@ export interface Route {
  * Distance ring marker configuration
  */
 export interface DistanceRing {
-  /** Distance from origin in light-years */
+  /**
+   * Distance from origin in light-years
+   */
   distance: number;
-  /** Optional label (e.g., "2 ly") */
+  /**
+   * Optional label (e.g., "2 ly")
+   */
   label?: string;
-  /** Ring type: "major" for sensor/scan range, "minor" for reference markers */
+  /**
+   * Ring type: "major" for sensor/scan range, "minor" for reference markers
+   */
   type?: "major" | "minor";
 }
 
@@ -74,9 +106,13 @@ export interface DistanceRing {
  * Event fired when a star system is selected
  */
 export interface StarSelectEvent {
-  /** Selected system data */
+  /**
+   * Selected system data
+   */
   system: StarSystem;
-  /** Distance from player in light-years */
+  /**
+   * Distance from player in light-years
+   */
   distance: number;
 }
 
@@ -84,13 +120,21 @@ export interface StarSelectEvent {
  * Event fired when a route is selected
  */
 export interface RouteSelectEvent {
-  /** Selected route data */
+  /**
+   * Selected route data
+   */
   route: Route;
-  /** Origin system */
+  /**
+   * Origin system
+   */
   from: StarSystem;
-  /** Destination system */
+  /**
+   * Destination system
+   */
   to: StarSystem;
-  /** Route length in light-years */
+  /**
+   * Route length in light-years
+   */
   distance: number;
 }
 
@@ -98,9 +142,13 @@ export interface RouteSelectEvent {
  * Current hover state
  */
 export interface HoverState {
-  /** Currently hovered system, if any */
+  /**
+   * Currently hovered system, if any
+   */
   system: StarSystem | null;
-  /** Currently hovered route, if any */
+  /**
+   * Currently hovered route, if any
+   */
   route: Route | null;
 }
 
@@ -108,11 +156,17 @@ export interface HoverState {
  * Camera position and orientation info
  */
 export interface CameraInfo {
-  /** Distance from origin */
+  /**
+   * Distance from origin
+   */
   distance: number;
-  /** Polar angle in radians */
+  /**
+   * Polar angle in radians
+   */
   polarAngle: number;
-  /** Azimuthal angle in radians */
+  /**
+   * Azimuthal angle in radians
+   */
   azimuthAngle: number;
 }
 
@@ -128,48 +182,88 @@ export type CameraMode = "perspective" | "orthographic" | "narrow";
  * Props for the main StarField component
  */
 export interface StarFieldProps {
-  /** Star systems to display */
+  /**
+   * Star systems to display
+   */
   systems: StarSystem[];
-  /** Routes between systems */
+  /**
+   * Routes between systems
+   */
   routes?: Route[];
-  /** Distance ring markers */
+  /**
+   * Distance ring markers
+   */
   distanceRings?: DistanceRing[];
-  /** Number of background stars (galaxy context) */
+  /**
+   * Number of background stars (galaxy context)
+   */
   backgroundStarCount?: number;
 
-  /** Currently selected system ID */
+  /**
+   * Currently selected system ID
+   */
   selectedSystemId?: string | null;
-  /** Currently selected route ID */
+  /**
+   * Currently selected route ID
+   */
   selectedRouteId?: string | null;
 
-  /** Called when a system is selected (null = deselected) */
+  /**
+   * Called when a system is selected (null = deselected)
+   */
   onSystemSelect?: (event: StarSelectEvent | null) => void;
-  /** Called when a route is selected (null = deselected) */
+  /**
+   * Called when a route is selected (null = deselected)
+   */
   onRouteSelect?: (event: RouteSelectEvent | null) => void;
-  /** Called when hover state changes */
+  /**
+   * Called when hover state changes
+   */
   onHoverChange?: (state: HoverState) => void;
-  /** Called when camera moves */
+  /**
+   * Called when camera moves
+   */
   onCameraChange?: (info: CameraInfo) => void;
 
-  /** Show background galaxy stars */
+  /**
+   * Show background galaxy stars
+   */
   showBackground?: boolean;
-  /** Show distance labels on rings */
+  /**
+   * Show distance labels on rings
+   */
   showDistanceLabels?: boolean;
-  /** Enable orbit controls */
+  /**
+   * Enable orbit controls
+   */
   enableControls?: boolean;
-  /** Initial camera distance from origin */
+  /**
+   * Initial camera distance from origin
+   */
   initialCameraDistance?: number;
-  /** Minimum zoom distance */
+  /**
+   * Minimum zoom distance
+   */
   minDistance?: number;
-  /** Maximum zoom distance */
+  /**
+   * Maximum zoom distance
+   */
   maxDistance?: number;
-  /** Camera projection mode */
+  /**
+   * Camera projection mode
+   */
   cameraMode?: CameraMode;
 
-  /** Additional CSS class name */
+  /**
+   * Additional CSS class name
+   */
   className?: string;
-  /** Inline styles */
+  /**
+   * Inline styles
+   */
   style?: CSSProperties;
-  /** Test ID for testing */
+  /**
+   * Test ID for testing
+   */
   "data-testid"?: string;
 }

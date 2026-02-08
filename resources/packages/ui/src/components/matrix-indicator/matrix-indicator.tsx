@@ -2,13 +2,21 @@ import type { CSSProperties } from "react";
 import "./matrix-indicator.css";
 
 export interface MatrixIndicatorProps {
-  /** Level from 0-100 */
+  /**
+   * Level from 0-100
+   */
   level?: number;
-  /** Matrix rows */
+  /**
+   * Matrix rows
+   */
   rows?: number;
-  /** Matrix columns */
+  /**
+   * Matrix columns
+   */
   cols?: number;
-  /** Surface tone */
+  /**
+   * Surface tone
+   */
   tone?:
     | "neutral"
     | "base"
@@ -29,11 +37,17 @@ export interface MatrixIndicatorProps {
     | "violet"
     | "plum"
     | "hopbush";
-  /** Additional CSS class names */
+  /**
+   * Additional CSS class names
+   */
   className?: string;
-  /** Inline styles */
+  /**
+   * Inline styles
+   */
   style?: CSSProperties;
-  /** Test ID for testing */
+  /**
+   * Test ID for testing
+   */
   "data-testid"?: string;
 }
 

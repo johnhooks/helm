@@ -63,7 +63,9 @@ export function StarField({
 
   // Get selected system's position for camera focus
   const focusTarget: Position3D | null = useMemo(() => {
-    if (!selectedSystemId) return null;
+    if (!selectedSystemId) {
+      return null;
+    }
     const system = systemsById.get(selectedSystemId);
     return system?.position ?? null;
   }, [selectedSystemId, systemsById]);
@@ -81,7 +83,9 @@ export function StarField({
   // Handle system selection
   const handleSystemClick = useCallback(
     (system: StarSystem) => {
-      if (!onSystemSelect) return;
+      if (!onSystemSelect) {
+        return;
+      }
 
       if (selectedSystemId === system.id) {
         onSystemSelect(null);
@@ -99,14 +103,18 @@ export function StarField({
   // Handle route selection
   const handleRouteClick = useCallback(
     (route: Route) => {
-      if (!onRouteSelect) return;
+      if (!onRouteSelect) {
+        return;
+      }
 
       if (selectedRouteId === route.id) {
         onRouteSelect(null);
       } else {
         const from = systemsById.get(route.from);
         const to = systemsById.get(route.to);
-        if (!from || !to) return;
+        if (!from || !to) {
+          return;
+        }
 
         const event: RouteSelectEvent = {
           route,
@@ -196,7 +204,9 @@ export function StarField({
         {routes.map((route) => {
           const from = systemsById.get(route.from);
           const to = systemsById.get(route.to);
-          if (!from || !to) return null;
+          if (!from || !to) {
+            return null;
+          }
 
           return (
             <RouteLine

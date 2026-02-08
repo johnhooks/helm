@@ -2,9 +2,13 @@ import type { CSSProperties } from "react";
 import "./orb-indicator.css";
 
 export interface OrbIndicatorProps {
-  /** Size variant */
+  /**
+   * Size variant
+   */
   size?: "sm" | "md" | "lg" | "xl" | "2xl";
-  /** Surface tone */
+  /**
+   * Surface tone
+   */
   tone?:
     | "neutral"
     | "base"
@@ -25,11 +29,17 @@ export interface OrbIndicatorProps {
     | "violet"
     | "plum"
     | "hopbush";
-  /** Additional CSS class names */
+  /**
+   * Additional CSS class names
+   */
   className?: string;
-  /** Inline styles */
+  /**
+   * Inline styles
+   */
   style?: CSSProperties;
-  /** Test ID for testing */
+  /**
+   * Test ID for testing
+   */
   "data-testid"?: string;
 }
 

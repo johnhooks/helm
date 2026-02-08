@@ -4,9 +4,13 @@ import type { Mesh } from "three";
 import { lcarsColors } from "../../utils/colors";
 
 export interface PlayerMarkerProps {
-  /** Size of the marker */
+  /**
+   * Size of the marker
+   */
   size?: number;
-  /** Whether to animate (pulse) */
+  /**
+   * Whether to animate (pulse)
+   */
   animate?: boolean;
 }
 
@@ -19,7 +23,9 @@ export function PlayerMarker({
   const meshRef = useRef<Mesh>(null);
 
   useFrame((state) => {
-    if (!animate || !meshRef.current) return;
+    if (!animate || !meshRef.current) {
+      return;
+    }
 
     const time = state.clock.getElapsedTime();
     // Subtle pulse

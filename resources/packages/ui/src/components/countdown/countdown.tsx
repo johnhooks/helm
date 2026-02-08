@@ -2,15 +2,25 @@ import type { CSSProperties, ReactNode } from "react";
 import "./countdown.css";
 
 export interface CountdownProps {
-  /** Label for the countdown */
+  /**
+   * Label for the countdown
+   */
   label?: string;
-  /** Remaining time in seconds (or formatted string) */
+  /**
+   * Remaining time in seconds (or formatted string)
+   */
   remaining: number | string;
-  /** Total time in seconds (for progress calculation) */
+  /**
+   * Total time in seconds (for progress calculation)
+   */
   total?: number;
-  /** Optional indicator element */
+  /**
+   * Optional indicator element
+   */
   indicator?: ReactNode;
-  /** Color tone */
+  /**
+   * Color tone
+   */
   tone?:
     | "neutral"
     | "accent"
@@ -22,17 +32,29 @@ export interface CountdownProps {
     | "lilac"
     | "violet"
     | "danger";
-  /** Size variant */
+  /**
+   * Size variant
+   */
   size?: "sm" | "md" | "lg";
-  /** Layout direction */
+  /**
+   * Layout direction
+   */
   layout?: "row" | "column";
-  /** Active/in-progress animation */
+  /**
+   * Active/in-progress animation
+   */
   active?: boolean;
-  /** Additional CSS class names */
+  /**
+   * Additional CSS class names
+   */
   className?: string;
-  /** Inline styles */
+  /**
+   * Inline styles
+   */
   style?: CSSProperties;
-  /** Test ID for testing */
+  /**
+   * Test ID for testing
+   */
   "data-testid"?: string;
 }
 
@@ -40,23 +62,29 @@ export interface CountdownProps {
  * Format seconds into human readable time
  */
 function formatTime(seconds: number): string {
-  if (seconds <= 0) return "0s";
+  if (seconds <= 0) {
+    return "0s";
+  }
 
   const days = Math.floor(seconds / 86400);
-  const hours = Math.floor((seconds % 86400) / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  const secs = Math.floor(seconds % 60);
-
   if (days > 0) {
+    const hours = Math.floor((seconds % 86400) / 3600);
     return hours > 0 ? `${days}d ${hours}h` : `${days}d`;
   }
+
+  const hours = Math.floor((seconds % 86400) / 3600);
   if (hours > 0) {
+    const minutes = Math.floor((seconds % 3600) / 60);
     return minutes > 0 ? `${hours}h ${minutes}m` : `${hours}h`;
   }
+
+  const minutes = Math.floor((seconds % 3600) / 60);
   if (minutes > 0) {
+    const secs = Math.floor(seconds % 60);
     return secs > 0 && minutes < 10 ? `${minutes}m ${secs}s` : `${minutes}m`;
   }
-  return `${secs}s`;
+
+  return `${Math.floor(seconds % 60)}s`;
 }
 
 export function Countdown({

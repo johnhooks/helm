@@ -2,17 +2,29 @@ import type { CSSProperties } from "react";
 import "./title.css";
 
 export interface TitleProps {
-  /** Title label */
+  /**
+   * Title label
+   */
   label: string;
-  /** Alignment of label */
+  /**
+   * Alignment of label
+   */
   align?: "left" | "right";
-  /** Size variant */
+  /**
+   * Size variant
+   */
   size?: "sm" | "md";
-  /** Additional CSS class names */
+  /**
+   * Additional CSS class names
+   */
   className?: string;
-  /** Inline styles */
+  /**
+   * Inline styles
+   */
   style?: CSSProperties;
-  /** Test ID for testing */
+  /**
+   * Test ID for testing
+   */
   "data-testid"?: string;
 }
 

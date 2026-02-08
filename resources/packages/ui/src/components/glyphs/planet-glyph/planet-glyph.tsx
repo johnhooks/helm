@@ -19,13 +19,21 @@ export const PLANET_TYPES = [
 export type PlanetType = (typeof PLANET_TYPES)[number];
 
 export interface PlanetGlyphProps {
-	/** Planet classification */
+	/**
+	 * Planet classification
+	 */
 	type?: PlanetType;
-	/** Size variant */
+	/**
+	 * Size variant
+	 */
 	size?: "xxs" | "xs" | "sm" | "md" | "lg" | "xl" | "xxl";
-	/** Additional CSS class names */
+	/**
+	 * Additional CSS class names
+	 */
 	className?: string;
-	/** Inline styles */
+	/**
+	 * Inline styles
+	 */
 	style?: CSSProperties;
 }
 
