@@ -1,0 +1,6 @@
+{
+	"name": "@helm/benchmark",
+	"version": "0.1.0",
+	"description": "REST API benchmarking tools",
+	"private": true
+}

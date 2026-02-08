@@ -23,7 +23,10 @@
         "test:e2e:debug": "playwright test --debug",
         "test:e2e:report": "playwright show-report artifacts/playwright-report",
         "storybook": "storybook dev -p 6006",
-        "storybook:build": "storybook build -o artifacts/storybook"
+        "storybook:build": "storybook build -o artifacts/storybook",
+        "bench": "bun ./resources/packages/benchmark/benchmarks/nodes.ts",
+        "bench:nodes": "bun ./resources/packages/benchmark/benchmarks/nodes.ts",
+        "bench:compare": "bun ./resources/packages/benchmark/benchmarks/compare.ts"
     },
     "dependencies": {
         "@wordpress/api-fetch": "^7.0.0",
@@ -45,6 +48,7 @@
         "@testing-library/jest-dom": "^6.9.1",
         "@testing-library/react": "^16.3.2",
         "@testing-library/user-event": "^14.6.1",
+        "@types/bun": "^1.3.8",
         "@types/node": "^20.10.0",
         "@types/react": "^18.3.1",
         "@types/react-dom": "^18.3.1",

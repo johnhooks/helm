@@ -24,7 +24,9 @@
             "@helm/bridge": ["resources/packages/bridge/src"],
             "@helm/bridge/*": ["resources/packages/bridge/src/*"],
             "@helm/astrometric": ["resources/packages/astrometric/src"],
-            "@helm/astrometric/*": ["resources/packages/astrometric/src/*"]
+            "@helm/astrometric/*": ["resources/packages/astrometric/src/*"],
+            "@helm/benchmark": ["resources/packages/benchmark/src"],
+            "@helm/benchmark/*": ["resources/packages/benchmark/src/*"]
         }
     },
     "include": [
