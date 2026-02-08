@@ -80,6 +80,19 @@
         "react-dom": "^18.3.1",
       },
     },
+    "resources/packages/cache": {
+      "name": "@helm/cache",
+      "version": "0.1.0",
+      "dependencies": {
+        "@helm/datacore": "workspace:*",
+        "@helm/errors": "workspace:*",
+        "@helm/types": "workspace:*",
+        "@wordpress/i18n": "^5.0.0",
+      },
+      "peerDependencies": {
+        "@wordpress/api-fetch": "^7.0.0",
+      },
+    },
     "resources/packages/datacore": {
       "name": "@helm/datacore",
       "version": "0.1.0",
@@ -487,6 +500,8 @@
     "@helm/benchmark": ["@helm/benchmark@workspace:resources/packages/benchmark"],
 
     "@helm/bridge": ["@helm/bridge@workspace:resources/packages/bridge"],
+
+    "@helm/cache": ["@helm/cache@workspace:resources/packages/cache"],
 
     "@helm/datacore": ["@helm/datacore@workspace:resources/packages/datacore"],
 

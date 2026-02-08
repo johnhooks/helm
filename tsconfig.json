@@ -31,13 +31,17 @@
             "@helm/datacore/*": ["resources/packages/datacore/src/*"],
             "@helm/errors": ["resources/packages/errors/src"],
             "@helm/errors/*": ["resources/packages/errors/src/*"],
+            "@helm/cache": ["resources/packages/cache/src"],
+            "@helm/cache/*": ["resources/packages/cache/src/*"],
             "@helm/types": ["resources/packages/types/src"],
             "@helm/types/*": ["resources/packages/types/src/*"]
         }
     },
     "include": [
+        "global.d.ts",
         "resources/packages/**/*.ts",
         "resources/packages/**/*.tsx",
+        "tests-e2e/**/*.ts",
         "vitest.setup.ts"
     ],
     "exclude": [

@@ -11,6 +11,11 @@ describe('ErrorCode', () => {
 		expect(ErrorCode.DatacoreUnexpectedResponse).toBe('helm.datacore.unexpected_response');
 	});
 
+	it('has client-side cache codes', () => {
+		expect(ErrorCode.CacheFetchFailed).toBe('helm.cache.fetch_failed');
+		expect(ErrorCode.CacheSyncFailed).toBe('helm.cache.sync_failed');
+	});
+
 	it('has an Unknown fallback', () => {
 		expect(ErrorCode.Unknown).toBe('unknown');
 	});

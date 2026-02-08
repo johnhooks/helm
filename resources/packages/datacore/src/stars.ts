@@ -80,6 +80,22 @@ export function createStarsRepository(conn: Connection) {
 			);
 		},
 
+		async insertStars(stars: Star[]): Promise<void> {
+			if (stars.length === 0) {
+				return;
+			}
+
+			const placeholders = stars.map(() => '(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)').join(', ');
+			const params = stars.flatMap((s) => [
+				s.id, s.node_id, s.title, s.catalog_id, s.spectral_class, s.post_type,
+				s.x, s.y, s.z, s.mass, s.radius, s.is_primary ? 1 : 0,
+			]);
+			await conn.run(
+				`INSERT INTO stars (id, node_id, title, catalog_id, spectral_class, post_type, x, y, z, mass, radius, is_primary) VALUES ${placeholders}`,
+				params,
+			);
+		},
+
 		async clearStars(): Promise<void> {
 			await conn.run('DELETE FROM stars');
 		},

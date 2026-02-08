@@ -11,4 +11,8 @@ export enum ErrorCode {
 	DatacoreUnsupported = 'helm.datacore.unsupported',
 	DatacoreWorkerError = 'helm.datacore.worker_error',
 	DatacoreUnexpectedResponse = 'helm.datacore.unexpected_response',
+
+	// Cache errors
+	CacheFetchFailed = 'helm.cache.fetch_failed',
+	CacheSyncFailed = 'helm.cache.sync_failed',
 }

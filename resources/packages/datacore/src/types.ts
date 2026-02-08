@@ -5,10 +5,10 @@ export type SQLiteParam = number | string | Uint8Array | bigint | null;
 
 /** Thin wrapper around sendQuery/sendRun for domain modules. */
 export interface Connection {
-	query<Row>(sql: string, params?: SQLiteParam[]): Promise<Row[]>;
-	run(sql: string, params?: SQLiteParam[]): Promise<void>;
-	exec(sql: string): Promise<void>;
-	transaction<T>(fn: () => Promise<T>): Promise<T>;
+	query: <Row>(sql: string, params?: SQLiteParam[]) => Promise<Row[]>;
+	run: (sql: string, params?: SQLiteParam[]) => Promise<void>;
+	exec: (sql: string) => Promise<void>;
+	transaction: <T>(fn: () => Promise<T>) => Promise<T>;
 }
 
 /** SQLite-compatible value types returned from queries. */
@@ -111,15 +111,17 @@ export interface DatacoreOptions {
 }
 
 export interface Datacore {
-	insertNode(node: NavNode): Promise<void>;
-	insertStar(star: Star): Promise<void>;
-	clearNodes(): Promise<void>;
-	clearStars(): Promise<void>;
-	getStarMap(): Promise<StarMapEntry[]>;
-	getStarsAtNode(nodeId: number): Promise<Star[]>;
-	getNode(id: number): Promise<NavNode | null>;
-	getMeta(key: string): Promise<string | null>;
-	setMeta(key: string, value: string): Promise<void>;
-	transaction<T>(fn: () => Promise<T>): Promise<T>;
-	close(): Promise<void>;
+	insertNode: (node: NavNode) => Promise<void>;
+	insertNodes: (nodes: NavNode[]) => Promise<void>;
+	insertStar: (star: Star) => Promise<void>;
+	insertStars: (stars: Star[]) => Promise<void>;
+	clearNodes: () => Promise<void>;
+	clearStars: () => Promise<void>;
+	getStarMap: () => Promise<StarMapEntry[]>;
+	getStarsAtNode: (nodeId: number) => Promise<Star[]>;
+	getNode: (id: number) => Promise<NavNode | null>;
+	getMeta: (key: string) => Promise<string | null>;
+	setMeta: (key: string, value: string) => Promise<void>;
+	transaction: <T>(fn: () => Promise<T>) => Promise<T>;
+	close: () => Promise<void>;
 }

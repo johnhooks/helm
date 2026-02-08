@@ -5,7 +5,9 @@ export default defineConfig({
 	root: __dirname,
 	resolve: {
 		alias: {
+			'@helm/cache': path.resolve(__dirname, '../../resources/packages/cache/src'),
 			'@helm/datacore': path.resolve(__dirname, '../../resources/packages/datacore/src'),
+			'@helm/errors': path.resolve(__dirname, '../../resources/packages/errors/src'),
 			'@helm/types': path.resolve(__dirname, '../../resources/packages/types/src'),
 		},
 	},

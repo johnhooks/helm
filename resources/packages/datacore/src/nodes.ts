@@ -38,6 +38,19 @@ export function createNodesRepository(conn: Connection) {
 			);
 		},
 
+		async insertNodes(nodes: NavNode[]): Promise<void> {
+			if (nodes.length === 0) {
+				return;
+			}
+
+			const placeholders = nodes.map(() => '(?, ?, ?, ?, ?, ?)').join(', ');
+			const params = nodes.flatMap((n) => [n.id, n.type, n.x, n.y, n.z, n.created_at]);
+			await conn.run(
+				`INSERT INTO nodes (id, type, x, y, z, created_at) VALUES ${placeholders}`,
+				params,
+			);
+		},
+
 		async clearNodes(): Promise<void> {
 			await conn.run('DELETE FROM nodes');
 		},
