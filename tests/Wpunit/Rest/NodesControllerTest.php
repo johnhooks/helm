@@ -385,4 +385,74 @@ class NodesControllerTest extends WPRestApiTestCase
         $this->assertContains('BINARY_A', $catalogIds);
         $this->assertContains('BINARY_B', $catalogIds);
     }
+
+    public function test_star_serialization_includes_is_primary(): void
+    {
+        $star1 = $this->tester->haveStar([
+            'id' => 'PRIMARY_A',
+            'name' => 'Primary Star',
+            'distanceLy' => 5.0,
+            'ra' => 100.0,
+            'dec' => -30.0,
+            'properties' => [
+                'system_id' => 'IS_PRIMARY_TEST',
+                'is_primary' => true,
+                'component_count' => 2,
+            ],
+        ]);
+
+        $node = $this->tester->getNodeForStar($star1);
+        $this->assertNotNull($node);
+
+        $this->tester->haveStar([
+            'id' => 'SECONDARY_B',
+            'name' => 'Secondary Star',
+            'distanceLy' => 5.0,
+            'ra' => 100.0,
+            'dec' => -30.0,
+            'properties' => [
+                'system_id' => 'IS_PRIMARY_TEST',
+                'is_primary' => false,
+                'component_count' => 2,
+            ],
+        ]);
+
+        $request = new WP_REST_Request('GET', "/helm/v1/nodes/{$node->id}/stars");
+        $response = rest_do_request($request);
+
+        $this->assertSame(200, $response->get_status());
+
+        $data = $response->get_data();
+        $this->assertGreaterThanOrEqual(2, count($data));
+
+        $starsByCatalog = [];
+        foreach ($data as $star) {
+            $this->assertArrayHasKey('is_primary', $star);
+            $starsByCatalog[$star['catalog_id']] = $star;
+        }
+
+        $this->assertTrue($starsByCatalog['PRIMARY_A']['is_primary']);
+        $this->assertFalse($starsByCatalog['SECONDARY_B']['is_primary']);
+    }
+
+    public function test_embedded_stars_include_is_primary(): void
+    {
+        ['star' => $star, 'node' => $node] = $this->createStarAtNode([
+            'id' => 'EMBED_PRIMARY',
+            'name' => 'Embed Primary Star',
+            'spectralType' => 'K1V',
+            'distanceLy' => 12.0,
+        ]);
+
+        $request = new WP_REST_Request('GET', "/helm/v1/nodes/{$node->id}");
+        $request->set_param('_embed', 'helm:stars');
+        $response = rest_do_request($request);
+
+        $this->assertSame(200, $response->get_status());
+
+        $embedded = $response->get_data()['_embedded']['helm:stars'];
+        $this->assertNotEmpty($embedded);
+        $this->assertArrayHasKey('is_primary', $embedded[0]);
+        $this->assertTrue($embedded[0]['is_primary']);
+    }
 }

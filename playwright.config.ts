@@ -9,14 +9,22 @@ export default defineConfig({
     workers: process.env.CI ? 1 : undefined,
     reporter: [['html', { outputFolder: './artifacts/playwright-report' }]],
     use: {
-        baseURL: process.env.WP_BASE_URL || 'http://localhost:8891',
         trace: 'on-first-retry',
         screenshot: 'only-on-failure',
     },
+    webServer: {
+        command: 'bunx vite --config tests-e2e/datacore/vite.config.ts',
+        port: 5188,
+        reuseExistingServer: !process.env.CI,
+    },
     projects: [
         {
-            name: 'chromium',
-            use: { ...devices['Desktop Chrome'] },
+            name: 'datacore',
+            testMatch: 'datacore.spec.ts',
+            use: {
+                ...devices['Desktop Chrome'],
+                baseURL: 'http://localhost:5188',
+            },
         },
     ],
 });

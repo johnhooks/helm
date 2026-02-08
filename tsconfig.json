@@ -26,7 +26,11 @@
             "@helm/astrometric": ["resources/packages/astrometric/src"],
             "@helm/astrometric/*": ["resources/packages/astrometric/src/*"],
             "@helm/benchmark": ["resources/packages/benchmark/src"],
-            "@helm/benchmark/*": ["resources/packages/benchmark/src/*"]
+            "@helm/benchmark/*": ["resources/packages/benchmark/src/*"],
+            "@helm/datacore": ["resources/packages/datacore/src"],
+            "@helm/datacore/*": ["resources/packages/datacore/src/*"],
+            "@helm/types": ["resources/packages/types/src"],
+            "@helm/types/*": ["resources/packages/types/src/*"]
         }
     },
     "include": [

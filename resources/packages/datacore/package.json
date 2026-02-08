@@ -1,0 +1,17 @@
+{
+	"name": "@helm/datacore",
+	"version": "0.1.0",
+	"description": "Client-side SQLite cache for Helm game data",
+	"private": true,
+	"main": "src/index.ts",
+	"types": "src/index.ts",
+	"scripts": {
+		"test": "vitest run",
+		"test:watch": "vitest",
+		"check-types": "tsc --noEmit"
+	},
+	"dependencies": {
+		"@helm/types": "workspace:*",
+		"wa-sqlite": "^1.0.0"
+	}
+}

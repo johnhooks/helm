@@ -134,6 +134,7 @@ final class CelestialService
             'z'              => $z,
             'mass'           => $star->mass(),
             'radius'         => $star->radius(),
+            'is_primary'     => $star->isPrimary(),
         ];
     }
 
