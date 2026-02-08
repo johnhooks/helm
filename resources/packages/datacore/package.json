@@ -11,7 +11,9 @@
 		"check-types": "tsc --noEmit"
 	},
 	"dependencies": {
+		"@helm/errors": "workspace:*",
 		"@helm/types": "workspace:*",
+		"@wordpress/i18n": "^5.0.0",
 		"wa-sqlite": "^1.0.0"
 	}
 }

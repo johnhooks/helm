@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { createDatacore, DatacoreUnsupportedError } from './client';
+import { ErrorCode, HelmError } from '@helm/errors';
+import { createDatacore } from './client';
 import type { WorkerResponse } from './types';
 
 /**
@@ -468,7 +469,8 @@ describe('createDatacore', () => {
 			message: 'Worker crashed',
 		} as ErrorEvent);
 
-		await expect(promise).rejects.toThrow('Worker crashed');
+		await expect(promise).rejects.toThrow(HelmError);
+		await expect(promise).rejects.toThrow(ErrorCode.DatacoreWorkerError);
 	});
 
 	it('rejects on error response from worker', async () => {
@@ -485,32 +487,39 @@ describe('createDatacore', () => {
 			}
 		});
 
-		await expect(dc.getMeta('key')).rejects.toThrow('SQL syntax error');
+		await expect(dc.getMeta('key')).rejects.toThrow(ErrorCode.DatacoreWorkerError);
 	});
 });
 
-describe('DatacoreUnsupportedError', () => {
+describe('unsupported browser errors', () => {
 	afterEach(() => {
 		// Restore the module-level stubs for other test suites.
 		vi.stubGlobal('Worker', MockWorker);
 		vi.stubGlobal('navigator', { storage: { getDirectory: vi.fn() } });
 	});
 
-	it('throws when Worker is unavailable', async () => {
+	it('throws HelmError when Worker is unavailable', async () => {
 		vi.stubGlobal('Worker', undefined);
 
-		await expect(createDatacore()).rejects.toThrow(DatacoreUnsupportedError);
+		await expect(createDatacore()).rejects.toThrow(HelmError);
+		await expect(createDatacore()).rejects.toThrow(ErrorCode.DatacoreUnsupported);
 	});
 
-	it('throws when OPFS is unavailable', async () => {
+	it('throws HelmError when OPFS is unavailable', async () => {
 		vi.stubGlobal('navigator', { storage: {} });
 
-		await expect(createDatacore()).rejects.toThrow(DatacoreUnsupportedError);
+		await expect(createDatacore()).rejects.toThrow(HelmError);
+		await expect(createDatacore()).rejects.toThrow(ErrorCode.DatacoreUnsupported);
 	});
 
-	it('error message names the missing API', async () => {
+	it('error detail names the missing API', async () => {
 		vi.stubGlobal('navigator', { storage: {} });
 
-		await expect(createDatacore()).rejects.toThrow('Origin Private File System');
+		try {
+			await createDatacore();
+		} catch (e) {
+			expect(HelmError.is(e)).toBe(true);
+			expect((e as HelmError).detail).toContain('Origin Private File System');
+		}
 	});
 });

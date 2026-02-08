@@ -1,0 +1,14 @@
+/**
+ * Client-side error codes for the Helm plugin.
+ *
+ * Used to construct PluginErrors in JavaScript code.
+ * All codes use dot notation: helm.{domain}.{error}
+ */
+export enum ErrorCode {
+	Unknown = 'unknown',
+
+	// Datacore errors
+	DatacoreUnsupported = 'helm.datacore.unsupported',
+	DatacoreWorkerError = 'helm.datacore.worker_error',
+	DatacoreUnexpectedResponse = 'helm.datacore.unexpected_response',
+}

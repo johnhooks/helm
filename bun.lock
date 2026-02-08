@@ -84,9 +84,15 @@
       "name": "@helm/datacore",
       "version": "0.1.0",
       "dependencies": {
+        "@helm/errors": "workspace:*",
         "@helm/types": "workspace:*",
+        "@wordpress/i18n": "^5.0.0",
         "wa-sqlite": "^1.0.0",
       },
+    },
+    "resources/packages/errors": {
+      "name": "@helm/errors",
+      "version": "0.1.0",
     },
     "resources/packages/types": {
       "name": "@helm/types",
@@ -483,6 +489,8 @@
     "@helm/bridge": ["@helm/bridge@workspace:resources/packages/bridge"],
 
     "@helm/datacore": ["@helm/datacore@workspace:resources/packages/datacore"],
+
+    "@helm/errors": ["@helm/errors@workspace:resources/packages/errors"],
 
     "@helm/types": ["@helm/types@workspace:resources/packages/types"],
 

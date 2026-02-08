@@ -1,6 +1,8 @@
+import { __ } from '@wordpress/i18n';
 import { META_SCHEMA, createMetaRepository } from './meta';
 import { NODES_SCHEMA, createNodesRepository } from './nodes';
 import { STARS_SCHEMA, createStarsRepository } from './stars';
+import { ErrorCode, HelmError } from '@helm/errors';
 import type {
 	Connection,
 	Datacore,
@@ -22,31 +24,25 @@ function nextId(): string {
 }
 
 /**
- * Thrown when the browser lacks the APIs required for Datacore
- * (Web Workers, IndexedDB). The app cannot function without
- * persistent client-side storage.
- */
-export class DatacoreUnsupportedError extends Error {
-	constructor(missing: string) {
-		super(`Datacore requires ${missing}, which is not available in this browser.`);
-		this.name = 'DatacoreUnsupportedError';
-	}
-}
-
-/**
  * Create a Datacore instance backed by a web worker.
  *
  * The worker boots SQLite with OPFS persistence, then accepts
  * query, run, exec, and close messages over postMessage.
  *
- * @throws {DatacoreUnsupportedError} if the browser lacks required APIs.
+ * @throws {HelmError} with code `helm.datacore.unsupported` if the browser lacks required APIs.
  */
 export async function createDatacore(options: DatacoreOptions = {}): Promise<Datacore> {
 	if (typeof Worker === 'undefined') {
-		throw new DatacoreUnsupportedError('Web Workers');
+		throw HelmError.safe(
+			ErrorCode.DatacoreUnsupported,
+			__('Datacore requires Web Workers, which is not available in this browser.', 'helm'),
+		);
 	}
 	if (!navigator.storage?.getDirectory) {
-		throw new DatacoreUnsupportedError('Origin Private File System');
+		throw HelmError.safe(
+			ErrorCode.DatacoreUnsupported,
+			__('Datacore requires Origin Private File System, which is not available in this browser.', 'helm'),
+		);
 	}
 
 	const pending = new Map<string, PendingRequest>();
@@ -62,14 +58,14 @@ export async function createDatacore(options: DatacoreOptions = {}): Promise<Dat
 		pending.delete(msg.id);
 
 		if (msg.type === 'error') {
-			req.reject(new Error(msg.payload.message));
+			req.reject(new HelmError(ErrorCode.DatacoreWorkerError));
 		} else {
 			req.resolve(msg);
 		}
 	};
 
-	worker.onerror = (event) => {
-		const err = new Error(event.message ?? 'Worker error');
+	worker.onerror = () => {
+		const err = new HelmError(ErrorCode.DatacoreWorkerError);
 		for (const req of pending.values()) {
 			req.reject(err);
 		}
@@ -94,7 +90,7 @@ export async function createDatacore(options: DatacoreOptions = {}): Promise<Dat
 		});
 
 		if (response.type !== 'result') {
-			throw new Error(`Unexpected response type: ${response.type}`);
+			throw new HelmError(ErrorCode.DatacoreUnexpectedResponse);
 		}
 
 		return response.payload.rows.map((row) => {
@@ -114,7 +110,7 @@ export async function createDatacore(options: DatacoreOptions = {}): Promise<Dat
 		});
 
 		if (response.type !== 'result') {
-			throw new Error(`Unexpected response type: ${response.type}`);
+			throw new HelmError(ErrorCode.DatacoreUnexpectedResponse);
 		}
 	}
 
@@ -126,7 +122,7 @@ export async function createDatacore(options: DatacoreOptions = {}): Promise<Dat
 		});
 
 		if (response.type !== 'result') {
-			throw new Error(`Unexpected response type: ${response.type}`);
+			throw new HelmError(ErrorCode.DatacoreUnexpectedResponse);
 		}
 	}
 

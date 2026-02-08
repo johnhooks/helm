@@ -9,6 +9,7 @@ export default defineConfig({
         environment: 'happy-dom',
         environmentMatchGlobs: [
             ['resources/packages/datacore/**', 'node'],
+            ['resources/packages/errors/**', 'node'],
         ],
         setupFiles: ['./vitest.setup.ts'],
         include: ['resources/packages/**/*.{test,spec}.{ts,tsx}'],
@@ -25,6 +26,7 @@ export default defineConfig({
             '@helm/bridge': path.resolve(__dirname, 'resources/packages/bridge/src'),
             '@helm/astrometric': path.resolve(__dirname, 'resources/packages/astrometric/src'),
             '@helm/datacore': path.resolve(__dirname, 'resources/packages/datacore/src'),
+            '@helm/errors': path.resolve(__dirname, 'resources/packages/errors/src'),
             '@helm/types': path.resolve(__dirname, 'resources/packages/types/src'),
         },
     },
