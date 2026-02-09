@@ -1,0 +1,14 @@
+{
+	"name": "@helm/core",
+	"version": "0.1.0",
+	"description": "Shared Helm runtime — bundles datacore, cache, errors, and logger into a single WordPress script.",
+	"private": true,
+	"main": "src/index.ts",
+	"types": "src/index.ts",
+	"dependencies": {
+		"@helm/cache": "workspace:*",
+		"@helm/datacore": "workspace:*",
+		"@helm/errors": "workspace:*",
+		"@helm/logger": "workspace:*"
+	}
+}

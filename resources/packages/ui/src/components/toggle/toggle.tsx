@@ -1,5 +1,4 @@
 import type { CSSProperties, ChangeEvent, ReactNode } from "react";
-import "./toggle.css";
 
 export interface ToggleProps {
   /**

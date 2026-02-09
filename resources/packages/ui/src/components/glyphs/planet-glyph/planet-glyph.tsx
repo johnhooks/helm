@@ -1,5 +1,4 @@
 import type { CSSProperties } from "react";
-import "./planet-glyph.css";
 
 export const PLANET_TYPES = [
 	"terrestrial",

@@ -1,5 +1,4 @@
 import type { CSSProperties } from "react";
-import "./placeholder.css";
 
 export interface PlaceholderProps {
   title?: string;

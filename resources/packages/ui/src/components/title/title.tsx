@@ -1,5 +1,4 @@
 import type { CSSProperties } from "react";
-import "./title.css";
 
 export interface TitleProps {
   /**

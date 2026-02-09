@@ -1,5 +1,4 @@
 import type { CSSProperties } from "react";
-import "./stack-indicator.css";
 
 export interface StackIndicatorProps {
   /**

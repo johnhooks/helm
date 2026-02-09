@@ -1,5 +1,4 @@
 import type { CSSProperties } from "react";
-import "./orb-indicator.css";
 
 export interface OrbIndicatorProps {
   /**

@@ -4,7 +4,6 @@ import Select, {
   type GroupBase,
   type StylesConfig,
 } from "react-select";
-import "./select-control.css";
 
 export interface SelectOption {
   value: string;

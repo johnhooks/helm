@@ -1,5 +1,4 @@
 import type { CSSProperties, ReactNode } from "react";
-import "./button-panel.css";
 
 export interface ButtonPanelProps {
   /**

@@ -1,5 +1,4 @@
 import type { CSSProperties, ReactNode } from "react";
-import "./readout.css";
 
 export interface ReadoutProps {
   /**

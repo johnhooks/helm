@@ -1,0 +1,38 @@
+/**
+ * Shared WP admin chrome overrides for Helm page roots.
+ *
+ * Applied via .helm-page-root on the server-rendered mount div so the
+ * dark background is immediate (no flash) and admin padding/footer are
+ * stripped before React hydrates.
+ *
+ * Design-system tokens are defined on .helm-page-root in tokens.css,
+ * scoping them to Helm pages rather than the whole WP admin.
+ */
+
+#wpcontent:has(.helm-page-root) {
+	padding-left: 0;
+}
+
+#wpbody-content:has(.helm-page-root) {
+	padding-bottom: 0;
+}
+
+#wpwrap:has(.helm-page-root) #wpfooter {
+	display: none;
+}
+
+.helm-page-root.wrap {
+	margin: 0;
+	padding: 0;
+	max-width: 100%;
+	background: var(--helm-ui-color-bg);
+	color: var(--helm-ui-color-text);
+	min-height: calc(100dvh - var(--wp-admin--admin-bar--height, 32px));
+	display: flex;
+	flex-direction: column;
+}
+
+/* AppRoot sets its own min-height; zero it out so the two don't stack. */
+.helm-page-root .helm-app-root {
+	min-height: 0;
+}

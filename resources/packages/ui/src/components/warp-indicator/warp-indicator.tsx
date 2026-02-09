@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
-import "./warp-indicator.css";
 
 export interface WarpIndicatorProps {
   /**

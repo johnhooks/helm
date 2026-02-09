@@ -1,11 +1,10 @@
 .helm-app-root {
-  width: 100%;
-  min-height: calc(100dvh - var(--wp-admin--admin-bar--height, 32px));
-  background: var(--helm-ui-color-bg, #0a0a0a);
-  color: var(--helm-ui-color-text, #f0e6d2);
+  background: var(--helm-ui-color-bg);
+  color: var(--helm-ui-color-text);
   font-family: var(--helm-ui-font-family);
   display: flex;
   flex-direction: column;
+  flex: 1;
 }
 
 .helm-fullscreen .helm-app-root {

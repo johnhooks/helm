@@ -70,7 +70,7 @@ final class Provider extends ServiceProvider
      */
     public function renderBridge(): void
     {
-        echo '<div class="wrap helm-bridge-root"></div>';
+        echo '<div class="wrap helm-page-root helm-bridge-root"></div>';
     }
 
     /**
@@ -78,7 +78,7 @@ final class Provider extends ServiceProvider
      */
     public function renderSettings(): void
     {
-        echo '<div class="wrap helm-admin-settings-root"></div>';
+        echo '<div class="wrap helm-page-root helm-settings-root"></div>';
     }
 
     /**
@@ -86,7 +86,8 @@ final class Provider extends ServiceProvider
      */
     public function enqueueBridge(): void
     {
-        $this->enqueueBundle('helm-bridge', 'bridge');
+        $this->enqueueShared();
+        $this->enqueueBundle('helm-bridge', 'bridge', ['helm-ui']);
         $this->enqueueHelmGlobals('helm-bridge');
     }
 
@@ -95,8 +96,18 @@ final class Provider extends ServiceProvider
      */
     public function enqueueSettings(): void
     {
-        $this->enqueueBundle('helm-admin-settings', 'admin-settings');
+        $this->enqueueShared();
+        $this->enqueueBundle('helm-admin-settings', 'admin-settings', ['helm-ui']);
         $this->enqueueHelmGlobals('helm-admin-settings');
+    }
+
+    /**
+     * Enqueue the shared @helm/ui and @helm/core bundles.
+     */
+    private function enqueueShared(): void
+    {
+        $this->enqueueBundle('helm-ui', 'ui');
+        $this->enqueueBundle('helm-core', 'core');
     }
 
     /**
@@ -119,8 +130,12 @@ final class Provider extends ServiceProvider
 
     /**
      * Enqueue a JS + CSS bundle from the build directory.
+     *
+     * @param string   $handle   WP handle for the script/style.
+     * @param string   $entry    Build entry name (maps to build/{entry}.js).
+     * @param string[] $cssDeps  Style handles this bundle depends on.
      */
-    private function enqueueBundle(string $handle, string $entry): void
+    private function enqueueBundle(string $handle, string $entry, array $cssDeps = []): void
     {
         $assetFile = HELM_PATH . "build/{$entry}.asset.php";
 
@@ -130,7 +145,7 @@ final class Provider extends ServiceProvider
 
         $asset = include $assetFile;
 
-        add_action('admin_enqueue_scripts', function () use ($handle, $entry, $asset): void {
+        add_action('admin_enqueue_scripts', function () use ($handle, $entry, $asset, $cssDeps): void {
             wp_enqueue_script(
                 $handle,
                 HELM_URL . "build/{$entry}.js",
@@ -144,7 +159,7 @@ final class Provider extends ServiceProvider
                 wp_enqueue_style(
                     $handle,
                     HELM_URL . "build/{$entry}.css",
-                    ['wp-components'],
+                    $cssDeps,
                     $asset['version'],
                 );
             }

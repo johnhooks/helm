@@ -1,5 +1,4 @@
 import type { CSSProperties } from "react";
-import "./matrix-indicator.css";
 
 export interface MatrixIndicatorProps {
   /**

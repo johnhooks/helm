@@ -6,7 +6,13 @@
  */
 import { createRoot, useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Button, Card, CardBody, CardHeader, Notice, Spinner } from './wp';
+import {
+	AppRoot,
+	Button,
+	Panel,
+	Readout,
+	Title,
+} from '@helm/ui';
 import { createDatacore } from '@helm/datacore';
 import { createCache, META_NODE_COUNT, META_STAR_COUNT } from '@helm/cache';
 import type { Datacore } from '@helm/datacore';
@@ -117,69 +123,59 @@ function Settings() {
 	}
 
 	return (
-		<div>
-			<h2>{__('Helm Settings', 'helm')}</h2>
+		<AppRoot className="helm-flex helm-flex-col helm-gap-4 helm-p-8">
+			<Title label={__('Helm Settings', 'helm')} size="md" />
 
 			{error && (
-				<Notice
-					status="error"
-					isDismissible
-					onDismiss={() => setError(null)}
-				>
-					{error}
-				</Notice>
+				<Panel variant="bordered" tone="danger">
+					<div className="helm-flex helm-items-center helm-justify-between">
+						<span>{error}</span>
+						<Button
+							variant="ghost"
+							size="sm"
+							onClick={() => setError(null)}
+							aria-label={__('Dismiss error', 'helm')}
+						>
+							{__('Dismiss', 'helm')}
+						</Button>
+					</div>
+				</Panel>
 			)}
 
-			<Card>
-				<CardHeader>
-					<h3 style={{ margin: 0 }}>
-						{__('Datacore', 'helm')}
-					</h3>
-				</CardHeader>
-				<CardBody>
-					{initializing ? (
-						<p>
-							<Spinner />
-							{__('Initializing Datacore…', 'helm')}
-						</p>
-					) : (
-						<>
-							<Button
-								variant="primary"
-								onClick={handleSync}
-								isBusy={syncing}
-								disabled={syncing}
-							>
-								{syncing
-									? __('Syncing…', 'helm')
-									: __('Sync Nodes', 'helm')}
-							</Button>
+			<Panel variant="bordered">
+				<div className="helm-flex helm-flex-col helm-gap-4 helm-items-start">
+					<Title label={__('Datacore', 'helm')} size="sm" />
 
-							{result && (
-								<div style={{ marginTop: '1em' }}>
-									<p>
-										{__('Nodes:', 'helm')}{' '}
-										<strong>{result.nodes}</strong>
-									</p>
-									<p>
-										{__('Stars:', 'helm')}{' '}
-										<strong>{result.stars}</strong>
-									</p>
-									<p>
-										{__('Last synced:', 'helm')}{' '}
-										<strong>{result.syncedAt}</strong>
-									</p>
-								</div>
-							)}
-						</>
-					)}
-				</CardBody>
-			</Card>
-		</div>
+					<Button
+						variant="primary"
+						onClick={handleSync}
+						disabled={initializing || syncing}
+					>
+						{__('Sync Nodes', 'helm')}
+					</Button>
+
+					<div className="helm-flex helm-gap-8">
+						<Readout
+							label={__('Nodes', 'helm')}
+							value={result?.nodes ?? '\u2014'}
+						/>
+						<Readout
+							label={__('Stars', 'helm')}
+							value={result?.stars ?? '\u2014'}
+						/>
+						<Readout
+							label={__('Last Synced', 'helm')}
+							value={result?.syncedAt ?? '\u2014'}
+							tone="neutral"
+						/>
+					</div>
+				</div>
+			</Panel>
+		</AppRoot>
 	);
 }
 
-const rootElement = document.querySelector('.helm-admin-settings-root');
+const rootElement = document.querySelector('.helm-settings-root');
 if (rootElement) {
 	createRoot(rootElement).render(<Settings />);
 }

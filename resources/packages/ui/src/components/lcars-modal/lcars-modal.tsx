@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
 import { Modal } from "@wordpress/components";
 import { TitleBar } from "../title-bar";
-import "./lcars-modal.css";
 
 export interface LcarsModalProps {
   /**

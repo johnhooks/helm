@@ -1,5 +1,4 @@
 import type { CSSProperties } from "react";
-import "./status-badge.css";
 
 export interface StatusBadgeProps {
   /**

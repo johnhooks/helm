@@ -1,5 +1,4 @@
 import type { CSSProperties } from 'react';
-import './bar-indicator.css';
 
 export interface BarIndicatorProps {
 	/**

@@ -1,5 +1,6 @@
-/* Set background for story canvas using design system token */
+/* Dark background for the Storybook canvas.
+   Tokens are scoped to .helm-page-root (not :root), so we hardcode here. */
 body,
 .sb-show-main {
-  background: var(--helm-ui-color-bg) !important;
+  background: #0a0a0a !important;
 }

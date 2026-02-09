@@ -1,6 +1,9 @@
 /**
- * Bridge layout overrides for WP admin chrome, plus fullscreen takeover.
+ * Bridge fullscreen takeover.
  * Fullscreen class (.helm-fullscreen) is toggled on <html> via useEffect.
+ *
+ * Admin chrome overrides (padding, footer) are handled by the shared
+ * .helm-page-root class in @helm/ui.
  */
 
 .helm-fullscreen #adminmenuwrap,
@@ -26,22 +29,4 @@
 
 .helm-fullscreen.wp-toolbar {
 	padding-top: 0 !important;
-}
-
-#wpcontent:has(.helm-bridge-root) {
-	padding-left: 0;
-}
-
-#wpbody-content:has(.helm-bridge-root) {
-	padding-bottom: 0;
-}
-
-#wpwrap:has(.helm-bridge-root) #wpfooter {
-	display: none;
-}
-
-.helm-bridge-root.wrap {
-	margin: 0;
-	padding: 0;
-	max-width: 100%;
 }

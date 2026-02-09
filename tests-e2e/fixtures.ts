@@ -28,11 +28,11 @@ export const test = base.extend({
 
 		// Boot Datacore and Cache.
 		await page.evaluate(async () => {
-			window.helm.dc = await window.helm.createDatacore();
-			window.helm.cache = window.helm.createCache({ datacore: window.helm.dc });
+			window.helm.dc = await window.helm.core.createDatacore();
+			window.helm.cache = window.helm.core.createCache({ datacore: window.helm.dc });
 		});
 
-		await use(page);
+		await use(page); // eslint-disable-line react-hooks/rules-of-hooks
 
 		// Close the instance after the test.
 		await page.evaluate(async () => {

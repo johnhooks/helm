@@ -1,5 +1,4 @@
 import type { CSSProperties } from "react";
-import "./progress-bar.css";
 
 export interface ProgressBarProps {
   /**

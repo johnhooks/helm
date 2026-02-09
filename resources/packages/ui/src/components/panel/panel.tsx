@@ -1,5 +1,4 @@
 import type { CSSProperties, ReactNode } from "react";
-import "./panel.css";
 
 export interface PanelProps {
   /**

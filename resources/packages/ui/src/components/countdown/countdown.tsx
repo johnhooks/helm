@@ -1,5 +1,4 @@
 import type { CSSProperties, ReactNode } from "react";
-import "./countdown.css";
 
 export interface CountdownProps {
   /**

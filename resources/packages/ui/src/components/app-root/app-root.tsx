@@ -1,5 +1,4 @@
 import type { CSSProperties, ReactNode } from "react";
-import "./app-root.css";
 
 export interface AppRootProps {
   children: ReactNode;

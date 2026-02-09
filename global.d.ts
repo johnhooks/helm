@@ -1,22 +1,21 @@
-import type { Datacore } from '@helm/datacore';
-import type { createDatacore } from '@helm/datacore';
-import type { Cache, createCache } from '@helm/cache';
-
-interface Settings {
-	workerUrl: string;
-	debug: boolean;
-}
-
-interface HelmGlobal {
-	createDatacore: typeof createDatacore;
-	createCache: typeof createCache;
-	dc: Datacore;
-	cache: Cache;
-	settings: Settings;
-}
-
 declare global {
+	interface HelmSettings {
+		workerUrl: string;
+		debug: boolean;
+	}
+
+	interface HelmGlobal {
+		/** PHP inline script — injected before page bundles. */
+		settings: HelmSettings;
+		/** Webpack library: window.helm.ui (handle: helm-ui). */
+		ui: typeof import('@helm/ui');
+		/** Webpack library: window.helm.core (handle: helm-core). */
+		core: typeof import('@helm/core');
+	}
+
 	interface Window {
 		helm: HelmGlobal;
 	}
 }
+
+export {};

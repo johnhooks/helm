@@ -1,5 +1,4 @@
 import type { CSSProperties } from "react";
-import "./star-glyph.css";
 
 export const SPECTRAL_CLASSES = ["O", "B", "A", "F", "G", "K", "M"] as const;
 

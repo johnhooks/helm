@@ -40,7 +40,9 @@
             "@helm/admin-settings": ["resources/packages/admin-settings/src"],
             "@helm/admin-settings/*": ["resources/packages/admin-settings/src/*"],
             "@helm/router": ["resources/packages/router/src"],
-            "@helm/router/*": ["resources/packages/router/src/*"]
+            "@helm/router/*": ["resources/packages/router/src/*"],
+            "@helm/core": ["resources/packages/core/src"],
+            "@helm/core/*": ["resources/packages/core/src/*"]
         }
     },
     "include": [

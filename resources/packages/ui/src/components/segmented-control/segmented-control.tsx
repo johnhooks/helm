@@ -1,5 +1,4 @@
 import type { CSSProperties } from "react";
-import "./segmented-control.css";
 
 export interface SegmentedOption {
   value: string;

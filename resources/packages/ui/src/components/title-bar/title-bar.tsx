@@ -1,5 +1,4 @@
 import type { CSSProperties, ReactNode } from "react";
-import "./title-bar.css";
 
 export interface TitleBarProps {
   /**

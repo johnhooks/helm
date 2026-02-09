@@ -6,7 +6,6 @@ import {
   type ReactNode,
   type KeyboardEvent,
 } from "react";
-import "./lcars-frame.css";
 
 export interface LcarsTab {
   /**

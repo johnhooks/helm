@@ -1,5 +1,4 @@
 import type { CSSProperties, MouseEvent, ReactNode } from "react";
-import "./button.css";
 
 export interface ButtonProps {
   /**

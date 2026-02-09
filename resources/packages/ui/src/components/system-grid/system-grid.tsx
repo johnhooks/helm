@@ -1,5 +1,4 @@
 import type { CSSProperties, ReactNode } from "react";
-import "./system-grid.css";
 
 export interface SystemGridProps {
   /**

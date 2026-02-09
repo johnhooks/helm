@@ -1,5 +1,4 @@
 import type { CSSProperties } from 'react';
-import './arc-indicator.css';
 
 export interface ArcIndicatorProps {
 	/**

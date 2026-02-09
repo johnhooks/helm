@@ -1,4 +1,4 @@
-:root {
+.helm-page-root {
   --helm-ui-font-family: "Antonio", "Helvetica Neue", Arial, sans-serif;
   --helm-ui-color-bg: #0a0a0a;
   --helm-ui-color-surface: #141414;

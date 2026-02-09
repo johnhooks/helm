@@ -1,0 +1,297 @@
+/**
+ * Layout utilities — Tailwind-compatible names with helm- prefix.
+ *
+ * Mirrors Tailwind's API so we can swap to real Tailwind later.
+ * Only layout/spacing utilities live here; visual styling stays
+ * in the component CSS.
+ */
+
+/* ---- Display ---- */
+.helm-block        { display: block; }
+.helm-inline-block { display: inline-block; }
+.helm-inline       { display: inline; }
+.helm-flex         { display: flex; }
+.helm-inline-flex  { display: inline-flex; }
+.helm-grid         { display: grid; }
+.helm-hidden       { display: none; }
+
+/* ---- Flex direction ---- */
+.helm-flex-row         { flex-direction: row; }
+.helm-flex-row-reverse { flex-direction: row-reverse; }
+.helm-flex-col         { flex-direction: column; }
+.helm-flex-col-reverse { flex-direction: column-reverse; }
+
+/* ---- Flex wrap ---- */
+.helm-flex-wrap    { flex-wrap: wrap; }
+.helm-flex-nowrap  { flex-wrap: nowrap; }
+
+/* ---- Flex grow / shrink / basis ---- */
+.helm-flex-1    { flex: 1 1 0%; }
+.helm-flex-auto { flex: 1 1 auto; }
+.helm-flex-none { flex: none; }
+.helm-grow      { flex-grow: 1; }
+.helm-grow-0    { flex-grow: 0; }
+.helm-shrink    { flex-shrink: 1; }
+.helm-shrink-0  { flex-shrink: 0; }
+
+/* ---- Align items ---- */
+.helm-items-start    { align-items: flex-start; }
+.helm-items-center   { align-items: center; }
+.helm-items-end      { align-items: flex-end; }
+.helm-items-baseline { align-items: baseline; }
+.helm-items-stretch  { align-items: stretch; }
+
+/* ---- Align self ---- */
+.helm-self-auto    { align-self: auto; }
+.helm-self-start   { align-self: flex-start; }
+.helm-self-center  { align-self: center; }
+.helm-self-end     { align-self: flex-end; }
+.helm-self-stretch { align-self: stretch; }
+
+/* ---- Justify content ---- */
+.helm-justify-start   { justify-content: flex-start; }
+.helm-justify-center  { justify-content: center; }
+.helm-justify-end     { justify-content: flex-end; }
+.helm-justify-between { justify-content: space-between; }
+.helm-justify-around  { justify-content: space-around; }
+.helm-justify-evenly  { justify-content: space-evenly; }
+
+/* ---- Gap (Tailwind spacing scale: 1 unit = 0.25rem) ---- */
+.helm-gap-0    { gap: 0px; }
+.helm-gap-0\.5 { gap: 0.125rem; }
+.helm-gap-1    { gap: 0.25rem; }
+.helm-gap-1\.5 { gap: 0.375rem; }
+.helm-gap-2    { gap: 0.5rem; }
+.helm-gap-2\.5 { gap: 0.625rem; }
+.helm-gap-3    { gap: 0.75rem; }
+.helm-gap-3\.5 { gap: 0.875rem; }
+.helm-gap-4    { gap: 1rem; }
+.helm-gap-5    { gap: 1.25rem; }
+.helm-gap-6    { gap: 1.5rem; }
+.helm-gap-7    { gap: 1.75rem; }
+.helm-gap-8    { gap: 2rem; }
+.helm-gap-9    { gap: 2.25rem; }
+.helm-gap-10   { gap: 2.5rem; }
+.helm-gap-11   { gap: 2.75rem; }
+.helm-gap-12   { gap: 3rem; }
+.helm-gap-14   { gap: 3.5rem; }
+.helm-gap-16   { gap: 4rem; }
+.helm-gap-20   { gap: 5rem; }
+.helm-gap-24   { gap: 6rem; }
+
+.helm-gap-x-0  { column-gap: 0px; }
+.helm-gap-x-1  { column-gap: 0.25rem; }
+.helm-gap-x-2  { column-gap: 0.5rem; }
+.helm-gap-x-3  { column-gap: 0.75rem; }
+.helm-gap-x-4  { column-gap: 1rem; }
+.helm-gap-x-6  { column-gap: 1.5rem; }
+.helm-gap-x-8  { column-gap: 2rem; }
+.helm-gap-x-12 { column-gap: 3rem; }
+
+.helm-gap-y-0  { row-gap: 0px; }
+.helm-gap-y-1  { row-gap: 0.25rem; }
+.helm-gap-y-2  { row-gap: 0.5rem; }
+.helm-gap-y-3  { row-gap: 0.75rem; }
+.helm-gap-y-4  { row-gap: 1rem; }
+.helm-gap-y-6  { row-gap: 1.5rem; }
+.helm-gap-y-8  { row-gap: 2rem; }
+.helm-gap-y-12 { row-gap: 3rem; }
+
+/* ---- Padding ---- */
+.helm-p-0    { padding: 0px; }
+.helm-p-0\.5 { padding: 0.125rem; }
+.helm-p-1    { padding: 0.25rem; }
+.helm-p-1\.5 { padding: 0.375rem; }
+.helm-p-2    { padding: 0.5rem; }
+.helm-p-2\.5 { padding: 0.625rem; }
+.helm-p-3    { padding: 0.75rem; }
+.helm-p-3\.5 { padding: 0.875rem; }
+.helm-p-4    { padding: 1rem; }
+.helm-p-5    { padding: 1.25rem; }
+.helm-p-6    { padding: 1.5rem; }
+.helm-p-7    { padding: 1.75rem; }
+.helm-p-8    { padding: 2rem; }
+.helm-p-9    { padding: 2.25rem; }
+.helm-p-10   { padding: 2.5rem; }
+.helm-p-11   { padding: 2.75rem; }
+.helm-p-12   { padding: 3rem; }
+.helm-p-14   { padding: 3.5rem; }
+.helm-p-16   { padding: 4rem; }
+.helm-p-20   { padding: 5rem; }
+.helm-p-24   { padding: 6rem; }
+
+.helm-px-0  { padding-left: 0px; padding-right: 0px; }
+.helm-px-1  { padding-left: 0.25rem; padding-right: 0.25rem; }
+.helm-px-2  { padding-left: 0.5rem; padding-right: 0.5rem; }
+.helm-px-3  { padding-left: 0.75rem; padding-right: 0.75rem; }
+.helm-px-4  { padding-left: 1rem; padding-right: 1rem; }
+.helm-px-5  { padding-left: 1.25rem; padding-right: 1.25rem; }
+.helm-px-6  { padding-left: 1.5rem; padding-right: 1.5rem; }
+.helm-px-8  { padding-left: 2rem; padding-right: 2rem; }
+.helm-px-10 { padding-left: 2.5rem; padding-right: 2.5rem; }
+.helm-px-12 { padding-left: 3rem; padding-right: 3rem; }
+
+.helm-py-0  { padding-top: 0px; padding-bottom: 0px; }
+.helm-py-1  { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+.helm-py-2  { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+.helm-py-3  { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+.helm-py-4  { padding-top: 1rem; padding-bottom: 1rem; }
+.helm-py-5  { padding-top: 1.25rem; padding-bottom: 1.25rem; }
+.helm-py-6  { padding-top: 1.5rem; padding-bottom: 1.5rem; }
+.helm-py-8  { padding-top: 2rem; padding-bottom: 2rem; }
+.helm-py-10 { padding-top: 2.5rem; padding-bottom: 2.5rem; }
+.helm-py-12 { padding-top: 3rem; padding-bottom: 3rem; }
+
+.helm-pt-0 { padding-top: 0px; }
+.helm-pt-1 { padding-top: 0.25rem; }
+.helm-pt-2 { padding-top: 0.5rem; }
+.helm-pt-4 { padding-top: 1rem; }
+.helm-pt-6 { padding-top: 1.5rem; }
+.helm-pt-8 { padding-top: 2rem; }
+
+.helm-pb-0 { padding-bottom: 0px; }
+.helm-pb-1 { padding-bottom: 0.25rem; }
+.helm-pb-2 { padding-bottom: 0.5rem; }
+.helm-pb-4 { padding-bottom: 1rem; }
+.helm-pb-6 { padding-bottom: 1.5rem; }
+.helm-pb-8 { padding-bottom: 2rem; }
+
+.helm-pl-0 { padding-left: 0px; }
+.helm-pl-1 { padding-left: 0.25rem; }
+.helm-pl-2 { padding-left: 0.5rem; }
+.helm-pl-4 { padding-left: 1rem; }
+.helm-pl-6 { padding-left: 1.5rem; }
+.helm-pl-8 { padding-left: 2rem; }
+
+.helm-pr-0 { padding-right: 0px; }
+.helm-pr-1 { padding-right: 0.25rem; }
+.helm-pr-2 { padding-right: 0.5rem; }
+.helm-pr-4 { padding-right: 1rem; }
+.helm-pr-6 { padding-right: 1.5rem; }
+.helm-pr-8 { padding-right: 2rem; }
+
+/* ---- Margin ---- */
+.helm-m-0    { margin: 0px; }
+.helm-m-auto { margin: auto; }
+.helm-m-1    { margin: 0.25rem; }
+.helm-m-2    { margin: 0.5rem; }
+.helm-m-4    { margin: 1rem; }
+.helm-m-8    { margin: 2rem; }
+
+.helm-mx-auto { margin-left: auto; margin-right: auto; }
+.helm-mx-0    { margin-left: 0px; margin-right: 0px; }
+.helm-mx-2    { margin-left: 0.5rem; margin-right: 0.5rem; }
+.helm-mx-4    { margin-left: 1rem; margin-right: 1rem; }
+
+.helm-my-0  { margin-top: 0px; margin-bottom: 0px; }
+.helm-my-2  { margin-top: 0.5rem; margin-bottom: 0.5rem; }
+.helm-my-4  { margin-top: 1rem; margin-bottom: 1rem; }
+.helm-my-8  { margin-top: 2rem; margin-bottom: 2rem; }
+
+.helm-mt-0 { margin-top: 0px; }
+.helm-mt-1 { margin-top: 0.25rem; }
+.helm-mt-2 { margin-top: 0.5rem; }
+.helm-mt-4 { margin-top: 1rem; }
+.helm-mt-6 { margin-top: 1.5rem; }
+.helm-mt-8 { margin-top: 2rem; }
+
+.helm-mb-0 { margin-bottom: 0px; }
+.helm-mb-1 { margin-bottom: 0.25rem; }
+.helm-mb-2 { margin-bottom: 0.5rem; }
+.helm-mb-4 { margin-bottom: 1rem; }
+.helm-mb-8 { margin-bottom: 2rem; }
+
+.helm-ml-0    { margin-left: 0px; }
+.helm-ml-auto { margin-left: auto; }
+.helm-ml-2    { margin-left: 0.5rem; }
+.helm-ml-4    { margin-left: 1rem; }
+
+.helm-mr-0    { margin-right: 0px; }
+.helm-mr-auto { margin-right: auto; }
+.helm-mr-2    { margin-right: 0.5rem; }
+.helm-mr-4    { margin-right: 1rem; }
+
+/* ---- Width ---- */
+.helm-w-full   { width: 100%; }
+.helm-w-auto   { width: auto; }
+.helm-w-screen { width: 100vw; }
+.helm-w-fit    { width: fit-content; }
+.helm-w-min    { width: min-content; }
+.helm-w-max    { width: max-content; }
+
+/* ---- Height ---- */
+.helm-h-full   { height: 100%; }
+.helm-h-auto   { height: auto; }
+.helm-h-screen { height: 100vh; }
+.helm-h-fit    { height: fit-content; }
+
+/* ---- Min / Max ---- */
+.helm-min-w-0    { min-width: 0px; }
+.helm-min-w-full { min-width: 100%; }
+.helm-min-h-0    { min-height: 0px; }
+.helm-min-h-full { min-height: 100%; }
+.helm-max-w-full { max-width: 100%; }
+
+/* ---- Overflow ---- */
+.helm-overflow-auto    { overflow: auto; }
+.helm-overflow-hidden  { overflow: hidden; }
+.helm-overflow-visible { overflow: visible; }
+.helm-overflow-scroll  { overflow: scroll; }
+
+/* ---- Position ---- */
+.helm-relative { position: relative; }
+.helm-absolute { position: absolute; }
+.helm-fixed    { position: fixed; }
+.helm-sticky   { position: sticky; }
+.helm-static   { position: static; }
+
+/* ---- Inset ---- */
+.helm-inset-0 { inset: 0px; }
+.helm-top-0   { top: 0px; }
+.helm-right-0 { right: 0px; }
+.helm-bottom-0 { bottom: 0px; }
+.helm-left-0  { left: 0px; }
+
+/* ---- Text alignment ---- */
+.helm-text-left   { text-align: left; }
+.helm-text-center { text-align: center; }
+.helm-text-right  { text-align: right; }
+
+/* ---- Truncate ---- */
+.helm-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---- Whitespace ---- */
+.helm-whitespace-nowrap { white-space: nowrap; }
+.helm-whitespace-normal { white-space: normal; }
+
+/* ---- Pointer events ---- */
+.helm-pointer-events-none { pointer-events: none; }
+.helm-pointer-events-auto { pointer-events: auto; }
+
+/* ---- Cursor ---- */
+.helm-cursor-pointer  { cursor: pointer; }
+.helm-cursor-default  { cursor: default; }
+.helm-cursor-not-allowed { cursor: not-allowed; }
+
+/* ---- Opacity ---- */
+.helm-opacity-0   { opacity: 0; }
+.helm-opacity-50  { opacity: 0.5; }
+.helm-opacity-75  { opacity: 0.75; }
+.helm-opacity-100 { opacity: 1; }
+
+/* ---- SR only ---- */
+.helm-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}

@@ -5,8 +5,8 @@ import { SlotFillProvider } from '@wordpress/components';
 // Import WordPress component styles (needed for Modal, etc.)
 import '@wordpress/components/build-style/style.css';
 
-// Import UI styles
-import '../resources/packages/ui/src/styles/index.css';
+// Import all UI styles (tokens, surfaces, layout, components).
+import '../resources/packages/ui/src/styles/all.css';
 import './preview.css';
 
 const preview: Preview = {
@@ -22,7 +22,12 @@ const preview: Preview = {
   },
   tags: ['autodocs'],
   decorators: [
-    (Story) => React.createElement(SlotFillProvider, null, React.createElement(Story)),
+    (Story) =>
+      React.createElement(
+        'div',
+        { className: 'helm-page-root' },
+        React.createElement(SlotFillProvider, null, React.createElement(Story)),
+      ),
   ],
 };
 
