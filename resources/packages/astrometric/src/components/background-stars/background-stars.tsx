@@ -1,5 +1,5 @@
 import { useRef, useMemo } from "react";
-import { useFrame } from "@react-three/fiber";
+import { useFrame, useThree } from "@react-three/fiber";
 import type { Points } from "three";
 import {
   BufferGeometry,
@@ -71,6 +71,7 @@ export function BackgroundStars({
   diskThickness = 8,
 }: BackgroundStarsProps) {
   const pointsRef = useRef<Points>(null);
+  const { invalidate } = useThree();
 
   // Pre-compute twinkle offsets for animation
   const twinkleOffsets = useMemo(() => {
@@ -154,6 +155,7 @@ export function BackgroundStars({
     }
 
     colors.needsUpdate = true;
+    invalidate();
   });
 
   return (

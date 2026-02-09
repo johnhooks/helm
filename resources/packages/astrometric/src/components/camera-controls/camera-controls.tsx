@@ -1,6 +1,6 @@
 import { OrbitControls } from "@react-three/drei";
 import { useThree } from "@react-three/fiber";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import type { ComponentRef } from "react";
 import {
   DEFAULT_CAMERA_DISTANCE,
@@ -62,7 +62,7 @@ export function CameraControls({
   const maxZoom = isOrthographic ? 200 : undefined;
 
   // Handle camera change events
-  const handleChange = () => {
+  const handleChange = useCallback(() => {
     if (!onCameraChange || !controlsRef.current) {
       return;
     }
@@ -76,7 +76,7 @@ export function CameraControls({
       polarAngle,
       azimuthAngle,
     });
-  };
+  }, [onCameraChange, camera]);
 
   return (
     <OrbitControls

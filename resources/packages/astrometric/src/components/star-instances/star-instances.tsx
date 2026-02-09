@@ -1,4 +1,4 @@
-import { useRef, useMemo, useEffect, useCallback } from "react";
+import { useRef, useMemo, useState, useEffect, useCallback } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import type { InstancedMesh } from "three";
 import { Object3D, Raycaster, Vector2 } from "three";
@@ -6,6 +6,9 @@ import { Html, Billboard, Ring } from "@react-three/drei";
 import type { StarNode } from "@helm/types";
 import { STAR_BASE_SIZE } from "../../constants";
 import { getStarSystemColor, lcarsColors } from "../../utils/colors";
+
+const HOVER_LERP_SPEED = 0.15;
+const HOVER_SCALE_MULT = 1.5;
 
 export interface StarInstancesProps {
   stars: StarNode[];
@@ -27,22 +30,30 @@ export function StarInstances({
   onStarHover,
 }: StarInstancesProps) {
   const meshRef = useRef<InstancedMesh>(null);
-  const { camera, gl } = useThree();
+  const { camera, gl, invalidate } = useThree();
 
-  // Track hovered instance
+  // Reusable Object3D for matrix calculations (avoids per-frame allocation)
+  const tempObj = useRef(new Object3D());
+
+  // Track hovered instance (ref for animation loop, state for label rendering)
   const hoveredRef = useRef<number | null>(null);
-  const hoveredStarRef = useRef<StarNode | null>(null);
+  const [hoveredStar, setHoveredStar] = useState<StarNode | null>(null);
+
+  // Stable refs for callbacks (prevents event listener churn)
+  const onStarHoverRef = useRef(onStarHover);
+  onStarHoverRef.current = onStarHover;
+  const onStarSelectRef = useRef(onStarSelect);
+  onStarSelectRef.current = onStarSelect;
+
+  // Hover animation state: at most 2 stars animating at once
+  const animRef = useRef<{
+    up: { index: number; t: number } | null;
+    down: { index: number; t: number } | null;
+  }>({ up: null, down: null });
 
   // Raycaster for mouse interaction
   const raycaster = useMemo(() => new Raycaster(), []);
   const mouse = useMemo(() => new Vector2(), []);
-
-  // Build index lookup
-  const starByIndex = useMemo(() => {
-    const map = new Map<number, StarNode>();
-    stars.forEach((s, i) => map.set(i, s));
-    return map;
-  }, [stars]);
 
   // Calculate scales for each star based on stellar radius and connectivity
   const getScale = useCallback(
@@ -71,16 +82,16 @@ export function StarInstances({
       return;
     }
 
-    const tempObj = new Object3D();
+    const tmp = tempObj.current;
 
     stars.forEach((star, i) => {
       const scale = getScale(star);
 
-      tempObj.position.set(star.x, star.y, star.z);
-      tempObj.scale.setScalar(scale);
-      tempObj.updateMatrix();
+      tmp.position.set(star.x, star.y, star.z);
+      tmp.scale.setScalar(scale);
+      tmp.updateMatrix();
 
-      meshRef.current!.setMatrixAt(i, tempObj.matrix);
+      meshRef.current!.setMatrixAt(i, tmp.matrix);
       meshRef.current!.setColorAt(i, getStarSystemColor(star.spectral_class));
     });
 
@@ -88,14 +99,18 @@ export function StarInstances({
     if (meshRef.current.instanceColor) {
       meshRef.current.instanceColor.needsUpdate = true;
     }
-  }, [stars, getScale]);
+
+    // Reset animation state when stars/scales change
+    animRef.current = { up: null, down: null };
+    invalidate();
+  }, [stars, getScale, invalidate]);
 
   // Handle pointer move for hover detection
   const handlePointerMove = useCallback(
     (event: PointerEvent) => {
       if (!meshRef.current) {
-      return;
-    }
+        return;
+      }
 
       const rect = gl.domElement.getBoundingClientRect();
       mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
@@ -108,27 +123,27 @@ export function StarInstances({
         const instanceId = intersects[0].instanceId;
         if (hoveredRef.current !== instanceId) {
           hoveredRef.current = instanceId;
-          const star = starByIndex.get(instanceId) || null;
-          hoveredStarRef.current = star;
-          onStarHover?.(star);
+          const star = stars[instanceId] ?? null;
+          setHoveredStar(star);
+          onStarHoverRef.current?.(star);
           gl.domElement.style.cursor = "pointer";
         }
       } else if (hoveredRef.current !== null) {
         hoveredRef.current = null;
-        hoveredStarRef.current = null;
-        onStarHover?.(null);
+        setHoveredStar(null);
+        onStarHoverRef.current?.(null);
         gl.domElement.style.cursor = "auto";
       }
     },
-    [camera, gl, mouse, raycaster, starByIndex, onStarHover]
+    [camera, gl, mouse, raycaster, stars]
   );
 
   // Handle click for selection
   const handleClick = useCallback(
     (event: MouseEvent) => {
       if (!meshRef.current) {
-      return;
-    }
+        return;
+      }
 
       const rect = gl.domElement.getBoundingClientRect();
       mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
@@ -138,13 +153,13 @@ export function StarInstances({
       const intersects = raycaster.intersectObject(meshRef.current);
 
       if (intersects.length > 0 && intersects[0].instanceId !== undefined) {
-        const star = starByIndex.get(intersects[0].instanceId);
+        const star = stars[intersects[0].instanceId];
         if (star) {
-          onStarSelect?.(star);
+          onStarSelectRef.current?.(star);
         }
       }
     },
-    [camera, gl, mouse, raycaster, starByIndex, onStarSelect]
+    [camera, gl, mouse, raycaster, stars]
   );
 
   // Attach event listeners
@@ -159,25 +174,61 @@ export function StarInstances({
     };
   }, [gl, handlePointerMove, handleClick]);
 
-  // Animate hovered/selected stars
+  // Animate hover scale with lerp — only touches 0-2 matrices per frame
   useFrame(() => {
     if (!meshRef.current) {
       return;
     }
 
-    const tempObj = new Object3D();
+    const curr = hoveredRef.current;
+    const anim = animRef.current;
 
-    // Update hovered star scale
-    if (hoveredRef.current !== null) {
-      const star = starByIndex.get(hoveredRef.current);
-      if (star) {
-        const baseScale = getScale(star);
-        tempObj.position.set(star.x, star.y, star.z);
-        tempObj.scale.setScalar(baseScale * 1.5);
-        tempObj.updateMatrix();
-        meshRef.current.setMatrixAt(hoveredRef.current, tempObj.matrix);
-        meshRef.current.instanceMatrix.needsUpdate = true;
+    // Detect hover change
+    if (curr !== (anim.up?.index ?? null)) {
+      // Start scaling the old hovered star back down
+      if (anim.up) {
+        anim.down = { ...anim.up };
       }
+      anim.up = curr !== null ? { index: curr, t: 0 } : null;
+    }
+
+    let dirty = false;
+    const tmp = tempObj.current;
+
+    // Animate scale-up (hovered star)
+    if (anim.up && anim.up.t < 1) {
+      anim.up.t = Math.min(1, anim.up.t + HOVER_LERP_SPEED);
+      const star = stars[anim.up.index];
+      if (star) {
+        const base = getScale(star);
+        tmp.position.set(star.x, star.y, star.z);
+        tmp.scale.setScalar(base * (1 + (HOVER_SCALE_MULT - 1) * anim.up.t));
+        tmp.updateMatrix();
+        meshRef.current.setMatrixAt(anim.up.index, tmp.matrix);
+        dirty = true;
+      }
+    }
+
+    // Animate scale-down (previously hovered star)
+    if (anim.down) {
+      anim.down.t = Math.max(0, anim.down.t - HOVER_LERP_SPEED);
+      const star = stars[anim.down.index];
+      if (star) {
+        const base = getScale(star);
+        tmp.position.set(star.x, star.y, star.z);
+        tmp.scale.setScalar(base * (1 + (HOVER_SCALE_MULT - 1) * anim.down.t));
+        tmp.updateMatrix();
+        meshRef.current.setMatrixAt(anim.down.index, tmp.matrix);
+        dirty = true;
+      }
+      if (anim.down.t <= 0) {
+        anim.down = null;
+      }
+    }
+
+    if (dirty) {
+      meshRef.current.instanceMatrix.needsUpdate = true;
+      invalidate();
     }
   });
 
@@ -185,8 +236,6 @@ export function StarInstances({
   const selectedStar = selectedStarId !== null && selectedStarId !== undefined
     ? stars.find((s) => s.id === selectedStarId)
     : null;
-
-  const hoveredStar = hoveredStarRef.current;
 
   return (
     <>

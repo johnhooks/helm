@@ -4,7 +4,7 @@
  * Initializes Datacore + Cache, auto-syncs if needed, then passes
  * StarNode[] from the datacore directly to the Three.js StarField renderer.
  */
-import { lazy, Suspense, useEffect, useRef, useState } from '@wordpress/element';
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { createDatacore } from '@helm/datacore';
 import { createCache } from '@helm/cache';
@@ -85,6 +85,8 @@ export function BridgePage() {
 		};
 	}, []);
 
+	const viewportStyle = useMemo(() => ({ width: '100%', height: '100%' }), []);
+
 	if (error) {
 		return (
 			<div className="helm-bridge__message helm-bridge__message--error">
@@ -102,7 +104,7 @@ export function BridgePage() {
 		<div className="helm-bridge">
 			<Panel variant="inset" padding="none" className="helm-bridge__viewport">
 				<Suspense fallback={null}>
-					<StarField stars={stars} style={{ width: '100%', height: '100%' }} />
+					<StarField stars={stars} style={viewportStyle} />
 				</Suspense>
 			</Panel>
 			<Panel tone="blue" className="helm-bridge__nav">

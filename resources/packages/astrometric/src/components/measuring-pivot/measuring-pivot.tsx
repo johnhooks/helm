@@ -1,5 +1,5 @@
 import { useRef, useEffect } from "react";
-import { useFrame } from "@react-three/fiber";
+import { useFrame, useThree } from "@react-three/fiber";
 import type { Group } from "three";
 import { Quaternion, Vector3 } from "three";
 import type { Position3D } from "../../types";
@@ -30,6 +30,7 @@ export function MeasuringPivot({
   const groupRef = useRef<Group>(null);
   const currentQuaternion = useRef(new Quaternion());
   const targetQuaternion = useRef(new Quaternion());
+  const { invalidate } = useThree();
 
   // Calculate target rotation when alignTarget changes
   useEffect(() => {
@@ -93,10 +94,12 @@ export function MeasuringPivot({
     }
 
     // Slerp toward target
-    currentQuaternion.current.slerp(targetQuaternion.current, animationSpeed);
-
-    // Apply to group
-    groupRef.current.quaternion.copy(currentQuaternion.current);
+    const dot = currentQuaternion.current.dot(targetQuaternion.current);
+    if (Math.abs(dot) < 0.9999) {
+      currentQuaternion.current.slerp(targetQuaternion.current, animationSpeed);
+      groupRef.current.quaternion.copy(currentQuaternion.current);
+      invalidate();
+    }
   });
 
   return <group ref={groupRef}>{children}</group>;

@@ -1,5 +1,5 @@
 import { Canvas } from "@react-three/fiber";
-import { useMemo, useCallback, useState } from "react";
+import { useMemo, useCallback, useRef } from "react";
 import type { StarNode } from "@helm/types";
 import type {
   StarFieldProps,
@@ -52,10 +52,7 @@ export function StarField({
   style,
   "data-testid": testId,
 }: StarFieldProps) {
-  const [hoverState, setHoverState] = useState<HoverState>({
-    star: null,
-    route: null,
-  });
+  const hoverRef = useRef<HoverState>({ star: null, route: null });
 
   // Build star lookup by node_id for routes
   const starsByNodeId = useMemo(() => {
@@ -132,23 +129,21 @@ export function StarField({
     [onRouteSelect, selectedRouteId, starsByNodeId]
   );
 
-  // Handle hover changes
+  // Handle hover changes (ref-based to avoid re-renders)
   const handleStarHover = useCallback(
     (star: StarNode | null) => {
-      const newState = { ...hoverState, star };
-      setHoverState(newState);
-      onHoverChange?.(newState);
+      hoverRef.current = { ...hoverRef.current, star };
+      onHoverChange?.(hoverRef.current);
     },
-    [hoverState, onHoverChange]
+    [onHoverChange]
   );
 
   const handleRouteHover = useCallback(
     (route: Route | null) => {
-      const newState = { ...hoverState, route };
-      setHoverState(newState);
-      onHoverChange?.(newState);
+      hoverRef.current = { ...hoverRef.current, route };
+      onHoverChange?.(hoverRef.current);
     },
-    [hoverState, onHoverChange]
+    [onHoverChange]
   );
 
   // Handle camera changes
@@ -178,6 +173,7 @@ export function StarField({
             ? { zoom: orthoZoom, near: 0.1, far: 500 }
             : { fov: cameraFov, near: 0.1, far: 500 }
         }
+        frameloop="demand"
         gl={{ antialias: true }}
       >
         {/* Background color */}
@@ -216,8 +212,8 @@ export function StarField({
             <RouteLine
               key={route.id}
               route={route}
-              from={{ x: from.x, y: from.y, z: from.z }}
-              to={{ x: to.x, y: to.y, z: to.z }}
+              from={from}
+              to={to}
               selected={selectedRouteId === route.id}
               onSelect={() => handleRouteClick(route)}
               onHover={(hovering) =>
