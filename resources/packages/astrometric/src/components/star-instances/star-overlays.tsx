@@ -1,0 +1,102 @@
+import { Html, Billboard, Ring } from "@react-three/drei";
+import type { StarNode } from "@helm/types";
+import { STAR_BASE_SIZE } from "../../constants";
+import { lcarsColors } from "../../utils/colors";
+
+export interface StarOverlaysProps {
+  selectedStar: StarNode | null;
+  hoveredStar: StarNode | null;
+  getScale: (star: StarNode) => number;
+}
+
+export function StarOverlays({
+  selectedStar,
+  hoveredStar,
+  getScale,
+}: StarOverlaysProps) {
+  return (
+    <>
+      {/* Selection ring - billboard that always faces camera */}
+      {selectedStar && (() => {
+        const starScale = getScale(selectedStar);
+        const starRadius = STAR_BASE_SIZE * starScale;
+        const ringPadding = starRadius * 0.8 + 0.1; // Proportional + minimum padding
+        const ringThickness = 0.05; // Fixed thickness
+        const innerRadius = starRadius + ringPadding;
+        const outerRadius = innerRadius + ringThickness;
+
+        return (
+          <Billboard
+            position={[
+              selectedStar.x,
+              selectedStar.y,
+              selectedStar.z,
+            ]}
+          >
+            <Ring args={[innerRadius, outerRadius, 64]}>
+              <meshBasicMaterial
+                color={lcarsColors.accent}
+                transparent
+                opacity={0.9}
+              />
+            </Ring>
+          </Billboard>
+        );
+      })()}
+
+      {/* Label for selected star - fixed screen size, anchored to star position */}
+      {selectedStar && (
+        <Html
+          position={[
+            selectedStar.x,
+            selectedStar.y,
+            selectedStar.z,
+          ]}
+          style={{ pointerEvents: "none", userSelect: "none" }}
+          center={false}
+        >
+          <div
+            style={{
+              color: "#f2b654",
+              fontSize: "12px",
+              fontFamily: "Antonio, sans-serif",
+              whiteSpace: "nowrap",
+              marginLeft: "24px",
+              textShadow: "0 0 4px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.7)",
+            }}
+          >
+            {selectedStar.title}
+          </div>
+        </Html>
+      )}
+
+      {/* Label for hovered star (if different from selected) */}
+      {hoveredStar && hoveredStar.id !== selectedStar?.id && (
+        <Html
+          position={[
+            hoveredStar.x,
+            hoveredStar.y + STAR_BASE_SIZE * 3,
+            hoveredStar.z,
+          ]}
+          center
+          style={{ pointerEvents: "none", userSelect: "none" }}
+        >
+          <div
+            style={{
+              background: "rgba(10, 10, 10, 0.9)",
+              color: "#f0e6d2",
+              padding: "4px 8px",
+              borderRadius: "4px",
+              fontSize: "12px",
+              fontFamily: "Antonio, sans-serif",
+              whiteSpace: "nowrap",
+              border: "1px solid #2a2a2a",
+            }}
+          >
+            {hoveredStar.title}
+          </div>
+        </Html>
+      )}
+    </>
+  );
+}
