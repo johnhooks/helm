@@ -1,5 +1,5 @@
 import type { Star, StarNode } from '@helm/types';
-import type { Connection, StarRow } from './types';
+import type { Connection, NearbyStarNode, StarRow } from './types';
 
 export const STARS_SCHEMA = `
 CREATE TABLE IF NOT EXISTS stars (
@@ -35,6 +35,28 @@ WHERE s.is_primary = 1
 `;
 
 /**
+ * Primary stars within a bounding box, refined by spherical distance.
+ *
+ * Uses the same strategy as NodeRepository::withinDistance() on the PHP side:
+ * bounding-box pre-filter on indexed coordinates, then HAVING on squared
+ * distance to avoid sqrt in the WHERE clause. Excludes the source node.
+ */
+const STARS_IN_RANGE = `
+SELECT s.id, s.node_id, s.title, s.catalog_id, s.spectral_class,
+       n.x, n.y, n.z, s.mass, s.radius, n.type AS node_type,
+       ((n.x - ?) * (n.x - ?) + (n.y - ?) * (n.y - ?) + (n.z - ?) * (n.z - ?)) AS dist_sq
+FROM stars s
+JOIN nodes n ON s.node_id = n.id
+WHERE s.is_primary = 1
+  AND n.id != ?
+  AND n.x BETWEEN ? AND ?
+  AND n.y BETWEEN ? AND ?
+  AND n.z BETWEEN ? AND ?
+HAVING dist_sq <= ?
+ORDER BY dist_sq
+`;
+
+/**
  * All stars at a given node (including companions in multi-star systems).
  */
 const STARS_AT_NODE = `
@@ -52,6 +74,38 @@ export function createStarsRepository(conn: Connection) {
 	return {
 		getStarMap(): Promise<StarNode[]> {
 			return conn.query<StarNode>(STAR_MAP_QUERY);
+		},
+
+		async getStarsInRange(nodeId: number, maxDistance: number): Promise<NearbyStarNode[]> {
+			// Look up the source node's coordinates.
+			const nodes = await conn.query<{ x: number; y: number; z: number }>(
+				'SELECT x, y, z FROM nodes WHERE id = ?',
+				[nodeId],
+			);
+			if (nodes.length === 0) {
+				return [];
+			}
+			const { x, y, z } = nodes[0];
+			const maxDistSq = maxDistance * maxDistance;
+
+			type RawRow = StarNode & { dist_sq: number };
+			const rows = await conn.query<RawRow>(STARS_IN_RANGE, [
+				// Distance calculation params: (n.x - ?) * (n.x - ?) ...
+				x, x, y, y, z, z,
+				// Exclude source node
+				nodeId,
+				// Bounding box
+				x - maxDistance, x + maxDistance,
+				y - maxDistance, y + maxDistance,
+				z - maxDistance, z + maxDistance,
+				// Distance threshold
+				maxDistSq,
+			]);
+
+			return rows.map(({ dist_sq, ...star }) => ({
+				...star,
+				distance: Math.sqrt(dist_sq),
+			}));
 		},
 
 		async getStarsAtNode(nodeId: number): Promise<Star[]> {

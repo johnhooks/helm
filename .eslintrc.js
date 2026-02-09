@@ -1,6 +1,7 @@
 module.exports = {
 	extends: ['plugin:@wordpress/eslint-plugin/recommended'],
 	rules: {
+		camelcase: 'off',
 		'jsdoc/check-access': 'off',
 		'jsdoc/check-alignment': 'off',
 		'jsdoc/check-line-alignment': 'off',

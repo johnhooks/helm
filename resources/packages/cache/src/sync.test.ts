@@ -26,6 +26,7 @@ function createMockDatacore(): Datacore {
 		clearNodes: vi.fn(),
 		clearStars: vi.fn(),
 		getStarMap: vi.fn(),
+		getStarsInRange: vi.fn(),
 		getStarsAtNode: vi.fn(),
 		getNode: vi.fn(),
 		getMeta: vi.fn(),
