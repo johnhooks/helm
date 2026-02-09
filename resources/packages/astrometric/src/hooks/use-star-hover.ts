@@ -1,31 +1,31 @@
 import { useState, useCallback } from "react";
-import type { StarSystem } from "../types";
+import type { StarNode } from "@helm/types";
 
 export interface UseStarHoverResult {
-  hoveredSystem: StarSystem | null;
-  handleHover: (system: StarSystem | null) => void;
-  isHovered: (systemId: string) => boolean;
+  hoveredStar: StarNode | null;
+  handleHover: (star: StarNode | null) => void;
+  isHovered: (starId: number) => boolean;
 }
 
 /**
- * Hook for managing star system hover state
+ * Hook for managing star hover state
  */
 export function useStarHover(): UseStarHoverResult {
-  const [hoveredSystem, setHoveredSystem] = useState<StarSystem | null>(null);
+  const [hoveredStar, setHoveredStar] = useState<StarNode | null>(null);
 
-  const handleHover = useCallback((system: StarSystem | null) => {
-    setHoveredSystem(system);
+  const handleHover = useCallback((star: StarNode | null) => {
+    setHoveredStar(star);
   }, []);
 
   const isHovered = useCallback(
-    (systemId: string) => {
-      return hoveredSystem?.id === systemId;
+    (starId: number) => {
+      return hoveredStar?.id === starId;
     },
-    [hoveredSystem]
+    [hoveredStar]
   );
 
   return {
-    hoveredSystem,
+    hoveredStar,
     handleHover,
     isHovered,
   };

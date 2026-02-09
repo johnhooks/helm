@@ -15,7 +15,7 @@ export const DEFAULT_CAMERA_DISTANCE = 20;
 /**
  * Default minimum zoom distance
  */
-export const DEFAULT_MIN_DISTANCE = 5;
+export const DEFAULT_MIN_DISTANCE = 2;
 
 /**
  * Default maximum zoom distance

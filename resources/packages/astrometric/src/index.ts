@@ -31,10 +31,10 @@ export { useStarHover, useStarSelection } from "./hooks";
 export type { UseStarHoverResult, UseStarSelectionResult } from "./hooks";
 
 // Types
+export type { StarNode } from "@helm/types";
 export type {
   Position3D,
   SpectralClass,
-  StarSystem,
   RouteStatus,
   Route,
   DistanceRing,

@@ -1,56 +1,57 @@
 import { useState, useCallback } from "react";
-import type { StarSystem, StarSelectEvent } from "../types";
+import type { StarNode } from "@helm/types";
+import type { StarSelectEvent } from "../types";
 import { distanceFromOrigin } from "../utils/coordinates";
 
 export interface UseStarSelectionResult {
-  selectedSystem: StarSystem | null;
-  selectedSystemId: string | null;
-  handleSelect: (system: StarSystem) => void;
+  selectedStar: StarNode | null;
+  selectedStarId: number | null;
+  handleSelect: (star: StarNode) => void;
   clearSelection: () => void;
-  isSelected: (systemId: string) => boolean;
+  isSelected: (starId: number) => boolean;
 }
 
 /**
- * Hook for managing star system selection state
+ * Hook for managing star selection state
  */
 export function useStarSelection(
   onSelect?: (event: StarSelectEvent | null) => void
 ): UseStarSelectionResult {
-  const [selectedSystem, setSelectedSystem] = useState<StarSystem | null>(null);
+  const [selectedStar, setSelectedStar] = useState<StarNode | null>(null);
 
   const handleSelect = useCallback(
-    (system: StarSystem) => {
-      if (selectedSystem?.id === system.id) {
-        // Deselect if clicking same system
-        setSelectedSystem(null);
+    (star: StarNode) => {
+      if (selectedStar?.id === star.id) {
+        // Deselect if clicking same star
+        setSelectedStar(null);
         onSelect?.(null);
       } else {
-        // Select new system
-        setSelectedSystem(system);
+        // Select new star
+        setSelectedStar(star);
         onSelect?.({
-          system,
-          distance: distanceFromOrigin(system.position),
+          star,
+          distance: distanceFromOrigin({ x: star.x, y: star.y, z: star.z }),
         });
       }
     },
-    [selectedSystem, onSelect]
+    [selectedStar, onSelect]
   );
 
   const clearSelection = useCallback(() => {
-    setSelectedSystem(null);
+    setSelectedStar(null);
     onSelect?.(null);
   }, [onSelect]);
 
   const isSelected = useCallback(
-    (systemId: string) => {
-      return selectedSystem?.id === systemId;
+    (starId: number) => {
+      return selectedStar?.id === starId;
     },
-    [selectedSystem]
+    [selectedStar]
   );
 
   return {
-    selectedSystem,
-    selectedSystemId: selectedSystem?.id ?? null,
+    selectedStar,
+    selectedStarId: selectedStar?.id ?? null,
     handleSelect,
     clearSelection,
     isSelected,

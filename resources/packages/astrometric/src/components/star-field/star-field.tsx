@@ -1,8 +1,8 @@
 import { Canvas } from "@react-three/fiber";
 import { useMemo, useCallback, useState } from "react";
+import type { StarNode } from "@helm/types";
 import type {
   StarFieldProps,
-  StarSystem,
   Route,
   StarSelectEvent,
   RouteSelectEvent,
@@ -28,13 +28,16 @@ import { RouteLine } from "../route-line";
 import "./star-field.css";
 
 export function StarField({
-  systems,
+  stars,
   routes = [],
   distanceRings = DEFAULT_DISTANCE_RINGS,
   backgroundStarCount = DEFAULT_BACKGROUND_STAR_COUNT,
-  selectedSystemId = null,
+  selectedStarId = null,
   selectedRouteId = null,
-  onSystemSelect,
+  currentNodeId,
+  visitedNodeIds,
+  reachableNodeIds,
+  onStarSelect,
   onRouteSelect,
   onHoverChange,
   onCameraChange,
@@ -50,29 +53,29 @@ export function StarField({
   "data-testid": testId,
 }: StarFieldProps) {
   const [hoverState, setHoverState] = useState<HoverState>({
-    system: null,
+    star: null,
     route: null,
   });
 
-  // Build system lookup for routes
-  const systemsById = useMemo(() => {
-    const map = new Map<string, StarSystem>();
-    systems.forEach((s) => map.set(s.id, s));
+  // Build star lookup by node_id for routes
+  const starsByNodeId = useMemo(() => {
+    const map = new Map<number, StarNode>();
+    stars.forEach((s) => map.set(s.node_id, s));
     return map;
-  }, [systems]);
+  }, [stars]);
 
-  // Get selected system's position for camera focus
+  // Get selected star's position for camera focus
   const focusTarget: Position3D | null = useMemo(() => {
-    if (!selectedSystemId) {
+    if (selectedStarId === null || selectedStarId === undefined) {
       return null;
     }
-    const system = systemsById.get(selectedSystemId);
-    return system?.position ?? null;
-  }, [selectedSystemId, systemsById]);
+    const star = stars.find((s) => s.id === selectedStarId);
+    return star ? { x: star.x, y: star.y, z: star.z } : null;
+  }, [selectedStarId, stars]);
 
-  // Track which systems have routes connected
-  const connectedSystemIds = useMemo(() => {
-    const ids = new Set<string>();
+  // Track which node IDs have routes connected
+  const connectedNodeIds = useMemo(() => {
+    const ids = new Set<number>();
     routes.forEach((route) => {
       ids.add(route.from);
       ids.add(route.to);
@@ -80,24 +83,24 @@ export function StarField({
     return ids;
   }, [routes]);
 
-  // Handle system selection
-  const handleSystemClick = useCallback(
-    (system: StarSystem) => {
-      if (!onSystemSelect) {
+  // Handle star selection
+  const handleStarClick = useCallback(
+    (star: StarNode) => {
+      if (!onStarSelect) {
         return;
       }
 
-      if (selectedSystemId === system.id) {
-        onSystemSelect(null);
+      if (selectedStarId === star.id) {
+        onStarSelect(null);
       } else {
         const event: StarSelectEvent = {
-          system,
-          distance: distanceFromOrigin(system.position),
+          star,
+          distance: distanceFromOrigin({ x: star.x, y: star.y, z: star.z }),
         };
-        onSystemSelect(event);
+        onStarSelect(event);
       }
     },
-    [onSystemSelect, selectedSystemId]
+    [onStarSelect, selectedStarId]
   );
 
   // Handle route selection
@@ -110,8 +113,8 @@ export function StarField({
       if (selectedRouteId === route.id) {
         onRouteSelect(null);
       } else {
-        const from = systemsById.get(route.from);
-        const to = systemsById.get(route.to);
+        const from = starsByNodeId.get(route.from);
+        const to = starsByNodeId.get(route.to);
         if (!from || !to) {
           return;
         }
@@ -120,18 +123,19 @@ export function StarField({
           route,
           from,
           to,
-          distance: distanceFromOrigin(from.position) + distanceFromOrigin(to.position),
+          distance: distanceFromOrigin({ x: from.x, y: from.y, z: from.z }) +
+            distanceFromOrigin({ x: to.x, y: to.y, z: to.z }),
         };
         onRouteSelect(event);
       }
     },
-    [onRouteSelect, selectedRouteId, systemsById]
+    [onRouteSelect, selectedRouteId, starsByNodeId]
   );
 
   // Handle hover changes
-  const handleSystemHover = useCallback(
-    (system: StarSystem | null) => {
-      const newState = { ...hoverState, system };
+  const handleStarHover = useCallback(
+    (star: StarNode | null) => {
+      const newState = { ...hoverState, star };
       setHoverState(newState);
       onHoverChange?.(newState);
     },
@@ -202,8 +206,8 @@ export function StarField({
 
         {/* Routes between systems */}
         {routes.map((route) => {
-          const from = systemsById.get(route.from);
-          const to = systemsById.get(route.to);
+          const from = starsByNodeId.get(route.from);
+          const to = starsByNodeId.get(route.to);
           if (!from || !to) {
             return null;
           }
@@ -212,8 +216,8 @@ export function StarField({
             <RouteLine
               key={route.id}
               route={route}
-              from={from.position}
-              to={to.position}
+              from={{ x: from.x, y: from.y, z: from.z }}
+              to={{ x: to.x, y: to.y, z: to.z }}
               selected={selectedRouteId === route.id}
               onSelect={() => handleRouteClick(route)}
               onHover={(hovering) =>
@@ -225,11 +229,14 @@ export function StarField({
 
         {/* Local star systems (instanced for performance) */}
         <StarInstances
-          systems={systems}
-          selectedSystemId={selectedSystemId}
-          connectedSystemIds={connectedSystemIds}
-          onSystemSelect={handleSystemClick}
-          onSystemHover={handleSystemHover}
+          stars={stars}
+          selectedStarId={selectedStarId}
+          connectedNodeIds={connectedNodeIds}
+          currentNodeId={currentNodeId}
+          visitedNodeIds={visitedNodeIds}
+          reachableNodeIds={reachableNodeIds}
+          onStarSelect={handleStarClick}
+          onStarHover={handleStarHover}
         />
       </Canvas>
     </div>

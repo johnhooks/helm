@@ -57,12 +57,14 @@ export function getSpectralColor(spectralClass: SpectralClass): Color {
  */
 export const defaultStarColor = new Color(spectralColors.G);
 
+const SPECTRAL_CLASSES = new Set<string>(["O", "B", "A", "F", "G", "K", "M"]);
+
 /**
  * Get color for a star system
  */
-export function getStarSystemColor(spectralClass?: SpectralClass): Color {
-  if (spectralClass) {
-    return getSpectralColor(spectralClass);
+export function getStarSystemColor(spectralClass: string | null | undefined): Color {
+  if (spectralClass && SPECTRAL_CLASSES.has(spectralClass)) {
+    return getSpectralColor(spectralClass as SpectralClass);
   }
   return defaultStarColor.clone();
 }

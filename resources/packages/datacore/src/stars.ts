@@ -1,5 +1,5 @@
-import type { Star } from '@helm/types';
-import type { Connection, StarMapEntry, StarRow } from './types';
+import type { Star, StarNode } from '@helm/types';
+import type { Connection, StarRow } from './types';
 
 export const STARS_SCHEMA = `
 CREATE TABLE IF NOT EXISTS stars (
@@ -27,7 +27,7 @@ CREATE INDEX IF NOT EXISTS idx_stars_is_primary ON stars(is_primary);
  * Returns one row per primary star — the main visual dot on the map.
  */
 const STAR_MAP_QUERY = `
-SELECT s.id, s.title, s.catalog_id, s.spectral_class,
+SELECT s.id, s.node_id, s.title, s.catalog_id, s.spectral_class,
        n.x, n.y, n.z, s.mass, s.radius, n.type AS node_type
 FROM stars s
 JOIN nodes n ON s.node_id = n.id
@@ -50,8 +50,8 @@ function toStar(row: StarRow): Star {
 
 export function createStarsRepository(conn: Connection) {
 	return {
-		getStarMap(): Promise<StarMapEntry[]> {
-			return conn.query<StarMapEntry>(STAR_MAP_QUERY);
+		getStarMap(): Promise<StarNode[]> {
+			return conn.query<StarNode>(STAR_MAP_QUERY);
 		},
 
 		async getStarsAtNode(nodeId: number): Promise<Star[]> {

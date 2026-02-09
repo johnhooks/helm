@@ -1,4 +1,4 @@
-import type { NavNode, Star } from '@helm/types';
+import type { NavNode, Star, StarNode } from '@helm/types';
 
 /**
  * SQLite-compatible parameter types for binding.
@@ -93,19 +93,6 @@ export type WorkerResponse =
 // Public API types
 // ---------------------------------------------------------------------------
 
-export interface StarMapEntry {
-	id: number;
-	title: string;
-	catalog_id: string;
-	spectral_class: string | null;
-	x: number;
-	y: number;
-	z: number;
-	mass: number | null;
-	radius: number | null;
-	node_type: string;
-}
-
 /**
  * What SQLite actually returns for star rows — `is_primary` is INTEGER (0|1),
  * not boolean. Used as the trust-boundary type inside `sendQuery<StarRow>()`.
@@ -123,7 +110,7 @@ export interface Datacore {
 	insertStars: (stars: Star[]) => Promise<void>;
 	clearNodes: () => Promise<void>;
 	clearStars: () => Promise<void>;
-	getStarMap: () => Promise<StarMapEntry[]>;
+	getStarMap: () => Promise<StarNode[]>;
 	getStarsAtNode: (nodeId: number) => Promise<Star[]>;
 	getNode: (id: number) => Promise<NavNode | null>;
 	getMeta: (key: string) => Promise<string | null>;

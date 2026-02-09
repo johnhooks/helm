@@ -285,7 +285,7 @@ describe('createDatacore', () => {
 		expect(names[0]).not.toBe(names[1]);
 	});
 
-	it('getStarMap returns typed StarMapEntry[]', async () => {
+	it('getStarMap returns typed StarNode[]', async () => {
 		const dc = await createTestDatacore();
 
 		MockWorker.instance.onPosted((msg: unknown) => {
@@ -295,8 +295,8 @@ describe('createDatacore', () => {
 					id: m.id,
 					type: 'result',
 					payload: {
-						rows: [[100, 'Sol', 'SOL_1', 'G', 1.0, 2.0, 3.0, 1.0, 1.0, 'system']],
-						columns: ['id', 'title', 'catalog_id', 'spectral_class', 'x', 'y', 'z', 'mass', 'radius', 'node_type'],
+						rows: [[100, 1, 'Sol', 'SOL_1', 'G', 1.0, 2.0, 3.0, 1.0, 1.0, 'system']],
+						columns: ['id', 'node_id', 'title', 'catalog_id', 'spectral_class', 'x', 'y', 'z', 'mass', 'radius', 'node_type'],
 					},
 				});
 			}
@@ -305,6 +305,7 @@ describe('createDatacore', () => {
 		const stars = await dc.getStarMap();
 		expect(stars).toEqual([{
 			id: 100,
+			node_id: 1,
 			title: 'Sol',
 			catalog_id: 'SOL_1',
 			spectral_class: 'G',

@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import type { StarNode } from "@helm/types";
 
 /**
  * 3D position in light-years from origin
@@ -16,48 +17,6 @@ export interface Position3D {
 export type SpectralClass = "O" | "B" | "A" | "F" | "G" | "K" | "M";
 
 /**
- * A star system in the local neighborhood
- */
-export interface StarSystem {
-  /**
-   * Unique identifier
-   */
-  id: string;
-  /**
-   * Display name
-   */
-  name: string;
-  /**
-   * Position relative to player (light-years)
-   */
-  position: Position3D;
-  /**
-   * Star spectral classification
-   */
-  spectralClass?: SpectralClass;
-  /**
-   * Stellar radius in solar radii
-   */
-  radius?: number;
-  /**
-   * Whether player has visited this system
-   */
-  visited?: boolean;
-  /**
-   * Whether system is within jump range
-   */
-  reachable?: boolean;
-  /**
-   * Player's current location
-   */
-  isCurrent?: boolean;
-  /**
-   * Additional metadata
-   */
-  data?: Record<string, unknown>;
-}
-
-/**
  * Route status between systems
  */
 export type RouteStatus = "discovered" | "plotted" | "traveled" | "blocked";
@@ -71,13 +30,13 @@ export interface Route {
    */
   id: string;
   /**
-   * Origin system ID
+   * Origin node ID
    */
-  from: string;
+  from: number;
   /**
-   * Destination system ID
+   * Destination node ID
    */
-  to: string;
+  to: number;
   /**
    * Whether route is currently selected/active
    */
@@ -111,9 +70,9 @@ export interface DistanceRing {
  */
 export interface StarSelectEvent {
   /**
-   * Selected system data
+   * Selected star data
    */
-  system: StarSystem;
+  star: StarNode;
   /**
    * Distance from player in light-years
    */
@@ -129,13 +88,13 @@ export interface RouteSelectEvent {
    */
   route: Route;
   /**
-   * Origin system
+   * Origin star
    */
-  from: StarSystem;
+  from: StarNode;
   /**
-   * Destination system
+   * Destination star
    */
-  to: StarSystem;
+  to: StarNode;
   /**
    * Route length in light-years
    */
@@ -147,9 +106,9 @@ export interface RouteSelectEvent {
  */
 export interface HoverState {
   /**
-   * Currently hovered system, if any
+   * Currently hovered star, if any
    */
-  system: StarSystem | null;
+  star: StarNode | null;
   /**
    * Currently hovered route, if any
    */
@@ -187,9 +146,9 @@ export type CameraMode = "perspective" | "orthographic" | "narrow";
  */
 export interface StarFieldProps {
   /**
-   * Star systems to display
+   * Stars to display
    */
-  systems: StarSystem[];
+  stars: StarNode[];
   /**
    * Routes between systems
    */
@@ -204,18 +163,31 @@ export interface StarFieldProps {
   backgroundStarCount?: number;
 
   /**
-   * Currently selected system ID
+   * Currently selected star ID
    */
-  selectedSystemId?: string | null;
+  selectedStarId?: number | null;
   /**
    * Currently selected route ID
    */
   selectedRouteId?: string | null;
 
   /**
-   * Called when a system is selected (null = deselected)
+   * Node ID of the player's current location
    */
-  onSystemSelect?: (event: StarSelectEvent | null) => void;
+  currentNodeId?: number | null;
+  /**
+   * Set of node IDs the player has visited
+   */
+  visitedNodeIds?: Set<number>;
+  /**
+   * Set of node IDs within jump range
+   */
+  reachableNodeIds?: Set<number>;
+
+  /**
+   * Called when a star is selected (null = deselected)
+   */
+  onStarSelect?: (event: StarSelectEvent | null) => void;
   /**
    * Called when a route is selected (null = deselected)
    */

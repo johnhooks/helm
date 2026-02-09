@@ -1,3 +1,3 @@
 export { createDatacore } from './client';
-export type { Datacore, DatacoreOptions, StarMapEntry } from './types';
-export type { NavNode, Star } from '@helm/types';
+export type { Datacore, DatacoreOptions } from './types';
+export type { NavNode, Star, StarNode } from '@helm/types';

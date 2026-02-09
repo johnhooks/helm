@@ -2,26 +2,29 @@ import { useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import type { Mesh } from "three";
 import { Html } from "@react-three/drei";
-import type { StarSystem } from "../../types";
+import type { StarNode } from "@helm/types";
 import { STAR_BASE_SIZE } from "../../constants";
 import { getStarSystemColor } from "../../utils/colors";
-import { toVector3 } from "../../utils/coordinates";
 
 export interface LocalSystemProps {
   /**
-   * Star system data
+   * Star data
    */
-  system: StarSystem;
+  star: StarNode;
   /**
-   * Whether this system is selected
+   * Whether this star is selected
    */
   selected?: boolean;
   /**
-   * Whether this system has routes connected
+   * Whether this star has routes connected
    */
   connected?: boolean;
   /**
-   * Called when system is clicked
+   * Whether this star is within jump range
+   */
+  reachable?: boolean;
+  /**
+   * Called when star is clicked
    */
   onSelect?: () => void;
   /**
@@ -31,27 +34,26 @@ export interface LocalSystemProps {
 }
 
 export function LocalSystem({
-  system,
+  star,
   selected = false,
   connected = false,
+  reachable = true,
   onSelect,
   onHover,
 }: LocalSystemProps) {
   const meshRef = useRef<Mesh>(null);
   const [hovered, setHovered] = useState(false);
 
-  const position = toVector3(system.position);
-  const starColor = getStarSystemColor(system.spectralClass);
+  const starColor = getStarSystemColor(star.spectral_class);
 
   // Calculate base scale based on status
   // Selected/connected: full size, reachable: smaller, unreachable: tiny
-  const isReachable = system.reachable !== false;
   const isHighlighted = selected || connected;
 
   let baseScale: number;
   if (isHighlighted) {
     baseScale = 1;
-  } else if (isReachable) {
+  } else if (reachable) {
     baseScale = 0.5;
   } else {
     baseScale = 0.2;
@@ -88,7 +90,7 @@ export function LocalSystem({
   };
 
   return (
-    <group position={position}>
+    <group position={[star.x, star.y, star.z]}>
       {/* Star sphere */}
       <mesh
         ref={meshRef}
@@ -122,7 +124,7 @@ export function LocalSystem({
               border: selected ? "1px solid #f2b654" : "1px solid #2a2a2a",
             }}
           >
-            {system.name}
+            {star.title}
           </div>
         </Html>
       )}
