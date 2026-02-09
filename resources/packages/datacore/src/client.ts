@@ -49,7 +49,8 @@ export async function createDatacore(options: DatacoreOptions = {}): Promise<Dat
 	const pending = new Map<string, PendingRequest>();
 
 	const workerUrl = options.workerUrl ?? new URL('./worker.ts', import.meta.url);
-	const worker = new Worker(workerUrl);
+	const isModule = String(workerUrl).endsWith('.ts') || String(workerUrl).endsWith('.mjs');
+	const worker = new Worker(workerUrl, isModule ? { type: 'module' } : undefined);
 
 	worker.onmessage = (event: MessageEvent<WorkerResponse>) => {
 		const msg = event.data;
