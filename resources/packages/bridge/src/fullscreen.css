@@ -1,6 +1,6 @@
 /**
- * Fullscreen takeover — only active when .helm-fullscreen is on <html>.
- * Added/removed by the Fullscreen route component via useEffect.
+ * Bridge layout overrides for WP admin chrome, plus fullscreen takeover.
+ * Fullscreen class (.helm-fullscreen) is toggled on <html> via useEffect.
  */
 
 .helm-fullscreen #adminmenuwrap,
@@ -28,7 +28,20 @@
 	padding-top: 0 !important;
 }
 
-.helm-fullscreen .helm-bridge-root.wrap {
-	max-width: 100%;
+#wpcontent:has(.helm-bridge-root) {
+	padding-left: 0;
+}
+
+#wpbody-content:has(.helm-bridge-root) {
+	padding-bottom: 0;
+}
+
+#wpwrap:has(.helm-bridge-root) #wpfooter {
+	display: none;
+}
+
+.helm-bridge-root.wrap {
 	margin: 0;
+	padding: 0;
+	max-width: 100%;
 }

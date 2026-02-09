@@ -49,7 +49,7 @@ export async function createDatacore(options: DatacoreOptions = {}): Promise<Dat
 	const pending = new Map<string, PendingRequest>();
 
 	const workerUrl = options.workerUrl ?? new URL('./worker.ts', import.meta.url);
-	const worker = new Worker(workerUrl, { type: 'module' });
+	const worker = new Worker(workerUrl);
 
 	worker.onmessage = (event: MessageEvent<WorkerResponse>) => {
 		const msg = event.data;
@@ -61,7 +61,7 @@ export async function createDatacore(options: DatacoreOptions = {}): Promise<Dat
 		pending.delete(msg.id);
 
 		if (msg.type === 'error') {
-			req.reject(new HelmError(ErrorCode.DatacoreWorkerError));
+			req.reject(new HelmError(ErrorCode.DatacoreWorkerError, msg.payload.message));
 		} else {
 			req.resolve(msg);
 		}

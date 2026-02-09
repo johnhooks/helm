@@ -46,7 +46,7 @@ export const POLAR_ANGLE_MAX = Math.PI * 0.9;
 /**
  * Base size for star rendering
  */
-export const STAR_BASE_SIZE = 0.15;
+export const STAR_BASE_SIZE = 0.08;
 
 /**
  * Size multiplier for current system marker

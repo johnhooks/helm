@@ -1,0 +1,8 @@
+{
+	"name": "@helm/logger",
+	"version": "0.1.0",
+	"description": "Logging for Helm client packages",
+	"private": true,
+	"main": "src/index.ts",
+	"types": "src/index.ts"
+}

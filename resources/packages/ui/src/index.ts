@@ -4,6 +4,9 @@
  * @package
  */
 
+export { AppRoot } from "./components/app-root";
+export type { AppRootProps } from "./components/app-root";
+
 export { Button } from "./components/button";
 export type { ButtonProps } from "./components/button";
 

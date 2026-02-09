@@ -40,19 +40,23 @@ export function StarInstances({
     return map;
   }, [systems]);
 
-  // Calculate scales for each star (selection now indicated by ring, not size)
+  // Calculate scales for each star based on stellar radius and connectivity
   const getScale = useCallback(
     (system: StarSystem) => {
       const isConnected = connectedSystemIds.has(system.id);
       const isReachable = system.reachable !== false;
 
+      // Stellar radius → visual scale via log curve (solar radii, clamped 0.1–20)
+      const r = Math.max(0.1, Math.min(system.radius ?? 1, 20));
+      const sizeScale = 0.3 + 0.6 * (Math.log10(r * 10) / Math.log10(200));
+
       if (isConnected) {
-        return 1.0;
+        return sizeScale;
       }
       if (isReachable) {
-        return 0.5;
+        return sizeScale * 0.5;
       }
-      return 0.2;
+      return sizeScale * 0.2;
     },
     [connectedSystemIds]
   );

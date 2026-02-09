@@ -1,0 +1,24 @@
+.helm-bridge {
+	display: grid;
+	grid-template-columns: 1fr 260px;
+	gap: 8px;
+	padding: 8px;
+	flex: 1;
+}
+
+.helm-bridge__viewport {
+	min-height: 0;
+}
+
+.helm-bridge__nav {
+	min-height: 0;
+}
+
+.helm-bridge__message {
+	padding: 2em;
+	color: var(--helm-ui-color-text, #f0e6d2);
+}
+
+.helm-bridge__message--error {
+	color: #c00;
+}

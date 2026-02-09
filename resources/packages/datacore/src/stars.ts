@@ -81,19 +81,19 @@ export function createStarsRepository(conn: Connection) {
 		},
 
 		async insertStars(stars: Star[]): Promise<void> {
-			if (stars.length === 0) {
-				return;
+			const chunkSize = 83; // 12 columns × 83 = 996 params (SQLite limit: 999)
+			for (let i = 0; i < stars.length; i += chunkSize) {
+				const chunk = stars.slice(i, i + chunkSize);
+				const placeholders = chunk.map(() => '(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)').join(', ');
+				const params = chunk.flatMap((s) => [
+					s.id, s.node_id, s.title, s.catalog_id, s.spectral_class, s.post_type,
+					s.x, s.y, s.z, s.mass, s.radius, s.is_primary ? 1 : 0,
+				]);
+				await conn.run(
+					`INSERT INTO stars (id, node_id, title, catalog_id, spectral_class, post_type, x, y, z, mass, radius, is_primary) VALUES ${placeholders}`,
+					params,
+				);
 			}
-
-			const placeholders = stars.map(() => '(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)').join(', ');
-			const params = stars.flatMap((s) => [
-				s.id, s.node_id, s.title, s.catalog_id, s.spectral_class, s.post_type,
-				s.x, s.y, s.z, s.mass, s.radius, s.is_primary ? 1 : 0,
-			]);
-			await conn.run(
-				`INSERT INTO stars (id, node_id, title, catalog_id, spectral_class, post_type, x, y, z, mass, radius, is_primary) VALUES ${placeholders}`,
-				params,
-			);
 		},
 
 		async clearStars(): Promise<void> {

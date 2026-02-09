@@ -36,6 +36,10 @@ export interface StarSystem {
    */
   spectralClass?: SpectralClass;
   /**
+   * Stellar radius in solar radii
+   */
+  radius?: number;
+  /**
    * Whether player has visited this system
    */
   visited?: boolean;

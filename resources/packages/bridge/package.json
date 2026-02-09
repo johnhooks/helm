@@ -10,6 +10,11 @@
 		"check-types": "tsc --noEmit"
 	},
 	"dependencies": {
+		"@helm/astrometric": "workspace:*",
+		"@helm/cache": "workspace:*",
+		"@helm/datacore": "workspace:*",
+		"@helm/errors": "workspace:*",
+		"@helm/logger": "workspace:*",
 		"@helm/router": "workspace:*",
 		"@helm/ui": "workspace:*",
 		"@tanstack/react-router": "^1.159.4"

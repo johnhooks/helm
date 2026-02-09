@@ -87,6 +87,7 @@ final class Provider extends ServiceProvider
     public function enqueueBridge(): void
     {
         $this->enqueueBundle('helm-bridge', 'bridge');
+        $this->enqueueHelmGlobals('helm-bridge');
     }
 
     /**
@@ -95,6 +96,25 @@ final class Provider extends ServiceProvider
     public function enqueueSettings(): void
     {
         $this->enqueueBundle('helm-admin-settings', 'admin-settings');
+        $this->enqueueHelmGlobals('helm-admin-settings');
+    }
+
+    /**
+     * Inject window.helm globals (settings, log) before a script handle.
+     */
+    private function enqueueHelmGlobals(string $handle): void
+    {
+        add_action('admin_enqueue_scripts', function () use ($handle): void {
+            wp_add_inline_script(
+                $handle,
+                'window.helm = window.helm || {};'
+                . 'window.helm.settings = ' . wp_json_encode([
+                    'workerUrl' => HELM_URL . 'build/datacore-worker.js',
+                    'debug'     => defined('WP_DEBUG') && WP_DEBUG,
+                ]) . ';',
+                'before',
+            );
+        });
     }
 
     /**

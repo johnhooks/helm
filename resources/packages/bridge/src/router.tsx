@@ -10,11 +10,11 @@ import {
 	createRootRoute,
 	createRoute,
 	createRouter,
-	Link,
 	Outlet,
 	useSearch,
 } from '@tanstack/react-router';
 import { createWpHistory } from '@helm/router';
+import { AppRoot } from '@helm/ui';
 import { BridgePage } from './routes/bridge';
 
 type RootSearch = {
@@ -45,17 +45,9 @@ const rootRoute = createRootRoute({
 		}, [fullscreen]);
 
 		return (
-			<div className="helm-app">
-				{!fullscreen && (
-					<nav className="helm-nav">
-						<Link to="/">Bridge</Link>
-						<Link to="." search={{ fullscreen: true }}>
-							Fullscreen
-						</Link>
-					</nav>
-				)}
+			<AppRoot>
 				<Outlet />
-			</div>
+			</AppRoot>
 		);
 	},
 });
