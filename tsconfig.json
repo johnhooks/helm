@@ -34,7 +34,13 @@
             "@helm/cache": ["resources/packages/cache/src"],
             "@helm/cache/*": ["resources/packages/cache/src/*"],
             "@helm/types": ["resources/packages/types/src"],
-            "@helm/types/*": ["resources/packages/types/src/*"]
+            "@helm/types/*": ["resources/packages/types/src/*"],
+            "@helm/ui": ["resources/packages/ui/src"],
+            "@helm/ui/*": ["resources/packages/ui/src/*"],
+            "@helm/admin-settings": ["resources/packages/admin-settings/src"],
+            "@helm/admin-settings/*": ["resources/packages/admin-settings/src/*"],
+            "@helm/router": ["resources/packages/router/src"],
+            "@helm/router/*": ["resources/packages/router/src/*"]
         }
     },
     "include": [

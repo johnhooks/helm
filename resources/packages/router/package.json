@@ -1,0 +1,10 @@
+{
+	"name": "@helm/router",
+	"version": "0.1.0",
+	"description": "WordPress-safe routing utilities for TanStack Router",
+	"private": true,
+	"main": "src/index.ts",
+	"peerDependencies": {
+		"@tanstack/react-router": "^1.159.4"
+	}
+}

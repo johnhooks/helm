@@ -9,6 +9,7 @@ if (! defined('ABSPATH')) {
     exit;
 }
 
+use Helm\Admin\Provider as AdminProvider;
 use Helm\Anomalies\Provider as AnomaliesProvider;
 use Helm\Celestials\Provider as CelestialsProvider;
 use Helm\CLI\Provider as CLIProvider;
@@ -70,6 +71,7 @@ final class Helm
         StarsProvider::class,
         CelestialsProvider::class,
         StationsProvider::class,
+        AdminProvider::class,
         AnomaliesProvider::class,
         ViewProvider::class,
     ];

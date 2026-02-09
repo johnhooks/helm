@@ -30,6 +30,9 @@ export default defineConfig({
             '@helm/datacore': path.resolve(__dirname, 'resources/packages/datacore/src'),
             '@helm/errors': path.resolve(__dirname, 'resources/packages/errors/src'),
             '@helm/types': path.resolve(__dirname, 'resources/packages/types/src'),
+            '@helm/ui': path.resolve(__dirname, 'resources/packages/ui/src'),
+            '@helm/admin-settings': path.resolve(__dirname, 'resources/packages/admin-settings/src'),
+            '@helm/router': path.resolve(__dirname, 'resources/packages/router/src'),
         },
     },
 });

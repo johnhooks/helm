@@ -1,0 +1,1 @@
+export { createWpHistory } from './history';
