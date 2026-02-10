@@ -7,6 +7,7 @@ namespace Helm\Rest;
 use Helm\Core\ErrorCode;
 use Helm\Inventory\InventoryRepository;
 use Helm\Inventory\LocationType;
+use Helm\Products\ProductRepository;
 use Helm\Ships\ShipPost;
 use WP_Error;
 use WP_REST_Request;
@@ -22,11 +23,10 @@ use WP_REST_Response;
 final class ShipSystemsController
 {
     private const NAMESPACE = 'helm/v1';
-    private const LINK_REL_PRODUCT = 'helm:product';
-    private const LINK_REL_INVENTORY = 'helm:inventory';
 
     public function __construct(
         private readonly InventoryRepository $inventoryRepository,
+        private readonly ProductRepository $productRepository,
     ) {
     }
 
@@ -95,22 +95,35 @@ final class ShipSystemsController
         // Lightweight query - only inventory + components, no products
         $systems = $this->inventoryRepository->findFittedByLocation(LocationType::Ship, $shipPostId);
 
-        $response = new WP_REST_Response($systems);
+        // Prime the product cache so embed resolution hits warm cache instead of N queries.
+        // Mirrors WP_REST_Server::embed_links() — non-array means "all", array means selective.
+        $embed = $request->get_param('_embed');
 
-        // Add embeddable links for each unique product
-        $productIds = array_unique(array_column($systems, 'product_id'));
-        foreach ($productIds as $productId) {
-            $response->add_link(
-                self::LINK_REL_PRODUCT,
-                rest_url(self::NAMESPACE . '/products/' . $productId),
-                ['embeddable' => true]
-            );
+        if ($embed !== null && (! is_array($embed) || in_array(LinkRel::Product->value, $embed, true))) {
+            $productIds = array_unique(array_column($systems, 'product_id'));
+            $this->productRepository->findByIds($productIds);
         }
 
-        // Add self, ship, and inventory links
+        // Add per-item links so WP REST embeds products on each component.
+        $items = array_map(static function (array $component): array {
+            $component['_links'] = [
+                LinkRel::Product->value => [
+                    [
+                        'href'       => rest_url(self::NAMESPACE . '/products/' . $component['product_id']),
+                        'embeddable' => true,
+                    ],
+                ],
+            ];
+
+            return $component;
+        }, $systems);
+
+        $response = new WP_REST_Response($items);
+
+        // Add collection-level links
         $response->add_link('self', rest_url(self::NAMESPACE . '/ships/' . $shipPostId . '/systems'));
-        $response->add_link('ship', rest_url(self::NAMESPACE . '/ships/' . $shipPostId), ['embeddable' => true]);
-        $response->add_link(self::LINK_REL_INVENTORY, rest_url(self::NAMESPACE . '/inventory'), ['embeddable' => true]);
+        $response->add_link(LinkRel::Ship->value, rest_url(self::NAMESPACE . '/ships/' . $shipPostId), ['embeddable' => true]);
+        $response->add_link(LinkRel::Inventory->value, rest_url(self::NAMESPACE . '/inventory'), ['embeddable' => true]);
 
         return $response;
     }

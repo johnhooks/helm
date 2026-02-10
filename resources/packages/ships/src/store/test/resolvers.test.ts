@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { getShip } from '../resolvers';
+import { getShip, getSystems } from '../resolvers';
 
 describe( 'getShip resolver', () => {
 	it( 'dispatches fetchShip with the ship ID', async () => {
@@ -10,5 +10,17 @@ describe( 'getShip resolver', () => {
 		await getShip( 42 )( { dispatch } as never );
 
 		expect( dispatch.fetchShip ).toHaveBeenCalledWith( 42 );
+	} );
+} );
+
+describe( 'getSystems resolver', () => {
+	it( 'dispatches fetchSystems with the ship ID', async () => {
+		const dispatch = Object.assign( vi.fn(), {
+			fetchSystems: vi.fn().mockResolvedValue( undefined ),
+		} );
+
+		await getSystems( 42 )( { dispatch } as never );
+
+		expect( dispatch.fetchSystems ).toHaveBeenCalledWith( 42 );
 	} );
 } );

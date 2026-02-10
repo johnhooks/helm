@@ -40,6 +40,7 @@ final class Provider extends ServiceProvider
         $this->container->singleton(ShipSystemsController::class, function () {
             return new ShipSystemsController(
                 $this->container->get(InventoryRepository::class),
+                $this->container->get(ProductRepository::class),
             );
         });
 

@@ -1,6 +1,7 @@
 import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
 import { ErrorCode, HelmError } from '@helm/errors';
+import { LinkRel } from '@helm/types';
 import type { ApiNodeResponse } from '@helm/types';
 
 const PER_PAGE = 500;
@@ -21,7 +22,7 @@ export async function fetchAllNodes(): Promise<ApiNodeResponse[]> {
 	try {
 		do {
 			const response = await apiFetch({
-				path: `/helm/v1/nodes?_embed=helm:stars&per_page=${PER_PAGE}&page=${page}`,
+				path: `/helm/v1/nodes?_embed=${ LinkRel.Stars }&per_page=${PER_PAGE}&page=${page}`,
 				parse: false as const,
 			});
 

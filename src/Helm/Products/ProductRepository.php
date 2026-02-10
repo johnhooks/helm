@@ -17,11 +17,20 @@ final class ProductRepository
 {
     use HydratesModels;
 
+    private const CACHE_GROUP = 'helm_products';
+
     /**
      * Find a product by ID.
      */
     public function find(int $id): ?Product
     {
+        /** @var array<string, mixed>|false $cached */
+        $cached = wp_cache_get($id, self::CACHE_GROUP);
+
+        if (is_array($cached)) {
+            return $this->hydrate($cached);
+        }
+
         global $wpdb;
 
         $table = $wpdb->prefix . Schema::TABLE_PRODUCTS;
@@ -37,6 +46,8 @@ final class ProductRepository
         if ($row === null) {
             return null;
         }
+
+        wp_cache_set($id, $row, self::CACHE_GROUP);
 
         return $this->hydrate($row);
     }
@@ -81,6 +92,8 @@ final class ProductRepository
     /**
      * Find multiple products by ID.
      *
+     * Primes the wp_cache identity map so subsequent find() calls avoid DB queries.
+     *
      * @param array<int> $ids
      * @return array<int, Product> Indexed by product ID
      */
@@ -90,23 +103,44 @@ final class ProductRepository
             return [];
         }
 
-        global $wpdb;
-
-        $table = $wpdb->prefix . Schema::TABLE_PRODUCTS;
-        $placeholders = implode(',', array_fill(0, count($ids), '%d'));
-
-        $rows = $wpdb->get_results(
-            $wpdb->prepare(
-                "SELECT * FROM {$table} WHERE id IN ({$placeholders})",
-                ...$ids
-            ),
-            ARRAY_A
-        );
-
         $products = [];
-        foreach ($rows as $row) {
-            $product = $this->hydrate($row);
-            $products[$product->id] = $product;
+
+        // Collect cached rows and determine which IDs need fetching.
+        $uncachedIds = _get_non_cached_ids($ids, self::CACHE_GROUP);
+
+        foreach ($ids as $id) {
+            if (in_array($id, $uncachedIds, true)) {
+                continue;
+            }
+
+            /** @var array<string, mixed>|false $cached */
+            $cached = wp_cache_get($id, self::CACHE_GROUP);
+
+            if (is_array($cached)) {
+                $products[$id] = $this->hydrate($cached);
+            }
+        }
+
+        // Batch-query only the missing IDs.
+        if ($uncachedIds !== []) {
+            global $wpdb;
+
+            $table = $wpdb->prefix . Schema::TABLE_PRODUCTS;
+            $placeholders = implode(',', array_fill(0, count($uncachedIds), '%d'));
+
+            $rows = $wpdb->get_results(
+                $wpdb->prepare(
+                    "SELECT * FROM {$table} WHERE id IN ({$placeholders})",
+                    ...$uncachedIds
+                ),
+                ARRAY_A
+            );
+
+            foreach ($rows as $row) {
+                wp_cache_set((int) $row['id'], $row, self::CACHE_GROUP);
+                $product = $this->hydrate($row);
+                $products[$product->id] = $product;
+            }
         }
 
         return $products;

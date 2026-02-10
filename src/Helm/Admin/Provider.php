@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Helm\Admin;
 
 use Helm\lucatume\DI52\ServiceProvider;
+use Helm\Rest\LinkRel;
 use Helm\Ships\ShipPost;
 
 /**
@@ -98,7 +99,7 @@ final class Provider extends ServiceProvider
         if ($shipPostId !== null) {
             $this->preloadRestPaths([
                 '/wp/v2/ships/' . $shipPostId,
-                '/helm/v1/ships/' . $shipPostId . '?_embed[]=helm:systems',
+                '/helm/v1/ships/' . $shipPostId . '?_embed[]=' . LinkRel::Systems->value,
             ]);
         }
     }

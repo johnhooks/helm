@@ -1,20 +1,31 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import apiFetch from '@wordpress/api-fetch';
 import { HelmError } from '@helm/errors';
-import { fetchShip, receiveShip } from '../actions';
-import { createShipState } from './fixtures';
+import { LinkRel } from '@helm/types';
+import {
+	fetchShip,
+	receiveShip,
+	fetchSystems,
+	receiveSystems,
+	receiveShipEmbeds,
+} from '../actions';
+import { createShipState, createSystemComponent } from './fixtures';
 
 vi.mock( '@wordpress/api-fetch' );
 
 const mockedApiFetch = vi.mocked( apiFetch );
 
 describe( 'fetchShip', () => {
-	let dispatch: ReturnType< typeof vi.fn > & { fetchShip: ReturnType< typeof vi.fn > };
+	let dispatch: ReturnType< typeof vi.fn > & {
+		fetchShip: ReturnType< typeof vi.fn >;
+		receiveShipEmbeds: ReturnType< typeof vi.fn >;
+	};
 
 	beforeEach( () => {
 		mockedApiFetch.mockReset();
 		dispatch = Object.assign( vi.fn(), {
 			fetchShip: vi.fn(),
+			receiveShipEmbeds: vi.fn(),
 		} );
 	} );
 
@@ -35,14 +46,56 @@ describe( 'fetchShip', () => {
 		} );
 	} );
 
-	it( 'calls apiFetch with the correct path', async () => {
+	it( 'calls apiFetch with embed param', async () => {
 		mockedApiFetch.mockResolvedValue( createShipState() );
 
 		await fetchShip( 7 )( { dispatch } as never );
 
 		expect( mockedApiFetch ).toHaveBeenCalledWith( {
-			path: '/helm/v1/ships/7',
+			path: '/helm/v1/ships/7?_embed[]=helm:systems',
 		} );
+	} );
+
+	it( 'strips _embedded but keeps _links on ship data', async () => {
+		const ship = createShipState( { id: 42 } );
+		const systems = [ createSystemComponent() ];
+		const _links = { self: [ { href: 'http://example.com' } ] };
+		mockedApiFetch.mockResolvedValue( {
+			...ship,
+			_embedded: { [ LinkRel.Systems ]: systems },
+			_links,
+		} );
+
+		await fetchShip( 42 )( { dispatch } as never );
+
+		expect( dispatch ).toHaveBeenCalledWith( {
+			type: 'FETCH_SHIP_FINISHED',
+			shipId: 42,
+			ship: { ...ship, _links },
+		} );
+	} );
+
+	it( 'dispatches receiveShipEmbeds when _embedded is present', async () => {
+		const embedded = { [ LinkRel.Systems ]: [ createSystemComponent() ] };
+		mockedApiFetch.mockResolvedValue( {
+			...createShipState( { id: 42 } ),
+			_embedded: embedded,
+		} );
+
+		await fetchShip( 42 )( { dispatch } as never );
+
+		expect( dispatch.receiveShipEmbeds ).toHaveBeenCalledWith(
+			42,
+			embedded
+		);
+	} );
+
+	it( 'does not dispatch receiveShipEmbeds when no _embedded', async () => {
+		mockedApiFetch.mockResolvedValue( createShipState( { id: 42 } ) );
+
+		await fetchShip( 42 )( { dispatch } as never );
+
+		expect( dispatch.receiveShipEmbeds ).not.toHaveBeenCalled();
 	} );
 
 	it( 'dispatches FAILED with HelmError on API error', async () => {
@@ -139,5 +192,120 @@ describe( 'receiveShip', () => {
 			shipId: 5,
 			ship,
 		} );
+	} );
+} );
+
+describe( 'fetchSystems', () => {
+	let dispatch: ReturnType< typeof vi.fn > & {
+		fetchSystems: ReturnType< typeof vi.fn >;
+	};
+
+	beforeEach( () => {
+		mockedApiFetch.mockReset();
+		dispatch = Object.assign( vi.fn(), {
+			fetchSystems: vi.fn(),
+		} );
+	} );
+
+	it( 'dispatches START then FINISHED on success', async () => {
+		const systems = [ createSystemComponent() ];
+		mockedApiFetch.mockResolvedValue( systems );
+
+		await fetchSystems( 42 )( { dispatch } as never );
+
+		expect( dispatch ).toHaveBeenCalledWith( {
+			type: 'FETCH_SYSTEMS_START',
+			shipId: 42,
+		} );
+		expect( dispatch ).toHaveBeenCalledWith( {
+			type: 'FETCH_SYSTEMS_FINISHED',
+			shipId: 42,
+			systems,
+		} );
+	} );
+
+	it( 'calls apiFetch with the correct path', async () => {
+		mockedApiFetch.mockResolvedValue( [] );
+
+		await fetchSystems( 7 )( { dispatch } as never );
+
+		expect( mockedApiFetch ).toHaveBeenCalledWith( {
+			path: '/helm/v1/ships/7/systems',
+		} );
+	} );
+
+	it( 'dispatches FAILED with HelmError on API error', async () => {
+		mockedApiFetch.mockRejectedValue( {
+			code: 'helm.ship.not_found',
+			message: 'Ship not found',
+			data: { status: 404 },
+		} );
+
+		await fetchSystems( 42 )( { dispatch } as never );
+
+		const failedCall = dispatch.mock.calls.find(
+			( [ action ] ) => action.type === 'FETCH_SYSTEMS_FAILED'
+		);
+		expect( failedCall ).toBeDefined();
+
+		const error = failedCall![ 0 ].error;
+		expect( error ).toBeInstanceOf( HelmError );
+		expect( error.message ).toBe( 'helm.ship.not_found' );
+	} );
+
+	it( 'wraps plain Error as systems invalid response', async () => {
+		mockedApiFetch.mockRejectedValue( new Error( 'Network failure' ) );
+
+		await fetchSystems( 1 )( { dispatch } as never );
+
+		const failedCall = dispatch.mock.calls.find(
+			( [ action ] ) => action.type === 'FETCH_SYSTEMS_FAILED'
+		);
+
+		const error = failedCall![ 0 ].error;
+		expect( error ).toBeInstanceOf( HelmError );
+		expect( error.message ).toBe( 'helm.ships.systems_invalid_response' );
+		expect( error.isSafe ).toBe( true );
+	} );
+} );
+
+describe( 'receiveSystems', () => {
+	it( 'returns a FETCH_SYSTEMS_FINISHED action', () => {
+		const systems = [ createSystemComponent() ];
+		const action = receiveSystems( 42, systems );
+
+		expect( action ).toEqual( {
+			type: 'FETCH_SYSTEMS_FINISHED',
+			shipId: 42,
+			systems,
+		} );
+	} );
+} );
+
+describe( 'receiveShipEmbeds', () => {
+	let dispatch: ReturnType< typeof vi.fn >;
+
+	beforeEach( () => {
+		dispatch = vi.fn();
+	} );
+
+	it( 'dispatches receiveSystems when helm:systems is present', () => {
+		const systems = [ createSystemComponent() ];
+
+		receiveShipEmbeds( 42, { [ LinkRel.Systems ]: systems } )( {
+			dispatch,
+		} as never );
+
+		expect( dispatch ).toHaveBeenCalledWith( {
+			type: 'FETCH_SYSTEMS_FINISHED',
+			shipId: 42,
+			systems,
+		} );
+	} );
+
+	it( 'does not dispatch when helm:systems is absent', () => {
+		receiveShipEmbeds( 42, {} )( { dispatch } as never );
+
+		expect( dispatch ).not.toHaveBeenCalled();
 	} );
 } );

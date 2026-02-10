@@ -1,3 +1,4 @@
+import { LinkRel } from './rest';
 import type { Star } from './star';
 
 export interface NavNode {
@@ -10,5 +11,5 @@ export interface NavNode {
 }
 
 export interface ApiNodeResponse extends NavNode {
-	_embedded?: { 'helm:stars'?: Star[] };
+	_embedded?: { [ LinkRel.Stars ]?: Star[] };
 }

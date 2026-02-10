@@ -105,7 +105,7 @@ final class ShipController
         $response = new WP_REST_Response($this->serializeShip($ship));
 
         $response->add_link('self', rest_url(self::NAMESPACE . '/ships/' . $shipPostId));
-        $response->add_link('helm:systems', rest_url(self::NAMESPACE . '/ships/' . $shipPostId . '/systems'), ['embeddable' => true]);
+        $response->add_link(LinkRel::Systems->value, rest_url(self::NAMESPACE . '/ships/' . $shipPostId . '/systems'), ['embeddable' => true]);
 
         return $response;
     }

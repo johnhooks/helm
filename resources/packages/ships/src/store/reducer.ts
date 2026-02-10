@@ -41,6 +41,52 @@ function ships( state: State[ 'ships' ], action: Action ): State[ 'ships' ] {
 	}
 }
 
+function systems(
+	state: State[ 'systems' ],
+	action: Action
+): State[ 'systems' ] {
+	switch ( action.type ) {
+		case 'FETCH_SYSTEMS_START': {
+			const { [ action.shipId ]: _removed, ...restErrors } =
+				state.errors;
+			return {
+				...state,
+				isLoading: { ...state.isLoading, [ action.shipId ]: true },
+				errors: restErrors,
+			};
+		}
+		case 'FETCH_SYSTEMS_FINISHED': {
+			const { [ action.shipId ]: _removed, ...restErrors } =
+				state.errors;
+			return {
+				byShipId: {
+					...state.byShipId,
+					[ action.shipId ]: action.systems,
+				},
+				isLoading: {
+					...state.isLoading,
+					[ action.shipId ]: false,
+				},
+				errors: restErrors,
+			};
+		}
+		case 'FETCH_SYSTEMS_FAILED':
+			return {
+				...state,
+				isLoading: {
+					...state.isLoading,
+					[ action.shipId ]: false,
+				},
+				errors: {
+					...state.errors,
+					[ action.shipId ]: action.error,
+				},
+			};
+		default:
+			return state;
+	}
+}
+
 export function initializeDefaultState(): State {
 	return {
 		ships: {
@@ -48,7 +94,12 @@ export function initializeDefaultState(): State {
 			isLoading: {},
 			errors: {},
 		},
+		systems: {
+			byShipId: {},
+			isLoading: {},
+			errors: {},
+		},
 	};
 }
 
-export const reducer = combineReducers( { ships } );
+export const reducer = combineReducers( { ships, systems } );

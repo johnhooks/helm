@@ -1,3 +1,4 @@
+import { LinkRel } from '@helm/types';
 import { setup, bench, header, formatResult, formatComparison } from '../src';
 import {
 	buildReport,
@@ -47,12 +48,12 @@ function validateEmbedded(body: unknown): string | null {
 	if (!embedded) {
 		return 'missing _embedded on node';
 	}
-	const stars = embedded['helm:stars'];
+	const stars = embedded[ LinkRel.Stars ];
 	if (!Array.isArray(stars)) {
-		return `expected _embedded["helm:stars"] array, got ${typeof stars}`;
+		return `expected _embedded["${ LinkRel.Stars }"] array, got ${typeof stars}`;
 	}
 	if (stars.length === 0) {
-		return '_embedded["helm:stars"] is empty';
+		return `_embedded["${ LinkRel.Stars }"] is empty`;
 	}
 	const star = stars[0] as Record<string, unknown>;
 	for (const key of ['id', 'post_type', 'title', 'catalog_id', 'spectral_class', 'x', 'y', 'z']) {
@@ -112,7 +113,7 @@ const embedResults: BenchResult[] = [];
 for (const perPage of [10, 50, 100, 250, 500]) {
 	const r = await bench({
 		label: `_embed pp=${perPage}`,
-		url: url('/nodes', { _embed: 'helm:stars', per_page: perPage }),
+		url: url('/nodes', { _embed: LinkRel.Stars, per_page: perPage }),
 		iterations,
 		auth,
 		quiet,

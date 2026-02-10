@@ -110,7 +110,7 @@ final class InventoryRepository
      * Lightweight query for REST responses - returns raw arrays, not model objects.
      * Joins to products to compute condition as life/hp.
      *
-     * @return array<array{id: int, product_id: int, slot: string, life: int|null, usage_count: int, condition: float}>
+     * @return array<array{id: int, product_id: int, slot: string, life: int|null, usage_count: int, condition: float, created_at: string, updated_at: string}>
      */
     public function findFittedByLocation(LocationType $locationType, int $locationId): array
     {
@@ -121,7 +121,7 @@ final class InventoryRepository
 
         $rows = $wpdb->get_results(
             $wpdb->prepare(
-                "SELECT i.id, i.product_id, i.slot, i.life, i.usage_count, p.hp
+                "SELECT i.id, i.product_id, i.slot, i.life, i.usage_count, i.created_at, i.updated_at, p.hp
                 FROM {$inventoryTable} i
                 JOIN {$productsTable} p ON p.id = i.product_id
                 WHERE i.location_type = %d AND i.location_id = %d AND i.slot IS NOT NULL
@@ -151,6 +151,8 @@ final class InventoryRepository
                     'life' => $life,
                     'usage_count' => (int) $row['usage_count'],
                     'condition' => $condition,
+                    'created_at' => $row['created_at'],
+                    'updated_at' => $row['updated_at'],
                 ];
             },
             $rows

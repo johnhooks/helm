@@ -18,4 +18,5 @@ export enum ErrorCode {
 
 	// Ships errors
 	ShipsInvalidResponse = 'helm.ships.invalid_response',
+	ShipsSystemsInvalidResponse = 'helm.ships.systems_invalid_response',
 }

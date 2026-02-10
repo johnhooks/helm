@@ -1,4 +1,4 @@
-import type { ShipState } from '@helm/types';
+import type { ShipState, SystemComponent } from '@helm/types';
 import type { State } from '../types';
 import { initializeDefaultState } from '../reducer';
 
@@ -17,12 +17,37 @@ export function createShipState(
 	};
 }
 
-export function createState( overrides: Partial< State[ 'ships' ] > = {} ): State {
+export function createSystemComponent(
+	overrides: Partial< SystemComponent > = {}
+): SystemComponent {
+	return {
+		id: 1,
+		product_id: 10,
+		slot: 'shields',
+		life: null,
+		usage_count: 0,
+		condition: 1.0,
+		created_at: '2025-01-01 00:00:00',
+		updated_at: '2025-01-01 00:00:00',
+		...overrides,
+	};
+}
+
+export function createState(
+	overrides: {
+		ships?: Partial< State[ 'ships' ] >;
+		systems?: Partial< State[ 'systems' ] >;
+	} = {}
+): State {
 	const defaults = initializeDefaultState();
 	return {
 		ships: {
 			...defaults.ships,
-			...overrides,
+			...overrides.ships,
+		},
+		systems: {
+			...defaults.systems,
+			...overrides.systems,
 		},
 	};
 }

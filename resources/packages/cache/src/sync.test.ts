@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { Datacore } from '@helm/datacore';
 import { ErrorCode, HelmError } from '@helm/errors';
+import { LinkRel } from '@helm/types';
 import { META_NODE_COUNT, META_STAR_COUNT, META_SYNCED_AT } from './types';
 
 vi.mock('@wordpress/api-fetch', () => ({ default: vi.fn() }));
@@ -44,7 +45,7 @@ const nodeA = {
 	z: 30,
 	created_at: '2025-01-01T00:00:00',
 	_embedded: {
-		'helm:stars': [
+		[ LinkRel.Stars ]: [
 			{
 				id: 10,
 				title: 'Sol',
@@ -119,7 +120,7 @@ describe('syncNodes', () => {
 		]);
 
 		expect(datacore.insertStars).toHaveBeenCalledOnce();
-		expect(datacore.insertStars).toHaveBeenCalledWith(nodeA._embedded['helm:stars']);
+		expect(datacore.insertStars).toHaveBeenCalledWith(nodeA._embedded[ LinkRel.Stars ]);
 	});
 
 	it('runs all writes inside a transaction', async () => {

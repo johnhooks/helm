@@ -1,6 +1,7 @@
 import { __ } from '@wordpress/i18n';
 import type { Datacore } from '@helm/datacore';
 import { ErrorCode, HelmError } from '@helm/errors';
+import { LinkRel } from '@helm/types';
 import type { ApiNodeResponse, NavNode, Star } from '@helm/types';
 import { fetchAllNodes } from './fetch-nodes';
 import { META_NODE_COUNT, META_STAR_COUNT, META_SYNCED_AT } from './types';
@@ -25,7 +26,7 @@ export async function syncNodes(datacore: Datacore): Promise<SyncResult> {
 	for (const apiNode of apiNodes) {
 		nodes.push(toNavNode(apiNode));
 
-		const embedded = apiNode._embedded?.['helm:stars'];
+		const embedded = apiNode._embedded?.[ LinkRel.Stars ];
 		if (embedded) {
 			stars.push(...embedded);
 		}

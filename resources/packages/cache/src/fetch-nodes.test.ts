@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { LinkRel } from '@helm/types';
 import type { ApiNodeResponse } from '@helm/types';
 import { ErrorCode, HelmError } from '@helm/errors';
 
@@ -79,7 +80,7 @@ describe('fetchAllNodes', () => {
 
 	it('preserves embedded stars in the response', async () => {
 		const nodeWithStars = makeNode(1, {
-			'helm:stars': [
+			[ LinkRel.Stars ]: [
 				{
 					id: 10,
 					title: 'Sol',
@@ -100,8 +101,8 @@ describe('fetchAllNodes', () => {
 
 		const result = await fetchAllNodes();
 
-		expect(result[0]._embedded?.['helm:stars']).toHaveLength(1);
-		expect(result[0]._embedded?.['helm:stars']?.[0].title).toBe('Sol');
+		expect(result[0]._embedded?.[ LinkRel.Stars ]).toHaveLength(1);
+		expect(result[0]._embedded?.[ LinkRel.Stars ]?.[0].title).toBe('Sol');
 	});
 
 	it('wraps fetch errors as CacheFetchFailed', async () => {
