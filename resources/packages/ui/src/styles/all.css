@@ -29,6 +29,7 @@
 @import "../components/lcars-modal/lcars-modal.css";
 @import "../components/progress-bar/progress-bar.css";
 @import "../components/countdown/countdown.css";
+@import "../components/dropdown/dropdown.css";
 
 /* Indicators */
 @import "../components/arc-indicator/arc-indicator.css";

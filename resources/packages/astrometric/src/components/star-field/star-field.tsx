@@ -43,11 +43,13 @@ export function StarField({
   onCameraChange,
   showBackground = false,
   showDistanceLabels = true,
+  showLabels = false,
   enableControls = true,
   initialCameraDistance = DEFAULT_CAMERA_DISTANCE,
   minDistance = DEFAULT_MIN_DISTANCE,
   maxDistance = DEFAULT_MAX_DISTANCE,
   cameraMode = "perspective",
+  starScale = 1,
   className = "",
   style,
   "data-testid": testId,
@@ -231,6 +233,8 @@ export function StarField({
           currentNodeId={currentNodeId}
           visitedNodeIds={visitedNodeIds}
           reachableNodeIds={reachableNodeIds}
+          starScale={starScale}
+          showLabels={showLabels}
           onStarSelect={handleStarClick}
           onStarHover={handleStarHover}
         />

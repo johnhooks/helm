@@ -17,6 +17,8 @@ export interface StarInstancesProps {
   currentNodeId?: number | null;
   visitedNodeIds?: Set<number>;
   reachableNodeIds?: Set<number>;
+  starScale?: number;
+  showLabels?: boolean;
   onStarSelect?: (star: StarNode) => void;
   onStarHover?: (star: StarNode | null) => void;
 }
@@ -26,6 +28,8 @@ export function StarInstances({
   selectedStarId,
   connectedNodeIds,
   reachableNodeIds,
+  starScale = 1,
+  showLabels = false,
   onStarSelect,
   onStarHover,
 }: StarInstancesProps) {
@@ -66,14 +70,14 @@ export function StarInstances({
       const sizeScale = 0.3 + 0.6 * (Math.log10(r * 10) / Math.log10(200));
 
       if (isConnected) {
-        return sizeScale;
+        return sizeScale * starScale;
       }
       if (isReachable) {
-        return sizeScale * 0.5;
+        return sizeScale * 0.5 * starScale;
       }
-      return sizeScale * 0.2;
+      return sizeScale * 0.2 * starScale;
     },
-    [connectedNodeIds, reachableNodeIds]
+    [connectedNodeIds, reachableNodeIds, starScale]
   );
 
   // Initialize and update instance matrices
@@ -247,8 +251,10 @@ export function StarInstances({
       </instancedMesh>
 
       <StarOverlays
+        stars={stars}
         selectedStar={selectedStar ?? null}
         hoveredStar={hoveredStar}
+        showLabels={showLabels}
         getScale={getScale}
       />
     </>

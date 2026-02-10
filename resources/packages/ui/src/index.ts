@@ -61,6 +61,13 @@ export type { SystemGridProps, SystemCellProps } from "./components/system-grid"
 export { Panel } from "./components/panel";
 export type { PanelProps } from "./components/panel";
 
+export { Dropdown } from "./components/dropdown";
+export type {
+  DropdownProps,
+  DropdownTriggerProps,
+  DropdownPlacement,
+} from "./components/dropdown";
+
 export { LcarsFrame, LcarsHeaderChip } from "./components/lcars-frame";
 export type { LcarsFrameProps, LcarsTab, LcarsHeaderChipProps } from "./components/lcars-frame";
 

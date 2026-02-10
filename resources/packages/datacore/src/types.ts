@@ -93,13 +93,6 @@ export type WorkerResponse =
 // Public API types
 // ---------------------------------------------------------------------------
 
-/**
- * StarNode with computed distance from a reference point.
- * Returned by range queries (getStarsInRange).
- */
-export interface NearbyStarNode extends StarNode {
-	distance: number;
-}
 
 /**
  * What SQLite actually returns for star rows — `is_primary` is INTEGER (0|1),
@@ -119,7 +112,7 @@ export interface Datacore {
 	clearNodes: () => Promise<void>;
 	clearStars: () => Promise<void>;
 	getStarMap: () => Promise<StarNode[]>;
-	getStarsInRange: (nodeId: number, maxDistance: number) => Promise<NearbyStarNode[]>;
+
 	getStarsAtNode: (nodeId: number) => Promise<Star[]>;
 	getNode: (id: number) => Promise<NavNode | null>;
 	getMeta: (key: string) => Promise<string | null>;

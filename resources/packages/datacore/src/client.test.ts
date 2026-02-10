@@ -318,64 +318,6 @@ describe('createDatacore', () => {
 		}]);
 	});
 
-	it('getStarsInRange returns nearby stars sorted by distance', async () => {
-		const dc = await createTestDatacore();
-
-		let queryCount = 0;
-		MockWorker.instance.onPosted((msg: unknown) => {
-			const m = msg as { id: string; type: string; payload?: { sql: string } };
-			if (m.type === 'query') {
-				queryCount++;
-				if (queryCount === 1) {
-					// First query: node lookup
-					MockWorker.instance.receive({
-						id: m.id,
-						type: 'result',
-						payload: {
-							rows: [[0, 0, 0]],
-							columns: ['x', 'y', 'z'],
-						},
-					});
-				} else {
-					// Second query: range query — dist_sq = 3² + 0² + 4² = 25
-					MockWorker.instance.receive({
-						id: m.id,
-						type: 'result',
-						payload: {
-							rows: [[200, 2, 'Proxima', 'PROX_1', 'M', 3.0, 0, 4.0, 0.12, 0.15, 'system', 25]],
-							columns: ['id', 'node_id', 'title', 'catalog_id', 'spectral_class', 'x', 'y', 'z', 'mass', 'radius', 'node_type', 'dist_sq'],
-						},
-					});
-				}
-			}
-		});
-
-		const nearby = await dc.getStarsInRange(1, 10);
-		expect(nearby).toHaveLength(1);
-		expect(nearby[0].title).toBe('Proxima');
-		expect(nearby[0].distance).toBe(5); // sqrt(25)
-		// dist_sq should not leak into the result
-		expect('dist_sq' in nearby[0]).toBe(false);
-	});
-
-	it('getStarsInRange returns empty array for unknown node', async () => {
-		const dc = await createTestDatacore();
-
-		MockWorker.instance.onPosted((msg: unknown) => {
-			const m = msg as { id: string; type: string };
-			if (m.type === 'query') {
-				MockWorker.instance.receive({
-					id: m.id,
-					type: 'result',
-					payload: { rows: [], columns: ['x', 'y', 'z'] },
-				});
-			}
-		});
-
-		const nearby = await dc.getStarsInRange(999, 10);
-		expect(nearby).toEqual([]);
-	});
-
 	it('getStarsAtNode returns Star[] with boolean is_primary', async () => {
 		const dc = await createTestDatacore();
 

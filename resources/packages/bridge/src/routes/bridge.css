@@ -7,11 +7,62 @@
 }
 
 .helm-bridge__viewport {
+	position: relative;
 	min-height: 0;
 }
 
 .helm-bridge__nav {
 	min-height: 0;
+}
+
+.helm-bridge__config {
+	position: absolute;
+	top: 8px;
+	right: 8px;
+	z-index: 16777272;
+}
+
+.helm-bridge__config-trigger {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: none;
+	border: none;
+	padding: 4px;
+	cursor: pointer;
+	opacity: 0.6;
+	transition: opacity 0.15s;
+}
+
+.helm-bridge__config-trigger svg {
+	fill: var(--helm-ui-color-text-muted, #9f9a90);
+}
+
+.helm-bridge__config-trigger:hover,
+.helm-bridge__config-trigger:focus-visible {
+	opacity: 1;
+}
+
+.helm-bridge__config-trigger:focus-visible {
+	outline: 1px solid var(--helm-ui-color-accent, #f1a35c);
+	outline-offset: 2px;
+}
+
+.helm-bridge__config-field {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+}
+
+.helm-bridge__config-field + .helm-bridge__config-field {
+	margin-top: 8px;
+}
+
+.helm-bridge__config-label {
+	font-size: 12px;
+	color: var(--helm-ui-color-text, #f0e6d2);
+	white-space: nowrap;
 }
 
 .helm-bridge__message {

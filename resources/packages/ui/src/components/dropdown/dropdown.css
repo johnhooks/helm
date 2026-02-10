@@ -1,0 +1,20 @@
+.helm-dropdown {
+	position: relative;
+	display: inline-block;
+}
+
+.helm-dropdown__content {
+	position: absolute;
+	z-index: 10;
+	margin-top: var(--helm-dropdown-gap, 4px);
+}
+
+.helm-dropdown--bottom-start .helm-dropdown__content {
+	top: 100%;
+	left: 0;
+}
+
+.helm-dropdown--bottom-end .helm-dropdown__content {
+	top: 100%;
+	right: 0;
+}

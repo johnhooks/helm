@@ -13,6 +13,7 @@ import { log } from '@helm/logger';
 import { Panel, Title, Readout } from '@helm/ui';
 import type { Datacore } from '@helm/datacore';
 import type { StarNode } from '@helm/types';
+import { ViewportConfig } from '../components/viewport-config';
 
 const StarField = lazy(() =>
 	import('@helm/astrometric').then((m) => ({ default: m.StarField }))
@@ -26,11 +27,30 @@ function errorMessage(err: unknown): string {
 	return err instanceof Error ? err.message : __('Unknown error.', 'helm');
 }
 
-export function BridgePage() {
+const STAR_SIZE_MULTIPLIER: Record<string, number> = {
+	sm: 0.5,
+	md: 1,
+	lg: 1.5,
+};
+
+interface BridgePageProps {
+	currentNodeId?: number;
+	jumpRange?: number;
+}
+
+export function BridgePage({
+	currentNodeId = 1,
+	jumpRange = 7,
+}: BridgePageProps) {
 	const [stars, setStars] = useState<StarNode[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 	const datacoreRef = useRef<Datacore | null>(null);
+	const allStarsRef = useRef<StarNode[]>([]);
+
+	const [starSize, setStarSize] = useState('md');
+	const [jumpRangeOnly, setJumpRangeOnly] = useState(false);
+	const [showLabels, setShowLabels] = useState(false);
 
 	useEffect(() => {
 		let cancelled = false;
@@ -63,6 +83,7 @@ export function BridgePage() {
 				log.info('bridge.starmap.loaded', { count: starMap.length });
 
 				if (!cancelled) {
+					allStarsRef.current = starMap;
 					setStars(starMap);
 				}
 			} catch (err) {
@@ -85,6 +106,47 @@ export function BridgePage() {
 		};
 	}, []);
 
+	// Turn off labels when jump range filter is disabled.
+	useEffect(() => {
+		if (!jumpRangeOnly) {
+			setShowLabels(false);
+		}
+	}, [jumpRangeOnly]);
+
+	// Filter stars to jump range client-side — all stars are already in memory.
+	useEffect(() => {
+		const all = allStarsRef.current;
+		if (all.length === 0) {
+			return;
+		}
+
+		if (!jumpRangeOnly) {
+			setStars(all);
+			return;
+		}
+
+		const origin = all.find((s) => s.node_id === currentNodeId);
+		if (!origin) {
+			setStars(all);
+			return;
+		}
+
+		const maxDistSq = jumpRange * jumpRange;
+		const filtered = all.filter((s) => {
+			if (s.node_id === currentNodeId) {
+				return true;
+			}
+			const dx = s.x - origin.x;
+			const dy = s.y - origin.y;
+			const dz = s.z - origin.z;
+			return dx * dx + dy * dy + dz * dz <= maxDistSq;
+		});
+
+		log.info('bridge.jumprange.filtered', { count: filtered.length });
+		setStars(filtered);
+	}, [jumpRangeOnly, currentNodeId, jumpRange]);
+
+	const sizeMultiplier = STAR_SIZE_MULTIPLIER[starSize] ?? 1;
 	const viewportStyle = useMemo(() => ({ width: '100%', height: '100%' }), []);
 
 	if (error) {
@@ -103,8 +165,21 @@ export function BridgePage() {
 	return (
 		<div className="helm-bridge">
 			<Panel variant="inset" padding="none" className="helm-bridge__viewport">
+				<ViewportConfig
+					starSize={starSize}
+					onStarSizeChange={setStarSize}
+					jumpRangeOnly={jumpRangeOnly}
+					onJumpRangeOnlyChange={setJumpRangeOnly}
+					showLabels={showLabels}
+					onShowLabelsChange={setShowLabels}
+				/>
 				<Suspense fallback={null}>
-					<StarField stars={stars} style={viewportStyle} />
+					<StarField
+						stars={stars}
+						starScale={sizeMultiplier}
+						showLabels={showLabels}
+						style={viewportStyle}
+					/>
 				</Suspense>
 			</Panel>
 			<Panel tone="blue" className="helm-bridge__nav">

@@ -137,7 +137,7 @@ export function SegmentedControl({
               name={groupName}
               value={option.value}
               checked={isChecked}
-              defaultChecked={defaultValue === option.value}
+              defaultChecked={value === undefined ? defaultValue === option.value : undefined}
               onChange={() => handleChange(option.value)}
               disabled={isDisabled}
             />

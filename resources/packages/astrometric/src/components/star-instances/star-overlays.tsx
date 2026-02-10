@@ -4,14 +4,18 @@ import { STAR_BASE_SIZE } from "../../constants";
 import { lcarsColors } from "../../utils/colors";
 
 export interface StarOverlaysProps {
+  stars: StarNode[];
   selectedStar: StarNode | null;
   hoveredStar: StarNode | null;
+  showLabels?: boolean;
   getScale: (star: StarNode) => number;
 }
 
 export function StarOverlays({
+  stars,
   selectedStar,
   hoveredStar,
+  showLabels = false,
   getScale,
 }: StarOverlaysProps) {
   return (
@@ -97,6 +101,38 @@ export function StarOverlays({
           </div>
         </Html>
       )}
+
+      {/* Labels for all stars (when enabled, e.g. in jump-range view) */}
+      {showLabels &&
+        stars.map((star) => {
+          // Skip stars that already have dedicated labels
+          if (star.id === selectedStar?.id || star.id === hoveredStar?.id) {
+            return null;
+          }
+
+          return (
+            <Html
+              key={star.id}
+              position={[star.x, star.y, star.z]}
+              style={{ pointerEvents: "none", userSelect: "none" }}
+              center={false}
+            >
+              <div
+                style={{
+                  color: "#a39a88",
+                  fontSize: "11px",
+                  fontFamily: "Antonio, sans-serif",
+                  whiteSpace: "nowrap",
+                  marginLeft: "16px",
+                  textShadow:
+                    "0 0 4px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.7)",
+                }}
+              >
+                {star.title}
+              </div>
+            </Html>
+          );
+        })}
     </>
   );
 }

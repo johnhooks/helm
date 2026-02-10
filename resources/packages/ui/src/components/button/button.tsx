@@ -61,6 +61,18 @@ export interface ButtonProps {
    * Accessible label
    */
   "aria-label"?: string;
+  /**
+   * Indicates the button controls an expandable element
+   */
+  "aria-expanded"?: boolean;
+  /**
+   * Indicates the type of popup triggered by the button
+   */
+  "aria-haspopup"?: "dialog" | "menu" | "listbox" | "tree" | "grid" | boolean;
+  /**
+   * ID of the controlled element
+   */
+  "aria-controls"?: string;
 }
 
 export function Button({
@@ -79,6 +91,9 @@ export function Button({
   style,
   "data-testid": testId,
   "aria-label": ariaLabel,
+  "aria-expanded": ariaExpanded,
+  "aria-haspopup": ariaHasPopup,
+  "aria-controls": ariaControls,
 }: ButtonProps) {
   const variantSurfaces: Record<string, ButtonProps["surface"]> = {
     primary: "accent",
@@ -110,6 +125,9 @@ export function Button({
       style={style}
       data-testid={testId}
       aria-label={ariaLabel}
+      aria-expanded={ariaExpanded}
+      aria-haspopup={ariaHasPopup}
+      aria-controls={ariaControls}
       disabled={disabled}
       onClick={onClick}
     >

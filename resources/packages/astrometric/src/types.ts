@@ -210,6 +210,10 @@ export interface StarFieldProps {
    */
   showDistanceLabels?: boolean;
   /**
+   * Show labels on all stars
+   */
+  showLabels?: boolean;
+  /**
    * Enable orbit controls
    */
   enableControls?: boolean;
@@ -229,6 +233,10 @@ export interface StarFieldProps {
    * Camera projection mode
    */
   cameraMode?: CameraMode;
+  /**
+   * Multiplier applied to all star sizes (default 1)
+   */
+  starScale?: number;
 
   /**
    * Additional CSS class name
