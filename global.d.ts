@@ -2,6 +2,7 @@ declare global {
 	interface HelmSettings {
 		workerUrl: string;
 		debug: boolean;
+		shipId: number | null;
 	}
 
 	interface HelmGlobal {

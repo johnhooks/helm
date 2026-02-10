@@ -162,6 +162,33 @@ class ShipControllerTest extends WPRestApiTestCase
         $this->assertSame(50, $data['fuel']);
     }
 
+    public function test_response_has_self_link(): void
+    {
+        $ship = $this->createShip();
+
+        wp_set_current_user($this->ownerId);
+        $response = $this->getShip($ship->postId());
+
+        $links = $response->get_links();
+
+        $this->assertArrayHasKey('self', $links);
+        $this->assertStringEndsWith('/helm/v1/ships/' . $ship->postId(), $links['self'][0]['href']);
+    }
+
+    public function test_response_has_embeddable_systems_link(): void
+    {
+        $ship = $this->createShip();
+
+        wp_set_current_user($this->ownerId);
+        $response = $this->getShip($ship->postId());
+
+        $links = $response->get_links();
+
+        $this->assertArrayHasKey('helm:systems', $links);
+        $this->assertStringEndsWith('/helm/v1/ships/' . $ship->postId() . '/systems', $links['helm:systems'][0]['href']);
+        $this->assertTrue($links['helm:systems'][0]['attributes']['embeddable'] ?? false);
+    }
+
     public function test_cargo_endpoint_requires_authentication(): void
     {
         $ship = $this->createShip();

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Helm\Admin;
 
 use Helm\lucatume\DI52\ServiceProvider;
+use Helm\Ships\ShipPost;
 
 /**
  * Registers admin pages and enqueues their React bundles.
@@ -88,7 +89,18 @@ final class Provider extends ServiceProvider
     {
         $this->enqueueShared();
         $this->enqueueBundle('helm-bridge', 'bridge', ['helm-ui']);
-        $this->enqueueHelmGlobals('helm-bridge');
+
+        $ship = ShipPost::findForUser(get_current_user_id());
+        $shipPostId = $ship?->postId();
+
+        $this->enqueueHelmGlobals('helm-bridge', $shipPostId);
+
+        if ($shipPostId !== null) {
+            $this->preloadRestPaths([
+                '/wp/v2/ships/' . $shipPostId,
+                '/helm/v1/ships/' . $shipPostId . '?_embed[]=helm:systems',
+            ]);
+        }
     }
 
     /**
@@ -113,17 +125,40 @@ final class Provider extends ServiceProvider
     /**
      * Inject window.helm globals (settings, log) before a script handle.
      */
-    private function enqueueHelmGlobals(string $handle): void
+    private function enqueueHelmGlobals(string $handle, ?int $shipPostId = null): void
     {
-        add_action('admin_enqueue_scripts', function () use ($handle): void {
+        add_action('admin_enqueue_scripts', function () use ($handle, $shipPostId): void {
             wp_add_inline_script(
                 $handle,
                 'window.helm = window.helm || {};'
                 . 'window.helm.settings = ' . wp_json_encode([
                     'workerUrl' => HELM_URL . 'build/datacore-worker.js',
-                    'debug'     => defined('WP_DEBUG') && WP_DEBUG,
+                    'debug'    => defined('WP_DEBUG') && WP_DEBUG,
+                    'shipId'   => $shipPostId,
                 ]) . ';',
                 'before',
+            );
+        });
+    }
+
+    /**
+     * Preload REST API responses and inject middleware.
+     *
+     * @param string[] $paths REST paths to preload.
+     */
+    private function preloadRestPaths(array $paths): void
+    {
+        /** @var array<string, array{body: mixed, headers: array<string, string>}> $preloaded */
+        $preloaded = array_reduce($paths, 'rest_preload_api_request', []);
+
+        add_action('admin_enqueue_scripts', function () use ($preloaded): void {
+            wp_add_inline_script(
+                'wp-api-fetch',
+                sprintf(
+                    'wp.apiFetch.use(wp.apiFetch.createPreloadingMiddleware(%s));',
+                    wp_json_encode($preloaded)
+                ),
+                'after',
             );
         });
     }
