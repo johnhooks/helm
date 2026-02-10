@@ -88,6 +88,25 @@ final class ShipPost
     }
 
     /**
+     * Find the ship belonging to a user.
+     */
+    public static function findForUser(int $userId): ?self
+    {
+        $posts = get_posts([
+            'post_type'   => PostTypeRegistry::POST_TYPE_SHIP,
+            'post_author' => $userId,
+            'numberposts' => 1,
+            'post_status' => 'publish',
+        ]);
+
+        if ($posts === []) {
+            return null;
+        }
+
+        return new self($posts[0]);
+    }
+
+    /**
      * Create a ShipPost from a post ID.
      */
     public static function fromId(int $postId): ?self

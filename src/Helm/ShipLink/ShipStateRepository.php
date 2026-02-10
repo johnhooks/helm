@@ -8,6 +8,7 @@ use Helm\Database\Schema;
 use Helm\Lib\Date;
 use Helm\Lib\HydratesModels;
 use Helm\ShipLink\Models\ShipState;
+use Helm\Ships\ShipPost;
 
 /**
  * Repository for ship state table operations.
@@ -40,6 +41,20 @@ final class ShipStateRepository
         }
 
         return $this->hydrate($row);
+    }
+
+    /**
+     * Find ship state for a user.
+     */
+    public function findForUser(int $userId): ?ShipState
+    {
+        $ship = ShipPost::findForUser($userId);
+
+        if ($ship === null) {
+            return null;
+        }
+
+        return $this->find($ship->postId());
     }
 
     /**
@@ -168,7 +183,7 @@ final class ShipStateRepository
      *
      * @return array<ShipState>
      */
-    public function atNode(int $nodeId): array
+    public function findAtNode(int $nodeId): array
     {
         global $wpdb;
 
@@ -193,7 +208,7 @@ final class ShipStateRepository
      *
      * @return array<ShipState>
      */
-    public function withCurrentAction(): array
+    public function findWithCurrentAction(): array
     {
         global $wpdb;
 

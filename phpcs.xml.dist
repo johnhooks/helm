@@ -46,6 +46,16 @@
     <!-- Modern PHP: dirname(__DIR__) instead of dirname(dirname(__FILE__)) -->
     <rule ref="Modernize.FunctionCalls.Dirname"/>
 
+    <!-- Tests use snake_case method names (PHPUnit convention) -->
+    <rule ref="PSR1.Methods.CamelCapsMethodName.NotCamelCaps">
+        <exclude-pattern>*/tests/*</exclude-pattern>
+    </rule>
+
+    <!-- Tests: _before() is a Codeception lifecycle method -->
+    <rule ref="PSR2.Methods.MethodDeclaration.Underscore">
+        <exclude-pattern>*/tests/*</exclude-pattern>
+    </rule>
+
     <!-- Tests don't need WP security rules -->
     <rule ref="WordPress.Security">
         <exclude-pattern>*/tests/*</exclude-pattern>

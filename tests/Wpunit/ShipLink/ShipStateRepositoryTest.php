@@ -148,7 +148,7 @@ class ShipStateRepositoryTest extends WPTestCase
         $this->assertFalse($this->repository->exists($postId));
     }
 
-    public function test_at_node_returns_ships_at_location(): void
+    public function test_find_at_node_returns_ships_at_location(): void
     {
         $ship1 = $this->tester->haveShipPost();
         $ship2 = $this->tester->haveShipPost();
@@ -163,8 +163,8 @@ class ShipStateRepositoryTest extends WPTestCase
         $this->insertWithNode($postId2, 10);
         $this->insertWithNode($postId3, 20);
 
-        $atNode10 = $this->repository->atNode(10);
-        $atNode20 = $this->repository->atNode(20);
+        $atNode10 = $this->repository->findAtNode(10);
+        $atNode20 = $this->repository->findAtNode(20);
 
         $this->assertCount(2, $atNode10);
         $this->assertCount(1, $atNode20);
@@ -196,7 +196,7 @@ class ShipStateRepositoryTest extends WPTestCase
         $this->assertSame(99, $found->current_action_id);
     }
 
-    public function test_with_current_action_returns_busy_ships(): void
+    public function test_find_with_current_action_returns_busy_ships(): void
     {
         $ship1 = $this->tester->haveShipPost();
         $ship2 = $this->tester->haveShipPost();
@@ -207,10 +207,31 @@ class ShipStateRepositoryTest extends WPTestCase
         // Only ship1 has an active action
         $this->repository->updateCurrentAction($ship1->postId(), 42);
 
-        $busy = $this->repository->withCurrentAction();
+        $busy = $this->repository->findWithCurrentAction();
 
         $this->assertCount(1, $busy);
         $this->assertSame($ship1->postId(), $busy[0]->ship_post_id);
+    }
+
+    public function test_find_for_user_returns_ship_state(): void
+    {
+        $userId = $this->factory()->user->create();
+        $shipPost = $this->tester->haveShipPost(['ownerId' => $userId]);
+        $this->repository->insert(ShipState::defaults($shipPost->postId()));
+
+        $state = $this->repository->findForUser($userId);
+
+        $this->assertNotNull($state);
+        $this->assertSame($shipPost->postId(), $state->ship_post_id);
+    }
+
+    public function test_find_for_user_returns_null_when_no_ship(): void
+    {
+        $userId = $this->factory()->user->create();
+
+        $state = $this->repository->findForUser($userId);
+
+        $this->assertNull($state);
     }
 
     /**
