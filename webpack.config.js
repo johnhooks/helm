@@ -22,6 +22,7 @@ const helmExternals = {
 	'@helm/cache': { global: ['helm', 'core'], handle: 'helm-core' },
 	'@helm/errors': { global: ['helm', 'core'], handle: 'helm-core' },
 	'@helm/logger': { global: ['helm', 'core'], handle: 'helm-core' },
+	'@helm/ships': { global: ['helm', 'ships'], handle: 'helm-ships' },
 };
 
 // Plugins without the default DependencyExtractionWebpackPlugin.
@@ -54,6 +55,10 @@ module.exports = [
 		...defaultConfig,
 		name: 'apps',
 		entry: {
+			ships: {
+				import: path.resolve(packages, 'ships/src/index.ts'),
+				library: { name: ['helm', 'ships'], type: 'window' },
+			},
 			bridge: path.resolve(packages, 'bridge/src/index.tsx'),
 			'admin-settings': path.resolve(packages, 'admin-settings/src/index.tsx'),
 			'datacore-worker': path.resolve(packages, 'datacore/src/worker.ts'),

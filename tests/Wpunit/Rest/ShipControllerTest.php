@@ -95,6 +95,7 @@ class ShipControllerTest extends WPRestApiTestCase
         $data = $response->get_data();
 
         $expectedKeys = [
+            'id',
             'node_id',
             'power_full_at',
             'shields_full_at',

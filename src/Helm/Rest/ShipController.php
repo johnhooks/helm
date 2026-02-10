@@ -133,6 +133,7 @@ final class ShipController
         $state = $ship->getState();
 
         return [
+            'id'                => $ship->getId(),
             'node_id'           => $state->node_id,
             'power_full_at'     => $state->power_full_at?->format('c'),
             'shields_full_at'   => $state->shields_full_at?->format('c'),

@@ -41,6 +41,8 @@
             "@helm/admin-settings/*": ["resources/packages/admin-settings/src/*"],
             "@helm/router": ["resources/packages/router/src"],
             "@helm/router/*": ["resources/packages/router/src/*"],
+            "@helm/ships": ["resources/packages/ships/src"],
+            "@helm/ships/*": ["resources/packages/ships/src/*"],
             "@helm/core": ["resources/packages/core/src"],
             "@helm/core/*": ["resources/packages/core/src/*"]
         }

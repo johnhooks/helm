@@ -17,7 +17,7 @@ describe('ErrorCode', () => {
 	});
 
 	it('has an Unknown fallback', () => {
-		expect(ErrorCode.Unknown).toBe('unknown');
+		expect(ErrorCode.Unknown).toBe('helm.unknown_error');
 	});
 
 	it('works as HelmError code', () => {
@@ -177,7 +177,7 @@ describe('HelmError.from()', () => {
 	it('wraps plain Error as unknown code and marks unsafe', () => {
 		const err = HelmError.from(new Error('Something broke'));
 
-		expect(err.message).toBe('unknown');
+		expect(err.message).toBe('helm.unknown_error');
 		expect(err.detail).toBe('Something broke');
 		expect(err.isSafe).toBe(false);
 	});
@@ -185,7 +185,7 @@ describe('HelmError.from()', () => {
 	it('wraps string as unknown code and marks unsafe', () => {
 		const err = HelmError.from('Network timeout');
 
-		expect(err.message).toBe('unknown');
+		expect(err.message).toBe('helm.unknown_error');
 		expect(err.detail).toBe('Network timeout');
 		expect(err.isSafe).toBe(false);
 	});
@@ -193,7 +193,7 @@ describe('HelmError.from()', () => {
 	it('wraps unexpected values as unknown code and marks unsafe', () => {
 		const err = HelmError.from(42);
 
-		expect(err.message).toBe('unknown');
+		expect(err.message).toBe('helm.unknown_error');
 		expect(err.detail).toBe('An unknown error occurred');
 		expect(err.isSafe).toBe(false);
 	});
@@ -213,6 +213,78 @@ describe('HelmError.from()', () => {
 	});
 });
 
+describe('HelmError.asyncFrom()', () => {
+	it('delegates non-Response values to from()', async () => {
+		const wpError = {
+			code: 'helm.ship.not_found',
+			message: 'Ship not found',
+			data: { status: 404 },
+		};
+
+		const err = await HelmError.asyncFrom(wpError);
+
+		expect(err.message).toBe('helm.ship.not_found');
+		expect(err.isSafe).toBe(true);
+	});
+
+	it('parses Response body as WP REST error', async () => {
+		const body = {
+			code: 'helm.action.failed',
+			message: 'Action failed',
+			data: { status: 422 },
+		};
+		const response = new Response(JSON.stringify(body), { status: 422 });
+
+		const err = await HelmError.asyncFrom(response);
+
+		expect(err.message).toBe('helm.action.failed');
+		expect(err.detail).toBe('Action failed');
+		expect(err.isSafe).toBe(true);
+		expect(err.status).toBe(422);
+	});
+
+	it('returns unsafe error for Response with non-WP-REST JSON', async () => {
+		const response = new Response(JSON.stringify({ error: 'nope' }), {
+			status: 500,
+			statusText: 'Internal Server Error',
+		});
+
+		const err = await HelmError.asyncFrom(response);
+
+		expect(err.message).toBe('helm.unknown_error');
+		expect(err.isSafe).toBe(false);
+		expect(err.detail).toBe('HTTP 500 Internal Server Error');
+	});
+
+	it('returns unsafe error for Response with invalid JSON', async () => {
+		const response = new Response('<html>Server Error</html>', {
+			status: 500,
+			statusText: 'Internal Server Error',
+		});
+
+		const err = await HelmError.asyncFrom(response);
+
+		expect(err.message).toBe('helm.unknown_error');
+		expect(err.isSafe).toBe(false);
+		expect(err.detail).toBe('HTTP 500 Internal Server Error');
+	});
+
+	it('passes through HelmError instances', async () => {
+		const original = new HelmError('helm.test', 'test');
+		const result = await HelmError.asyncFrom(original);
+
+		expect(result).toBe(original);
+	});
+
+	it('wraps plain Error as unknown', async () => {
+		const err = await HelmError.asyncFrom(new Error('Network failure'));
+
+		expect(err.message).toBe('helm.unknown_error');
+		expect(err.detail).toBe('Network failure');
+		expect(err.isSafe).toBe(false);
+	});
+});
+
 describe('HelmError.safe()', () => {
 	it('creates a safe error with isSafe true', () => {
 		const err = HelmError.safe('helm.datacore.worker_error', 'A database error occurred.');
@@ -229,7 +301,7 @@ describe('HelmError.safe()', () => {
 
 		expect(err.isSafe).toBe(true);
 		expect(err.causes).toHaveLength(1);
-		expect(err.causes[0].message).toBe('unknown');
+		expect(err.causes[0].message).toBe('helm.unknown_error');
 		expect(err.causes[0].detail).toBe('SQLITE_CORRUPT: database disk image is malformed');
 		expect(err.causes[0].isSafe).toBe(false);
 	});

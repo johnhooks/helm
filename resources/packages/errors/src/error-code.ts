@@ -5,7 +5,7 @@
  * All codes use dot notation: helm.{domain}.{error}
  */
 export enum ErrorCode {
-	Unknown = 'unknown',
+	Unknown = 'helm.unknown_error',
 
 	// Datacore errors
 	DatacoreUnsupported = 'helm.datacore.unsupported',
@@ -15,4 +15,7 @@ export enum ErrorCode {
 	// Cache errors
 	CacheFetchFailed = 'helm.cache.fetch_failed',
 	CacheSyncFailed = 'helm.cache.sync_failed',
+
+	// Ships errors
+	ShipsInvalidResponse = 'helm.ships.invalid_response',
 }

@@ -1,3 +1,4 @@
+import { ErrorCode } from './error-code';
 import type { HelmErrorOptions } from './types';
 import { isWpRestErrorResponse } from './utils';
 
@@ -69,7 +70,32 @@ export class HelmError extends Error {
 			detail = 'An unknown error occurred';
 		}
 
-		return new HelmError('unknown', detail, { isSafe: false });
+		return new HelmError(ErrorCode.Unknown, detail, { isSafe: false });
+	}
+
+	/**
+	 * Convert an unknown thrown value to a HelmError, awaiting Response bodies.
+	 *
+	 * Use this in catch blocks where apiFetch may throw a raw Response
+	 * (e.g. when the response isn't valid JSON, or with `parse: false`).
+	 * The Response body is parsed as JSON and inspected for a WP REST error.
+	 */
+	static async asyncFrom(error: unknown): Promise<HelmError> {
+		if (error instanceof Response) {
+			try {
+				const body: unknown = await error.json();
+				if (isWpRestErrorResponse(body)) {
+					return HelmError.from(body);
+				}
+			} catch {
+				// JSON parse failed — not a WP REST response.
+			}
+			return new HelmError(ErrorCode.Unknown, `HTTP ${ error.status } ${ error.statusText }`.trim(), {
+				isSafe: false,
+			});
+		}
+
+		return HelmError.from(error);
 	}
 
 	/**

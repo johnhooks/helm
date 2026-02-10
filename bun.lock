@@ -137,6 +137,7 @@
         "@helm/datacore": "workspace:*",
         "@helm/errors": "workspace:*",
         "@helm/logger": "workspace:*",
+        "@helm/ships": "workspace:*",
       },
     },
     "resources/packages/datacore": {
@@ -162,6 +163,19 @@
       "version": "0.1.0",
       "peerDependencies": {
         "@tanstack/react-router": "^1.159.4",
+      },
+    },
+    "resources/packages/ships": {
+      "name": "@helm/ships",
+      "version": "0.1.0",
+      "dependencies": {
+        "@helm/errors": "workspace:*",
+        "@helm/types": "workspace:*",
+      },
+      "peerDependencies": {
+        "@wordpress/api-fetch": "^7.0.0",
+        "@wordpress/data": "^10.0.0",
+        "@wordpress/i18n": "^5.0.0",
       },
     },
     "resources/packages/types": {
@@ -579,6 +593,8 @@
     "@helm/logger": ["@helm/logger@workspace:resources/packages/logger"],
 
     "@helm/router": ["@helm/router@workspace:resources/packages/router"],
+
+    "@helm/ships": ["@helm/ships@workspace:resources/packages/ships"],
 
     "@helm/types": ["@helm/types@workspace:resources/packages/types"],
 
