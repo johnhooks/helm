@@ -1,0 +1,40 @@
+/* Error content — full display */
+.helm-error-content {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+	font-family: var(--helm-ui-font-family);
+}
+
+.helm-error-content__detail {
+	margin: 0;
+	color: var(--helm-ui-color-muted);
+	font-size: 12px;
+	line-height: 1.5;
+}
+
+/* Causes list */
+.helm-error-causes {
+	list-style: disc;
+	margin: 0;
+	padding: 0;
+	padding-inline-start: 1.25rem;
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+	color: var(--helm-ui-color-muted);
+	font-size: 11px;
+}
+
+/* Error compact — inline display */
+.helm-error-compact {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	font-family: var(--helm-ui-font-family);
+}
+
+.helm-error-compact__detail {
+	color: var(--helm-ui-color-muted);
+	font-size: 12px;
+}

@@ -30,6 +30,7 @@
 @import "../components/progress-bar/progress-bar.css";
 @import "../components/countdown/countdown.css";
 @import "../components/dropdown/dropdown.css";
+@import "../components/error-display/error-display.css";
 
 /* Indicators */
 @import "../components/arc-indicator/arc-indicator.css";

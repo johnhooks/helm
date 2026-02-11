@@ -111,16 +111,29 @@ final class Provider extends ServiceProvider
     {
         $this->enqueueShared();
         $this->enqueueBundle('helm-admin-settings', 'admin-settings', ['helm-ui']);
-        $this->enqueueHelmGlobals('helm-admin-settings');
+
+        $ship = ShipPost::findForUser(get_current_user_id());
+        $shipPostId = $ship?->postId();
+
+        $this->enqueueHelmGlobals('helm-admin-settings', $shipPostId);
+
+        if ($shipPostId !== null) {
+            $this->preloadRestPaths([
+                '/helm/v1/ships/' . $shipPostId . '?_embed[]=' . LinkRel::Systems->value,
+                '/helm/v1/ships/' . $shipPostId . '/systems?_embed[]=' . LinkRel::Product->value,
+            ]);
+        }
     }
 
     /**
-     * Enqueue the shared @helm/ui and @helm/core bundles.
+     * Enqueue the shared @helm/* bundles.
      */
     private function enqueueShared(): void
     {
         $this->enqueueBundle('helm-ui', 'ui');
         $this->enqueueBundle('helm-core', 'core');
+        $this->enqueueBundle('helm-products', 'products');
+        $this->enqueueBundle('helm-ships', 'ships');
     }
 
     /**
@@ -145,7 +158,7 @@ final class Provider extends ServiceProvider
     /**
      * Preload REST API responses and inject middleware.
      *
-     * @param string[] $paths REST paths to preload.
+     * @param string[] $paths REST-root-relative paths to preload (e.g. "/helm/v1/ships/1").
      */
     private function preloadRestPaths(array $paths): void
     {

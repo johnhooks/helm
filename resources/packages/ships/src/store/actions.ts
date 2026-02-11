@@ -46,15 +46,23 @@ export function receiveShip(
 
 export const fetchSystems =
 	( shipId: number ): Thunk< Action, typeof store > =>
-	async ( { dispatch } ) => {
+	async ( { dispatch, registry } ) => {
 		dispatch( { type: 'FETCH_SYSTEMS_START', shipId } );
 
 		try {
 			const systems = await apiFetch< SystemComponentResponse[] >( {
-				path: `/helm/v1/ships/${ shipId }/systems`,
+				path: `/helm/v1/ships/${ shipId }/systems?_embed[]=${ LinkRel.Product }`,
 			} );
 
 			dispatch( { type: 'FETCH_SYSTEMS_FINISHED', shipId, systems } );
+
+			const products = systems
+				.map( ( system ) => system._embedded?.[ LinkRel.Product ]?.[ 0 ] )
+				.filter( ( p ): p is NonNullable< typeof p > => p !== undefined );
+
+			if ( products.length > 0 ) {
+				registry.dispatch( productsStore ).receiveProducts( products );
+			}
 		} catch ( error ) {
 			const helmError = await HelmError.asyncFrom( error );
 

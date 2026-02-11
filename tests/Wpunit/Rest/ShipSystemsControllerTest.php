@@ -145,21 +145,6 @@ class ShipSystemsControllerTest extends WPRestApiTestCase
         $this->assertEquals(1.0, $core['condition']); // assertEquals handles int/float comparison
     }
 
-    public function test_response_has_collection_links(): void
-    {
-        $ship = $this->createShip();
-
-        wp_set_current_user($this->ownerId);
-        $response = $this->getSystems($ship->postId());
-
-        $links = $response->get_links();
-
-        $this->assertArrayHasKey('self', $links);
-
-        $this->assertArrayHasKey('helm:ship', $links);
-        $this->assertTrue($links['helm:ship'][0]['attributes']['embeddable'] ?? false);
-    }
-
     public function test_each_system_has_embeddable_product_link(): void
     {
         $ship = $this->createShip();

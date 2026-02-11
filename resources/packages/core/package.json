@@ -7,8 +7,13 @@
 	"types": "src/index.ts",
 	"dependencies": {
 		"@helm/cache": "workspace:*",
+		"@helm/data": "workspace:*",
 		"@helm/datacore": "workspace:*",
 		"@helm/errors": "workspace:*",
-		"@helm/logger": "workspace:*"
+		"@helm/logger": "workspace:*",
+		"@helm/ui": "workspace:*"
+	},
+	"peerDependencies": {
+		"react": "^18.3.1"
 	}
 }

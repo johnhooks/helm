@@ -1,0 +1,12 @@
+{
+	"name": "@helm/data",
+	"version": "0.1.0",
+	"description": "Data store utilities for Helm",
+	"private": true,
+	"main": "src/index.ts",
+	"types": "src/index.ts",
+	"peerDependencies": {
+		"@wordpress/data": "^10.0.0",
+		"@wordpress/element": "^6.0.0"
+	}
+}

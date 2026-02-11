@@ -9,6 +9,11 @@ import '@wordpress/components/build-style/style.css';
 import '../resources/packages/ui/src/styles/all.css';
 import './preview.css';
 
+// Tokens are scoped to .helm-page-root. WordPress Modal portals to
+// document.body which escapes the decorator div, so also put the class
+// on body so portaled content inherits the design tokens.
+document.body.classList.add('helm-page-root');
+
 const preview: Preview = {
   parameters: {
     backgrounds: { disable: true },

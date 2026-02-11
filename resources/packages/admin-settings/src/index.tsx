@@ -2,23 +2,28 @@
  * Helm Settings — admin settings entry point.
  *
  * Initializes Datacore (Web Worker + SQLite) and Cache, provides
- * a "Sync Nodes" button for manual cache sync, and displays status.
+ * a "Sync Nodes" button for manual cache sync, displays status,
+ * and shows the current ship via the ShipProvider context.
  */
-import { createRoot, useEffect, useRef, useState } from '@wordpress/element';
+import { createRoot, Suspense, useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	AppRoot,
 	Button,
 	Panel,
 	Readout,
+	StatusBadge,
 	Title,
+	TitleBar,
 } from '@helm/ui';
+import { ErrorBoundary } from 'react-error-boundary';
 import { createDatacore } from '@helm/datacore';
 import { createCache, META_NODE_COUNT, META_STAR_COUNT } from '@helm/cache';
 import type { Datacore } from '@helm/datacore';
 import type { Cache, SyncResult } from '@helm/cache';
-import { HelmError } from '@helm/errors';
+import { HelmError, HelmErrorFallback } from '@helm/core';
 import { log } from '@helm/logger';
+import { ShipProvider, useShip } from '@helm/ships';
 
 function errorData(err: unknown): Record<string, unknown> {
 	if (HelmError.is(err)) {
@@ -29,6 +34,84 @@ function errorData(err: unknown): Record<string, unknown> {
 		};
 	}
 	return { error: err instanceof Error ? err.message : err };
+}
+
+
+function ShipSkeleton() {
+	return (
+		<Panel variant="bordered" tone="neutral">
+			<div className="helm-flex helm-flex-col helm-gap-4">
+				<TitleBar title={ __( 'Ship', 'helm' ) } tone="neutral" />
+				<div className="helm-flex helm-gap-8">
+					<Readout label={ __( 'Hull', 'helm' ) } value="\u2014" tone="neutral" />
+					<Readout label={ __( 'Systems', 'helm' ) } value="\u2014" tone="neutral" />
+					<Readout label={ __( 'Position', 'helm' ) } value="\u2014" tone="neutral" />
+				</div>
+			</div>
+		</Panel>
+	);
+}
+
+function ShipStatus() {
+	const shipId = window.helm.settings.shipId;
+
+	if ( ! shipId ) {
+		return (
+			<Panel variant="bordered" tone="neutral">
+				<Title label={ __( 'Ship', 'helm' ) } size="sm" />
+				<Readout
+					label={ __( 'Status', 'helm' ) }
+					value={ __( 'No ship assigned', 'helm' ) }
+					tone="neutral"
+				/>
+			</Panel>
+		);
+	}
+
+	return (
+		<ErrorBoundary FallbackComponent={ HelmErrorFallback }>
+			<Suspense fallback={ <ShipSkeleton /> }>
+				<ShipProvider shipId={ shipId }>
+					<ShipPanel />
+				</ShipProvider>
+			</Suspense>
+		</ErrorBoundary>
+	);
+}
+
+function ShipPanel() {
+	const { ship, systems } = useShip();
+	const isActive = ship.current_action_id !== null;
+
+	return (
+		<Panel variant="bordered" tone="neutral">
+			<div className="helm-flex helm-flex-col helm-gap-4">
+				<TitleBar title={ __( 'Ship', 'helm' ) } tone="neutral">
+					<StatusBadge tone={ isActive ? 'info' : 'success' } pulse={ isActive }>
+						{ isActive ? __( 'Active', 'helm' ) : __( 'Idle', 'helm' ) }
+					</StatusBadge>
+				</TitleBar>
+				<div className="helm-flex helm-gap-8">
+					<Readout
+						label={ __( 'Hull', 'helm' ) }
+						value={ ship.hull_integrity }
+						unit="%"
+						tone="neutral"
+					/>
+					<Readout
+						label={ __( 'Systems', 'helm' ) }
+						value={ systems.length }
+						tone="neutral"
+					/>
+					<Readout
+						label={ __( 'Position', 'helm' ) }
+						value={ ship.node_id ?? '\u2014' }
+						tone="neutral"
+					/>
+				</div>
+			</div>
+		</Panel>
+	);
 }
 
 function Settings() {
@@ -141,6 +224,8 @@ function Settings() {
 					</div>
 				</Panel>
 			)}
+
+			<ShipStatus />
 
 			<Panel variant="bordered">
 				<div className="helm-flex helm-flex-col helm-gap-4 helm-items-start">

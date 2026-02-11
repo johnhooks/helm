@@ -18,6 +18,7 @@
         "@wordpress/url": "^4.0.0",
         "react": "^18.3.1",
         "react-dom": "^18.3.1",
+        "react-error-boundary": "^6.1.0",
       },
       "devDependencies": {
         "@playwright/test": "^1.58.0",
@@ -60,17 +61,22 @@
       "version": "0.1.0",
       "dependencies": {
         "@helm/cache": "workspace:*",
+        "@helm/core": "workspace:*",
+        "@helm/data": "workspace:*",
         "@helm/datacore": "workspace:*",
         "@helm/errors": "workspace:*",
         "@helm/logger": "workspace:*",
+        "@helm/ships": "workspace:*",
         "@helm/ui": "workspace:*",
       },
       "peerDependencies": {
         "@wordpress/api-fetch": "^7.0.0",
+        "@wordpress/data": "^10.0.0",
         "@wordpress/element": "^6.0.0",
         "@wordpress/i18n": "^5.0.0",
         "react": "^18.3.1",
         "react-dom": "^18.3.1",
+        "react-error-boundary": "^6.0.0",
       },
     },
     "resources/packages/astrometric": {
@@ -138,9 +144,22 @@
       "version": "0.1.0",
       "dependencies": {
         "@helm/cache": "workspace:*",
+        "@helm/data": "workspace:*",
         "@helm/datacore": "workspace:*",
         "@helm/errors": "workspace:*",
         "@helm/logger": "workspace:*",
+        "@helm/ui": "workspace:*",
+      },
+      "peerDependencies": {
+        "react": "^18.3.1",
+      },
+    },
+    "resources/packages/data": {
+      "name": "@helm/data",
+      "version": "0.1.0",
+      "peerDependencies": {
+        "@wordpress/data": "^10.0.0",
+        "@wordpress/element": "^6.0.0",
       },
     },
     "resources/packages/datacore": {
@@ -156,6 +175,9 @@
     "resources/packages/errors": {
       "name": "@helm/errors",
       "version": "0.1.0",
+      "peerDependencies": {
+        "@wordpress/i18n": "^5.0.0",
+      },
     },
     "resources/packages/logger": {
       "name": "@helm/logger",
@@ -602,6 +624,8 @@
     "@helm/cache": ["@helm/cache@workspace:resources/packages/cache"],
 
     "@helm/core": ["@helm/core@workspace:resources/packages/core"],
+
+    "@helm/data": ["@helm/data@workspace:resources/packages/data"],
 
     "@helm/datacore": ["@helm/datacore@workspace:resources/packages/datacore"],
 
@@ -2912,6 +2936,8 @@
     "react-docgen-typescript": ["react-docgen-typescript@2.4.0", "", { "peerDependencies": { "typescript": ">= 4.3.x" } }, "sha512-ZtAp5XTO5HRzQctjPU0ybY0RRCQO19X/8fxn3w7y2VVTUbGHDKULPTL4ky3vB05euSgG5NpALhEhDPvQ56wvXg=="],
 
     "react-dom": ["react-dom@18.3.1", "", { "dependencies": { "loose-envify": "^1.1.0", "scheduler": "^0.23.2" }, "peerDependencies": { "react": "^18.3.1" } }, "sha512-5m4nQKp+rZRb09LNH59GM4BxTh9251/ylbKIbpe7TpGxfJ+9kv6BLkLBXIjjspbgbnIBNqlI23tRnTWT0snUIw=="],
+
+    "react-error-boundary": ["react-error-boundary@6.1.0", "", { "peerDependencies": { "react": "^18.0.0 || ^19.0.0" } }, "sha512-02k9WQ/mUhdbXir0tC1NiMesGzRPaCsJEWU/4bcFrbY1YMZOtHShtZP6zw0SJrBWA/31H0KT9/FgdL8+sPKgHA=="],
 
     "react-is": ["react-is@16.13.1", "", {}, "sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ=="],
 

@@ -118,13 +118,6 @@ final class ShipSystemsController
             return $component;
         }, $systems);
 
-        $response = new WP_REST_Response($items);
-
-        // Add collection-level links
-        $response->add_link('self', rest_url(self::NAMESPACE . '/ships/' . $shipPostId . '/systems'));
-        $response->add_link(LinkRel::Ship->value, rest_url(self::NAMESPACE . '/ships/' . $shipPostId), ['embeddable' => true]);
-        $response->add_link(LinkRel::Inventory->value, rest_url(self::NAMESPACE . '/inventory'), ['embeddable' => true]);
-
-        return $response;
+        return new WP_REST_Response($items);
     }
 }

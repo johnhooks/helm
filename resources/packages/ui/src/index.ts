@@ -77,6 +77,21 @@ export type { LcarsModalProps } from "./components/lcars-modal";
 export { ProgressBar } from "./components/progress-bar";
 export type { ProgressBarProps } from "./components/progress-bar";
 
+export { ErrorContent } from "./components/error-display";
+export type { ErrorContentProps } from "./components/error-display";
+
+export { ErrorCompactContent } from "./components/error-display";
+export type { ErrorCompactContentProps } from "./components/error-display";
+
+export { ErrorCard } from "./components/error-display";
+export type { ErrorCardProps } from "./components/error-display";
+
+export { ErrorCompact } from "./components/error-display";
+export type { ErrorCompactProps } from "./components/error-display";
+
+export { ErrorModal } from "./components/error-display";
+export type { ErrorModalProps } from "./components/error-display";
+
 export { Countdown, formatTime } from "./components/countdown";
 export type { CountdownProps } from "./components/countdown";
 
