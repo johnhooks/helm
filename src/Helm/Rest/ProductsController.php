@@ -76,7 +76,7 @@ final class ProductsController
         }
 
         $data = array_map(
-            fn (Product $product) => $this->serializeProduct($product, $request),
+            fn (Product $product) => $this->serializeProduct($product),
             $products
         );
 
@@ -101,7 +101,7 @@ final class ProductsController
             );
         }
 
-        $response = new WP_REST_Response($this->serializeProduct($product, $request));
+        $response = new WP_REST_Response($this->serializeProduct($product));
         $response->add_links($this->prepareLinks($product));
 
         return $response;
@@ -110,74 +110,26 @@ final class ProductsController
     /**
      * Serialize a product for JSON response.
      *
-     * @param WP_REST_Request<array<string, mixed>> $request
      * @return array<string, mixed>
      */
-    private function serializeProduct(Product $product, WP_REST_Request $request): array
+    private function serializeProduct(Product $product): array
     {
-        $context = $request->get_param('context') ?? 'view';
-
-        // Minimal data for embed context
-        $data = [
-            'id'    => $product->id,
-            'slug'  => $product->slug,
-            'type'  => $product->type,
-            'label' => $product->label,
+        return [
+            'id'        => $product->id,
+            'slug'      => $product->slug,
+            'type'      => $product->type,
+            'label'     => $product->label,
+            'version'   => $product->version,
+            'hp'        => $product->hp,
+            'footprint' => $product->footprint,
+            'rate'      => $product->rate,
+            'range'     => $product->range,
+            'capacity'  => $product->capacity,
+            'chance'    => $product->chance,
+            'mult_a'    => $product->mult_a,
+            'mult_b'    => $product->mult_b,
+            'mult_c'    => $product->mult_c,
         ];
-
-        // Full data for view/edit context
-        if ($context !== 'embed') {
-            $data['version'] = $product->version;
-            $data['hp'] = $product->hp;
-            $data['footprint'] = $product->footprint;
-            $data['stats'] = $this->serializeStats($product);
-        }
-
-        return $data;
-    }
-
-    /**
-     * Serialize product stats based on type.
-     *
-     * @return array<string, float|null>
-     */
-    private function serializeStats(Product $product): array
-    {
-        return match ($product->type) {
-            'core' => [
-                'regen_rate'    => $product->rate,
-                'output'        => $product->mult_a,
-                'jump_cost'     => $product->mult_b,
-            ],
-            'drive' => [
-                'sustain'       => $product->range,
-                'speed'         => $product->mult_a,
-                'consumption'   => $product->mult_b,
-                'amplitude'     => $product->mult_c,
-            ],
-            'sensor' => [
-                'range'         => $product->range,
-                'success'       => $product->chance,
-                'duration_mult' => $product->mult_a,
-            ],
-            'shield' => [
-                'regen_rate'    => $product->rate,
-                'capacity'      => $product->capacity,
-            ],
-            'nav' => [
-                'skill'         => $product->mult_a,
-                'efficiency'    => $product->mult_b,
-            ],
-            default => [
-                'rate'     => $product->rate,
-                'range'    => $product->range,
-                'capacity' => $product->capacity,
-                'chance'   => $product->chance,
-                'mult_a'   => $product->mult_a,
-                'mult_b'   => $product->mult_b,
-                'mult_c'   => $product->mult_c,
-            ],
-        };
     }
 
     /**

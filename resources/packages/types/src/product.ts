@@ -1,6 +1,20 @@
-export interface ProductEmbed {
+import type { WithRestLinks } from './rest';
+
+export interface Product {
 	id: number;
 	slug: string;
 	type: string;
 	label: string;
+	version: number;
+	hp: number | null;
+	footprint: number;
+	rate: number | null;
+	range: number | null;
+	capacity: number | null;
+	chance: number | null;
+	mult_a: number | null;
+	mult_b: number | null;
+	mult_c: number | null;
 }
+
+export type ProductEmbed = WithRestLinks< Product >;

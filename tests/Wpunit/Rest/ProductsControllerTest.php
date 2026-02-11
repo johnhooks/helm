@@ -8,7 +8,6 @@ use Helm\Products\ProductRepository;
 use lucatume\WPBrowser\TestCase\WPRestApiTestCase;
 use Tests\Support\WpunitTester;
 use WP_REST_Request;
-use WP_REST_Response;
 
 /**
  * @covers \Helm\Rest\ProductsController
@@ -78,9 +77,8 @@ class ProductsControllerTest extends WPRestApiTestCase
         $this->assertSame('core', $data['type']);
         $this->assertSame('Epoch-S Standard', $data['label']);
 
-        // Full context should include stats
-        $this->assertArrayHasKey('stats', $data);
-        $this->assertArrayHasKey('regen_rate', $data['stats']);
+        // Full context should include stat columns
+        $this->assertArrayHasKey('rate', $data);
     }
 
     public function test_get_single_product_not_found(): void
@@ -104,15 +102,13 @@ class ProductsControllerTest extends WPRestApiTestCase
 
         $data = $response->get_data();
 
-        // Embed context should have minimal data
+        // Embed context returns full product data (same as view)
         $this->assertSame($product->id, $data['id']);
         $this->assertSame('epoch_s', $data['slug']);
         $this->assertSame('core', $data['type']);
         $this->assertSame('Epoch-S Standard', $data['label']);
-
-        // Should NOT have detailed stats in embed context
-        $this->assertArrayNotHasKey('stats', $data);
-        $this->assertArrayNotHasKey('version', $data);
+        $this->assertArrayHasKey('rate', $data);
+        $this->assertArrayHasKey('version', $data);
     }
 
     public function test_single_product_has_links(): void
@@ -149,11 +145,10 @@ class ProductsControllerTest extends WPRestApiTestCase
         $response = rest_do_request($request);
 
         $data = $response->get_data();
-        $stats = $data['stats'];
 
-        $this->assertArrayHasKey('regen_rate', $stats);
-        $this->assertArrayHasKey('output', $stats);
-        $this->assertArrayHasKey('jump_cost', $stats);
+        $this->assertArrayHasKey('rate', $data);
+        $this->assertArrayHasKey('mult_a', $data);
+        $this->assertArrayHasKey('mult_b', $data);
     }
 
     public function test_drive_stats_structure(): void
@@ -165,12 +160,11 @@ class ProductsControllerTest extends WPRestApiTestCase
         $response = rest_do_request($request);
 
         $data = $response->get_data();
-        $stats = $data['stats'];
 
-        $this->assertArrayHasKey('sustain', $stats);
-        $this->assertArrayHasKey('speed', $stats);
-        $this->assertArrayHasKey('consumption', $stats);
-        $this->assertArrayHasKey('amplitude', $stats);
+        $this->assertArrayHasKey('range', $data);
+        $this->assertArrayHasKey('mult_a', $data);
+        $this->assertArrayHasKey('mult_b', $data);
+        $this->assertArrayHasKey('mult_c', $data);
     }
 
     public function test_sensor_stats_structure(): void
@@ -182,10 +176,9 @@ class ProductsControllerTest extends WPRestApiTestCase
         $response = rest_do_request($request);
 
         $data = $response->get_data();
-        $stats = $data['stats'];
 
-        $this->assertArrayHasKey('range', $stats);
-        $this->assertArrayHasKey('success', $stats);
-        $this->assertArrayHasKey('duration_mult', $stats);
+        $this->assertArrayHasKey('range', $data);
+        $this->assertArrayHasKey('chance', $data);
+        $this->assertArrayHasKey('mult_a', $data);
     }
 }

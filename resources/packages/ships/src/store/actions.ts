@@ -1,6 +1,7 @@
 import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
 import { ErrorCode, HelmError } from '@helm/errors';
+import { store as productsStore } from '@helm/products';
 import { LinkRel } from '@helm/types';
 import type { ShipState, SystemComponentResponse, Thunk, WithRestLinks } from '@helm/types';
 import type { Action, ShipEmbeds, ShipResponse } from './types';
@@ -76,10 +77,18 @@ export function receiveSystems(
 
 export const receiveShipEmbeds =
 	( shipId: number, embedded: ShipEmbeds ): Thunk< Action, typeof store > =>
-	async ( { dispatch } ) => {
+	async ( { dispatch, registry } ) => {
 		const systems = embedded[ LinkRel.Systems ];
 
 		if ( systems ) {
 			dispatch( receiveSystems( shipId, systems ) );
+
+			const products = systems
+				.map( ( system ) => system._embedded?.[ LinkRel.Product ]?.[ 0 ] )
+				.filter( ( p ): p is NonNullable< typeof p > => p !== undefined );
+
+			if ( products.length > 0 ) {
+				registry.dispatch( productsStore ).receiveProducts( products );
+			}
 		}
 	};

@@ -1,4 +1,4 @@
-import type { ShipState, SystemComponent } from '@helm/types';
+import type { Product, ProductEmbed, ShipState, SystemComponent } from '@helm/types';
 import type { State } from '../types';
 import { initializeDefaultState } from '../reducer';
 
@@ -29,6 +29,28 @@ export function createSystemComponent(
 		condition: 1.0,
 		created_at: '2025-01-01 00:00:00',
 		updated_at: '2025-01-01 00:00:00',
+		...overrides,
+	};
+}
+
+export function createProductEmbed(
+	overrides: Partial< Product > = {}
+): ProductEmbed {
+	return {
+		id: 10,
+		slug: 'epoch_s',
+		type: 'core',
+		label: 'Epoch-S Standard',
+		version: 1,
+		hp: null,
+		footprint: 4,
+		rate: 0.5,
+		range: null,
+		capacity: null,
+		chance: null,
+		mult_a: 1.0,
+		mult_b: 0.8,
+		mult_c: null,
 		...overrides,
 	};
 }

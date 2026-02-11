@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import apiFetch from '@wordpress/api-fetch';
 import { HelmError } from '@helm/errors';
+import { store as productsStore } from '@helm/products';
 import { LinkRel } from '@helm/types';
 import {
 	fetchShip,
@@ -9,7 +10,7 @@ import {
 	receiveSystems,
 	receiveShipEmbeds,
 } from '../actions';
-import { createShipState, createSystemComponent } from './fixtures';
+import { createShipState, createSystemComponent, createProductEmbed } from './fixtures';
 
 vi.mock( '@wordpress/api-fetch' );
 
@@ -284,9 +285,15 @@ describe( 'receiveSystems', () => {
 
 describe( 'receiveShipEmbeds', () => {
 	let dispatch: ReturnType< typeof vi.fn >;
+	let registry: { dispatch: ReturnType< typeof vi.fn > };
+	let productsDispatch: { receiveProducts: ReturnType< typeof vi.fn > };
 
 	beforeEach( () => {
 		dispatch = vi.fn();
+		productsDispatch = { receiveProducts: vi.fn() };
+		registry = {
+			dispatch: vi.fn().mockReturnValue( productsDispatch ),
+		};
 	} );
 
 	it( 'dispatches receiveSystems when helm:systems is present', () => {
@@ -294,6 +301,7 @@ describe( 'receiveShipEmbeds', () => {
 
 		receiveShipEmbeds( 42, { [ LinkRel.Systems ]: systems } )( {
 			dispatch,
+			registry,
 		} as never );
 
 		expect( dispatch ).toHaveBeenCalledWith( {
@@ -303,9 +311,39 @@ describe( 'receiveShipEmbeds', () => {
 		} );
 	} );
 
+	it( 'dispatches product embeds to the products store', () => {
+		const product = createProductEmbed( { id: 10 } );
+		const systems = [
+			{
+				...createSystemComponent( { product_id: 10 } ),
+				_embedded: { [ LinkRel.Product ]: [ product ] as [ typeof product ] },
+			},
+		];
+
+		receiveShipEmbeds( 42, { [ LinkRel.Systems ]: systems } )( {
+			dispatch,
+			registry,
+		} as never );
+
+		expect( registry.dispatch ).toHaveBeenCalledWith( productsStore );
+		expect( productsDispatch.receiveProducts ).toHaveBeenCalledWith( [ product ] );
+	} );
+
+	it( 'skips products dispatch when no product embeds', () => {
+		const systems = [ createSystemComponent() ];
+
+		receiveShipEmbeds( 42, { [ LinkRel.Systems ]: systems } )( {
+			dispatch,
+			registry,
+		} as never );
+
+		expect( registry.dispatch ).not.toHaveBeenCalled();
+	} );
+
 	it( 'does not dispatch when helm:systems is absent', () => {
-		receiveShipEmbeds( 42, {} )( { dispatch } as never );
+		receiveShipEmbeds( 42, {} )( { dispatch, registry } as never );
 
 		expect( dispatch ).not.toHaveBeenCalled();
+		expect( registry.dispatch ).not.toHaveBeenCalled();
 	} );
 } );
