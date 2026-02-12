@@ -1,14 +1,14 @@
 import type { Datacore } from '@helm/datacore';
-import type { Cache } from '@helm/cache';
+import type { syncNodes } from '@helm/nav';
 
 /**
- * E2E test augmentation — adds dc and cache instance holders
+ * E2E test augmentation — adds dc and sync function holders
  * to window.helm. Set by the Playwright fixture before each test.
  */
 declare global {
 	interface HelmGlobal {
 		dc: Datacore;
-		cache: Cache;
+		syncNodes: typeof syncNodes;
 	}
 }
 

@@ -35,19 +35,19 @@ const coreExternals = {
 	...uiExternals,
 	'@helm/core': { global: ['helm', 'core'], handle: 'helm-core' },
 	'@helm/data': { global: ['helm', 'core'], handle: 'helm-core' },
-	'@helm/datacore': { global: ['helm', 'core'], handle: 'helm-core' },
-	'@helm/cache': { global: ['helm', 'core'], handle: 'helm-core' },
 	'@helm/errors': { global: ['helm', 'core'], handle: 'helm-core' },
 	'@helm/logger': { global: ['helm', 'core'], handle: 'helm-core' },
 };
 
 /**
- * Externals for datastore entries (products, ships).
- * Includes core externals + cross-datastore deps (ships → products).
+ * Externals for datastore entries (products, ships, nav).
+ * Includes core externals + cross-datastore deps.
  */
 const datastoreExternals = {
 	...coreExternals,
+	'@helm/datacore': { global: ['helm', 'datacore'], handle: 'helm-datacore' },
 	'@helm/products': { global: ['helm', 'products'], handle: 'helm-products' },
+	'@helm/nav': { global: ['helm', 'nav'], handle: 'helm-nav' },
 };
 
 /**
@@ -78,8 +78,8 @@ module.exports = [
 	},
 
 	// ── Core library (tier 2) ─────────────────────────────────────────
-	// Externalizes @helm/ui. Contains lib packages (errors, data, cache,
-	// logger, datacore) + composed app components.
+	// Externalizes @helm/ui. Contains lib packages (errors, data, logger)
+	// + composed app components.
 	{
 		...defaultConfig,
 		name: 'core',
@@ -108,11 +108,19 @@ module.exports = [
 
 	// ── Datastore bundles ────────────────────────────────────────────
 	// WordPress + @helm/core externals. These entries provide the
-	// @helm/products and @helm/ships window globals consumed by apps.
+	// @helm/* window globals consumed by apps.
 	{
 		...defaultConfig,
 		name: 'datastores',
 		entry: {
+			datacore: {
+				import: path.resolve(packages, 'datacore/src/index.ts'),
+				library: { name: ['helm', 'datacore'], type: 'window' },
+			},
+			nav: {
+				import: path.resolve(packages, 'nav/src/index.ts'),
+				library: { name: ['helm', 'nav'], type: 'window' },
+			},
 			products: {
 				import: path.resolve(packages, 'products/src/index.ts'),
 				library: { name: ['helm', 'products'], type: 'window' },

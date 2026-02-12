@@ -10,7 +10,7 @@ const NODES_PATH = '**/helm/v1/nodes*';
 
 async function runSync(page: import('@playwright/test').Page) {
 	return page.evaluate(async () => {
-		return window.helm.cache.syncNodes();
+		return window.helm.syncNodes(window.helm.dc);
 	});
 }
 
@@ -74,10 +74,9 @@ test.describe('Cache E2E', () => {
 			expect(await getNodeCount(page)).toBe(10);
 			expect(await getStarCount(page)).toBe(10);
 
-			const synced = await page.evaluate(() => window.helm.cache.isSynced());
-			expect(synced).toBe(true);
-
-			const syncedAt = await page.evaluate(() => window.helm.cache.lastSyncedAt());
+			const syncedAt = await page.evaluate(async () => {
+				return window.helm.dc.getMeta('cache.synced_at');
+			});
 			expect(syncedAt).toBeTruthy();
 		});
 
@@ -230,29 +229,20 @@ test.describe('Cache E2E', () => {
 	// -------------------------------------------------------------------
 
 	test.describe('Sync state', () => {
-		test('isSynced returns false before first sync', async ({ page }) => {
-			const synced = await page.evaluate(() => window.helm.cache.isSynced());
-			expect(synced).toBe(false);
-		});
-
-		test('lastSyncedAt returns null before first sync', async ({ page }) => {
-			const syncedAt = await page.evaluate(() => window.helm.cache.lastSyncedAt());
+		test('synced_at meta is null before first sync', async ({ page }) => {
+			const syncedAt = await page.evaluate(async () => {
+				return window.helm.dc.getMeta('cache.synced_at');
+			});
 			expect(syncedAt).toBeNull();
 		});
 
-		test('isSynced returns true after sync', async ({ page }) => {
+		test('synced_at meta is set after sync', async ({ page }) => {
 			await page.route(NODES_PATH, paginatedRoute([[makeApiNode(1)]]));
 			await runSync(page);
 
-			const synced = await page.evaluate(() => window.helm.cache.isSynced());
-			expect(synced).toBe(true);
-		});
-
-		test('lastSyncedAt returns ISO timestamp after sync', async ({ page }) => {
-			await page.route(NODES_PATH, paginatedRoute([[makeApiNode(1)]]));
-			await runSync(page);
-
-			const syncedAt = await page.evaluate(() => window.helm.cache.lastSyncedAt());
+			const syncedAt = await page.evaluate(async () => {
+				return window.helm.dc.getMeta('cache.synced_at');
+			});
 			expect(syncedAt).toBeTruthy();
 			// Should be a valid ISO date.
 			expect(new Date(syncedAt!).toISOString()).toBe(syncedAt);
@@ -284,7 +274,7 @@ test.describe('Cache E2E', () => {
 
 			const error = await page.evaluate(async () => {
 				try {
-					await window.helm.cache.syncNodes();
+					await window.helm.syncNodes(window.helm.dc);
 					return null;
 				} catch (e: any) {
 					return { message: e.message, isSafe: e.isSafe };
@@ -313,7 +303,7 @@ test.describe('Cache E2E', () => {
 
 			const error = await page.evaluate(async () => {
 				try {
-					await window.helm.cache.syncNodes();
+					await window.helm.syncNodes(window.helm.dc);
 					return null;
 				} catch (e: any) {
 					return { message: e.message, isSafe: e.isSafe };
@@ -331,7 +321,7 @@ test.describe('Cache E2E', () => {
 
 			const error = await page.evaluate(async () => {
 				try {
-					await window.helm.cache.syncNodes();
+					await window.helm.syncNodes(window.helm.dc);
 					return null;
 				} catch (e: any) {
 					return { message: e.message, isSafe: e.isSafe };
@@ -376,7 +366,7 @@ test.describe('Cache E2E', () => {
 
 			const error = await page.evaluate(async () => {
 				try {
-					await window.helm.cache.syncNodes();
+					await window.helm.syncNodes(window.helm.dc);
 					return null;
 				} catch (e: any) {
 					return { message: e.message };

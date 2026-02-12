@@ -10,14 +10,14 @@
 		"check-types": "tsc --noEmit"
 	},
 	"dependencies": {
-		"@helm/cache": "workspace:*",
 		"@helm/core": "workspace:*",
-		"@helm/datacore": "workspace:*",
 		"@helm/logger": "workspace:*",
+		"@helm/nav": "workspace:*",
 		"@helm/ships": "workspace:*",
 		"@helm/ui": "workspace:*"
 	},
 	"peerDependencies": {
+		"@wordpress/data": "^10.0.0",
 		"@wordpress/element": "^6.0.0",
 		"@wordpress/i18n": "^5.0.0",
 		"react": "^18.3.1",

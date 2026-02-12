@@ -1,11 +1,12 @@
 /**
  * Helm Settings — admin settings entry point.
  *
- * Initializes Datacore (Web Worker + SQLite) and Cache, provides
- * a "Sync Nodes" button for manual cache sync, displays status,
+ * Uses the nav store for datacore sync and status display.
+ * Provides a "Sync Nodes" button for manual cache sync,
  * and shows the current ship via the ShipProvider context.
  */
-import { createRoot, Suspense, useEffect, useRef, useState } from '@wordpress/element';
+import { createRoot, Suspense, useState } from '@wordpress/element';
+import { useSelect, useDispatch, useSuspenseSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import {
 	AppRoot,
@@ -17,10 +18,7 @@ import {
 	TitleBar,
 } from '@helm/ui';
 import { ErrorBoundary } from 'react-error-boundary';
-import { createDatacore } from '@helm/datacore';
-import { createCache, META_NODE_COUNT, META_STAR_COUNT } from '@helm/cache';
-import type { Datacore } from '@helm/datacore';
-import type { Cache, SyncResult } from '@helm/cache';
+import { store as navStore } from '@helm/nav';
 import { HelmError, HelmErrorFallback } from '@helm/core';
 import { log } from '@helm/logger';
 import { ShipProvider, useShip } from '@helm/ships';
@@ -34,49 +32,6 @@ function errorData(err: unknown): Record<string, unknown> {
 		};
 	}
 	return { error: err instanceof Error ? err.message : err };
-}
-
-
-function ShipSkeleton() {
-	return (
-		<Panel variant="bordered" tone="neutral">
-			<div className="helm-flex helm-flex-col helm-gap-4">
-				<TitleBar title={ __( 'Ship', 'helm' ) } tone="neutral" />
-				<div className="helm-flex helm-gap-8">
-					<Readout label={ __( 'Hull', 'helm' ) } value="\u2014" tone="neutral" />
-					<Readout label={ __( 'Systems', 'helm' ) } value="\u2014" tone="neutral" />
-					<Readout label={ __( 'Position', 'helm' ) } value="\u2014" tone="neutral" />
-				</div>
-			</div>
-		</Panel>
-	);
-}
-
-function ShipStatus() {
-	const shipId = window.helm.settings.shipId;
-
-	if ( ! shipId ) {
-		return (
-			<Panel variant="bordered" tone="neutral">
-				<Title label={ __( 'Ship', 'helm' ) } size="sm" />
-				<Readout
-					label={ __( 'Status', 'helm' ) }
-					value={ __( 'No ship assigned', 'helm' ) }
-					tone="neutral"
-				/>
-			</Panel>
-		);
-	}
-
-	return (
-		<ErrorBoundary FallbackComponent={ HelmErrorFallback }>
-			<Suspense fallback={ <ShipSkeleton /> }>
-				<ShipProvider shipId={ shipId }>
-					<ShipPanel />
-				</ShipProvider>
-			</Suspense>
-		</ErrorBoundary>
-	);
 }
 
 function ShipPanel() {
@@ -114,94 +69,57 @@ function ShipPanel() {
 	);
 }
 
+function NoShip() {
+	return (
+		<Panel variant="bordered" tone="neutral">
+			<Title label={ __( 'Ship', 'helm' ) } size="sm" />
+			<Readout
+				label={ __( 'Status', 'helm' ) }
+				value={ __( 'No ship assigned', 'helm' ) }
+				tone="neutral"
+			/>
+		</Panel>
+	);
+}
+
 function Settings() {
-	const [syncing, setSyncing] = useState(false);
-	const [initializing, setInitializing] = useState(true);
-	const [error, setError] = useState<string | null>(null);
-	const [result, setResult] = useState<SyncResult | null>(null);
+	const shipId = window.helm.settings.shipId;
+	const [localError, setLocalError] = useState<string | null>(null);
 
-	const datacoreRef = useRef<Datacore | null>(null);
-	const cacheRef = useRef<Cache | null>(null);
+	// Trigger the nav resolver — suspends until hydrate/sync completes.
+	useSuspenseSelect(
+		(select) => select(navStore).getStarNodes(),
+		[],
+	);
 
-	useEffect(() => {
-		let cancelled = false;
+	const { syncStatus, syncResult, navError } = useSelect(
+		(select) => ({
+			syncStatus: select(navStore).getSyncStatus(),
+			syncResult: select(navStore).getSyncResult(),
+			navError: select(navStore).getError(),
+		}),
+		[],
+	);
 
-		async function init() {
-			try {
-				log.debug('datacore.init', { workerUrl: window.helm.settings.workerUrl });
-				const dc = await createDatacore({
-					workerUrl: window.helm.settings.workerUrl,
-				});
-				log.debug('datacore.ready');
+	const { syncNodes } = useDispatch(navStore);
 
-				if (cancelled) {
-					await dc.close();
-					return;
-				}
-
-				datacoreRef.current = dc;
-
-				const cache = createCache({ datacore: dc });
-				cacheRef.current = cache;
-
-				const lastSynced = await cache.lastSyncedAt();
-				const nodeCount = await dc.getMeta(META_NODE_COUNT);
-				const starCount = await dc.getMeta(META_STAR_COUNT);
-				log.debug('cache.restore', { lastSynced, nodeCount, starCount });
-				if (lastSynced) {
-					setResult({
-						nodes: Number(nodeCount ?? 0),
-						stars: Number(starCount ?? 0),
-						syncedAt: lastSynced,
-					});
-				}
-			} catch (err) {
-				log.error('init.error', errorData(err));
-				if (!cancelled) {
-					setError(
-						err instanceof Error
-							? err.message
-							: __('Failed to initialize Datacore.', 'helm'),
-					);
-				}
-			} finally {
-				if (!cancelled) {
-					setInitializing(false);
-				}
-			}
-		}
-
-		init();
-
-		return () => {
-			cancelled = true;
-			datacoreRef.current?.close();
-		};
-	}, []);
+	const syncing = syncStatus === 'syncing';
+	const error = localError ?? (navError ? navError.detail ?? navError.message : null);
 
 	async function handleSync() {
-		const cache = cacheRef.current;
-		if (!cache) {
-			return;
-		}
-
-		setSyncing(true);
-		setError(null);
+		setLocalError(null);
 
 		try {
 			log.info('sync.start');
-			const syncResult = await cache.syncNodes();
-			log.info('sync.complete', syncResult);
-			setResult(syncResult);
+			await syncNodes();
+			log.info('sync.complete');
 		} catch (err) {
 			log.error('sync.error', errorData(err));
-			setError(
+			setLocalError(
 				err instanceof Error
 					? err.message
 					: __('Sync failed.', 'helm'),
 			);
-		} finally {
-			setSyncing(false);
 		}
 	}
 
@@ -216,7 +134,7 @@ function Settings() {
 						<Button
 							variant="ghost"
 							size="sm"
-							onClick={() => setError(null)}
+							onClick={() => setLocalError(null)}
 							aria-label={__('Dismiss error', 'helm')}
 						>
 							{__('Dismiss', 'helm')}
@@ -225,7 +143,13 @@ function Settings() {
 				</Panel>
 			)}
 
-			<ShipStatus />
+			{ shipId ? (
+				<ShipProvider shipId={ shipId }>
+					<ShipPanel />
+				</ShipProvider>
+			) : (
+				<NoShip />
+			) }
 
 			<Panel variant="bordered">
 				<div className="helm-flex helm-flex-col helm-gap-4 helm-items-start">
@@ -234,7 +158,7 @@ function Settings() {
 					<Button
 						variant="primary"
 						onClick={handleSync}
-						disabled={initializing || syncing}
+						disabled={syncing}
 					>
 						{__('Sync Nodes', 'helm')}
 					</Button>
@@ -242,15 +166,15 @@ function Settings() {
 					<div className="helm-flex helm-gap-8">
 						<Readout
 							label={__('Nodes', 'helm')}
-							value={result?.nodes ?? '\u2014'}
+							value={syncResult?.nodes ?? '\u2014'}
 						/>
 						<Readout
 							label={__('Stars', 'helm')}
-							value={result?.stars ?? '\u2014'}
+							value={syncResult?.stars ?? '\u2014'}
 						/>
 						<Readout
 							label={__('Last Synced', 'helm')}
-							value={result?.syncedAt ?? '\u2014'}
+							value={syncResult?.syncedAt ?? '\u2014'}
 							tone="neutral"
 						/>
 					</div>
@@ -262,5 +186,11 @@ function Settings() {
 
 const rootElement = document.querySelector('.helm-settings-root');
 if (rootElement) {
-	createRoot(rootElement).render(<Settings />);
+	createRoot(rootElement).render(
+		<ErrorBoundary FallbackComponent={ HelmErrorFallback }>
+			<Suspense fallback={ null }>
+				<Settings />
+			</Suspense>
+		</ErrorBoundary>,
+	);
 }

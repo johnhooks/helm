@@ -9,7 +9,7 @@ export default defineConfig({
         environment: 'happy-dom',
         environmentMatchGlobs: [
             ['resources/packages/datacore/**', 'node'],
-            ['resources/packages/cache/**', 'node'],
+            ['resources/packages/nav/**', 'node'],
             ['resources/packages/errors/**', 'node'],
             ['resources/packages/ships/**', 'node'],
             ['resources/packages/products/**', 'node'],
@@ -28,7 +28,7 @@ export default defineConfig({
             '@helm/lcars': path.resolve(__dirname, 'resources/packages/lcars/src'),
             '@helm/bridge': path.resolve(__dirname, 'resources/packages/bridge/src'),
             '@helm/astrometric': path.resolve(__dirname, 'resources/packages/astrometric/src'),
-            '@helm/cache': path.resolve(__dirname, 'resources/packages/cache/src'),
+            '@helm/nav': path.resolve(__dirname, 'resources/packages/nav/src'),
             '@helm/datacore': path.resolve(__dirname, 'resources/packages/datacore/src'),
             '@helm/errors': path.resolve(__dirname, 'resources/packages/errors/src'),
             '@helm/types': path.resolve(__dirname, 'resources/packages/types/src'),

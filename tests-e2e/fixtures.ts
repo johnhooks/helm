@@ -3,12 +3,12 @@ import { test as base } from '@playwright/test';
 const OPFS_DIR = 'helm-datacore';
 
 /**
- * Custom test fixture that provides a fresh Datacore + Cache on every test.
+ * Custom test fixture that provides a fresh Datacore on every test.
  *
  * Usage:
  *   import { test, expect } from './fixtures';
  *
- * Each test gets a page with `window.helm.dc` and `window.helm.cache` ready.
+ * Each test gets a page with `window.helm.dc` and `window.helm.syncNodes` ready.
  * OPFS is wiped before each test, and the instance is closed after.
  */
 export const test = base.extend({
@@ -26,10 +26,9 @@ export const test = base.extend({
 			}
 		}, OPFS_DIR);
 
-		// Boot Datacore and Cache.
+		// Boot Datacore.
 		await page.evaluate(async () => {
-			window.helm.dc = await window.helm.core.createDatacore();
-			window.helm.cache = window.helm.core.createCache({ datacore: window.helm.dc });
+			window.helm.dc = await window.helm.datacore.createDatacore();
 		});
 
 		await use(page); // eslint-disable-line react-hooks/rules-of-hooks

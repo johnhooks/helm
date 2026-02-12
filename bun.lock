@@ -60,17 +60,13 @@
       "name": "@helm/admin-settings",
       "version": "0.1.0",
       "dependencies": {
-        "@helm/cache": "workspace:*",
         "@helm/core": "workspace:*",
-        "@helm/data": "workspace:*",
-        "@helm/datacore": "workspace:*",
-        "@helm/errors": "workspace:*",
         "@helm/logger": "workspace:*",
+        "@helm/nav": "workspace:*",
         "@helm/ships": "workspace:*",
         "@helm/ui": "workspace:*",
       },
       "peerDependencies": {
-        "@wordpress/api-fetch": "^7.0.0",
         "@wordpress/data": "^10.0.0",
         "@wordpress/element": "^6.0.0",
         "@wordpress/i18n": "^5.0.0",
@@ -108,17 +104,20 @@
       "version": "0.1.0",
       "dependencies": {
         "@helm/astrometric": "workspace:*",
-        "@helm/cache": "workspace:*",
-        "@helm/datacore": "workspace:*",
+        "@helm/core": "workspace:*",
         "@helm/errors": "workspace:*",
         "@helm/logger": "workspace:*",
+        "@helm/nav": "workspace:*",
         "@helm/router": "workspace:*",
+        "@helm/ships": "workspace:*",
         "@helm/ui": "workspace:*",
         "@tanstack/react-router": "^1.159.4",
+        "react-error-boundary": "^4.1.2",
       },
       "peerDependencies": {
         "@wordpress/api-fetch": "^7.0.0",
         "@wordpress/components": "^28.0.0",
+        "@wordpress/data": "^10.0.0",
         "@wordpress/element": "^6.0.0",
         "@wordpress/i18n": "^5.0.0",
         "@wordpress/icons": "^10.0.0",
@@ -126,26 +125,11 @@
         "react-dom": "^18.3.1",
       },
     },
-    "resources/packages/cache": {
-      "name": "@helm/cache",
-      "version": "0.1.0",
-      "dependencies": {
-        "@helm/datacore": "workspace:*",
-        "@helm/errors": "workspace:*",
-        "@helm/types": "workspace:*",
-        "@wordpress/i18n": "^5.0.0",
-      },
-      "peerDependencies": {
-        "@wordpress/api-fetch": "^7.0.0",
-      },
-    },
     "resources/packages/core": {
       "name": "@helm/core",
       "version": "0.1.0",
       "dependencies": {
-        "@helm/cache": "workspace:*",
         "@helm/data": "workspace:*",
-        "@helm/datacore": "workspace:*",
         "@helm/errors": "workspace:*",
         "@helm/logger": "workspace:*",
         "@helm/ui": "workspace:*",
@@ -183,6 +167,20 @@
       "name": "@helm/logger",
       "version": "0.1.0",
     },
+    "resources/packages/nav": {
+      "name": "@helm/nav",
+      "version": "0.1.0",
+      "dependencies": {
+        "@helm/datacore": "workspace:*",
+        "@helm/errors": "workspace:*",
+        "@helm/types": "workspace:*",
+      },
+      "peerDependencies": {
+        "@wordpress/api-fetch": "^7.0.0",
+        "@wordpress/data": "^10.0.0",
+        "@wordpress/i18n": "^5.0.0",
+      },
+    },
     "resources/packages/products": {
       "name": "@helm/products",
       "version": "0.1.0",
@@ -214,6 +212,7 @@
       "peerDependencies": {
         "@wordpress/api-fetch": "^7.0.0",
         "@wordpress/data": "^10.0.0",
+        "@wordpress/element": "^6.0.0",
         "@wordpress/i18n": "^5.0.0",
       },
     },
@@ -621,8 +620,6 @@
 
     "@helm/bridge": ["@helm/bridge@workspace:resources/packages/bridge"],
 
-    "@helm/cache": ["@helm/cache@workspace:resources/packages/cache"],
-
     "@helm/core": ["@helm/core@workspace:resources/packages/core"],
 
     "@helm/data": ["@helm/data@workspace:resources/packages/data"],
@@ -632,6 +629,8 @@
     "@helm/errors": ["@helm/errors@workspace:resources/packages/errors"],
 
     "@helm/logger": ["@helm/logger@workspace:resources/packages/logger"],
+
+    "@helm/nav": ["@helm/nav@workspace:resources/packages/nav"],
 
     "@helm/products": ["@helm/products@workspace:resources/packages/products"],
 
@@ -3572,6 +3571,8 @@
     "@es-joy/jsdoccomment/@typescript-eslint/types": ["@typescript-eslint/types@8.54.0", "", {}, "sha512-PDUI9R1BVjqu7AUDsRBbKMtwmjWcn4J3le+5LpcFgWULN3LvHC5rkc9gCVxbrsrGmO1jfPybN5s6h4Jy+OnkAA=="],
 
     "@eslint/eslintrc/espree": ["espree@9.6.1", "", { "dependencies": { "acorn": "^8.9.0", "acorn-jsx": "^5.3.2", "eslint-visitor-keys": "^3.4.1" } }, "sha512-oruZaFkjorTpF32kDSI5/75ViwGeZginGGy2NoOSg3Q9bnwlnmDm4HLnkl0RE3n+njDXR037aY1+x58Z/zFdwQ=="],
+
+    "@helm/bridge/react-error-boundary": ["react-error-boundary@4.1.2", "", { "dependencies": { "@babel/runtime": "^7.12.5" }, "peerDependencies": { "react": ">=16.13.1" } }, "sha512-GQDxZ5Jd+Aq/qUxbCm1UtzmL/s++V7zKgE8yMktJiCQXCCFZnMZh9ng+6/Ne6PjNSXH0L9CjeOEREfRnq6Duag=="],
 
     "@isaacs/cliui/string-width": ["string-width@5.1.2", "", { "dependencies": { "eastasianwidth": "^0.2.0", "emoji-regex": "^9.2.2", "strip-ansi": "^7.0.1" } }, "sha512-HnLOCR3vjcY8beoNLtcjZ5/nxn2afmME6lhrDrebokqMap+XbeW8n9TXpPDOqdGK5qcI3oT0GKTW6wC7EMiVqA=="],
 

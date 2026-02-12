@@ -1,0 +1,18 @@
+{
+	"name": "@helm/nav",
+	"version": "0.1.0",
+	"description": "Navigation data store for Helm — stars, nodes, sync",
+	"private": true,
+	"main": "src/index.ts",
+	"types": "src/index.ts",
+	"dependencies": {
+		"@helm/datacore": "workspace:*",
+		"@helm/errors": "workspace:*",
+		"@helm/types": "workspace:*"
+	},
+	"peerDependencies": {
+		"@wordpress/api-fetch": "^7.0.0",
+		"@wordpress/data": "^10.0.0",
+		"@wordpress/i18n": "^5.0.0"
+	}
+}

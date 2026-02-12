@@ -231,7 +231,7 @@ describe( 'fetchSystems', () => {
 		await fetchSystems( 7 )( { dispatch } as never );
 
 		expect( mockedApiFetch ).toHaveBeenCalledWith( {
-			path: '/helm/v1/ships/7/systems',
+			path: '/helm/v1/ships/7/systems?_embed[]=helm:product',
 		} );
 	} );
 
