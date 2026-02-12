@@ -105,7 +105,7 @@ function ShipPanel() {
 					/>
 					<Readout
 						label={ __( 'Position', 'helm' ) }
-						value={ ship.node_id ?? '\u2014' }
+						value={ ship.node_id }
 						tone="neutral"
 					/>
 				</div>

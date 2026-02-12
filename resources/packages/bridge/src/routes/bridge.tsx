@@ -11,6 +11,7 @@ import { createCache } from '@helm/cache';
 import { HelmError } from '@helm/errors';
 import { log } from '@helm/logger';
 import { Panel, Title, Readout } from '@helm/ui';
+import { useShip } from '@helm/ships';
 import type { Datacore } from '@helm/datacore';
 import type { StarNode } from '@helm/types';
 import { ViewportConfig } from '../components/viewport-config';
@@ -33,15 +34,10 @@ const STAR_SIZE_MULTIPLIER: Record<string, number> = {
 	lg: 1.5,
 };
 
-interface BridgePageProps {
-	currentNodeId?: number;
-	jumpRange?: number;
-}
-
-export function BridgePage({
-	currentNodeId = 1,
-	jumpRange = 7,
-}: BridgePageProps) {
+export function BridgePage() {
+	const { ship } = useShip();
+	const currentNodeId = ship.node_id;
+	const jumpRange = 7;
 	const [stars, setStars] = useState<StarNode[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
@@ -146,6 +142,10 @@ export function BridgePage({
 		setStars(filtered);
 	}, [jumpRangeOnly, currentNodeId, jumpRange]);
 
+	const currentStar = useMemo(
+		() => allStarsRef.current.find((s) => s.node_id === currentNodeId) ?? null,
+		[stars, currentNodeId],
+	);
 	const sizeMultiplier = STAR_SIZE_MULTIPLIER[starSize] ?? 1;
 	const viewportStyle = useMemo(() => ({ width: '100%', height: '100%' }), []);
 
@@ -176,6 +176,7 @@ export function BridgePage({
 				<Suspense fallback={null}>
 					<StarField
 						stars={stars}
+						currentNodeId={currentNodeId}
 						starScale={sizeMultiplier}
 						showLabels={showLabels}
 						style={viewportStyle}
@@ -184,7 +185,7 @@ export function BridgePage({
 			</Panel>
 			<Panel tone="blue" className="helm-bridge__nav">
 				<Title label={__('Navigation', 'helm')} />
-				<Readout label={__('System', 'helm')} value="Sol" />
+				<Readout label={__('System', 'helm')} value={currentStar?.title ?? '\u2014'} />
 			</Panel>
 		</div>
 	);

@@ -12,12 +12,15 @@
 	"dependencies": {
 		"@helm/astrometric": "workspace:*",
 		"@helm/cache": "workspace:*",
+		"@helm/core": "workspace:*",
 		"@helm/datacore": "workspace:*",
 		"@helm/errors": "workspace:*",
 		"@helm/logger": "workspace:*",
 		"@helm/router": "workspace:*",
+		"@helm/ships": "workspace:*",
 		"@helm/ui": "workspace:*",
-		"@tanstack/react-router": "^1.159.4"
+		"@tanstack/react-router": "^1.159.4",
+		"react-error-boundary": "^4.1.2"
 	},
 	"peerDependencies": {
 		"@wordpress/api-fetch": "^7.0.0",

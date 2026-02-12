@@ -5,7 +5,7 @@
  * URL structure. Fullscreen mode is a search param that can be applied to
  * any route.
  */
-import { useEffect } from 'react';
+import { Suspense, useEffect } from '@wordpress/element';
 import {
 	createRootRoute,
 	createRoute,
@@ -13,6 +13,9 @@ import {
 	Outlet,
 	useSearch,
 } from '@tanstack/react-router';
+import { ErrorBoundary } from 'react-error-boundary';
+import { HelmErrorFallback } from '@helm/core';
+import { ShipProvider } from '@helm/ships';
 import { createWpHistory } from '@helm/router';
 import { AppRoot } from '@helm/ui';
 import { BridgePage } from './routes/bridge';
@@ -34,6 +37,7 @@ const rootRoute = createRootRoute({
 	},
 	component: function RootLayout() {
 		const { fullscreen } = useSearch({ from: rootRoute.id });
+		const shipId = window.helm.settings.shipId;
 
 		useEffect(() => {
 			if (fullscreen) {
@@ -44,9 +48,23 @@ const rootRoute = createRootRoute({
 			};
 		}, [fullscreen]);
 
+		if ( ! shipId ) {
+			return (
+				<AppRoot>
+					<Outlet />
+				</AppRoot>
+			);
+		}
+
 		return (
 			<AppRoot>
-				<Outlet />
+				<ErrorBoundary FallbackComponent={ HelmErrorFallback }>
+					<Suspense fallback={ null }>
+						<ShipProvider shipId={ shipId }>
+							<Outlet />
+						</ShipProvider>
+					</Suspense>
+				</ErrorBoundary>
 			</AppRoot>
 		);
 	},
