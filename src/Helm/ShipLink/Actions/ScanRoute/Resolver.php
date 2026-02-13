@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Helm\ShipLink\Actions\ScanRoute;
 
+use Helm\Navigation\Edge;
 use Helm\Navigation\NavigationService;
+use Helm\Navigation\Node;
 use Helm\ShipLink\Contracts\ActionHandler;
 use Helm\ShipLink\Models\Action;
 use Helm\ShipLink\Ship;
@@ -42,8 +44,12 @@ final class Resolver implements ActionHandler
         // Update action result with scan outcome
         if ($scanResult->failed) {
             $result['success'] = false;
+            $result['complete'] = false;
             $result['edges_discovered'] = 0;
             $result['waypoints_created'] = 0;
+            $result['path'] = [];
+            $result['nodes'] = [];
+            $result['edges'] = [];
         } else {
             $waypointCount = 0;
             foreach ($scanResult->nodes as $node) {
@@ -53,8 +59,23 @@ final class Resolver implements ActionHandler
             }
 
             $result['success'] = true;
+            $result['complete'] = $scanResult->complete;
             $result['edges_discovered'] = count($scanResult->edges);
             $result['waypoints_created'] = $waypointCount;
+            $result['path'] = $scanResult->pathIds();
+            $result['nodes'] = array_map(static fn(Node $n) => [
+                'id' => $n->id,
+                'type' => $n->isSystem() ? 'system' : 'waypoint',
+                'x' => $n->x,
+                'y' => $n->y,
+                'z' => $n->z,
+            ], $scanResult->nodes);
+            $result['edges'] = array_map(static fn(Edge $e) => [
+                'id' => $e->id,
+                'node_a_id' => $e->nodeAId,
+                'node_b_id' => $e->nodeBId,
+                'distance' => $e->distance,
+            ], $scanResult->edges);
         }
 
         $action->result = $result;

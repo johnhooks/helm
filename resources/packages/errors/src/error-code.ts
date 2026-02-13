@@ -22,4 +22,8 @@ export enum ErrorCode {
 
 	// Products errors
 	ProductsInvalidResponse = 'helm.products.invalid_response',
+
+	// Actions errors
+	ActionsCreateFailed = 'helm.actions.create_failed',
+	ActionsInvalidResponse = 'helm.actions.invalid_response',
 }

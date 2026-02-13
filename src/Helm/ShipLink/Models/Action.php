@@ -26,6 +26,7 @@ use Helm\StellarWP\Models\ModelPropertyDefinition;
  * @property DateTimeImmutable|null $processing_at Timestamp lock for concurrent workers
  * @property int $attempts Processing attempts (0 = never picked up, 1 = first attempt, etc.)
  * @property array<string, mixed>|null $result
+ * @property DateTimeImmutable|null $broadcast_at
  * @property DateTimeImmutable $created_at
  * @property DateTimeImmutable $updated_at
  */
@@ -78,6 +79,11 @@ final class Action extends Model
                 ->type('array')
                 ->nullable()
                 ->castWith(static fn ($v) => self::castJson($v)),
+
+            'broadcast_at' => (new ModelPropertyDefinition())
+                ->type(DateTimeImmutable::class)
+                ->nullable()
+                ->castWith(static fn ($v) => self::castDateTime($v)),
 
             'created_at' => (new ModelPropertyDefinition())
                 ->type(DateTimeImmutable::class)
@@ -137,6 +143,7 @@ final class Action extends Model
             $this->result = array_merge($this->result ?? [], $result);
         }
         $this->processing_at = null;
+        $this->broadcast_at = Date::now();
         return $this;
     }
 
@@ -152,6 +159,7 @@ final class Action extends Model
             'error' => rest_convert_error_to_response($error)->get_data(),
         ]);
         $this->processing_at = null;
+        $this->broadcast_at = Date::now();
         return $this;
     }
 
@@ -162,6 +170,7 @@ final class Action extends Model
     {
         $this->status = ActionStatus::Running;
         $this->processing_at = Date::now();
+        $this->broadcast_at = Date::now();
         return $this;
     }
 

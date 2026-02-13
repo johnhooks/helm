@@ -68,12 +68,74 @@ class ResolverTest extends WPTestCase
 
         // Scan outcome added
         $this->assertArrayHasKey('success', $action->result);
+        $this->assertArrayHasKey('complete', $action->result);
         $this->assertArrayHasKey('edges_discovered', $action->result);
         $this->assertArrayHasKey('waypoints_created', $action->result);
+        $this->assertArrayHasKey('path', $action->result);
+        $this->assertArrayHasKey('nodes', $action->result);
+        $this->assertArrayHasKey('edges', $action->result);
 
         $this->assertIsBool($action->result['success']);
+        $this->assertIsBool($action->result['complete']);
         $this->assertIsInt($action->result['edges_discovered']);
         $this->assertIsInt($action->result['waypoints_created']);
+        $this->assertIsArray($action->result['path']);
+        $this->assertIsArray($action->result['nodes']);
+        $this->assertIsArray($action->result['edges']);
+    }
+
+    public function test_serializes_node_and_edge_objects_on_success(): void
+    {
+        $star1 = $this->tester->haveStar(['id' => 'SERIAL_FROM', 'distanceLy' => 0.0]);
+        $star2 = $this->tester->haveStar(['id' => 'SERIAL_TO', 'distanceLy' => 5.0]);
+
+        $node1 = $this->tester->getNodeForStar($star1);
+        $node2 = $this->tester->getNodeForStar($star2);
+
+        $shipPost = $this->tester->haveShip(['node_id' => $node1->id]);
+        $ship = $this->shipFactory->build($shipPost->postId());
+
+        $action = new Action([
+            'ship_post_id' => $shipPost->postId(),
+            'type' => ActionType::ScanRoute,
+            'params' => ['target_node_id' => $node2->id],
+            'result' => [
+                'from_node_id' => $node1->id,
+                'to_node_id' => $node2->id,
+                'skill' => 1.0,
+                'efficiency' => 1.0,
+                'duration' => 3600,
+            ],
+        ]);
+
+        $this->resolver->handle($action, $ship);
+
+        if (! $action->result['success']) {
+            $this->markTestSkipped('Scan did not succeed - probabilistic outcome');
+        }
+
+        // Verify node structure
+        $this->assertNotEmpty($action->result['nodes']);
+        $firstNode = $action->result['nodes'][0];
+        $this->assertArrayHasKey('id', $firstNode);
+        $this->assertArrayHasKey('type', $firstNode);
+        $this->assertArrayHasKey('x', $firstNode);
+        $this->assertArrayHasKey('y', $firstNode);
+        $this->assertArrayHasKey('z', $firstNode);
+        $this->assertContains($firstNode['type'], ['system', 'waypoint']);
+
+        // Verify edge structure
+        $this->assertNotEmpty($action->result['edges']);
+        $firstEdge = $action->result['edges'][0];
+        $this->assertArrayHasKey('id', $firstEdge);
+        $this->assertArrayHasKey('node_a_id', $firstEdge);
+        $this->assertArrayHasKey('node_b_id', $firstEdge);
+        $this->assertArrayHasKey('distance', $firstEdge);
+
+        // Path should match node IDs
+        $this->assertCount(count($action->result['nodes']), $action->result['path']);
+        // edges_discovered should match edges array length
+        $this->assertSame($action->result['edges_discovered'], count($action->result['edges']));
     }
 
     public function test_failed_scan_still_completes(): void
@@ -107,5 +169,8 @@ class ResolverTest extends WPTestCase
         $this->assertIsBool($action->result['success']);
         $this->assertIsInt($action->result['edges_discovered']);
         $this->assertIsInt($action->result['waypoints_created']);
+        $this->assertIsArray($action->result['path']);
+        $this->assertIsArray($action->result['nodes']);
+        $this->assertIsArray($action->result['edges']);
     }
 }

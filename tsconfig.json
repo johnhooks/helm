@@ -19,6 +19,8 @@
         "forceConsistentCasingInFileNames": true,
         "baseUrl": ".",
         "paths": {
+            "@helm/actions": ["resources/packages/actions/src"],
+            "@helm/actions/*": ["resources/packages/actions/src/*"],
             "@helm/lcars": ["resources/packages/lcars/src"],
             "@helm/lcars/*": ["resources/packages/lcars/src/*"],
             "@helm/bridge": ["resources/packages/bridge/src"],

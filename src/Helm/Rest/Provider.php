@@ -10,6 +10,7 @@ use Helm\lucatume\DI52\ServiceProvider;
 use Helm\Navigation\NodeRepository;
 use Helm\Products\ProductRepository;
 use Helm\ShipLink\ActionFactory;
+use Helm\ShipLink\ActionRepository;
 use Helm\ShipLink\ShipFactory;
 
 /**
@@ -28,6 +29,7 @@ final class Provider extends ServiceProvider
         $this->container->singleton(ShipActionsController::class, function () {
             return new ShipActionsController(
                 $this->container->get(ActionFactory::class),
+                $this->container->get(ActionRepository::class),
             );
         });
 

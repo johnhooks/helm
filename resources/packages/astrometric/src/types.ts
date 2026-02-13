@@ -163,6 +163,12 @@ export interface StarFieldProps {
   backgroundStarCount?: number;
 
   /**
+   * Supplementary coordinate lookup for nodes not in the stars array.
+   * Used to render routes to waypoint nodes discovered by scans.
+   */
+  nodePositions?: Map<number, Position3D>;
+
+  /**
    * Currently selected star ID
    */
   selectedStarId?: number | null;

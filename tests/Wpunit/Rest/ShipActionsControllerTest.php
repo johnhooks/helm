@@ -6,6 +6,7 @@ namespace Tests\Wpunit\Rest;
 
 use Helm\Navigation\EdgeRepository;
 use Helm\Navigation\NodeRepository;
+use Helm\ShipLink\ActionRepository;
 use Helm\ShipLink\ActionStatus;
 use Helm\Ships\ShipPost;
 use lucatume\WPBrowser\TestCase\WPRestApiTestCase;
@@ -240,5 +241,95 @@ class ShipActionsControllerTest extends WPRestApiTestCase
         // The jump validator requires target_node_id, so we expect a validation
         // error — not a crash. This proves params defaults to [].
         $this->assertErrorResponse('helm.navigation.missing_target', $response, 422);
+    }
+
+    // ------------------------------------------------------------------
+    // GET endpoints
+    // ------------------------------------------------------------------
+
+    public function test_get_routes_registered(): void
+    {
+        $routes = rest_get_server()->get_routes();
+
+        $this->assertArrayHasKey('/helm/v1/ships/(?P<id>\\d+)/actions/current', $routes);
+        $this->assertArrayHasKey('/helm/v1/ships/(?P<id>\\d+)/actions/(?P<actionId>\\d+)', $routes);
+    }
+
+    public function test_get_current_returns_active_action(): void
+    {
+        $ship = $this->createShip();
+
+        wp_set_current_user($this->ownerId);
+
+        // Create an action so there's an active one.
+        $this->tester->postAction($ship->postId(), [
+            'type'   => 'scan_route',
+            'params' => ['target_node_id' => $this->toNodeId],
+        ]);
+
+        $response = $this->tester->getAction($ship->postId());
+
+        $this->assertSame(200, $response->get_status());
+
+        $data = $response->get_data();
+        $this->assertSame($ship->postId(), $data['ship_post_id']);
+        $this->assertSame('scan_route', $data['type']);
+    }
+
+    public function test_get_current_returns_404_when_none(): void
+    {
+        $ship = $this->createShip();
+
+        wp_set_current_user($this->ownerId);
+
+        $response = $this->tester->getAction($ship->postId());
+
+        $this->assertErrorResponse('helm.action.none', $response, 404);
+    }
+
+    public function test_get_by_id_returns_action(): void
+    {
+        $ship = $this->createShip();
+
+        wp_set_current_user($this->ownerId);
+
+        $createResponse = $this->tester->postAction($ship->postId(), [
+            'type'   => 'scan_route',
+            'params' => ['target_node_id' => $this->toNodeId],
+        ]);
+
+        $actionId = $createResponse->get_data()['id'];
+
+        $response = $this->tester->getAction($ship->postId(), (string) $actionId);
+
+        $this->assertSame(200, $response->get_status());
+
+        $data = $response->get_data();
+        $this->assertSame($actionId, $data['id']);
+        $this->assertSame($ship->postId(), $data['ship_post_id']);
+    }
+
+    public function test_get_by_id_returns_404_for_wrong_ship(): void
+    {
+        $ship = $this->createShip();
+        $otherShip = $this->tester->haveShip([
+            'ownerId'   => $this->ownerId,
+            'node_id'   => $this->toNodeId,
+            'core_life' => 1000.0,
+        ]);
+
+        wp_set_current_user($this->ownerId);
+
+        $createResponse = $this->tester->postAction($ship->postId(), [
+            'type'   => 'scan_route',
+            'params' => ['target_node_id' => $this->toNodeId],
+        ]);
+
+        $actionId = $createResponse->get_data()['id'];
+
+        // Fetch action using the wrong ship's ID — should 404.
+        $response = $this->tester->getAction($otherShip->postId(), (string) $actionId);
+
+        $this->assertErrorResponse('helm.action.not_found', $response, 404);
     }
 }

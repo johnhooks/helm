@@ -263,6 +263,7 @@ class ActionTest extends \Codeception\TestCase\WPTestCase
             'processing_at' => '2025-01-15 09:30:00',
             'attempts' => 1,
             'result' => null,
+            'broadcast_at' => '2025-01-15 09:30:00',
             'created_at' => '2025-01-15 09:00:00',
             'updated_at' => '2025-01-15 09:30:00',
         ];
@@ -291,6 +292,7 @@ class ActionTest extends \Codeception\TestCase\WPTestCase
             'processing_at' => null,
             'attempts' => 0,
             'result' => '{"core_used":5.5,"duration":120}',
+            'broadcast_at' => '2025-01-15 09:30:00',
             'created_at' => '2025-01-15 09:00:00',
             'updated_at' => '2025-01-15 09:30:00',
         ];

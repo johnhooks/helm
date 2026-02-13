@@ -32,6 +32,7 @@ export function StarField({
   routes = [],
   distanceRings = DEFAULT_DISTANCE_RINGS,
   backgroundStarCount = DEFAULT_BACKGROUND_STAR_COUNT,
+  nodePositions,
   selectedStarId = null,
   selectedRouteId = null,
   currentNodeId,
@@ -204,8 +205,8 @@ export function StarField({
 
         {/* Routes between systems */}
         {routes.map((route) => {
-          const from = starsByNodeId.get(route.from);
-          const to = starsByNodeId.get(route.to);
+          const from = starsByNodeId.get(route.from) ?? nodePositions?.get(route.from);
+          const to = starsByNodeId.get(route.to) ?? nodePositions?.get(route.to);
           if (!from || !to) {
             return null;
           }

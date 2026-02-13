@@ -131,9 +131,10 @@ final class ActionResolver
         $updated = $wpdb->query(
             $wpdb->prepare(
                 "UPDATE {$table}
-                 SET status = %s, processing_at = %s, updated_at = %s
+                 SET status = %s, processing_at = %s, broadcast_at = %s, updated_at = %s
                  WHERE id = %d AND status = %s",
                 ActionStatus::Running->value,
+                $nowString,
                 $nowString,
                 $nowString,
                 $actionId,

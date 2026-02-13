@@ -44,7 +44,7 @@ final class Schema
      * Current schema version.
      * Increment when making schema changes.
      */
-    public const VERSION = 1;
+    public const VERSION = 2;
 
     /**
      * Option key for stored schema version.
@@ -458,12 +458,14 @@ CREATE TABLE {$prefix}helm_ship_actions (
     processing_at datetime DEFAULT NULL,
     attempts tinyint(3) unsigned NOT NULL DEFAULT 0,
     result JSON DEFAULT NULL,
+    broadcast_at datetime DEFAULT NULL,
     created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY  (id),
     KEY ship_post_id (ship_post_id),
     KEY ship_status (ship_post_id,status),
-    KEY idx_ready (status,deferred_until,processing_at)
+    KEY idx_ready (status,deferred_until,processing_at),
+    KEY idx_broadcast (broadcast_at)
 ) {$charsetCollate};
 ";
     }

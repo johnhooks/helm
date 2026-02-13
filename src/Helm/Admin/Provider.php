@@ -136,6 +136,7 @@ final class Provider extends ServiceProvider
         $this->enqueueBundle('helm-nav', 'nav');
         $this->enqueueBundle('helm-products', 'products');
         $this->enqueueBundle('helm-ships', 'ships');
+        $this->enqueueBundle('helm-actions', 'actions');
     }
 
     /**

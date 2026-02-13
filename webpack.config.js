@@ -48,6 +48,7 @@ const datastoreExternals = {
 	'@helm/datacore': { global: ['helm', 'datacore'], handle: 'helm-datacore' },
 	'@helm/products': { global: ['helm', 'products'], handle: 'helm-products' },
 	'@helm/nav': { global: ['helm', 'nav'], handle: 'helm-nav' },
+	'@helm/actions': { global: ['helm', 'actions'], handle: 'helm-actions' },
 };
 
 /**
@@ -128,6 +129,10 @@ module.exports = [
 			ships: {
 				import: path.resolve(packages, 'ships/src/index.ts'),
 				library: { name: ['helm', 'ships'], type: 'window' },
+			},
+			actions: {
+				import: path.resolve(packages, 'actions/src/index.ts'),
+				library: { name: ['helm', 'actions'], type: 'window' },
 			},
 		},
 		plugins: [

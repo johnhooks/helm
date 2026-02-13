@@ -428,9 +428,10 @@ final class ActionRepository
         $wpdb->query(
             $wpdb->prepare(
                 "UPDATE {$table}
-                 SET status = %s, processing_at = %s, updated_at = %s
+                 SET status = %s, processing_at = %s, broadcast_at = %s, updated_at = %s
                  WHERE id IN ({$idPlaceholders})",
                 ActionStatus::Running->value,
+                $nowString,
                 $nowString,
                 $nowString,
                 ...$ids
@@ -443,8 +444,41 @@ final class ActionRepository
         return array_map(function (array $row) use ($nowString): Action {
             $row['status'] = ActionStatus::Running->value;
             $row['processing_at'] = $nowString;
+            $row['broadcast_at'] = $nowString;
             return $this->hydrate($row);
         }, $rows);
+    }
+
+    /**
+     * Find all actions broadcast since a given time for a user's ships.
+     *
+     * Ownership is enforced by joining to wp_posts on post_author.
+     *
+     * @return array<Action>
+     */
+    public function findBroadcastsSince(DateTimeImmutable $since, int $userId): array
+    {
+        global $wpdb;
+
+        $table = $wpdb->prefix . Schema::TABLE_SHIP_ACTIONS;
+
+        $rows = $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT a.* FROM {$table} a
+                 INNER JOIN {$wpdb->posts} p ON a.ship_post_id = p.ID
+                 WHERE p.post_author = %d
+                   AND a.broadcast_at > %s
+                 ORDER BY a.broadcast_at ASC",
+                $userId,
+                $since->format('Y-m-d H:i:s')
+            ),
+            ARRAY_A
+        );
+
+        return array_map(
+            fn(array $row) => $this->hydrate($row),
+            $rows
+        );
     }
 
     /**

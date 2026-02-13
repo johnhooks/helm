@@ -7,6 +7,7 @@ namespace Helm\Rest;
 use Helm\Core\ErrorCode;
 use Helm\ShipLink\ActionException;
 use Helm\ShipLink\ActionFactory;
+use Helm\ShipLink\ActionRepository;
 use Helm\ShipLink\ActionType;
 use Helm\ShipLink\Models\Action;
 use Helm\Ships\ShipPost;
@@ -17,7 +18,9 @@ use WP_REST_Response;
 /**
  * REST controller for ship actions.
  *
- * POST /helm/v1/ships/{id}/actions
+ * POST   /helm/v1/ships/{id}/actions
+ * GET    /helm/v1/ships/{id}/actions/current
+ * GET    /helm/v1/ships/{id}/actions/{actionId}
  */
 final class ShipActionsController
 {
@@ -26,6 +29,7 @@ final class ShipActionsController
 
     public function __construct(
         private readonly ActionFactory $actionFactory,
+        private readonly ActionRepository $actionRepository,
     ) {
     }
 
@@ -55,6 +59,26 @@ final class ShipActionsController
                         'default'  => [],
                     ],
                 ],
+            ]
+        );
+
+        register_rest_route(
+            self::NAMESPACE,
+            self::ROUTE . '/current',
+            [
+                'methods'             => 'GET',
+                'callback'            => [$this, 'current'],
+                'permission_callback' => [$this, 'permissions'],
+            ]
+        );
+
+        register_rest_route(
+            self::NAMESPACE,
+            self::ROUTE . '/(?P<actionId>\d+)',
+            [
+                'methods'             => 'GET',
+                'callback'            => [$this, 'show'],
+                'permission_callback' => [$this, 'permissions'],
             ]
         );
     }
@@ -117,6 +141,53 @@ final class ShipActionsController
         }
 
         return new WP_REST_Response($this->serializeAction($action), 201);
+    }
+
+    /**
+     * Get the current (pending/running) action for a ship.
+     *
+     * @param WP_REST_Request<array<string, mixed>> $request
+     * @return WP_REST_Response|WP_Error
+     */
+    public function current(WP_REST_Request $request)
+    {
+        $shipPostId = (int) $request->get_param('id');
+
+        $action = $this->actionRepository->findCurrentForShip($shipPostId);
+
+        if ($action === null) {
+            return new WP_Error(
+                'helm.action.none',
+                __('No active action.', 'helm'),
+                ['status' => 404]
+            );
+        }
+
+        return new WP_REST_Response($this->serializeAction($action));
+    }
+
+    /**
+     * Get a specific action by ID.
+     *
+     * @param WP_REST_Request<array<string, mixed>> $request
+     * @return WP_REST_Response|WP_Error
+     */
+    public function show(WP_REST_Request $request)
+    {
+        $shipPostId = (int) $request->get_param('id');
+        $actionId   = (int) $request->get_param('actionId');
+
+        $action = $this->actionRepository->find($actionId);
+
+        if ($action === null || $action->ship_post_id !== $shipPostId) {
+            return new WP_Error(
+                'helm.action.not_found',
+                __('Action not found.', 'helm'),
+                ['status' => 404]
+            );
+        }
+
+        return new WP_REST_Response($this->serializeAction($action));
     }
 
     /**

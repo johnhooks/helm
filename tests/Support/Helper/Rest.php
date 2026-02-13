@@ -30,4 +30,18 @@ class Rest extends Module
 
         return rest_do_request($request);
     }
+
+    /**
+     * Dispatch a GET request to fetch a ship action.
+     *
+     * @param int    $shipPostId Ship post ID.
+     * @param string $path       "current" or a numeric action ID.
+     * @return WP_REST_Response
+     */
+    public function getAction(int $shipPostId, string $path = 'current'): WP_REST_Response
+    {
+        $request = new WP_REST_Request('GET', "/helm/v1/ships/{$shipPostId}/actions/{$path}");
+
+        return rest_do_request($request);
+    }
 }

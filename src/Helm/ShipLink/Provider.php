@@ -73,12 +73,19 @@ final class Provider extends ServiceProvider
                 $this->container->get(ActionResolver::class),
             );
         });
+
+        $this->container->singleton(ActionHeartbeat::class, function () {
+            return new ActionHeartbeat(
+                $this->container->get(ActionRepository::class),
+            );
+        });
     }
 
     public function boot(): void
     {
         $this->registerProcessorHook();
         $this->ensureProcessorScheduled();
+        $this->registerHeartbeat();
     }
 
     /**
@@ -94,6 +101,17 @@ final class Provider extends ServiceProvider
                 $processor->processReady();
             }
         );
+    }
+
+    /**
+     * Register the heartbeat handler for action state updates.
+     */
+    private function registerHeartbeat(): void
+    {
+        /** @var ActionHeartbeat $heartbeat */
+        $heartbeat = $this->container->get(ActionHeartbeat::class);
+
+        add_filter('heartbeat_received', [$heartbeat, 'handle'], 10, 2);
     }
 
     /**

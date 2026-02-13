@@ -5,14 +5,18 @@
  * sync, and queries behind its resolver. The bridge suspends until
  * the star map is ready, then renders.
  */
-import { lazy, Suspense, useEffect, useMemo, useState } from '@wordpress/element';
-import { useSuspenseSelect } from '@wordpress/data';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from '@wordpress/element';
+import { useSelect, useSuspenseSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as navStore } from '@helm/nav';
 import { log } from '@helm/logger';
 import { Panel, Title, Readout } from '@helm/ui';
 import { useShip } from '@helm/ships';
+import { store as actionsStore } from '@helm/actions';
+import type { StarSelectEvent, Position3D, Route } from '@helm/astrometric';
+import type { StarNode } from '@helm/types';
 import { ViewportConfig } from '../components/viewport-config';
+import { ScanPanel } from '../components/scan-panel';
 
 const StarField = lazy(() =>
 	import('@helm/astrometric').then((m) => ({ default: m.StarField }))
@@ -25,8 +29,15 @@ const STAR_SIZE_MULTIPLIER: Record<string, number> = {
 	lg: 1.5,
 };
 
+function distance3D(a: { x: number; y: number; z: number }, b: { x: number; y: number; z: number }): number {
+	const dx = a.x - b.x;
+	const dy = a.y - b.y;
+	const dz = a.z - b.z;
+	return Math.sqrt(dx * dx + dy * dy + dz * dz);
+}
+
 export function BridgePage() {
-	const { ship } = useShip();
+	const { shipId, ship } = useShip();
 	const currentNodeId = ship.node_id;
 	const jumpRange = 7;
 
@@ -39,6 +50,11 @@ export function BridgePage() {
 	const [starSize, setStarSize] = useState('md');
 	const [jumpRangeOnly, setJumpRangeOnly] = useState(false);
 	const [showLabels, setShowLabels] = useState(false);
+	const [selectedStar, setSelectedStar] = useState<StarNode | null>(null);
+
+	const handleStarSelect = useCallback((event: StarSelectEvent | null) => {
+		setSelectedStar(event?.star ?? null);
+	}, []);
 
 	// Keep local filtered state in sync with store data.
 	useEffect(() => {
@@ -90,6 +106,45 @@ export function BridgePage() {
 		() => allStars.find((s) => s.node_id === currentNodeId) ?? null,
 		[allStars, currentNodeId],
 	);
+
+	// Compute distance from current star to selected star.
+	const selectedDistance = useMemo(() => {
+		if (!currentStar || !selectedStar) {
+			return null;
+		}
+		return distance3D(currentStar, selectedStar);
+	}, [currentStar, selectedStar]);
+
+	// Derive routes and waypoint positions from the current action's scan result.
+	const action = useSelect(
+		(select) => select(actionsStore).getCurrentAction(shipId),
+		[shipId],
+	);
+
+	const { scanRoutes, scanNodePositions } = useMemo(() => {
+		const result = action?.result as Record<string, unknown> | null;
+		if (!result || !result.edges || !result.nodes) {
+			return { scanRoutes: [] as Route[], scanNodePositions: undefined };
+		}
+
+		const nodes = result.nodes as Array<{ id: number; x: number; y: number; z: number }>;
+		const edges = result.edges as Array<{ id: number; node_a_id: number; node_b_id: number }>;
+
+		const positions = new Map<number, Position3D>();
+		for (const node of nodes) {
+			positions.set(node.id, { x: node.x, y: node.y, z: node.z });
+		}
+
+		const routes: Route[] = edges.map((edge) => ({
+			id: `scan-${edge.id}`,
+			from: edge.node_a_id,
+			to: edge.node_b_id,
+			status: 'discovered' as const,
+		}));
+
+		return { scanRoutes: routes, scanNodePositions: positions };
+	}, [action?.result]);
+
 	const sizeMultiplier = STAR_SIZE_MULTIPLIER[starSize] ?? 1;
 	const viewportStyle = useMemo(() => ({ width: '100%', height: '100%' }), []);
 
@@ -107,7 +162,11 @@ export function BridgePage() {
 				<Suspense fallback={null}>
 					<StarField
 						stars={stars}
+						routes={scanRoutes}
+						nodePositions={scanNodePositions}
 						currentNodeId={currentNodeId}
+						selectedStarId={selectedStar?.id ?? null}
+						onStarSelect={handleStarSelect}
 						starScale={sizeMultiplier}
 						showLabels={showLabels}
 						style={viewportStyle}
@@ -117,6 +176,11 @@ export function BridgePage() {
 			<Panel tone="blue" className="helm-bridge__nav">
 				<Title label={__('Navigation', 'helm')} />
 				<Readout label={__('System', 'helm')} value={currentStar?.title ?? '\u2014'} />
+				<ScanPanel
+					shipId={shipId}
+					selectedStar={selectedStar}
+					distance={selectedDistance}
+				/>
 			</Panel>
 		</div>
 	);
