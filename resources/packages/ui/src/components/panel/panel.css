@@ -22,6 +22,7 @@
 
 /* Padding */
 .helm-panel--padding-none { --helm-panel-padding: 0; }
+.helm-panel--padding-xs { --helm-panel-padding: 8px; }
 .helm-panel--padding-sm { --helm-panel-padding: 16px; }
 .helm-panel--padding-md { --helm-panel-padding: 24px; }
 .helm-panel--padding-lg { --helm-panel-padding: 32px; }

@@ -24,7 +24,7 @@ const meta = {
     },
     padding: {
       control: "select",
-      options: ["none", "sm", "md", "lg"],
+      options: ["none", "xs", "sm", "md", "lg"],
     },
   },
 } satisfies Meta<typeof Panel>;

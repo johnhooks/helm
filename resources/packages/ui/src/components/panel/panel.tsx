@@ -26,7 +26,7 @@ export interface PanelProps {
   /**
    * Padding size
    */
-  padding?: "none" | "sm" | "md" | "lg";
+  padding?: "none" | "xs" | "sm" | "md" | "lg";
   /**
    * Additional CSS class names
    */
