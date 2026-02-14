@@ -1,22 +1,20 @@
 /**
- * Scan Panel — shows scan target info, progress, and results.
+ * Scan Panel — shows scan progress and results.
  *
- * Three states:
- * 1. Star selected, no action → target name, distance, "Scan Route" button
- * 2. Action in progress → countdown to deferred_until
- * 3. Action complete → result summary, dismiss button
+ * Two states:
+ * 1. Action in progress → countdown to deferred_until
+ * 2. Action complete → result summary, dismiss button
+ *
+ * Scan initiation is handled by StarContextMenu.
  */
 import { useCallback, useEffect, useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as actionsStore } from '@helm/actions';
 import { Button, Countdown, Readout, Title } from '@helm/ui';
-import type { StarNode } from '@helm/types';
 
 interface ScanPanelProps {
 	shipId: number;
-	selectedStar: StarNode | null;
-	distance: number | null;
 }
 
 function getRemainingSeconds( deferredUntil: string | null ): number {
@@ -27,23 +25,12 @@ function getRemainingSeconds( deferredUntil: string | null ): number {
 	return Math.max( 0, Math.floor( ( target - Date.now() ) / 1000 ) );
 }
 
-export function ScanPanel( { shipId, selectedStar, distance }: ScanPanelProps ) {
+export function ScanPanel( { shipId }: ScanPanelProps ) {
 	const action = useSelect(
 		( select ) => select( actionsStore ).getCurrentAction( shipId ),
 		[ shipId ]
 	);
-	const isCreatingAction = useSelect(
-		( select ) => select( actionsStore ).isCreating( shipId ),
-		[ shipId ]
-	);
-	const { createAction, clearAction } = useDispatch( actionsStore );
-
-	const handleScan = useCallback( () => {
-		if ( ! selectedStar ) {
-			return;
-		}
-		createAction( shipId, 'scan_route', { target_node_id: selectedStar.node_id } );
-	}, [ shipId, selectedStar, createAction ] );
+	const { clearAction } = useDispatch( actionsStore );
 
 	const handleDismiss = useCallback( () => {
 		clearAction( shipId );
@@ -142,29 +129,6 @@ export function ScanPanel( { shipId, selectedStar, distance }: ScanPanelProps ) 
 		);
 	}
 
-	// No action, star selected.
-	if ( selectedStar && distance !== null ) {
-		return (
-			<div className="helm-scan-panel">
-				<Title label={ __( 'Scan Route', 'helm' ) } />
-				<Readout
-					label={ __( 'Target', 'helm' ) }
-					value={ selectedStar.title }
-				/>
-				<Readout
-					label={ __( 'Distance', 'helm' ) }
-					value={ `${ distance.toFixed( 1 ) } ly` }
-				/>
-				<Button
-					onClick={ handleScan }
-					disabled={ isCreatingAction }
-				>
-					{ __( 'Scan Route', 'helm' ) }
-				</Button>
-			</div>
-		);
-	}
-
-	// Nothing selected.
+	// No active action.
 	return null;
 }

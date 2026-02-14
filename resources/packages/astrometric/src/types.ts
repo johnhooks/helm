@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import type { StarNode } from "@helm/types";
 
 /**
@@ -77,6 +77,10 @@ export interface StarSelectEvent {
    * Distance from player in light-years
    */
   distance: number;
+  /**
+   * Click position in canvas-relative pixels
+   */
+  screenPosition: { x: number; y: number };
 }
 
 /**
@@ -243,6 +247,12 @@ export interface StarFieldProps {
    * Multiplier applied to all star sizes (default 1)
    */
   starScale?: number;
+
+  /**
+   * Content rendered beside the selected star via Html overlay.
+   * Follows the star as the camera moves.
+   */
+  selectedStarOverlay?: ReactNode;
 
   /**
    * Additional CSS class name

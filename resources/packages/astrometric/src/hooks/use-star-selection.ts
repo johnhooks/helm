@@ -6,7 +6,7 @@ import { distanceFromOrigin } from "../utils/coordinates";
 export interface UseStarSelectionResult {
   selectedStar: StarNode | null;
   selectedStarId: number | null;
-  handleSelect: (star: StarNode) => void;
+  handleSelect: (star: StarNode, screenPosition: { x: number; y: number }) => void;
   clearSelection: () => void;
   isSelected: (starId: number) => boolean;
 }
@@ -20,7 +20,7 @@ export function useStarSelection(
   const [selectedStar, setSelectedStar] = useState<StarNode | null>(null);
 
   const handleSelect = useCallback(
-    (star: StarNode) => {
+    (star: StarNode, screenPosition: { x: number; y: number }) => {
       if (selectedStar?.id === star.id) {
         // Deselect if clicking same star
         setSelectedStar(null);
@@ -31,6 +31,7 @@ export function useStarSelection(
         onSelect?.({
           star,
           distance: distanceFromOrigin({ x: star.x, y: star.y, z: star.z }),
+          screenPosition,
         });
       }
     },

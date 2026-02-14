@@ -19,7 +19,7 @@ export interface StarInstancesProps {
   reachableNodeIds?: Set<number>;
   starScale?: number;
   showLabels?: boolean;
-  onStarSelect?: (star: StarNode) => void;
+  onStarSelect?: (star: StarNode, screenPosition: { x: number; y: number }) => void;
   onStarHover?: (star: StarNode | null) => void;
 }
 
@@ -159,7 +159,11 @@ export function StarInstances({
       if (intersects.length > 0 && intersects[0].instanceId !== undefined) {
         const star = stars[intersects[0].instanceId];
         if (star) {
-          onStarSelectRef.current?.(star);
+          const screenPosition = {
+            x: event.clientX - rect.left,
+            y: event.clientY - rect.top,
+          };
+          onStarSelectRef.current?.(star, screenPosition);
         }
       }
     },

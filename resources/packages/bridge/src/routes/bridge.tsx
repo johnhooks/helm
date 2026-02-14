@@ -6,7 +6,7 @@
  * the star map is ready, then renders.
  */
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from '@wordpress/element';
-import { useSelect, useSuspenseSelect } from '@wordpress/data';
+import { useDispatch, useSelect, useSuspenseSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as navStore } from '@helm/nav';
 import { log } from '@helm/logger';
@@ -14,9 +14,9 @@ import { Panel, SideDrawer, Title, Readout } from '@helm/ui';
 import { useShip } from '@helm/ships';
 import { store as actionsStore } from '@helm/actions';
 import type { StarSelectEvent, Position3D, Route } from '@helm/astrometric';
-import type { StarNode } from '@helm/types';
 import { ViewportConfig } from '../components/viewport-config';
 import { ScanPanel } from '../components/scan-panel';
+import { StarContextMenu } from '../components/star-context-menu';
 
 const StarField = lazy(() =>
 	import('@helm/astrometric').then((m) => ({ default: m.StarField }))
@@ -50,11 +50,13 @@ export function BridgePage() {
 	const [starSize, setStarSize] = useState('md');
 	const [jumpRangeOnly, setJumpRangeOnly] = useState(false);
 	const [showLabels, setShowLabels] = useState(false);
-	const [selectedStar, setSelectedStar] = useState<StarNode | null>(null);
+	const [starSelectEvent, setStarSelectEvent] = useState<StarSelectEvent | null>(null);
 	const [drawerOpen, setDrawerOpen] = useState(true);
 
+	const selectedStar = starSelectEvent?.star ?? null;
+
 	const handleStarSelect = useCallback((event: StarSelectEvent | null) => {
-		setSelectedStar(event?.star ?? null);
+		setStarSelectEvent(event);
 	}, []);
 
 	// Keep local filtered state in sync with store data.
@@ -153,6 +155,21 @@ export function BridgePage() {
 		setDrawerOpen((v) => !v);
 	}, []);
 
+	const { createAction } = useDispatch(actionsStore);
+
+	const hasActiveAction = !! action && ( action.status === 'pending' || action.status === 'running' );
+
+	const handleContextMenuScanRoute = useCallback(() => {
+		if ( ! selectedStar ) {
+			return;
+		}
+		createAction( shipId, 'scan_route', { target_node_id: selectedStar.node_id } );
+	}, [ shipId, selectedStar, createAction ]);
+
+	const handleContextMenuClose = useCallback(() => {
+		setStarSelectEvent(null);
+	}, []);
+
 	return (
 		<SideDrawer
 			open={drawerOpen}
@@ -179,6 +196,17 @@ export function BridgePage() {
 							starScale={sizeMultiplier}
 							showLabels={showLabels}
 							style={viewportStyle}
+							selectedStarOverlay={
+								starSelectEvent ? (
+									<StarContextMenu
+										star={ starSelectEvent.star }
+										distance={ selectedDistance ?? starSelectEvent.distance }
+										hasActiveAction={ hasActiveAction }
+										onScanRoute={ handleContextMenuScanRoute }
+										onClose={ handleContextMenuClose }
+									/>
+								) : undefined
+							}
 						/>
 					</Suspense>
 				</Panel>
@@ -187,11 +215,7 @@ export function BridgePage() {
 			<Panel tone="blue" className="helm-bridge__nav">
 				<Title label={__('Navigation', 'helm')} />
 				<Readout label={__('System', 'helm')} value={currentStar?.title ?? '\u2014'} />
-				<ScanPanel
-					shipId={shipId}
-					selectedStar={selectedStar}
-					distance={selectedDistance}
-				/>
+				<ScanPanel shipId={shipId} />
 			</Panel>
 		</SideDrawer>
 	);

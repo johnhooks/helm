@@ -25,7 +25,7 @@ export function StarOverlays({
         const starScale = getScale(selectedStar);
         const starRadius = STAR_BASE_SIZE * starScale;
         const ringPadding = starRadius * 0.8 + 0.1; // Proportional + minimum padding
-        const ringThickness = 0.05; // Fixed thickness
+        const ringThickness = 0.01; // Thin hairline ring
         const innerRadius = starRadius + ringPadding;
         const outerRadius = innerRadius + ringThickness;
 
@@ -39,40 +39,12 @@ export function StarOverlays({
           >
             <Ring args={[innerRadius, outerRadius, 64]}>
               <meshBasicMaterial
-                color={lcarsColors.accent}
-                transparent
-                opacity={0.9}
+                color={lcarsColors.sky}
               />
             </Ring>
           </Billboard>
         );
       })()}
-
-      {/* Label for selected star - fixed screen size, anchored to star position */}
-      {selectedStar && (
-        <Html
-          position={[
-            selectedStar.x,
-            selectedStar.y,
-            selectedStar.z,
-          ]}
-          style={{ pointerEvents: "none", userSelect: "none" }}
-          center={false}
-        >
-          <div
-            style={{
-              color: "#f2b654",
-              fontSize: "12px",
-              fontFamily: "Antonio, sans-serif",
-              whiteSpace: "nowrap",
-              marginLeft: "24px",
-              textShadow: "0 0 4px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.7)",
-            }}
-          >
-            {selectedStar.title}
-          </div>
-        </Html>
-      )}
 
       {/* Label for hovered star (if different from selected) */}
       {hoveredStar && hoveredStar.id !== selectedStar?.id && (

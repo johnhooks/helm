@@ -1,4 +1,5 @@
 import { Canvas } from "@react-three/fiber";
+import { Html } from "@react-three/drei";
 import { useMemo, useCallback, useRef } from "react";
 import type { StarNode } from "@helm/types";
 import type {
@@ -51,6 +52,7 @@ export function StarField({
   maxDistance = DEFAULT_MAX_DISTANCE,
   cameraMode = "perspective",
   starScale = 1,
+  selectedStarOverlay,
   className = "",
   style,
   "data-testid": testId,
@@ -85,7 +87,7 @@ export function StarField({
 
   // Handle star selection
   const handleStarClick = useCallback(
-    (star: StarNode) => {
+    (star: StarNode, screenPosition: { x: number; y: number }) => {
       if (!onStarSelect) {
         return;
       }
@@ -96,6 +98,7 @@ export function StarField({
         const event: StarSelectEvent = {
           star,
           distance: distanceFromOrigin({ x: star.x, y: star.y, z: star.z }),
+          screenPosition,
         };
         onStarSelect(event);
       }
@@ -239,6 +242,19 @@ export function StarField({
           onStarSelect={handleStarClick}
           onStarHover={handleStarHover}
         />
+
+        {/* Overlay content anchored to selected star (e.g. context menu) */}
+        {focusTarget && selectedStarOverlay && (
+          <Html
+            position={[focusTarget.x, focusTarget.y, focusTarget.z]}
+            center={false}
+            style={{ pointerEvents: "auto" }}
+          >
+            <div style={{ marginLeft: "28px", marginTop: "16px" }}>
+              {selectedStarOverlay}
+            </div>
+          </Html>
+        )}
       </Canvas>
     </div>
   );
