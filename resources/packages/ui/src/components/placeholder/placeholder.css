@@ -6,20 +6,20 @@
   padding: 20px 24px;
   border-radius: var(--helm-ui-radius-lg);
   background: linear-gradient(135deg, #0b0b0b 0%, #151515 100%);
-  border: 1px solid #2a2a2a;
-  color: #f0d7a2;
+  border: 1px solid var(--helm-ui-color-border);
+  color: var(--helm-ui-color-text);
   font-family: var(--helm-ui-font-family);
 }
 
 .helm-placeholder__title {
-  font-size: 20px;
+  font-size: var(--helm-ui-font-size-display-sm);
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
 .helm-placeholder__detail {
-  font-size: 12px;
-  color: #a69b83;
+  font-size: var(--helm-ui-font-size-body-sm);
+  color: var(--helm-ui-color-muted);
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }

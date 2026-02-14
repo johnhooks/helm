@@ -10,11 +10,11 @@
 }
 
 .helm-title--sm {
-  font-size: 12px;
+  font-size: var(--helm-ui-font-size-body-sm);
 }
 
 .helm-title--md {
-  font-size: 13px;
+  font-size: var(--helm-ui-font-size-body);
 }
 
 .helm-title--left {

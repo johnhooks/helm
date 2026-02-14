@@ -153,11 +153,11 @@
 }
 
 .helm-toggle--sm .helm-toggle__label {
-  font-size: 12px;
+  font-size: var(--helm-ui-font-size-body-sm);
 }
 
 .helm-toggle--md .helm-toggle__label {
-  font-size: 13px;
+  font-size: var(--helm-ui-font-size-body);
 }
 
 .helm-toggle--disabled .helm-toggle__label {

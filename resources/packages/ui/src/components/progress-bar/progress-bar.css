@@ -24,8 +24,8 @@
 .helm-progress-bar--sky { --progress-color: var(--helm-ui-color-sky); }
 .helm-progress-bar--lilac { --progress-color: var(--helm-ui-color-lilac); }
 .helm-progress-bar--violet { --progress-color: var(--helm-ui-color-violet); }
-.helm-progress-bar--danger { --progress-color: #ff6b6b; }
-.helm-progress-bar--success { --progress-color: #4ade80; }
+.helm-progress-bar--danger { --progress-color: var(--helm-ui-color-danger-accent); }
+.helm-progress-bar--success { --progress-color: var(--helm-ui-color-success); }
 
 /* =============================================================================
    TRACK & FILL
@@ -61,9 +61,9 @@
   text-align: right;
 }
 
-.helm-progress-bar--sm .helm-progress-bar__value { font-size: 10px; }
-.helm-progress-bar--md .helm-progress-bar__value { font-size: 12px; }
-.helm-progress-bar--lg .helm-progress-bar__value { font-size: 14px; }
+.helm-progress-bar--sm .helm-progress-bar__value { font-size: var(--helm-ui-font-size-label); }
+.helm-progress-bar--md .helm-progress-bar__value { font-size: var(--helm-ui-font-size-body-sm); }
+.helm-progress-bar--lg .helm-progress-bar__value { font-size: var(--helm-ui-font-size-body-lg); }
 
 /* =============================================================================
    ACTIVE STATE - pulsing glow animation

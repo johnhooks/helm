@@ -18,7 +18,7 @@
 .helm-panel--sky { --helm-panel-color: var(--helm-ui-color-sky); }
 .helm-panel--lilac { --helm-panel-color: var(--helm-ui-color-lilac); }
 .helm-panel--violet { --helm-panel-color: var(--helm-ui-color-violet); }
-.helm-panel--danger { --helm-panel-color: #ff6b6b; }
+.helm-panel--danger { --helm-panel-color: var(--helm-ui-color-danger-accent); }
 
 /* Padding */
 .helm-panel--padding-none { --helm-panel-padding: 0; }
@@ -32,7 +32,7 @@
    ============================================================================= */
 
 .helm-panel--default {
-  background: #0a0a0a;
+  background: var(--helm-ui-color-bg);
   border-radius: 12px;
   padding: var(--helm-panel-padding);
 }
@@ -42,7 +42,7 @@
    ============================================================================= */
 
 .helm-panel--bordered {
-  background: #0a0a0a;
+  background: var(--helm-ui-color-bg);
   border-radius: 12px;
   padding: var(--helm-panel-padding);
   border: 1px solid var(--helm-panel-color);
@@ -91,7 +91,7 @@
 
 .helm-panel__bracket-content {
   flex: 1;
-  background: #0a0a0a;
+  background: var(--helm-ui-color-bg);
   border-radius: 8px;
   padding: var(--helm-panel-padding);
 }

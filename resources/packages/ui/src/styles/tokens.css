@@ -8,6 +8,7 @@
   --helm-ui-color-muted: #a39a88;
   --helm-ui-color-accent: #f2b654;
   --helm-ui-color-danger: #cc4444;
+  --helm-ui-color-danger-accent: #ff6b6b;
   --helm-ui-color-focus: #9cc7ff;
   --helm-ui-color-warning: #f2b654;
   --helm-ui-color-success: #8fbf4d;
@@ -25,6 +26,21 @@
   --helm-ui-color-violet: #9999cc;
   --helm-ui-color-plum: #664466;
   --helm-ui-color-hopbush: #c082a9;
+  /* Font sizes */
+  --helm-ui-font-size-subtext: 0.4375rem;    /* 7px */
+  --helm-ui-font-size-caption: 0.5rem;        /* 8px */
+  --helm-ui-font-size-label-sm: 0.5625rem;    /* 9px */
+  --helm-ui-font-size-label: 0.625rem;        /* 10px */
+  --helm-ui-font-size-label-lg: 0.6875rem;    /* 11px */
+  --helm-ui-font-size-body-sm: 0.75rem;       /* 12px */
+  --helm-ui-font-size-body: 0.8125rem;        /* 13px */
+  --helm-ui-font-size-body-lg: 0.875rem;      /* 14px */
+  --helm-ui-font-size-base: 1rem;             /* 16px */
+  --helm-ui-font-size-display-sm: 1.25rem;    /* 20px */
+  --helm-ui-font-size-display: 1.375rem;      /* 22px */
+  --helm-ui-font-size-display-lg: 1.75rem;    /* 28px */
+  --helm-ui-font-size-display-xl: 2.375rem;   /* 38px */
+
   --helm-ui-radius-md: 12px;
   --helm-ui-radius-lg: 16px;
   --helm-ui-stack-gap: 8px;

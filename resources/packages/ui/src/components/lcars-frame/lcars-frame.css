@@ -38,7 +38,7 @@
 .helm-lcars-frame--sky { --lcars-color: var(--helm-ui-color-sky); }
 .helm-lcars-frame--lilac { --lcars-color: var(--helm-ui-color-lilac); }
 .helm-lcars-frame--violet { --lcars-color: var(--helm-ui-color-violet); }
-.helm-lcars-frame--danger { --lcars-color: #ff6b6b; }
+.helm-lcars-frame--danger { --lcars-color: var(--helm-ui-color-danger-accent); }
 
 /* =============================================================================
    HEADER ROW
@@ -67,7 +67,7 @@
 }
 
 .helm-lcars-frame__title {
-  font-size: 12px;
+  font-size: var(--helm-ui-font-size-body-sm);
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -80,7 +80,7 @@
   }
 
   .helm-lcars-frame__title {
-    font-size: 14px;
+    font-size: var(--helm-ui-font-size-body-lg);
   }
 }
 
@@ -134,7 +134,7 @@
 
 .helm-lcars-frame__content {
   flex: 1;
-  background: #0a0a0a;
+  background: var(--helm-ui-color-bg);
   border-radius: 0 8px 8px 0;
   padding: 16px;
 }
@@ -160,7 +160,7 @@
   border-radius: 0;
   padding: 4px 6px 3px;
   font-family: var(--helm-ui-font-family);
-  font-size: 9px;
+  font-size: var(--helm-ui-font-size-label-sm);
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -180,7 +180,7 @@
 @container (min-width: 600px) {
   .helm-lcars-frame__sidebar > button[role="tab"] {
     padding: 6px 8px 4px;
-    font-size: 10px;
+    font-size: var(--helm-ui-font-size-label);
     letter-spacing: 0.08em;
   }
 }
@@ -218,7 +218,7 @@
 .helm-lcars-frame__sidebar > button[role="tab"]::before {
   content: attr(data-subtext);
   display: block;
-  font-size: 7px;
+  font-size: var(--helm-ui-font-size-subtext);
   font-weight: 400;
   letter-spacing: 0.02em;
   opacity: 0.5;
@@ -233,6 +233,6 @@
 
 @container (min-width: 600px) {
   .helm-lcars-frame__sidebar > button[role="tab"]::before {
-    font-size: 8px;
+    font-size: var(--helm-ui-font-size-caption);
   }
 }

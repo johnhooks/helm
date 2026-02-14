@@ -29,12 +29,12 @@
 
 .helm-button--sm {
   height: 32px;
-  font-size: 12px;
+  font-size: var(--helm-ui-font-size-body-sm);
 }
 
 .helm-button--md {
   height: 36px;
-  font-size: 13px;
+  font-size: var(--helm-ui-font-size-body);
 }
 
 .helm-button__text {
@@ -51,7 +51,7 @@
 }
 
 .helm-button__secondary {
-  font-size: 10px;
+  font-size: var(--helm-ui-font-size-label);
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--helm-surface-text);

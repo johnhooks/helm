@@ -9,6 +9,7 @@
 .helm-side-drawer {
   display: flex;
   height: 100%;
+  overflow: hidden;
 }
 
 /* Viewport fills remaining space — positioned so children can use inset: 0 */

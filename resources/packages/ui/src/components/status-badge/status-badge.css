@@ -10,12 +10,12 @@
 }
 
 .helm-status-badge--sm {
-  font-size: 10px;
+  font-size: var(--helm-ui-font-size-label);
   gap: 5px;
 }
 
 .helm-status-badge--md {
-  font-size: 11px;
+  font-size: var(--helm-ui-font-size-label-lg);
   gap: 6px;
 }
 

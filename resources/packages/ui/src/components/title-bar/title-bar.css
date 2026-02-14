@@ -19,7 +19,7 @@
 .helm-title-bar--sky { --helm-title-bar-color: var(--helm-ui-color-sky); }
 .helm-title-bar--lilac { --helm-title-bar-color: var(--helm-ui-color-lilac); }
 .helm-title-bar--violet { --helm-title-bar-color: var(--helm-ui-color-violet); }
-.helm-title-bar--danger { --helm-title-bar-color: #ff6b6b; }
+.helm-title-bar--danger { --helm-title-bar-color: var(--helm-ui-color-danger-accent); }
 
 .helm-title-bar__content {
   display: flex;
@@ -32,7 +32,7 @@
 
 .helm-title-bar__title {
   margin: 0;
-  font-size: 14px;
+  font-size: var(--helm-ui-font-size-body-lg);
   font-weight: 700;
   letter-spacing: 0.15em;
   text-transform: uppercase;

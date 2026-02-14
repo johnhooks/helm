@@ -49,7 +49,7 @@
 
 .helm-log-card__time {
   font-family: var(--helm-ui-font-family);
-  font-size: 10px;
+  font-size: var(--helm-ui-font-size-label);
   letter-spacing: 0.08em;
   color: var(--helm-ui-color-muted);
   text-transform: uppercase;
@@ -58,7 +58,7 @@
 }
 
 .helm-log-card__title {
-  font-size: 13px;
+  font-size: var(--helm-ui-font-size-body);
   color: var(--helm-ui-color-text);
   font-weight: 500;
 }

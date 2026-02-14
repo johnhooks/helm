@@ -9,7 +9,7 @@
 .helm-error-content__detail {
 	margin: 0;
 	color: var(--helm-ui-color-muted);
-	font-size: 12px;
+	font-size: var(--helm-ui-font-size-body-sm);
 	line-height: 1.5;
 }
 
@@ -23,7 +23,7 @@
 	flex-direction: column;
 	gap: 0.25rem;
 	color: var(--helm-ui-color-muted);
-	font-size: 11px;
+	font-size: var(--helm-ui-font-size-label-lg);
 }
 
 /* Error page — full-page centered fallback */
@@ -44,7 +44,7 @@
 }
 
 .helm-error-page__icon svg {
-	fill: var(--helm-ui-color-danger);
+	fill: var(--helm-ui-color-danger-accent);
 }
 
 /* Error compact — inline display */
@@ -57,5 +57,5 @@
 
 .helm-error-compact__detail {
 	color: var(--helm-ui-color-muted);
-	font-size: 12px;
+	font-size: var(--helm-ui-font-size-body-sm);
 }

@@ -43,13 +43,13 @@
 .helm-segmented--vertical.helm-segmented--sm .helm-segmented__label {
   height: 22px;
   padding: 0 10px;
-  font-size: 10px;
+  font-size: var(--helm-ui-font-size-label);
 }
 
 .helm-segmented--vertical.helm-segmented--md .helm-segmented__label {
   height: 26px;
   padding: 0 12px;
-  font-size: 11px;
+  font-size: var(--helm-ui-font-size-label-lg);
 }
 
 .helm-segmented--disabled {
@@ -103,13 +103,13 @@
 .helm-segmented--sm .helm-segmented__label {
   height: 26px;
   padding: 0 12px;
-  font-size: 11px;
+  font-size: var(--helm-ui-font-size-label-lg);
 }
 
 .helm-segmented--md .helm-segmented__label {
   height: 30px;
   padding: 0 16px;
-  font-size: 12px;
+  font-size: var(--helm-ui-font-size-body-sm);
 }
 
 /* Hover state (inactive) */

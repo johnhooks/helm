@@ -12,7 +12,7 @@
 .helm-lcars-modal.components-modal__frame {
   --modal-color: var(--helm-ui-color-gold);
 
-  background: #0a0a0a;
+  background: var(--helm-ui-color-bg);
   border: 2px solid var(--modal-color);
   border-radius: 16px;
   box-shadow: 0 0 40px color-mix(in srgb, var(--modal-color) 20%, transparent);
@@ -45,7 +45,7 @@
 .helm-lcars-modal--sky.components-modal__frame { --modal-color: var(--helm-ui-color-sky); }
 .helm-lcars-modal--lilac.components-modal__frame { --modal-color: var(--helm-ui-color-lilac); }
 .helm-lcars-modal--violet.components-modal__frame { --modal-color: var(--helm-ui-color-violet); }
-.helm-lcars-modal--danger.components-modal__frame { --modal-color: #ff6b6b; }
+.helm-lcars-modal--danger.components-modal__frame { --modal-color: var(--helm-ui-color-danger-accent); }
 
 /* Hide WordPress default content padding */
 .helm-lcars-modal .components-modal__content {
@@ -74,7 +74,7 @@
   border: none;
   border-radius: 50%;
   color: var(--modal-color);
-  font-size: 20px;
+  font-size: var(--helm-ui-font-size-display-sm);
   font-weight: 700;
   line-height: 1;
   cursor: pointer;
@@ -94,7 +94,7 @@
 
 .helm-lcars-modal__content {
   color: var(--helm-ui-color-text);
-  font-size: 14px;
+  font-size: var(--helm-ui-font-size-body-lg);
   line-height: 1.5;
 }
 

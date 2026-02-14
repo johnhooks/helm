@@ -51,15 +51,15 @@
 }
 
 .helm-readout--sm .helm-readout__label {
-  font-size: 9px;
+  font-size: var(--helm-ui-font-size-label-sm);
 }
 
 .helm-readout--md .helm-readout__label {
-  font-size: 10px;
+  font-size: var(--helm-ui-font-size-label);
 }
 
 .helm-readout--lg .helm-readout__label {
-  font-size: 11px;
+  font-size: var(--helm-ui-font-size-label-lg);
 }
 
 /* Unit */
@@ -71,15 +71,15 @@
 }
 
 .helm-readout--sm .helm-readout__unit {
-  font-size: 9px;
+  font-size: var(--helm-ui-font-size-label-sm);
 }
 
 .helm-readout--md .helm-readout__unit {
-  font-size: 10px;
+  font-size: var(--helm-ui-font-size-label);
 }
 
 .helm-readout--lg .helm-readout__unit {
-  font-size: 11px;
+  font-size: var(--helm-ui-font-size-label-lg);
 }
 
 /* Value row (dd element - reset default margin) */
@@ -97,15 +97,15 @@
 }
 
 .helm-readout--sm .helm-readout__value {
-  font-size: 20px;
+  font-size: var(--helm-ui-font-size-display-sm);
 }
 
 .helm-readout--md .helm-readout__value {
-  font-size: 28px;
+  font-size: var(--helm-ui-font-size-display-lg);
 }
 
 .helm-readout--lg .helm-readout__value {
-  font-size: 38px;
+  font-size: var(--helm-ui-font-size-display-xl);
 }
 
 /* Max */
@@ -116,13 +116,13 @@
 }
 
 .helm-readout--sm .helm-readout__max {
-  font-size: 13px;
+  font-size: var(--helm-ui-font-size-body);
 }
 
 .helm-readout--md .helm-readout__max {
-  font-size: 16px;
+  font-size: var(--helm-ui-font-size-base);
 }
 
 .helm-readout--lg .helm-readout__max {
-  font-size: 22px;
+  font-size: var(--helm-ui-font-size-display);
 }
