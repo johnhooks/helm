@@ -101,6 +101,9 @@ export type { ErrorModalProps } from "./components/error-display";
 export { Countdown, formatTime } from "./components/countdown";
 export type { CountdownProps } from "./components/countdown";
 
+export { SideDrawer } from "./components/side-drawer";
+export type { SideDrawerProps } from "./components/side-drawer";
+
 // Glyphs
 export { PlanetGlyph, PLANET_TYPES } from "./components/glyphs";
 export type { PlanetGlyphProps, PlanetType } from "./components/glyphs";

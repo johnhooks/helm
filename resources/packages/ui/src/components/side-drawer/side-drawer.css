@@ -1,0 +1,89 @@
+
+/* =============================================================================
+   SIDE DRAWER - Sliding sidebar panel
+   ============================================================================= */
+
+.helm-side-drawer {
+  display: grid;
+  grid-template-columns: 1fr var(--helm-drawer-width, 380px);
+  gap: 8px;
+  transition: grid-template-columns 250ms ease;
+}
+
+.helm-side-drawer--closed {
+  grid-template-columns: 1fr 0px;
+  gap: 0px;
+}
+
+/* Viewport fills available space */
+.helm-side-drawer__viewport {
+  min-height: 0;
+  min-width: 0;
+}
+
+/* Wrapper is the grid cell — positions the toggle but does NOT clip */
+.helm-side-drawer__wrapper {
+  position: relative;
+  min-height: 0;
+  min-width: 0;
+}
+
+/* Toggle tab hangs off the wrapper's left edge — never clipped */
+.helm-side-drawer__toggle {
+  position: absolute;
+  top: 50%;
+  left: -10px;
+  transform: translate(-100%, -50%);
+  z-index: 10;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 48px;
+  padding: 0;
+  border: 1px solid var(--helm-ui-color-border);
+  border-right: none;
+  border-radius: 6px 0 0 6px;
+  background: var(--helm-ui-color-surface);
+  cursor: pointer;
+  transition: opacity 0.15s, background 0.15s, left 250ms ease;
+  opacity: 0.6;
+}
+
+
+/* When closed, sit flush with the wrapper edge */
+.helm-side-drawer--closed .helm-side-drawer__toggle {
+  left: 0;
+}
+
+.helm-side-drawer__toggle:hover,
+.helm-side-drawer__toggle:focus-visible {
+  opacity: 1;
+  background: var(--helm-ui-color-surface-2);
+}
+
+.helm-side-drawer__toggle:focus-visible {
+  outline: 1px solid var(--helm-ui-color-accent);
+  outline-offset: -1px;
+}
+
+/* Chevron icon */
+.helm-side-drawer__chevron {
+  fill: var(--helm-ui-color-muted);
+}
+
+/* Drawer clips content during slide */
+.helm-side-drawer__drawer {
+  overflow: hidden;
+  height: 100%;
+}
+
+/* Inner content — keeps its full width so nothing reflows during transition */
+.helm-side-drawer__content {
+  width: var(--helm-drawer-width, 380px);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}

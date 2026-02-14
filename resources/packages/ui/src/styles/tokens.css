@@ -29,6 +29,9 @@
   --helm-ui-radius-lg: 16px;
   --helm-ui-stack-gap: 8px;
 
+  /* Layout */
+  --helm-drawer-width: 380px;
+
   /* Scrollbar */
   scrollbar-color: var(--helm-ui-color-border) transparent;
   scrollbar-width: thin;
