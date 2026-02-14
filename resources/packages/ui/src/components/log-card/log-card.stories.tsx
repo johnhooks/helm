@@ -73,7 +73,7 @@ export const Draft: Story = {
       <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
         <Readout label="Distance" value="11.9" unit="ly" tone="sky" size="sm" />
         <Readout label="ETA" value="4d 2h" tone="sky" size="sm" />
-        <Readout label="Fuel Cost" value={32} unit="%" tone="gold" size="sm" />
+        <Readout label="Draw" value={120} unit="MJ" tone="gold" size="sm" />
       </div>
     ),
     action: (
@@ -121,7 +121,7 @@ export const JumpDraft: Story = {
       <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
         <Readout label="Distance" value="11.9" unit="ly" tone="sky" size="sm" />
         <Readout label="ETA" value="4d 2h" tone="sky" size="sm" />
-        <Readout label="Fuel Cost" value={32} unit="%" tone="gold" size="sm" />
+        <Readout label="Draw" value={120} unit="MJ" tone="gold" size="sm" />
       </div>
     ),
     action: (

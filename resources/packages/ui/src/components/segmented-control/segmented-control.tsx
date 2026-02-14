@@ -31,6 +31,7 @@ export interface SegmentedControlProps {
    * Surface tone for active segment
    */
   surface?:
+    | "neutral"
     | "accent"
     | "orange"
     | "gold"
@@ -51,6 +52,10 @@ export interface SegmentedControlProps {
    * Full width (segments expand equally)
    */
   fullWidth?: boolean;
+  /**
+   * Layout orientation
+   */
+  orientation?: "horizontal" | "vertical";
   /**
    * Additional CSS class names
    */
@@ -81,6 +86,7 @@ export function SegmentedControl({
   size = "md",
   disabled = false,
   fullWidth = false,
+  orientation = "horizontal",
   className = "",
   style,
   "data-testid": testId,
@@ -94,6 +100,7 @@ export function SegmentedControl({
     `helm-segmented--${surface}`,
     disabled && "helm-segmented--disabled",
     fullWidth && "helm-segmented--full",
+    orientation === "vertical" && "helm-segmented--vertical",
     className,
   ]
     .filter(Boolean)

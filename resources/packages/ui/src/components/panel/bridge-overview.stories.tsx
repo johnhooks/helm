@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { useState } from "react";
 import type { CSSProperties, ReactNode } from "react";
 import { Panel } from "./panel";
 import { StatusBadge } from "../status-badge";
@@ -7,6 +8,9 @@ import { Countdown } from "../countdown";
 import { ProgressBar } from "../progress-bar";
 import { Button } from "../button";
 import { ContextMenu } from "../context-menu";
+import { MatrixIndicator } from "../matrix-indicator";
+import { LogCard } from "../log-card";
+import { SegmentedControl } from "../segmented-control";
 
 /* ================================================================
  *  Meta
@@ -35,12 +39,6 @@ const meta = {
             0%   { opacity: 0; }
             50%  { opacity: 0.06; }
             100% { opacity: 0; }
-          }
-          @keyframes helm-scan-sweep {
-            0%   { transform: translateX(-100%); opacity: 0; }
-            20%  { opacity: 0.3; }
-            80%  { opacity: 0.3; }
-            100% { transform: translateX(100%); opacity: 0; }
           }
         `}</style>
         <div style={{ height: "100dvh", boxSizing: "border-box" }}>
@@ -87,40 +85,124 @@ const labelStyle: CSSProperties = {
   textTransform: "uppercase",
 };
 
-const timeStyle: CSSProperties = {
-  ...labelStyle,
-  flexShrink: 0,
-  minWidth: 42,
-};
-
-const entryTitle: CSSProperties = {
-  fontSize: 13,
-  color: C.text,
-  fontWeight: 500,
-};
-
 /* ================================================================
- *  Readout Strip
+ *  Engineering Card
  * ============================================================= */
 
-const ReadoutStrip = () => (
-  <Panel variant="default" padding="sm">
-    <div style={{
-      display: "flex",
-      gap: 24,
-      flexWrap: "wrap",
-      alignItems: "center",
-    }}>
-      <Readout label="Hull" value={87} unit="%" tone="accent" size="sm" />
-      <div style={{ width: 1, height: 20, background: C.border }} />
-      <Readout label="Shields" value={100} unit="%" tone="sky" size="sm" />
-      <div style={{ width: 1, height: 20, background: C.border }} />
-      <Readout label="Power" value={85} unit="%" tone="gold" size="sm" />
-      <div style={{ width: 1, height: 20, background: C.border }} />
-      <Readout label="System" value="Sol" tone="sky" size="sm" />
-    </div>
-  </Panel>
+/**
+ * Base values (Normal mode). Multipliers from PowerMode enum:
+ *   Efficiency → output 0.7×, regen 0.5×, decay 0.0×
+ *   Normal     → output 1.0×, regen 1.0×, decay 1.0×
+ *   Overdrive  → output 1.3×, regen 1.3×, decay 2.5×
+ */
+const POWER_MODES = {
+  efficiency: { label: "Efficiency", output: 0.7, regen: 0.5, decay: 0.0 },
+  normal:     { label: "Normal",     output: 1.0, regen: 1.0, decay: 1.0 },
+  overdrive:  { label: "Overdrive",  output: 1.3, regen: 1.3, decay: 2.5 },
+} as const;
+
+const BASE = {
+  energy: 850, energyMax: 1000,
+  regenRate: 2.4,    // MJ/h
+  coreLife: 42,       // ly remaining
+  jumpRange: 12,      // ly (sustain)
+  jumpSpeed: 3.2,     // ly/day (amplitude)
+  jumpDraw: 120,      // MJ per jump
+  sensorRange: 8,     // ly (base range)
+  scanDuration: 72,   // min (route scan)
+  discovery: 82,      // % (first-hop chance)
+} as const;
+
+const MODE_OPTIONS = [
+  { value: "efficiency", label: "Efficiency" },
+  { value: "normal", label: "Normal" },
+  { value: "overdrive", label: "Overdrive" },
+];
+
+const EngCell = ({ label, value, unit, max, level, tone = "gold" }: {
+  label: string;
+  value: ReactNode;
+  unit: string;
+  max?: ReactNode;
+  level: number;
+  tone?: "gold" | "accent" | "sky" | "lilac";
+}) => (
+  <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
+    <MatrixIndicator level={level} rows={4} cols={3} tone={tone} />
+    <Readout label={label} value={value} max={max} unit={unit} tone={tone} size="sm" />
+  </div>
 );
+
+const SystemPanel = ({ label, children }: { label: string; children: ReactNode }) => (
+  <div style={{ display: "flex", flexDirection: "column", gap: 4, flexShrink: 0 }}>
+    <div style={{ ...labelStyle, padding: "2px 0" }}>{label}</div>
+    <Panel variant="default" padding="sm" style={{ border: `1px solid ${C.border}` }}>
+      {children}
+    </Panel>
+  </div>
+);
+
+type PowerModeKey = keyof typeof POWER_MODES;
+
+const EngineeringPanel = ({ mode, onModeChange }: { mode: PowerModeKey; onModeChange: (m: PowerModeKey) => void }) => {
+  const m = POWER_MODES[mode];
+  const recharge = +(BASE.regenRate * m.regen).toFixed(1);
+
+  return (
+    <SystemPanel label="Engineering">
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
+          <EngCell label="Energy" value={BASE.energy} max={BASE.energyMax} unit="MJ" level={85} tone="gold" />
+          <EngCell label="Recharge" value={recharge} unit="MJ/h" level={m.regen * 50} tone="gold" />
+          <EngCell label="Core Life" value={BASE.coreLife} unit="ly" level={84} tone="accent" />
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+          <div style={labelStyle}>Power Mode</div>
+          <SegmentedControl
+            options={MODE_OPTIONS}
+            value={mode}
+            onChange={(v) => onModeChange(v as PowerModeKey)}
+            surface="neutral"
+            size="sm"
+            fullWidth
+            aria-label="Power mode"
+          />
+        </div>
+      </div>
+    </SystemPanel>
+  );
+};
+
+const NavigationPanel = ({ mode }: { mode: PowerModeKey }) => {
+  const m = POWER_MODES[mode];
+  const jumpRange = +(BASE.jumpRange * m.output).toFixed(1);
+  const speed = +(BASE.jumpSpeed * m.output).toFixed(1);
+
+  return (
+    <SystemPanel label="Navigation">
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
+        <EngCell label="Range" value={jumpRange} unit="ly" level={m.output * 70} tone="sky" />
+        <EngCell label="Speed" value={speed} unit="ly/d" level={m.output * 65} tone="sky" />
+        <EngCell label="Draw" value={BASE.jumpDraw} unit="MJ" level={60} tone="gold" />
+      </div>
+    </SystemPanel>
+  );
+};
+
+const SensorsPanel = ({ mode }: { mode: PowerModeKey }) => {
+  const m = POWER_MODES[mode];
+  const range = +(BASE.sensorRange * m.output).toFixed(1);
+
+  return (
+    <SystemPanel label="Sensors">
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
+        <EngCell label="Range" value={range} unit="ly" level={m.output * 65} tone="lilac" />
+        <EngCell label="Scan" value={BASE.scanDuration} unit="min" level={55} tone="lilac" />
+        <EngCell label="Discovery" value={BASE.discovery} unit="%" level={BASE.discovery} tone="lilac" />
+      </div>
+    </SystemPanel>
+  );
+};
 
 /* ================================================================
  *  Starfield
@@ -552,156 +634,25 @@ const SurveyView = ({ selectedPlanet }: { selectedPlanet?: string }) => (
 );
 
 /* ================================================================
- *  Log Entry
- * ============================================================= */
-
-interface LogEntryProps {
-  time: string;
-  title: string;
-  tone?: "accent" | "sky" | "lilac" | "gold" | "orange" | "neutral";
-  active?: boolean;
-  status?: ReactNode;
-  children?: ReactNode;
-  action?: ReactNode;
-}
-
-const toneColor: Record<string, string> = {
-  accent: C.accent,
-  sky: C.sky,
-  lilac: C.lilac,
-  gold: C.gold,
-  orange: C.orange,
-  neutral: C.muted,
-};
-
-const LogEntry = ({ time, title, tone = "accent", active, status, children, action }: LogEntryProps) => (
-  <Panel
-    variant={active ? "bordered" : "default"}
-    tone="neutral"
-    padding="sm"
-    style={active ? { position: "relative" } : { position: "relative", border: `1px solid ${C.border}` }}
-  >
-    {/* Accent orb */}
-    <div style={{
-      position: "absolute",
-      left: 10,
-      top: 12,
-      width: 6,
-      height: 6,
-      borderRadius: "50%",
-      background: toneColor[tone] ?? C.muted,
-      opacity: 0.6,
-      boxShadow: `0 0 6px ${toneColor[tone] ?? C.muted}44`,
-    }} />
-    <div style={{ display: "flex", flexDirection: "column", gap: 8, paddingLeft: 10 }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <span style={timeStyle}>{time}</span>
-        <span style={entryTitle}>{title}</span>
-        <span style={{ marginLeft: "auto", flexShrink: 0 }}>{status}</span>
-      </div>
-      {children && <div style={{ paddingLeft: 50 }}>{children}</div>}
-      {action && <div style={{ paddingLeft: 50 }}>{action}</div>}
-    </div>
-  </Panel>
-);
-
-/* ================================================================
- *  Draft Action Cards
- * ============================================================= */
-
-const DraftCard = ({ title, tone, children }: { title: string; tone: string; children: ReactNode }) => (
-  <div style={{
-    border: `1px dashed ${C.border}`,
-    borderRadius: 8,
-    padding: 12,
-    display: "flex",
-    flexDirection: "column",
-    gap: 10,
-    background: C.surface,
-    position: "relative",
-    overflow: "hidden",
-  }}>
-    {/* Accent orb */}
-    <div style={{
-      position: "absolute",
-      left: 10,
-      top: 16,
-      width: 6,
-      height: 6,
-      borderRadius: "50%",
-      background: tone,
-      opacity: 0.6,
-      boxShadow: `0 0 6px ${tone}44`,
-    }} />
-    {/* Subtle scan-line sweep */}
-    <div style={{
-      position: "absolute",
-      inset: 0,
-      background: `linear-gradient(90deg, transparent, ${tone}08, transparent)`,
-      animation: "helm-scan-sweep 3s ease-in-out infinite",
-      pointerEvents: "none",
-    }} />
-    <div style={{ display: "flex", alignItems: "center", gap: 8, paddingLeft: 10 }}>
-      <span style={{ ...timeStyle, color: C.muted }}>draft</span>
-      <span style={entryTitle}>{title}</span>
-      <span style={{ marginLeft: "auto" }}>
-        <StatusBadge tone="warning" size="sm">Pending</StatusBadge>
-      </span>
-    </div>
-    <div style={{ paddingLeft: 60, display: "flex", flexDirection: "column", gap: 10 }}>
-      {children}
-    </div>
-  </div>
-);
-
-const DraftJumpAction = () => (
-  <DraftCard title="Jump to Tau Ceti" tone={C.sky}>
-    <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
-      <Readout label="Distance" value="11.9" unit="ly" tone="sky" size="sm" />
-      <Readout label="ETA" value="4d 2h" tone="sky" size="sm" />
-      <Readout label="Fuel Cost" value={32} unit="%" tone="gold" size="sm" />
-    </div>
-    <div style={{ display: "flex", gap: 8 }}>
-      <Button variant="primary" size="sm">Confirm Jump</Button>
-      <Button variant="tertiary" size="sm">Cancel</Button>
-    </div>
-  </DraftCard>
-);
-
-const DraftScanAction = () => (
-  <DraftCard title="Scan Jupiter" tone={C.lilac}>
-    <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
-      <Readout label="Duration" value="1h 12m" tone="lilac" size="sm" />
-      <Readout label="Power Cost" value={8} unit="%" tone="gold" size="sm" />
-      <Readout label="Type" value="Gas Giant" tone="lilac" size="sm" />
-    </div>
-    <div style={{ display: "flex", gap: 8 }}>
-      <Button variant="primary" size="sm">Begin Scan</Button>
-      <Button variant="tertiary" size="sm">Cancel</Button>
-    </div>
-  </DraftCard>
-);
-
-/* ================================================================
  *  Log variants
  * ============================================================= */
 
 const completedEntries = (
   <>
-    <LogEntry time="08:42" title="Docked at Sol Station" tone="accent"
+    <LogCard time="08:42" title="Docked at Sol Station" tone="accent"
       status={<StatusBadge tone="success" size="sm">Complete</StatusBadge>}
     />
-    <LogEntry time="06:15" title="Scan complete — Sol III" tone="lilac"
+    <LogCard time="06:15" title="Scan complete — Sol III" tone="lilac"
       status={<StatusBadge tone="success" size="sm">Complete</StatusBadge>}
       action={<Button variant="tertiary" size="sm">View Results</Button>}
     />
-    <LogEntry time="02:30" title="Arrived in Sol" tone="sky"
+    <LogCard time="02:30" title="Arrived in Sol" tone="sky"
       status={<StatusBadge tone="success" size="sm">Complete</StatusBadge>}
     />
-    <LogEntry time="Y1 D12" title="Jump to Sol initiated" tone="sky"
+    <LogCard time="Y1 D12" title="Jump to Sol initiated" tone="sky"
       status={<StatusBadge tone="muted" size="sm">Resolved</StatusBadge>}
     />
-    <LogEntry time="Y1 D11" title="Scan complete — Tau Ceti IV" tone="lilac"
+    <LogCard time="Y1 D11" title="Scan complete — Tau Ceti IV" tone="lilac"
       status={<StatusBadge tone="success" size="sm">Complete</StatusBadge>}
       action={<Button variant="tertiary" size="sm">View Results</Button>}
     />
@@ -709,9 +660,13 @@ const completedEntries = (
 );
 
 const LogShell = ({ children }: { children: ReactNode }) => (
-  <div style={{ display: "flex", flexDirection: "column", gap: 6, overflow: "auto", flex: 1 }}>
-    <div style={{ ...labelStyle, padding: "4px 0" }}>Activity Log</div>
-    {children}
+  <div style={{ display: "flex", flexDirection: "column", gap: 4, flex: 1, minHeight: 0 }}>
+    <div style={{ ...labelStyle, padding: "2px 0", flexShrink: 0 }}>Activity Log</div>
+    <div style={{ overflowY: "auto", flex: 1, minHeight: 0 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+        {children}
+      </div>
+    </div>
   </div>
 );
 
@@ -721,16 +676,16 @@ const IdleLog = () => (
 
 const ActiveLog = () => (
   <LogShell>
-    <LogEntry time="now" title="Scanning Sol IV" tone="lilac" active
+    <LogCard time="now" title="Scanning Sol IV" tone="lilac" variant="active"
       status={<StatusBadge tone="info" size="sm" pulse>In Progress</StatusBadge>}
     >
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
         <ProgressBar value={32} tone="lilac" size="sm" />
         <Countdown remaining={4320} tone="lilac" active label="Remaining" size="sm" />
       </div>
-    </LogEntry>
+    </LogCard>
 
-    <LogEntry time="now" title="Traveling to Tau Ceti" tone="sky" active
+    <LogCard time="now" title="Traveling to Tau Ceti" tone="sky" variant="active"
       status={<StatusBadge tone="info" size="sm" pulse>In Progress</StatusBadge>}
       action={<Button variant="tertiary" size="sm">Cancel</Button>}
     >
@@ -741,7 +696,7 @@ const ActiveLog = () => (
         </div>
         <ProgressBar value={18} tone="sky" size="sm" />
       </div>
-    </LogEntry>
+    </LogCard>
 
     {completedEntries}
   </LogShell>
@@ -751,25 +706,29 @@ const ActiveLog = () => (
  *  Bridge Layout
  * ============================================================= */
 
-const BridgeLayout = ({ log, view }: { log: ReactNode; view: ReactNode }) => (
-  <div style={{
-    display: "grid",
-    gridTemplateColumns: "1fr minmax(300px, 400px)",
-    gridTemplateRows: "auto 1fr",
-    gap: 8,
-    height: "100%",
-    padding: 8,
-    boxSizing: "border-box",
-  }}>
-    <div style={{ gridColumn: "1 / -1" }}>
-      <ReadoutStrip />
+const BridgeLayout = ({ log, view }: { log: ReactNode; view: ReactNode }) => {
+  const [mode, setMode] = useState<PowerModeKey>("normal");
+
+  return (
+    <div style={{
+      display: "flex",
+      gap: 8,
+      height: "100dvh",
+      padding: 8,
+      boxSizing: "border-box",
+    }}>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        {view}
+      </div>
+      <div style={{ width: 380, display: "flex", flexDirection: "column", gap: 6 }}>
+        <EngineeringPanel mode={mode} onModeChange={setMode} />
+        <NavigationPanel mode={mode} />
+        <SensorsPanel mode={mode} />
+        {log}
+      </div>
     </div>
-    {view}
-    <div style={{ display: "flex", flexDirection: "column", minHeight: 0 }}>
-      {log}
-    </div>
-  </div>
-);
+  );
+};
 
 /* ================================================================
  *  Stories
@@ -885,7 +844,25 @@ export const DraftJump: Story = {
       view={<StarfieldView selectedStar="Tau Ceti" />}
       log={
         <LogShell>
-          <DraftJumpAction />
+          <LogCard
+            time="draft"
+            title="Jump to Tau Ceti"
+            tone="sky"
+            variant="draft"
+            status={<StatusBadge tone="warning" size="sm">Pending</StatusBadge>}
+            action={
+              <div style={{ display: "flex", gap: 8 }}>
+                <Button variant="primary" size="sm">Confirm Jump</Button>
+                <Button variant="tertiary" size="sm">Cancel</Button>
+              </div>
+            }
+          >
+            <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
+              <Readout label="Distance" value="11.9" unit="ly" tone="sky" size="sm" />
+              <Readout label="ETA" value="4d 2h" tone="sky" size="sm" />
+              <Readout label="Draw" value={120} unit="MJ" tone="gold" size="sm" />
+            </div>
+          </LogCard>
           {completedEntries}
         </LogShell>
       }
@@ -929,7 +906,25 @@ export const DraftScan: Story = {
       view={<SurveyView selectedPlanet="Jupiter" />}
       log={
         <LogShell>
-          <DraftScanAction />
+          <LogCard
+            time="draft"
+            title="Scan Jupiter"
+            tone="lilac"
+            variant="draft"
+            status={<StatusBadge tone="warning" size="sm">Pending</StatusBadge>}
+            action={
+              <div style={{ display: "flex", gap: 8 }}>
+                <Button variant="primary" size="sm">Begin Scan</Button>
+                <Button variant="tertiary" size="sm">Cancel</Button>
+              </div>
+            }
+          >
+            <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
+              <Readout label="Duration" value="1h 12m" tone="lilac" size="sm" />
+              <Readout label="Power Cost" value={8} unit="%" tone="gold" size="sm" />
+              <Readout label="Type" value="Gas Giant" tone="lilac" size="sm" />
+            </div>
+          </LogCard>
           {completedEntries}
         </LogShell>
       }

@@ -21,6 +21,37 @@
   width: 100%;
 }
 
+/* Vertical orientation */
+.helm-segmented--vertical {
+  flex-direction: column;
+  display: inline-flex;
+}
+
+.helm-segmented--vertical.helm-segmented--full {
+  width: auto;
+}
+
+.helm-segmented--vertical .helm-segmented__option {
+  width: 100%;
+}
+
+.helm-segmented--vertical .helm-segmented__label {
+  width: 100%;
+  justify-content: center;
+}
+
+.helm-segmented--vertical.helm-segmented--sm .helm-segmented__label {
+  height: 22px;
+  padding: 0 10px;
+  font-size: 10px;
+}
+
+.helm-segmented--vertical.helm-segmented--md .helm-segmented__label {
+  height: 26px;
+  padding: 0 12px;
+  font-size: 11px;
+}
+
 .helm-segmented--disabled {
   opacity: 0.5;
 }
@@ -99,6 +130,10 @@
 }
 
 /* Surface colors for active state */
+.helm-segmented--neutral .helm-segmented__input:checked + .helm-segmented__label {
+  background: var(--helm-ui-color-muted);
+}
+
 .helm-segmented--accent .helm-segmented__input:checked + .helm-segmented__label {
   background: var(--helm-ui-color-accent);
 }
@@ -133,5 +168,6 @@
 
 /* Hover on active */
 .helm-segmented__option:not(.helm-segmented__option--disabled) .helm-segmented__input:checked:hover + .helm-segmented__label {
-  filter: brightness(0.92);
+  filter: brightness(1.1);
+  color: var(--helm-ui-color-bg);
 }

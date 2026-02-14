@@ -28,4 +28,27 @@
   --helm-ui-radius-md: 12px;
   --helm-ui-radius-lg: 16px;
   --helm-ui-stack-gap: 8px;
+
+  /* Scrollbar */
+  scrollbar-color: var(--helm-ui-color-border) transparent;
+  scrollbar-width: thin;
+}
+
+/* Webkit scrollbar (Chrome, Safari, Edge) */
+.helm-page-root ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.helm-page-root ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.helm-page-root ::-webkit-scrollbar-thumb {
+  background: var(--helm-ui-color-border);
+  border-radius: 3px;
+}
+
+.helm-page-root ::-webkit-scrollbar-thumb:hover {
+  background: var(--helm-ui-color-muted);
 }

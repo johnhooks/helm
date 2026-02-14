@@ -150,6 +150,44 @@ export const PartiallyDisabled: Story = {
   },
 };
 
+export const Vertical: Story = {
+  args: {
+    options: powerOptions,
+    defaultValue: "normal",
+    orientation: "vertical",
+    surface: "gold",
+    size: "sm",
+  },
+};
+
+export const VerticalControlled: Story = {
+  args: {
+    options: powerOptions,
+  },
+  render: () => {
+    const [value, setValue] = useState("normal");
+    return (
+      <div style={{ display: "flex", gap: 16, alignItems: "start" }}>
+        <SegmentedControl
+          options={[
+            { value: "low", label: "EFF" },
+            { value: "normal", label: "NRM" },
+            { value: "high", label: "OVR" },
+          ]}
+          value={value}
+          onChange={setValue}
+          orientation="vertical"
+          surface="gold"
+          size="sm"
+        />
+        <span style={{ color: "#a39a88", fontSize: 12 }}>
+          Selected: {value}
+        </span>
+      </div>
+    );
+  },
+};
+
 export const ManyOptions: Story = {
   args: {
     options: [
