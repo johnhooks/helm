@@ -71,6 +71,7 @@
 .helm-side-drawer__drawer {
   overflow: hidden;
   height: 100%;
+  border-left: 1px solid var(--helm-ui-color-border);
 }
 
 /* Inner content — keeps its full width so nothing reflows during transition */
