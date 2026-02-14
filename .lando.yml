@@ -25,9 +25,16 @@ services:
     hogfrom:
       - appserver
 
+  phpmyadmin:
+    type: phpmyadmin
+    hosts:
+      - database
+
 proxy:
   mailhog:
     - mail.helm.lndo.site
+  phpmyadmin:
+    - pma.helm.lndo.site
 
 tooling:
   xdebug-on:
