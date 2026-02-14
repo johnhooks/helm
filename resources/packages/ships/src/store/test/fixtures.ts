@@ -11,6 +11,7 @@ export function createShipState(
 		power_full_at: '2025-01-01T00:00:00+00:00',
 		shields_full_at: '2025-01-01T00:00:00+00:00',
 		hull_integrity: 100,
+		power_mode: 'normal',
 		cargo: {},
 		current_action_id: null,
 		...overrides,

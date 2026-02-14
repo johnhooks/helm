@@ -42,6 +42,7 @@ enum ErrorCode: string
     case ShipInvalidState = 'ship.invalid_state';
     case ShipInsufficientCore = 'ship.insufficient_core';
     case ShipSystemsNotFound = 'ship.systems_not_found';
+    case ShipInvalidPowerMode = 'ship.invalid_power_mode';
 
     // Product errors
     case ProductNotFound = 'product.not_found';
@@ -115,7 +116,8 @@ enum ErrorCode: string
             self::NavigationRouteLost,
             self::ShipNoPosition,
             self::ShipInvalidState,
-            self::ShipInsufficientCore => 422,
+            self::ShipInsufficientCore,
+            self::ShipInvalidPowerMode => 422,
 
             // Bad request (default)
             default => 400,

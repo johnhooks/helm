@@ -3,7 +3,8 @@ import type { Action, State } from './types';
 
 function ships( state: State[ 'ships' ], action: Action ): State[ 'ships' ] {
 	switch ( action.type ) {
-		case 'FETCH_SHIP_START': {
+		case 'FETCH_SHIP_START':
+		case 'PATCH_SHIP_START': {
 			const { [ action.shipId ]: _removed, ...restErrors } =
 				state.errors;
 			return {
@@ -12,7 +13,8 @@ function ships( state: State[ 'ships' ], action: Action ): State[ 'ships' ] {
 				errors: restErrors,
 			};
 		}
-		case 'FETCH_SHIP_FINISHED': {
+		case 'FETCH_SHIP_FINISHED':
+		case 'PATCH_SHIP_FINISHED': {
 			const { [ action.shipId ]: _removed, ...restErrors } =
 				state.errors;
 			return {
@@ -25,6 +27,7 @@ function ships( state: State[ 'ships' ], action: Action ): State[ 'ships' ] {
 			};
 		}
 		case 'FETCH_SHIP_FAILED':
+		case 'PATCH_SHIP_FAILED':
 			return {
 				...state,
 				isLoading: {

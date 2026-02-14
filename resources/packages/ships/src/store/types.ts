@@ -8,7 +8,10 @@ export type Action =
 	| { type: 'FETCH_SHIP_FAILED'; shipId: number; error: HelmError }
 	| { type: 'FETCH_SYSTEMS_START'; shipId: number }
 	| { type: 'FETCH_SYSTEMS_FINISHED'; shipId: number; systems: SystemComponentResponse[] }
-	| { type: 'FETCH_SYSTEMS_FAILED'; shipId: number; error: HelmError };
+	| { type: 'FETCH_SYSTEMS_FAILED'; shipId: number; error: HelmError }
+	| { type: 'PATCH_SHIP_START'; shipId: number }
+	| { type: 'PATCH_SHIP_FINISHED'; shipId: number; ship: WithRestLinks< ShipState > }
+	| { type: 'PATCH_SHIP_FAILED'; shipId: number; error: HelmError };
 
 export interface State {
 	ships: {

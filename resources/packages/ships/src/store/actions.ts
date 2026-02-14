@@ -83,6 +83,36 @@ export function receiveSystems(
 	return { type: 'FETCH_SYSTEMS_FINISHED', shipId, systems };
 }
 
+export const patchPowerMode =
+	( shipId: number, powerMode: string ): Thunk< Action, typeof store > =>
+	async ( { dispatch } ) => {
+		dispatch( { type: 'PATCH_SHIP_START', shipId } );
+
+		try {
+			const ship = await apiFetch< WithRestLinks< ShipState > >( {
+				path: `/helm/v1/ships/${ shipId }`,
+				method: 'PATCH',
+				data: { power_mode: powerMode },
+			} );
+
+			dispatch( { type: 'PATCH_SHIP_FINISHED', shipId, ship } );
+		} catch ( error ) {
+			const helmError = await HelmError.asyncFrom( error );
+
+			dispatch( {
+				type: 'PATCH_SHIP_FAILED',
+				shipId,
+				error: helmError.isSafe
+					? helmError
+					: HelmError.safe(
+							ErrorCode.ShipsPatchFailed,
+							__( 'Could not patch ship.', 'helm' ),
+							helmError
+					  ),
+			} );
+		}
+	};
+
 export const receiveShipEmbeds =
 	( shipId: number, embedded: ShipEmbeds ): Thunk< Action, typeof store > =>
 	async ( { dispatch, registry } ) => {

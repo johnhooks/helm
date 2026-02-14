@@ -34,6 +34,7 @@ export enum ServerErrorCode {
 	ShipInvalidState = 'helm.ship.invalid_state',
 	ShipInsufficientCore = 'helm.ship.insufficient_core',
 	ShipSystemsNotFound = 'helm.ship.systems_not_found',
+	ShipInvalidPowerMode = 'helm.ship.invalid_power_mode',
 
 	// Product errors
 	ProductNotFound = 'helm.product.not_found',

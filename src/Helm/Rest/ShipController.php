@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Helm\Rest;
 
 use Helm\Core\ErrorCode;
+use Helm\ShipLink\Components\PowerMode;
 use Helm\ShipLink\Ship;
 use Helm\ShipLink\ShipFactory;
+use Helm\ShipLink\ShipStateRepository;
 use Helm\Ships\ShipPost;
 use WP_Error;
 use WP_REST_Request;
@@ -15,17 +17,20 @@ use WP_REST_Response;
 /**
  * REST controller for ship state.
  *
- * GET /helm/v1/ships/{id} - Ship operational state
- * GET /helm/v1/ships/{id}/cargo - Ship cargo hold
+ * GET   /helm/v1/ships/{id}       - Ship operational state
+ * PATCH /helm/v1/ships/{id}       - Patch ship state
+ * GET   /helm/v1/ships/{id}/cargo - Ship cargo hold
  *
  * For ship metadata (name, owner, etc.), use /wp/v2/ships/{id}.
  */
 final class ShipController
 {
     private const NAMESPACE = 'helm/v1';
+    private const PATCHABLE_FIELDS = ['power_mode'];
 
     public function __construct(
         private readonly ShipFactory $shipFactory,
+        private readonly ShipStateRepository $stateRepository,
     ) {
     }
 
@@ -41,6 +46,22 @@ final class ShipController
                 'methods'             => 'GET',
                 'callback'            => [$this, 'show'],
                 'permission_callback' => [$this, 'permissions'],
+            ]
+        );
+
+        register_rest_route(
+            self::NAMESPACE,
+            '/ships/(?P<id>\d+)',
+            [
+                'methods'             => 'PATCH',
+                'callback'            => [$this, 'patch'],
+                'permission_callback' => [$this, 'permissions'],
+                'args'                => [
+                    'power_mode' => [
+                        'type' => 'string',
+                        'enum' => PowerMode::slugs(),
+                    ],
+                ],
             ]
         );
 
@@ -111,6 +132,65 @@ final class ShipController
     }
 
     /**
+     * Patch ship state.
+     *
+     * @param WP_REST_Request<array<string, mixed>> $request
+     * @return WP_REST_Response|WP_Error
+     */
+    public function patch(WP_REST_Request $request)
+    {
+        $body = $request->get_json_params();
+
+        $unknown = array_diff(array_keys($body), self::PATCHABLE_FIELDS);
+
+        if ($unknown !== []) {
+            return new WP_Error(
+                'rest_invalid_param',
+                /* translators: %s: comma-separated list of unknown property names */
+                sprintf(__('Unknown property: %s', 'helm'), implode(', ', $unknown)),
+                ['status' => 400]
+            );
+        }
+
+        $updates = array_intersect_key($body, array_flip(self::PATCHABLE_FIELDS));
+
+        if ($updates === []) {
+            return new WP_Error(
+                'rest_missing_callback_param',
+                __('No properties to patch.', 'helm'),
+                ['status' => 400]
+            );
+        }
+
+        $shipPostId = (int) $request->get_param('id');
+        $state = $this->stateRepository->find($shipPostId);
+
+        if ($state === null) {
+            return ErrorCode::ShipNotFound->error(
+                __('Ship not found.', 'helm'),
+                ['status' => ErrorCode::ShipNotFound->httpStatus()]
+            );
+        }
+
+        if (array_key_exists('power_mode', $updates)) {
+            $mode = PowerMode::fromSlug((string) $updates['power_mode']);
+
+            if ($mode === null) {
+                return ErrorCode::ShipInvalidPowerMode->error(
+                    __('Invalid power mode.', 'helm'),
+                    ['status' => ErrorCode::ShipInvalidPowerMode->httpStatus()]
+                );
+            }
+
+            $state->power_mode = $mode;
+        }
+
+        $this->stateRepository->update($state);
+
+        return $this->show($request);
+    }
+
+    /**
      * Get ship cargo.
      *
      * @param WP_REST_Request<array<string, mixed>> $request
@@ -138,6 +218,7 @@ final class ShipController
             'power_full_at'     => $state->power_full_at?->format('c'),
             'shields_full_at'   => $state->shields_full_at?->format('c'),
             'hull_integrity'    => $state->hull_integrity,
+            'power_mode'        => $state->power_mode->slug(),
             'cargo'             => $ship->cargo()->all(),
             'current_action_id' => $state->current_action_id,
         ];

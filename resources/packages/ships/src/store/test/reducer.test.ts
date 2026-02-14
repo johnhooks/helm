@@ -281,6 +281,98 @@ describe( 'reducer', () => {
 		} );
 	} );
 
+	describe( 'PATCH_SHIP_START', () => {
+		it( 'sets isLoading for the ship', () => {
+			const state = reduce( undefined, {
+				type: 'PATCH_SHIP_START',
+				shipId: 1,
+			} );
+
+			expect( state.ships.isLoading[ 1 ] ).toBe( true );
+		} );
+
+		it( 'clears any existing error for the ship', () => {
+			const prev = createState( {
+				ships: { errors: { 1: new HelmError( 'helm.test', 'Error' ) } },
+			} );
+
+			const state = reduce( prev, {
+				type: 'PATCH_SHIP_START',
+				shipId: 1,
+			} );
+
+			expect( state.ships.errors[ 1 ] ).toBeUndefined();
+		} );
+	} );
+
+	describe( 'PATCH_SHIP_FINISHED', () => {
+		it( 'stores the ship and clears loading', () => {
+			const ship = createShipState( { power_mode: 'overdrive' } );
+			const prev = createState( { ships: { isLoading: { 1: true } } } );
+
+			const state = reduce( prev, {
+				type: 'PATCH_SHIP_FINISHED',
+				shipId: 1,
+				ship,
+			} );
+
+			expect( state.ships.byId[ 1 ] ).toBe( ship );
+			expect( state.ships.byId[ 1 ].power_mode ).toBe( 'overdrive' );
+			expect( state.ships.isLoading[ 1 ] ).toBe( false );
+		} );
+
+		it( 'clears any existing error for the ship', () => {
+			const prev = createState( {
+				ships: {
+					isLoading: { 1: true },
+					errors: { 1: new HelmError( 'helm.test', 'Error' ) },
+				},
+			} );
+
+			const state = reduce( prev, {
+				type: 'PATCH_SHIP_FINISHED',
+				shipId: 1,
+				ship: createShipState(),
+			} );
+
+			expect( state.ships.errors[ 1 ] ).toBeUndefined();
+		} );
+	} );
+
+	describe( 'PATCH_SHIP_FAILED', () => {
+		it( 'stores the error and clears loading', () => {
+			const error = new HelmError( 'helm.ships.patch_failed', 'Patch failed' );
+			const prev = createState( { ships: { isLoading: { 1: true } } } );
+
+			const state = reduce( prev, {
+				type: 'PATCH_SHIP_FAILED',
+				shipId: 1,
+				error,
+			} );
+
+			expect( state.ships.errors[ 1 ] ).toBe( error );
+			expect( state.ships.isLoading[ 1 ] ).toBe( false );
+		} );
+
+		it( 'does not remove existing ship data', () => {
+			const ship = createShipState();
+			const prev = createState( {
+				ships: {
+					byId: { 1: ship },
+					isLoading: { 1: true },
+				},
+			} );
+
+			const state = reduce( prev, {
+				type: 'PATCH_SHIP_FAILED',
+				shipId: 1,
+				error: new HelmError( 'helm.test', 'Error' ),
+			} );
+
+			expect( state.ships.byId[ 1 ] ).toBe( ship );
+		} );
+	} );
+
 	describe( 'unknown action', () => {
 		it( 'returns the same state', () => {
 			const prev = initializeDefaultState();

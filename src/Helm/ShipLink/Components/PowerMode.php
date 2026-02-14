@@ -22,6 +22,28 @@ enum PowerMode: int
     case Normal = 2;      // Standard operations
     case Overdrive = 3;   // Emergency, pushing it - fast but burns core
 
+    /**
+     * @return array<string>
+     */
+    public static function slugs(): array
+    {
+        return array_map(
+            static fn(self $case) => $case->slug(),
+            self::cases()
+        );
+    }
+
+    public static function fromSlug(string $slug): ?self
+    {
+        foreach (self::cases() as $case) {
+            if ($case->slug() === $slug) {
+                return $case;
+            }
+        }
+
+        return null;
+    }
+
     public function slug(): string
     {
         return match ($this) {

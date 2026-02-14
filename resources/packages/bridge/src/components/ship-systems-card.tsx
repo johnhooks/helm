@@ -1,21 +1,18 @@
-import { useState } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
+import { useCallback, useState } from '@wordpress/element';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { Panel, MatrixIndicator, Readout, SegmentedControl } from '@helm/ui';
 import { store, useShip } from '@helm/ships';
 import './ship-systems-card.css';
-
-// TODO: Power mode is client-side only for now. It should be persisted to the
-// ship state on the server and read back via useShip().
 
 /* ----------------------------------------------------------------
  *  Power mode multipliers (mirrors PowerMode.php)
  * --------------------------------------------------------------- */
 
 const POWER_MODES = {
-	efficiency: { label: 'Efficiency', output: 0.7, regen: 0.5, decay: 0.0 },
-	normal: { label: 'Normal', output: 1.0, regen: 1.0, decay: 1.0 },
-	overdrive: { label: 'Overdrive', output: 1.3, regen: 1.3, decay: 2.5 },
+	efficiency: { output: 0.7, regen: 0.5, decay: 0.0 },
+	normal: { output: 1.0, regen: 1.0, decay: 1.0 },
+	overdrive: { output: 1.3, regen: 1.3, decay: 2.5 },
 } as const;
 
 type PowerModeKey = keyof typeof POWER_MODES;
@@ -56,8 +53,21 @@ function SystemCell( {
  * --------------------------------------------------------------- */
 
 export function ShipSystemsCard() {
-	const { shipId } = useShip();
-	const [ powerMode, setPowerMode ] = useState< PowerModeKey >( 'normal' );
+	const { shipId, ship } = useShip();
+	const { patchPowerMode } = useDispatch( store );
+
+	// Optimistic local state: tracks the pending mode while the server round-trips.
+	const [ optimistic, setOptimistic ] = useState< PowerModeKey | null >( null );
+	const powerMode: PowerModeKey = optimistic ?? ( ship.power_mode as PowerModeKey ) ?? 'normal';
+
+	const handlePowerModeChange = useCallback(
+		( value: string ) => {
+			const next = value as PowerModeKey;
+			setOptimistic( next );
+			patchPowerMode( shipId, next ).then( () => setOptimistic( null ) );
+		},
+		[ shipId, patchPowerMode ],
+	);
 
 	const stats = useSelect(
 		( select ) => select( store ).getSystemStats( shipId ),
@@ -175,7 +185,7 @@ export function ShipSystemsCard() {
 					<SegmentedControl
 						options={ MODE_OPTIONS }
 						value={ powerMode }
-						onChange={ ( v ) => setPowerMode( v as PowerModeKey ) }
+						onChange={ handlePowerModeChange }
 						surface="neutral"
 						size="sm"
 						fullWidth

@@ -9,6 +9,7 @@ import {
 	fetchSystems,
 	receiveSystems,
 	receiveShipEmbeds,
+	patchPowerMode,
 } from '../actions';
 import { createShipState, createSystemComponent, createProductEmbed } from './fixtures';
 
@@ -345,5 +346,78 @@ describe( 'receiveShipEmbeds', () => {
 
 		expect( dispatch ).not.toHaveBeenCalled();
 		expect( registry.dispatch ).not.toHaveBeenCalled();
+	} );
+} );
+
+describe( 'patchPowerMode', () => {
+	let dispatch: ReturnType< typeof vi.fn >;
+
+	beforeEach( () => {
+		mockedApiFetch.mockReset();
+		dispatch = vi.fn();
+	} );
+
+	it( 'dispatches START then FINISHED on success', async () => {
+		const ship = createShipState( { id: 42, power_mode: 'overdrive' } );
+		mockedApiFetch.mockResolvedValue( ship );
+
+		await patchPowerMode( 42, 'overdrive' )( { dispatch } as never );
+
+		expect( dispatch ).toHaveBeenCalledWith( {
+			type: 'PATCH_SHIP_START',
+			shipId: 42,
+		} );
+		expect( dispatch ).toHaveBeenCalledWith( {
+			type: 'PATCH_SHIP_FINISHED',
+			shipId: 42,
+			ship,
+		} );
+	} );
+
+	it( 'calls apiFetch with PATCH method and power_mode body', async () => {
+		mockedApiFetch.mockResolvedValue( createShipState() );
+
+		await patchPowerMode( 7, 'efficiency' )( { dispatch } as never );
+
+		expect( mockedApiFetch ).toHaveBeenCalledWith( {
+			path: '/helm/v1/ships/7',
+			method: 'PATCH',
+			data: { power_mode: 'efficiency' },
+		} );
+	} );
+
+	it( 'dispatches FAILED with HelmError on API error', async () => {
+		mockedApiFetch.mockRejectedValue( {
+			code: 'helm.ship.invalid_power_mode',
+			message: 'Invalid power mode',
+			data: { status: 422 },
+		} );
+
+		await patchPowerMode( 42, 'bad' )( { dispatch } as never );
+
+		const failedCall = dispatch.mock.calls.find(
+			( [ action ] ) => action.type === 'PATCH_SHIP_FAILED'
+		);
+		expect( failedCall ).toBeDefined();
+
+		const error = failedCall![ 0 ].error;
+		expect( error ).toBeInstanceOf( HelmError );
+		expect( error.message ).toBe( 'helm.ship.invalid_power_mode' );
+	} );
+
+	it( 'wraps plain Error as update failed with cause', async () => {
+		mockedApiFetch.mockRejectedValue( new Error( 'Network failure' ) );
+
+		await patchPowerMode( 1, 'normal' )( { dispatch } as never );
+
+		const failedCall = dispatch.mock.calls.find(
+			( [ action ] ) => action.type === 'PATCH_SHIP_FAILED'
+		);
+
+		const error = failedCall![ 0 ].error;
+		expect( error ).toBeInstanceOf( HelmError );
+		expect( error.message ).toBe( 'helm.ships.patch_failed' );
+		expect( error.isSafe ).toBe( true );
+		expect( error.causes ).toHaveLength( 1 );
 	} );
 } );
