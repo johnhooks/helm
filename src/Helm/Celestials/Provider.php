@@ -14,10 +14,7 @@ final class Provider extends ServiceProvider
     public function register(): void
     {
         $this->container->singleton(CelestialRepository::class);
-
-        $this->container->singleton(CelestialService::class, fn () => new CelestialService(
-            $this->container->get(CelestialRepository::class),
-        ));
+        $this->container->singleton(CelestialService::class);
     }
 
     public function boot(): void

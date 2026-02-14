@@ -16,15 +16,8 @@ final class Provider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->container->singleton(ProductRepository::class, function () {
-            return new ProductRepository();
-        });
-
-        $this->container->singleton(ProductSeeder::class, function () {
-            return new ProductSeeder(
-                $this->container->get(ProductRepository::class),
-            );
-        });
+        $this->container->singleton(ProductRepository::class);
+        $this->container->singleton(ProductSeeder::class);
     }
 
     public function boot(): void

@@ -62,6 +62,18 @@ final class PostTypeRegistry
     public const META_SHIP_NAV_EFFICIENCY = '_helm_nav_efficiency';
 
     /**
+     * Register all post types, taxonomies, and meta.
+     *
+     * Taxonomies are registered first since post types reference them.
+     */
+    public function registerAll(): void
+    {
+        $this->registerTaxonomies();
+        $this->registerPostTypes();
+        $this->registerMeta();
+    }
+
+    /**
      * Register all custom post types.
      */
     public function registerPostTypes(): void

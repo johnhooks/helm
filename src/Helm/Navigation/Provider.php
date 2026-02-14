@@ -7,7 +7,6 @@ namespace Helm\Navigation;
 use Helm\Celestials\CelestialRepository;
 use Helm\Celestials\CelestialType;
 use Helm\lucatume\DI52\ServiceProvider;
-use Helm\Origin\Origin;
 use Helm\Stars\Star;
 use Helm\Stars\StarPost;
 use Helm\Stars\StarRepository;
@@ -31,25 +30,9 @@ final class Provider extends ServiceProvider
         $this->container->singleton(NodeRepository::class);
         $this->container->singleton(EdgeRepository::class);
         $this->container->singleton(RouteRepository::class);
-
-        $this->container->singleton(NodeGenerator::class, fn () => new NodeGenerator(
-            $this->container->get(Origin::class),
-        ));
-
-        $this->container->singleton(NavComputer::class, fn () => new NavComputer(
-            $this->container->get(NodeGenerator::class),
-            $this->container->get(NodeRepository::class),
-            $this->container->get(EdgeRepository::class),
-        ));
-
-        $this->container->singleton(NavigationService::class, fn () => new NavigationService(
-            $this->container->get(NavComputer::class),
-            $this->container->get(NodeRepository::class),
-            $this->container->get(EdgeRepository::class),
-            $this->container->get(RouteRepository::class),
-            $this->container->get(StarRepository::class),
-            $this->container->get(CelestialRepository::class),
-        ));
+        $this->container->singleton(NodeGenerator::class);
+        $this->container->singleton(NavComputer::class);
+        $this->container->singleton(NavigationService::class);
     }
 
     public function boot(): void

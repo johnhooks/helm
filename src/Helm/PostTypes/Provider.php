@@ -4,15 +4,11 @@ declare(strict_types=1);
 
 namespace Helm\PostTypes;
 
-use Helm\Celestials\CelestialRepository;
-use Helm\Discovery\DiscoveryService;
 use Helm\Generation\SystemGenerator;
 use Helm\lucatume\DI52\ServiceProvider;
-use Helm\Navigation\NodeRepository;
 use Helm\Origin\Origin;
 use Helm\Planets\PlanetRepository;
 use Helm\Stars\StarRepository;
-use Helm\View\View;
 
 /**
  * Service provider for Custom Post Types.
@@ -23,73 +19,18 @@ final class Provider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->container->singleton(PostTypeRegistry::class, function () {
-            return new PostTypeRegistry();
-        });
-
-        $this->container->singleton(TaxonomySeeder::class, function () {
-            return new TaxonomySeeder();
-        });
-
-        $this->container->singleton(AdminColumns::class, function () {
-            return new AdminColumns();
-        });
-
-        $this->container->singleton(StarMetaBoxes::class, function () {
-            return new StarMetaBoxes(
-                $this->container->get(View::class),
-                $this->container->get(StarRepository::class),
-                $this->container->get(PlanetRepository::class),
-                $this->container->get(DiscoveryService::class),
-                $this->container->get(NodeRepository::class),
-                $this->container->get(CelestialRepository::class),
-                $this->container->get(Origin::class),
-            );
-        });
+        $this->container->singleton(PostTypeRegistry::class);
+        $this->container->singleton(TaxonomySeeder::class);
+        $this->container->singleton(AdminColumns::class);
+        $this->container->singleton(StarMetaBoxes::class);
     }
 
     public function boot(): void
     {
-        add_action('init', [$this, 'registerPostTypesAndTaxonomies'], 5);
-        add_action('admin_init', [$this, 'registerAdminColumns']);
-        add_action('admin_init', [$this, 'registerMetaBoxes']);
+        add_action('init', $this->container->callback(PostTypeRegistry::class, 'registerAll'), 5);
+        add_action('admin_init', $this->container->callback(AdminColumns::class, 'register'));
+        add_action('admin_init', $this->container->callback(StarMetaBoxes::class, 'register'));
         add_action('admin_post_helm_generate_planets', [$this, 'handleGeneratePlanets']);
-    }
-
-    /**
-     * Register all post types and taxonomies.
-     *
-     * Runs at priority 5 to ensure CPTs are available before other init hooks.
-     */
-    public function registerPostTypesAndTaxonomies(): void
-    {
-        /** @var PostTypeRegistry $registry */
-        $registry = $this->container->get(PostTypeRegistry::class);
-
-        // Taxonomies must be registered before post types that use them
-        $registry->registerTaxonomies();
-        $registry->registerPostTypes();
-        $registry->registerMeta();
-    }
-
-    /**
-     * Register admin column customizations.
-     */
-    public function registerAdminColumns(): void
-    {
-        /** @var AdminColumns $columns */
-        $columns = $this->container->get(AdminColumns::class);
-        $columns->register();
-    }
-
-    /**
-     * Register meta boxes for CPT edit screens.
-     */
-    public function registerMetaBoxes(): void
-    {
-        /** @var StarMetaBoxes $starMetaBoxes */
-        $starMetaBoxes = $this->container->get(StarMetaBoxes::class);
-        $starMetaBoxes->register();
     }
 
     /**

@@ -13,7 +13,7 @@ final class Provider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->container->singleton(Config::class, fn() => new Config());
+        $this->container->singleton(Config::class);
     }
 
     public function boot(): void

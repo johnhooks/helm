@@ -13,8 +13,6 @@ final class Provider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->container->singleton(InventoryRepository::class, function () {
-            return new InventoryRepository();
-        });
+        $this->container->singleton(InventoryRepository::class);
     }
 }

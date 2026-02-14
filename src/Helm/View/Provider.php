@@ -13,11 +13,11 @@ final class Provider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->container->singleton(View::class, function () {
-            return new ViewRenderer(
-                dirname(__DIR__, 2) . '/views'
-            );
-        });
+        $this->container->when(ViewRenderer::class)
+            ->needs('$directory')
+            ->give(dirname(__DIR__, 2) . '/views');
+
+        $this->container->singleton(View::class, ViewRenderer::class);
     }
 
     public function boot(): void

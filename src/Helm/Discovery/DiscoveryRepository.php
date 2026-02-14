@@ -11,25 +11,22 @@ use Helm\Database\Schema;
  */
 final class DiscoveryRepository
 {
-    public function __construct(
-        private readonly \wpdb $wpdb,
-    ) {
-    }
-
     /**
      * Save a discovery.
      */
     public function save(Discovery $discovery): Discovery
     {
+        global $wpdb;
+
         $table = $this->tableName();
 
-        $this->wpdb->insert(
+        $wpdb->insert(
             $table,
             $discovery->toRow(),
             ['%s', '%s', '%s', '%d', '%d']
         );
 
-        $id = (int) $this->wpdb->insert_id;
+        $id = (int) $wpdb->insert_id;
 
         return new Discovery(
             id: $id,
@@ -46,10 +43,12 @@ final class DiscoveryRepository
      */
     public function countByStarId(string $starId): int
     {
+        global $wpdb;
+
         $table = $this->tableName();
 
-        return (int) $this->wpdb->get_var(
-            $this->wpdb->prepare(
+        return (int) $wpdb->get_var(
+            $wpdb->prepare(
                 "SELECT COUNT(*) FROM {$table} WHERE star_id = %s",
                 $starId
             )
@@ -61,10 +60,12 @@ final class DiscoveryRepository
      */
     public function getFirstByStarId(string $starId): ?Discovery
     {
+        global $wpdb;
+
         $table = $this->tableName();
 
-        $row = $this->wpdb->get_row(
-            $this->wpdb->prepare(
+        $row = $wpdb->get_row(
+            $wpdb->prepare(
                 "SELECT * FROM {$table} WHERE star_id = %s AND is_first = 1 LIMIT 1",
                 $starId
             ),
@@ -85,10 +86,12 @@ final class DiscoveryRepository
      */
     public function findByShipId(string $shipId): array
     {
+        global $wpdb;
+
         $table = $this->tableName();
 
-        $rows = $this->wpdb->get_results(
-            $this->wpdb->prepare(
+        $rows = $wpdb->get_results(
+            $wpdb->prepare(
                 "SELECT * FROM {$table} WHERE ship_id = %s ORDER BY discovered_at DESC",
                 $shipId
             ),
@@ -108,10 +111,12 @@ final class DiscoveryRepository
      */
     public function findByStarId(string $starId): array
     {
+        global $wpdb;
+
         $table = $this->tableName();
 
-        $rows = $this->wpdb->get_results(
-            $this->wpdb->prepare(
+        $rows = $wpdb->get_results(
+            $wpdb->prepare(
                 "SELECT * FROM {$table} WHERE star_id = %s ORDER BY discovered_at ASC",
                 $starId
             ),
@@ -131,10 +136,12 @@ final class DiscoveryRepository
      */
     public function findFirstDiscoveries(int $limit = 100): array
     {
+        global $wpdb;
+
         $table = $this->tableName();
 
-        $rows = $this->wpdb->get_results(
-            $this->wpdb->prepare(
+        $rows = $wpdb->get_results(
+            $wpdb->prepare(
                 "SELECT * FROM {$table} WHERE is_first = 1 ORDER BY discovered_at DESC LIMIT %d",
                 $limit
             ),
@@ -152,10 +159,12 @@ final class DiscoveryRepository
      */
     public function existsByShipAndStar(string $shipId, string $starId): bool
     {
+        global $wpdb;
+
         $table = $this->tableName();
 
-        return (bool) $this->wpdb->get_var(
-            $this->wpdb->prepare(
+        return (bool) $wpdb->get_var(
+            $wpdb->prepare(
                 "SELECT 1 FROM {$table} WHERE ship_id = %s AND star_id = %s LIMIT 1",
                 $shipId,
                 $starId
@@ -163,9 +172,6 @@ final class DiscoveryRepository
         );
     }
 
-    /**
-     * Get the full table name.
-     */
     private function tableName(): string
     {
         return Schema::table(Schema::TABLE_DISCOVERIES);
