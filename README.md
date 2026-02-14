@@ -56,6 +56,10 @@ What you're looking at is the first steps toward the WordPress-controlled spaces
 
 If this sounds interesting to you — if the phrase "space economy MMO on WordPress" makes you smile instead of wince — pull up a chair. The devoted are always accepting pull requests.
 
+## Getting Started
+
+See [docs/dev/getting-started.md](docs/dev/getting-started.md) for installation, setup, and initializing a game world.
+
 ## License
 
 GPL-2.0-or-later. Because warp drive is open source and you can't patent faster-than-light travel.
