@@ -83,49 +83,13 @@ final class Provider extends ServiceProvider
 
     public function boot(): void
     {
-        $this->registerProcessorHook();
-        $this->ensureProcessorScheduled();
-        $this->registerHeartbeat();
-    }
+        add_action(ActionProcessor::HOOK, $this->container->callback(ActionProcessor::class, 'processReady'));
+        add_filter('heartbeat_received', $this->container->callback(ActionHeartbeat::class, 'handle'), 10, 2);
 
-    /**
-     * Register the cron hook for batch action processing.
-     */
-    private function registerProcessorHook(): void
-    {
-        add_action(
-            ActionProcessor::HOOK,
-            function (): void {
-                /** @var ActionProcessor $processor */
-                $processor = $this->container->get(ActionProcessor::class);
-                $processor->processReady();
-            }
-        );
-    }
-
-    /**
-     * Register the heartbeat handler for action state updates.
-     */
-    private function registerHeartbeat(): void
-    {
-        /** @var ActionHeartbeat $heartbeat */
-        $heartbeat = $this->container->get(ActionHeartbeat::class);
-
-        add_filter('heartbeat_received', [$heartbeat, 'handle'], 10, 2);
-    }
-
-    /**
-     * Ensure the recurring cron job is scheduled.
-     */
-    private function ensureProcessorScheduled(): void
-    {
-        // Only schedule on admin requests to avoid overhead on every page load
-        if (! is_admin() && ! (defined('WP_CLI') && WP_CLI)) {
-            return;
+        // Deferred to `init` because Action Scheduler registers its API
+        // functions (as_has_scheduled_action, etc.) on that hook.
+        if (is_admin() || (defined('WP_CLI') && WP_CLI)) {
+            add_action('init', $this->container->callback(ActionProcessor::class, 'ensureScheduled'));
         }
-
-        /** @var ActionProcessor $processor */
-        $processor = $this->container->get(ActionProcessor::class);
-        $processor->ensureScheduled();
     }
 }
