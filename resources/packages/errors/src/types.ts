@@ -17,5 +17,6 @@ export interface WpRestErrorResponse {
 export interface HelmErrorOptions {
 	data?: Record<string, unknown>;
 	causes?: HelmError[];
+	cause?: unknown;
 	isSafe?: boolean;
 }

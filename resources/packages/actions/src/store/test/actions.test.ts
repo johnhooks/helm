@@ -63,8 +63,8 @@ describe( 'createAction', () => {
 		expect( error ).toBeInstanceOf( HelmError );
 		expect( error.message ).toBe( 'helm.actions.create_failed' );
 		expect( error.isSafe ).toBe( true );
-		expect( error.causes ).toHaveLength( 1 );
-		expect( error.causes[ 0 ].message ).toBe( 'helm.actions.create_failed' );
+		expect( HelmError.is( error.cause ) ).toBe( true );
+		expect( ( error.cause as HelmError ).message ).toBe( 'helm.actions.create_failed' );
 	} );
 
 	it( 'wraps plain Error as create_failed with cause', async () => {
@@ -80,8 +80,8 @@ describe( 'createAction', () => {
 		expect( error ).toBeInstanceOf( HelmError );
 		expect( error.message ).toBe( 'helm.actions.create_failed' );
 		expect( error.isSafe ).toBe( true );
-		expect( error.causes ).toHaveLength( 1 );
-		expect( error.causes[ 0 ].detail ).toBe( 'Network failure' );
+		expect( HelmError.is( error.cause ) ).toBe( true );
+		expect( ( error.cause as HelmError ).detail ).toBe( 'Network failure' );
 	} );
 
 	it( 'extracts WP REST error from thrown Response as cause', async () => {
@@ -104,8 +104,8 @@ describe( 'createAction', () => {
 		expect( error ).toBeInstanceOf( HelmError );
 		expect( error.message ).toBe( 'helm.actions.create_failed' );
 		expect( error.isSafe ).toBe( true );
-		expect( error.causes ).toHaveLength( 1 );
-		expect( error.causes[ 0 ].message ).toBe( 'helm.actions.create_failed' );
+		expect( HelmError.is( error.cause ) ).toBe( true );
+		expect( ( error.cause as HelmError ).message ).toBe( 'helm.actions.create_failed' );
 	} );
 
 	it( 'wraps non-WP-REST Response as create_failed', async () => {
@@ -123,8 +123,8 @@ describe( 'createAction', () => {
 		expect( error ).toBeInstanceOf( HelmError );
 		expect( error.message ).toBe( 'helm.actions.create_failed' );
 		expect( error.isSafe ).toBe( true );
-		expect( error.causes ).toHaveLength( 1 );
-		expect( error.causes[ 0 ].detail ).toBe( 'HTTP 500 Internal Server Error' );
+		expect( HelmError.is( error.cause ) ).toBe( true );
+		expect( ( error.cause as HelmError ).detail ).toBe( 'HTTP 500 Internal Server Error' );
 	} );
 } );
 
@@ -197,8 +197,8 @@ describe( 'fetchCurrentAction', () => {
 		expect( error ).toBeInstanceOf( HelmError );
 		expect( error.message ).toBe( 'helm.actions.invalid_response' );
 		expect( error.isSafe ).toBe( true );
-		expect( error.causes ).toHaveLength( 1 );
-		expect( error.causes[ 0 ].message ).toBe( 'helm.server_error' );
+		expect( HelmError.is( error.cause ) ).toBe( true );
+		expect( ( error.cause as HelmError ).message ).toBe( 'helm.server_error' );
 	} );
 
 	it( 'wraps plain Error as invalid_response with cause', async () => {
@@ -214,7 +214,7 @@ describe( 'fetchCurrentAction', () => {
 		expect( error ).toBeInstanceOf( HelmError );
 		expect( error.message ).toBe( 'helm.actions.invalid_response' );
 		expect( error.isSafe ).toBe( true );
-		expect( error.causes ).toHaveLength( 1 );
+		expect( HelmError.is( error.cause ) ).toBe( true );
 	} );
 } );
 

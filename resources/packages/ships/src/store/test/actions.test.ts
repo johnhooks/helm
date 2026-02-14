@@ -97,7 +97,7 @@ describe( 'fetchShip', () => {
 		expect( dispatch.receiveShipEmbeds ).not.toHaveBeenCalled();
 	} );
 
-	it( 'dispatches FAILED with HelmError on API error', async () => {
+	it( 'always wraps API error with store-level code', async () => {
 		mockedApiFetch.mockRejectedValue( {
 			code: 'helm.ship.not_found',
 			message: 'Ship not found',
@@ -117,7 +117,10 @@ describe( 'fetchShip', () => {
 
 		const error = failedCall![ 0 ].error;
 		expect( error ).toBeInstanceOf( HelmError );
-		expect( error.message ).toBe( 'helm.ship.not_found' );
+		expect( error.message ).toBe( 'helm.ships.invalid_response' );
+		expect( error.isSafe ).toBe( true );
+		expect( HelmError.is( error.cause ) ).toBe( true );
+		expect( ( error.cause as HelmError ).message ).toBe( 'helm.ship.not_found' );
 	} );
 
 	it( 'wraps plain Error as invalid response with cause', async () => {
@@ -133,12 +136,12 @@ describe( 'fetchShip', () => {
 		expect( error ).toBeInstanceOf( HelmError );
 		expect( error.message ).toBe( 'helm.ships.invalid_response' );
 		expect( error.isSafe ).toBe( true );
-		expect( error.causes ).toHaveLength( 1 );
-		expect( error.causes[ 0 ].message ).toBe( 'helm.unknown_error' );
-		expect( error.causes[ 0 ].detail ).toBe( 'Network failure' );
+		expect( HelmError.is( error.cause ) ).toBe( true );
+		expect( ( error.cause as HelmError ).message ).toBe( 'helm.unknown_error' );
+		expect( ( error.cause as HelmError ).detail ).toBe( 'Network failure' );
 	} );
 
-	it( 'extracts WP REST error from thrown Response', async () => {
+	it( 'extracts WP REST error from thrown Response and wraps it', async () => {
 		const body = {
 			code: 'helm.ship.not_found',
 			message: 'Ship not found',
@@ -156,8 +159,9 @@ describe( 'fetchShip', () => {
 
 		const error = failedCall![ 0 ].error;
 		expect( error ).toBeInstanceOf( HelmError );
-		expect( error.message ).toBe( 'helm.ship.not_found' );
+		expect( error.message ).toBe( 'helm.ships.invalid_response' );
 		expect( error.isSafe ).toBe( true );
+		expect( ( error.cause as HelmError ).message ).toBe( 'helm.ship.not_found' );
 	} );
 
 	it( 'wraps non-WP-REST Response as invalid response', async () => {
@@ -175,8 +179,8 @@ describe( 'fetchShip', () => {
 		expect( error ).toBeInstanceOf( HelmError );
 		expect( error.message ).toBe( 'helm.ships.invalid_response' );
 		expect( error.isSafe ).toBe( true );
-		expect( error.causes ).toHaveLength( 1 );
-		expect( error.causes[ 0 ].detail ).toBe( 'HTTP 500 Internal Server Error' );
+		expect( HelmError.is( error.cause ) ).toBe( true );
+		expect( ( error.cause as HelmError ).detail ).toBe( 'HTTP 500 Internal Server Error' );
 	} );
 } );
 
@@ -229,7 +233,7 @@ describe( 'fetchSystems', () => {
 		} );
 	} );
 
-	it( 'dispatches FAILED with HelmError on API error', async () => {
+	it( 'always wraps API error with store-level code', async () => {
 		mockedApiFetch.mockRejectedValue( {
 			code: 'helm.ship.not_found',
 			message: 'Ship not found',
@@ -245,7 +249,9 @@ describe( 'fetchSystems', () => {
 
 		const error = failedCall![ 0 ].error;
 		expect( error ).toBeInstanceOf( HelmError );
-		expect( error.message ).toBe( 'helm.ship.not_found' );
+		expect( error.message ).toBe( 'helm.ships.systems_invalid_response' );
+		expect( error.isSafe ).toBe( true );
+		expect( ( error.cause as HelmError ).message ).toBe( 'helm.ship.not_found' );
 	} );
 
 	it( 'wraps plain Error as systems invalid response', async () => {
@@ -261,6 +267,7 @@ describe( 'fetchSystems', () => {
 		expect( error ).toBeInstanceOf( HelmError );
 		expect( error.message ).toBe( 'helm.ships.systems_invalid_response' );
 		expect( error.isSafe ).toBe( true );
+		expect( HelmError.is( error.cause ) ).toBe( true );
 	} );
 } );
 
@@ -396,7 +403,7 @@ describe( 'patchShip', () => {
 		} );
 	} );
 
-	it( 'dispatches FAILED with HelmError on API error', async () => {
+	it( 'always wraps API error with store-level code', async () => {
 		mockedApiFetch.mockRejectedValue( {
 			code: 'helm.ship.invalid_power_mode',
 			message: 'Invalid power mode',
@@ -412,7 +419,9 @@ describe( 'patchShip', () => {
 
 		const error = failedCall![ 0 ].error;
 		expect( error ).toBeInstanceOf( HelmError );
-		expect( error.message ).toBe( 'helm.ship.invalid_power_mode' );
+		expect( error.message ).toBe( 'helm.ships.patch_failed' );
+		expect( error.isSafe ).toBe( true );
+		expect( ( error.cause as HelmError ).message ).toBe( 'helm.ship.invalid_power_mode' );
 	} );
 
 	it( 'returns the HelmError on failure', async () => {
@@ -425,7 +434,7 @@ describe( 'patchShip', () => {
 		const result = await patchShip( 42, { power_mode: 'bad' } )( { dispatch } as never );
 
 		expect( result ).toBeInstanceOf( HelmError );
-		expect( result?.message ).toBe( 'helm.ship.invalid_power_mode' );
+		expect( result?.message ).toBe( 'helm.ships.patch_failed' );
 	} );
 
 	it( 'wraps plain Error as patch failed with cause', async () => {
@@ -441,6 +450,6 @@ describe( 'patchShip', () => {
 		expect( error ).toBeInstanceOf( HelmError );
 		expect( error.message ).toBe( 'helm.ships.patch_failed' );
 		expect( error.isSafe ).toBe( true );
-		expect( error.causes ).toHaveLength( 1 );
+		expect( HelmError.is( error.cause ) ).toBe( true );
 	} );
 } );

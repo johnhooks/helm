@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { ErrorCode } from './error-code';
 import { ServerErrorCode } from './server-error-code';
 import { HelmError } from './helm-error';
+import { formatError } from './format-error';
 import { isWpRestErrorResponse } from './utils';
 
 describe('ErrorCode', () => {
@@ -293,25 +294,24 @@ describe('HelmError.safe()', () => {
 		expect(err.detail).toBe('A database error occurred.');
 		expect(err.isSafe).toBe(true);
 		expect(err.causes).toEqual([]);
+		expect(err.cause).toBeUndefined();
 	});
 
-	it('wraps the original error as a cause', () => {
+	it('stores the original error in native Error.cause', () => {
 		const original = new Error('SQLITE_CORRUPT: database disk image is malformed');
 		const err = HelmError.safe('helm.datacore.worker_error', 'A database error occurred.', original);
 
 		expect(err.isSafe).toBe(true);
-		expect(err.causes).toHaveLength(1);
-		expect(err.causes[0].message).toBe('helm.unknown_error');
-		expect(err.causes[0].detail).toBe('SQLITE_CORRUPT: database disk image is malformed');
-		expect(err.causes[0].isSafe).toBe(false);
+		expect(err.cause).toBe(original);
+		expect(err.causes).toEqual([]);
 	});
 
-	it('wraps a HelmError cause as-is', () => {
+	it('stores a HelmError cause in native Error.cause', () => {
 		const original = new HelmError('helm.inner', 'Inner error');
 		const err = HelmError.safe('helm.outer', 'Outer error', original);
 
-		expect(err.causes).toHaveLength(1);
-		expect(err.causes[0]).toBe(original);
+		expect(err.cause).toBe(original);
+		expect(err.causes).toEqual([]);
 	});
 });
 
@@ -363,5 +363,80 @@ describe('isWpRestErrorResponse()', () => {
 	it('returns false when code or message is not a string', () => {
 		expect(isWpRestErrorResponse({ code: 123, message: 'msg' })).toBe(false);
 		expect(isWpRestErrorResponse({ code: 'test', message: 123 })).toBe(false);
+	});
+});
+
+describe('formatError()', () => {
+	it('returns safe detail for a safe HelmError', () => {
+		const err = HelmError.safe('helm.test', 'Something went wrong.');
+		const result = formatError(err);
+
+		expect(result.detail).toBe('Something went wrong.');
+		expect(result.causes).toEqual([]);
+	});
+
+	it('returns fallback detail for an unsafe error', () => {
+		const err = new HelmError('helm.unknown_error', 'stack trace garbage');
+		const result = formatError(err);
+
+		expect(result.detail).toBe('An unknown error occurred.');
+		expect(result.causes).toEqual([]);
+	});
+
+	it('collects horizontal causes (additional_errors)', () => {
+		const err = new HelmError('helm.action.failed', 'Action failed', {
+			isSafe: true,
+			causes: [
+				new HelmError('helm.navigation.no_route', 'No known route', { isSafe: true }),
+				new HelmError('helm.fuel.empty', 'Not enough fuel', { isSafe: true }),
+			],
+		});
+
+		const result = formatError(err);
+
+		expect(result.detail).toBe('Action failed');
+		expect(result.causes).toEqual(['No known route', 'Not enough fuel']);
+	});
+
+	it('collects vertical cause chain via Error.cause', () => {
+		const inner = HelmError.safe('helm.server', 'Server error');
+		const outer = HelmError.safe('helm.store', 'Could not load data.', inner);
+
+		const result = formatError(outer);
+
+		expect(result.detail).toBe('Could not load data.');
+		expect(result.causes).toEqual(['Server error']);
+	});
+
+	it('walks both dimensions: vertical chain with horizontal siblings', () => {
+		const inner = new HelmError('helm.action.failed', 'Jump failed', {
+			isSafe: true,
+			causes: [
+				new HelmError('helm.navigation.no_route', 'No route', { isSafe: true }),
+			],
+		});
+		const outer = HelmError.safe('helm.store', 'Could not perform action.', inner);
+
+		const result = formatError(outer);
+
+		expect(result.detail).toBe('Could not perform action.');
+		expect(result.causes).toEqual(['Jump failed', 'No route']);
+	});
+
+	it('skips unsafe messages in the cause chain', () => {
+		const inner = new HelmError('helm.unknown_error', 'raw stack trace');
+		const outer = HelmError.safe('helm.store', 'Safe message.', inner);
+
+		const result = formatError(outer);
+
+		expect(result.detail).toBe('Safe message.');
+		expect(result.causes).toEqual([]);
+	});
+
+	it('handles non-HelmError input', () => {
+		const result = formatError(new Error('whoops'));
+
+		expect(result.detail).toBe('An unknown error occurred.');
+		expect(result.causes).toEqual([]);
 	});
 });

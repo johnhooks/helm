@@ -47,7 +47,7 @@ describe( 'fetchProduct', () => {
 		} );
 	} );
 
-	it( 'dispatches FAILED with HelmError on API error', async () => {
+	it( 'always wraps API error with store-level code', async () => {
 		mockedApiFetch.mockRejectedValue( {
 			code: 'helm.product.not_found',
 			message: 'Product not found',
@@ -68,7 +68,9 @@ describe( 'fetchProduct', () => {
 
 		const error = failedCall![ 0 ].error;
 		expect( error ).toBeInstanceOf( HelmError );
-		expect( error.message ).toBe( 'helm.product.not_found' );
+		expect( error.message ).toBe( 'helm.products.invalid_response' );
+		expect( error.isSafe ).toBe( true );
+		expect( ( error.cause as HelmError ).message ).toBe( 'helm.product.not_found' );
 	} );
 
 	it( 'wraps plain Error as invalid response with cause', async () => {
@@ -84,12 +86,12 @@ describe( 'fetchProduct', () => {
 		expect( error ).toBeInstanceOf( HelmError );
 		expect( error.message ).toBe( 'helm.products.invalid_response' );
 		expect( error.isSafe ).toBe( true );
-		expect( error.causes ).toHaveLength( 1 );
-		expect( error.causes[ 0 ].message ).toBe( 'helm.unknown_error' );
-		expect( error.causes[ 0 ].detail ).toBe( 'Network failure' );
+		expect( HelmError.is( error.cause ) ).toBe( true );
+		expect( ( error.cause as HelmError ).message ).toBe( 'helm.unknown_error' );
+		expect( ( error.cause as HelmError ).detail ).toBe( 'Network failure' );
 	} );
 
-	it( 'extracts WP REST error from thrown Response', async () => {
+	it( 'extracts WP REST error from thrown Response and wraps it', async () => {
 		const body = {
 			code: 'helm.product.not_found',
 			message: 'Product not found',
@@ -107,8 +109,9 @@ describe( 'fetchProduct', () => {
 
 		const error = failedCall![ 0 ].error;
 		expect( error ).toBeInstanceOf( HelmError );
-		expect( error.message ).toBe( 'helm.product.not_found' );
+		expect( error.message ).toBe( 'helm.products.invalid_response' );
 		expect( error.isSafe ).toBe( true );
+		expect( ( error.cause as HelmError ).message ).toBe( 'helm.product.not_found' );
 	} );
 
 	it( 'wraps non-WP-REST Response as invalid response', async () => {
@@ -126,8 +129,8 @@ describe( 'fetchProduct', () => {
 		expect( error ).toBeInstanceOf( HelmError );
 		expect( error.message ).toBe( 'helm.products.invalid_response' );
 		expect( error.isSafe ).toBe( true );
-		expect( error.causes ).toHaveLength( 1 );
-		expect( error.causes[ 0 ].detail ).toBe( 'HTTP 500 Internal Server Error' );
+		expect( HelmError.is( error.cause ) ).toBe( true );
+		expect( ( error.cause as HelmError ).detail ).toBe( 'HTTP 500 Internal Server Error' );
 	} );
 } );
 

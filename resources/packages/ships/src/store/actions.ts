@@ -27,13 +27,9 @@ export const fetchShip =
 				dispatch.receiveShipEmbeds( _embedded );
 			}
 		} catch ( error ) {
-			const helmError = await HelmError.asyncFrom( error );
-
 			dispatch( {
 				type: 'FETCH_SHIP_FAILED',
-				error: helmError.isSafe
-					? helmError
-					: HelmError.safe( ErrorCode.ShipsInvalidResponse, __( 'Could not load ship data.', 'helm' ), helmError ),
+				error: HelmError.safe( ErrorCode.ShipsInvalidResponse, __( 'Could not load ship data.', 'helm' ), await HelmError.asyncFrom( error ) ),
 			} );
 		}
 	};
@@ -64,13 +60,9 @@ export const fetchSystems =
 				registry.dispatch( productsStore ).receiveProducts( products );
 			}
 		} catch ( error ) {
-			const helmError = await HelmError.asyncFrom( error );
-
 			dispatch( {
 				type: 'FETCH_SYSTEMS_FAILED',
-				error: helmError.isSafe
-					? helmError
-					: HelmError.safe( ErrorCode.ShipsSystemsInvalidResponse, __( 'Could not load ship systems.', 'helm' ), helmError ),
+				error: HelmError.safe( ErrorCode.ShipsSystemsInvalidResponse, __( 'Could not load ship systems.', 'helm' ), await HelmError.asyncFrom( error ) ),
 			} );
 		}
 	};
@@ -100,15 +92,11 @@ export const patchShip =
 			dispatch( { type: 'PATCH_SHIP_FINISHED', ship } );
 			return null;
 		} catch ( error ) {
-			const helmError = await HelmError.asyncFrom( error );
-
-			const safeError = helmError.isSafe
-				? helmError
-				: HelmError.safe(
-						ErrorCode.ShipsPatchFailed,
-						__( 'Could not patch ship.', 'helm' ),
-						helmError
-				  );
+			const safeError = HelmError.safe(
+				ErrorCode.ShipsPatchFailed,
+				__( 'Could not patch ship.', 'helm' ),
+				await HelmError.asyncFrom( error )
+			);
 
 			dispatch( { type: 'PATCH_SHIP_FAILED', error: safeError } );
 			return safeError;

@@ -17,14 +17,10 @@ export const fetchProduct =
 
 			dispatch( { type: 'FETCH_PRODUCT_FINISHED', productId, product } );
 		} catch ( error ) {
-			const helmError = await HelmError.asyncFrom( error );
-
 			dispatch( {
 				type: 'FETCH_PRODUCT_FAILED',
 				productId,
-				error: helmError.isSafe
-					? helmError
-					: HelmError.safe( ErrorCode.ProductsInvalidResponse, __( 'Could not load product data.', 'helm' ), helmError ),
+				error: HelmError.safe( ErrorCode.ProductsInvalidResponse, __( 'Could not load product data.', 'helm' ), await HelmError.asyncFrom( error ) ),
 			} );
 		}
 	};

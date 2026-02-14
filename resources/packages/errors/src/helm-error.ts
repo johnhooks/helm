@@ -22,7 +22,7 @@ export class HelmError extends Error {
 	readonly causes: readonly HelmError[];
 
 	constructor(code: string, detail?: string, options?: HelmErrorOptions) {
-		super(code);
+		super(code, { cause: options?.cause });
 		this.name = 'HelmError';
 		this.message = code;
 		this.detail = detail ?? '';
@@ -105,8 +105,7 @@ export class HelmError extends Error {
 	 * with a translatable message suitable for display in the UI.
 	 */
 	static safe(code: string, detail: string, cause?: unknown): HelmError {
-		const causes = cause !== undefined ? [HelmError.from(cause)] : [];
-		return new HelmError(code, detail, { isSafe: true, causes });
+		return new HelmError(code, detail, { isSafe: true, cause });
 	}
 
 	/**
