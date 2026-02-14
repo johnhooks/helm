@@ -1,18 +1,16 @@
 .helm-bridge {
-	display: grid;
-	grid-template-columns: 1fr 260px;
-	gap: 8px;
 	padding: 8px;
 	flex: 1;
 }
 
 .helm-bridge__viewport {
-	position: relative;
-	min-height: 0;
+	position: absolute;
+	inset: 0;
 }
 
 .helm-bridge__nav {
 	min-height: 0;
+	height: 100%;
 }
 
 .helm-bridge__config {

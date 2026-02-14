@@ -10,7 +10,7 @@ import { useSelect, useSuspenseSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as navStore } from '@helm/nav';
 import { log } from '@helm/logger';
-import { Panel, Title, Readout } from '@helm/ui';
+import { Panel, SideDrawer, Title, Readout } from '@helm/ui';
 import { useShip } from '@helm/ships';
 import { store as actionsStore } from '@helm/actions';
 import type { StarSelectEvent, Position3D, Route } from '@helm/astrometric';
@@ -51,6 +51,7 @@ export function BridgePage() {
 	const [jumpRangeOnly, setJumpRangeOnly] = useState(false);
 	const [showLabels, setShowLabels] = useState(false);
 	const [selectedStar, setSelectedStar] = useState<StarNode | null>(null);
+	const [drawerOpen, setDrawerOpen] = useState(true);
 
 	const handleStarSelect = useCallback((event: StarSelectEvent | null) => {
 		setSelectedStar(event?.star ?? null);
@@ -148,31 +149,41 @@ export function BridgePage() {
 	const sizeMultiplier = STAR_SIZE_MULTIPLIER[starSize] ?? 1;
 	const viewportStyle = useMemo(() => ({ width: '100%', height: '100%' }), []);
 
+	const handleDrawerToggle = useCallback(() => {
+		setDrawerOpen((v) => !v);
+	}, []);
+
 	return (
-		<div className="helm-bridge">
-			<Panel variant="inset" padding="none" className="helm-bridge__viewport">
-				<ViewportConfig
-					starSize={starSize}
-					onStarSizeChange={setStarSize}
-					jumpRangeOnly={jumpRangeOnly}
-					onJumpRangeOnlyChange={setJumpRangeOnly}
-					showLabels={showLabels}
-					onShowLabelsChange={setShowLabels}
-				/>
-				<Suspense fallback={null}>
-					<StarField
-						stars={stars}
-						routes={scanRoutes}
-						nodePositions={scanNodePositions}
-						currentNodeId={currentNodeId}
-						selectedStarId={selectedStar?.id ?? null}
-						onStarSelect={handleStarSelect}
-						starScale={sizeMultiplier}
+		<SideDrawer
+			open={drawerOpen}
+			onToggle={handleDrawerToggle}
+			className="helm-bridge"
+			viewport={
+				<Panel variant="inset" padding="none" className="helm-bridge__viewport">
+					<ViewportConfig
+						starSize={starSize}
+						onStarSizeChange={setStarSize}
+						jumpRangeOnly={jumpRangeOnly}
+						onJumpRangeOnlyChange={setJumpRangeOnly}
 						showLabels={showLabels}
-						style={viewportStyle}
+						onShowLabelsChange={setShowLabels}
 					/>
-				</Suspense>
-			</Panel>
+					<Suspense fallback={null}>
+						<StarField
+							stars={stars}
+							routes={scanRoutes}
+							nodePositions={scanNodePositions}
+							currentNodeId={currentNodeId}
+							selectedStarId={selectedStar?.id ?? null}
+							onStarSelect={handleStarSelect}
+							starScale={sizeMultiplier}
+							showLabels={showLabels}
+							style={viewportStyle}
+						/>
+					</Suspense>
+				</Panel>
+			}
+		>
 			<Panel tone="blue" className="helm-bridge__nav">
 				<Title label={__('Navigation', 'helm')} />
 				<Readout label={__('System', 'helm')} value={currentStar?.title ?? '\u2014'} />
@@ -182,6 +193,6 @@ export function BridgePage() {
 					distance={selectedDistance}
 				/>
 			</Panel>
-		</div>
+		</SideDrawer>
 	);
 }
