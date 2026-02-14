@@ -133,31 +133,52 @@ const EngCell = ({ label, value, unit, max, level, tone = "gold" }: {
   </div>
 );
 
-const SystemPanel = ({ label, children }: { label: string; children: ReactNode }) => (
-  <div style={{ display: "flex", flexDirection: "column", gap: 4, flexShrink: 0 }}>
-    <div style={{ ...labelStyle, padding: "2px 0" }}>{label}</div>
-    <Panel variant="default" padding="sm" style={{ border: `1px solid ${C.border}` }}>
-      {children}
-    </Panel>
-  </div>
-);
-
 type PowerModeKey = keyof typeof POWER_MODES;
 
-const EngineeringPanel = ({ mode, onModeChange }: { mode: PowerModeKey; onModeChange: (m: PowerModeKey) => void }) => {
+const sectionLabel: CSSProperties = {
+  ...labelStyle,
+  fontSize: 9,
+  color: "#444",
+  padding: "2px 0 0",
+};
+
+const readoutGrid: CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "repeat(3, 1fr)",
+  gap: 16,
+};
+
+const ShipCard = ({ mode, onModeChange }: { mode: PowerModeKey; onModeChange: (m: PowerModeKey) => void }) => {
   const m = POWER_MODES[mode];
   const recharge = +(BASE.regenRate * m.regen).toFixed(1);
+  const jumpRange = +(BASE.jumpRange * m.output).toFixed(1);
+  const speed = +(BASE.jumpSpeed * m.output).toFixed(1);
+  const sensorRange = +(BASE.sensorRange * m.output).toFixed(1);
 
   return (
-    <SystemPanel label="Engineering">
-      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
-          <EngCell label="Energy" value={BASE.energy} max={BASE.energyMax} unit="MJ" level={85} tone="gold" />
-          <EngCell label="Recharge" value={recharge} unit="MJ/h" level={m.regen * 50} tone="gold" />
-          <EngCell label="Core Life" value={BASE.coreLife} unit="ly" level={84} tone="accent" />
-        </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-          <div style={labelStyle}>Power Mode</div>
+    <div style={{ display: "flex", flexDirection: "column", gap: 4, flexShrink: 0 }}>
+      <div style={{ ...labelStyle, padding: "2px 0" }}>Ship Systems</div>
+      <Panel variant="default" padding="sm" style={{ border: `1px solid ${C.border}` }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          <div style={sectionLabel}>Engineering</div>
+          <div style={readoutGrid}>
+            <EngCell label="Energy" value={BASE.energy} max={BASE.energyMax} unit="MJ" level={85} tone="gold" />
+            <EngCell label="Recharge" value={recharge} unit="MJ/h" level={m.regen * 50} tone="gold" />
+            <EngCell label="Core Life" value={BASE.coreLife} unit="ly" level={84} tone="accent" />
+          </div>
+          <div style={sectionLabel}>Navigation</div>
+          <div style={readoutGrid}>
+            <EngCell label="Range" value={jumpRange} unit="ly" level={m.output * 70} tone="sky" />
+            <EngCell label="Speed" value={speed} unit="ly/d" level={m.output * 65} tone="sky" />
+            <EngCell label="Draw" value={BASE.jumpDraw} unit="MJ" level={60} tone="gold" />
+          </div>
+          <div style={sectionLabel}>Sensors</div>
+          <div style={readoutGrid}>
+            <EngCell label="Range" value={sensorRange} unit="ly" level={m.output * 65} tone="lilac" />
+            <EngCell label="Scan" value={BASE.scanDuration} unit="min" level={55} tone="lilac" />
+            <EngCell label="Discovery" value={BASE.discovery} unit="%" level={BASE.discovery} tone="lilac" />
+          </div>
+          <div style={sectionLabel}>Power Mode</div>
           <SegmentedControl
             options={MODE_OPTIONS}
             value={mode}
@@ -168,39 +189,8 @@ const EngineeringPanel = ({ mode, onModeChange }: { mode: PowerModeKey; onModeCh
             aria-label="Power mode"
           />
         </div>
-      </div>
-    </SystemPanel>
-  );
-};
-
-const NavigationPanel = ({ mode }: { mode: PowerModeKey }) => {
-  const m = POWER_MODES[mode];
-  const jumpRange = +(BASE.jumpRange * m.output).toFixed(1);
-  const speed = +(BASE.jumpSpeed * m.output).toFixed(1);
-
-  return (
-    <SystemPanel label="Navigation">
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
-        <EngCell label="Range" value={jumpRange} unit="ly" level={m.output * 70} tone="sky" />
-        <EngCell label="Speed" value={speed} unit="ly/d" level={m.output * 65} tone="sky" />
-        <EngCell label="Draw" value={BASE.jumpDraw} unit="MJ" level={60} tone="gold" />
-      </div>
-    </SystemPanel>
-  );
-};
-
-const SensorsPanel = ({ mode }: { mode: PowerModeKey }) => {
-  const m = POWER_MODES[mode];
-  const range = +(BASE.sensorRange * m.output).toFixed(1);
-
-  return (
-    <SystemPanel label="Sensors">
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
-        <EngCell label="Range" value={range} unit="ly" level={m.output * 65} tone="lilac" />
-        <EngCell label="Scan" value={BASE.scanDuration} unit="min" level={55} tone="lilac" />
-        <EngCell label="Discovery" value={BASE.discovery} unit="%" level={BASE.discovery} tone="lilac" />
-      </div>
-    </SystemPanel>
+      </Panel>
+    </div>
   );
 };
 
@@ -721,9 +711,7 @@ const BridgeLayout = ({ log, view }: { log: ReactNode; view: ReactNode }) => {
         {view}
       </div>
       <div style={{ width: 380, display: "flex", flexDirection: "column", gap: 6 }}>
-        <EngineeringPanel mode={mode} onModeChange={setMode} />
-        <NavigationPanel mode={mode} />
-        <SensorsPanel mode={mode} />
+        <ShipCard mode={mode} onModeChange={setMode} />
         {log}
       </div>
     </div>
