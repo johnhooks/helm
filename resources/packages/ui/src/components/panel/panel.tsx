@@ -22,7 +22,7 @@ export interface PanelProps {
   /**
    * Panel variant
    */
-  variant?: "default" | "bordered" | "bracket" | "inset";
+  variant?: "default" | "bordered" | "bracket" | "inset" | "dashed";
   /**
    * Padding size
    */

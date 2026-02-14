@@ -62,6 +62,17 @@
 }
 
 /* =============================================================================
+   DASHED - Dashed border for draft/pending states
+   ============================================================================= */
+
+.helm-panel--dashed {
+  background: var(--helm-ui-color-surface);
+  border-radius: 8px;
+  padding: var(--helm-panel-padding);
+  border: 1px dashed var(--helm-ui-color-border);
+}
+
+/* =============================================================================
    BRACKET - Vertical bars on sides (like holding brackets)
    ============================================================================= */
 

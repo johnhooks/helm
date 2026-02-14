@@ -1,0 +1,104 @@
+
+/* =============================================================================
+   LOG CARD - Timeline entry card
+   ============================================================================= */
+
+.helm-log-card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto auto;
+  gap: 0 10px;
+  overflow: hidden;
+}
+
+/* Tone colors */
+.helm-log-card--neutral { --helm-log-card-color: var(--helm-ui-color-muted); }
+.helm-log-card--accent  { --helm-log-card-color: var(--helm-ui-color-accent); }
+.helm-log-card--sky     { --helm-log-card-color: var(--helm-ui-color-sky); }
+.helm-log-card--lilac   { --helm-log-card-color: var(--helm-ui-color-lilac); }
+.helm-log-card--gold    { --helm-log-card-color: var(--helm-ui-color-gold); }
+.helm-log-card--orange  { --helm-log-card-color: var(--helm-ui-color-orange); }
+
+/* =============================================================================
+   Orb
+   ============================================================================= */
+
+.helm-log-card__orb {
+  grid-column: 1;
+  grid-row: 1;
+  align-self: center;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--helm-log-card-color);
+  opacity: 0.6;
+  box-shadow: 0 0 6px color-mix(in srgb, var(--helm-log-card-color) 27%, transparent);
+}
+
+/* =============================================================================
+   Header
+   ============================================================================= */
+
+.helm-log-card__header {
+  grid-column: 2;
+  grid-row: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.helm-log-card__time {
+  font-family: var(--helm-ui-font-family);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--helm-ui-color-muted);
+  text-transform: uppercase;
+  flex-shrink: 0;
+  min-width: 42px;
+}
+
+.helm-log-card__title {
+  font-size: 13px;
+  color: var(--helm-ui-color-text);
+  font-weight: 500;
+}
+
+.helm-log-card__status {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+/* =============================================================================
+   Body & Action
+   ============================================================================= */
+
+.helm-log-card__body {
+  grid-column: 2;
+  grid-row: 2;
+  padding-top: 8px;
+}
+
+.helm-log-card__action {
+  grid-column: 2;
+  grid-row: 3;
+  padding-top: 8px;
+}
+
+/* =============================================================================
+   Sweep animation (draft variant)
+   ============================================================================= */
+
+@keyframes helm-log-card-sweep {
+  0%   { transform: translateX(-100%); opacity: 0; }
+  20%  { opacity: 0.3; }
+  80%  { opacity: 0.3; }
+  100% { transform: translateX(100%); opacity: 0; }
+}
+
+.helm-log-card__sweep {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--helm-log-card-color) 3%, transparent), transparent);
+  animation: helm-log-card-sweep 3s ease-in-out infinite;
+  pointer-events: none;
+}

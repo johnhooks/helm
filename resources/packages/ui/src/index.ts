@@ -61,6 +61,9 @@ export type { SystemGridProps, SystemCellProps } from "./components/system-grid"
 export { Panel } from "./components/panel";
 export type { PanelProps } from "./components/panel";
 
+export { LogCard } from "./components/log-card";
+export type { LogCardProps } from "./components/log-card";
+
 export { ContextMenu } from "./components/context-menu";
 export type { ContextMenuProps, ContextMenuAction } from "./components/context-menu";
 
