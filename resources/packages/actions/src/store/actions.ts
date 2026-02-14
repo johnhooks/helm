@@ -2,7 +2,7 @@ import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
 import { ErrorCode, HelmError } from '@helm/errors';
 import type { Thunk } from '@helm/types';
-import type { Action, ShipAction } from './types';
+import type { Action, DraftAction, ShipAction } from './types';
 import type { store } from './index';
 
 export const createAction =
@@ -66,3 +66,22 @@ export function receiveHeartbeat( actions: ShipAction[], cursor: string ): Actio
 export function clearAction( shipId: number ): Action {
 	return { type: 'CLEAR_ACTION', shipId };
 }
+
+export function draftCreate( action: DraftAction ): Action {
+	return { type: 'CREATE_DRAFT', action };
+}
+
+export function clearDraft(): Action {
+	return { type: 'CLEAR_DRAFT' };
+}
+
+export const submitDraft =
+	( shipId: number ): Thunk< Action, typeof store > =>
+	async ( { dispatch, select } ) => {
+		const draft = select.getDraft();
+		if ( ! draft ) {
+			return;
+		}
+
+		dispatch.createAction( shipId, draft.type, draft.params );
+	};

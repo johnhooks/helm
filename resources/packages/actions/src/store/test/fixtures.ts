@@ -21,12 +21,14 @@ export function createShipAction(
 export function createState(
 	overrides: {
 		actions?: Partial< State[ 'actions' ] >;
+		create?: Partial< State[ 'create' ] >;
 		meta?: Partial< State[ 'meta' ] >;
 	} = {}
 ): State {
 	const defaults = initializeDefaultState();
 	return {
 		actions: { ...defaults.actions, ...overrides.actions },
+		create: { ...defaults.create, ...overrides.create },
 		meta: { ...defaults.meta, ...overrides.meta },
 	};
 }

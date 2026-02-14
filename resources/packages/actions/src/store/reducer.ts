@@ -1,12 +1,19 @@
-import type { Action, State } from './types';
+import type { Action, CreateState, State } from './types';
+
+const DEFAULT_CREATE: CreateState = {
+	action: null,
+	isDraft: false,
+	isSubmitting: false,
+	error: null,
+};
 
 export function initializeDefaultState(): State {
 	return {
 		actions: {
 			byShipId: {},
-			creating: {},
 			errors: {},
 		},
+		create: { ...DEFAULT_CREATE },
 		meta: {
 			cursor: null,
 		},
@@ -15,34 +22,45 @@ export function initializeDefaultState(): State {
 
 export function reducer( state: State = initializeDefaultState(), action: Action ): State {
 	switch ( action.type ) {
-		case 'CREATE_ACTION_START': {
-			const { [ action.shipId ]: _removed, ...restErrors } = state.actions.errors;
+		case 'CREATE_DRAFT':
 			return {
 				...state,
-				actions: {
-					...state.actions,
-					creating: { ...state.actions.creating, [ action.shipId ]: true },
-					errors: restErrors,
+				create: {
+					...DEFAULT_CREATE,
+					action: action.action,
+					isDraft: true,
 				},
 			};
-		}
+		case 'CLEAR_DRAFT':
+			return {
+				...state,
+				create: { ...DEFAULT_CREATE },
+			};
+		case 'CREATE_ACTION_START':
+			return {
+				...state,
+				create: {
+					...state.create,
+					isSubmitting: true,
+					error: null,
+				},
+			};
 		case 'CREATE_ACTION_FINISHED':
 			return {
 				...state,
 				actions: {
 					...state.actions,
 					byShipId: { ...state.actions.byShipId, [ action.shipId ]: action.action },
-					creating: { ...state.actions.creating, [ action.shipId ]: false },
-					errors: { ...state.actions.errors, [ action.shipId ]: null },
 				},
+				create: { ...DEFAULT_CREATE },
 			};
 		case 'CREATE_ACTION_FAILED':
 			return {
 				...state,
-				actions: {
-					...state.actions,
-					creating: { ...state.actions.creating, [ action.shipId ]: false },
-					errors: { ...state.actions.errors, [ action.shipId ]: action.error },
+				create: {
+					...state.create,
+					isSubmitting: false,
+					error: action.error,
 				},
 			};
 		case 'FETCH_ACTION_START':

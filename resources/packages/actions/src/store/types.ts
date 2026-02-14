@@ -12,10 +12,18 @@ export interface ShipAction {
 	updated_at: string;
 }
 
+export type DraftAction = Pick< ShipAction, 'type' | 'params' >;
+
 export interface ActionsState {
 	byShipId: Record< number, ShipAction | null >;
-	creating: Record< number, boolean >;
 	errors: Record< number, HelmError | null >;
+}
+
+export interface CreateState {
+	action: DraftAction | null;
+	isDraft: boolean;
+	isSubmitting: boolean;
+	error: HelmError | null;
 }
 
 export interface MetaState {
@@ -24,6 +32,7 @@ export interface MetaState {
 
 export interface State {
 	actions: ActionsState;
+	create: CreateState;
 	meta: MetaState;
 }
 
@@ -36,4 +45,6 @@ export type Action =
 	| { type: 'FETCH_ACTION_FAILED'; shipId: number; error: HelmError }
 	| { type: 'RECEIVE_ACTION'; shipId: number; action: ShipAction }
 	| { type: 'RECEIVE_HEARTBEAT'; actions: ShipAction[]; cursor: string }
-	| { type: 'CLEAR_ACTION'; shipId: number };
+	| { type: 'CLEAR_ACTION'; shipId: number }
+	| { type: 'CREATE_DRAFT'; action: DraftAction }
+	| { type: 'CLEAR_DRAFT' };

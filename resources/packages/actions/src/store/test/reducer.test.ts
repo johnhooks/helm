@@ -13,8 +13,13 @@ describe( 'reducer', () => {
 			expect( initializeDefaultState() ).toEqual( {
 				actions: {
 					byShipId: {},
-					creating: {},
 					errors: {},
+				},
+				create: {
+					action: null,
+					isDraft: false,
+					isSubmitting: false,
+					error: null,
 				},
 				meta: {
 					cursor: null,
@@ -23,19 +28,65 @@ describe( 'reducer', () => {
 		} );
 	} );
 
+	describe( 'CREATE_DRAFT', () => {
+		it( 'sets the draft action with isDraft flag', () => {
+			const draft = { type: 'scan_route', params: { target_node_id: 5 } };
+			const state = reduce( undefined, { type: 'CREATE_DRAFT', action: draft } );
+
+			expect( state.create.action ).toEqual( draft );
+			expect( state.create.isDraft ).toBe( true );
+			expect( state.create.isSubmitting ).toBe( false );
+			expect( state.create.error ).toBeNull();
+		} );
+
+		it( 'resets error from a previous failed create', () => {
+			const prev = createState( {
+				create: {
+					action: { type: 'scan_route', params: {} },
+					isDraft: true,
+					isSubmitting: false,
+					error: new HelmError( 'helm.test', 'Error' ),
+				},
+			} );
+
+			const draft = { type: 'scan_route', params: { target_node_id: 10 } };
+			const state = reduce( prev, { type: 'CREATE_DRAFT', action: draft } );
+
+			expect( state.create.action ).toEqual( draft );
+			expect( state.create.isDraft ).toBe( true );
+			expect( state.create.error ).toBeNull();
+		} );
+	} );
+
+	describe( 'CLEAR_DRAFT', () => {
+		it( 'resets the entire create slice', () => {
+			const prev = createState( {
+				create: {
+					action: { type: 'scan_route', params: {} },
+					isDraft: true,
+					isSubmitting: false,
+					error: new HelmError( 'helm.test', 'Error' ),
+				},
+			} );
+
+			const state = reduce( prev, { type: 'CLEAR_DRAFT' } );
+
+			expect( state.create.action ).toBeNull();
+			expect( state.create.isDraft ).toBe( false );
+			expect( state.create.isSubmitting ).toBe( false );
+			expect( state.create.error ).toBeNull();
+		} );
+	} );
+
 	describe( 'CREATE_ACTION_START', () => {
-		it( 'sets creating for the ship', () => {
-			const state = reduce( undefined, {
-				type: 'CREATE_ACTION_START',
-				shipId: 1,
-			} );
-
-			expect( state.actions.creating[ 1 ] ).toBe( true );
-		} );
-
-		it( 'clears any existing error for the ship', () => {
+		it( 'sets isSubmitting and clears error', () => {
 			const prev = createState( {
-				actions: { errors: { 1: new HelmError( 'helm.test', 'Error' ) } },
+				create: {
+					action: { type: 'scan_route', params: {} },
+					isDraft: true,
+					isSubmitting: false,
+					error: new HelmError( 'helm.test', 'Error' ),
+				},
 			} );
 
 			const state = reduce( prev, {
@@ -43,13 +94,16 @@ describe( 'reducer', () => {
 				shipId: 1,
 			} );
 
-			expect( state.actions.errors[ 1 ] ).toBeUndefined();
+			expect( state.create.isSubmitting ).toBe( true );
+			expect( state.create.error ).toBeNull();
+			expect( state.create.action ).toEqual( { type: 'scan_route', params: {} } );
+			expect( state.create.isDraft ).toBe( true );
 		} );
 
-		it( 'does not affect other ships', () => {
-			const action2 = createShipAction( { id: 2, ship_post_id: 2 } );
+		it( 'does not affect actions state', () => {
+			const action = createShipAction( { id: 2, ship_post_id: 2 } );
 			const prev = createState( {
-				actions: { byShipId: { 2: action2 }, creating: { 2: false } },
+				actions: { byShipId: { 2: action } },
 			} );
 
 			const state = reduce( prev, {
@@ -57,8 +111,7 @@ describe( 'reducer', () => {
 				shipId: 1,
 			} );
 
-			expect( state.actions.byShipId[ 2 ] ).toBe( action2 );
-			expect( state.actions.creating[ 2 ] ).toBe( false );
+			expect( state.actions.byShipId[ 2 ] ).toBe( action );
 		} );
 
 		it( 'does not affect meta', () => {
@@ -74,12 +127,14 @@ describe( 'reducer', () => {
 	} );
 
 	describe( 'CREATE_ACTION_FINISHED', () => {
-		it( 'stores the action, clears creating and error', () => {
+		it( 'stores the action and resets the create slice', () => {
 			const action = createShipAction();
 			const prev = createState( {
-				actions: {
-					creating: { 1: true },
-					errors: { 1: new HelmError( 'helm.test', 'Error' ) },
+				create: {
+					action: { type: 'scan_route', params: {} },
+					isDraft: true,
+					isSubmitting: true,
+					error: null,
 				},
 			} );
 
@@ -90,8 +145,10 @@ describe( 'reducer', () => {
 			} );
 
 			expect( state.actions.byShipId[ 1 ] ).toBe( action );
-			expect( state.actions.creating[ 1 ] ).toBe( false );
-			expect( state.actions.errors[ 1 ] ).toBeNull();
+			expect( state.create.action ).toBeNull();
+			expect( state.create.isDraft ).toBe( false );
+			expect( state.create.isSubmitting ).toBe( false );
+			expect( state.create.error ).toBeNull();
 		} );
 
 		it( 'replaces an existing action', () => {
@@ -112,10 +169,11 @@ describe( 'reducer', () => {
 	} );
 
 	describe( 'CREATE_ACTION_FAILED', () => {
-		it( 'stores the error and clears creating', () => {
+		it( 'stores the error on create and clears isSubmitting', () => {
 			const error = new HelmError( 'helm.actions.create_failed', 'Failed' );
+			const draft = { type: 'scan_route', params: {} };
 			const prev = createState( {
-				actions: { creating: { 1: true } },
+				create: { action: draft, isDraft: true, isSubmitting: true, error: null },
 			} );
 
 			const state = reduce( prev, {
@@ -124,14 +182,16 @@ describe( 'reducer', () => {
 				error,
 			} );
 
-			expect( state.actions.errors[ 1 ] ).toBe( error );
-			expect( state.actions.creating[ 1 ] ).toBe( false );
+			expect( state.create.error ).toBe( error );
+			expect( state.create.isSubmitting ).toBe( false );
+			expect( state.create.action ).toEqual( draft );
 		} );
 
 		it( 'does not remove existing action data', () => {
 			const action = createShipAction();
 			const prev = createState( {
-				actions: { byShipId: { 1: action }, creating: { 1: true } },
+				actions: { byShipId: { 1: action } },
+				create: { action: { type: 'scan_route', params: {} }, isDraft: true, isSubmitting: true, error: null },
 			} );
 
 			const state = reduce( prev, {
@@ -223,10 +283,9 @@ describe( 'reducer', () => {
 			expect( state.actions.byShipId[ 5 ] ).toBe( action );
 		} );
 
-		it( 'does not touch creating or errors', () => {
+		it( 'does not touch create or errors', () => {
 			const prev = createState( {
 				actions: {
-					creating: { 5: true },
 					errors: { 5: new HelmError( 'helm.test', 'Error' ) },
 				},
 			} );
@@ -237,7 +296,6 @@ describe( 'reducer', () => {
 				action: createShipAction( { ship_post_id: 5 } ),
 			} );
 
-			expect( state.actions.creating[ 5 ] ).toBe( true );
 			expect( state.actions.errors[ 5 ] ).toBeDefined();
 		} );
 	} );

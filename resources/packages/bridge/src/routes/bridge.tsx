@@ -155,7 +155,7 @@ export function BridgePage() {
 		setDrawerOpen((v) => !v);
 	}, []);
 
-	const { createAction } = useDispatch(actionsStore);
+	const { draftCreate } = useDispatch(actionsStore);
 
 	const hasActiveAction = !! action && ( action.status === 'pending' || action.status === 'running' );
 
@@ -163,8 +163,8 @@ export function BridgePage() {
 		if ( ! selectedStar ) {
 			return;
 		}
-		createAction( shipId, 'scan_route', { target_node_id: selectedStar.node_id } );
-	}, [ shipId, selectedStar, createAction ]);
+		draftCreate( { type: 'scan_route', params: { target_node_id: selectedStar.node_id } } );
+	}, [ selectedStar, draftCreate ]);
 
 	const handleContextMenuClose = useCallback(() => {
 		setStarSelectEvent(null);

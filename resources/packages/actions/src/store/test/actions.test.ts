@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import apiFetch from '@wordpress/api-fetch';
 import { HelmError } from '@helm/errors';
-import { createAction, fetchCurrentAction, receiveAction, receiveHeartbeat, clearAction } from '../actions';
+import { createAction, fetchCurrentAction, receiveAction, receiveHeartbeat, clearAction, draftCreate, clearDraft } from '../actions';
 import { createShipAction } from './fixtures';
 
 vi.mock( '@wordpress/api-fetch' );
@@ -266,5 +266,20 @@ describe( 'clearAction', () => {
 			type: 'CLEAR_ACTION',
 			shipId: 5,
 		} );
+	} );
+} );
+
+describe( 'draftCreate', () => {
+	it( 'returns a CREATE_DRAFT action', () => {
+		const action = { type: 'scan_route', params: { target_node_id: 5 } };
+		const result = draftCreate( action );
+
+		expect( result ).toEqual( { type: 'CREATE_DRAFT', action } );
+	} );
+} );
+
+describe( 'clearDraft', () => {
+	it( 'returns a CLEAR_DRAFT action', () => {
+		expect( clearDraft() ).toEqual( { type: 'CLEAR_DRAFT' } );
 	} );
 } );
