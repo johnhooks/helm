@@ -4,6 +4,7 @@
   background: var(--helm-ui-color-bg, #0a0a0a);
   border-radius: var(--helm-ui-radius-md, 12px);
   overflow: hidden;
+  isolation: isolate;
 }
 
 .helm-star-field canvas {
