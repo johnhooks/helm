@@ -1,0 +1,45 @@
+.helm-ship-systems {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	flex-shrink: 0;
+	min-width: 0;
+	padding: 0;
+}
+
+.helm-ship-systems__label {
+	font-family: Antonio, sans-serif;
+	font-size: 10px;
+	letter-spacing: 0.08em;
+	color: #555;
+	text-transform: uppercase;
+	padding: 2px 0;
+}
+
+.helm-ship-systems__body {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.helm-ship-systems__section-label {
+	font-family: Antonio, sans-serif;
+	font-size: 9px;
+	letter-spacing: 0.1em;
+	color: #444;
+	text-transform: uppercase;
+	padding: 2px 0 0;
+}
+
+.helm-ship-systems__grid {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 16px;
+}
+
+.helm-ship-systems__cell {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	min-width: 0;
+}

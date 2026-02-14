@@ -18,6 +18,7 @@
 		"@helm/nav": "workspace:*",
 		"@helm/router": "workspace:*",
 		"@helm/ships": "workspace:*",
+		"@helm/types": "workspace:*",
 		"@helm/ui": "workspace:*",
 		"@tanstack/react-router": "^1.159.4",
 		"react-error-boundary": "^4.1.2"

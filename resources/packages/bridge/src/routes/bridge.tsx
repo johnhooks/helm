@@ -17,6 +17,7 @@ import type { StarSelectEvent, Position3D, Route } from '@helm/astrometric';
 import { ViewportConfig } from '../components/viewport-config';
 import { ScanPanel } from '../components/scan-panel';
 import { StarContextMenu } from '../components/star-context-menu';
+import { ShipSystemsCard } from '../components/ship-systems-card';
 
 const StarField = lazy(() =>
 	import('@helm/astrometric').then((m) => ({ default: m.StarField }))
@@ -212,6 +213,7 @@ export function BridgePage() {
 				</Panel>
 			}
 		>
+			<ShipSystemsCard />
 			<Panel tone="blue" className="helm-bridge__nav">
 				<Title label={__('Navigation', 'helm')} />
 				<Readout label={__('System', 'helm')} value={currentStar?.title ?? '\u2014'} />

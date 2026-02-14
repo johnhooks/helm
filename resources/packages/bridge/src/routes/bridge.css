@@ -1,16 +1,20 @@
 .helm-bridge {
-	padding: 8px;
 	flex: 1;
 }
 
 .helm-bridge__viewport {
 	position: absolute;
-	inset: 0;
+	inset: 8px;
+}
+
+.helm-bridge .helm-side-drawer__content {
+	box-sizing: border-box;
+	padding: 8px;
 }
 
 .helm-bridge__nav {
 	min-height: 0;
-	height: 100%;
+	flex: 1;
 }
 
 .helm-bridge__config {

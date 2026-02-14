@@ -21,6 +21,12 @@ export type {
 	SystemComponentResponse,
 } from './system';
 export type {
+	EngineeringStats,
+	NavigationStats,
+	SensorStats,
+	SystemStats,
+} from './system-stats';
+export type {
 	DispatchFunction,
 	PromisifiedSelectorsOf,
 	Registry,
