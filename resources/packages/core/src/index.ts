@@ -11,5 +11,4 @@
 export * from '../../data/src/index';
 export * from '../../errors/src/index';
 export * from '../../logger/src/index';
-export { HelmErrorFallback, HelmErrorCompactFallback } from './components/helm-error-fallback';
 

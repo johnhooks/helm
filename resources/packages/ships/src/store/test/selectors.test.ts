@@ -4,112 +4,123 @@ import { store as productsStore } from '@helm/products';
 import type { Product, WithRestLinks } from '@helm/types';
 import {
 	getShip,
-	isShipLoading,
 	getShipError,
 	getSystems,
-	areSystemsLoading,
 	getSystemsError,
+	getEdits,
+	isSubmitting,
+	getEditError,
 	getSystemStats,
 } from '../selectors';
-import { createShipState, createSystemComponent, createProductEmbed, createState } from './fixtures';
+import { createShipState, createSystemComponent, createProductEmbed, createEditsState, createState } from './fixtures';
 
 describe( 'getShip', () => {
 	it( 'returns the ship when it exists', () => {
 		const ship = createShipState();
-		const state = createState( { ships: { byId: { 1: ship } } } );
+		const state = createState( { ship } );
 
 		expect( getShip( state, 1 ) ).toBe( ship );
 	} );
 
-	it( 'returns undefined for unknown ship', () => {
+	it( 'returns undefined when ship is null', () => {
 		const state = createState();
 
-		expect( getShip( state, 999 ) ).toBeUndefined();
-	} );
-} );
-
-describe( 'isShipLoading', () => {
-	it( 'returns true when loading', () => {
-		const state = createState( { ships: { isLoading: { 1: true } } } );
-
-		expect( isShipLoading( state, 1 ) ).toBe( true );
-	} );
-
-	it( 'returns false when not loading', () => {
-		const state = createState( { ships: { isLoading: { 1: false } } } );
-
-		expect( isShipLoading( state, 1 ) ).toBe( false );
-	} );
-
-	it( 'returns false for unknown ship', () => {
-		const state = createState();
-
-		expect( isShipLoading( state, 999 ) ).toBe( false );
+		expect( getShip( state, 1 ) ).toBeUndefined();
 	} );
 } );
 
 describe( 'getShipError', () => {
 	it( 'returns the error when it exists', () => {
 		const error = new HelmError( 'helm.ship.not_found', 'Not found' );
-		const state = createState( { ships: { errors: { 1: error } } } );
+		const state = createState( { shipError: error } );
 
-		expect( getShipError( state, 1 ) ).toBe( error );
+		expect( getShipError( state ) ).toBe( error );
 	} );
 
-	it( 'returns undefined when no error', () => {
+	it( 'returns null when no error', () => {
 		const state = createState();
 
-		expect( getShipError( state, 999 ) ).toBeUndefined();
+		expect( getShipError( state ) ).toBeNull();
 	} );
 } );
 
 describe( 'getSystems', () => {
 	it( 'returns systems when they exist', () => {
 		const systems = [ createSystemComponent() ];
-		const state = createState( { systems: { byShipId: { 1: systems } } } );
+		const state = createState( { systems } );
 
 		expect( getSystems( state, 1 ) ).toBe( systems );
 	} );
 
-	it( 'returns undefined for unknown ship', () => {
+	it( 'returns undefined when systems is null', () => {
 		const state = createState();
 
-		expect( getSystems( state, 999 ) ).toBeUndefined();
-	} );
-} );
-
-describe( 'areSystemsLoading', () => {
-	it( 'returns true when loading', () => {
-		const state = createState( { systems: { isLoading: { 1: true } } } );
-
-		expect( areSystemsLoading( state, 1 ) ).toBe( true );
-	} );
-
-	it( 'returns false when not loading', () => {
-		const state = createState( { systems: { isLoading: { 1: false } } } );
-
-		expect( areSystemsLoading( state, 1 ) ).toBe( false );
-	} );
-
-	it( 'returns false for unknown ship', () => {
-		const state = createState();
-
-		expect( areSystemsLoading( state, 999 ) ).toBe( false );
+		expect( getSystems( state, 1 ) ).toBeUndefined();
 	} );
 } );
 
 describe( 'getSystemsError', () => {
 	it( 'returns the error when it exists', () => {
 		const error = new HelmError( 'helm.test', 'Error' );
-		const state = createState( { systems: { errors: { 1: error } } } );
+		const state = createState( { systemsError: error } );
 
-		expect( getSystemsError( state, 1 ) ).toBe( error );
+		expect( getSystemsError( state ) ).toBe( error );
 	} );
 
-	it( 'returns undefined when no error', () => {
+	it( 'returns null when no error', () => {
 		const state = createState();
 
-		expect( getSystemsError( state, 999 ) ).toBeUndefined();
+		expect( getSystemsError( state ) ).toBeNull();
+	} );
+} );
+
+describe( 'getEdits', () => {
+	it( 'returns the staged ship edits', () => {
+		const ship = { power_mode: 'overdrive' };
+		const state = createState( {
+			edits: createEditsState( { ship } ),
+		} );
+
+		expect( getEdits( state ) ).toBe( ship );
+	} );
+
+	it( 'returns null when no edits are staged', () => {
+		const state = createState();
+
+		expect( getEdits( state ) ).toBeNull();
+	} );
+} );
+
+describe( 'isSubmitting', () => {
+	it( 'returns true when submitting', () => {
+		const state = createState( {
+			edits: createEditsState( { isSubmitting: true } ),
+		} );
+
+		expect( isSubmitting( state ) ).toBe( true );
+	} );
+
+	it( 'returns false when not submitting', () => {
+		const state = createState();
+
+		expect( isSubmitting( state ) ).toBe( false );
+	} );
+} );
+
+describe( 'getEditError', () => {
+	it( 'returns the error when it exists', () => {
+		const error = new HelmError( 'helm.test', 'Error' );
+		const state = createState( {
+			edits: createEditsState( { error } ),
+		} );
+
+		expect( getEditError( state ) ).toBe( error );
+	} );
+
+	it( 'returns null when no error', () => {
+		const state = createState();
+
+		expect( getEditError( state ) ).toBeNull();
 	} );
 } );
 
@@ -170,15 +181,11 @@ describe( 'getSystemStats', () => {
 
 	function createSystemsState() {
 		return createState( {
-			systems: {
-				byShipId: {
-					1: [
-						createSystemComponent( { id: 1, slot: 'core', product_id: CORE_PRODUCT_ID, life: 500, condition: 0.95 } ),
-						createSystemComponent( { id: 2, slot: 'drive', product_id: DRIVE_PRODUCT_ID, condition: 0.8 } ),
-						createSystemComponent( { id: 3, slot: 'sensor', product_id: SENSOR_PRODUCT_ID, condition: 0.6 } ),
-					],
-				},
-			},
+			systems: [
+				createSystemComponent( { id: 1, slot: 'core', product_id: CORE_PRODUCT_ID, life: 500, condition: 0.95 } ),
+				createSystemComponent( { id: 2, slot: 'drive', product_id: DRIVE_PRODUCT_ID, condition: 0.8 } ),
+				createSystemComponent( { id: 3, slot: 'sensor', product_id: SENSOR_PRODUCT_ID, condition: 0.6 } ),
+			],
 		} );
 	}
 

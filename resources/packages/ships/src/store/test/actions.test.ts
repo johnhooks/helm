@@ -8,8 +8,9 @@ import {
 	receiveShip,
 	fetchSystems,
 	receiveSystems,
+	editShip,
+	patchShip,
 	receiveShipEmbeds,
-	patchPowerMode,
 } from '../actions';
 import { createShipState, createSystemComponent, createProductEmbed } from './fixtures';
 
@@ -39,11 +40,9 @@ describe( 'fetchShip', () => {
 
 		expect( dispatch ).toHaveBeenCalledWith( {
 			type: 'FETCH_SHIP_START',
-			shipId: 42,
 		} );
 		expect( dispatch ).toHaveBeenCalledWith( {
 			type: 'FETCH_SHIP_FINISHED',
-			shipId: 42,
 			ship,
 		} );
 	} );
@@ -72,7 +71,6 @@ describe( 'fetchShip', () => {
 
 		expect( dispatch ).toHaveBeenCalledWith( {
 			type: 'FETCH_SHIP_FINISHED',
-			shipId: 42,
 			ship: { ...ship, _links },
 		} );
 	} );
@@ -87,7 +85,6 @@ describe( 'fetchShip', () => {
 		await fetchShip( 42 )( { dispatch } as never );
 
 		expect( dispatch.receiveShipEmbeds ).toHaveBeenCalledWith(
-			42,
 			embedded
 		);
 	} );
@@ -111,7 +108,6 @@ describe( 'fetchShip', () => {
 
 		expect( dispatch ).toHaveBeenCalledWith( {
 			type: 'FETCH_SHIP_START',
-			shipId: 42,
 		} );
 
 		const failedCall = dispatch.mock.calls.find(
@@ -185,13 +181,12 @@ describe( 'fetchShip', () => {
 } );
 
 describe( 'receiveShip', () => {
-	it( 'returns a FETCH_SHIP_FINISHED action', () => {
+	it( 'returns a RECEIVE_SHIP action', () => {
 		const ship = createShipState( { id: 5 } );
-		const action = receiveShip( 5, ship );
+		const action = receiveShip( ship );
 
 		expect( action ).toEqual( {
-			type: 'FETCH_SHIP_FINISHED',
-			shipId: 5,
+			type: 'RECEIVE_SHIP',
 			ship,
 		} );
 	} );
@@ -217,11 +212,9 @@ describe( 'fetchSystems', () => {
 
 		expect( dispatch ).toHaveBeenCalledWith( {
 			type: 'FETCH_SYSTEMS_START',
-			shipId: 42,
 		} );
 		expect( dispatch ).toHaveBeenCalledWith( {
 			type: 'FETCH_SYSTEMS_FINISHED',
-			shipId: 42,
 			systems,
 		} );
 	} );
@@ -272,14 +265,25 @@ describe( 'fetchSystems', () => {
 } );
 
 describe( 'receiveSystems', () => {
-	it( 'returns a FETCH_SYSTEMS_FINISHED action', () => {
+	it( 'returns a RECEIVE_SYSTEMS action', () => {
 		const systems = [ createSystemComponent() ];
-		const action = receiveSystems( 42, systems );
+		const action = receiveSystems( systems );
 
 		expect( action ).toEqual( {
-			type: 'FETCH_SYSTEMS_FINISHED',
-			shipId: 42,
+			type: 'RECEIVE_SYSTEMS',
 			systems,
+		} );
+	} );
+} );
+
+describe( 'editShip', () => {
+	it( 'returns an EDIT_SHIP action', () => {
+		const edits = { power_mode: 'overdrive' };
+		const action = editShip( edits );
+
+		expect( action ).toEqual( {
+			type: 'EDIT_SHIP',
+			edits,
 		} );
 	} );
 } );
@@ -300,14 +304,13 @@ describe( 'receiveShipEmbeds', () => {
 	it( 'dispatches receiveSystems when helm:systems is present', () => {
 		const systems = [ createSystemComponent() ];
 
-		receiveShipEmbeds( 42, { [ LinkRel.Systems ]: systems } )( {
+		receiveShipEmbeds( { [ LinkRel.Systems ]: systems } )( {
 			dispatch,
 			registry,
 		} as never );
 
 		expect( dispatch ).toHaveBeenCalledWith( {
-			type: 'FETCH_SYSTEMS_FINISHED',
-			shipId: 42,
+			type: 'RECEIVE_SYSTEMS',
 			systems,
 		} );
 	} );
@@ -321,7 +324,7 @@ describe( 'receiveShipEmbeds', () => {
 			},
 		];
 
-		receiveShipEmbeds( 42, { [ LinkRel.Systems ]: systems } )( {
+		receiveShipEmbeds( { [ LinkRel.Systems ]: systems } )( {
 			dispatch,
 			registry,
 		} as never );
@@ -333,7 +336,7 @@ describe( 'receiveShipEmbeds', () => {
 	it( 'skips products dispatch when no product embeds', () => {
 		const systems = [ createSystemComponent() ];
 
-		receiveShipEmbeds( 42, { [ LinkRel.Systems ]: systems } )( {
+		receiveShipEmbeds( { [ LinkRel.Systems ]: systems } )( {
 			dispatch,
 			registry,
 		} as never );
@@ -342,14 +345,14 @@ describe( 'receiveShipEmbeds', () => {
 	} );
 
 	it( 'does not dispatch when helm:systems is absent', () => {
-		receiveShipEmbeds( 42, {} )( { dispatch, registry } as never );
+		receiveShipEmbeds( {} )( { dispatch, registry } as never );
 
 		expect( dispatch ).not.toHaveBeenCalled();
 		expect( registry.dispatch ).not.toHaveBeenCalled();
 	} );
 } );
 
-describe( 'patchPowerMode', () => {
+describe( 'patchShip', () => {
 	let dispatch: ReturnType< typeof vi.fn >;
 
 	beforeEach( () => {
@@ -357,27 +360,34 @@ describe( 'patchPowerMode', () => {
 		dispatch = vi.fn();
 	} );
 
-	it( 'dispatches START then FINISHED on success', async () => {
+	it( 'dispatches PATCH_SHIP_START with edits, then FINISHED on success', async () => {
 		const ship = createShipState( { id: 42, power_mode: 'overdrive' } );
 		mockedApiFetch.mockResolvedValue( ship );
 
-		await patchPowerMode( 42, 'overdrive' )( { dispatch } as never );
+		await patchShip( 42, { power_mode: 'overdrive' } )( { dispatch } as never );
 
 		expect( dispatch ).toHaveBeenCalledWith( {
 			type: 'PATCH_SHIP_START',
-			shipId: 42,
+			edits: { power_mode: 'overdrive' },
 		} );
 		expect( dispatch ).toHaveBeenCalledWith( {
 			type: 'PATCH_SHIP_FINISHED',
-			shipId: 42,
 			ship,
 		} );
 	} );
 
-	it( 'calls apiFetch with PATCH method and power_mode body', async () => {
+	it( 'returns null on success', async () => {
 		mockedApiFetch.mockResolvedValue( createShipState() );
 
-		await patchPowerMode( 7, 'efficiency' )( { dispatch } as never );
+		const result = await patchShip( 1, { power_mode: 'normal' } )( { dispatch } as never );
+
+		expect( result ).toBeNull();
+	} );
+
+	it( 'calls apiFetch with PATCH method and edits body', async () => {
+		mockedApiFetch.mockResolvedValue( createShipState() );
+
+		await patchShip( 7, { power_mode: 'efficiency' } )( { dispatch } as never );
 
 		expect( mockedApiFetch ).toHaveBeenCalledWith( {
 			path: '/helm/v1/ships/7',
@@ -393,7 +403,7 @@ describe( 'patchPowerMode', () => {
 			data: { status: 422 },
 		} );
 
-		await patchPowerMode( 42, 'bad' )( { dispatch } as never );
+		await patchShip( 42, { power_mode: 'bad' } )( { dispatch } as never );
 
 		const failedCall = dispatch.mock.calls.find(
 			( [ action ] ) => action.type === 'PATCH_SHIP_FAILED'
@@ -405,10 +415,23 @@ describe( 'patchPowerMode', () => {
 		expect( error.message ).toBe( 'helm.ship.invalid_power_mode' );
 	} );
 
-	it( 'wraps plain Error as update failed with cause', async () => {
+	it( 'returns the HelmError on failure', async () => {
+		mockedApiFetch.mockRejectedValue( {
+			code: 'helm.ship.invalid_power_mode',
+			message: 'Invalid power mode',
+			data: { status: 422 },
+		} );
+
+		const result = await patchShip( 42, { power_mode: 'bad' } )( { dispatch } as never );
+
+		expect( result ).toBeInstanceOf( HelmError );
+		expect( result?.message ).toBe( 'helm.ship.invalid_power_mode' );
+	} );
+
+	it( 'wraps plain Error as patch failed with cause', async () => {
 		mockedApiFetch.mockRejectedValue( new Error( 'Network failure' ) );
 
-		await patchPowerMode( 1, 'normal' )( { dispatch } as never );
+		await patchShip( 1, { power_mode: 'normal' } )( { dispatch } as never );
 
 		const failedCall = dispatch.mock.calls.find(
 			( [ action ] ) => action.type === 'PATCH_SHIP_FAILED'

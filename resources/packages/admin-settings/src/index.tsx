@@ -20,7 +20,8 @@ import {
 import {ErrorBoundary} from 'react-error-boundary';
 import {store as navStore} from '@helm/nav';
 import {store as actionsStore} from '@helm/actions';
-import {HelmError, HelmErrorFallback} from '@helm/core';
+import {HelmError} from '@helm/core';
+import {HelmErrorFallback} from '@helm/shell';
 import {log} from '@helm/logger';
 import {ShipProvider, useShip} from '@helm/ships';
 

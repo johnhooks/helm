@@ -1,108 +1,96 @@
-import { combineReducers } from '@wordpress/data';
-import type { Action, State } from './types';
+import type { Action, EditsState, State } from './types';
 
-function ships( state: State[ 'ships' ], action: Action ): State[ 'ships' ] {
-	switch ( action.type ) {
-		case 'FETCH_SHIP_START':
-		case 'PATCH_SHIP_START': {
-			const { [ action.shipId ]: _removed, ...restErrors } =
-				state.errors;
-			return {
-				...state,
-				isLoading: { ...state.isLoading, [ action.shipId ]: true },
-				errors: restErrors,
-			};
-		}
-		case 'FETCH_SHIP_FINISHED':
-		case 'PATCH_SHIP_FINISHED': {
-			const { [ action.shipId ]: _removed, ...restErrors } =
-				state.errors;
-			return {
-				byId: { ...state.byId, [ action.shipId ]: action.ship },
-				isLoading: {
-					...state.isLoading,
-					[ action.shipId ]: false,
-				},
-				errors: restErrors,
-			};
-		}
-		case 'FETCH_SHIP_FAILED':
-		case 'PATCH_SHIP_FAILED':
-			return {
-				...state,
-				isLoading: {
-					...state.isLoading,
-					[ action.shipId ]: false,
-				},
-				errors: {
-					...state.errors,
-					[ action.shipId ]: action.error,
-				},
-			};
-		default:
-			return state;
-	}
-}
-
-function systems(
-	state: State[ 'systems' ],
-	action: Action
-): State[ 'systems' ] {
-	switch ( action.type ) {
-		case 'FETCH_SYSTEMS_START': {
-			const { [ action.shipId ]: _removed, ...restErrors } =
-				state.errors;
-			return {
-				...state,
-				isLoading: { ...state.isLoading, [ action.shipId ]: true },
-				errors: restErrors,
-			};
-		}
-		case 'FETCH_SYSTEMS_FINISHED': {
-			const { [ action.shipId ]: _removed, ...restErrors } =
-				state.errors;
-			return {
-				byShipId: {
-					...state.byShipId,
-					[ action.shipId ]: action.systems,
-				},
-				isLoading: {
-					...state.isLoading,
-					[ action.shipId ]: false,
-				},
-				errors: restErrors,
-			};
-		}
-		case 'FETCH_SYSTEMS_FAILED':
-			return {
-				...state,
-				isLoading: {
-					...state.isLoading,
-					[ action.shipId ]: false,
-				},
-				errors: {
-					...state.errors,
-					[ action.shipId ]: action.error,
-				},
-			};
-		default:
-			return state;
-	}
-}
+const INITIAL_EDITS: EditsState = {
+	ship: null,
+	isSubmitting: false,
+	error: null,
+};
 
 export function initializeDefaultState(): State {
 	return {
-		ships: {
-			byId: {},
-			isLoading: {},
-			errors: {},
-		},
-		systems: {
-			byShipId: {},
-			isLoading: {},
-			errors: {},
-		},
+		ship: null,
+		shipError: null,
+		systems: null,
+		systemsError: null,
+		edits: { ...INITIAL_EDITS },
 	};
 }
 
-export const reducer = combineReducers( { ships, systems } );
+export function reducer( state: State = initializeDefaultState(), action: Action ): State {
+	switch ( action.type ) {
+		case 'FETCH_SHIP_START':
+			return state;
+
+		case 'FETCH_SHIP_FINISHED':
+		case 'RECEIVE_SHIP':
+			return {
+				...state,
+				ship: action.ship,
+				shipError: null,
+			};
+
+		case 'FETCH_SHIP_FAILED':
+			return {
+				...state,
+				shipError: action.error,
+			};
+
+		case 'FETCH_SYSTEMS_START':
+			return state;
+
+		case 'FETCH_SYSTEMS_FINISHED':
+		case 'RECEIVE_SYSTEMS':
+			return {
+				...state,
+				systems: action.systems,
+				systemsError: null,
+			};
+
+		case 'FETCH_SYSTEMS_FAILED':
+			return {
+				...state,
+				systemsError: action.error,
+			};
+
+		case 'EDIT_SHIP':
+			return {
+				...state,
+				edits: {
+					...state.edits,
+					ship: { ...state.edits.ship, ...action.edits },
+				},
+			};
+
+		case 'PATCH_SHIP_START':
+			return {
+				...state,
+				edits: {
+					ship: action.edits
+						? { ...state.edits.ship, ...action.edits }
+						: state.edits.ship,
+					isSubmitting: true,
+					error: null,
+				},
+			};
+
+		case 'PATCH_SHIP_FINISHED':
+			return {
+				...state,
+				ship: action.ship,
+				edits: { ...INITIAL_EDITS },
+			};
+
+		case 'PATCH_SHIP_FAILED':
+			return {
+				...state,
+				edits: {
+					...state.edits,
+					isSubmitting: false,
+					error: action.error,
+				},
+			};
+
+		default:
+			return state;
+	}
+}

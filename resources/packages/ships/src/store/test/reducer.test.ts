@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { HelmError } from '@helm/errors';
 import { reducer, initializeDefaultState } from '../reducer';
-import { createShipState, createSystemComponent, createState } from './fixtures';
+import { createShipState, createSystemComponent, createEditsState, createState } from './fixtures';
 
 function reduce( state = initializeDefaultState(), action: Parameters< typeof reducer >[ 1 ] ) {
 	return reducer( state, action );
@@ -9,367 +9,354 @@ function reduce( state = initializeDefaultState(), action: Parameters< typeof re
 
 describe( 'reducer', () => {
 	describe( 'initializeDefaultState', () => {
-		it( 'returns empty ships and systems slices', () => {
+		it( 'returns null ship, systems, and initial edits', () => {
 			expect( initializeDefaultState() ).toEqual( {
-				ships: {
-					byId: {},
-					isLoading: {},
-					errors: {},
-				},
-				systems: {
-					byShipId: {},
-					isLoading: {},
-					errors: {},
+				ship: null,
+				shipError: null,
+				systems: null,
+				systemsError: null,
+				edits: {
+					ship: null,
+					isSubmitting: false,
+					error: null,
 				},
 			} );
 		} );
 	} );
 
 	describe( 'FETCH_SHIP_START', () => {
-		it( 'sets isLoading for the ship', () => {
-			const state = reduce( undefined, {
-				type: 'FETCH_SHIP_START',
-				shipId: 1,
-			} );
+		it( 'returns the same state', () => {
+			const prev = initializeDefaultState();
+			const state = reduce( prev, { type: 'FETCH_SHIP_START' } );
 
-			expect( state.ships.isLoading[ 1 ] ).toBe( true );
-		} );
-
-		it( 'clears any existing error for the ship', () => {
-			const prev = createState( {
-				ships: { errors: { 1: new HelmError( 'helm.ship.not_found', 'Not found' ) } },
-			} );
-
-			const state = reduce( prev, {
-				type: 'FETCH_SHIP_START',
-				shipId: 1,
-			} );
-
-			expect( state.ships.errors[ 1 ] ).toBeUndefined();
-		} );
-
-		it( 'does not affect other ships', () => {
-			const ship2 = createShipState( { id: 2 } );
-			const prev = createState( {
-				ships: {
-					byId: { 2: ship2 },
-					isLoading: { 2: false },
-				},
-			} );
-
-			const state = reduce( prev, {
-				type: 'FETCH_SHIP_START',
-				shipId: 1,
-			} );
-
-			expect( state.ships.byId[ 2 ] ).toBe( ship2 );
-			expect( state.ships.isLoading[ 2 ] ).toBe( false );
-		} );
-
-		it( 'does not affect systems slice', () => {
-			const systems = [ createSystemComponent() ];
-			const prev = createState( {
-				systems: { byShipId: { 1: systems } },
-			} );
-
-			const state = reduce( prev, {
-				type: 'FETCH_SHIP_START',
-				shipId: 1,
-			} );
-
-			expect( state.systems.byShipId[ 1 ] ).toBe( systems );
+			expect( state ).toBe( prev );
 		} );
 	} );
 
 	describe( 'FETCH_SHIP_FINISHED', () => {
-		it( 'stores the ship and clears loading', () => {
+		it( 'stores the ship and clears shipError', () => {
 			const ship = createShipState();
-			const prev = createState( { ships: { isLoading: { 1: true } } } );
+			const prev = createState( {
+				shipError: new HelmError( 'helm.test', 'Error' ),
+			} );
 
 			const state = reduce( prev, {
 				type: 'FETCH_SHIP_FINISHED',
-				shipId: 1,
 				ship,
 			} );
 
-			expect( state.ships.byId[ 1 ] ).toBe( ship );
-			expect( state.ships.isLoading[ 1 ] ).toBe( false );
-		} );
-
-		it( 'clears any existing error for the ship', () => {
-			const prev = createState( {
-				ships: {
-					isLoading: { 1: true },
-					errors: { 1: new HelmError( 'helm.test', 'Error' ) },
-				},
-			} );
-
-			const state = reduce( prev, {
-				type: 'FETCH_SHIP_FINISHED',
-				shipId: 1,
-				ship: createShipState(),
-			} );
-
-			expect( state.ships.errors[ 1 ] ).toBeUndefined();
+			expect( state.ship ).toBe( ship );
+			expect( state.shipError ).toBeNull();
 		} );
 
 		it( 'replaces an existing ship', () => {
 			const original = createShipState( { hull_integrity: 80 } );
 			const updated = createShipState( { hull_integrity: 100 } );
-			const prev = createState( { ships: { byId: { 1: original } } } );
+			const prev = createState( { ship: original } );
 
 			const state = reduce( prev, {
 				type: 'FETCH_SHIP_FINISHED',
-				shipId: 1,
 				ship: updated,
 			} );
 
-			expect( state.ships.byId[ 1 ].hull_integrity ).toBe( 100 );
+			expect( state.ship?.hull_integrity ).toBe( 100 );
+		} );
+
+		it( 'does not affect systems', () => {
+			const systems = [ createSystemComponent() ];
+			const prev = createState( { systems } );
+
+			const state = reduce( prev, {
+				type: 'FETCH_SHIP_FINISHED',
+				ship: createShipState(),
+			} );
+
+			expect( state.systems ).toBe( systems );
 		} );
 	} );
 
 	describe( 'FETCH_SHIP_FAILED', () => {
-		it( 'stores the error and clears loading', () => {
+		it( 'stores the error', () => {
 			const error = new HelmError( 'helm.ship.not_found', 'Not found' );
-			const prev = createState( { ships: { isLoading: { 1: true } } } );
 
-			const state = reduce( prev, {
+			const state = reduce( undefined, {
 				type: 'FETCH_SHIP_FAILED',
-				shipId: 1,
 				error,
 			} );
 
-			expect( state.ships.errors[ 1 ] ).toBe( error );
-			expect( state.ships.isLoading[ 1 ] ).toBe( false );
+			expect( state.shipError ).toBe( error );
 		} );
 
 		it( 'does not remove existing ship data', () => {
 			const ship = createShipState();
-			const prev = createState( {
-				ships: {
-					byId: { 1: ship },
-					isLoading: { 1: true },
-				},
-			} );
+			const prev = createState( { ship } );
 
 			const state = reduce( prev, {
 				type: 'FETCH_SHIP_FAILED',
-				shipId: 1,
 				error: new HelmError( 'helm.test', 'Error' ),
 			} );
 
-			expect( state.ships.byId[ 1 ] ).toBe( ship );
+			expect( state.ship ).toBe( ship );
+		} );
+	} );
+
+	describe( 'RECEIVE_SHIP', () => {
+		it( 'stores the ship and clears shipError', () => {
+			const ship = createShipState();
+			const prev = createState( {
+				shipError: new HelmError( 'helm.test', 'Error' ),
+			} );
+
+			const state = reduce( prev, {
+				type: 'RECEIVE_SHIP',
+				ship,
+			} );
+
+			expect( state.ship ).toBe( ship );
+			expect( state.shipError ).toBeNull();
 		} );
 	} );
 
 	describe( 'FETCH_SYSTEMS_START', () => {
-		it( 'sets isLoading for the ship systems', () => {
-			const state = reduce( undefined, {
-				type: 'FETCH_SYSTEMS_START',
-				shipId: 1,
-			} );
+		it( 'returns the same state', () => {
+			const prev = initializeDefaultState();
+			const state = reduce( prev, { type: 'FETCH_SYSTEMS_START' } );
 
-			expect( state.systems.isLoading[ 1 ] ).toBe( true );
-		} );
-
-		it( 'clears any existing error', () => {
-			const prev = createState( {
-				systems: { errors: { 1: new HelmError( 'helm.test', 'Error' ) } },
-			} );
-
-			const state = reduce( prev, {
-				type: 'FETCH_SYSTEMS_START',
-				shipId: 1,
-			} );
-
-			expect( state.systems.errors[ 1 ] ).toBeUndefined();
-		} );
-
-		it( 'does not affect ships slice', () => {
-			const ship = createShipState();
-			const prev = createState( {
-				ships: { byId: { 1: ship } },
-			} );
-
-			const state = reduce( prev, {
-				type: 'FETCH_SYSTEMS_START',
-				shipId: 1,
-			} );
-
-			expect( state.ships.byId[ 1 ] ).toBe( ship );
+			expect( state ).toBe( prev );
 		} );
 	} );
 
 	describe( 'FETCH_SYSTEMS_FINISHED', () => {
-		it( 'stores the systems and clears loading', () => {
+		it( 'stores the systems and clears systemsError', () => {
 			const systems = [ createSystemComponent() ];
-			const prev = createState( { systems: { isLoading: { 1: true } } } );
+			const prev = createState( {
+				systemsError: new HelmError( 'helm.test', 'Error' ),
+			} );
 
 			const state = reduce( prev, {
 				type: 'FETCH_SYSTEMS_FINISHED',
-				shipId: 1,
 				systems,
 			} );
 
-			expect( state.systems.byShipId[ 1 ] ).toBe( systems );
-			expect( state.systems.isLoading[ 1 ] ).toBe( false );
-		} );
-
-		it( 'clears any existing error', () => {
-			const prev = createState( {
-				systems: {
-					isLoading: { 1: true },
-					errors: { 1: new HelmError( 'helm.test', 'Error' ) },
-				},
-			} );
-
-			const state = reduce( prev, {
-				type: 'FETCH_SYSTEMS_FINISHED',
-				shipId: 1,
-				systems: [ createSystemComponent() ],
-			} );
-
-			expect( state.systems.errors[ 1 ] ).toBeUndefined();
+			expect( state.systems ).toBe( systems );
+			expect( state.systemsError ).toBeNull();
 		} );
 
 		it( 'replaces existing systems', () => {
 			const original = [ createSystemComponent( { condition: 0.5 } ) ];
 			const updated = [ createSystemComponent( { condition: 1.0 } ) ];
-			const prev = createState( { systems: { byShipId: { 1: original } } } );
+			const prev = createState( { systems: original } );
 
 			const state = reduce( prev, {
 				type: 'FETCH_SYSTEMS_FINISHED',
-				shipId: 1,
 				systems: updated,
 			} );
 
-			expect( state.systems.byShipId[ 1 ][ 0 ].condition ).toBe( 1.0 );
+			expect( state.systems?.[ 0 ].condition ).toBe( 1.0 );
+		} );
+
+		it( 'does not affect ship', () => {
+			const ship = createShipState();
+			const prev = createState( { ship } );
+
+			const state = reduce( prev, {
+				type: 'FETCH_SYSTEMS_FINISHED',
+				systems: [ createSystemComponent() ],
+			} );
+
+			expect( state.ship ).toBe( ship );
 		} );
 	} );
 
 	describe( 'FETCH_SYSTEMS_FAILED', () => {
-		it( 'stores the error and clears loading', () => {
+		it( 'stores the error', () => {
 			const error = new HelmError( 'helm.test', 'Error' );
-			const prev = createState( { systems: { isLoading: { 1: true } } } );
 
-			const state = reduce( prev, {
+			const state = reduce( undefined, {
 				type: 'FETCH_SYSTEMS_FAILED',
-				shipId: 1,
 				error,
 			} );
 
-			expect( state.systems.errors[ 1 ] ).toBe( error );
-			expect( state.systems.isLoading[ 1 ] ).toBe( false );
+			expect( state.systemsError ).toBe( error );
 		} );
 
 		it( 'does not remove existing systems data', () => {
 			const systems = [ createSystemComponent() ];
-			const prev = createState( {
-				systems: {
-					byShipId: { 1: systems },
-					isLoading: { 1: true },
-				},
-			} );
+			const prev = createState( { systems } );
 
 			const state = reduce( prev, {
 				type: 'FETCH_SYSTEMS_FAILED',
-				shipId: 1,
 				error: new HelmError( 'helm.test', 'Error' ),
 			} );
 
-			expect( state.systems.byShipId[ 1 ] ).toBe( systems );
+			expect( state.systems ).toBe( systems );
+		} );
+	} );
+
+	describe( 'RECEIVE_SYSTEMS', () => {
+		it( 'stores the systems and clears systemsError', () => {
+			const systems = [ createSystemComponent() ];
+			const prev = createState( {
+				systemsError: new HelmError( 'helm.test', 'Error' ),
+			} );
+
+			const state = reduce( prev, {
+				type: 'RECEIVE_SYSTEMS',
+				systems,
+			} );
+
+			expect( state.systems ).toBe( systems );
+			expect( state.systemsError ).toBeNull();
+		} );
+	} );
+
+	describe( 'EDIT_SHIP', () => {
+		it( 'merges edits into edits.ship', () => {
+			const state = reduce( undefined, {
+				type: 'EDIT_SHIP',
+				edits: { power_mode: 'overdrive' },
+			} );
+
+			expect( state.edits.ship ).toEqual( { power_mode: 'overdrive' } );
+		} );
+
+		it( 'accumulates multiple edits', () => {
+			const first = reduce( undefined, {
+				type: 'EDIT_SHIP',
+				edits: { power_mode: 'overdrive' },
+			} );
+
+			const second = reduce( first, {
+				type: 'EDIT_SHIP',
+				edits: { hull_integrity: 50 },
+			} );
+
+			expect( second.edits.ship ).toEqual( {
+				power_mode: 'overdrive',
+				hull_integrity: 50,
+			} );
+		} );
+
+		it( 'does not affect other state', () => {
+			const ship = createShipState();
+			const prev = createState( { ship } );
+
+			const state = reduce( prev, {
+				type: 'EDIT_SHIP',
+				edits: { power_mode: 'overdrive' },
+			} );
+
+			expect( state.ship ).toBe( ship );
 		} );
 	} );
 
 	describe( 'PATCH_SHIP_START', () => {
-		it( 'sets isLoading for the ship', () => {
-			const state = reduce( undefined, {
-				type: 'PATCH_SHIP_START',
-				shipId: 1,
+		it( 'sets isSubmitting and clears error', () => {
+			const prev = createState( {
+				edits: createEditsState( {
+					error: new HelmError( 'helm.test', 'Error' ),
+				} ),
 			} );
 
-			expect( state.ships.isLoading[ 1 ] ).toBe( true );
+			const state = reduce( prev, { type: 'PATCH_SHIP_START' } );
+
+			expect( state.edits.isSubmitting ).toBe( true );
+			expect( state.edits.error ).toBeNull();
 		} );
 
-		it( 'clears any existing error for the ship', () => {
-			const prev = createState( {
-				ships: { errors: { 1: new HelmError( 'helm.test', 'Error' ) } },
-			} );
-
-			const state = reduce( prev, {
+		it( 'merges edits when provided', () => {
+			const state = reduce( undefined, {
 				type: 'PATCH_SHIP_START',
-				shipId: 1,
+				edits: { power_mode: 'overdrive' },
 			} );
 
-			expect( state.ships.errors[ 1 ] ).toBeUndefined();
+			expect( state.edits.ship ).toEqual( { power_mode: 'overdrive' } );
+			expect( state.edits.isSubmitting ).toBe( true );
+		} );
+
+		it( 'preserves existing staged edits', () => {
+			const prev = createState( {
+				edits: createEditsState( {
+					ship: { power_mode: 'overdrive' },
+				} ),
+			} );
+
+			const state = reduce( prev, { type: 'PATCH_SHIP_START' } );
+
+			expect( state.edits.ship ).toEqual( { power_mode: 'overdrive' } );
 		} );
 	} );
 
 	describe( 'PATCH_SHIP_FINISHED', () => {
-		it( 'stores the ship and clears loading', () => {
+		it( 'stores the ship and resets edits', () => {
 			const ship = createShipState( { power_mode: 'overdrive' } );
-			const prev = createState( { ships: { isLoading: { 1: true } } } );
+			const prev = createState( {
+				edits: createEditsState( {
+					ship: { power_mode: 'overdrive' },
+					isSubmitting: true,
+				} ),
+			} );
 
 			const state = reduce( prev, {
 				type: 'PATCH_SHIP_FINISHED',
-				shipId: 1,
 				ship,
 			} );
 
-			expect( state.ships.byId[ 1 ] ).toBe( ship );
-			expect( state.ships.byId[ 1 ].power_mode ).toBe( 'overdrive' );
-			expect( state.ships.isLoading[ 1 ] ).toBe( false );
-		} );
-
-		it( 'clears any existing error for the ship', () => {
-			const prev = createState( {
-				ships: {
-					isLoading: { 1: true },
-					errors: { 1: new HelmError( 'helm.test', 'Error' ) },
-				},
-			} );
-
-			const state = reduce( prev, {
-				type: 'PATCH_SHIP_FINISHED',
-				shipId: 1,
-				ship: createShipState(),
-			} );
-
-			expect( state.ships.errors[ 1 ] ).toBeUndefined();
+			expect( state.ship ).toBe( ship );
+			expect( state.edits.ship ).toBeNull();
+			expect( state.edits.isSubmitting ).toBe( false );
+			expect( state.edits.error ).toBeNull();
 		} );
 	} );
 
 	describe( 'PATCH_SHIP_FAILED', () => {
-		it( 'stores the error and clears loading', () => {
+		it( 'stores the error and clears isSubmitting', () => {
 			const error = new HelmError( 'helm.ships.patch_failed', 'Patch failed' );
-			const prev = createState( { ships: { isLoading: { 1: true } } } );
+			const prev = createState( {
+				edits: createEditsState( {
+					ship: { power_mode: 'overdrive' },
+					isSubmitting: true,
+				} ),
+			} );
 
 			const state = reduce( prev, {
 				type: 'PATCH_SHIP_FAILED',
-				shipId: 1,
 				error,
 			} );
 
-			expect( state.ships.errors[ 1 ] ).toBe( error );
-			expect( state.ships.isLoading[ 1 ] ).toBe( false );
+			expect( state.edits.error ).toBe( error );
+			expect( state.edits.isSubmitting ).toBe( false );
+		} );
+
+		it( 'preserves staged edits', () => {
+			const prev = createState( {
+				edits: createEditsState( {
+					ship: { power_mode: 'overdrive' },
+					isSubmitting: true,
+				} ),
+			} );
+
+			const state = reduce( prev, {
+				type: 'PATCH_SHIP_FAILED',
+				error: new HelmError( 'helm.test', 'Error' ),
+			} );
+
+			expect( state.edits.ship ).toEqual( { power_mode: 'overdrive' } );
 		} );
 
 		it( 'does not remove existing ship data', () => {
 			const ship = createShipState();
 			const prev = createState( {
-				ships: {
-					byId: { 1: ship },
-					isLoading: { 1: true },
-				},
+				ship,
+				edits: createEditsState( { isSubmitting: true } ),
 			} );
 
 			const state = reduce( prev, {
 				type: 'PATCH_SHIP_FAILED',
-				shipId: 1,
 				error: new HelmError( 'helm.test', 'Error' ),
 			} );
 
-			expect( state.ships.byId[ 1 ] ).toBe( ship );
+			expect( state.ship ).toBe( ship );
 		} );
 	} );
 

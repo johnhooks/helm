@@ -15,8 +15,9 @@ const packages = path.resolve(__dirname, 'resources/packages');
  *
  * Split into tiers so each compilation only externalizes packages it doesn't own:
  *   uiExternals        → tier 1 (for core compilation)
- *   coreExternals      → tier 1 + 2 (for datastores and apps)
- *   datastoreExternals → core + cross-datastore deps (ships → products)
+ *   coreExternals      → tier 1 + 2 (for shell and datastores)
+ *   shellExternals     → core + shell (for datastores and apps)
+ *   datastoreExternals → shell + cross-datastore deps (ships → products)
  *   helmExternals      → everything above + ships (for app entries)
  */
 
@@ -40,11 +41,19 @@ const coreExternals = {
 };
 
 /**
+ * Tier 3: Shell — composed components bridging UI + Core.
+ */
+const shellExternals = {
+	...coreExternals,
+	'@helm/shell': { global: ['helm', 'shell'], handle: 'helm-shell' },
+};
+
+/**
  * Externals for datastore entries (products, ships, nav).
- * Includes core externals + cross-datastore deps.
+ * Includes shell externals + cross-datastore deps.
  */
 const datastoreExternals = {
-	...coreExternals,
+	...shellExternals,
 	'@helm/datacore': { global: ['helm', 'datacore'], handle: 'helm-datacore' },
 	'@helm/products': { global: ['helm', 'products'], handle: 'helm-products' },
 	'@helm/nav': { global: ['helm', 'nav'], handle: 'helm-nav' },
@@ -79,8 +88,7 @@ module.exports = [
 	},
 
 	// ── Core library (tier 2) ─────────────────────────────────────────
-	// Externalizes @helm/ui. Contains lib packages (errors, data, logger)
-	// + composed app components.
+	// Externalizes @helm/ui. Bundles lib packages (errors, data, logger).
 	{
 		...defaultConfig,
 		name: 'core',
@@ -101,6 +109,34 @@ module.exports = [
 				requestToHandle(request) {
 					if (uiExternals[request]) {
 						return uiExternals[request].handle;
+					}
+				},
+			}),
+		],
+	},
+
+	// ── Shell (tier 3) ───────────────────────────────────────────────
+	// Composed components and hooks bridging @helm/ui + @helm/core.
+	{
+		...defaultConfig,
+		name: 'shell',
+		entry: {
+			shell: {
+				import: path.resolve(packages, 'shell/src/entry.ts'),
+				library: { name: ['helm', 'shell'], type: 'window' },
+			},
+		},
+		plugins: [
+			...basePlugins,
+			new DependencyExtractionWebpackPlugin({
+				requestToExternal(request) {
+					if (coreExternals[request]) {
+						return coreExternals[request].global;
+					}
+				},
+				requestToHandle(request) {
+					if (coreExternals[request]) {
+						return coreExternals[request].handle;
 					}
 				},
 			}),

@@ -1,6 +1,5 @@
 import { ErrorCard, ErrorCompact } from '@helm/ui';
-import { formatError } from '../../../errors/src/format-error';
-import { HelmError } from '../../../errors/src/helm-error';
+import { formatError, HelmError } from '@helm/core';
 
 /**
  * ErrorBoundary fallback that renders a structured error card.

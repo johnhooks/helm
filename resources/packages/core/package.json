@@ -8,10 +8,6 @@
 	"dependencies": {
 		"@helm/data": "workspace:*",
 		"@helm/errors": "workspace:*",
-		"@helm/logger": "workspace:*",
-		"@helm/ui": "workspace:*"
-	},
-	"peerDependencies": {
-		"react": "^18.3.1"
+		"@helm/logger": "workspace:*"
 	}
 }

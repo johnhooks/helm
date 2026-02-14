@@ -1,7 +1,8 @@
-import { useCallback, useState } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { Panel, MatrixIndicator, Readout, SegmentedControl } from '@helm/ui';
+import { useErrorModal } from '@helm/shell';
 import { store, useShip } from '@helm/ships';
 import './ship-systems-card.css';
 
@@ -54,19 +55,31 @@ function SystemCell( {
 
 export function ShipSystemsCard() {
 	const { shipId, ship } = useShip();
-	const { patchPowerMode } = useDispatch( store );
+	const { patchShip } = useDispatch( store );
+	const [ ErrorModal, openErrorModal ] = useErrorModal();
 
-	// Optimistic local state: tracks the pending mode while the server round-trips.
-	const [ optimistic, setOptimistic ] = useState< PowerModeKey | null >( null );
-	const powerMode: PowerModeKey = optimistic ?? ( ship.power_mode as PowerModeKey ) ?? 'normal';
+	const { edits, isSubmitting } = useSelect(
+		( select ) => ( {
+			edits: select( store ).getEdits(),
+			isSubmitting: select( store ).isSubmitting(),
+		} ),
+		[],
+	);
+
+	const powerMode: PowerModeKey =
+		( edits?.power_mode as PowerModeKey ) ??
+		( ship.power_mode as PowerModeKey ) ??
+		'normal';
 
 	const handlePowerModeChange = useCallback(
 		( value: string ) => {
-			const next = value as PowerModeKey;
-			setOptimistic( next );
-			patchPowerMode( shipId, next ).then( () => setOptimistic( null ) );
+			patchShip( shipId, { power_mode: value } ).then( ( error ) => {
+				if ( error ) {
+					openErrorModal( error );
+				}
+			} );
 		},
-		[ shipId, patchPowerMode ],
+		[ shipId, patchShip, openErrorModal ],
 	);
 
 	const stats = useSelect(
@@ -186,6 +199,7 @@ export function ShipSystemsCard() {
 						options={ MODE_OPTIONS }
 						value={ powerMode }
 						onChange={ handlePowerModeChange }
+						disabled={ isSubmitting }
 						surface="neutral"
 						size="sm"
 						fullWidth
@@ -193,6 +207,7 @@ export function ShipSystemsCard() {
 					/>
 				</div>
 			</Panel>
+			{ ErrorModal }
 		</div>
 	);
 }

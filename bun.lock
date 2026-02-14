@@ -78,6 +78,7 @@
         "@helm/core": "workspace:*",
         "@helm/logger": "workspace:*",
         "@helm/nav": "workspace:*",
+        "@helm/shell": "workspace:*",
         "@helm/ships": "workspace:*",
         "@helm/ui": "workspace:*",
       },
@@ -125,6 +126,7 @@
         "@helm/logger": "workspace:*",
         "@helm/nav": "workspace:*",
         "@helm/router": "workspace:*",
+        "@helm/shell": "workspace:*",
         "@helm/ships": "workspace:*",
         "@helm/types": "workspace:*",
         "@helm/ui": "workspace:*",
@@ -149,10 +151,6 @@
         "@helm/data": "workspace:*",
         "@helm/errors": "workspace:*",
         "@helm/logger": "workspace:*",
-        "@helm/ui": "workspace:*",
-      },
-      "peerDependencies": {
-        "react": "^18.3.1",
       },
     },
     "resources/packages/data": {
@@ -216,6 +214,17 @@
       "version": "0.1.0",
       "peerDependencies": {
         "@tanstack/react-router": "^1.159.4",
+      },
+    },
+    "resources/packages/shell": {
+      "name": "@helm/shell",
+      "version": "0.1.0",
+      "dependencies": {
+        "@helm/core": "workspace:*",
+        "@helm/ui": "workspace:*",
+      },
+      "peerDependencies": {
+        "react": "^18.3.1",
       },
     },
     "resources/packages/ships": {
@@ -656,6 +665,8 @@
     "@helm/products": ["@helm/products@workspace:resources/packages/products"],
 
     "@helm/router": ["@helm/router@workspace:resources/packages/router"],
+
+    "@helm/shell": ["@helm/shell@workspace:resources/packages/shell"],
 
     "@helm/ships": ["@helm/ships@workspace:resources/packages/ships"],
 

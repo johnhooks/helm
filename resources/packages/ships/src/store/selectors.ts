@@ -7,37 +7,37 @@ import type { State } from './types';
 
 export const getShip = (
 	state: State,
-	shipId: number
-): WithRestLinks< ShipState > | undefined => state.ships.byId[ shipId ];
-
-export const isShipLoading = (
-	state: State,
-	shipId: number
-): boolean => state.ships.isLoading[ shipId ] ?? false;
+	_shipId: number
+): WithRestLinks< ShipState > | undefined => state.ship ?? undefined;
 
 export const getShipError = (
-	state: State,
-	shipId: number
-): HelmError | undefined => state.ships.errors[ shipId ];
+	state: State
+): HelmError | null => state.shipError;
 
 export const getSystems = (
 	state: State,
-	shipId: number
-): SystemComponentResponse[] | undefined => state.systems.byShipId[ shipId ];
-
-export const areSystemsLoading = (
-	state: State,
-	shipId: number
-): boolean => state.systems.isLoading[ shipId ] ?? false;
+	_shipId: number
+): SystemComponentResponse[] | undefined => state.systems ?? undefined;
 
 export const getSystemsError = (
-	state: State,
-	shipId: number
-): HelmError | undefined => state.systems.errors[ shipId ];
+	state: State
+): HelmError | null => state.systemsError;
+
+export const getEdits = (
+	state: State
+): Partial< ShipState > | null => state.edits.ship;
+
+export const isSubmitting = (
+	state: State
+): boolean => state.edits.isSubmitting;
+
+export const getEditError = (
+	state: State
+): HelmError | null => state.edits.error;
 
 export const getSystemStats = createRegistrySelector(
-	( select ) => ( state: State, shipId: number ): SystemStats | undefined => {
-		const systems = state.systems.byShipId[ shipId ];
+	( select ) => ( state: State, _shipId: number ): SystemStats | undefined => {
+		const systems = state.systems;
 		if ( ! systems ) {
 			return undefined;
 		}

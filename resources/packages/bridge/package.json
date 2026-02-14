@@ -17,6 +17,7 @@
 		"@helm/logger": "workspace:*",
 		"@helm/nav": "workspace:*",
 		"@helm/router": "workspace:*",
+		"@helm/shell": "workspace:*",
 		"@helm/ships": "workspace:*",
 		"@helm/types": "workspace:*",
 		"@helm/ui": "workspace:*",

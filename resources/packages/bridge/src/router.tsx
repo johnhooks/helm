@@ -14,7 +14,7 @@ import {
 	useSearch,
 } from '@tanstack/react-router';
 import { ErrorBoundary } from 'react-error-boundary';
-import { HelmErrorFallback } from '@helm/core';
+import { HelmErrorFallback } from '@helm/shell';
 import { ShipProvider } from '@helm/ships';
 import { createWpHistory } from '@helm/router';
 import { AppRoot } from '@helm/ui';
