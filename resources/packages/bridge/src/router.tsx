@@ -14,7 +14,7 @@ import {
 	useSearch,
 } from '@tanstack/react-router';
 import { ErrorBoundary } from 'react-error-boundary';
-import { HelmErrorFallback } from '@helm/shell';
+import { HelmErrorPageFallback } from '@helm/shell';
 import { ShipProvider } from '@helm/ships';
 import { createWpHistory } from '@helm/router';
 import { AppRoot } from '@helm/ui';
@@ -58,7 +58,7 @@ const rootRoute = createRootRoute({
 
 		return (
 			<AppRoot>
-				<ErrorBoundary FallbackComponent={ HelmErrorFallback }>
+				<ErrorBoundary FallbackComponent={ HelmErrorPageFallback }>
 					<Suspense fallback={ null }>
 						<ShipProvider shipId={ shipId }>
 							<Outlet />

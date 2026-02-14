@@ -95,6 +95,9 @@ export type { ErrorCardProps } from "./components/error-display";
 export { ErrorCompact } from "./components/error-display";
 export type { ErrorCompactProps } from "./components/error-display";
 
+export { ErrorPage } from "./components/error-display";
+export type { ErrorPageProps } from "./components/error-display";
+
 export { ErrorModal } from "./components/error-display";
 export type { ErrorModalProps } from "./components/error-display";
 

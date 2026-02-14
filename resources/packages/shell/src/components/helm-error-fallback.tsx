@@ -1,4 +1,4 @@
-import { ErrorCard, ErrorCompact } from '@helm/ui';
+import { ErrorCard, ErrorPage, ErrorCompact } from '@helm/ui';
 import { formatError, HelmError } from '@helm/core';
 
 /**
@@ -9,6 +9,16 @@ export function HelmErrorFallback( { error }: { error: unknown } ) {
 	const { detail, causes } = formatError( error );
 
 	return <ErrorCard code={ code } detail={ detail } causes={ causes } />;
+}
+
+/**
+ * ErrorBoundary fallback that renders a full-page centered error display.
+ */
+export function HelmErrorPageFallback( { error }: { error: unknown } ) {
+	const code = HelmError.from( error ).message;
+	const { detail, causes } = formatError( error );
+
+	return <ErrorPage code={ code } detail={ detail } causes={ causes } />;
 }
 
 /**

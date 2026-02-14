@@ -26,6 +26,27 @@
 	font-size: 11px;
 }
 
+/* Error page — full-page centered fallback */
+.helm-error-page {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex: 1;
+	padding: 24px;
+}
+
+.helm-error-page__panel {
+	width: min(560px, 100%);
+}
+
+.helm-error-page__icon {
+	margin-bottom: 0.75rem;
+}
+
+.helm-error-page__icon svg {
+	fill: var(--helm-ui-color-danger);
+}
+
 /* Error compact — inline display */
 .helm-error-compact {
 	display: inline-flex;

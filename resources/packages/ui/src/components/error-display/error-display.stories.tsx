@@ -4,6 +4,7 @@ import { ErrorContent } from "./error-content";
 import { ErrorCard } from "./error-card";
 import { ErrorCompact } from "./error-compact";
 import { ErrorModal } from "./error-modal";
+import { ErrorPage } from "./error-page";
 import { Button } from "../button";
 import { Panel } from "../panel";
 
@@ -68,6 +69,35 @@ export const CompactInPanel: CardStory = {
         <ErrorCompact code="helm.power.insufficient" detail="Not enough power." />
       </div>
     </Panel>
+  ),
+};
+
+// ── ErrorPage (full-page centered fallback) ─────────────────────────
+
+export const Page: CardStory = {
+  args: { code: "" },
+  parameters: { layout: "fullscreen" },
+  render: () => (
+    <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+      <ErrorPage
+        code="helm.fatal"
+        detail="An unrecoverable error occurred during initialization."
+        causes={ [
+          "Origin handshake failed.",
+          "Ship state could not be restored.",
+        ] }
+      />
+    </div>
+  ),
+};
+
+export const PageMinimal: CardStory = {
+  args: { code: "" },
+  parameters: { layout: "fullscreen" },
+  render: () => (
+    <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+      <ErrorPage code="helm.unknown" />
+    </div>
   ),
 };
 

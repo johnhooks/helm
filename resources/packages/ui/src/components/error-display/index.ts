@@ -10,5 +10,8 @@ export type { ErrorCardProps } from './error-card';
 export { ErrorCompact } from './error-compact';
 export type { ErrorCompactProps } from './error-compact';
 
+export { ErrorPage } from './error-page';
+export type { ErrorPageProps } from './error-page';
+
 export { ErrorModal } from './error-modal';
 export type { ErrorModalProps } from './error-modal';
