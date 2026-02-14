@@ -6,6 +6,7 @@ import { Readout } from "../readout";
 import { Countdown } from "../countdown";
 import { ProgressBar } from "../progress-bar";
 import { Button } from "../button";
+import { ContextMenu } from "../context-menu";
 
 /* ================================================================
  *  Meta
@@ -524,7 +525,7 @@ const SurveyView = ({ selectedPlanet }: { selectedPlanet?: string }) => (
           <ContextMenu
             name={selectedPlanet}
             subtitle={planet.type}
-            tone={C.lilac}
+            tone="lilac"
             actions={[
               { label: "Scan Planet", detail: planet.scanned ? "rescan" : "2h 40m" },
               { label: "Survey Moons", detail: "4h" },
@@ -548,104 +549,6 @@ const SurveyView = ({ selectedPlanet }: { selectedPlanet?: string }) => (
       Sol System — Survey View
     </div>
   </Panel>
-);
-
-/* ================================================================
- *  Context Menu — compact dropdown
- * ============================================================= */
-
-interface MenuAction {
-  label: string;
-  detail?: string;
-  disabled?: boolean;
-  tone?: string;
-}
-
-const ContextMenu = ({
-  name,
-  subtitle,
-  tone = C.sky,
-  actions,
-}: {
-  name: string;
-  subtitle?: string;
-  tone?: string;
-  actions: MenuAction[];
-}) => (
-  <div style={{
-    fontFamily: "Antonio, sans-serif",
-    width: 180,
-    background: C.surface,
-    border: `1px solid ${C.border}`,
-    borderRadius: 8,
-    overflow: "hidden",
-    filter: `drop-shadow(0 4px 16px rgba(0,0,0,0.6))`,
-  }}>
-    {/* Header */}
-    <div style={{
-      padding: "6px 10px",
-      borderBottom: `1px solid ${C.border}`,
-      display: "flex",
-      alignItems: "baseline",
-      justifyContent: "space-between",
-      gap: 8,
-    }}>
-      <span style={{
-        fontSize: 11,
-        fontWeight: 700,
-        letterSpacing: "0.06em",
-        textTransform: "uppercase",
-        color: tone,
-      }}>
-        {name}
-      </span>
-      {subtitle && (
-        <span style={{ fontSize: 9, color: "#444", letterSpacing: "0.06em" }}>
-          {subtitle}
-        </span>
-      )}
-    </div>
-
-    {/* Actions */}
-    <div style={{ padding: 4, display: "flex", flexDirection: "column", gap: 2 }}>
-      {actions.map((action) => (
-        <button
-          key={action.label}
-          type="button"
-          disabled={action.disabled}
-          style={{
-            fontFamily: "Antonio, sans-serif",
-            width: "100%",
-            background: "transparent",
-            border: "none",
-            borderRadius: 6,
-            padding: "6px 8px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: 8,
-            cursor: action.disabled ? "not-allowed" : "pointer",
-            opacity: action.disabled ? 0.35 : 1,
-          }}
-        >
-          <span style={{
-            fontSize: 11,
-            fontWeight: 700,
-            letterSpacing: "0.04em",
-            textTransform: "uppercase",
-            color: action.disabled ? C.muted : (action.tone ?? C.text),
-          }}>
-            {action.label}
-          </span>
-          {action.detail && (
-            <span style={{ fontSize: 9, color: "#555", letterSpacing: "0.04em" }}>
-              {action.detail}
-            </span>
-          )}
-        </button>
-      ))}
-    </div>
-  </div>
 );
 
 /* ================================================================
@@ -919,7 +822,7 @@ export const StarSelected: Story = {
                 <ContextMenu
                   name="Tau Ceti"
                   subtitle="G8.5V · 11.9 ly"
-                  tone={C.sky}
+                  tone="sky"
                   actions={[
                     { label: "Scan Route", detail: "1h 12m" },
                     { label: "Jump", detail: "route unknown", disabled: true },
@@ -956,10 +859,10 @@ export const StarSelectedScanned: Story = {
                 <ContextMenu
                   name="Tau Ceti"
                   subtitle="G8.5V · 11.9 ly"
-                  tone={C.sky}
+                  tone="sky"
                   actions={[
                     { label: "Rescan Route", detail: "1h 12m" },
-                    { label: "Jump", detail: "4d 2h · 32% fuel", tone: C.accent },
+                    { label: "Jump", detail: "4d 2h", tone: "accent" },
                   ]}
                 />
               </div>
