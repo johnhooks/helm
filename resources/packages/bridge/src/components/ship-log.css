@@ -1,0 +1,31 @@
+.helm-ship-log {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	flex: 1;
+	min-height: 0;
+}
+
+.helm-ship-log__label {
+	font-family: var(--helm-ui-font-family);
+	font-size: var(--helm-ui-font-size-label);
+	letter-spacing: 0.08em;
+	color: var(--helm-ui-color-muted);
+	text-transform: uppercase;
+	padding: 2px 0;
+	flex-shrink: 0;
+}
+
+.helm-ship-log__list {
+	overflow-y: auto;
+	flex: 1;
+	min-height: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.helm-ship-log__load-more {
+	flex-shrink: 0;
+	padding-top: 4px;
+}

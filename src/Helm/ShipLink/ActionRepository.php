@@ -25,11 +25,21 @@ final class ActionRepository
      * Column mapping for property names to database columns.
      */
     private const COLUMN_MAP = ['type' => 'action_type'];
+
+    private const CACHE_GROUP = 'helm_ship_actions';
+
     /**
      * Find an action by ID.
      */
     public function find(int $id): ?Action
     {
+        /** @var array<string, mixed>|false $cached */
+        $cached = wp_cache_get($id, self::CACHE_GROUP);
+
+        if (is_array($cached)) {
+            return $this->hydrate($cached);
+        }
+
         global $wpdb;
 
         $table = $wpdb->prefix . Schema::TABLE_SHIP_ACTIONS;
@@ -46,7 +56,49 @@ final class ActionRepository
             return null;
         }
 
+        wp_cache_set($id, $row, self::CACHE_GROUP);
+
         return $this->hydrate($row);
+    }
+
+    /**
+     * Find actions for a ship with cursor-based pagination.
+     *
+     * @return array{actions: array<Action>, has_more: bool}
+     */
+    public function findForShipPaginated(int $shipPostId, int $perPage = 20, ?int $before = null): array
+    {
+        global $wpdb;
+
+        $table = $wpdb->prefix . Schema::TABLE_SHIP_ACTIONS;
+
+        if ($before !== null) {
+            $sql = $wpdb->prepare(
+                "SELECT * FROM {$table} WHERE ship_post_id = %d AND id < %d ORDER BY id DESC LIMIT %d",
+                $shipPostId,
+                $before,
+                $perPage + 1
+            );
+        } else {
+            $sql = $wpdb->prepare(
+                "SELECT * FROM {$table} WHERE ship_post_id = %d ORDER BY id DESC LIMIT %d",
+                $shipPostId,
+                $perPage + 1
+            );
+        }
+
+        $rows = $wpdb->get_results($sql, ARRAY_A);
+
+        $hasMore = count($rows) > $perPage;
+
+        if ($hasMore) {
+            array_pop($rows);
+        }
+
+        return [
+            'actions'  => array_map(fn(array $row) => $this->hydrate($row), $rows),
+            'has_more' => $hasMore,
+        ];
     }
 
     /**
@@ -269,6 +321,7 @@ final class ActionRepository
 
         if ($result !== false) {
             $action->syncOriginal();
+            wp_cache_delete($action->id, self::CACHE_GROUP);
         }
 
         return $result !== false;
@@ -296,6 +349,10 @@ final class ActionRepository
         $table = $wpdb->prefix . Schema::TABLE_SHIP_ACTIONS;
 
         $result = $wpdb->delete($table, ['id' => $id]);
+
+        if ($result !== false) {
+            wp_cache_delete($id, self::CACHE_GROUP);
+        }
 
         return $result !== false;
     }

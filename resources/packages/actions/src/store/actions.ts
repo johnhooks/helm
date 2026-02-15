@@ -1,14 +1,16 @@
 import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
-import { ErrorCode, HelmError } from '@helm/errors';
+import { assert, ErrorCode, HelmError } from '@helm/errors';
 import type { Thunk } from '@helm/types';
-import type { Action, DraftAction, ShipAction } from './types';
+import type { Action, DraftAction, ShipAction, ShipActionType } from './types';
 import type { store } from './index';
+import { createIndexQueryId } from './utils';
+import li from 'li';
 
 export const createAction =
-	( shipId: number, actionType: string, params: Record< string, unknown > = {} ): Thunk< Action, typeof store > =>
+	( shipId: number, actionType: ShipActionType, params: Record< string, unknown > = {} ): Thunk< Action, typeof store > =>
 	async ( { dispatch } ) => {
-		dispatch( { type: 'CREATE_ACTION_START', shipId } );
+		dispatch( { type: 'CREATE_ACTION_START' } );
 
 		try {
 			const action = await apiFetch< ShipAction >( {
@@ -17,54 +19,21 @@ export const createAction =
 				data: { type: actionType, params },
 			} );
 
-			dispatch( { type: 'CREATE_ACTION_FINISHED', shipId, action } );
+			dispatch( { type: 'CREATE_ACTION_FINISHED', action } );
 		} catch ( error ) {
 			dispatch( {
 				type: 'CREATE_ACTION_FAILED',
-				shipId,
 				error: HelmError.safe( ErrorCode.ActionsCreateFailed, __( 'Helm failed to initialize your requested ship action.', 'helm' ), await HelmError.asyncFrom( error ) ),
 			} );
 		}
 	};
 
-export const fetchCurrentAction =
-	( shipId: number ): Thunk< Action, typeof store > =>
-	async ( { dispatch } ) => {
-		dispatch( { type: 'FETCH_ACTION_START', shipId } );
-
-		try {
-			const action = await apiFetch< ShipAction >( {
-				path: `/helm/v1/ships/${ shipId }/actions/current`,
-			} );
-
-			dispatch( { type: 'FETCH_ACTION_FINISHED', shipId, action } );
-		} catch ( error ) {
-			const helmError = await HelmError.asyncFrom( error );
-
-			// 404 means no active action — that's a valid state, not an error.
-			if ( helmError.message === 'helm.action.none' ) {
-				dispatch( { type: 'FETCH_ACTION_FINISHED', shipId, action: null } );
-				return;
-			}
-
-			dispatch( {
-				type: 'FETCH_ACTION_FAILED',
-				shipId,
-				error: HelmError.safe( ErrorCode.ActionsInvalidResponse, __( 'Helm failed to load your ships current action.', 'helm' ), helmError ),
-			} );
-		}
-	};
-
-export function receiveAction( shipId: number, action: ShipAction ): Action {
-	return { type: 'RECEIVE_ACTION', shipId, action };
+export function receiveAction( action: ShipAction ): Action {
+	return { type: 'RECEIVE_ACTION', action };
 }
 
 export function receiveHeartbeat( actions: ShipAction[], cursor: string ): Action {
 	return { type: 'RECEIVE_HEARTBEAT', actions, cursor };
-}
-
-export function clearAction( shipId: number ): Action {
-	return { type: 'CLEAR_ACTION', shipId };
 }
 
 export function draftCreate( action: DraftAction ): Action {
@@ -75,13 +44,49 @@ export function clearDraft(): Action {
 	return { type: 'CLEAR_DRAFT' };
 }
 
+/**
+ * Submit the current draft action for the given ship.
+ *
+ * @throws {HelmError} If no draft exists.
+ */
 export const submitDraft =
 	( shipId: number ): Thunk< Action, typeof store > =>
 	async ( { dispatch, select } ) => {
 		const draft = select.getDraft();
-		if ( ! draft ) {
+		assert( draft, 'helm.actions.no_draft', 'submitDraft called without a draft' );
+
+		dispatch.createAction( shipId, draft.type, draft.params );
+	};
+
+export const loadMore =
+	( shipId: number ): Thunk< Action, typeof store > =>
+	async ( { dispatch, select } ) => {
+		const meta = select.getQueryMeta( shipId );
+
+		// No next page or already loading — skip.
+		if ( ! meta?.next || meta.isLoading ) {
 			return;
 		}
 
-		dispatch.createAction( shipId, draft.type, draft.params );
+		const queryId = createIndexQueryId( shipId );
+		dispatch( { type: 'LOAD_MORE_START', queryId } );
+
+		try {
+			const response = await apiFetch( {
+				url: meta.next,
+				parse: false as const,
+			} );
+
+			const actions = ( await response.json() ) as ShipAction[];
+			const linkHeader = response.headers.get( 'Link' );
+			const links = linkHeader ? ( li.parse( linkHeader ) as Record< string, string > ) : {};
+
+			dispatch( { type: 'LOAD_MORE_FINISHED', queryId, actions, next: links.next ?? null } );
+		} catch ( error ) {
+			dispatch( {
+				type: 'LOAD_MORE_FAILED',
+				queryId,
+				error: HelmError.safe( ErrorCode.ActionsInvalidResponse, __( 'Failed to load ship log.', 'helm' ), await HelmError.asyncFrom( error ) ),
+			} );
+		}
 	};

@@ -8,7 +8,9 @@ use Helm\Navigation\EdgeRepository;
 use Helm\Navigation\NodeRepository;
 use Helm\ShipLink\ActionRepository;
 use Helm\ShipLink\ActionStatus;
+use Helm\ShipLink\Models\Action;
 use Helm\Ships\ShipPost;
+use Helm\StellarWP\Models\Model;
 use lucatume\WPBrowser\TestCase\WPRestApiTestCase;
 use Tests\Support\WpunitTester;
 
@@ -251,40 +253,8 @@ class ShipActionsControllerTest extends WPRestApiTestCase
     {
         $routes = rest_get_server()->get_routes();
 
-        $this->assertArrayHasKey('/helm/v1/ships/(?P<id>\\d+)/actions/current', $routes);
         $this->assertArrayHasKey('/helm/v1/ships/(?P<id>\\d+)/actions/(?P<actionId>\\d+)', $routes);
-    }
-
-    public function test_get_current_returns_active_action(): void
-    {
-        $ship = $this->createShip();
-
-        wp_set_current_user($this->ownerId);
-
-        // Create an action so there's an active one.
-        $this->tester->postAction($ship->postId(), [
-            'type'   => 'scan_route',
-            'params' => ['target_node_id' => $this->toNodeId],
-        ]);
-
-        $response = $this->tester->getAction($ship->postId());
-
-        $this->assertSame(200, $response->get_status());
-
-        $data = $response->get_data();
-        $this->assertSame($ship->postId(), $data['ship_post_id']);
-        $this->assertSame('scan_route', $data['type']);
-    }
-
-    public function test_get_current_returns_404_when_none(): void
-    {
-        $ship = $this->createShip();
-
-        wp_set_current_user($this->ownerId);
-
-        $response = $this->tester->getAction($ship->postId());
-
-        $this->assertErrorResponse('helm.action.none', $response, 404);
+        $this->assertArrayHasKey('/helm/v1/actions/(?P<actionId>\\d+)', $routes);
     }
 
     public function test_get_by_id_returns_action(): void
@@ -300,7 +270,7 @@ class ShipActionsControllerTest extends WPRestApiTestCase
 
         $actionId = $createResponse->get_data()['id'];
 
-        $response = $this->tester->getAction($ship->postId(), (string) $actionId);
+        $response = $this->tester->getAction((int) $actionId);
 
         $this->assertSame(200, $response->get_status());
 
@@ -309,14 +279,188 @@ class ShipActionsControllerTest extends WPRestApiTestCase
         $this->assertSame($ship->postId(), $data['ship_post_id']);
     }
 
-    public function test_get_by_id_returns_404_for_wrong_ship(): void
+    // ------------------------------------------------------------------
+    // GET /actions (index)
+    // ------------------------------------------------------------------
+
+    public function test_index_returns_empty_array_when_no_actions(): void
     {
         $ship = $this->createShip();
-        $otherShip = $this->tester->haveShip([
-            'ownerId'   => $this->ownerId,
-            'node_id'   => $this->toNodeId,
-            'core_life' => 1000.0,
+
+        wp_set_current_user($this->ownerId);
+        $response = $this->tester->getActions($ship->postId());
+
+        $this->assertSame(200, $response->get_status());
+        $this->assertSame([], $response->get_data());
+    }
+
+    public function test_index_returns_actions_newest_first(): void
+    {
+        $ship = $this->createShip();
+        $repo = helm(ActionRepository::class);
+
+        // Insert completed actions directly to avoid the "one active action" constraint.
+        $action1 = Action::fromData([
+            'ship_post_id' => $ship->postId(),
+            'type'         => 'scan_route',
+            'status'       => ActionStatus::Fulfilled->value,
+            'params'       => '{}',
+        ], Model::BUILD_MODE_IGNORE_MISSING);
+        $repo->insert($action1);
+
+        $action2 = Action::fromData([
+            'ship_post_id' => $ship->postId(),
+            'type'         => 'jump',
+            'status'       => ActionStatus::Fulfilled->value,
+            'params'       => '{}',
+        ], Model::BUILD_MODE_IGNORE_MISSING);
+        $repo->insert($action2);
+
+        wp_set_current_user($this->ownerId);
+        $response = $this->tester->getActions($ship->postId());
+
+        $this->assertSame(200, $response->get_status());
+
+        $data = $response->get_data();
+        $this->assertCount(2, $data);
+
+        // Newest first (higher ID).
+        $this->assertGreaterThan($data[1]['id'], $data[0]['id']);
+        $this->assertSame('jump', $data[0]['type']);
+        $this->assertSame('scan_route', $data[1]['type']);
+    }
+
+    public function test_index_respects_per_page_and_sets_link_header(): void
+    {
+        $ship = $this->createShip();
+        $repo = helm(ActionRepository::class);
+
+        // Insert 3 completed actions.
+        for ($i = 0; $i < 3; $i++) {
+            $action = Action::fromData([
+                'ship_post_id' => $ship->postId(),
+                'type'         => 'scan_route',
+                'status'       => ActionStatus::Fulfilled->value,
+                'params'       => '{}',
+            ], Model::BUILD_MODE_IGNORE_MISSING);
+            $repo->insert($action);
+        }
+
+        wp_set_current_user($this->ownerId);
+        $response = $this->tester->getActions($ship->postId(), ['per_page' => 2]);
+
+        $this->assertSame(200, $response->get_status());
+
+        $data = $response->get_data();
+        $this->assertCount(2, $data);
+
+        // Should have a Link header with rel="next".
+        $headers = $response->get_headers();
+        $this->assertArrayHasKey('Link', $headers);
+        $this->assertStringContainsString('rel="next"', $headers['Link']);
+        $this->assertStringContainsString('before=', $headers['Link']);
+    }
+
+    public function test_index_cursor_pagination_no_overlap(): void
+    {
+        $ship = $this->createShip();
+        $repo = helm(ActionRepository::class);
+
+        // Insert 5 completed actions.
+        $insertedIds = [];
+        for ($i = 0; $i < 5; $i++) {
+            $action = Action::fromData([
+                'ship_post_id' => $ship->postId(),
+                'type'         => 'scan_route',
+                'status'       => ActionStatus::Fulfilled->value,
+                'params'       => '{}',
+            ], Model::BUILD_MODE_IGNORE_MISSING);
+            $repo->insert($action);
+            $insertedIds[] = $action->id;
+        }
+
+        wp_set_current_user($this->ownerId);
+
+        // First page: 3 actions.
+        $response1 = $this->tester->getActions($ship->postId(), ['per_page' => 3]);
+        $page1     = $response1->get_data();
+        $this->assertCount(3, $page1);
+
+        // Parse the "before" cursor from the Link header.
+        $headers = $response1->get_headers();
+        $this->assertArrayHasKey('Link', $headers);
+
+        preg_match('/before=(\d+)/', $headers['Link'], $matches);
+        $this->assertNotEmpty($matches);
+        $cursor = (int) $matches[1];
+
+        // Second page: remaining 2 actions.
+        $response2 = $this->tester->getActions($ship->postId(), [
+            'per_page' => 3,
+            'before'   => $cursor,
         ]);
+        $page2 = $response2->get_data();
+        $this->assertCount(2, $page2);
+
+        // No overlap between pages.
+        $page1Ids = array_column($page1, 'id');
+        $page2Ids = array_column($page2, 'id');
+        $this->assertEmpty(array_intersect($page1Ids, $page2Ids));
+    }
+
+    public function test_index_last_page_has_no_link_header(): void
+    {
+        $ship = $this->createShip();
+        $repo = helm(ActionRepository::class);
+
+        // Insert 2 actions, request with per_page=5.
+        for ($i = 0; $i < 2; $i++) {
+            $action = Action::fromData([
+                'ship_post_id' => $ship->postId(),
+                'type'         => 'scan_route',
+                'status'       => ActionStatus::Fulfilled->value,
+                'params'       => '{}',
+            ], Model::BUILD_MODE_IGNORE_MISSING);
+            $repo->insert($action);
+        }
+
+        wp_set_current_user($this->ownerId);
+        $response = $this->tester->getActions($ship->postId(), ['per_page' => 5]);
+
+        $this->assertSame(200, $response->get_status());
+        $this->assertCount(2, $response->get_data());
+
+        $headers = $response->get_headers();
+        $this->assertArrayNotHasKey('Link', $headers);
+    }
+
+    public function test_index_requires_authentication(): void
+    {
+        $ship = $this->createShip();
+
+        wp_set_current_user(0);
+        $response = $this->tester->getActions($ship->postId());
+
+        $this->assertErrorResponse('rest_not_logged_in', $response, 401);
+    }
+
+    public function test_index_rejects_non_owner(): void
+    {
+        $ship = $this->createShip();
+
+        wp_set_current_user($this->otherId);
+        $response = $this->tester->getActions($ship->postId());
+
+        $this->assertErrorResponse('rest_forbidden', $response, 403);
+    }
+
+    // ------------------------------------------------------------------
+    // GET /actions/{actionId} (by ID, no ship context)
+    // ------------------------------------------------------------------
+
+    public function test_get_action_by_id_returns_action(): void
+    {
+        $ship = $this->createShip();
 
         wp_set_current_user($this->ownerId);
 
@@ -327,9 +471,55 @@ class ShipActionsControllerTest extends WPRestApiTestCase
 
         $actionId = $createResponse->get_data()['id'];
 
-        // Fetch action using the wrong ship's ID — should 404.
-        $response = $this->tester->getAction($otherShip->postId(), (string) $actionId);
+        $response = $this->tester->getAction((int) $actionId);
+
+        $this->assertSame(200, $response->get_status());
+
+        $data = $response->get_data();
+        $this->assertSame($actionId, $data['id']);
+        $this->assertSame($ship->postId(), $data['ship_post_id']);
+    }
+
+    public function test_get_action_by_id_returns_404_for_missing(): void
+    {
+        wp_set_current_user($this->ownerId);
+
+        $response = $this->tester->getAction(999999);
 
         $this->assertErrorResponse('helm.action.not_found', $response, 404);
+    }
+
+    public function test_get_action_by_id_requires_authentication(): void
+    {
+        $ship = $this->createShip();
+
+        wp_set_current_user($this->ownerId);
+        $createResponse = $this->tester->postAction($ship->postId(), [
+            'type'   => 'scan_route',
+            'params' => ['target_node_id' => $this->toNodeId],
+        ]);
+        $actionId = $createResponse->get_data()['id'];
+
+        wp_set_current_user(0);
+        $response = $this->tester->getAction((int) $actionId);
+
+        $this->assertErrorResponse('rest_not_logged_in', $response, 401);
+    }
+
+    public function test_get_action_by_id_rejects_non_owner(): void
+    {
+        $ship = $this->createShip();
+
+        wp_set_current_user($this->ownerId);
+        $createResponse = $this->tester->postAction($ship->postId(), [
+            'type'   => 'scan_route',
+            'params' => ['target_node_id' => $this->toNodeId],
+        ]);
+        $actionId = $createResponse->get_data()['id'];
+
+        wp_set_current_user($this->otherId);
+        $response = $this->tester->getAction((int) $actionId);
+
+        $this->assertErrorResponse('rest_forbidden', $response, 403);
     }
 }

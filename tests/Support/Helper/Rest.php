@@ -32,15 +32,32 @@ class Rest extends Module
     }
 
     /**
-     * Dispatch a GET request to fetch a ship action.
+     * Dispatch a GET request to fetch an action by ID.
      *
-     * @param int    $shipPostId Ship post ID.
-     * @param string $path       "current" or a numeric action ID.
+     * @param int $actionId Action ID.
      * @return WP_REST_Response
      */
-    public function getAction(int $shipPostId, string $path = 'current'): WP_REST_Response
+    public function getAction(int $actionId): WP_REST_Response
     {
-        $request = new WP_REST_Request('GET', "/helm/v1/ships/{$shipPostId}/actions/{$path}");
+        $request = new WP_REST_Request('GET', "/helm/v1/actions/{$actionId}");
+
+        return rest_do_request($request);
+    }
+
+    /**
+     * Dispatch a GET request to list ship actions.
+     *
+     * @param int                  $shipPostId Ship post ID.
+     * @param array<string, mixed> $params     Query params (per_page, before).
+     * @return WP_REST_Response
+     */
+    public function getActions(int $shipPostId, array $params = []): WP_REST_Response
+    {
+        $request = new WP_REST_Request('GET', "/helm/v1/ships/{$shipPostId}/actions");
+
+        foreach ($params as $key => $value) {
+            $request->set_param($key, $value);
+        }
 
         return rest_do_request($request);
     }

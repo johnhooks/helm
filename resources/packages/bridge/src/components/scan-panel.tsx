@@ -3,19 +3,15 @@
  *
  * Two states:
  * 1. Action in progress → countdown to deferred_until
- * 2. Action complete → result summary, dismiss button
+ * 2. Action complete → result summary
  *
  * Scan initiation is handled by StarContextMenu.
  */
-import { useCallback, useEffect, useState } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useEffect, useState } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as actionsStore } from '@helm/actions';
-import { Button, Countdown, Readout, Title } from '@helm/ui';
-
-interface ScanPanelProps {
-	shipId: number;
-}
+import { Countdown, Readout, Title } from '@helm/ui';
 
 function getRemainingSeconds( deferredUntil: string | null ): number {
 	if ( ! deferredUntil ) {
@@ -25,16 +21,11 @@ function getRemainingSeconds( deferredUntil: string | null ): number {
 	return Math.max( 0, Math.floor( ( target - Date.now() ) / 1000 ) );
 }
 
-export function ScanPanel( { shipId }: ScanPanelProps ) {
+export function ScanPanel() {
 	const action = useSelect(
-		( select ) => select( actionsStore ).getCurrentAction( shipId ),
-		[ shipId ]
+		( select ) => select( actionsStore ).getLatestAction(),
+		[]
 	);
-	const { clearAction } = useDispatch( actionsStore );
-
-	const handleDismiss = useCallback( () => {
-		clearAction( shipId );
-	}, [ shipId, clearAction ] );
 
 	// Live countdown timer.
 	const [ remaining, setRemaining ] = useState( () =>
@@ -118,13 +109,6 @@ export function ScanPanel( { shipId }: ScanPanelProps ) {
 						) }
 					</>
 				) }
-				<Button
-					onClick={ handleDismiss }
-					variant="secondary"
-					size="sm"
-				>
-					{ __( 'Dismiss', 'helm' ) }
-				</Button>
 			</div>
 		);
 	}

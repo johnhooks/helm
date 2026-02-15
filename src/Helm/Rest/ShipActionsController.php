@@ -18,8 +18,9 @@ use WP_REST_Response;
 /**
  * REST controller for ship actions.
  *
+ * GET    /helm/v1/actions/{actionId}
+ * GET    /helm/v1/ships/{id}/actions
  * POST   /helm/v1/ships/{id}/actions
- * GET    /helm/v1/ships/{id}/actions/current
  * GET    /helm/v1/ships/{id}/actions/{actionId}
  */
 final class ShipActionsController
@@ -42,33 +43,46 @@ final class ShipActionsController
             self::NAMESPACE,
             self::ROUTE,
             [
-                'methods'             => 'POST',
-                'callback'            => [$this, 'create'],
-                'permission_callback' => [$this, 'permissions'],
-                'args'                => [
-                    'type'   => [
-                        'required'          => true,
-                        'type'              => 'string',
-                        'validate_callback' => static function ($value): bool {
-                            return ActionType::tryFrom($value) !== null;
-                        },
-                    ],
-                    'params' => [
-                        'required' => false,
-                        'type'     => 'object',
-                        'default'  => [],
+                [
+                    'methods'             => 'GET',
+                    'callback'            => [$this, 'index'],
+                    'permission_callback' => [$this, 'permissions'],
+                    'args'                => [
+                        'per_page' => [
+                            'required'          => false,
+                            'type'              => 'integer',
+                            'default'           => 20,
+                            'minimum'           => 1,
+                            'maximum'           => 100,
+                            'sanitize_callback' => 'absint',
+                        ],
+                        'before'   => [
+                            'required'          => false,
+                            'type'              => 'integer',
+                            'minimum'           => 1,
+                            'sanitize_callback' => 'absint',
+                        ],
                     ],
                 ],
-            ]
-        );
-
-        register_rest_route(
-            self::NAMESPACE,
-            self::ROUTE . '/current',
-            [
-                'methods'             => 'GET',
-                'callback'            => [$this, 'current'],
-                'permission_callback' => [$this, 'permissions'],
+                [
+                    'methods'             => 'POST',
+                    'callback'            => [$this, 'create'],
+                    'permission_callback' => [$this, 'permissions'],
+                    'args'                => [
+                        'type'   => [
+                            'required'          => true,
+                            'type'              => 'string',
+                            'validate_callback' => static function ($value): bool {
+                                return ActionType::tryFrom($value) !== null;
+                            },
+                        ],
+                        'params' => [
+                            'required' => false,
+                            'type'     => 'object',
+                            'default'  => [],
+                        ],
+                    ],
+                ],
             ]
         );
 
@@ -79,6 +93,16 @@ final class ShipActionsController
                 'methods'             => 'GET',
                 'callback'            => [$this, 'show'],
                 'permission_callback' => [$this, 'permissions'],
+            ]
+        );
+
+        register_rest_route(
+            self::NAMESPACE,
+            '/actions/(?P<actionId>\d+)',
+            [
+                'methods'             => 'GET',
+                'callback'            => [$this, 'showById'],
+                'permission_callback' => [$this, 'actionPermissions'],
             ]
         );
     }
@@ -120,6 +144,85 @@ final class ShipActionsController
     }
 
     /**
+     * Permission callback for action-by-ID routes.
+     *
+     * Looks up the action, then checks ownership via its ship.
+     *
+     * @param WP_REST_Request<array<string, mixed>> $request
+     * @return true|WP_Error
+     */
+    public function actionPermissions(WP_REST_Request $request)
+    {
+        if (! is_user_logged_in()) {
+            return new WP_Error(
+                'rest_not_logged_in',
+                __('You must be logged in.', 'helm'),
+                ['status' => 401]
+            );
+        }
+
+        $action = $this->actionRepository->find((int) $request->get_param('actionId'));
+
+        if ($action === null) {
+            return new WP_Error(
+                'helm.action.not_found',
+                __('Action not found.', 'helm'),
+                ['status' => 404]
+            );
+        }
+
+        $ship = ShipPost::fromId($action->ship_post_id);
+
+        if ($ship === null || $ship->ownerId() !== get_current_user_id()) {
+            return new WP_Error(
+                'rest_forbidden',
+                __('You do not own this ship.', 'helm'),
+                ['status' => 403]
+            );
+        }
+
+        return true;
+    }
+
+    /**
+     * List ship actions (newest first) with cursor-based pagination.
+     *
+     * @param WP_REST_Request<array<string, mixed>> $request
+     * @return WP_REST_Response
+     */
+    public function index(WP_REST_Request $request): WP_REST_Response
+    {
+        $shipPostId = (int) $request->get_param('id');
+        $perPage    = (int) $request->get_param('per_page');
+        $before     = $request->get_param('before');
+
+        $result = $this->actionRepository->findForShipPaginated(
+            $shipPostId,
+            $perPage,
+            $before !== null ? (int) $before : null
+        );
+
+        $data = array_map(
+            fn(Action $action) => $this->serializeAction($action),
+            $result['actions']
+        );
+
+        $response = new WP_REST_Response($data);
+
+        if ($result['has_more'] && count($result['actions']) > 0) {
+            $lastAction = end($result['actions']);
+            $nextUrl    = rest_url(sprintf('helm/v1/ships/%d/actions', $shipPostId));
+            $nextUrl    = add_query_arg([
+                'per_page' => $perPage,
+                'before'   => $lastAction->id,
+            ], $nextUrl);
+            $response->link_header('next', $nextUrl);
+        }
+
+        return $response;
+    }
+
+    /**
      * Create a ship action.
      *
      * @param WP_REST_Request<array<string, mixed>> $request
@@ -144,29 +247,6 @@ final class ShipActionsController
     }
 
     /**
-     * Get the current (pending/running) action for a ship.
-     *
-     * @param WP_REST_Request<array<string, mixed>> $request
-     * @return WP_REST_Response|WP_Error
-     */
-    public function current(WP_REST_Request $request)
-    {
-        $shipPostId = (int) $request->get_param('id');
-
-        $action = $this->actionRepository->findCurrentForShip($shipPostId);
-
-        if ($action === null) {
-            return new WP_Error(
-                'helm.action.none',
-                __('No active action.', 'helm'),
-                ['status' => 404]
-            );
-        }
-
-        return new WP_REST_Response($this->serializeAction($action));
-    }
-
-    /**
      * Get a specific action by ID.
      *
      * @param WP_REST_Request<array<string, mixed>> $request
@@ -186,6 +266,19 @@ final class ShipActionsController
                 ['status' => 404]
             );
         }
+
+        return new WP_REST_Response($this->serializeAction($action));
+    }
+
+    /**
+     * Get an action by ID (without ship context).
+     *
+     * @param WP_REST_Request<array<string, mixed>> $request
+     * @return WP_REST_Response
+     */
+    public function showById(WP_REST_Request $request): WP_REST_Response
+    {
+        $action = $this->actionRepository->find((int) $request->get_param('actionId'));
 
         return new WP_REST_Response($this->serializeAction($action));
     }

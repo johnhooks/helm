@@ -651,7 +651,7 @@ const completedEntries = (
 
 const LogShell = ({ children }: { children: ReactNode }) => (
   <div style={{ display: "flex", flexDirection: "column", gap: 4, flex: 1, minHeight: 0 }}>
-    <div style={{ ...labelStyle, padding: "2px 0", flexShrink: 0 }}>Activity Log</div>
+    <div style={{ ...labelStyle, padding: "2px 0", flexShrink: 0 }}>Ship Log</div>
     <div style={{ overflowY: "auto", flex: 1, minHeight: 0 }}>
       <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
         {children}

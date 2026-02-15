@@ -7,17 +7,16 @@
  */
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import { useDispatch, useSelect, useSuspenseSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
 import { store as navStore } from '@helm/nav';
 import { log } from '@helm/logger';
-import { Panel, SideDrawer, Title, Readout } from '@helm/ui';
+import { Panel, SideDrawer } from '@helm/ui';
 import { useShip } from '@helm/ships';
 import { store as actionsStore } from '@helm/actions';
 import type { StarSelectEvent, Position3D, Route } from '@helm/astrometric';
 import { ViewportConfig } from '../components/viewport-config';
-import { ScanPanel } from '../components/scan-panel';
 import { StarContextMenu } from '../components/star-context-menu';
 import { ShipSystemsCard } from '../components/ship-systems-card';
+import { ShipLog } from '../components/ship-log';
 
 const StarField = lazy(() =>
 	import('@helm/astrometric').then((m) => ({ default: m.StarField }))
@@ -121,8 +120,8 @@ export function BridgePage() {
 
 	// Derive routes and waypoint positions from the current action's scan result.
 	const action = useSelect(
-		(select) => select(actionsStore).getCurrentAction(shipId),
-		[shipId],
+		(select) => select(actionsStore).getLatestAction(),
+		[],
 	);
 
 	const { scanRoutes, scanNodePositions } = useMemo(() => {
@@ -214,11 +213,7 @@ export function BridgePage() {
 			}
 		>
 			<ShipSystemsCard />
-			<Panel tone="blue" className="helm-bridge__nav">
-				<Title label={__('Navigation', 'helm')} />
-				<Readout label={__('System', 'helm')} value={currentStar?.title ?? '\u2014'} />
-				<ScanPanel shipId={shipId} />
-			</Panel>
+			<ShipLog shipId={shipId} />
 		</SideDrawer>
 	);
 }

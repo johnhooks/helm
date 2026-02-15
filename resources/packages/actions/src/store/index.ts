@@ -29,7 +29,7 @@ register( store );
 // Subscribe to WordPress Heartbeat for action state updates.
 jQuery( document ).on( 'heartbeat-send', ( ..._args: unknown[] ) => {
 	const data = _args[ 1 ] as Record< string, unknown >;
-	const cursor = select( store ).getCursor();
+	const cursor = select( store ).getHeartbeatCursor();
 	data.helm_actions = { since: cursor ?? '' };
 	log.debug( 'heartbeat.send', { cursor } );
 } );

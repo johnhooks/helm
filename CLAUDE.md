@@ -136,7 +136,7 @@ bun run build              # wp-scripts build (production)
 bun run storybook          # Component development UI
 ```
 
-Note: PHP tests run via [slic](https://github.com/developer-toolbelt/slic) for WordPress integration.
+Note: PHP tests run via [slic](https://github.com/developer-toolbelt/slic) for WordPress integration. To rebuild Codeception actor classes after changing test helpers: `slic cc build`.
 
 ## Container Access
 

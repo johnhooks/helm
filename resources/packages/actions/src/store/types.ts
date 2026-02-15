@@ -1,9 +1,22 @@
 import type { HelmError } from '@helm/errors';
 
+export type ShipActionType =
+	| 'scan_route'
+	| 'jump'
+	| 'survey'
+	| 'scan_planet'
+	| 'mine'
+	| 'refine'
+	| 'buy'
+	| 'sell'
+	| 'transfer'
+	| 'repair'
+	| 'upgrade';
+
 export interface ShipAction {
 	id: number;
 	ship_post_id: number;
-	type: string;
+	type: ShipActionType;
 	status: 'pending' | 'running' | 'fulfilled' | 'partial' | 'failed';
 	params: Record< string, unknown >;
 	result: Record< string, unknown > | null;
@@ -14,9 +27,18 @@ export interface ShipAction {
 
 export type DraftAction = Pick< ShipAction, 'type' | 'params' >;
 
+export interface QueryMeta {
+	next: string | null;
+	isLoading: boolean;
+	error: HelmError | null;
+}
+
 export interface ActionsState {
-	byShipId: Record< number, ShipAction | null >;
-	errors: Record< number, HelmError | null >;
+	byId: Record< number, ShipAction >;
+	queries: Record< string, number[] >;
+	meta: Record< string, QueryMeta >;
+	isLoading: Record< string, boolean >;
+	error: Record< string, HelmError >;
 }
 
 export interface CreateState {
@@ -26,25 +48,30 @@ export interface CreateState {
 	error: HelmError | null;
 }
 
-export interface MetaState {
+export interface HeartbeatState {
 	cursor: string | null;
 }
 
 export interface State {
 	actions: ActionsState;
 	create: CreateState;
-	meta: MetaState;
+	heartbeat: HeartbeatState;
 }
 
 export type Action =
-	| { type: 'CREATE_ACTION_START'; shipId: number }
-	| { type: 'CREATE_ACTION_FINISHED'; shipId: number; action: ShipAction }
-	| { type: 'CREATE_ACTION_FAILED'; shipId: number; error: HelmError }
-	| { type: 'FETCH_ACTION_START'; shipId: number }
-	| { type: 'FETCH_ACTION_FINISHED'; shipId: number; action: ShipAction | null }
-	| { type: 'FETCH_ACTION_FAILED'; shipId: number; error: HelmError }
-	| { type: 'RECEIVE_ACTION'; shipId: number; action: ShipAction }
+	| { type: 'CREATE_ACTION_START' }
+	| { type: 'CREATE_ACTION_FINISHED'; action: ShipAction }
+	| { type: 'CREATE_ACTION_FAILED'; error: HelmError }
+	| { type: 'FETCH_ACTION_START'; actionId: number }
+	| { type: 'FETCH_ACTION_FINISHED'; action: ShipAction }
+	| { type: 'FETCH_ACTION_FAILED'; actionId: number; error: HelmError }
+	| { type: 'RECEIVE_ACTION'; action: ShipAction }
 	| { type: 'RECEIVE_HEARTBEAT'; actions: ShipAction[]; cursor: string }
-	| { type: 'CLEAR_ACTION'; shipId: number }
 	| { type: 'CREATE_DRAFT'; action: DraftAction }
-	| { type: 'CLEAR_DRAFT' };
+	| { type: 'CLEAR_DRAFT' }
+	| { type: 'FETCH_ACTIONS_START'; queryId: string }
+	| { type: 'FETCH_ACTIONS_FINISHED'; queryId: string; actions: ShipAction[]; next: string | null }
+	| { type: 'FETCH_ACTIONS_FAILED'; queryId: string; error: HelmError }
+	| { type: 'LOAD_MORE_START'; queryId: string }
+	| { type: 'LOAD_MORE_FINISHED'; queryId: string; actions: ShipAction[]; next: string | null }
+	| { type: 'LOAD_MORE_FAILED'; queryId: string; error: HelmError };

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import apiFetch from '@wordpress/api-fetch';
 import { HelmError } from '@helm/errors';
-import { createAction, fetchCurrentAction, receiveAction, receiveHeartbeat, clearAction, draftCreate, clearDraft } from '../actions';
+import { createAction, loadMore, receiveAction, receiveHeartbeat, draftCreate, clearDraft, submitDraft } from '../actions';
 import { createShipAction } from './fixtures';
 
 vi.mock( '@wordpress/api-fetch' );
@@ -22,15 +22,9 @@ describe( 'createAction', () => {
 
 		await createAction( 1, 'scan_route' )( { dispatch } as never );
 
-		expect( dispatch ).toHaveBeenCalledWith( {
-			type: 'CREATE_ACTION_START',
-			shipId: 1,
-		} );
-		expect( dispatch ).toHaveBeenCalledWith( {
-			type: 'CREATE_ACTION_FINISHED',
-			shipId: 1,
-			action,
-		} );
+		expect( dispatch ).toHaveBeenCalledTimes( 2 );
+		expect( dispatch ).toHaveBeenNthCalledWith( 1, { type: 'CREATE_ACTION_START' } );
+		expect( dispatch ).toHaveBeenNthCalledWith( 2, { type: 'CREATE_ACTION_FINISHED', action } );
 	} );
 
 	it( 'calls apiFetch with the correct path and data', async () => {
@@ -54,12 +48,10 @@ describe( 'createAction', () => {
 
 		await createAction( 1, 'scan_route' )( { dispatch } as never );
 
-		const failedCall = dispatch.mock.calls.find(
-			( [ a ] ) => a.type === 'CREATE_ACTION_FAILED'
-		);
-		expect( failedCall ).toBeDefined();
+		expect( dispatch ).toHaveBeenCalledTimes( 2 );
 
-		const error = failedCall![ 0 ].error;
+		const error = dispatch.mock.calls[ 1 ][ 0 ].error;
+		expect( dispatch.mock.calls[ 1 ][ 0 ].type ).toBe( 'CREATE_ACTION_FAILED' );
 		expect( error ).toBeInstanceOf( HelmError );
 		expect( error.message ).toBe( 'helm.actions.create_failed' );
 		expect( error.isSafe ).toBe( true );
@@ -72,11 +64,10 @@ describe( 'createAction', () => {
 
 		await createAction( 1, 'scan_route' )( { dispatch } as never );
 
-		const failedCall = dispatch.mock.calls.find(
-			( [ a ] ) => a.type === 'CREATE_ACTION_FAILED'
-		);
+		expect( dispatch ).toHaveBeenCalledTimes( 2 );
 
-		const error = failedCall![ 0 ].error;
+		const error = dispatch.mock.calls[ 1 ][ 0 ].error;
+		expect( dispatch.mock.calls[ 1 ][ 0 ].type ).toBe( 'CREATE_ACTION_FAILED' );
 		expect( error ).toBeInstanceOf( HelmError );
 		expect( error.message ).toBe( 'helm.actions.create_failed' );
 		expect( error.isSafe ).toBe( true );
@@ -96,11 +87,10 @@ describe( 'createAction', () => {
 
 		await createAction( 1, 'scan_route' )( { dispatch } as never );
 
-		const failedCall = dispatch.mock.calls.find(
-			( [ a ] ) => a.type === 'CREATE_ACTION_FAILED'
-		);
+		expect( dispatch ).toHaveBeenCalledTimes( 2 );
 
-		const error = failedCall![ 0 ].error;
+		const error = dispatch.mock.calls[ 1 ][ 0 ].error;
+		expect( dispatch.mock.calls[ 1 ][ 0 ].type ).toBe( 'CREATE_ACTION_FAILED' );
 		expect( error ).toBeInstanceOf( HelmError );
 		expect( error.message ).toBe( 'helm.actions.create_failed' );
 		expect( error.isSafe ).toBe( true );
@@ -115,11 +105,10 @@ describe( 'createAction', () => {
 
 		await createAction( 1, 'scan_route' )( { dispatch } as never );
 
-		const failedCall = dispatch.mock.calls.find(
-			( [ a ] ) => a.type === 'CREATE_ACTION_FAILED'
-		);
+		expect( dispatch ).toHaveBeenCalledTimes( 2 );
 
-		const error = failedCall![ 0 ].error;
+		const error = dispatch.mock.calls[ 1 ][ 0 ].error;
+		expect( dispatch.mock.calls[ 1 ][ 0 ].type ).toBe( 'CREATE_ACTION_FAILED' );
 		expect( error ).toBeInstanceOf( HelmError );
 		expect( error.message ).toBe( 'helm.actions.create_failed' );
 		expect( error.isSafe ).toBe( true );
@@ -128,104 +117,13 @@ describe( 'createAction', () => {
 	} );
 } );
 
-describe( 'fetchCurrentAction', () => {
-	let dispatch: ReturnType< typeof vi.fn >;
-
-	beforeEach( () => {
-		mockedApiFetch.mockReset();
-		dispatch = vi.fn();
-	} );
-
-	it( 'dispatches START then FINISHED on success', async () => {
-		const action = createShipAction();
-		mockedApiFetch.mockResolvedValue( action );
-
-		await fetchCurrentAction( 1 )( { dispatch } as never );
-
-		expect( dispatch ).toHaveBeenCalledWith( {
-			type: 'FETCH_ACTION_START',
-			shipId: 1,
-		} );
-		expect( dispatch ).toHaveBeenCalledWith( {
-			type: 'FETCH_ACTION_FINISHED',
-			shipId: 1,
-			action,
-		} );
-	} );
-
-	it( 'calls apiFetch with the correct path', async () => {
-		mockedApiFetch.mockResolvedValue( createShipAction() );
-
-		await fetchCurrentAction( 7 )( { dispatch } as never );
-
-		expect( mockedApiFetch ).toHaveBeenCalledWith( {
-			path: '/helm/v1/ships/7/actions/current',
-		} );
-	} );
-
-	it( 'dispatches FINISHED with null for helm.action.none', async () => {
-		mockedApiFetch.mockRejectedValue( {
-			code: 'helm.action.none',
-			message: 'helm.action.none',
-			data: { status: 404 },
-		} );
-
-		await fetchCurrentAction( 1 )( { dispatch } as never );
-
-		expect( dispatch ).toHaveBeenCalledWith( {
-			type: 'FETCH_ACTION_FINISHED',
-			shipId: 1,
-			action: null,
-		} );
-	} );
-
-	it( 'wraps safe API error as cause', async () => {
-		mockedApiFetch.mockRejectedValue( {
-			code: 'helm.server_error',
-			message: 'Server error',
-			data: { status: 500 },
-		} );
-
-		await fetchCurrentAction( 1 )( { dispatch } as never );
-
-		const failedCall = dispatch.mock.calls.find(
-			( [ a ] ) => a.type === 'FETCH_ACTION_FAILED'
-		);
-		expect( failedCall ).toBeDefined();
-
-		const error = failedCall![ 0 ].error;
-		expect( error ).toBeInstanceOf( HelmError );
-		expect( error.message ).toBe( 'helm.actions.invalid_response' );
-		expect( error.isSafe ).toBe( true );
-		expect( HelmError.is( error.cause ) ).toBe( true );
-		expect( ( error.cause as HelmError ).message ).toBe( 'helm.server_error' );
-	} );
-
-	it( 'wraps plain Error as invalid_response with cause', async () => {
-		mockedApiFetch.mockRejectedValue( new Error( 'Network failure' ) );
-
-		await fetchCurrentAction( 1 )( { dispatch } as never );
-
-		const failedCall = dispatch.mock.calls.find(
-			( [ a ] ) => a.type === 'FETCH_ACTION_FAILED'
-		);
-
-		const error = failedCall![ 0 ].error;
-		expect( error ).toBeInstanceOf( HelmError );
-		expect( error.message ).toBe( 'helm.actions.invalid_response' );
-		expect( error.isSafe ).toBe( true );
-		expect( HelmError.is( error.cause ) ).toBe( true );
-	} );
-} );
-
 describe( 'receiveAction', () => {
 	it( 'returns a RECEIVE_ACTION action', () => {
 		const action = createShipAction( { ship_post_id: 5 } );
-		const result = receiveAction( 5, action );
+		const result = receiveAction( action );
 
 		expect( result ).toEqual( {
 			type: 'RECEIVE_ACTION',
-			shipId: 5,
 			action,
 		} );
 	} );
@@ -258,20 +156,9 @@ describe( 'receiveHeartbeat', () => {
 	} );
 } );
 
-describe( 'clearAction', () => {
-	it( 'returns a CLEAR_ACTION action', () => {
-		const result = clearAction( 5 );
-
-		expect( result ).toEqual( {
-			type: 'CLEAR_ACTION',
-			shipId: 5,
-		} );
-	} );
-} );
-
 describe( 'draftCreate', () => {
 	it( 'returns a CREATE_DRAFT action', () => {
-		const action = { type: 'scan_route', params: { target_node_id: 5 } };
+		const action = { type: 'scan_route' as const, params: { target_node_id: 5 } };
 		const result = draftCreate( action );
 
 		expect( result ).toEqual( { type: 'CREATE_DRAFT', action } );
@@ -281,5 +168,142 @@ describe( 'draftCreate', () => {
 describe( 'clearDraft', () => {
 	it( 'returns a CLEAR_DRAFT action', () => {
 		expect( clearDraft() ).toEqual( { type: 'CLEAR_DRAFT' } );
+	} );
+} );
+
+describe( 'submitDraft', () => {
+	let dispatch: ReturnType< typeof vi.fn > & { createAction: ReturnType< typeof vi.fn > };
+	let select: Record< string, ReturnType< typeof vi.fn > >;
+
+	beforeEach( () => {
+		dispatch = Object.assign( vi.fn(), {
+			createAction: vi.fn(),
+		} );
+		select = {
+			getDraft: vi.fn().mockReturnValue( null ),
+		};
+	} );
+
+	it( 'calls createAction with draft type and params', async () => {
+		select.getDraft.mockReturnValue( { type: 'scan_route', params: { depth: 3 } } );
+
+		await submitDraft( 7 )( { dispatch, select } as never );
+
+		expect( dispatch.createAction ).toHaveBeenCalledWith( 7, 'scan_route', { depth: 3 } );
+	} );
+
+	it( 'throws when no draft', async () => {
+		select.getDraft.mockReturnValue( null );
+
+		await expect( submitDraft( 7 )( { dispatch, select } as never ) )
+			.rejects.toThrow( HelmError );
+	} );
+} );
+
+describe( 'loadMore', () => {
+	let dispatch: ReturnType< typeof vi.fn >;
+	let select: Record< string, ReturnType< typeof vi.fn > >;
+
+	beforeEach( () => {
+		mockedApiFetch.mockReset();
+		dispatch = vi.fn();
+		select = {
+			getQueryMeta: vi.fn().mockReturnValue( null ),
+		};
+	} );
+
+	it( 'fetches the next URL from meta', async () => {
+		select.getQueryMeta.mockReturnValue( {
+			next: 'http://example.com/page2',
+			isLoading: false,
+			error: null,
+		} );
+
+		const response = new Response( JSON.stringify( [] ), {
+			headers: {},
+		} );
+		mockedApiFetch.mockResolvedValue( response );
+
+		await loadMore( 1 )( { dispatch, select } as never );
+
+		expect( mockedApiFetch ).toHaveBeenCalledWith(
+			expect.objectContaining( { url: 'http://example.com/page2', parse: false } )
+		);
+	} );
+
+	it( 'dispatches START then FINISHED on success', async () => {
+		select.getQueryMeta.mockReturnValue( {
+			next: 'http://example.com/page2',
+			isLoading: false,
+			error: null,
+		} );
+
+		const actions = [ createShipAction( { id: 5 } ) ];
+		const response = new Response( JSON.stringify( actions ), {
+			headers: { Link: '<http://example.com/page3>; rel="next"' },
+		} );
+		mockedApiFetch.mockResolvedValue( response );
+
+		await loadMore( 1 )( { dispatch, select } as never );
+
+		expect( dispatch ).toHaveBeenCalledTimes( 2 );
+		expect( dispatch ).toHaveBeenNthCalledWith( 1, { type: 'LOAD_MORE_START', queryId: '/helm/v1/ships/1/actions' } );
+		expect( dispatch ).toHaveBeenNthCalledWith( 2, {
+			type: 'LOAD_MORE_FINISHED',
+			queryId: '/helm/v1/ships/1/actions',
+			actions,
+			next: 'http://example.com/page3',
+		} );
+	} );
+
+	it( 'dispatches FAILED on error', async () => {
+		select.getQueryMeta.mockReturnValue( {
+			next: 'http://example.com/page2',
+			isLoading: false,
+			error: null,
+		} );
+		mockedApiFetch.mockRejectedValue( new Error( 'Network failure' ) );
+
+		await loadMore( 1 )( { dispatch, select } as never );
+
+		expect( dispatch ).toHaveBeenCalledTimes( 2 );
+		expect( dispatch ).toHaveBeenNthCalledWith( 1, { type: 'LOAD_MORE_START', queryId: '/helm/v1/ships/1/actions' } );
+		expect( dispatch.mock.calls[ 1 ][ 0 ].type ).toBe( 'LOAD_MORE_FAILED' );
+		expect( dispatch.mock.calls[ 1 ][ 0 ].error ).toBeInstanceOf( HelmError );
+	} );
+
+	it( 'skips when no next URL', async () => {
+		select.getQueryMeta.mockReturnValue( {
+			next: null,
+			isLoading: false,
+			error: null,
+		} );
+
+		await loadMore( 1 )( { dispatch, select } as never );
+
+		expect( dispatch ).not.toHaveBeenCalled();
+		expect( mockedApiFetch ).not.toHaveBeenCalled();
+	} );
+
+	it( 'skips when already loading', async () => {
+		select.getQueryMeta.mockReturnValue( {
+			next: 'http://example.com/page2',
+			isLoading: true,
+			error: null,
+		} );
+
+		await loadMore( 1 )( { dispatch, select } as never );
+
+		expect( dispatch ).not.toHaveBeenCalled();
+		expect( mockedApiFetch ).not.toHaveBeenCalled();
+	} );
+
+	it( 'skips when no meta exists', async () => {
+		select.getQueryMeta.mockReturnValue( null );
+
+		await loadMore( 1 )( { dispatch, select } as never );
+
+		expect( dispatch ).not.toHaveBeenCalled();
+		expect( mockedApiFetch ).not.toHaveBeenCalled();
 	} );
 } );

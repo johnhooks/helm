@@ -104,7 +104,7 @@ function Settings() {
     );
 
     const cursor = useSelect(
-        (select) => select(actionsStore).getCursor(),
+        (select) => select(actionsStore).getHeartbeatCursor(),
         [],
     );
 
