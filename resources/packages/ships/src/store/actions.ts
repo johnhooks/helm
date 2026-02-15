@@ -42,7 +42,7 @@ export const patchShip =
 		} catch ( error ) {
 			const safeError = HelmError.safe(
 				ErrorCode.ShipsPatchFailed,
-				__( 'Could not patch ship.', 'helm' ),
+				__( 'ShipLink failed to update ship configuration', 'helm' ),
 				await HelmError.asyncFrom( error )
 			);
 

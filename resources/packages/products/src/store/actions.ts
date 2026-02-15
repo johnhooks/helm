@@ -20,7 +20,7 @@ export const fetchProduct =
 			dispatch( {
 				type: 'FETCH_PRODUCT_FAILED',
 				productId,
-				error: HelmError.safe( ErrorCode.ProductsInvalidResponse, __( 'Could not load product data.', 'helm' ), await HelmError.asyncFrom( error ) ),
+				error: HelmError.safe( ErrorCode.ProductsInvalidResponse, __( 'ShipLink failed to retrieve component specifications', 'helm' ), await HelmError.asyncFrom( error ) ),
 			} );
 		}
 	};

@@ -25,7 +25,7 @@ export const getShip =
 		} catch ( error ) {
 			dispatch( {
 				type: 'FETCH_SHIP_FAILED',
-				error: HelmError.safe( ErrorCode.ShipsInvalidResponse, __( 'Could not load ship data.', 'helm' ), await HelmError.asyncFrom( error ) ),
+				error: HelmError.safe( ErrorCode.ShipsInvalidResponse, __( 'ShipLink failed to retrieve ship state', 'helm' ), await HelmError.asyncFrom( error ) ),
 			} );
 		}
 	};
@@ -50,7 +50,7 @@ export const getSystems =
 		} catch ( error ) {
 			dispatch( {
 				type: 'FETCH_SYSTEMS_FAILED',
-				error: HelmError.safe( ErrorCode.ShipsSystemsInvalidResponse, __( 'Could not load ship systems.', 'helm' ), await HelmError.asyncFrom( error ) ),
+				error: HelmError.safe( ErrorCode.ShipsSystemsInvalidResponse, __( 'ShipLink failed to retrieve system components', 'helm' ), await HelmError.asyncFrom( error ) ),
 			} );
 		}
 	};

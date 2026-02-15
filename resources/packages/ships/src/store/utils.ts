@@ -54,7 +54,7 @@ export function expectLoadout(
 		};
 	} catch ( error ) {
 		throw HelmError.safe(
-			ErrorCode.ShipLinkLoadoutFailed,
+			ErrorCode.ShipsLoadoutFailed,
 			__( 'ShipLink failed to load ship systems — expected data is missing', 'helm' ),
 			error
 		);

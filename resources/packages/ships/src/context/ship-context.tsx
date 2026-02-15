@@ -1,6 +1,7 @@
 import { createContext, useContext } from '@wordpress/element';
 import { useSelect, useSuspenseSelect } from '@wordpress/data';
-import { assert } from '@helm/errors';
+import { assert, ErrorCode, HelmError } from '@helm/errors';
+import { __ } from '@wordpress/i18n';
 import type { ShipState, SystemComponentResponse, WithRestLinks } from '@helm/types';
 import { store } from '../store';
 
@@ -39,8 +40,18 @@ export function ShipProvider( {
 		[ shipId ],
 	);
 
-	assert( ship, 'helm.ship.not_found', 'Ship data was not found after resolution.' );
-	assert( systems, 'helm.ship.systems_not_found', 'Ship systems were not found after resolution.' );
+	if ( ! ship ) {
+		throw HelmError.safe(
+			ErrorCode.ShipsUnavailable,
+			__( 'ShipLink connection lost — ship state unavailable', 'helm' ),
+		);
+	}
+	if ( ! systems ) {
+		throw HelmError.safe(
+			ErrorCode.ShipsSystemsUnavailable,
+			__( 'ShipLink connection lost — system data unavailable', 'helm' ),
+		);
+	}
 
 	return (
 		<ShipContext.Provider value={ { shipId, ship, systems } }>
@@ -56,6 +67,6 @@ export function ShipProvider( {
  */
 export function useShip(): ShipContextValue {
 	const context = useContext( ShipContext );
-	assert( context, 'helm.ship.no_provider', 'useShip must be used within a ShipProvider.' );
+	assert( context, ErrorCode.ShipsNoProvider, 'useShip must be used within a ShipProvider.' );
 	return context;
 }

@@ -23,7 +23,7 @@ export const createAction =
 		} catch ( error ) {
 			dispatch( {
 				type: 'CREATE_ACTION_FAILED',
-				error: HelmError.safe( ErrorCode.ActionsCreateFailed, __( 'Helm failed to initialize your requested ship action.', 'helm' ), await HelmError.asyncFrom( error ) ),
+				error: HelmError.safe( ErrorCode.ActionsCreateFailed, __( 'ShipLink failed to dispatch the requested action', 'helm' ), await HelmError.asyncFrom( error ) ),
 			} );
 		}
 	};
@@ -53,7 +53,7 @@ export const submitDraft =
 	( shipId: number ): Thunk< Action, typeof store > =>
 	async ( { dispatch, select } ) => {
 		const draft = select.getDraft();
-		assert( draft, 'helm.actions.no_draft', 'submitDraft called without a draft' );
+		assert( draft, ErrorCode.ActionsNoDraft, 'submitDraft called without a draft' );
 
 		dispatch.createAction( shipId, draft.type, draft.params );
 	};
@@ -86,7 +86,7 @@ export const loadMore =
 			dispatch( {
 				type: 'LOAD_MORE_FAILED',
 				queryId,
-				error: HelmError.safe( ErrorCode.ActionsInvalidResponse, __( 'Failed to load ship log.', 'helm' ), await HelmError.asyncFrom( error ) ),
+				error: HelmError.safe( ErrorCode.ActionsInvalidResponse, __( 'ShipLink failed to retrieve the ship log', 'helm' ), await HelmError.asyncFrom( error ) ),
 			} );
 		}
 	};

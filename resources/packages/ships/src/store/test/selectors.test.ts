@@ -286,7 +286,7 @@ describe( 'getShipWithLoadout', () => {
 		}
 
 		expect( error ).toBeInstanceOf( HelmError );
-		expect( error?.message ).toBe( ErrorCode.ShipLinkLoadoutFailed );
+		expect( error?.message ).toBe( ErrorCode.ShipsLoadoutFailed );
 		expect( error?.isSafe ).toBe( true );
 		expect( error?.cause ).toBeInstanceOf( HelmError );
 	} );
@@ -309,7 +309,7 @@ describe( 'getShipWithLoadout', () => {
 		}
 
 		expect( error ).toBeInstanceOf( HelmError );
-		expect( error?.message ).toBe( ErrorCode.ShipLinkLoadoutFailed );
+		expect( error?.message ).toBe( ErrorCode.ShipsLoadoutFailed );
 		expect( error?.isSafe ).toBe( true );
 		expect( error?.cause ).toBeInstanceOf( HelmError );
 	} );
@@ -418,7 +418,7 @@ describe( 'getSystemStats', () => {
 		}
 
 		expect( error ).toBeInstanceOf( HelmError );
-		expect( error?.message ).toBe( ErrorCode.ShipLinkLoadoutFailed );
+		expect( error?.message ).toBe( ErrorCode.ShipsLoadoutFailed );
 		expect( error?.isSafe ).toBe( true );
 		expect( error?.cause ).toBeInstanceOf( HelmError );
 	} );

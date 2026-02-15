@@ -23,7 +23,10 @@ export enum ErrorCode {
 	ShipsNotLoaded = 'helm.ships.not_loaded',
 	ShipsSystemsNotLoaded = 'helm.ships.systems_not_loaded',
 	ShipsMissingSystem = 'helm.ships.missing_system',
-	ShipLinkLoadoutFailed = 'helm.shiplink.loadout_failed',
+	ShipsLoadoutFailed = 'helm.ships.loadout_failed',
+	ShipsUnavailable = 'helm.ships.unavailable',
+	ShipsSystemsUnavailable = 'helm.ships.systems_unavailable',
+	ShipsNoProvider = 'helm.ships.no_provider',
 
 	// Products errors
 	ProductsInvalidResponse = 'helm.products.invalid_response',
@@ -32,4 +35,5 @@ export enum ErrorCode {
 	// Actions errors
 	ActionsCreateFailed = 'helm.actions.create_failed',
 	ActionsInvalidResponse = 'helm.actions.invalid_response',
+	ActionsNoDraft = 'helm.actions.no_draft',
 }

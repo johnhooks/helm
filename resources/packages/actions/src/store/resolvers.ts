@@ -28,7 +28,7 @@ export const getActions =
 			dispatch( {
 				type: 'FETCH_ACTIONS_FAILED',
 				queryId,
-				error: HelmError.safe( ErrorCode.ActionsInvalidResponse, __( 'Failed to load ship log.', 'helm' ), await HelmError.asyncFrom( error ) ),
+				error: HelmError.safe( ErrorCode.ActionsInvalidResponse, __( 'ShipLink failed to retrieve the ship log', 'helm' ), await HelmError.asyncFrom( error ) ),
 			} );
 		}
 	};
@@ -48,7 +48,7 @@ export const getAction =
 			dispatch( {
 				type: 'FETCH_ACTION_FAILED',
 				actionId,
-				error: HelmError.safe( ErrorCode.ActionsInvalidResponse, __( 'Failed to reload action.', 'helm' ), await HelmError.asyncFrom( error ) ),
+				error: HelmError.safe( ErrorCode.ActionsInvalidResponse, __( 'ShipLink failed to retrieve action data', 'helm' ), await HelmError.asyncFrom( error ) ),
 			} );
 		}
 	};
