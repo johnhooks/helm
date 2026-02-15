@@ -3,10 +3,8 @@ import { LinkRel } from '@helm/types';
 import type { ShipState, SystemComponentResponse, WithRestLinks } from '@helm/types';
 
 export type Action =
-	| { type: 'FETCH_SHIP_START' }
 	| { type: 'FETCH_SHIP_FINISHED'; ship: WithRestLinks< ShipState > }
 	| { type: 'FETCH_SHIP_FAILED'; error: HelmError }
-	| { type: 'FETCH_SYSTEMS_START' }
 	| { type: 'FETCH_SYSTEMS_FINISHED'; systems: SystemComponentResponse[] }
 	| { type: 'FETCH_SYSTEMS_FAILED'; error: HelmError }
 	| { type: 'RECEIVE_SHIP'; ship: WithRestLinks< ShipState > }
@@ -16,6 +14,17 @@ export type Action =
 	| { type: 'PATCH_SHIP_FINISHED'; ship: WithRestLinks< ShipState > }
 	| { type: 'PATCH_SHIP_FAILED'; error: HelmError };
 
+// "ShipSlice" to avoid collision with the ShipState domain type.
+export interface ShipSlice {
+	ship: WithRestLinks< ShipState > | null;
+	error: HelmError | null;
+}
+
+export interface SystemsState {
+	systems: SystemComponentResponse[] | null;
+	error: HelmError | null;
+}
+
 export interface EditsState {
 	ship: Partial< ShipState > | null;
 	isSubmitting: boolean;
@@ -23,10 +32,8 @@ export interface EditsState {
 }
 
 export interface State {
-	ship: WithRestLinks< ShipState > | null;
-	shipError: HelmError | null;
-	systems: SystemComponentResponse[] | null;
-	systemsError: HelmError | null;
+	ship: ShipSlice;
+	systems: SystemsState;
 	edits: EditsState;
 }
 

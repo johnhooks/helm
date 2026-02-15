@@ -17,7 +17,7 @@ import { createShipState, createSystemComponent, createProductEmbed, createEdits
 describe( 'getShip', () => {
 	it( 'returns the ship when it exists', () => {
 		const ship = createShipState();
-		const state = createState( { ship } );
+		const state = createState( { ship: { ship } } );
 
 		expect( getShip( state, 1 ) ).toBe( ship );
 	} );
@@ -32,7 +32,7 @@ describe( 'getShip', () => {
 describe( 'getShipError', () => {
 	it( 'returns the error when it exists', () => {
 		const error = new HelmError( 'helm.ship.not_found', 'Not found' );
-		const state = createState( { shipError: error } );
+		const state = createState( { ship: { error } } );
 
 		expect( getShipError( state ) ).toBe( error );
 	} );
@@ -47,7 +47,7 @@ describe( 'getShipError', () => {
 describe( 'getSystems', () => {
 	it( 'returns systems when they exist', () => {
 		const systems = [ createSystemComponent() ];
-		const state = createState( { systems } );
+		const state = createState( { systems: { systems } } );
 
 		expect( getSystems( state, 1 ) ).toBe( systems );
 	} );
@@ -62,7 +62,7 @@ describe( 'getSystems', () => {
 describe( 'getSystemsError', () => {
 	it( 'returns the error when it exists', () => {
 		const error = new HelmError( 'helm.test', 'Error' );
-		const state = createState( { systemsError: error } );
+		const state = createState( { systems: { error } } );
 
 		expect( getSystemsError( state ) ).toBe( error );
 	} );
@@ -181,11 +181,13 @@ describe( 'getSystemStats', () => {
 
 	function createSystemsState() {
 		return createState( {
-			systems: [
-				createSystemComponent( { id: 1, slot: 'core', product_id: CORE_PRODUCT_ID, life: 500, condition: 0.95 } ),
-				createSystemComponent( { id: 2, slot: 'drive', product_id: DRIVE_PRODUCT_ID, condition: 0.8 } ),
-				createSystemComponent( { id: 3, slot: 'sensor', product_id: SENSOR_PRODUCT_ID, condition: 0.6 } ),
-			],
+			systems: {
+				systems: [
+					createSystemComponent( { id: 1, slot: 'core', product_id: CORE_PRODUCT_ID, life: 500, condition: 0.95 } ),
+					createSystemComponent( { id: 2, slot: 'drive', product_id: DRIVE_PRODUCT_ID, condition: 0.8 } ),
+					createSystemComponent( { id: 3, slot: 'sensor', product_id: SENSOR_PRODUCT_ID, condition: 0.6 } ),
+				],
+			},
 		} );
 	}
 

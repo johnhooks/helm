@@ -8,20 +8,20 @@ import type { State } from './types';
 export const getShip = (
 	state: State,
 	_shipId: number
-): WithRestLinks< ShipState > | undefined => state.ship ?? undefined;
+): WithRestLinks< ShipState > | undefined => state.ship.ship ?? undefined;
 
 export const getShipError = (
 	state: State
-): HelmError | null => state.shipError;
+): HelmError | null => state.ship.error;
 
 export const getSystems = (
 	state: State,
 	_shipId: number
-): SystemComponentResponse[] | undefined => state.systems ?? undefined;
+): SystemComponentResponse[] | undefined => state.systems.systems ?? undefined;
 
 export const getSystemsError = (
 	state: State
-): HelmError | null => state.systemsError;
+): HelmError | null => state.systems.error;
 
 export const getEdits = (
 	state: State
@@ -37,7 +37,7 @@ export const getEditError = (
 
 export const getSystemStats = createRegistrySelector(
 	( select ) => ( state: State, _shipId: number ): SystemStats | undefined => {
-		const systems = state.systems;
+		const systems = state.systems.systems;
 		if ( ! systems ) {
 			return undefined;
 		}

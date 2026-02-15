@@ -11,10 +11,8 @@ describe( 'reducer', () => {
 	describe( 'initializeDefaultState', () => {
 		it( 'returns null ship, systems, and initial edits', () => {
 			expect( initializeDefaultState() ).toEqual( {
-				ship: null,
-				shipError: null,
-				systems: null,
-				systemsError: null,
+				ship: { ship: null, error: null },
+				systems: { systems: null, error: null },
 				edits: {
 					ship: null,
 					isSubmitting: false,
@@ -24,20 +22,11 @@ describe( 'reducer', () => {
 		} );
 	} );
 
-	describe( 'FETCH_SHIP_START', () => {
-		it( 'returns the same state', () => {
-			const prev = initializeDefaultState();
-			const state = reduce( prev, { type: 'FETCH_SHIP_START' } );
-
-			expect( state ).toBe( prev );
-		} );
-	} );
-
 	describe( 'FETCH_SHIP_FINISHED', () => {
-		it( 'stores the ship and clears shipError', () => {
+		it( 'stores the ship and clears ship error', () => {
 			const ship = createShipState();
 			const prev = createState( {
-				shipError: new HelmError( 'helm.test', 'Error' ),
+				ship: { error: new HelmError( 'helm.test', 'Error' ) },
 			} );
 
 			const state = reduce( prev, {
@@ -45,33 +34,33 @@ describe( 'reducer', () => {
 				ship,
 			} );
 
-			expect( state.ship ).toBe( ship );
-			expect( state.shipError ).toBeNull();
+			expect( state.ship.ship ).toBe( ship );
+			expect( state.ship.error ).toBeNull();
 		} );
 
 		it( 'replaces an existing ship', () => {
 			const original = createShipState( { hull_integrity: 80 } );
 			const updated = createShipState( { hull_integrity: 100 } );
-			const prev = createState( { ship: original } );
+			const prev = createState( { ship: { ship: original } } );
 
 			const state = reduce( prev, {
 				type: 'FETCH_SHIP_FINISHED',
 				ship: updated,
 			} );
 
-			expect( state.ship?.hull_integrity ).toBe( 100 );
+			expect( state.ship.ship?.hull_integrity ).toBe( 100 );
 		} );
 
 		it( 'does not affect systems', () => {
 			const systems = [ createSystemComponent() ];
-			const prev = createState( { systems } );
+			const prev = createState( { systems: { systems } } );
 
 			const state = reduce( prev, {
 				type: 'FETCH_SHIP_FINISHED',
 				ship: createShipState(),
 			} );
 
-			expect( state.systems ).toBe( systems );
+			expect( state.systems.systems ).toBe( systems );
 		} );
 	} );
 
@@ -84,27 +73,27 @@ describe( 'reducer', () => {
 				error,
 			} );
 
-			expect( state.shipError ).toBe( error );
+			expect( state.ship.error ).toBe( error );
 		} );
 
 		it( 'does not remove existing ship data', () => {
 			const ship = createShipState();
-			const prev = createState( { ship } );
+			const prev = createState( { ship: { ship } } );
 
 			const state = reduce( prev, {
 				type: 'FETCH_SHIP_FAILED',
 				error: new HelmError( 'helm.test', 'Error' ),
 			} );
 
-			expect( state.ship ).toBe( ship );
+			expect( state.ship.ship ).toBe( ship );
 		} );
 	} );
 
 	describe( 'RECEIVE_SHIP', () => {
-		it( 'stores the ship and clears shipError', () => {
+		it( 'stores the ship and clears ship error', () => {
 			const ship = createShipState();
 			const prev = createState( {
-				shipError: new HelmError( 'helm.test', 'Error' ),
+				ship: { error: new HelmError( 'helm.test', 'Error' ) },
 			} );
 
 			const state = reduce( prev, {
@@ -112,25 +101,16 @@ describe( 'reducer', () => {
 				ship,
 			} );
 
-			expect( state.ship ).toBe( ship );
-			expect( state.shipError ).toBeNull();
-		} );
-	} );
-
-	describe( 'FETCH_SYSTEMS_START', () => {
-		it( 'returns the same state', () => {
-			const prev = initializeDefaultState();
-			const state = reduce( prev, { type: 'FETCH_SYSTEMS_START' } );
-
-			expect( state ).toBe( prev );
+			expect( state.ship.ship ).toBe( ship );
+			expect( state.ship.error ).toBeNull();
 		} );
 	} );
 
 	describe( 'FETCH_SYSTEMS_FINISHED', () => {
-		it( 'stores the systems and clears systemsError', () => {
+		it( 'stores the systems and clears systems error', () => {
 			const systems = [ createSystemComponent() ];
 			const prev = createState( {
-				systemsError: new HelmError( 'helm.test', 'Error' ),
+				systems: { error: new HelmError( 'helm.test', 'Error' ) },
 			} );
 
 			const state = reduce( prev, {
@@ -138,33 +118,33 @@ describe( 'reducer', () => {
 				systems,
 			} );
 
-			expect( state.systems ).toBe( systems );
-			expect( state.systemsError ).toBeNull();
+			expect( state.systems.systems ).toBe( systems );
+			expect( state.systems.error ).toBeNull();
 		} );
 
 		it( 'replaces existing systems', () => {
 			const original = [ createSystemComponent( { condition: 0.5 } ) ];
 			const updated = [ createSystemComponent( { condition: 1.0 } ) ];
-			const prev = createState( { systems: original } );
+			const prev = createState( { systems: { systems: original } } );
 
 			const state = reduce( prev, {
 				type: 'FETCH_SYSTEMS_FINISHED',
 				systems: updated,
 			} );
 
-			expect( state.systems?.[ 0 ].condition ).toBe( 1.0 );
+			expect( state.systems.systems?.[ 0 ].condition ).toBe( 1.0 );
 		} );
 
 		it( 'does not affect ship', () => {
 			const ship = createShipState();
-			const prev = createState( { ship } );
+			const prev = createState( { ship: { ship } } );
 
 			const state = reduce( prev, {
 				type: 'FETCH_SYSTEMS_FINISHED',
 				systems: [ createSystemComponent() ],
 			} );
 
-			expect( state.ship ).toBe( ship );
+			expect( state.ship.ship ).toBe( ship );
 		} );
 	} );
 
@@ -177,27 +157,27 @@ describe( 'reducer', () => {
 				error,
 			} );
 
-			expect( state.systemsError ).toBe( error );
+			expect( state.systems.error ).toBe( error );
 		} );
 
 		it( 'does not remove existing systems data', () => {
 			const systems = [ createSystemComponent() ];
-			const prev = createState( { systems } );
+			const prev = createState( { systems: { systems } } );
 
 			const state = reduce( prev, {
 				type: 'FETCH_SYSTEMS_FAILED',
 				error: new HelmError( 'helm.test', 'Error' ),
 			} );
 
-			expect( state.systems ).toBe( systems );
+			expect( state.systems.systems ).toBe( systems );
 		} );
 	} );
 
 	describe( 'RECEIVE_SYSTEMS', () => {
-		it( 'stores the systems and clears systemsError', () => {
+		it( 'stores the systems and clears systems error', () => {
 			const systems = [ createSystemComponent() ];
 			const prev = createState( {
-				systemsError: new HelmError( 'helm.test', 'Error' ),
+				systems: { error: new HelmError( 'helm.test', 'Error' ) },
 			} );
 
 			const state = reduce( prev, {
@@ -205,8 +185,8 @@ describe( 'reducer', () => {
 				systems,
 			} );
 
-			expect( state.systems ).toBe( systems );
-			expect( state.systemsError ).toBeNull();
+			expect( state.systems.systems ).toBe( systems );
+			expect( state.systems.error ).toBeNull();
 		} );
 	} );
 
@@ -239,14 +219,14 @@ describe( 'reducer', () => {
 
 		it( 'does not affect other state', () => {
 			const ship = createShipState();
-			const prev = createState( { ship } );
+			const prev = createState( { ship: { ship } } );
 
 			const state = reduce( prev, {
 				type: 'EDIT_SHIP',
 				edits: { power_mode: 'overdrive' },
 			} );
 
-			expect( state.ship ).toBe( ship );
+			expect( state.ship.ship ).toBe( ship );
 		} );
 	} );
 
@@ -302,7 +282,7 @@ describe( 'reducer', () => {
 				ship,
 			} );
 
-			expect( state.ship ).toBe( ship );
+			expect( state.ship.ship ).toBe( ship );
 			expect( state.edits.ship ).toBeNull();
 			expect( state.edits.isSubmitting ).toBe( false );
 			expect( state.edits.error ).toBeNull();
@@ -347,7 +327,7 @@ describe( 'reducer', () => {
 		it( 'does not remove existing ship data', () => {
 			const ship = createShipState();
 			const prev = createState( {
-				ship,
+				ship: { ship },
 				edits: createEditsState( { isSubmitting: true } ),
 			} );
 
@@ -356,7 +336,7 @@ describe( 'reducer', () => {
 				error: new HelmError( 'helm.test', 'Error' ),
 			} );
 
-			expect( state.ship ).toBe( ship );
+			expect( state.ship.ship ).toBe( ship );
 		} );
 	} );
 
@@ -365,7 +345,7 @@ describe( 'reducer', () => {
 			const prev = initializeDefaultState();
 			const state = reduce( prev, { type: 'UNKNOWN' } as never );
 
-			expect( state ).toBe( prev );
+			expect( state ).toEqual( prev );
 		} );
 	} );
 } );

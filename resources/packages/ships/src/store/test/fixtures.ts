@@ -1,5 +1,5 @@
 import type { Product, ProductEmbed, ShipState, SystemComponent } from '@helm/types';
-import type { EditsState, State } from '../types';
+import type { EditsState, ShipSlice, State, SystemsState } from '../types';
 import { initializeDefaultState } from '../reducer';
 
 export function createShipState(
@@ -67,11 +67,15 @@ export function createEditsState(
 	};
 }
 
-export function createState(
-	overrides: Partial< State > = {}
-): State {
+export function createState( overrides: {
+	ship?: Partial< ShipSlice >;
+	systems?: Partial< SystemsState >;
+	edits?: Partial< EditsState >;
+} = {} ): State {
+	const defaults = initializeDefaultState();
 	return {
-		...initializeDefaultState(),
-		...overrides,
+		ship: { ...defaults.ship, ...overrides.ship },
+		systems: { ...defaults.systems, ...overrides.systems },
+		edits: { ...defaults.edits, ...overrides.edits },
 	};
 }

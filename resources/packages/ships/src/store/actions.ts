@@ -4,68 +4,16 @@ import { ErrorCode, HelmError } from '@helm/errors';
 import { store as productsStore } from '@helm/products';
 import { LinkRel } from '@helm/types';
 import type { ShipState, SystemComponentResponse, Thunk, ThunkArgs, WithRestLinks } from '@helm/types';
-import type { Action, ShipEmbeds, ShipResponse } from './types';
+import type { Action, ShipEmbeds } from './types';
 import type { store } from './index';
 
 type StoreThunkArgs = ThunkArgs< Action, typeof store >;
-
-export const fetchShip =
-	( shipId: number ): Thunk< Action, typeof store > =>
-	async ( { dispatch } ) => {
-		dispatch( { type: 'FETCH_SHIP_START' } );
-
-		try {
-			const response = await apiFetch< ShipResponse >( {
-				path: `/helm/v1/ships/${ shipId }?_embed[]=${ LinkRel.Systems }`,
-			} );
-
-			const { _embedded, ...ship } = response;
-
-			dispatch( { type: 'FETCH_SHIP_FINISHED', ship } );
-
-			if ( _embedded ) {
-				dispatch.receiveShipEmbeds( _embedded );
-			}
-		} catch ( error ) {
-			dispatch( {
-				type: 'FETCH_SHIP_FAILED',
-				error: HelmError.safe( ErrorCode.ShipsInvalidResponse, __( 'Could not load ship data.', 'helm' ), await HelmError.asyncFrom( error ) ),
-			} );
-		}
-	};
 
 export function receiveShip(
 	ship: WithRestLinks< ShipState >
 ): Action {
 	return { type: 'RECEIVE_SHIP', ship };
 }
-
-export const fetchSystems =
-	( shipId: number ): Thunk< Action, typeof store > =>
-	async ( { dispatch, registry } ) => {
-		dispatch( { type: 'FETCH_SYSTEMS_START' } );
-
-		try {
-			const systems = await apiFetch< SystemComponentResponse[] >( {
-				path: `/helm/v1/ships/${ shipId }/systems?_embed[]=${ LinkRel.Product }`,
-			} );
-
-			dispatch( { type: 'FETCH_SYSTEMS_FINISHED', systems } );
-
-			const products = systems
-				.map( ( system ) => system._embedded?.[ LinkRel.Product ]?.[ 0 ] )
-				.filter( ( p ): p is NonNullable< typeof p > => p !== undefined );
-
-			if ( products.length > 0 ) {
-				registry.dispatch( productsStore ).receiveProducts( products );
-			}
-		} catch ( error ) {
-			dispatch( {
-				type: 'FETCH_SYSTEMS_FAILED',
-				error: HelmError.safe( ErrorCode.ShipsSystemsInvalidResponse, __( 'Could not load ship systems.', 'helm' ), await HelmError.asyncFrom( error ) ),
-			} );
-		}
-	};
 
 export function receiveSystems(
 	systems: SystemComponentResponse[]
