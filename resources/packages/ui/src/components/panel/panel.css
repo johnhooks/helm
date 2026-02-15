@@ -5,20 +5,7 @@
 
 .helm-panel {
   font-family: var(--helm-ui-font-family);
-  --helm-panel-color: var(--helm-ui-color-muted);
 }
-
-/* Tones */
-.helm-panel--neutral { --helm-panel-color: var(--helm-ui-color-muted); }
-.helm-panel--accent { --helm-panel-color: var(--helm-ui-color-accent); }
-.helm-panel--orange { --helm-panel-color: var(--helm-ui-color-orange); }
-.helm-panel--gold { --helm-panel-color: var(--helm-ui-color-gold); }
-.helm-panel--peach { --helm-panel-color: var(--helm-ui-color-peach); }
-.helm-panel--blue { --helm-panel-color: var(--helm-ui-color-blue); }
-.helm-panel--sky { --helm-panel-color: var(--helm-ui-color-sky); }
-.helm-panel--lilac { --helm-panel-color: var(--helm-ui-color-lilac); }
-.helm-panel--violet { --helm-panel-color: var(--helm-ui-color-violet); }
-.helm-panel--danger { --helm-panel-color: var(--helm-ui-color-danger-accent); }
 
 /* Padding */
 .helm-panel--padding-none { --helm-panel-padding: 0; }
@@ -45,8 +32,8 @@
   background: var(--helm-ui-color-bg);
   border-radius: 12px;
   padding: var(--helm-panel-padding);
-  border: 1px solid var(--helm-panel-color);
-  box-shadow: 0 0 20px color-mix(in srgb, var(--helm-panel-color) 15%, transparent);
+  border: 1px solid var(--helm-tone);
+  box-shadow: 0 0 20px color-mix(in srgb, var(--helm-tone) 15%, transparent);
 }
 
 /* =============================================================================
@@ -85,7 +72,7 @@
 .helm-panel__bracket-left,
 .helm-panel__bracket-right {
   width: 8px;
-  background: var(--helm-panel-color);
+  background: var(--helm-tone);
   border-radius: 4px;
 }
 

@@ -87,50 +87,15 @@
   transform: translateX(20px);
 }
 
-/* Track colors when checked */
-.helm-toggle__input:checked + .helm-toggle__track--accent {
-  background: var(--helm-ui-color-accent);
-  border-color: var(--helm-ui-color-accent);
-}
-
-.helm-toggle__input:checked + .helm-toggle__track--orange {
-  background: var(--helm-ui-color-orange);
-  border-color: var(--helm-ui-color-orange);
-}
-
-.helm-toggle__input:checked + .helm-toggle__track--gold {
-  background: var(--helm-ui-color-gold);
-  border-color: var(--helm-ui-color-gold);
-}
-
-.helm-toggle__input:checked + .helm-toggle__track--blue {
-  background: var(--helm-ui-color-blue);
-  border-color: var(--helm-ui-color-blue);
-}
-
-.helm-toggle__input:checked + .helm-toggle__track--sky {
-  background: var(--helm-ui-color-sky);
-  border-color: var(--helm-ui-color-sky);
-}
-
-.helm-toggle__input:checked + .helm-toggle__track--success {
-  background: var(--helm-ui-color-success);
-  border-color: var(--helm-ui-color-success);
-}
-
-.helm-toggle__input:checked + .helm-toggle__track--lilac {
-  background: var(--helm-ui-color-lilac);
-  border-color: var(--helm-ui-color-lilac);
-}
-
-.helm-toggle__input:checked + .helm-toggle__track--violet {
-  background: var(--helm-ui-color-violet);
-  border-color: var(--helm-ui-color-violet);
+/* Track color when checked — reads --helm-tone from parent tone class */
+.helm-toggle__input:checked + .helm-toggle__track {
+  background: var(--helm-tone);
+  border-color: var(--helm-tone);
 }
 
 /* Focus state */
 .helm-toggle__input:focus-visible + .helm-toggle__track {
-  outline: 2px solid var(--helm-ui-color-focus);
+  outline: 2px solid var(--helm-tone);
   outline-offset: 2px;
 }
 

@@ -5,6 +5,7 @@ import { StatusBadge } from "../status-badge";
 import { SystemGrid, SystemCell } from "../system-grid";
 import { StackIndicator } from "../stack-indicator";
 import { Readout } from "../readout";
+import { LCARS_TONES } from "../../tones";
 
 const meta = {
   title: "Layout/Panel",
@@ -16,7 +17,7 @@ const meta = {
   argTypes: {
     tone: {
       control: "select",
-      options: ["neutral", "accent", "orange", "gold", "peach", "blue", "sky", "lilac", "violet", "danger"],
+      options: [...LCARS_TONES],
     },
     variant: {
       control: "select",
@@ -42,9 +43,8 @@ export const Default: Story = {
 };
 
 export const AllVariants: Story = {
-  args: {
-    children: null,
-  },
+  args: { children: null },
+  parameters: { controls: { disable: true } },
   render: () => (
     <div style={{ display: "flex", flexDirection: "column", gap: 32, minWidth: 400 }}>
       <div>
@@ -79,9 +79,8 @@ export const AllVariants: Story = {
 };
 
 export const BracketTones: Story = {
-  args: {
-    children: null,
-  },
+  args: { children: null },
+  parameters: { controls: { disable: true } },
   render: () => (
     <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 300 }}>
       <Panel variant="bracket" tone="gold">
@@ -98,9 +97,8 @@ export const BracketTones: Story = {
 };
 
 export const BorderedAlert: Story = {
-  args: {
-    children: null,
-  },
+  args: { children: null },
+  parameters: { controls: { disable: true } },
   render: () => (
     <Panel variant="bordered" tone="danger" padding="lg">
       <TitleBar title="Warning" tone="danger">
@@ -115,9 +113,8 @@ export const BorderedAlert: Story = {
 };
 
 export const NestedPanels: Story = {
-  args: {
-    children: null,
-  },
+  args: { children: null },
+  parameters: { controls: { disable: true } },
   render: () => (
     <Panel variant="default" tone="gold" padding="lg">
       <TitleBar title="Engineering" subtitle="Power Systems" tone="gold">
@@ -139,9 +136,8 @@ export const NestedPanels: Story = {
 };
 
 export const EngineeringConsole: Story = {
-  args: {
-    children: null,
-  },
+  args: { children: null },
+  parameters: { controls: { disable: true } },
   render: () => (
     <Panel variant="default" padding="lg">
       <TitleBar title="Engineering" subtitle="Main Systems" tone="gold">
@@ -193,9 +189,8 @@ export const EngineeringConsole: Story = {
 };
 
 export const NavigationConsole: Story = {
-  args: {
-    children: null,
-  },
+  args: { children: null },
+  parameters: { controls: { disable: true } },
   render: () => (
     <Panel variant="bracket" tone="sky" padding="lg">
       <TitleBar title="Navigation" subtitle="En Route to Tau Ceti" tone="sky">
@@ -228,9 +223,8 @@ export const NavigationConsole: Story = {
 };
 
 export const TacticalConsole: Story = {
-  args: {
-    children: null,
-  },
+  args: { children: null },
+  parameters: { controls: { disable: true } },
   render: () => (
     <Panel variant="bordered" tone="danger" padding="lg">
       <TitleBar title="Tactical" subtitle="Combat Status" tone="danger">
@@ -256,9 +250,8 @@ export const TacticalConsole: Story = {
 };
 
 export const MultiPanelLayout: Story = {
-  args: {
-    children: null,
-  },
+  args: { children: null },
+  parameters: { controls: { disable: true } },
   render: () => (
     <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 16, maxWidth: 900 }}>
       <Panel variant="default" padding="md">

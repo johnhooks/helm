@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { BarIndicator } from './bar-indicator';
+import { LCARS_TONES } from '../../tones';
 
 const meta = {
 	title: 'UI/Indicators/Bar',
@@ -14,27 +15,7 @@ const meta = {
 		},
 		tone: {
 			control: 'select',
-			options: [
-				'neutral',
-				'base',
-				'accent',
-				'muted',
-				'danger',
-				'success',
-				'warning',
-				'info',
-				'orange',
-				'gold',
-				'peach',
-				'sunset',
-				'blue',
-				'sky',
-				'ice',
-				'lilac',
-				'violet',
-				'plum',
-				'hopbush',
-			],
+			options: [...LCARS_TONES],
 		},
 		level: { control: { type: 'range', min: 0, max: 100 } },
 	},
@@ -46,12 +27,13 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
 	args: {
 		size: 'md',
-		tone: 'sunset',
+		tone: 'orange',
 		level: 62,
 	},
 };
 
 export const Sizes: Story = {
+	parameters: { controls: { disable: true } },
 	render: () => (
 		<div
 			style={{
@@ -61,11 +43,11 @@ export const Sizes: Story = {
 				gap: '12px',
 			}}
 		>
-			<BarIndicator size="sm" tone="sunset" level={62} />
-			<BarIndicator size="md" tone="sunset" level={62} />
-			<BarIndicator size="lg" tone="sunset" level={62} />
-			<BarIndicator size="xl" tone="sunset" level={62} />
-			<BarIndicator size="2xl" tone="sunset" level={62} />
+			<BarIndicator size="sm" tone="orange" level={62} />
+			<BarIndicator size="md" tone="orange" level={62} />
+			<BarIndicator size="lg" tone="orange" level={62} />
+			<BarIndicator size="xl" tone="orange" level={62} />
+			<BarIndicator size="2xl" tone="orange" level={62} />
 		</div>
 	),
 };

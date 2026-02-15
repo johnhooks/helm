@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import type { LcarsTone } from "../../tones";
 
 export interface SegmentedOption {
   value: string;
@@ -28,18 +29,9 @@ export interface SegmentedControlProps {
    */
   name?: string;
   /**
-   * Surface tone for active segment
+   * Color tone for active segment
    */
-  surface?:
-    | "neutral"
-    | "accent"
-    | "orange"
-    | "gold"
-    | "blue"
-    | "sky"
-    | "success"
-    | "lilac"
-    | "violet";
+  tone?: LcarsTone;
   /**
    * Size variant
    */
@@ -82,7 +74,7 @@ export function SegmentedControl({
   defaultValue,
   onChange,
   name,
-  surface = "accent",
+  tone = "neutral",
   size = "md",
   disabled = false,
   fullWidth = false,
@@ -96,8 +88,9 @@ export function SegmentedControl({
 
   const classNames = [
     "helm-segmented",
+    `helm-tone--${tone}`,
+    "helm-surface--toned",
     `helm-segmented--${size}`,
-    `helm-segmented--${surface}`,
     disabled && "helm-segmented--disabled",
     fullWidth && "helm-segmented--full",
     orientation === "vertical" && "helm-segmented--vertical",

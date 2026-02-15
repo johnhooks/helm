@@ -9,23 +9,50 @@
   --helm-ui-color-accent: #f2b654;
   --helm-ui-color-danger: #cc4444;
   --helm-ui-color-danger-accent: #ff6b6b;
-  --helm-ui-color-focus: #9cc7ff;
-  --helm-ui-color-warning: #f2b654;
+
+  --helm-ui-color-warning: #e8953a;
   --helm-ui-color-success: #8fbf4d;
   --helm-ui-color-info: #7fb2ff;
 
   /* LCARS palette accents */
   --helm-ui-color-orange: #ff9900;
   --helm-ui-color-gold: #ffcc66;
-  --helm-ui-color-peach: #ffcc99;
-  --helm-ui-color-sunset: #ff9966;
   --helm-ui-color-blue: #99ccff;
   --helm-ui-color-sky: #6699cc;
   --helm-ui-color-ice: #ccddff;
   --helm-ui-color-lilac: #cc99cc;
   --helm-ui-color-violet: #9999cc;
-  --helm-ui-color-plum: #664466;
-  --helm-ui-color-hopbush: #c082a9;
+
+  /* Default tone (neutral) */
+  --helm-tone: var(--helm-ui-color-muted);
+  --helm-tone-fg: var(--helm-ui-fg-on-warm);
+  --helm-tone-fg-muted: var(--helm-ui-fg-on-warm-muted);
+
+  /* Contrast foregrounds for tone-as-background usage */
+  --helm-ui-fg-on-warm: #1a1206;
+  --helm-ui-fg-on-warm-muted: #3b2a10;
+  --helm-ui-fg-on-cool: #0f1420;
+  --helm-ui-fg-on-cool-muted: #1f2e4a;
+  --helm-ui-fg-on-purple: #1b0f1e;
+  --helm-ui-fg-on-purple-muted: #3b2a3f;
+  --helm-ui-fg-on-green: #0f140a;
+  --helm-ui-fg-on-green-muted: #2f3a24;
+  --helm-ui-fg-on-red: #1a0808;
+  --helm-ui-fg-on-red-muted: #3a1414;
+
+  /* Planet type colors */
+  --helm-planet-terrestrial: #ffcc99;
+  --helm-planet-super-earth: var(--helm-ui-color-gold);
+  --helm-planet-gas-giant: #ff9966;
+  --helm-planet-ice-giant: var(--helm-ui-color-ice);
+  --helm-planet-hot-jupiter: var(--helm-ui-color-orange);
+  --helm-planet-dwarf: var(--helm-ui-color-muted);
+  --helm-planet-molten: var(--helm-ui-color-danger);
+  --helm-planet-frozen: var(--helm-ui-color-sky);
+  --helm-planet-ocean: var(--helm-ui-color-blue);
+  --helm-planet-desert: #d4a45a;
+  --helm-planet-toxic: #c082a9;
+
   /* Font sizes */
   --helm-ui-font-size-subtext: 0.4375rem;    /* 7px */
   --helm-ui-font-size-caption: 0.5rem;        /* 8px */

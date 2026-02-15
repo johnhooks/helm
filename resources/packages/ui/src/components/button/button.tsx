@@ -1,4 +1,5 @@
 import type { CSSProperties, MouseEvent, ReactNode } from "react";
+import type { LcarsTone } from "../../tones";
 
 export interface ButtonProps {
   /**
@@ -14,9 +15,10 @@ export interface ButtonProps {
    */
   variant?: "primary" | "secondary" | "tertiary" | "ghost" | "danger";
   /**
-   * Surface tone
+   * Primary color tone. Only affects the `primary` variant — other variants
+   * use their structural surface colors regardless of this value.
    */
-  surface?: "neutral" | "base" | "accent" | "muted" | "danger";
+  tone?: LcarsTone;
   /**
    * Size variant
    */
@@ -79,7 +81,7 @@ export function Button({
   children,
   secondary,
   variant = "primary",
-  surface,
+  tone,
   size = "md",
   edge = "none",
   fullWidth = false,
@@ -95,18 +97,21 @@ export function Button({
   "aria-haspopup": ariaHasPopup,
   "aria-controls": ariaControls,
 }: ButtonProps) {
-  const variantSurfaces: Record<string, ButtonProps["surface"]> = {
+  const variantSurfaces: Record<string, string> = {
     primary: "accent",
     danger: "danger",
     tertiary: "muted",
     ghost: "base",
   };
-  const resolvedSurface = surface ?? variantSurfaces[variant] ?? "neutral";
+  const resolvedSurface = variantSurfaces[variant] ?? "neutral";
+  const resolvedTone = tone ?? (variant === "danger" ? "danger" : undefined);
+  const useTone = resolvedSurface === "accent";
+  const toneClass = resolvedTone ? `helm-tone--${resolvedTone}` : undefined;
 
   const classNames = [
     "helm-button",
-    "helm-surface",
-    `helm-surface--${resolvedSurface}`,
+    toneClass,
+    useTone ? "helm-surface--toned" : `helm-surface--${resolvedSurface}`,
     `helm-button--${variant}`,
     `helm-button--${size}`,
     `helm-button--edge-${edge}`,

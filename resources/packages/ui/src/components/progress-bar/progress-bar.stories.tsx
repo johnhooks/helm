@@ -6,6 +6,7 @@ import { Readout } from "../readout";
 import { StatusBadge } from "../status-badge";
 import { ArcIndicator } from "../arc-indicator";
 import { StackIndicator } from "../stack-indicator";
+import { LCARS_TONES } from "../../tones";
 
 const meta = {
   title: "Display/ProgressBar",
@@ -17,7 +18,7 @@ const meta = {
   argTypes: {
     tone: {
       control: "select",
-      options: ["neutral", "accent", "orange", "gold", "peach", "blue", "sky", "lilac", "violet", "danger", "success"],
+      options: [...LCARS_TONES],
     },
     size: {
       control: "radio",
@@ -63,9 +64,8 @@ export const WithValue: Story = {
 };
 
 export const Sizes: Story = {
-  args: {
-    value: 67,
-  },
+  args: { value: 0 },
+  parameters: { controls: { disable: true } },
   render: () => (
     <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 300 }}>
       <ProgressBar value={67} size="sm" label="Small" showValue />
@@ -76,9 +76,8 @@ export const Sizes: Story = {
 };
 
 export const Tones: Story = {
-  args: {
-    value: 67,
-  },
+  args: { value: 0 },
+  parameters: { controls: { disable: true } },
   render: () => (
     <div style={{ display: "flex", flexDirection: "column", gap: 12, minWidth: 300 }}>
       <ProgressBar value={75} tone="accent" showValue />
@@ -127,9 +126,8 @@ export const Active: Story = {
 };
 
 export const JumpProgress: Story = {
-  args: {
-    value: 67,
-  },
+  args: { value: 0 },
+  parameters: { controls: { disable: true } },
   render: () => (
     <div style={{ minWidth: 400 }}>
       <Panel variant="default" padding="lg">
@@ -157,9 +155,8 @@ export const JumpProgress: Story = {
 };
 
 export const ScanProgress: Story = {
-  args: {
-    value: 42,
-  },
+  args: { value: 0 },
+  parameters: { controls: { disable: true } },
   render: () => (
     <div style={{ minWidth: 400 }}>
       <Panel variant="bracket" tone="lilac" padding="md">
@@ -183,9 +180,8 @@ export const ScanProgress: Story = {
 };
 
 export const RepairProgress: Story = {
-  args: {
-    value: 78,
-  },
+  args: { value: 0 },
+  parameters: { controls: { disable: true } },
   render: () => (
     <div style={{ minWidth: 400 }}>
       <Panel variant="default" padding="lg">
@@ -219,9 +215,8 @@ export const RepairProgress: Story = {
 };
 
 export const MultipleOperations: Story = {
-  args: {
-    value: 50,
-  },
+  args: { value: 0 },
+  parameters: { controls: { disable: true } },
   render: () => (
     <div style={{ minWidth: 450 }}>
       <Panel variant="default" padding="lg">
@@ -274,9 +269,8 @@ export const MultipleOperations: Story = {
 };
 
 export const IndicatorsAsProgress: Story = {
-  args: {
-    value: 67,
-  },
+  args: { value: 0 },
+  parameters: { controls: { disable: true } },
   render: () => (
     <div style={{ minWidth: 500 }}>
       <Panel variant="default" padding="lg">

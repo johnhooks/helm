@@ -2,6 +2,7 @@ import { useCallback } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { Panel, MatrixIndicator, Readout, SegmentedControl } from '@helm/ui';
+import type { LcarsTone } from '@helm/ui';
 import { useErrorModal } from '@helm/shell';
 import { store, useShip } from '@helm/ships';
 import './ship-systems-card.css';
@@ -39,7 +40,7 @@ function SystemCell( {
 	value: number | string;
 	unit: string;
 	level: number;
-	tone?: 'gold' | 'accent' | 'sky' | 'lilac';
+	tone?: LcarsTone;
 } ) {
 	return (
 		<div className="helm-ship-systems__cell">
@@ -200,7 +201,7 @@ export function ShipSystemsCard() {
 						value={ powerMode }
 						onChange={ handlePowerModeChange }
 						disabled={ isSubmitting }
-						surface="neutral"
+						tone="neutral"
 						size="sm"
 						fullWidth
 						aria-label={ __( 'Power mode', 'helm' ) }

@@ -4,6 +4,7 @@ import Select, {
   type GroupBase,
   type StylesConfig,
 } from "react-select";
+import type { LcarsTone } from "../../tones";
 
 export interface SelectOption {
   value: string;
@@ -18,17 +19,11 @@ export interface SelectControlProps<
   /**
    * Surface tone
    */
-  surface?:
-    | "neutral"
-    | "base"
-    | "accent"
-    | "muted"
-    | "orange"
-    | "gold"
-    | "blue"
-    | "sky"
-    | "lilac"
-    | "violet";
+  surface?: "neutral" | "base" | "accent" | "muted";
+  /**
+   * Primary color tone for selected option highlighting
+   */
+  tone?: LcarsTone;
   /**
    * Size variant
    */
@@ -53,6 +48,7 @@ export function SelectControl<
   Group extends GroupBase<Option> = GroupBase<Option>,
 >({
   surface = "neutral",
+  tone = "neutral",
   size = "md",
   className = "",
   style,
@@ -61,31 +57,47 @@ export function SelectControl<
 }: SelectControlProps<Option, IsMulti, Group>) {
   const classNames = [
     "helm-select",
-    "helm-surface",
     `helm-surface--${surface}`,
+    `helm-tone--${tone}`,
     `helm-select--${size}`,
     className,
   ]
     .filter(Boolean)
     .join(" ");
 
+  /*
+   * Helm tone/surface → react-select style mapping
+   *
+   * react-select doesn't use CSS classes for internal elements — it requires a
+   * `styles` config object with per-part style functions. We bridge the Helm
+   * design system into that API here:
+   *
+   *   --helm-surface-*  → control chrome (bg, border, fg)
+   *   --helm-tone        → focus ring, selected-option background
+   *   --helm-tone-fg     → selected-option foreground text
+   *   --helm-ui-*        → menu/dropdown (these sit outside the surface context)
+   *
+   * Because react-select resolves CSS variables at style-application time, all
+   * Helm token references work — including dynamic tone classes set on the
+   * wrapper div above.
+   */
   const customStyles: StylesConfig<Option, IsMulti, Group> = {
     control: (base, state) => ({
       ...base,
       background: "var(--helm-surface-bg)",
       borderColor: state.isFocused
-        ? "var(--helm-ui-color-focus)"
+        ? "var(--helm-tone)"
         : "var(--helm-surface-border)",
       borderRadius: "var(--helm-ui-radius-md)",
       borderWidth: "1px",
       boxShadow: state.isFocused
-        ? "0 0 0 1px var(--helm-ui-color-focus)"
+        ? "0 0 0 1px var(--helm-tone)"
         : "none",
       minHeight: size === "sm" ? "32px" : "36px",
       cursor: "pointer",
       "&:hover": {
         borderColor: "var(--helm-surface-border)",
-        background: "var(--helm-surface-hover)",
+        background: "var(--helm-surface-bg-hover)",
       },
     }),
     valueContainer: (base) => ({
@@ -94,7 +106,7 @@ export function SelectControl<
     }),
     singleValue: (base) => ({
       ...base,
-      color: "var(--helm-surface-text)",
+      color: "var(--helm-surface-fg)",
       fontFamily: "var(--helm-ui-font-family)",
       fontSize: size === "sm" ? "12px" : "13px",
       fontWeight: 700,
@@ -104,7 +116,7 @@ export function SelectControl<
     }),
     placeholder: (base) => ({
       ...base,
-      color: "var(--helm-surface-muted)",
+      color: "var(--helm-surface-fg-muted)",
       fontFamily: "var(--helm-ui-font-family)",
       fontSize: size === "sm" ? "12px" : "13px",
       fontWeight: 700,
@@ -113,7 +125,7 @@ export function SelectControl<
     }),
     input: (base) => ({
       ...base,
-      color: "var(--helm-surface-text)",
+      color: "var(--helm-surface-fg)",
       fontFamily: "var(--helm-ui-font-family)",
       fontSize: size === "sm" ? "12px" : "13px",
       fontWeight: 700,
@@ -127,17 +139,17 @@ export function SelectControl<
     }),
     dropdownIndicator: (base, state) => ({
       ...base,
-      color: "var(--helm-surface-text)",
+      color: "var(--helm-surface-fg)",
       padding: size === "sm" ? "6px" : "8px",
       transition: "transform 160ms ease",
       transform: state.selectProps.menuIsOpen ? "rotate(180deg)" : undefined,
       "&:hover": {
-        color: "var(--helm-surface-text)",
+        color: "var(--helm-surface-fg)",
       },
     }),
     clearIndicator: (base) => ({
       ...base,
-      color: "var(--helm-surface-muted)",
+      color: "var(--helm-surface-fg-muted)",
       padding: size === "sm" ? "6px" : "8px",
       "&:hover": {
         color: "var(--helm-ui-color-danger)",
@@ -161,12 +173,12 @@ export function SelectControl<
       ...base,
       // eslint-disable-next-line no-nested-ternary
       background: state.isSelected
-        ? "var(--helm-ui-color-accent)"
+        ? "var(--helm-tone)"
         : state.isFocused
           ? "var(--helm-ui-color-surface-2)"
           : "transparent",
       color: state.isSelected
-        ? "#1a1206"
+        ? "var(--helm-tone-fg)"
         : "var(--helm-ui-color-text)",
       fontFamily: "var(--helm-ui-font-family)",
       fontSize: size === "sm" ? "12px" : "13px",
@@ -178,13 +190,13 @@ export function SelectControl<
       cursor: "pointer",
       "&:active": {
         background: state.isSelected
-          ? "var(--helm-ui-color-accent)"
+          ? "var(--helm-tone)"
           : "var(--helm-ui-color-surface-2)",
       },
     }),
     noOptionsMessage: (base) => ({
       ...base,
-      color: "var(--helm-surface-muted)",
+      color: "var(--helm-surface-fg-muted)",
       fontFamily: "var(--helm-ui-font-family)",
       fontSize: size === "sm" ? "12px" : "13px",
       fontWeight: 700,

@@ -252,10 +252,8 @@ const LogShell = ({ label, children }: { label: string; children: ReactNode }) =
  * Drawer open (default). The viewport and sidebar share the space.
  */
 export const Default: Story = {
-  args: {
-    viewport: null,
-    children: null,
-  },
+  args: { viewport: null, children: null },
+  parameters: { controls: { disable: true } },
   render: () => {
     const [open, setOpen] = useState(true);
 
@@ -277,10 +275,8 @@ export const Default: Story = {
  * Click the chevron tab to expand.
  */
 export const Closed: Story = {
-  args: {
-    viewport: null,
-    children: null,
-  },
+  args: { viewport: null, children: null },
+  parameters: { controls: { disable: true } },
   render: () => {
     const [open, setOpen] = useState(false);
 
@@ -301,10 +297,8 @@ export const Closed: Story = {
  * Full bridge composition with ship log entries in the sidebar.
  */
 export const WithLog: Story = {
-  args: {
-    viewport: null,
-    children: null,
-  },
+  args: { viewport: null, children: null },
+  parameters: { controls: { disable: true } },
   render: () => {
     const [open, setOpen] = useState(true);
 
@@ -339,10 +333,8 @@ export const WithLog: Story = {
  * Custom width (300px) to show the width prop works.
  */
 export const NarrowDrawer: Story = {
-  args: {
-    viewport: null,
-    children: null,
-  },
+  args: { viewport: null, children: null },
+  parameters: { controls: { disable: true } },
   render: () => {
     const [open, setOpen] = useState(true);
 

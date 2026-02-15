@@ -26,6 +26,7 @@ type Story = StoryObj< typeof meta >;
 
 export const Empty: Story = {
 	args: { time: '', title: '' },
+	parameters: { controls: { disable: true } },
 	render: () => (
 		<div style={ { color: 'var(--helm-ui-color-muted, #a39a88)', fontFamily: 'Antonio, sans-serif', fontSize: 12, letterSpacing: '0.06em' } }>
 			No actions yet.
@@ -39,6 +40,7 @@ export const Empty: Story = {
 
 export const Idle: Story = {
 	args: { time: '', title: '' },
+	parameters: { controls: { disable: true } },
 	render: () => (
 		<>
 			<LogCard time="08:42" title="Route Scan — Tau Ceti" tone="lilac"
@@ -60,6 +62,7 @@ export const Idle: Story = {
 
 export const Active: Story = {
 	args: { time: '', title: '' },
+	parameters: { controls: { disable: true } },
 	render: () => (
 		<>
 			<LogCard time="now" title="Route Scan — Tau Ceti" tone="lilac" variant="active"
@@ -84,6 +87,7 @@ export const Active: Story = {
 
 export const WithDraft: Story = {
 	args: { time: '', title: '' },
+	parameters: { controls: { disable: true } },
 	render: () => (
 		<>
 			<LogCard time="draft" title="Jump — Tau Ceti" tone="sky" variant="draft"

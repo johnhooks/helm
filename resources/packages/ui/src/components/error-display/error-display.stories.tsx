@@ -51,6 +51,7 @@ export const CodeOnly: CardStory = {
 
 export const Compact: CardStory = {
   args: { code: "" },
+  parameters: { controls: { disable: true } },
   render: () => (
     <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 400 }}>
       <ErrorCompact code="helm.ship.not_found" detail="Ship not found." />
@@ -62,6 +63,7 @@ export const Compact: CardStory = {
 
 export const CompactInPanel: CardStory = {
   args: { code: "" },
+  parameters: { controls: { disable: true } },
   render: () => (
     <Panel variant="bordered" tone="neutral" padding="md">
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -76,7 +78,7 @@ export const CompactInPanel: CardStory = {
 
 export const Page: CardStory = {
   args: { code: "" },
-  parameters: { layout: "fullscreen" },
+  parameters: { layout: "fullscreen", controls: { disable: true } },
   render: () => (
     <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
       <ErrorPage
@@ -93,7 +95,7 @@ export const Page: CardStory = {
 
 export const PageMinimal: CardStory = {
   args: { code: "" },
-  parameters: { layout: "fullscreen" },
+  parameters: { layout: "fullscreen", controls: { disable: true } },
   render: () => (
     <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
       <ErrorPage code="helm.unknown" />
@@ -105,6 +107,7 @@ export const PageMinimal: CardStory = {
 
 export const ContentOnly: CardStory = {
   args: { code: "" },
+  parameters: { controls: { disable: true } },
   render: () => (
     <Panel variant="default" padding="md">
       <ErrorContent
@@ -121,6 +124,7 @@ export const ContentOnly: CardStory = {
 
 export const Modal: CardStory = {
   args: { code: "" },
+  parameters: { controls: { disable: true } },
   render: function ModalStory() {
     const [isOpen, setIsOpen] = useState(true);
 
@@ -147,6 +151,7 @@ export const Modal: CardStory = {
 
 export const ModalMinimal: CardStory = {
   args: { code: "" },
+  parameters: { controls: { disable: true } },
   render: function ModalMinimalStory() {
     const [isOpen, setIsOpen] = useState(true);
 

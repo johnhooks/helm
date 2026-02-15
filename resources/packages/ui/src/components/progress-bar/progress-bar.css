@@ -4,7 +4,6 @@
    ============================================================================= */
 
 .helm-progress-bar {
-  --progress-color: var(--helm-ui-color-accent);
   --progress-track: #1a1a1a;
   --progress-value: 0%;
 
@@ -13,19 +12,6 @@
   gap: 12px;
   font-family: var(--helm-ui-font-family);
 }
-
-/* Tones */
-.helm-progress-bar--neutral { --progress-color: var(--helm-ui-color-muted); }
-.helm-progress-bar--accent { --progress-color: var(--helm-ui-color-accent); }
-.helm-progress-bar--orange { --progress-color: var(--helm-ui-color-orange); }
-.helm-progress-bar--gold { --progress-color: var(--helm-ui-color-gold); }
-.helm-progress-bar--peach { --progress-color: var(--helm-ui-color-peach); }
-.helm-progress-bar--blue { --progress-color: var(--helm-ui-color-blue); }
-.helm-progress-bar--sky { --progress-color: var(--helm-ui-color-sky); }
-.helm-progress-bar--lilac { --progress-color: var(--helm-ui-color-lilac); }
-.helm-progress-bar--violet { --progress-color: var(--helm-ui-color-violet); }
-.helm-progress-bar--danger { --progress-color: var(--helm-ui-color-danger-accent); }
-.helm-progress-bar--success { --progress-color: var(--helm-ui-color-success); }
 
 /* =============================================================================
    TRACK & FILL
@@ -45,7 +31,7 @@
 .helm-progress-bar__fill {
   height: 100%;
   width: var(--progress-value);
-  background: var(--progress-color);
+  background: var(--helm-tone);
   border-radius: 2px;
   transition: width 0.3s ease;
 }
@@ -56,7 +42,7 @@
 
 .helm-progress-bar__value {
   font-weight: 700;
-  color: var(--progress-color);
+  color: var(--helm-tone);
   min-width: 3em;
   text-align: right;
 }
@@ -80,11 +66,11 @@
 @keyframes progress-pulse {
   0%, 100% {
     opacity: 1;
-    box-shadow: 0 0 8px var(--progress-color);
+    box-shadow: 0 0 8px var(--helm-tone);
   }
   50% {
     opacity: 0.7;
-    box-shadow: 0 0 16px var(--progress-color), 0 0 24px var(--progress-color);
+    box-shadow: 0 0 16px var(--helm-tone), 0 0 24px var(--helm-tone);
   }
 }
 
@@ -115,5 +101,13 @@
   }
   100% {
     transform: translateX(-100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .helm-progress-bar--active .helm-progress-bar__fill,
+  .helm-progress-bar--active .helm-progress-bar__value,
+  .helm-progress-bar--indeterminate .helm-progress-bar__fill {
+    animation: none;
   }
 }

@@ -1,4 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
+import type { LcarsTone } from "../../tones";
 
 export interface PanelProps {
   /**
@@ -8,17 +9,7 @@ export interface PanelProps {
   /**
    * Color tone for accents
    */
-  tone?:
-    | "neutral"
-    | "accent"
-    | "orange"
-    | "gold"
-    | "peach"
-    | "blue"
-    | "sky"
-    | "lilac"
-    | "violet"
-    | "danger";
+  tone?: LcarsTone;
   /**
    * Panel variant
    */
@@ -53,7 +44,7 @@ export function Panel({
   const classNames = [
     "helm-panel",
     `helm-panel--${variant}`,
-    `helm-panel--${tone}`,
+    `helm-tone--${tone}`,
     `helm-panel--padding-${padding}`,
     className,
   ]

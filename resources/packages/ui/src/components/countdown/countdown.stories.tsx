@@ -7,6 +7,7 @@ import { TitleBar } from "../title-bar";
 import { StatusBadge } from "../status-badge";
 import { ProgressBar } from "../progress-bar";
 import { Readout } from "../readout";
+import { LCARS_TONES } from "../../tones";
 
 const meta = {
   title: "Display/Countdown",
@@ -18,7 +19,7 @@ const meta = {
   argTypes: {
     tone: {
       control: "select",
-      options: ["neutral", "accent", "orange", "gold", "peach", "blue", "sky", "lilac", "violet", "danger"],
+      options: [...LCARS_TONES],
     },
     size: {
       control: "radio",
@@ -40,6 +41,7 @@ export const Default: Story = {
     remaining: 16320, // 4h 32m
     tone: "sky",
     size: "md",
+    layout: "row",
   },
 };
 
@@ -55,9 +57,8 @@ export const Active: Story = {
 };
 
 export const Sizes: Story = {
-  args: {
-    remaining: 16320,
-  },
+  args: { remaining: 16320 },
+  parameters: { controls: { disable: true } },
   render: () => (
     <div style={{ display: "flex", gap: 32, alignItems: "flex-start" }}>
       <Countdown label="Small" remaining={16320} size="sm" tone="sky" />
@@ -68,9 +69,8 @@ export const Sizes: Story = {
 };
 
 export const WithArcIndicator: Story = {
-  args: {
-    remaining: 16320,
-  },
+  args: { remaining: 16320 },
+  parameters: { controls: { disable: true } },
   render: () => (
     <Countdown
       label="Jump Progress"
@@ -85,9 +85,8 @@ export const WithArcIndicator: Story = {
 };
 
 export const WithStackIndicator: Story = {
-  args: {
-    remaining: 16320,
-  },
+  args: { remaining: 16320 },
+  parameters: { controls: { disable: true } },
   render: () => (
     <Countdown
       label="Scan"
@@ -102,9 +101,8 @@ export const WithStackIndicator: Story = {
 };
 
 export const ColumnLayout: Story = {
-  args: {
-    remaining: 16320,
-  },
+  args: { remaining: 16320 },
+  parameters: { controls: { disable: true } },
   render: () => (
     <div style={{ display: "flex", gap: 48 }}>
       <Countdown
@@ -142,9 +140,8 @@ export const ColumnLayout: Story = {
 };
 
 export const TimeFormats: Story = {
-  args: {
-    remaining: 0,
-  },
+  args: { remaining: 0 },
+  parameters: { controls: { disable: true } },
   render: () => (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       <Countdown label="Days" remaining={172800} tone="gold" /> {/* 2 days */}
@@ -157,9 +154,8 @@ export const TimeFormats: Story = {
 };
 
 export const JumpPanel: Story = {
-  args: {
-    remaining: 16320,
-  },
+  args: { remaining: 16320 },
+  parameters: { controls: { disable: true } },
   render: () => (
     <div style={{ minWidth: 450 }}>
       <Panel variant="default" padding="lg">
@@ -192,9 +188,8 @@ export const JumpPanel: Story = {
 };
 
 export const MultipleOperations: Story = {
-  args: {
-    remaining: 16320,
-  },
+  args: { remaining: 16320 },
+  parameters: { controls: { disable: true } },
   render: () => (
     <div style={{ minWidth: 500 }}>
       <Panel variant="default" padding="lg">
@@ -238,9 +233,8 @@ export const MultipleOperations: Story = {
 };
 
 export const StackCountdowns: Story = {
-  args: {
-    remaining: 16320,
-  },
+  args: { remaining: 16320 },
+  parameters: { controls: { disable: true } },
   render: () => (
     <div style={{ minWidth: 400 }}>
       <Panel variant="default" padding="lg">
@@ -286,9 +280,8 @@ export const StackCountdowns: Story = {
 };
 
 export const UsingReadout: Story = {
-  args: {
-    remaining: 16320,
-  },
+  args: { remaining: 16320 },
+  parameters: { controls: { disable: true } },
   render: () => (
     <div style={{ minWidth: 300 }}>
       <Panel variant="default" padding="lg">

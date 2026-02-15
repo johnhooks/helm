@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { TitleBar } from "./title-bar";
 import { StatusBadge } from "../status-badge";
+import { LCARS_TONES } from "../../tones";
 
 const meta = {
   title: "Layout/TitleBar",
@@ -12,7 +13,7 @@ const meta = {
   argTypes: {
     tone: {
       control: "select",
-      options: ["neutral", "accent", "orange", "gold", "peach", "blue", "sky", "lilac", "violet", "danger"],
+      options: [...LCARS_TONES],
     },
   },
 } satisfies Meta<typeof TitleBar>;
@@ -73,17 +74,15 @@ export const Navigation: Story = {
 };
 
 export const AllTones: Story = {
-  args: {
-    title: "Panel",
-    tone: "gold",
-  },
+  args: { title: "" },
+  parameters: { controls: { disable: true } },
   render: () => (
     <div style={{ display: "flex", flexDirection: "column", gap: 24, minWidth: 300 }}>
       <TitleBar title="Neutral" tone="neutral" />
       <TitleBar title="Accent" tone="accent" />
       <TitleBar title="Orange" tone="orange" />
       <TitleBar title="Gold" tone="gold" />
-      <TitleBar title="Peach" tone="peach" />
+      <TitleBar title="Ice" tone="ice" />
       <TitleBar title="Blue" tone="blue" />
       <TitleBar title="Sky" tone="sky" />
       <TitleBar title="Lilac" tone="lilac" />

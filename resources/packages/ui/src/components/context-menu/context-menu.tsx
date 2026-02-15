@@ -1,20 +1,19 @@
 import { useCallback, useRef, type CSSProperties, type KeyboardEvent } from "react";
+import type { LcarsTone } from "../../tones";
 import "./context-menu.css";
-
-type Tone = "accent" | "sky" | "lilac" | "gold" | "orange" | "danger" | "neutral";
 
 export interface ContextMenuAction {
   label: string;
   detail?: string;
   disabled?: boolean;
-  tone?: Tone;
+  tone?: LcarsTone;
   onClick?: () => void;
 }
 
 export interface ContextMenuProps {
   name: string;
   subtitle?: string;
-  tone?: Tone;
+  tone?: LcarsTone;
   actions: ContextMenuAction[];
   width?: number;
   className?: string;
@@ -97,7 +96,6 @@ export function ContextMenu({
 
   const classNames = [
     "helm-context-menu",
-    `helm-context-menu--${tone}`,
     className,
   ]
     .filter(Boolean)
@@ -113,7 +111,7 @@ export function ContextMenu({
       onKeyDown={handleKeyDown}
       data-testid={testId}
     >
-      <div className="helm-context-menu__header">
+      <div className={`helm-context-menu__header helm-tone--${tone}`}>
         <span className="helm-context-menu__name">{name}</span>
         {subtitle && (
           <span className="helm-context-menu__subtitle">{subtitle}</span>
@@ -132,7 +130,7 @@ export function ContextMenu({
             }}
             className={[
               "helm-context-menu__action",
-              action.tone && `helm-context-menu__action--${action.tone}`,
+              action.tone && `helm-tone--${action.tone}`,
             ]
               .filter(Boolean)
               .join(" ")}

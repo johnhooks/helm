@@ -1,4 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
+import type { LcarsTone } from "../../tones";
 
 export interface TitleBarProps {
   /**
@@ -16,17 +17,7 @@ export interface TitleBarProps {
   /**
    * Color tone for the title and border
    */
-  tone?:
-    | "neutral"
-    | "accent"
-    | "orange"
-    | "gold"
-    | "peach"
-    | "blue"
-    | "sky"
-    | "lilac"
-    | "violet"
-    | "danger";
+  tone?: LcarsTone;
   /**
    * Additional CSS class names
    */
@@ -52,7 +43,7 @@ export function TitleBar({
 }: TitleBarProps) {
   const classNames = [
     "helm-title-bar",
-    `helm-title-bar--${tone}`,
+    `helm-tone--${tone}`,
     className,
   ]
     .filter(Boolean)

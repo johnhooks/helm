@@ -49,6 +49,7 @@ export const Default: Story = {
  * Spectral classes from hot (O) to cool (M)
  */
 export const SpectralClasses: Story = {
+	parameters: { controls: { disable: true } },
 	render: () => (
 		<Panel variant="inset" padding="lg" style={{ minWidth: 500 }}>
 			<div
@@ -173,6 +174,7 @@ export const SpectralClasses: Story = {
  * Exotic stellar types
  */
 export const StellarTypes: Story = {
+	parameters: { controls: { disable: true } },
 	render: () => (
 		<Panel variant="inset" padding="lg" style={{ minWidth: 400 }}>
 			<div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -238,6 +240,7 @@ const spectralSizeMap: Record<SpectralClass, "xxs" | "xs" | "sm" | "md" | "lg" |
  * Stellar neighborhood with relative sizes
  */
 export const StellarNeighborhood: Story = {
+	parameters: { controls: { disable: true } },
 	render: () => {
 		const stars: Array<{
 			name: string;
@@ -341,6 +344,7 @@ export const StellarNeighborhood: Story = {
  * Exotic system with unusual stellar objects
  */
 export const ExoticSystem: Story = {
+	parameters: { controls: { disable: true } },
 	render: () => (
 		<Panel variant="bordered" tone="violet" padding="lg" style={{ minWidth: 500 }}>
 			<TitleBar title="PSR J0737-3039" subtitle="Binary Pulsar System" tone="violet">

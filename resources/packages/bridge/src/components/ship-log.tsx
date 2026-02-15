@@ -10,6 +10,7 @@ import { __ } from '@wordpress/i18n';
 import { store as actionsStore } from '@helm/actions';
 import type { ShipAction } from '@helm/actions';
 import { Button, LogCard, StatusBadge, Countdown } from '@helm/ui';
+import type { LcarsTone } from '@helm/ui';
 import './ship-log.css';
 
 interface ShipLogProps {
@@ -20,9 +21,7 @@ interface ShipLogProps {
  *  Action type → LogCard tone
  * --------------------------------------------------------------- */
 
-type LogCardTone = 'lilac' | 'sky' | 'gold' | 'accent' | 'orange' | 'neutral';
-
-const ACTION_TONE: Record< string, LogCardTone > = {
+const ACTION_TONE: Record< string, LcarsTone > = {
 	scan_route: 'lilac',
 	scan_planet: 'lilac',
 	survey: 'lilac',

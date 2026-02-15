@@ -206,6 +206,7 @@ const interactiveStars = [...sampleStars, ...generateRandomStars(100, 20)];
  * Interactive demo with selection handling
  */
 export const Interactive: Story = {
+  parameters: { controls: { disable: true } },
   render: () => {
     const [selectedStarId, setSelectedStarId] = useState<number | null>(null);
     const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
@@ -319,6 +320,7 @@ const cameraModes: { mode: CameraMode; label: string; description: string }[] = 
  * Compare different camera projection modes
  */
 export const CameraModes: Story = {
+  parameters: { controls: { disable: true } },
   render: () => {
     const [cameraMode, setCameraMode] = useState<CameraMode>("perspective");
 

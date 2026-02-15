@@ -2,7 +2,7 @@
 .helm-orb-indicator {
   display: inline-block;
   border-radius: 50%;
-  background: var(--helm-surface-bg);
+  background: var(--helm-tone);
 }
 
 .helm-orb-indicator--sm {

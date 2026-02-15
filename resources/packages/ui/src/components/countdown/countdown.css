@@ -5,23 +5,9 @@
    ============================================================================= */
 
 .helm-countdown {
-  --countdown-color: var(--helm-ui-color-accent);
-
   display: flex;
   font-family: var(--helm-ui-font-family);
 }
-
-/* Tones - same as Readout */
-.helm-countdown--neutral { --countdown-color: var(--helm-ui-color-muted); }
-.helm-countdown--accent { --countdown-color: var(--helm-ui-color-accent); }
-.helm-countdown--orange { --countdown-color: var(--helm-ui-color-orange); }
-.helm-countdown--gold { --countdown-color: var(--helm-ui-color-gold); }
-.helm-countdown--peach { --countdown-color: var(--helm-ui-color-peach); }
-.helm-countdown--blue { --countdown-color: var(--helm-ui-color-blue); }
-.helm-countdown--sky { --countdown-color: var(--helm-ui-color-sky); }
-.helm-countdown--lilac { --countdown-color: var(--helm-ui-color-lilac); }
-.helm-countdown--violet { --countdown-color: var(--helm-ui-color-violet); }
-.helm-countdown--danger { --countdown-color: var(--helm-ui-color-danger-accent); }
 
 /* =============================================================================
    LAYOUT VARIANTS
@@ -71,7 +57,7 @@
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--countdown-color);
+  color: var(--helm-tone);
 }
 
 .helm-countdown--sm .helm-countdown__label { font-size: var(--helm-ui-font-size-label-sm); }
@@ -84,7 +70,7 @@
 
 .helm-countdown__time {
   font-weight: 700;
-  color: var(--countdown-color);
+  color: var(--helm-tone);
   font-variant-numeric: tabular-nums;
 }
 
@@ -129,10 +115,17 @@
 @keyframes countdown-indicator-pulse {
   0%, 100% {
     opacity: 1;
-    filter: drop-shadow(0 0 4px var(--countdown-color));
+    filter: drop-shadow(0 0 4px var(--helm-tone));
   }
   50% {
     opacity: 0.8;
-    filter: drop-shadow(0 0 12px var(--countdown-color));
+    filter: drop-shadow(0 0 12px var(--helm-tone));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .helm-countdown--active .helm-countdown__time,
+  .helm-countdown--active .helm-countdown__indicator {
+    animation: none;
   }
 }

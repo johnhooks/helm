@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { LCARS_TONES } from "../../tones";
 import { Button } from "./button";
 
 const meta = {
@@ -13,29 +14,9 @@ const meta = {
       control: "select",
       options: ["primary", "secondary", "tertiary", "ghost", "danger"],
     },
-    surface: {
+    tone: {
       control: "select",
-      options: [
-        "neutral",
-        "base",
-        "accent",
-        "muted",
-        "danger",
-        "success",
-        "warning",
-        "info",
-        "orange",
-        "gold",
-        "peach",
-        "sunset",
-        "blue",
-        "sky",
-        "ice",
-        "lilac",
-        "violet",
-        "plum",
-        "hopbush",
-      ],
+      options: [...LCARS_TONES],
     },
     size: { control: "inline-radio", options: ["sm", "md"] },
     edge: { control: "inline-radio", options: ["none", "left", "right"] },
@@ -63,7 +44,8 @@ export const Default: Story = {
 };
 
 export const Variants: Story = {
-  args: { children: "Button" },
+  args: { children: null },
+  parameters: { controls: { disable: true } },
   render: () => (
     <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
       <Button variant="primary">Primary</Button>
@@ -76,7 +58,8 @@ export const Variants: Story = {
 };
 
 export const EdgeStack: Story = {
-  args: { children: "Button" },
+  args: { children: null },
+  parameters: { controls: { disable: true } },
   render: () => (
     <div
       style={{
@@ -132,6 +115,23 @@ export const EdgeStack: Story = {
           Comms
         </Button>
       </div>
+    </div>
+  ),
+};
+
+export const Tones: Story = {
+  args: { children: null },
+  parameters: { controls: { disable: true } },
+  render: () => (
+    <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+      <Button tone="accent">Accent</Button>
+      <Button tone="orange">Orange</Button>
+      <Button tone="gold">Gold</Button>
+      <Button tone="blue">Blue</Button>
+      <Button tone="sky">Sky</Button>
+      <Button tone="success">Success</Button>
+      <Button tone="lilac">Lilac</Button>
+      <Button tone="violet">Violet</Button>
     </div>
   ),
 };

@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { LCARS_TONES } from "../../tones";
 import { SelectControl } from "./select-control";
 
 const meta = {
@@ -18,18 +19,11 @@ const meta = {
   argTypes: {
     surface: {
       control: "select",
-      options: [
-        "neutral",
-        "base",
-        "accent",
-        "muted",
-        "orange",
-        "gold",
-        "blue",
-        "sky",
-        "lilac",
-        "violet",
-      ],
+      options: ["neutral", "base", "accent", "muted"],
+    },
+    tone: {
+      control: "select",
+      options: [...LCARS_TONES],
     },
     size: {
       control: "radio",
@@ -60,6 +54,8 @@ export const Default: Story = {
   args: {
     options: scanDepthOptions,
     placeholder: "Select scan depth...",
+    surface: "neutral",
+    size: "md",
   },
 };
 
@@ -103,6 +99,7 @@ export const Small: Story = {
 };
 
 export const Surfaces: Story = {
+  parameters: { controls: { disable: true } },
   render: () => (
     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
       <SelectControl
@@ -112,18 +109,18 @@ export const Surfaces: Story = {
       />
       <SelectControl
         options={scanDepthOptions}
-        placeholder="Gold"
-        surface="gold"
+        placeholder="Base"
+        surface="base"
       />
       <SelectControl
         options={scanDepthOptions}
-        placeholder="Sky"
-        surface="sky"
+        placeholder="Accent"
+        surface="accent"
       />
       <SelectControl
         options={scanDepthOptions}
-        placeholder="Lilac"
-        surface="lilac"
+        placeholder="Muted"
+        surface="muted"
       />
     </div>
   ),
@@ -135,4 +132,52 @@ export const MultiSelect: Story = {
     placeholder: "Select destinations...",
     isMulti: true,
   },
+};
+
+export const Tones: Story = {
+  parameters: { controls: { disable: true } },
+  render: () => (
+    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+      <SelectControl
+        options={scanDepthOptions}
+        defaultValue={scanDepthOptions[1]}
+        tone="accent"
+      />
+      <SelectControl
+        options={scanDepthOptions}
+        defaultValue={scanDepthOptions[1]}
+        tone="orange"
+      />
+      <SelectControl
+        options={scanDepthOptions}
+        defaultValue={scanDepthOptions[1]}
+        tone="gold"
+      />
+      <SelectControl
+        options={scanDepthOptions}
+        defaultValue={scanDepthOptions[1]}
+        tone="blue"
+      />
+      <SelectControl
+        options={scanDepthOptions}
+        defaultValue={scanDepthOptions[1]}
+        tone="sky"
+      />
+      <SelectControl
+        options={scanDepthOptions}
+        defaultValue={scanDepthOptions[1]}
+        tone="success"
+      />
+      <SelectControl
+        options={scanDepthOptions}
+        defaultValue={scanDepthOptions[1]}
+        tone="lilac"
+      />
+      <SelectControl
+        options={scanDepthOptions}
+        defaultValue={scanDepthOptions[1]}
+        tone="violet"
+      />
+    </div>
+  ),
 };

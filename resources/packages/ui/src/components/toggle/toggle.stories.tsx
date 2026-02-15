@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { LCARS_TONES } from "../../tones";
 import { Toggle } from "./toggle";
 
 const meta = {
@@ -10,18 +11,9 @@ const meta = {
     backgrounds: { default: "dark" },
   },
   argTypes: {
-    surface: {
+    tone: {
       control: "select",
-      options: [
-        "accent",
-        "orange",
-        "gold",
-        "blue",
-        "sky",
-        "success",
-        "lilac",
-        "violet",
-      ],
+      options: [...LCARS_TONES],
     },
     size: {
       control: "radio",
@@ -41,12 +33,15 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   args: {
     label: "Auto-scan",
-    surface: "accent",
+    tone: "accent",
     size: "md",
+    labelPosition: "right",
+    disabled: false,
   },
 };
 
 export const Controlled: Story = {
+  parameters: { controls: { disable: true } },
   render: () => {
     const [checked, setChecked] = useState(false);
     return (
@@ -64,22 +59,24 @@ export const Controlled: Story = {
   },
 };
 
-export const Surfaces: Story = {
+export const Tones: Story = {
+  parameters: { controls: { disable: true } },
   render: () => (
     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-      <Toggle defaultChecked label="Accent" surface="accent" />
-      <Toggle defaultChecked label="Orange" surface="orange" />
-      <Toggle defaultChecked label="Gold" surface="gold" />
-      <Toggle defaultChecked label="Blue" surface="blue" />
-      <Toggle defaultChecked label="Sky" surface="sky" />
-      <Toggle defaultChecked label="Success" surface="success" />
-      <Toggle defaultChecked label="Lilac" surface="lilac" />
-      <Toggle defaultChecked label="Violet" surface="violet" />
+      <Toggle defaultChecked label="Accent" tone="accent" />
+      <Toggle defaultChecked label="Orange" tone="orange" />
+      <Toggle defaultChecked label="Gold" tone="gold" />
+      <Toggle defaultChecked label="Blue" tone="blue" />
+      <Toggle defaultChecked label="Sky" tone="sky" />
+      <Toggle defaultChecked label="Success" tone="success" />
+      <Toggle defaultChecked label="Lilac" tone="lilac" />
+      <Toggle defaultChecked label="Violet" tone="violet" />
     </div>
   ),
 };
 
 export const Sizes: Story = {
+  parameters: { controls: { disable: true } },
   render: () => (
     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
       <Toggle defaultChecked label="Small" size="sm" />
@@ -89,6 +86,7 @@ export const Sizes: Story = {
 };
 
 export const LabelPosition: Story = {
+  parameters: { controls: { disable: true } },
   render: () => (
     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
       <Toggle defaultChecked label="Label Right" labelPosition="right" />
@@ -98,6 +96,7 @@ export const LabelPosition: Story = {
 };
 
 export const Disabled: Story = {
+  parameters: { controls: { disable: true } },
   render: () => (
     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
       <Toggle disabled label="Disabled Off" />
@@ -114,6 +113,7 @@ export const NoLabel: Story = {
 };
 
 export const SystemSettings: Story = {
+  parameters: { controls: { disable: true } },
   render: () => {
     const [settings, setSettings] = useState({
       autoScan: true,
@@ -142,25 +142,25 @@ export const SystemSettings: Story = {
           checked={settings.autoScan}
           onChange={toggle("autoScan")}
           label="Auto-scan"
-          surface="sky"
+          tone="sky"
         />
         <Toggle
           checked={settings.shields}
           onChange={toggle("shields")}
           label="Shields"
-          surface="blue"
+          tone="blue"
         />
         <Toggle
           checked={settings.comms}
           onChange={toggle("comms")}
           label="Comms"
-          surface="gold"
+          tone="gold"
         />
         <Toggle
           checked={settings.stealth}
           onChange={toggle("stealth")}
           label="Stealth"
-          surface="violet"
+          tone="violet"
         />
       </div>
     );

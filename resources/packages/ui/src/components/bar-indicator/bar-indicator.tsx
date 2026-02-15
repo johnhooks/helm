@@ -1,4 +1,5 @@
 import type { CSSProperties } from 'react';
+import type { LcarsTone } from '../../tones';
 
 export interface BarIndicatorProps {
 	/**
@@ -12,26 +13,7 @@ export interface BarIndicatorProps {
 	/**
 	 * Surface tone
 	 */
-	tone?:
-		| 'neutral'
-		| 'base'
-		| 'accent'
-		| 'muted'
-		| 'danger'
-		| 'success'
-		| 'warning'
-		| 'info'
-		| 'orange'
-		| 'gold'
-		| 'peach'
-		| 'sunset'
-		| 'blue'
-		| 'sky'
-		| 'ice'
-		| 'lilac'
-		| 'violet'
-		| 'plum'
-		| 'hopbush';
+	tone?: LcarsTone;
 	/**
 	 * Additional CSS class names
 	 */
@@ -49,7 +31,7 @@ export interface BarIndicatorProps {
 export function BarIndicator({
 	level = 60,
 	size = 'md',
-	tone = 'accent',
+	tone = 'neutral',
 	className = '',
 	style,
 	'data-testid': testId,
@@ -57,8 +39,7 @@ export function BarIndicator({
 	const clamped = Math.min(100, Math.max(0, level));
 	const classNames = [
 		'helm-bar-indicator',
-		'helm-surface',
-		`helm-surface--${tone}`,
+		`helm-tone--${tone}`,
 		`helm-bar-indicator--${size}`,
 		className,
 	]

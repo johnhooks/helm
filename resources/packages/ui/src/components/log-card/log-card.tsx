@@ -1,4 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
+import type { LcarsTone } from "../../tones";
 import { Panel } from "../panel";
 import "./log-card.css";
 
@@ -14,7 +15,7 @@ export interface LogCardProps {
   /**
    * Color tone for the accent orb
    */
-  tone?: "accent" | "sky" | "lilac" | "gold" | "orange" | "neutral";
+  tone?: LcarsTone;
   /**
    * Card variant
    *
@@ -58,7 +59,7 @@ const PANEL_MAP = {
 export function LogCard({
   time,
   title,
-  tone = "accent",
+  tone = "neutral",
   variant = "default",
   status,
   action,
@@ -72,7 +73,7 @@ export function LogCard({
 
   const classNames = [
     "helm-log-card",
-    `helm-log-card--${tone}`,
+    `helm-tone--${tone}`,
     `helm-log-card--${variant}`,
     className,
   ]

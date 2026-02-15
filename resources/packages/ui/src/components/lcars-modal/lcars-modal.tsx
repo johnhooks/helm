@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { Modal } from "@wordpress/components";
 import { TitleBar } from "../title-bar";
+import type { LcarsTone } from "../../tones";
 
 export interface LcarsModalProps {
   /**
@@ -22,17 +23,7 @@ export interface LcarsModalProps {
   /**
    * Color tone
    */
-  tone?:
-    | "neutral"
-    | "accent"
-    | "orange"
-    | "gold"
-    | "peach"
-    | "blue"
-    | "sky"
-    | "lilac"
-    | "violet"
-    | "danger";
+  tone?: LcarsTone;
   /**
    * Size variant
    */
@@ -65,7 +56,7 @@ export function LcarsModal({
     <Modal
       title={title}
       onRequestClose={onRequestClose}
-      className={`helm-lcars-modal helm-lcars-modal--${tone} helm-lcars-modal--${size}`}
+      className={`helm-lcars-modal helm-tone--${tone} helm-lcars-modal--${size}`}
       overlayClassName="helm-lcars-modal__overlay"
       __experimentalHideHeader
     >

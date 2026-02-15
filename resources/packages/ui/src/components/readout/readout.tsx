@@ -1,4 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
+import type { LcarsTone } from "../../tones";
 
 export interface ReadoutProps {
   /**
@@ -20,16 +21,7 @@ export interface ReadoutProps {
   /**
    * Color tone
    */
-  tone?:
-    | "neutral"
-    | "accent"
-    | "orange"
-    | "gold"
-    | "peach"
-    | "blue"
-    | "sky"
-    | "lilac"
-    | "violet";
+  tone?: LcarsTone;
   /**
    * Size variant
    */
@@ -57,7 +49,7 @@ export function Readout({
   value,
   max,
   unit,
-  tone = "accent",
+  tone = "neutral",
   size = "md",
   align = "left",
   className = "",
@@ -68,7 +60,7 @@ export function Readout({
     "helm-readout",
     `helm-readout--${size}`,
     `helm-readout--${align}`,
-    `helm-readout--${tone}`,
+    `helm-tone--${tone}`,
     className,
   ]
     .filter(Boolean)

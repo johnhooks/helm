@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import type { LcarsTone } from "../../tones";
 
 export interface MatrixIndicatorProps {
   /**
@@ -16,26 +17,7 @@ export interface MatrixIndicatorProps {
   /**
    * Surface tone
    */
-  tone?:
-    | "neutral"
-    | "base"
-    | "accent"
-    | "muted"
-    | "danger"
-    | "success"
-    | "warning"
-    | "info"
-    | "orange"
-    | "gold"
-    | "peach"
-    | "sunset"
-    | "blue"
-    | "sky"
-    | "ice"
-    | "lilac"
-    | "violet"
-    | "plum"
-    | "hopbush";
+  tone?: LcarsTone;
   /**
    * Additional CSS class names
    */
@@ -54,7 +36,7 @@ export function MatrixIndicator({
   level = 60,
   rows = 6,
   cols = 4,
-  tone = "accent",
+  tone = "neutral",
   className = "",
   style,
   "data-testid": testId,
@@ -69,8 +51,7 @@ export function MatrixIndicator({
 
   const classNames = [
     "helm-matrix-indicator",
-    "helm-surface",
-    `helm-surface--${tone}`,
+    `helm-tone--${tone}`,
     className,
   ]
     .filter(Boolean)

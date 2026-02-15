@@ -20,15 +20,11 @@ export const lcarsColors = {
   info: new Color("#7fb2ff"),
   orange: new Color("#ff9900"),
   gold: new Color("#ffcc66"),
-  peach: new Color("#ffcc99"),
-  sunset: new Color("#ff9966"),
   blue: new Color("#99ccff"),
   sky: new Color("#6699cc"),
   ice: new Color("#ccddff"),
   lilac: new Color("#cc99cc"),
   violet: new Color("#9999cc"),
-  plum: new Color("#664466"),
-  hopbush: new Color("#c082a9"),
 } as const;
 
 /**
@@ -89,5 +85,5 @@ export function getRouteColor(status?: string, active?: boolean): Color {
   if (status && status in routeStatusColors) {
     return routeStatusColors[status].clone();
   }
-  return lcarsColors.peach.clone();
+  return lcarsColors.gold.clone();
 }

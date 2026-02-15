@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { ArcIndicator } from './arc-indicator';
+import { LCARS_TONES } from '../../tones';
 
 const meta = {
 	title: 'UI/Indicators/Arc',
@@ -14,27 +15,7 @@ const meta = {
 		},
 		tone: {
 			control: 'select',
-			options: [
-				'neutral',
-				'base',
-				'accent',
-				'muted',
-				'danger',
-				'success',
-				'warning',
-				'info',
-				'orange',
-				'gold',
-				'peach',
-				'sunset',
-				'blue',
-				'sky',
-				'ice',
-				'lilac',
-				'violet',
-				'plum',
-				'hopbush',
-			],
+			options: [...LCARS_TONES],
 		},
 		level: { control: { type: 'range', min: 0, max: 100 } },
 	},
@@ -52,6 +33,7 @@ export const Default: Story = {
 };
 
 export const Sizes: Story = {
+	parameters: { controls: { disable: true } },
 	render: () => (
 		<div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
 			<ArcIndicator size="sm" tone="gold" level={62} />

@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { LcarsModal } from "./lcars-modal";
 import { Button } from "../button";
 import { Readout } from "../readout";
+import { LCARS_TONES } from "../../tones";
 
 const meta = {
   title: "Overlay/LcarsModal",
@@ -14,7 +15,7 @@ const meta = {
   argTypes: {
     tone: {
       control: "select",
-      options: ["neutral", "accent", "orange", "gold", "peach", "blue", "sky", "lilac", "violet", "danger"],
+      options: [...LCARS_TONES],
     },
     size: {
       control: "radio",
@@ -66,19 +67,14 @@ export const Default: Story = {
 };
 
 export const JumpConfirmation: Story = {
-  args: {
-    title: "Confirm Jump",
-    onRequestClose: () => {},
-    tone: "sky",
-    size: "medium",
-    children: null,
-  },
+  args: { title: "Confirm Jump", onRequestClose: () => {}, children: null },
+  parameters: { controls: { disable: true } },
   render: function JumpModal() {
     const [isOpen, setIsOpen] = useState(true);
 
     return (
       <>
-        <Button onClick={() => setIsOpen(true)} surface="base">Initiate Jump</Button>
+        <Button onClick={() => setIsOpen(true)} variant="ghost">Initiate Jump</Button>
         <LcarsModal
           title="Confirm Jump"
           tone="sky"
@@ -106,13 +102,8 @@ export const JumpConfirmation: Story = {
 };
 
 export const RedAlert: Story = {
-  args: {
-    title: "Red Alert",
-    onRequestClose: () => {},
-    tone: "danger",
-    size: "medium",
-    children: null,
-  },
+  args: { title: "Red Alert", onRequestClose: () => {}, children: null },
+  parameters: { controls: { disable: true } },
   render: function AlertModal() {
     const [isOpen, setIsOpen] = useState(true);
 
@@ -146,12 +137,8 @@ export const RedAlert: Story = {
 };
 
 export const Sizes: Story = {
-  args: {
-    title: "Size Demo",
-    onRequestClose: () => {},
-    tone: "gold",
-    children: null,
-  },
+  args: { title: "Size Demo", onRequestClose: () => {}, children: null },
+  parameters: { controls: { disable: true } },
   render: function SizesDemo() {
     const [openSize, setOpenSize] = useState<string | null>(null);
 
@@ -211,12 +198,8 @@ export const Sizes: Story = {
 };
 
 export const AllTones: Story = {
-  args: {
-    title: "Tones",
-    onRequestClose: () => {},
-    tone: "gold",
-    children: null,
-  },
+  args: { title: "Tones", onRequestClose: () => {}, children: null },
+  parameters: { controls: { disable: true } },
   render: function TonesDemo() {
     const [openTone, setOpenTone] = useState<string | null>(null);
     const tones = ["gold", "sky", "accent", "lilac", "orange", "danger"] as const;
@@ -250,13 +233,8 @@ export const AllTones: Story = {
 };
 
 export const NoFooter: Story = {
-  args: {
-    title: "Information",
-    onRequestClose: () => {},
-    tone: "accent",
-    size: "small",
-    children: null,
-  },
+  args: { title: "Information", onRequestClose: () => {}, children: null },
+  parameters: { controls: { disable: true } },
   render: function NoFooterModal() {
     const [isOpen, setIsOpen] = useState(true);
 

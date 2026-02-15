@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { OrbIndicator } from "./orb-indicator";
+import { LCARS_TONES } from "../../tones";
 
 const meta = {
   title: "UI/Indicators/Orb",
@@ -11,27 +12,7 @@ const meta = {
     size: { control: "inline-radio", options: ["sm", "md", "lg", "xl", "2xl"] },
     tone: {
       control: "select",
-      options: [
-        "neutral",
-        "base",
-        "accent",
-        "muted",
-        "danger",
-        "success",
-        "warning",
-        "info",
-        "orange",
-        "gold",
-        "peach",
-        "sunset",
-        "blue",
-        "sky",
-        "ice",
-        "lilac",
-        "violet",
-        "plum",
-        "hopbush",
-      ],
+      options: [...LCARS_TONES],
     },
   },
 } satisfies Meta<typeof OrbIndicator>;
@@ -47,6 +28,7 @@ export const Default: Story = {
 };
 
 export const Sizes: Story = {
+  parameters: { controls: { disable: true } },
   render: () => (
     <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
       <OrbIndicator size="sm" tone="accent" />

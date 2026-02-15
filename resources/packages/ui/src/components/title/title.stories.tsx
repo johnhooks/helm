@@ -26,7 +26,8 @@ export const Default: Story = {
 };
 
 export const Alignments: Story = {
-  args: { label: "Title" },
+  args: { label: "" },
+  parameters: { controls: { disable: true } },
   render: () => (
     <div
       style={{

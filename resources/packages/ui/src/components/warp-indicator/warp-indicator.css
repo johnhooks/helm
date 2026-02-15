@@ -8,7 +8,7 @@
 .helm-warp-indicator__shell {
   position: relative;
   display: block;
-  background: color-mix(in srgb, var(--helm-surface-bg) 30%, #000 70%);
+  background: color-mix(in srgb, var(--helm-tone) 30%, #000 70%);
   border-radius: 999px;
   overflow: hidden;
 }
@@ -25,7 +25,7 @@
 
 .helm-warp-indicator__segment {
   border-radius: 999px;
-  background: color-mix(in srgb, var(--helm-surface-bg) 35%, #000 65%);
+  background: color-mix(in srgb, var(--helm-tone) 35%, #000 65%);
   opacity: calc(var(--helm-warp-intensity) * 0.35);
   animation: helm-warp-glow var(--helm-warp-speed) ease-in-out infinite;
   animation-delay: var(--helm-warp-delay);
@@ -99,11 +99,11 @@
   0%,
   100% {
     opacity: calc(var(--helm-warp-intensity) * 0.35);
-    background: color-mix(in srgb, var(--helm-surface-bg) 35%, #000 65%);
+    background: color-mix(in srgb, var(--helm-tone) 35%, #000 65%);
   }
   50% {
     opacity: calc(var(--helm-warp-intensity) * 1.05);
-    background: color-mix(in srgb, var(--helm-surface-bg) 85%, #fff 15%);
+    background: color-mix(in srgb, var(--helm-tone) 85%, #fff 15%);
   }
 }
 

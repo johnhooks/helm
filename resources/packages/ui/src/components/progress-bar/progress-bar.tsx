@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import type { LcarsTone } from "../../tones";
 
 export interface ProgressBarProps {
   /**
@@ -28,18 +29,7 @@ export interface ProgressBarProps {
   /**
    * Color tone
    */
-  tone?:
-    | "neutral"
-    | "accent"
-    | "orange"
-    | "gold"
-    | "peach"
-    | "blue"
-    | "sky"
-    | "lilac"
-    | "violet"
-    | "danger"
-    | "success";
+  tone?: LcarsTone;
   /**
    * Indeterminate state (for unknown progress)
    */
@@ -69,7 +59,7 @@ export function ProgressBar({
   label,
   showValue = false,
   size = "md",
-  tone = "accent",
+  tone = "neutral",
   indeterminate = false,
   active = false,
   className = "",
@@ -81,7 +71,7 @@ export function ProgressBar({
   const classNames = [
     "helm-progress-bar",
     `helm-progress-bar--${size}`,
-    `helm-progress-bar--${tone}`,
+    `helm-tone--${tone}`,
     indeterminate && "helm-progress-bar--indeterminate",
     active && "helm-progress-bar--active",
     className,

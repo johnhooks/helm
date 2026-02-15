@@ -3,9 +3,9 @@
   display: inline-block;
   border-radius: 50%;
   background: conic-gradient(
-    var(--helm-surface-bg) 0deg,
-    var(--helm-surface-bg) calc(var(--helm-arc-level) * 2.7deg),
-    color-mix(in srgb, var(--helm-surface-bg) 20%, transparent) 0
+    var(--helm-tone) 0deg,
+    var(--helm-tone) calc(var(--helm-arc-level) * 2.7deg),
+    color-mix(in srgb, var(--helm-tone) 20%, transparent) 0
   );
   mask: radial-gradient(
     farthest-side,

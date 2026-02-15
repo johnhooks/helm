@@ -11,14 +11,6 @@
   overflow: hidden;
 }
 
-/* Tone colors */
-.helm-log-card--neutral { --helm-log-card-color: var(--helm-ui-color-muted); }
-.helm-log-card--accent  { --helm-log-card-color: var(--helm-ui-color-accent); }
-.helm-log-card--sky     { --helm-log-card-color: var(--helm-ui-color-sky); }
-.helm-log-card--lilac   { --helm-log-card-color: var(--helm-ui-color-lilac); }
-.helm-log-card--gold    { --helm-log-card-color: var(--helm-ui-color-gold); }
-.helm-log-card--orange  { --helm-log-card-color: var(--helm-ui-color-orange); }
-
 /* =============================================================================
    Orb
    ============================================================================= */
@@ -30,9 +22,9 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--helm-log-card-color);
+  background: var(--helm-tone);
   opacity: 0.6;
-  box-shadow: 0 0 6px color-mix(in srgb, var(--helm-log-card-color) 27%, transparent);
+  box-shadow: 0 0 6px color-mix(in srgb, var(--helm-tone) 27%, transparent);
 }
 
 /* =============================================================================
@@ -98,7 +90,13 @@
 .helm-log-card__sweep {
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--helm-log-card-color) 3%, transparent), transparent);
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--helm-tone) 3%, transparent), transparent);
   animation: helm-log-card-sweep 3s ease-in-out infinite;
   pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .helm-log-card__sweep {
+    animation: none;
+  }
 }

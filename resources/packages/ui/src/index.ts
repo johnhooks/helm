@@ -4,6 +4,9 @@
  * @package
  */
 
+export { LCARS_TONES } from "./tones";
+export type { LcarsTone } from "./tones";
+
 export { AppRoot } from "./components/app-root";
 export type { AppRootProps } from "./components/app-root";
 

@@ -120,54 +120,18 @@
 
 /* Focus state */
 .helm-segmented__input:focus-visible + .helm-segmented__label {
-  outline: 2px solid var(--helm-ui-color-focus);
+  outline: 2px solid var(--helm-tone);
   outline-offset: 1px;
 }
 
-/* Active/checked state - base styles */
-.helm-segmented__input:checked + .helm-segmented__label {
-  color: var(--helm-ui-color-bg);
-}
-
-/* Surface colors for active state */
-.helm-segmented--neutral .helm-segmented__input:checked + .helm-segmented__label {
-  background: var(--helm-ui-color-muted);
-}
-
-.helm-segmented--accent .helm-segmented__input:checked + .helm-segmented__label {
-  background: var(--helm-ui-color-accent);
-}
-
-.helm-segmented--orange .helm-segmented__input:checked + .helm-segmented__label {
-  background: var(--helm-ui-color-orange);
-}
-
-.helm-segmented--gold .helm-segmented__input:checked + .helm-segmented__label {
-  background: var(--helm-ui-color-gold);
-}
-
-.helm-segmented--blue .helm-segmented__input:checked + .helm-segmented__label {
-  background: var(--helm-ui-color-blue);
-}
-
-.helm-segmented--sky .helm-segmented__input:checked + .helm-segmented__label {
-  background: var(--helm-ui-color-sky);
-}
-
-.helm-segmented--success .helm-segmented__input:checked + .helm-segmented__label {
-  background: var(--helm-ui-color-success);
-}
-
-.helm-segmented--lilac .helm-segmented__input:checked + .helm-segmented__label {
-  background: var(--helm-ui-color-lilac);
-}
-
-.helm-segmented--violet .helm-segmented__input:checked + .helm-segmented__label {
-  background: var(--helm-ui-color-violet);
+/* Active/checked state — reads surface variables from tone + .helm-surface--toned */
+.helm-segmented .helm-segmented__input:checked + .helm-segmented__label {
+  background: var(--helm-surface-bg);
+  color: var(--helm-surface-fg);
 }
 
 /* Hover on active */
 .helm-segmented__option:not(.helm-segmented__option--disabled) .helm-segmented__input:checked:hover + .helm-segmented__label {
   filter: brightness(1.1);
-  color: var(--helm-ui-color-bg);
+  color: var(--helm-surface-fg);
 }

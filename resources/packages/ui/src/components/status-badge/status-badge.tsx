@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import type { LcarsTone } from "../../tones";
 
 export interface StatusBadgeProps {
   /**
@@ -8,20 +9,7 @@ export interface StatusBadgeProps {
   /**
    * Surface tone
    */
-  tone?:
-    | "neutral"
-    | "muted"
-    | "accent"
-    | "success"
-    | "warning"
-    | "danger"
-    | "info"
-    | "orange"
-    | "gold"
-    | "blue"
-    | "sky"
-    | "lilac"
-    | "violet";
+  tone?: LcarsTone;
   /**
    * Size variant
    */
@@ -55,7 +43,7 @@ export function StatusBadge({
 }: StatusBadgeProps) {
   const classNames = [
     "helm-status-badge",
-    `helm-status-badge--${tone}`,
+    `helm-tone--${tone}`,
     `helm-status-badge--${size}`,
     className,
   ]

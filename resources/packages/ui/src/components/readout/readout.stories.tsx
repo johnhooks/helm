@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Readout } from "./readout";
+import { LCARS_TONES } from "../../tones";
 
 const meta = {
   title: "Display/Readout",
@@ -11,7 +12,7 @@ const meta = {
   argTypes: {
     tone: {
       control: "select",
-      options: ["neutral", "accent", "orange", "gold", "peach", "blue", "sky", "lilac", "violet"],
+      options: [...LCARS_TONES],
     },
     size: {
       control: "radio",
@@ -40,10 +41,8 @@ export const Default: Story = {
 };
 
 export const Tones: Story = {
-  args: {
-    label: "Power",
-    value: 85,
-  },
+  args: { label: "", value: "" },
+  parameters: { controls: { disable: true } },
   render: () => (
     <div style={{ display: "flex", gap: 24 }}>
       <Readout label="Power" value={85} max={100} tone="accent" />
@@ -55,17 +54,15 @@ export const Tones: Story = {
 };
 
 export const AllTones: Story = {
-  args: {
-    label: "Power",
-    value: 85,
-  },
+  args: { label: "", value: "" },
+  parameters: { controls: { disable: true } },
   render: () => (
     <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20 }}>
       <Readout label="Neutral" value={85} tone="neutral" />
       <Readout label="Accent" value={85} tone="accent" />
       <Readout label="Orange" value={85} tone="orange" />
       <Readout label="Gold" value={85} tone="gold" />
-      <Readout label="Peach" value={85} tone="peach" />
+      <Readout label="Ice" value={85} tone="ice" />
       <Readout label="Blue" value={85} tone="blue" />
       <Readout label="Sky" value={85} tone="sky" />
       <Readout label="Lilac" value={85} tone="lilac" />
@@ -75,10 +72,8 @@ export const AllTones: Story = {
 };
 
 export const Sizes: Story = {
-  args: {
-    label: "Power",
-    value: 85,
-  },
+  args: { label: "", value: "" },
+  parameters: { controls: { disable: true } },
   render: () => (
     <div style={{ display: "flex", gap: 32, alignItems: "flex-start" }}>
       <Readout label="Power" value={85} max={100} unit="MW" size="sm" tone="gold" />
@@ -89,10 +84,8 @@ export const Sizes: Story = {
 };
 
 export const Alignments: Story = {
-  args: {
-    label: "Power",
-    value: 85,
-  },
+  args: { label: "", value: "" },
+  parameters: { controls: { disable: true } },
   render: () => (
     <div style={{ display: "flex", gap: 32 }}>
       <div style={{ width: 120, padding: 12, background: "#141414", borderRadius: 8 }}>
@@ -109,10 +102,8 @@ export const Alignments: Story = {
 };
 
 export const WarpCorePanel: Story = {
-  args: {
-    label: "Power",
-    value: 85,
-  },
+  args: { label: "", value: "" },
+  parameters: { controls: { disable: true } },
   render: () => (
     <div style={{ padding: 16, background: "#141414", borderRadius: 12 }}>
       <div
@@ -137,10 +128,8 @@ export const WarpCorePanel: Story = {
 };
 
 export const ShipSystems: Story = {
-  args: {
-    label: "Power",
-    value: 85,
-  },
+  args: { label: "", value: "" },
+  parameters: { controls: { disable: true } },
   render: () => (
     <div
       style={{
@@ -162,10 +151,8 @@ export const ShipSystems: Story = {
 };
 
 export const NavigationPanel: Story = {
-  args: {
-    label: "Power",
-    value: 85,
-  },
+  args: { label: "", value: "" },
+  parameters: { controls: { disable: true } },
   render: () => (
     <div style={{ padding: 16, background: "#141414", borderRadius: 12 }}>
       <div
@@ -190,10 +177,8 @@ export const NavigationPanel: Story = {
 };
 
 export const CenteredGrid: Story = {
-  args: {
-    label: "Power",
-    value: 85,
-  },
+  args: { label: "", value: "" },
+  parameters: { controls: { disable: true } },
   render: () => (
     <div
       style={{
@@ -214,10 +199,8 @@ export const CenteredGrid: Story = {
 };
 
 export const WithAccentHighlight: Story = {
-  args: {
-    label: "Power",
-    value: 85,
-  },
+  args: { label: "", value: "" },
+  parameters: { controls: { disable: true } },
   render: () => (
     <div style={{ padding: 16, background: "#141414", borderRadius: 12 }}>
       <div

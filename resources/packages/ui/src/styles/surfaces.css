@@ -1,287 +1,86 @@
-.helm-surface {
-  --helm-surface-bg: var(--helm-ui-color-surface);
-  --helm-surface-text: var(--helm-ui-color-text);
-  --helm-surface-muted: var(--helm-ui-color-muted);
-  --helm-surface-border: var(--helm-ui-color-border);
-  --helm-surface-hover: var(--helm-ui-color-surface-2);
-}
+/* =============================================================================
+   SURFACES — structural surface blocks for Button / SelectControl
+   Sets --helm-surface-* variables used by interactive controls.
+   ============================================================================= */
 
 .helm-surface--neutral {
   --helm-surface-bg: var(--helm-ui-color-surface);
-  --helm-surface-text: var(--helm-ui-color-text);
-  --helm-surface-muted: var(--helm-ui-color-muted);
+  --helm-surface-fg: var(--helm-ui-color-text);
+  --helm-surface-fg-muted: var(--helm-ui-color-muted);
+  --helm-surface-fg-hover: var(--helm-ui-color-text);
   --helm-surface-border: var(--helm-ui-color-border);
-  --helm-surface-hover: var(--helm-ui-color-surface-2);
+  --helm-surface-bg-hover: var(--helm-ui-color-surface-2);
 }
 
 .helm-surface--base {
   --helm-surface-bg: var(--helm-ui-color-bg);
-  --helm-surface-text: var(--helm-ui-color-text);
-  --helm-surface-muted: var(--helm-ui-color-muted);
+  --helm-surface-fg: var(--helm-ui-color-text);
+  --helm-surface-fg-muted: var(--helm-ui-color-muted);
+  --helm-surface-fg-hover: var(--helm-ui-color-text);
   --helm-surface-border: var(--helm-ui-color-border);
-  --helm-surface-hover: var(--helm-ui-color-surface);
+  --helm-surface-bg-hover: var(--helm-ui-color-surface);
 }
 
 .helm-surface--accent {
   --helm-surface-bg: var(--helm-ui-color-accent);
-  --helm-surface-text: #1a1206;
-  --helm-surface-muted: #3b2a10;
-  --helm-surface-border: color-mix(
-    in srgb,
-    var(--helm-ui-color-accent) 70%,
-    #000 30%
-  );
-  --helm-surface-hover: color-mix(
-    in srgb,
-    var(--helm-ui-color-accent) 85%,
-    #000 15%
-  );
+  --helm-surface-fg: var(--helm-ui-fg-on-warm);
+  --helm-surface-fg-muted: var(--helm-ui-fg-on-warm-muted);
+  --helm-surface-fg-hover: var(--helm-ui-fg-on-warm);
+  --helm-surface-border: color-mix(in srgb, var(--helm-ui-color-accent) 70%, #000 30%);
+  --helm-surface-bg-hover: color-mix(in srgb, var(--helm-ui-color-accent) 85%, #000 15%);
 }
 
 .helm-surface--muted {
   --helm-surface-bg: var(--helm-ui-color-surface-2);
-  --helm-surface-text: var(--helm-ui-color-muted);
-  --helm-surface-muted: var(--helm-ui-color-muted);
+  --helm-surface-fg: var(--helm-ui-color-muted);
+  --helm-surface-fg-muted: var(--helm-ui-color-muted);
+  --helm-surface-fg-hover: var(--helm-ui-color-muted);
   --helm-surface-border: var(--helm-ui-color-border);
-  --helm-surface-hover: var(--helm-ui-color-surface);
+  --helm-surface-bg-hover: var(--helm-ui-color-surface);
 }
 
 .helm-surface--danger {
-  --helm-surface-bg: color-mix(
-    in srgb,
-    var(--helm-ui-color-danger) 70%,
-    #120000 30%
-  );
-  --helm-surface-text: #1a0808;
-  --helm-surface-muted: #3a1414;
+  --helm-surface-bg: var(--helm-ui-color-danger);
+  --helm-surface-fg: var(--helm-ui-fg-on-red);
+  --helm-surface-fg-muted: var(--helm-ui-fg-on-red-muted);
+  --helm-surface-fg-hover: var(--helm-ui-fg-on-red);
   --helm-surface-border: var(--helm-ui-color-danger);
-  --helm-surface-hover: color-mix(
-    in srgb,
-    var(--helm-ui-color-danger) 85%,
-    #000 15%
-  );
+  --helm-surface-bg-hover: color-mix(in srgb, var(--helm-ui-color-danger) 85%, #000 15%);
 }
 
 .helm-surface--success {
-  --helm-surface-bg: color-mix(
-    in srgb,
-    var(--helm-ui-color-success) 70%,
-    #0c1208 30%
-  );
-  --helm-surface-text: #0f140a;
-  --helm-surface-muted: #2f3a24;
+  --helm-surface-bg: color-mix(in srgb, var(--helm-ui-color-success) 70%, #0c1208 30%);
+  --helm-surface-fg: var(--helm-ui-fg-on-green);
+  --helm-surface-fg-muted: var(--helm-ui-fg-on-green-muted);
+  --helm-surface-fg-hover: var(--helm-ui-fg-on-green);
   --helm-surface-border: var(--helm-ui-color-success);
-  --helm-surface-hover: color-mix(
-    in srgb,
-    var(--helm-ui-color-success) 85%,
-    #000 15%
-  );
+  --helm-surface-bg-hover: color-mix(in srgb, var(--helm-ui-color-success) 85%, #000 15%);
 }
 
 .helm-surface--warning {
   --helm-surface-bg: var(--helm-ui-color-warning);
-  --helm-surface-text: #1a1206;
-  --helm-surface-muted: #3b2a10;
-  --helm-surface-border: color-mix(
-    in srgb,
-    var(--helm-ui-color-warning) 70%,
-    #000 30%
-  );
-  --helm-surface-hover: color-mix(
-    in srgb,
-    var(--helm-ui-color-warning) 85%,
-    #000 15%
-  );
+  --helm-surface-fg: var(--helm-ui-fg-on-warm);
+  --helm-surface-fg-muted: var(--helm-ui-fg-on-warm-muted);
+  --helm-surface-fg-hover: var(--helm-ui-fg-on-warm);
+  --helm-surface-border: color-mix(in srgb, var(--helm-ui-color-warning) 70%, #000 30%);
+  --helm-surface-bg-hover: color-mix(in srgb, var(--helm-ui-color-warning) 85%, #000 15%);
 }
 
 .helm-surface--info {
   --helm-surface-bg: var(--helm-ui-color-info);
-  --helm-surface-text: #0f1420;
-  --helm-surface-muted: #1f2e4a;
-  --helm-surface-border: color-mix(
-    in srgb,
-    var(--helm-ui-color-info) 70%,
-    #000 30%
-  );
-  --helm-surface-hover: color-mix(
-    in srgb,
-    var(--helm-ui-color-info) 85%,
-    #000 15%
-  );
+  --helm-surface-fg: var(--helm-ui-fg-on-cool);
+  --helm-surface-fg-muted: var(--helm-ui-fg-on-cool-muted);
+  --helm-surface-fg-hover: var(--helm-ui-fg-on-cool);
+  --helm-surface-border: color-mix(in srgb, var(--helm-ui-color-info) 70%, #000 30%);
+  --helm-surface-bg-hover: color-mix(in srgb, var(--helm-ui-color-info) 85%, #000 15%);
 }
 
-.helm-surface--orange {
-  --helm-surface-bg: var(--helm-ui-color-orange);
-  --helm-surface-text: #1a1206;
-  --helm-surface-muted: #3b2a10;
-  --helm-surface-border: color-mix(
-    in srgb,
-    var(--helm-ui-color-orange) 70%,
-    #000 30%
-  );
-  --helm-surface-hover: color-mix(
-    in srgb,
-    var(--helm-ui-color-orange) 85%,
-    #000 15%
-  );
-}
-
-.helm-surface--gold {
-  --helm-surface-bg: var(--helm-ui-color-gold);
-  --helm-surface-text: #1a1206;
-  --helm-surface-muted: #3b2a10;
-  --helm-surface-border: color-mix(
-    in srgb,
-    var(--helm-ui-color-gold) 70%,
-    #000 30%
-  );
-  --helm-surface-hover: color-mix(
-    in srgb,
-    var(--helm-ui-color-gold) 85%,
-    #000 15%
-  );
-}
-
-.helm-surface--peach {
-  --helm-surface-bg: var(--helm-ui-color-peach);
-  --helm-surface-text: #1a1206;
-  --helm-surface-muted: #3b2a10;
-  --helm-surface-border: color-mix(
-    in srgb,
-    var(--helm-ui-color-peach) 70%,
-    #000 30%
-  );
-  --helm-surface-hover: color-mix(
-    in srgb,
-    var(--helm-ui-color-peach) 85%,
-    #000 15%
-  );
-}
-
-.helm-surface--sunset {
-  --helm-surface-bg: var(--helm-ui-color-sunset);
-  --helm-surface-text: #1a1206;
-  --helm-surface-muted: #3b2a10;
-  --helm-surface-border: color-mix(
-    in srgb,
-    var(--helm-ui-color-sunset) 70%,
-    #000 30%
-  );
-  --helm-surface-hover: color-mix(
-    in srgb,
-    var(--helm-ui-color-sunset) 85%,
-    #000 15%
-  );
-}
-
-.helm-surface--blue {
-  --helm-surface-bg: var(--helm-ui-color-blue);
-  --helm-surface-text: #0f1420;
-  --helm-surface-muted: #1f2e4a;
-  --helm-surface-border: color-mix(
-    in srgb,
-    var(--helm-ui-color-blue) 70%,
-    #000 30%
-  );
-  --helm-surface-hover: color-mix(
-    in srgb,
-    var(--helm-ui-color-blue) 85%,
-    #000 15%
-  );
-}
-
-.helm-surface--sky {
-  --helm-surface-bg: var(--helm-ui-color-sky);
-  --helm-surface-text: #0f1420;
-  --helm-surface-muted: #1f2e4a;
-  --helm-surface-border: color-mix(
-    in srgb,
-    var(--helm-ui-color-sky) 70%,
-    #000 30%
-  );
-  --helm-surface-hover: color-mix(
-    in srgb,
-    var(--helm-ui-color-sky) 85%,
-    #000 15%
-  );
-}
-
-.helm-surface--ice {
-  --helm-surface-bg: var(--helm-ui-color-ice);
-  --helm-surface-text: #10151f;
-  --helm-surface-muted: #22314e;
-  --helm-surface-border: color-mix(
-    in srgb,
-    var(--helm-ui-color-ice) 70%,
-    #000 30%
-  );
-  --helm-surface-hover: color-mix(
-    in srgb,
-    var(--helm-ui-color-ice) 85%,
-    #000 15%
-  );
-}
-
-.helm-surface--lilac {
-  --helm-surface-bg: var(--helm-ui-color-lilac);
-  --helm-surface-text: #1b0f1e;
-  --helm-surface-muted: #3b2a3f;
-  --helm-surface-border: color-mix(
-    in srgb,
-    var(--helm-ui-color-lilac) 70%,
-    #000 30%
-  );
-  --helm-surface-hover: color-mix(
-    in srgb,
-    var(--helm-ui-color-lilac) 85%,
-    #000 15%
-  );
-}
-
-.helm-surface--violet {
-  --helm-surface-bg: var(--helm-ui-color-violet);
-  --helm-surface-text: #1b0f1e;
-  --helm-surface-muted: #3b2a3f;
-  --helm-surface-border: color-mix(
-    in srgb,
-    var(--helm-ui-color-violet) 70%,
-    #000 30%
-  );
-  --helm-surface-hover: color-mix(
-    in srgb,
-    var(--helm-ui-color-violet) 85%,
-    #000 15%
-  );
-}
-
-.helm-surface--plum {
-  --helm-surface-bg: var(--helm-ui-color-plum);
-  --helm-surface-text: var(--helm-ui-color-text);
-  --helm-surface-muted: #c7b7a0;
-  --helm-surface-border: color-mix(
-    in srgb,
-    var(--helm-ui-color-plum) 70%,
-    #000 30%
-  );
-  --helm-surface-hover: color-mix(
-    in srgb,
-    var(--helm-ui-color-plum) 85%,
-    #000 15%
-  );
-}
-
-.helm-surface--hopbush {
-  --helm-surface-bg: var(--helm-ui-color-hopbush);
-  --helm-surface-text: #1b0f1e;
-  --helm-surface-muted: #3b2a3f;
-  --helm-surface-border: color-mix(
-    in srgb,
-    var(--helm-ui-color-hopbush) 70%,
-    #000 30%
-  );
-  --helm-surface-hover: color-mix(
-    in srgb,
-    var(--helm-ui-color-hopbush) 85%,
-    #000 15%
-  );
+/* Computed surface from tone — for components using both tone + surface classes */
+.helm-surface--toned {
+  --helm-surface-bg: var(--helm-tone);
+  --helm-surface-bg-hover: color-mix(in srgb, var(--helm-tone) 85%, #000 15%);
+  --helm-surface-fg: var(--helm-tone-fg);
+  --helm-surface-fg-hover: var(--helm-tone-fg);
+  --helm-surface-fg-muted: var(--helm-tone-fg-muted);
+  --helm-surface-border: color-mix(in srgb, var(--helm-tone) 70%, #000 30%);
 }

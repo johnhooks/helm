@@ -6,6 +6,7 @@ import {
   type ReactNode,
   type KeyboardEvent,
 } from "react";
+import type { LcarsTone } from "../../tones";
 
 export interface LcarsTab {
   /**
@@ -54,17 +55,7 @@ export interface LcarsFrameProps {
   /**
    * Color tone
    */
-  tone?:
-    | "neutral"
-    | "accent"
-    | "orange"
-    | "gold"
-    | "peach"
-    | "blue"
-    | "sky"
-    | "lilac"
-    | "violet"
-    | "danger";
+  tone?: LcarsTone;
   /**
    * Additional CSS class names
    */
@@ -160,7 +151,7 @@ export function LcarsFrame({
 
   const classNames = [
     "helm-lcars-frame",
-    `helm-lcars-frame--${tone}`,
+    `helm-tone--${tone}`,
     className,
   ]
     .filter(Boolean)

@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { MatrixIndicator } from "./matrix-indicator";
+import { LCARS_TONES } from "../../tones";
 
 const meta = {
   title: "UI/Indicators/Matrix",
@@ -11,27 +12,7 @@ const meta = {
   argTypes: {
     tone: {
       control: "select",
-      options: [
-        "neutral",
-        "base",
-        "accent",
-        "muted",
-        "danger",
-        "success",
-        "warning",
-        "info",
-        "orange",
-        "gold",
-        "peach",
-        "sunset",
-        "blue",
-        "sky",
-        "ice",
-        "lilac",
-        "violet",
-        "plum",
-        "hopbush",
-      ],
+      options: [...LCARS_TONES],
     },
     level: { control: { type: "range", min: 0, max: 100 } },
     rows: { control: { type: "number", min: 2, max: 12 } },
@@ -44,7 +25,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    tone: "sunset",
+    tone: "orange",
     level: 62,
     rows: 6,
     cols: 4,

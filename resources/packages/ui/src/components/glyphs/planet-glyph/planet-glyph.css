@@ -41,54 +41,65 @@
 	height: 56px;
 }
 
-/* Planet types - solid colors from LCARS palette */
+/* Planet types — each sets --helm-planet-color + background */
 .helm-planet-glyph--terrestrial {
-	background: var(--helm-ui-color-peach);
+	--helm-planet-color: var(--helm-planet-terrestrial);
+	background: var(--helm-planet-color);
 }
 
 .helm-planet-glyph--superEarth {
-	background: var(--helm-ui-color-gold);
+	--helm-planet-color: var(--helm-planet-super-earth);
+	background: var(--helm-planet-color);
 }
 
 .helm-planet-glyph--gasGiant {
-	background: var(--helm-ui-color-sunset);
+	--helm-planet-color: var(--helm-planet-gas-giant);
+	background: var(--helm-planet-color);
 }
 
 .helm-planet-glyph--iceGiant {
-	background: var(--helm-ui-color-ice);
+	--helm-planet-color: var(--helm-planet-ice-giant);
+	background: var(--helm-planet-color);
 }
 
 .helm-planet-glyph--hotJupiter {
-	background: var(--helm-ui-color-orange);
+	--helm-planet-color: var(--helm-planet-hot-jupiter);
+	background: var(--helm-planet-color);
 }
 
 .helm-planet-glyph--dwarf {
-	background: var(--helm-ui-color-muted);
+	--helm-planet-color: var(--helm-planet-dwarf);
+	background: var(--helm-planet-color);
 }
 
 .helm-planet-glyph--molten {
-	background: var(--helm-ui-color-danger);
+	--helm-planet-color: var(--helm-planet-molten);
+	background: var(--helm-planet-color);
 }
 
 .helm-planet-glyph--frozen {
-	background: var(--helm-ui-color-sky);
+	--helm-planet-color: var(--helm-planet-frozen);
+	background: var(--helm-planet-color);
 }
 
 .helm-planet-glyph--ocean {
-	background: var(--helm-ui-color-blue);
+	--helm-planet-color: var(--helm-planet-ocean);
+	background: var(--helm-planet-color);
 }
 
 .helm-planet-glyph--desert {
-	background: var(--helm-ui-color-gold);
+	--helm-planet-color: var(--helm-planet-desert);
+	background: var(--helm-planet-color);
 }
 
 .helm-planet-glyph--toxic {
-	background: var(--helm-ui-color-hopbush);
+	--helm-planet-color: var(--helm-planet-toxic);
+	background: var(--helm-planet-color);
 }
 
+/* Modifier — adds a ring using the planet's own color */
 .helm-planet-glyph--ringed {
-	background: var(--helm-ui-color-peach);
 	box-shadow:
 		inset 0 0 0 1px var(--helm-ui-color-bg),
-		0 0 0 2px var(--helm-ui-color-peach);
+		0 0 0 2px var(--helm-planet-color);
 }

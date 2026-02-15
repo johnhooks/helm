@@ -20,11 +20,8 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
-  args: {
-    columns: 2,
-    gap: "md",
-    children: null,
-  },
+  args: { children: null },
+  parameters: { controls: { disable: true } },
   render: () => (
     <SystemGrid columns={2}>
       <SystemCell indicator={<ArcIndicator level={85} size="lg" tone="accent" />}>
@@ -38,10 +35,8 @@ export const Default: Story = {
 };
 
 export const EngineeringPanel: Story = {
-  args: {
-    columns: 2,
-    children: null,
-  },
+  args: { children: null },
+  parameters: { controls: { disable: true } },
   render: () => (
     <div
       style={{
@@ -115,10 +110,8 @@ export const EngineeringPanel: Story = {
 };
 
 export const TacticalPanel: Story = {
-  args: {
-    columns: 4,
-    children: null,
-  },
+  args: { children: null },
+  parameters: { controls: { disable: true } },
   render: () => (
     <div
       style={{
@@ -150,10 +143,8 @@ export const TacticalPanel: Story = {
 };
 
 export const NavigationPanel: Story = {
-  args: {
-    columns: 2,
-    children: null,
-  },
+  args: { children: null },
+  parameters: { controls: { disable: true } },
   render: () => (
     <div
       style={{
@@ -230,10 +221,8 @@ export const NavigationPanel: Story = {
 };
 
 export const ColumnLayout: Story = {
-  args: {
-    columns: 4,
-    children: null,
-  },
+  args: { children: null },
+  parameters: { controls: { disable: true } },
   render: () => (
     <div
       style={{
@@ -262,10 +251,8 @@ export const ColumnLayout: Story = {
 };
 
 export const CriticalAlert: Story = {
-  args: {
-    columns: 2,
-    children: null,
-  },
+  args: { children: null },
+  parameters: { controls: { disable: true } },
   render: () => (
     <div
       style={{
@@ -327,10 +314,8 @@ export const CriticalAlert: Story = {
 };
 
 export const StacksPanel: Story = {
-  args: {
-    columns: 3,
-    children: null,
-  },
+  args: { children: null },
+  parameters: { controls: { disable: true } },
   render: () => (
     <div
       style={{
@@ -357,10 +342,8 @@ export const StacksPanel: Story = {
 };
 
 export const ReadoutsOnly: Story = {
-  args: {
-    columns: 2,
-    children: null,
-  },
+  args: { children: null },
+  parameters: { controls: { disable: true } },
   render: () => (
     <div
       style={{

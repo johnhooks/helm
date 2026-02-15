@@ -1,4 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
+import type { LcarsTone } from "../../tones";
 
 export interface CountdownProps {
   /**
@@ -20,17 +21,7 @@ export interface CountdownProps {
   /**
    * Color tone
    */
-  tone?:
-    | "neutral"
-    | "accent"
-    | "orange"
-    | "gold"
-    | "peach"
-    | "blue"
-    | "sky"
-    | "lilac"
-    | "violet"
-    | "danger";
+  tone?: LcarsTone;
   /**
    * Size variant
    */
@@ -91,7 +82,7 @@ export function Countdown({
   remaining,
   total,
   indicator,
-  tone = "accent",
+  tone = "neutral",
   size = "md",
   layout = "row",
   active = false,
@@ -108,7 +99,7 @@ export function Countdown({
   const classNames = [
     "helm-countdown",
     `helm-countdown--${size}`,
-    `helm-countdown--${tone}`,
+    `helm-tone--${tone}`,
     `helm-countdown--${layout}`,
     active && "helm-countdown--active",
     className,

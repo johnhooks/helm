@@ -57,94 +57,10 @@
   line-height: 1;
 }
 
-/* Tone colors */
-.helm-status-badge--neutral .helm-status-badge__dot {
-  background: var(--helm-ui-color-muted);
-}
-.helm-status-badge--neutral .helm-status-badge__label {
-  color: var(--helm-ui-color-muted);
+.helm-status-badge__dot {
+  background: var(--helm-tone);
 }
 
-.helm-status-badge--muted .helm-status-badge__dot {
-  background: var(--helm-ui-color-border);
-}
-.helm-status-badge--muted .helm-status-badge__label {
-  color: var(--helm-ui-color-border);
-}
-
-.helm-status-badge--accent .helm-status-badge__dot {
-  background: var(--helm-ui-color-accent);
-}
-.helm-status-badge--accent .helm-status-badge__label {
-  color: var(--helm-ui-color-accent);
-}
-
-.helm-status-badge--success .helm-status-badge__dot {
-  background: var(--helm-ui-color-success);
-}
-.helm-status-badge--success .helm-status-badge__label {
-  color: var(--helm-ui-color-success);
-}
-
-.helm-status-badge--warning .helm-status-badge__dot {
-  background: var(--helm-ui-color-warning);
-}
-.helm-status-badge--warning .helm-status-badge__label {
-  color: var(--helm-ui-color-warning);
-}
-
-.helm-status-badge--danger .helm-status-badge__dot {
-  background: var(--helm-ui-color-danger);
-}
-.helm-status-badge--danger .helm-status-badge__label {
-  color: var(--helm-ui-color-danger);
-}
-
-.helm-status-badge--info .helm-status-badge__dot {
-  background: var(--helm-ui-color-info);
-}
-.helm-status-badge--info .helm-status-badge__label {
-  color: var(--helm-ui-color-info);
-}
-
-.helm-status-badge--orange .helm-status-badge__dot {
-  background: var(--helm-ui-color-orange);
-}
-.helm-status-badge--orange .helm-status-badge__label {
-  color: var(--helm-ui-color-orange);
-}
-
-.helm-status-badge--gold .helm-status-badge__dot {
-  background: var(--helm-ui-color-gold);
-}
-.helm-status-badge--gold .helm-status-badge__label {
-  color: var(--helm-ui-color-gold);
-}
-
-.helm-status-badge--blue .helm-status-badge__dot {
-  background: var(--helm-ui-color-blue);
-}
-.helm-status-badge--blue .helm-status-badge__label {
-  color: var(--helm-ui-color-blue);
-}
-
-.helm-status-badge--sky .helm-status-badge__dot {
-  background: var(--helm-ui-color-sky);
-}
-.helm-status-badge--sky .helm-status-badge__label {
-  color: var(--helm-ui-color-sky);
-}
-
-.helm-status-badge--lilac .helm-status-badge__dot {
-  background: var(--helm-ui-color-lilac);
-}
-.helm-status-badge--lilac .helm-status-badge__label {
-  color: var(--helm-ui-color-lilac);
-}
-
-.helm-status-badge--violet .helm-status-badge__dot {
-  background: var(--helm-ui-color-violet);
-}
-.helm-status-badge--violet .helm-status-badge__label {
-  color: var(--helm-ui-color-violet);
+.helm-status-badge__label {
+  color: var(--helm-tone);
 }

@@ -4,7 +4,6 @@
    ============================================================================= */
 
 .helm-lcars-frame {
-  --lcars-color: var(--helm-ui-color-gold);
   --lcars-sidebar-width: 72px;
   --lcars-header-height: 36px;
   --lcars-gap: 3px;
@@ -28,18 +27,6 @@
   }
 }
 
-/* Tones */
-.helm-lcars-frame--neutral { --lcars-color: var(--helm-ui-color-muted); }
-.helm-lcars-frame--accent { --lcars-color: var(--helm-ui-color-accent); }
-.helm-lcars-frame--orange { --lcars-color: var(--helm-ui-color-orange); }
-.helm-lcars-frame--gold { --lcars-color: var(--helm-ui-color-gold); }
-.helm-lcars-frame--peach { --lcars-color: var(--helm-ui-color-peach); }
-.helm-lcars-frame--blue { --lcars-color: var(--helm-ui-color-blue); }
-.helm-lcars-frame--sky { --lcars-color: var(--helm-ui-color-sky); }
-.helm-lcars-frame--lilac { --lcars-color: var(--helm-ui-color-lilac); }
-.helm-lcars-frame--violet { --lcars-color: var(--helm-ui-color-violet); }
-.helm-lcars-frame--danger { --lcars-color: var(--helm-ui-color-danger-accent); }
-
 /* =============================================================================
    HEADER ROW
    ============================================================================= */
@@ -52,13 +39,13 @@
 
 .helm-lcars-frame__corner {
   width: var(--lcars-sidebar-width);
-  background: var(--lcars-color);
+  background: var(--helm-tone);
   border-radius: var(--lcars-radius) 0 0 0;
 }
 
 .helm-lcars-frame__header-bar {
   flex: 1;
-  background: var(--lcars-color);
+  background: var(--helm-tone);
   border-radius: 0 var(--lcars-radius) var(--lcars-radius) 0;
   display: flex;
   align-items: center;
@@ -128,7 +115,7 @@
 
 .helm-lcars-frame__sidebar-cap {
   min-height: 32px;
-  background: var(--lcars-color);
+  background: var(--helm-tone);
   border-radius: 0 0 0 var(--lcars-radius);
 }
 
@@ -155,7 +142,7 @@
   flex: 1;
   min-height: var(--lcars-button-height);
   width: 100%;
-  background: var(--lcars-color);
+  background: var(--helm-tone);
   border: none;
   border-radius: 0;
   padding: 4px 6px 3px;
@@ -193,9 +180,9 @@
   filter: brightness(0.9);
 }
 
-/* Focus visible for keyboard navigation */
+/* Focus visible for keyboard navigation — darkened tone contrasts against tone background */
 .helm-lcars-frame__sidebar > button[role="tab"]:focus-visible {
-  outline: 2px solid #fff;
+  outline: 2px solid color-mix(in srgb, var(--helm-tone) 50%, #000);
   outline-offset: -2px;
 }
 

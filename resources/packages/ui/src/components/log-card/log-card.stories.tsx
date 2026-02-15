@@ -91,6 +91,7 @@ export const Draft: Story = {
 
 export const Tones: Story = {
   args: { time: "", title: "" },
+  parameters: { controls: { disable: true } },
   render: () => (
     <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
       {(["accent", "sky", "lilac", "gold", "orange", "neutral"] as const).map((tone) => (
@@ -160,6 +161,7 @@ export const ScanActive: Story = {
 
 export const Timeline: Story = {
   args: { time: "", title: "" },
+  parameters: { controls: { disable: true } },
   render: () => (
     <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
       <LogCard

@@ -18,6 +18,7 @@ const meta = {
 			control: "select",
 			options: PLANET_TYPES,
 		},
+		ringed: { control: "boolean" },
 		size: {
 			control: "inline-radio",
 			options: ["xxs", "xs", "sm", "md", "lg", "xl", "xxl"],
@@ -40,6 +41,7 @@ export const Default: Story = {
  * All planet types at each size
  */
 export const AllTypes: Story = {
+	parameters: { controls: { disable: true } },
 	render: () => (
 		<Panel variant="inset" padding="lg" style={{ minWidth: 600 }}>
 			<div
@@ -97,6 +99,7 @@ export const AllTypes: Story = {
  * Planet glyph as part of a survey readout row
  */
 export const SurveyRow: Story = {
+	parameters: { controls: { disable: true } },
 	render: () => (
 		<Panel variant="default" padding="lg" style={{ minWidth: 500 }}>
 			<TitleBar title="Survey Results" subtitle="Tau Ceti System" tone="gold">
@@ -173,12 +176,13 @@ export const SurveyRow: Story = {
  * Planet detail card showing glyph with full stats
  */
 export const PlanetCard: Story = {
+	parameters: { controls: { disable: true } },
 	render: () => (
-		<Panel variant="bordered" tone="peach" padding="lg" style={{ minWidth: 320 }}>
+		<Panel variant="bordered" tone="gold" padding="lg" style={{ minWidth: 320 }}>
 			<div style={{ display: "flex", alignItems: "flex-start", gap: 16 }}>
 				<PlanetGlyph type="terrestrial" size="lg" />
 				<div style={{ flex: 1 }}>
-					<TitleBar title="Kepler-442b" tone="peach" style={{ marginBottom: 4 }}>
+					<TitleBar title="Kepler-442b" tone="gold" style={{ marginBottom: 4 }}>
 						<StatusBadge tone="success" size="sm">
 							HABITABLE
 						</StatusBadge>
@@ -198,10 +202,10 @@ export const PlanetCard: Story = {
 			</div>
 
 			<div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-				<Readout label="Mass" value="2.3" unit="M⊕" tone="peach" size="sm" />
-				<Readout label="Radius" value="1.34" unit="R⊕" tone="peach" size="sm" />
-				<Readout label="Temp" value="233" unit="K" tone="peach" size="sm" />
-				<Readout label="Orbit" value="112.3" unit="d" tone="peach" size="sm" />
+				<Readout label="Mass" value="2.3" unit="M⊕" tone="gold" size="sm" />
+				<Readout label="Radius" value="1.34" unit="R⊕" tone="gold" size="sm" />
+				<Readout label="Temp" value="233" unit="K" tone="gold" size="sm" />
+				<Readout label="Orbit" value="112.3" unit="d" tone="gold" size="sm" />
 			</div>
 
 			<div style={{ marginTop: 16 }}>
@@ -232,7 +236,6 @@ const planetSizeMap: Record<PlanetType, "xxs" | "xs" | "sm" | "md" | "lg" | "xl"
 	ocean: "md",
 	toxic: "md",
 	superEarth: "md",
-	ringed: "lg",
 	iceGiant: "lg",
 	hotJupiter: "xl",
 	gasGiant: "xxl",
@@ -242,6 +245,7 @@ const planetSizeMap: Record<PlanetType, "xxs" | "xs" | "sm" | "md" | "lg" | "xl"
  * System overview showing all planets with relative sizes
  */
 export const SystemOverview: Story = {
+	parameters: { controls: { disable: true } },
 	render: () => {
 		const planets: Array<{ type: PlanetType; name: string; distance: string }> = [
 			{ type: "molten", name: "Alpha I", distance: "0.4 AU" },

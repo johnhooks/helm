@@ -10,17 +10,7 @@
   border-radius: 8px;
   overflow: hidden;
   filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.6));
-  --helm-context-menu-color: var(--helm-ui-color-sky);
 }
-
-/* Tones */
-.helm-context-menu--neutral { --helm-context-menu-color: var(--helm-ui-color-muted); }
-.helm-context-menu--accent  { --helm-context-menu-color: var(--helm-ui-color-accent); }
-.helm-context-menu--sky     { --helm-context-menu-color: var(--helm-ui-color-sky); }
-.helm-context-menu--lilac   { --helm-context-menu-color: var(--helm-ui-color-lilac); }
-.helm-context-menu--gold    { --helm-context-menu-color: var(--helm-ui-color-gold); }
-.helm-context-menu--orange  { --helm-context-menu-color: var(--helm-ui-color-orange); }
-.helm-context-menu--danger  { --helm-context-menu-color: var(--helm-ui-color-danger); }
 
 /* Header */
 .helm-context-menu__header {
@@ -37,7 +27,7 @@
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--helm-context-menu-color);
+  color: var(--helm-tone);
 }
 
 .helm-context-menu__subtitle {
@@ -85,20 +75,12 @@
   letter-spacing: 0.04em;
   text-transform: uppercase;
   white-space: nowrap;
-  color: var(--helm-ui-color-text);
+  color: var(--helm-tone, var(--helm-ui-color-text));
 }
 
 .helm-context-menu__action:disabled .helm-context-menu__action-label {
   color: var(--helm-ui-color-muted);
 }
-
-/* Per-action tone overrides */
-.helm-context-menu__action--accent .helm-context-menu__action-label  { color: var(--helm-ui-color-accent); }
-.helm-context-menu__action--sky .helm-context-menu__action-label     { color: var(--helm-ui-color-sky); }
-.helm-context-menu__action--lilac .helm-context-menu__action-label   { color: var(--helm-ui-color-lilac); }
-.helm-context-menu__action--gold .helm-context-menu__action-label    { color: var(--helm-ui-color-gold); }
-.helm-context-menu__action--orange .helm-context-menu__action-label  { color: var(--helm-ui-color-orange); }
-.helm-context-menu__action--danger .helm-context-menu__action-label  { color: var(--helm-ui-color-danger); }
 
 .helm-context-menu__action-detail {
   font-size: var(--helm-ui-font-size-label-sm);

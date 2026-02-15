@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { StatusBadge } from "./status-badge";
+import { LCARS_TONES } from "../../tones";
 
 const meta = {
   title: "Display/StatusBadge",
@@ -11,21 +12,7 @@ const meta = {
   argTypes: {
     tone: {
       control: "select",
-      options: [
-        "neutral",
-        "muted",
-        "accent",
-        "success",
-        "warning",
-        "danger",
-        "info",
-        "orange",
-        "gold",
-        "blue",
-        "sky",
-        "lilac",
-        "violet",
-      ],
+      options: [...LCARS_TONES],
     },
     size: {
       control: "radio",
@@ -48,9 +35,8 @@ export const Default: Story = {
 };
 
 export const Tones: Story = {
-  args: {
-    children: "Status",
-  },
+  args: { children: "" },
+  parameters: { controls: { disable: true } },
   render: () => (
     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
       <StatusBadge tone="neutral">Idle</StatusBadge>
@@ -65,9 +51,8 @@ export const Tones: Story = {
 };
 
 export const LcarsTones: Story = {
-  args: {
-    children: "Status",
-  },
+  args: { children: "" },
+  parameters: { controls: { disable: true } },
   render: () => (
     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
       <StatusBadge tone="orange">Alert</StatusBadge>
@@ -81,9 +66,8 @@ export const LcarsTones: Story = {
 };
 
 export const Sizes: Story = {
-  args: {
-    children: "Status",
-  },
+  args: { children: "" },
+  parameters: { controls: { disable: true } },
   render: () => (
     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
       <StatusBadge size="sm" tone="success">Small</StatusBadge>
@@ -93,9 +77,8 @@ export const Sizes: Story = {
 };
 
 export const Pulsing: Story = {
-  args: {
-    children: "Status",
-  },
+  args: { children: "" },
+  parameters: { controls: { disable: true } },
   render: () => (
     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
       <StatusBadge tone="success" pulse>Online</StatusBadge>
@@ -107,9 +90,8 @@ export const Pulsing: Story = {
 };
 
 export const ShipSystems: Story = {
-  args: {
-    children: "Status",
-  },
+  args: { children: "" },
+  parameters: { controls: { disable: true } },
   render: () => (
     <div
       style={{

@@ -10,12 +10,10 @@
 
 /* Modal frame */
 .helm-lcars-modal.components-modal__frame {
-  --modal-color: var(--helm-ui-color-gold);
-
   background: var(--helm-ui-color-bg);
-  border: 2px solid var(--modal-color);
+  border: 2px solid var(--helm-tone);
   border-radius: 16px;
-  box-shadow: 0 0 40px color-mix(in srgb, var(--modal-color) 20%, transparent);
+  box-shadow: 0 0 40px color-mix(in srgb, var(--helm-tone) 20%, transparent);
   padding: 0;
   font-family: var(--helm-ui-font-family);
   max-height: calc(100vh - 48px);
@@ -34,18 +32,6 @@
 .helm-lcars-modal--large.components-modal__frame {
   width: min(800px, calc(100vw - 48px));
 }
-
-/* Tones */
-.helm-lcars-modal--neutral.components-modal__frame { --modal-color: var(--helm-ui-color-muted); }
-.helm-lcars-modal--accent.components-modal__frame { --modal-color: var(--helm-ui-color-accent); }
-.helm-lcars-modal--orange.components-modal__frame { --modal-color: var(--helm-ui-color-orange); }
-.helm-lcars-modal--gold.components-modal__frame { --modal-color: var(--helm-ui-color-gold); }
-.helm-lcars-modal--peach.components-modal__frame { --modal-color: var(--helm-ui-color-peach); }
-.helm-lcars-modal--blue.components-modal__frame { --modal-color: var(--helm-ui-color-blue); }
-.helm-lcars-modal--sky.components-modal__frame { --modal-color: var(--helm-ui-color-sky); }
-.helm-lcars-modal--lilac.components-modal__frame { --modal-color: var(--helm-ui-color-lilac); }
-.helm-lcars-modal--violet.components-modal__frame { --modal-color: var(--helm-ui-color-violet); }
-.helm-lcars-modal--danger.components-modal__frame { --modal-color: var(--helm-ui-color-danger-accent); }
 
 /* Hide WordPress default content padding */
 .helm-lcars-modal .components-modal__content {
@@ -73,7 +59,7 @@
   background: #000;
   border: none;
   border-radius: 50%;
-  color: var(--modal-color);
+  color: var(--helm-tone);
   font-size: var(--helm-ui-font-size-display-sm);
   font-weight: 700;
   line-height: 1;

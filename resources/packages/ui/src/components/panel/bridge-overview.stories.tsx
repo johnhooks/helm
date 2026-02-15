@@ -183,7 +183,7 @@ const ShipCard = ({ mode, onModeChange }: { mode: PowerModeKey; onModeChange: (m
             options={MODE_OPTIONS}
             value={mode}
             onChange={(v) => onModeChange(v as PowerModeKey)}
-            surface="neutral"
+            tone="neutral"
             size="sm"
             fullWidth
             aria-label="Power mode"
@@ -727,6 +727,7 @@ const BridgeLayout = ({ log, view }: { log: ReactNode; view: ReactNode }) => {
  */
 export const Default: Story = {
   args: { children: null },
+  parameters: { controls: { disable: true } },
   render: () => (
     <BridgeLayout
       view={<StarfieldView />}
@@ -740,6 +741,7 @@ export const Default: Story = {
  */
 export const Active: Story = {
   args: { children: null },
+  parameters: { controls: { disable: true } },
   render: () => (
     <BridgeLayout
       view={<StarfieldView />}
@@ -753,6 +755,7 @@ export const Active: Story = {
  */
 export const StarSelected: Story = {
   args: { children: null },
+  parameters: { controls: { disable: true } },
   render: () => (
     <BridgeLayout
       view={
@@ -790,6 +793,7 @@ export const StarSelected: Story = {
  */
 export const StarSelectedScanned: Story = {
   args: { children: null },
+  parameters: { controls: { disable: true } },
   render: () => (
     <BridgeLayout
       view={
@@ -827,6 +831,7 @@ export const StarSelectedScanned: Story = {
  */
 export const DraftJump: Story = {
   args: { children: null },
+  parameters: { controls: { disable: true } },
   render: () => (
     <BridgeLayout
       view={<StarfieldView selectedStar="Tau Ceti" />}
@@ -863,6 +868,7 @@ export const DraftJump: Story = {
  */
 export const Survey: Story = {
   args: { children: null },
+  parameters: { controls: { disable: true } },
   render: () => (
     <BridgeLayout
       view={<SurveyView />}
@@ -876,6 +882,7 @@ export const Survey: Story = {
  */
 export const SurveyPlanetSelected: Story = {
   args: { children: null },
+  parameters: { controls: { disable: true } },
   render: () => (
     <BridgeLayout
       view={<SurveyView selectedPlanet="Jupiter" />}
@@ -889,6 +896,7 @@ export const SurveyPlanetSelected: Story = {
  */
 export const DraftScan: Story = {
   args: { children: null },
+  parameters: { controls: { disable: true } },
   render: () => (
     <BridgeLayout
       view={<SurveyView selectedPlanet="Jupiter" />}

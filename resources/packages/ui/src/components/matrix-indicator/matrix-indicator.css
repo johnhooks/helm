@@ -10,9 +10,9 @@
   width: 4px;
   height: 4px;
   border-radius: 2px;
-  background: color-mix(in srgb, var(--helm-surface-bg) 20%, transparent);
+  background: color-mix(in srgb, var(--helm-tone) 20%, transparent);
 }
 
 .helm-matrix-indicator__cell--filled {
-  background: var(--helm-surface-bg);
+  background: var(--helm-tone);
 }

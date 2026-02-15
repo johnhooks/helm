@@ -6,6 +6,7 @@ import { Readout } from "../readout";
 import { ArcIndicator } from "../arc-indicator";
 import { StackIndicator } from "../stack-indicator";
 import { SystemGrid, SystemCell } from "../system-grid";
+import { LCARS_TONES } from "../../tones";
 
 const meta = {
   title: "Layout/LcarsFrame",
@@ -17,7 +18,7 @@ const meta = {
   argTypes: {
     tone: {
       control: "select",
-      options: ["neutral", "accent", "orange", "gold", "peach", "blue", "sky", "lilac", "violet", "danger"],
+      options: [...LCARS_TONES],
     },
   },
 } satisfies Meta<typeof LcarsFrame>;
@@ -167,11 +168,8 @@ export const TacticalFrame: Story = {
 };
 
 export const ControlledTabs: Story = {
-  args: {
-    title: "Engineering",
-    tone: "gold",
-    tabs: engineeringTabs,
-  },
+  args: { title: "Engineering", tone: "gold", tabs: engineeringTabs },
+  parameters: { controls: { disable: true } },
   render: function ControlledExample() {
     const [activeTab, setActiveTab] = useState("power");
 
@@ -191,11 +189,8 @@ export const ControlledTabs: Story = {
 };
 
 export const AllTones: Story = {
-  args: {
-    title: "Test",
-    tone: "gold",
-    tabs: [],
-  },
+  args: { title: "Test", tone: "gold", tabs: [] },
+  parameters: { controls: { disable: true } },
   render: () => (
     <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(280px, 1fr))", gap: 24 }}>
       <div style={{ minHeight: 200 }}>
@@ -243,11 +238,8 @@ export const AllTones: Story = {
 };
 
 export const CompactVsExpanded: Story = {
-  args: {
-    title: "Test",
-    tone: "gold",
-    tabs: [],
-  },
+  args: { title: "Test", tone: "gold", tabs: [] },
+  parameters: { controls: { disable: true } },
   render: () => (
     <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
       <div>
@@ -357,19 +349,16 @@ const systemsOverviewTabs: LcarsTab[] = [
     subtext: "19-623",
     content: (
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        <Readout label="Sickbay" value="Ready" tone="peach" />
-        <Readout label="Patients" value={0} tone="peach" />
+        <Readout label="Sickbay" value="Ready" tone="gold" />
+        <Readout label="Patients" value={0} tone="gold" />
       </div>
     ),
   },
 ];
 
 export const LargeContent: Story = {
-  args: {
-    title: "Systems Overview",
-    tone: "gold",
-    tabs: systemsOverviewTabs,
-  },
+  args: { title: "Systems Overview", tone: "gold", tabs: systemsOverviewTabs },
+  parameters: { controls: { disable: true } },
   render: () => (
     <div style={{ width: 800, height: 400 }}>
       <LcarsFrame
@@ -384,11 +373,8 @@ export const LargeContent: Story = {
 };
 
 export const ManyTabs: Story = {
-  args: {
-    title: "Many Tabs",
-    tone: "lilac",
-    tabs: [],
-  },
+  args: { title: "Many Tabs", tone: "lilac", tabs: [] },
+  parameters: { controls: { disable: true } },
   render: () => (
     <div style={{ width: 500, height: 500 }}>
       <LcarsFrame

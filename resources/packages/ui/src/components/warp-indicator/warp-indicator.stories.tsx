@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { WarpIndicator } from "./warp-indicator";
+import { LCARS_TONES } from "../../tones";
 
 const meta = {
   title: "UI/Indicators/Warp",
@@ -11,27 +12,7 @@ const meta = {
     size: { control: "inline-radio", options: ["sm", "md", "lg", "xl", "2xl"] },
     tone: {
       control: "select",
-      options: [
-        "neutral",
-        "base",
-        "accent",
-        "muted",
-        "danger",
-        "success",
-        "warning",
-        "info",
-        "orange",
-        "gold",
-        "peach",
-        "sunset",
-        "blue",
-        "sky",
-        "ice",
-        "lilac",
-        "violet",
-        "plum",
-        "hopbush",
-      ],
+      options: [...LCARS_TONES],
     },
     level: { control: { type: "range", min: 0, max: 100 } },
     segments: { control: { type: "number", min: 4, max: 14 } },
@@ -51,6 +32,7 @@ export const Playground: Story = {
 };
 
 export const Sizes: Story = {
+  parameters: { controls: { disable: true } },
   render: () => (
     <div style={{ display: "flex", alignItems: "center", gap: "24px" }}>
       <WarpIndicator size="sm" tone="orange" level={62} segments={10} transitionMs={0} />

@@ -1,0 +1,91 @@
+/* =============================================================================
+   TONES — shared accent color for layout components
+   Sets --helm-tone to the appropriate design token for the given tone name.
+   Components reference var(--helm-tone) for borders, text, and accents.
+   --helm-tone-fg and --helm-tone-fg-muted provide hand-picked foreground
+   colors for text/icons on a tone-colored background.
+   ============================================================================= */
+
+.helm-tone--neutral {
+  --helm-tone: var(--helm-ui-color-muted);
+  --helm-tone-fg: var(--helm-ui-fg-on-warm);
+  --helm-tone-fg-muted: var(--helm-ui-fg-on-warm-muted);
+}
+
+.helm-tone--accent {
+  --helm-tone: var(--helm-ui-color-accent);
+  --helm-tone-fg: var(--helm-ui-fg-on-warm);
+  --helm-tone-fg-muted: var(--helm-ui-fg-on-warm-muted);
+}
+
+.helm-tone--muted {
+  --helm-tone: var(--helm-ui-color-border);
+  --helm-tone-fg: var(--helm-ui-color-text);
+  --helm-tone-fg-muted: var(--helm-ui-color-muted);
+}
+
+.helm-tone--danger {
+  --helm-tone: var(--helm-ui-color-danger);
+  --helm-tone-fg: var(--helm-ui-fg-on-red);
+  --helm-tone-fg-muted: var(--helm-ui-fg-on-red-muted);
+}
+
+.helm-tone--success {
+  --helm-tone: var(--helm-ui-color-success);
+  --helm-tone-fg: var(--helm-ui-fg-on-green);
+  --helm-tone-fg-muted: var(--helm-ui-fg-on-green-muted);
+}
+
+.helm-tone--warning {
+  --helm-tone: var(--helm-ui-color-warning);
+  --helm-tone-fg: var(--helm-ui-fg-on-warm);
+  --helm-tone-fg-muted: var(--helm-ui-fg-on-warm-muted);
+}
+
+.helm-tone--info {
+  --helm-tone: var(--helm-ui-color-info);
+  --helm-tone-fg: var(--helm-ui-fg-on-cool);
+  --helm-tone-fg-muted: var(--helm-ui-fg-on-cool-muted);
+}
+
+.helm-tone--orange {
+  --helm-tone: var(--helm-ui-color-orange);
+  --helm-tone-fg: var(--helm-ui-fg-on-warm);
+  --helm-tone-fg-muted: var(--helm-ui-fg-on-warm-muted);
+}
+
+.helm-tone--gold {
+  --helm-tone: var(--helm-ui-color-gold);
+  --helm-tone-fg: var(--helm-ui-fg-on-warm);
+  --helm-tone-fg-muted: var(--helm-ui-fg-on-warm-muted);
+}
+
+.helm-tone--blue {
+  --helm-tone: var(--helm-ui-color-blue);
+  --helm-tone-fg: var(--helm-ui-fg-on-cool);
+  --helm-tone-fg-muted: var(--helm-ui-fg-on-cool-muted);
+}
+
+.helm-tone--sky {
+  --helm-tone: var(--helm-ui-color-sky);
+  --helm-tone-fg: var(--helm-ui-fg-on-cool);
+  --helm-tone-fg-muted: var(--helm-ui-fg-on-cool-muted);
+}
+
+.helm-tone--ice {
+  --helm-tone: var(--helm-ui-color-ice);
+  --helm-tone-fg: var(--helm-ui-fg-on-cool);
+  --helm-tone-fg-muted: var(--helm-ui-fg-on-cool-muted);
+}
+
+.helm-tone--lilac {
+  --helm-tone: var(--helm-ui-color-lilac);
+  --helm-tone-fg: var(--helm-ui-fg-on-purple);
+  --helm-tone-fg-muted: var(--helm-ui-fg-on-purple-muted);
+}
+
+.helm-tone--violet {
+  --helm-tone: var(--helm-ui-color-violet);
+  --helm-tone-fg: var(--helm-ui-fg-on-purple);
+  --helm-tone-fg-muted: var(--helm-ui-fg-on-purple-muted);
+}

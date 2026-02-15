@@ -1,4 +1,5 @@
 import type { CSSProperties, ChangeEvent, ReactNode } from "react";
+import type { LcarsTone } from "../../tones";
 
 export interface ToggleProps {
   /**
@@ -22,17 +23,9 @@ export interface ToggleProps {
    */
   labelPosition?: "left" | "right";
   /**
-   * Surface tone
+   * Color tone for checked state
    */
-  surface?:
-    | "accent"
-    | "orange"
-    | "gold"
-    | "blue"
-    | "sky"
-    | "success"
-    | "lilac"
-    | "violet";
+  tone?: LcarsTone;
   /**
    * Size variant
    */
@@ -73,7 +66,7 @@ export function Toggle({
   onChange,
   label,
   labelPosition = "right",
-  surface = "accent",
+  tone = "neutral",
   size = "md",
   disabled = false,
   name,
@@ -85,6 +78,7 @@ export function Toggle({
 }: ToggleProps) {
   const classNames = [
     "helm-toggle",
+    `helm-tone--${tone}`,
     `helm-toggle--${size}`,
     `helm-toggle--label-${labelPosition}`,
     disabled && "helm-toggle--disabled",
@@ -112,10 +106,7 @@ export function Toggle({
         value={value}
         aria-label={!label ? ariaLabel : undefined}
       />
-      <span
-        className={`helm-toggle__track helm-toggle__track--${surface}`}
-        aria-hidden="true"
-      >
+      <span className="helm-toggle__track" aria-hidden="true">
         <span className="helm-toggle__thumb" />
       </span>
       {label && <span className="helm-toggle__label">{label}</span>}

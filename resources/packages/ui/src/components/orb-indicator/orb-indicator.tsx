@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import type { LcarsTone } from "../../tones";
 
 export interface OrbIndicatorProps {
   /**
@@ -8,26 +9,7 @@ export interface OrbIndicatorProps {
   /**
    * Surface tone
    */
-  tone?:
-    | "neutral"
-    | "base"
-    | "accent"
-    | "muted"
-    | "danger"
-    | "success"
-    | "warning"
-    | "info"
-    | "orange"
-    | "gold"
-    | "peach"
-    | "sunset"
-    | "blue"
-    | "sky"
-    | "ice"
-    | "lilac"
-    | "violet"
-    | "plum"
-    | "hopbush";
+  tone?: LcarsTone;
   /**
    * Additional CSS class names
    */
@@ -44,15 +26,14 @@ export interface OrbIndicatorProps {
 
 export function OrbIndicator({
   size = "md",
-  tone = "accent",
+  tone = "neutral",
   className = "",
   style,
   "data-testid": testId,
 }: OrbIndicatorProps) {
   const classNames = [
     "helm-orb-indicator",
-    "helm-surface",
-    `helm-surface--${tone}`,
+    `helm-tone--${tone}`,
     `helm-orb-indicator--${size}`,
     className,
   ]

@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { CSSProperties } from "react";
 import { ContextMenu } from "./context-menu";
+import { LCARS_TONES } from "../../tones";
 
 const meta = {
   title: "Overlay/ContextMenu",
@@ -12,7 +13,7 @@ const meta = {
   argTypes: {
     tone: {
       control: "select",
-      options: ["accent", "sky", "lilac", "gold", "orange", "danger", "neutral"],
+      options: [...LCARS_TONES],
     },
     width: { control: { type: "number", min: 120, max: 320 } },
   },
@@ -30,6 +31,7 @@ export const Default: Story = {
     name: "Tau Ceti",
     subtitle: "G8.5V · 11.9 ly",
     tone: "sky",
+    width: 180,
     actions: [
       { label: "Scan Route", detail: "1h 12m" },
       { label: "Jump", detail: "route unknown", disabled: true },
@@ -43,6 +45,7 @@ export const Default: Story = {
 
 export const Tones: Story = {
   args: { name: "", actions: [] },
+  parameters: { controls: { disable: true } },
   render: () => (
     <div style={{ display: "flex", gap: 24, flexWrap: "wrap", alignItems: "flex-start" }}>
       <ContextMenu
@@ -139,6 +142,7 @@ export const ActionTones: Story = {
 
 export const AllStates: Story = {
   args: { name: "", actions: [] },
+  parameters: { controls: { disable: true } },
   render: () => (
     <div style={{ display: "flex", gap: 24, flexWrap: "wrap", alignItems: "flex-start" }}>
       <div>
@@ -224,7 +228,7 @@ const LABEL: CSSProperties = { fontFamily: '"Antonio", sans-serif', fontSize: 9,
  */
 export const Design: Story = {
   args: { name: "", actions: [] },
-  parameters: { layout: "padded" },
+  parameters: { layout: "padded", controls: { disable: true } },
   render: () => (
     <div style={DOC}>
       <h1 style={H1}>Star Context Menu</h1>

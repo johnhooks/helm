@@ -12,7 +12,6 @@ export const PLANET_TYPES = [
 	"ocean",
 	"desert",
 	"toxic",
-	"ringed",
 ] as const;
 
 export type PlanetType = (typeof PLANET_TYPES)[number];
@@ -22,6 +21,10 @@ export interface PlanetGlyphProps {
 	 * Planet classification
 	 */
 	type?: PlanetType;
+	/**
+	 * Whether the planet has rings
+	 */
+	ringed?: boolean;
 	/**
 	 * Size variant
 	 */
@@ -38,6 +41,7 @@ export interface PlanetGlyphProps {
 
 export function PlanetGlyph({
 	type = "terrestrial",
+	ringed = false,
 	size = "md",
 	className = "",
 	style,
@@ -46,6 +50,7 @@ export function PlanetGlyph({
 		"helm-planet-glyph",
 		`helm-planet-glyph--${type}`,
 		`helm-planet-glyph--${size}`,
+		ringed && "helm-planet-glyph--ringed",
 		className,
 	]
 		.filter(Boolean)

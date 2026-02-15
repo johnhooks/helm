@@ -9,7 +9,7 @@
   width: 12px;
   height: 5px;
   border-radius: 3px;
-  background: color-mix(in srgb, var(--helm-surface-bg) 20%, transparent);
+  background: color-mix(in srgb, var(--helm-tone) 20%, transparent);
 }
 
 .helm-stack-indicator--sm .helm-stack-indicator__segment {
@@ -38,5 +38,5 @@
 }
 
 .helm-stack-indicator__segment--filled {
-  background: var(--helm-surface-bg);
+  background: var(--helm-tone);
 }

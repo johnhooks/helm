@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { LCARS_TONES } from "../../tones";
 import { SegmentedControl } from "./segmented-control";
 
 const meta = {
@@ -10,18 +11,9 @@ const meta = {
     backgrounds: { default: "dark" },
   },
   argTypes: {
-    surface: {
+    tone: {
       control: "select",
-      options: [
-        "accent",
-        "orange",
-        "gold",
-        "blue",
-        "sky",
-        "success",
-        "lilac",
-        "violet",
-      ],
+      options: [...LCARS_TONES],
     },
     size: {
       control: "radio",
@@ -58,15 +50,16 @@ export const Default: Story = {
   args: {
     options: scanOptions,
     defaultValue: "standard",
-    surface: "accent",
+    tone: "accent",
     size: "md",
+    fullWidth: false,
+    disabled: false,
   },
 };
 
 export const Controlled: Story = {
-  args: {
-    options: rangeOptions,
-  },
+  args: { options: [] },
+  parameters: { controls: { disable: true } },
   render: () => {
     const [value, setValue] = useState("medium");
     return (
@@ -75,7 +68,7 @@ export const Controlled: Story = {
           options={rangeOptions}
           value={value}
           onChange={setValue}
-          surface="sky"
+          tone="sky"
         />
         <span style={{ color: "#a39a88", fontSize: 12 }}>
           Selected: {value}
@@ -85,28 +78,26 @@ export const Controlled: Story = {
   },
 };
 
-export const Surfaces: Story = {
-  args: {
-    options: powerOptions,
-  },
+export const Tones: Story = {
+  args: { options: [] },
+  parameters: { controls: { disable: true } },
   render: () => (
     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-      <SegmentedControl options={powerOptions} defaultValue="normal" surface="accent" />
-      <SegmentedControl options={powerOptions} defaultValue="normal" surface="orange" />
-      <SegmentedControl options={powerOptions} defaultValue="normal" surface="gold" />
-      <SegmentedControl options={powerOptions} defaultValue="normal" surface="blue" />
-      <SegmentedControl options={powerOptions} defaultValue="normal" surface="sky" />
-      <SegmentedControl options={powerOptions} defaultValue="normal" surface="success" />
-      <SegmentedControl options={powerOptions} defaultValue="normal" surface="lilac" />
-      <SegmentedControl options={powerOptions} defaultValue="normal" surface="violet" />
+      <SegmentedControl options={powerOptions} defaultValue="normal" tone="accent" />
+      <SegmentedControl options={powerOptions} defaultValue="normal" tone="orange" />
+      <SegmentedControl options={powerOptions} defaultValue="normal" tone="gold" />
+      <SegmentedControl options={powerOptions} defaultValue="normal" tone="blue" />
+      <SegmentedControl options={powerOptions} defaultValue="normal" tone="sky" />
+      <SegmentedControl options={powerOptions} defaultValue="normal" tone="success" />
+      <SegmentedControl options={powerOptions} defaultValue="normal" tone="lilac" />
+      <SegmentedControl options={powerOptions} defaultValue="normal" tone="violet" />
     </div>
   ),
 };
 
 export const Sizes: Story = {
-  args: {
-    options: scanOptions,
-  },
+  args: { options: [] },
+  parameters: { controls: { disable: true } },
   render: () => (
     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
       <SegmentedControl options={scanOptions} defaultValue="standard" size="sm" />
@@ -127,7 +118,7 @@ export const FullWidth: Story = {
     options: scanOptions,
     defaultValue: "standard",
     fullWidth: true,
-    surface: "gold",
+    tone: "gold",
   },
 };
 
@@ -155,15 +146,14 @@ export const Vertical: Story = {
     options: powerOptions,
     defaultValue: "normal",
     orientation: "vertical",
-    surface: "gold",
+    tone: "gold",
     size: "sm",
   },
 };
 
 export const VerticalControlled: Story = {
-  args: {
-    options: powerOptions,
-  },
+  args: { options: [] },
+  parameters: { controls: { disable: true } },
   render: () => {
     const [value, setValue] = useState("normal");
     return (
@@ -177,7 +167,7 @@ export const VerticalControlled: Story = {
           value={value}
           onChange={setValue}
           orientation="vertical"
-          surface="gold"
+          tone="gold"
           size="sm"
         />
         <span style={{ color: "#a39a88", fontSize: 12 }}>
@@ -199,14 +189,13 @@ export const ManyOptions: Story = {
       { value: "6", label: "6" },
     ],
     defaultValue: "3",
-    surface: "violet",
+    tone: "violet",
   },
 };
 
 export const ScanDepthPanel: Story = {
-  args: {
-    options: scanOptions,
-  },
+  args: { options: [] },
+  parameters: { controls: { disable: true } },
   render: () => {
     const [depth, setDepth] = useState("standard");
     const [range, setRange] = useState("medium");
@@ -239,7 +228,7 @@ export const ScanDepthPanel: Story = {
             options={scanOptions}
             value={depth}
             onChange={setDepth}
-            surface="gold"
+            tone="gold"
             fullWidth
           />
         </div>
@@ -259,7 +248,7 @@ export const ScanDepthPanel: Story = {
             options={rangeOptions}
             value={range}
             onChange={setRange}
-            surface="sky"
+            tone="sky"
             fullWidth
           />
         </div>

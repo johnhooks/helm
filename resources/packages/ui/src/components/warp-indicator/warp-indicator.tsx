@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
+import type { LcarsTone } from "../../tones";
 
 export interface WarpIndicatorProps {
   /**
@@ -21,26 +22,7 @@ export interface WarpIndicatorProps {
   /**
    * Surface tone
    */
-  tone?:
-    | "neutral"
-    | "base"
-    | "accent"
-    | "muted"
-    | "danger"
-    | "success"
-    | "warning"
-    | "info"
-    | "orange"
-    | "gold"
-    | "peach"
-    | "sunset"
-    | "blue"
-    | "sky"
-    | "ice"
-    | "lilac"
-    | "violet"
-    | "plum"
-    | "hopbush";
+  tone?: LcarsTone;
   /**
    * Additional CSS class names
    */
@@ -60,7 +42,7 @@ export function WarpIndicator({
   size = "md",
   segments = 10,
   transitionMs = 60000,
-  tone = "accent",
+  tone = "neutral",
   className = "",
   style,
   "data-testid": testId,
@@ -102,8 +84,7 @@ export function WarpIndicator({
 
   const classNames = [
     "helm-warp-indicator",
-    "helm-surface",
-    `helm-surface--${tone}`,
+    `helm-tone--${tone}`,
     `helm-warp-indicator--${size}`,
     className,
   ]
