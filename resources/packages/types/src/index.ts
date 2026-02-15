@@ -16,9 +16,12 @@ export type {
 } from './rest';
 export type { ShipState } from './ship';
 export type {
+	ShipLoadout,
+	SlotProducts,
 	SystemComponent,
 	SystemComponentEmbeds,
 	SystemComponentResponse,
+	SystemSlots,
 } from './system';
 export type {
 	EngineeringStats,

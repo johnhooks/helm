@@ -1,9 +1,8 @@
 import { createRegistrySelector } from '@wordpress/data';
-import { assert } from '@helm/errors';
 import type { HelmError } from '@helm/errors';
-import { store as productsStore } from '@helm/products';
-import type { ShipState, SystemComponentResponse, SystemStats, WithRestLinks } from '@helm/types';
+import type { ShipLoadout, ShipState, SystemComponentResponse, SystemStats, WithRestLinks } from '@helm/types';
 import type { State } from './types';
+import { expectLoadout } from './utils';
 
 export const getShip = (
 	state: State,
@@ -35,49 +34,40 @@ export const getEditError = (
 	state: State
 ): HelmError | null => state.edits.error;
 
+/**
+ * @throws {HelmError} When ship, systems, a required slot, or its preloaded product is missing.
+ */
+export const getShipWithLoadout = createRegistrySelector(
+	( select ) => ( state: State, _shipId: number ): ShipLoadout => {
+		return expectLoadout( state, select );
+	}
+);
+
+/**
+ * @throws {HelmError} When ship, systems, a required slot, or its preloaded product is missing.
+ */
 export const getSystemStats = createRegistrySelector(
-	( select ) => ( state: State, _shipId: number ): SystemStats | undefined => {
-		const systems = state.systems.systems;
-		if ( ! systems ) {
-			return undefined;
-		}
-
-		const core = systems.find( ( s ) => s.slot === 'core' );
-		const drive = systems.find( ( s ) => s.slot === 'drive' );
-		const sensor = systems.find( ( s ) => s.slot === 'sensor' );
-
-		const coreProduct = core
-			? select( productsStore ).getProduct( core.product_id )
-			: undefined;
-		const driveProduct = drive
-			? select( productsStore ).getProduct( drive.product_id )
-			: undefined;
-		const sensorProduct = sensor
-			? select( productsStore ).getProduct( sensor.product_id )
-			: undefined;
-
-		assert( coreProduct, 'helm.ship.missing_core_product', `Product store missing expected preloaded core: ${ core?.product_id }` );
-		assert( driveProduct, 'helm.ship.missing_drive_product', `Product store missing expected preloaded drive: ${ drive?.product_id }` );
-		assert( sensorProduct, 'helm.ship.missing_sensor_product', `Product store missing expected preloaded sensor: ${ sensor?.product_id }` );
+	( select ) => ( state: State, _shipId: number ): SystemStats => {
+		const { slots, products } = expectLoadout( state, select );
 
 		return {
 			engineering: {
-				rechargeRate: coreProduct.rate ?? 0,
-				coreLife: core?.life ?? 0,
-				outputMult: coreProduct.mult_a ?? 1,
-				condition: ( core?.condition ?? 0 ) * 100,
+				rechargeRate: products.core.rate ?? 0,
+				coreLife: slots.core.life ?? 0,
+				outputMult: products.core.mult_a ?? 1,
+				condition: slots.core.condition * 100,
 			},
 			navigation: {
-				range: driveProduct.range ?? 0,
-				speed: driveProduct.mult_a ?? 0,
-				draw: driveProduct.mult_b ?? 0,
-				condition: ( drive?.condition ?? 0 ) * 100,
+				range: products.drive.range ?? 0,
+				speed: products.drive.mult_a ?? 0,
+				draw: products.drive.mult_b ?? 0,
+				condition: slots.drive.condition * 100,
 			},
 			sensors: {
-				range: sensorProduct.range ?? 0,
-				scanDuration: sensorProduct.mult_a ?? 0,
-				discovery: ( sensorProduct.chance ?? 0 ) * 100,
-				condition: ( sensor?.condition ?? 0 ) * 100,
+				range: products.sensor.range ?? 0,
+				scanDuration: products.sensor.mult_a ?? 0,
+				discovery: ( products.sensor.chance ?? 0 ) * 100,
+				condition: slots.sensor.condition * 100,
 			},
 		};
 	}

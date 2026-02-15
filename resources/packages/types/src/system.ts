@@ -1,6 +1,7 @@
-import type { ProductEmbed } from './product';
+import type { Product, ProductEmbed } from './product';
 import { LinkRel } from './rest';
 import type { WithRestLinks } from './rest';
+import type { ShipState } from './ship';
 
 export interface SystemComponent {
 	id: number;
@@ -24,3 +25,21 @@ export type SystemComponentEmbeds = {
 export type SystemComponentResponse = WithRestLinks< SystemComponent > & {
 	_embedded?: SystemComponentEmbeds;
 };
+
+export interface SystemSlots {
+	core: SystemComponentResponse;
+	drive: SystemComponentResponse;
+	sensor: SystemComponentResponse;
+	shield: SystemComponentResponse;
+	nav: SystemComponentResponse;
+}
+
+export type SlotProducts = {
+	[ K in keyof SystemSlots ]: WithRestLinks< Product >;
+};
+
+export interface ShipLoadout {
+	ship: WithRestLinks< ShipState >;
+	slots: SystemSlots;
+	products: SlotProducts;
+}

@@ -20,9 +20,14 @@ export enum ErrorCode {
 	ShipsInvalidResponse = 'helm.ships.invalid_response',
 	ShipsSystemsInvalidResponse = 'helm.ships.systems_invalid_response',
 	ShipsPatchFailed = 'helm.ships.patch_failed',
+	ShipsNotLoaded = 'helm.ships.not_loaded',
+	ShipsSystemsNotLoaded = 'helm.ships.systems_not_loaded',
+	ShipsMissingSystem = 'helm.ships.missing_system',
+	ShipLinkLoadoutFailed = 'helm.shiplink.loadout_failed',
 
 	// Products errors
 	ProductsInvalidResponse = 'helm.products.invalid_response',
+	ProductsNotPreloaded = 'helm.products.not_preloaded',
 
 	// Actions errors
 	ActionsCreateFailed = 'helm.actions.create_failed',

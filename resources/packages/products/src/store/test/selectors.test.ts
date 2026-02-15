@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { HelmError } from '@helm/errors';
-import { getProduct, isProductLoading, getProductError } from '../selectors';
+import { getProduct, getPreloadedProduct, isProductLoading, getProductError } from '../selectors';
 import { createProduct, createState } from './fixtures';
 
 describe( 'getProduct', () => {
@@ -15,6 +15,29 @@ describe( 'getProduct', () => {
 		const state = createState();
 
 		expect( getProduct( state, 999 ) ).toBeUndefined();
+	} );
+} );
+
+describe( 'getPreloadedProduct', () => {
+	it( 'returns the product when it exists', () => {
+		const product = createProduct();
+		const state = createState( { byId: { 1: product } } );
+
+		expect( getPreloadedProduct( state, 1 ) ).toBe( product );
+	} );
+
+	it( 'throws when product is not in store', () => {
+		const state = createState();
+		let error: HelmError | undefined;
+
+		try {
+			getPreloadedProduct( state, 999 );
+		} catch ( e ) {
+			error = e as HelmError;
+		}
+
+		expect( error ).toBeInstanceOf( HelmError );
+		expect( error?.message ).toBe( 'helm.products.not_preloaded' );
 	} );
 } );
 
