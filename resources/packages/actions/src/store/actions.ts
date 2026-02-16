@@ -23,7 +23,7 @@ export const createAction =
 		} catch ( error ) {
 			dispatch( {
 				type: 'CREATE_ACTION_FAILED',
-				error: HelmError.safe( ErrorCode.ActionsCreateFailed, __( 'ShipLink failed to dispatch the requested action', 'helm' ), await HelmError.asyncFrom( error ) ),
+				error: HelmError.safe( ErrorCode.ActionsCreateFailed, __( 'Ship link failed to dispatch the requested action', 'helm' ), await HelmError.asyncFrom( error ) ),
 			} );
 		}
 	};
@@ -86,7 +86,7 @@ export const loadMore =
 			dispatch( {
 				type: 'LOAD_MORE_FAILED',
 				queryId,
-				error: HelmError.safe( ErrorCode.ActionsInvalidResponse, __( 'ShipLink failed to retrieve the ship log', 'helm' ), await HelmError.asyncFrom( error ) ),
+				error: HelmError.safe( ErrorCode.ActionsInvalidResponse, __( 'Ship link failed to retrieve the ship log', 'helm' ), await HelmError.asyncFrom( error ) ),
 			} );
 		}
 	};

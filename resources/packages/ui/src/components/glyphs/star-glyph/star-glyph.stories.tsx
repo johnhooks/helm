@@ -31,7 +31,6 @@ const meta = {
 			options: ["xxs", "xs", "sm", "md", "lg", "xl", "xxl"],
 		},
 	},
-	tags: ["autodocs"],
 } satisfies Meta<typeof StarGlyph>;
 
 export default meta;

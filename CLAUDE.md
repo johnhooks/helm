@@ -114,7 +114,6 @@ composer analyse           # PHPStan static analysis
 composer lint              # PHP_CodeSniffer (WPCS)
 composer lint:fix          # Auto-fix PHP linting issues
 bun run lint:js            # ESLint for JS/TS
-bun run lint:style         # Stylelint for CSS
 bun run lint:fix           # Auto-fix JS linting issues
 bun run format             # Prettier formatting
 bun run check-types        # TypeScript type checking

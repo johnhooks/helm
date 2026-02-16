@@ -16,7 +16,7 @@ import type { StarSelectEvent, Position3D, Route } from '@helm/astrometric';
 import { ViewportConfig } from '../components/viewport-config';
 import { StarContextMenu } from '../components/star-context-menu';
 import { ShipSystemsCard } from '../components/ship-systems-card';
-import { ShipLog } from '../components/ship-log';
+import { ShipLog } from '@helm/shell';
 
 const StarField = lazy(() =>
 	import('@helm/astrometric').then((m) => ({ default: m.StarField }))

@@ -14,23 +14,22 @@ const packages = path.resolve(__dirname, 'resources/packages');
  *   - handle: the WordPress script handle listed in .asset.php dependencies.
  *
  * Split into tiers so each compilation only externalizes packages it doesn't own:
- *   uiExternals        → tier 1 (for core compilation)
- *   coreExternals      → tier 1 + 2 (for shell and datastores)
- *   shellExternals     → core + shell (for datastores and apps)
- *   datastoreExternals → shell + cross-datastore deps (ships → products)
- *   helmExternals      → everything above + ships (for app entries)
+ *   uiExternals        → tier 1 (for core)
+ *   coreExternals      → tier 1 + 2 (for datastores)
+ *   datastoreExternals → core + cross-datastore deps (for shell and apps)
+ *   shellExternals     → datastores + shell (for apps)
+ *   helmExternals      → everything (for app entries)
  */
 
 /**
- * Tier 1: UI library — externalised by core and everything above.
+ * Tier 1: UI library — purely presentational.
  */
 const uiExternals = {
 	'@helm/ui': { global: ['helm', 'ui'], handle: 'helm-ui' },
 };
 
 /**
- * Tier 2: Core library — externalised by datastores and apps.
- * Includes the UI external plus every sub-package that bundles into helm-core.
+ * Tier 2: Core library — errors, data, logger bundled into one script.
  */
 const coreExternals = {
 	...uiExternals,
@@ -41,31 +40,31 @@ const coreExternals = {
 };
 
 /**
- * Tier 3: Shell — composed components bridging UI + Core.
- */
-const shellExternals = {
-	...coreExternals,
-	'@helm/shell': { global: ['helm', 'shell'], handle: 'helm-shell' },
-};
-
-/**
- * Externals for datastore entries (products, ships, nav).
- * Includes shell externals + cross-datastore deps.
+ * Tier 3: Datastores — each gets its own window global.
+ * Cross-datastore deps (ships → products) are externalized here.
  */
 const datastoreExternals = {
-	...shellExternals,
+	...coreExternals,
 	'@helm/datacore': { global: ['helm', 'datacore'], handle: 'helm-datacore' },
 	'@helm/products': { global: ['helm', 'products'], handle: 'helm-products' },
 	'@helm/nav': { global: ['helm', 'nav'], handle: 'helm-nav' },
 	'@helm/actions': { global: ['helm', 'actions'], handle: 'helm-actions' },
+	'@helm/ships': { global: ['helm', 'ships'], handle: 'helm-ships' },
+};
+
+/**
+ * Tier 4: Shell — composition layer wiring UI + core + datastores.
+ */
+const shellExternals = {
+	...datastoreExternals,
+	'@helm/shell': { global: ['helm', 'shell'], handle: 'helm-shell' },
 };
 
 /**
  * Full set of @helm/* externals for app bundles.
  */
 const helmExternals = {
-	...datastoreExternals,
-	'@helm/ships': { global: ['helm', 'ships'], handle: 'helm-ships' },
+	...shellExternals,
 };
 
 // Plugins without the default DependencyExtractionWebpackPlugin.
@@ -115,37 +114,8 @@ module.exports = [
 		],
 	},
 
-	// ── Shell (tier 3) ───────────────────────────────────────────────
-	// Composed components and hooks bridging @helm/ui + @helm/core.
-	{
-		...defaultConfig,
-		name: 'shell',
-		entry: {
-			shell: {
-				import: path.resolve(packages, 'shell/src/entry.ts'),
-				library: { name: ['helm', 'shell'], type: 'window' },
-			},
-		},
-		plugins: [
-			...basePlugins,
-			new DependencyExtractionWebpackPlugin({
-				requestToExternal(request) {
-					if (coreExternals[request]) {
-						return coreExternals[request].global;
-					}
-				},
-				requestToHandle(request) {
-					if (coreExternals[request]) {
-						return coreExternals[request].handle;
-					}
-				},
-			}),
-		],
-	},
-
-	// ── Datastore bundles ────────────────────────────────────────────
-	// WordPress + @helm/core externals. These entries provide the
-	// @helm/* window globals consumed by apps.
+	// ── Datastore bundles (tier 3) ──────────────────────────────────
+	// Each gets its own window global. Externalize core + cross-datastore deps.
 	{
 		...defaultConfig,
 		name: 'datastores',
@@ -169,6 +139,34 @@ module.exports = [
 			actions: {
 				import: path.resolve(packages, 'actions/src/index.ts'),
 				library: { name: ['helm', 'actions'], type: 'window' },
+			},
+		},
+		plugins: [
+			...basePlugins,
+			new DependencyExtractionWebpackPlugin({
+				requestToExternal(request) {
+					if (datastoreExternals[request]) {
+						return datastoreExternals[request].global;
+					}
+				},
+				requestToHandle(request) {
+					if (datastoreExternals[request]) {
+						return datastoreExternals[request].handle;
+					}
+				},
+			}),
+		],
+	},
+
+	// ── Shell (tier 4) ──────────────────────────────────────────────
+	// Composition layer — wires UI + core + datastores for app entries.
+	{
+		...defaultConfig,
+		name: 'shell',
+		entry: {
+			shell: {
+				import: path.resolve(packages, 'shell/src/index.ts'),
+				library: { name: ['helm', 'shell'], type: 'window' },
 			},
 		},
 		plugins: [

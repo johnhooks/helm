@@ -10,7 +10,6 @@
         "build": "wp-scripts build",
         "dev": "wp-scripts start",
         "lint:js": "wp-scripts lint-js resources/packages",
-        "lint:style": "wp-scripts lint-style resources/css",
         "lint:fix": "wp-scripts lint-js resources/packages --fix",
         "format": "wp-scripts format resources/packages",
         "check-types": "tsc --noEmit",

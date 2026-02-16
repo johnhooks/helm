@@ -69,6 +69,7 @@
         "@wordpress/api-fetch": "^7.0.0",
         "@wordpress/data": "^10.0.0",
         "@wordpress/i18n": "^5.0.0",
+        "@wordpress/url": "^4.0.0",
       },
     },
     "resources/packages/admin-settings": {
@@ -221,10 +222,16 @@
       "name": "@helm/shell",
       "version": "0.1.0",
       "dependencies": {
+        "@helm/actions": "workspace:*",
         "@helm/core": "workspace:*",
+        "@helm/errors": "workspace:*",
         "@helm/ui": "workspace:*",
+        "react-error-boundary": "^6.1.0",
       },
       "peerDependencies": {
+        "@wordpress/components": "^28.0.0",
+        "@wordpress/data": "^10.0.0",
+        "@wordpress/i18n": "^5.0.0",
         "react": "^18.3.1",
       },
     },

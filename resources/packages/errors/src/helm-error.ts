@@ -99,6 +99,19 @@ export class HelmError extends Error {
 	}
 
 	/**
+	 * Convert an unknown thrown value to a safe HelmError.
+	 *
+	 * Already-safe HelmErrors pass through unchanged. Unsafe errors are
+	 * wrapped with the provided code/detail and the original tucked into `cause`.
+	 */
+	static safeFrom(error: unknown, code: string, detail: string): HelmError {
+		if (HelmError.is(error) && error.isSafe) {
+			return error;
+		}
+		return HelmError.safe(code, detail, error);
+	}
+
+	/**
 	 * Create a safe, user-facing HelmError that wraps an original error as a cause.
 	 *
 	 * Use this at catch boundaries to replace a technical or unsafe error

@@ -26,7 +26,6 @@ const preview: Preview = {
     },
     layout: 'centered',
   },
-  tags: ['autodocs'],
   decorators: [
     (Story) =>
       React.createElement(

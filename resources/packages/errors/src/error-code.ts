@@ -36,4 +36,6 @@ export enum ErrorCode {
 	ActionsCreateFailed = 'helm.actions.create_failed',
 	ActionsInvalidResponse = 'helm.actions.invalid_response',
 	ActionsNoDraft = 'helm.actions.no_draft',
+	ActionsMissingFill = 'helm.actions.missing_fill',
+	ActionsRenderFailed = 'helm.actions.render_failed',
 }

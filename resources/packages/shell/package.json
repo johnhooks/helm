@@ -1,15 +1,21 @@
 {
-	"name": "@helm/shell",
-	"version": "0.1.0",
-	"description": "Shared composed components and hooks bridging @helm/ui with @helm/core.",
-	"private": true,
-	"main": "src/index.ts",
-	"types": "src/index.ts",
-	"dependencies": {
-		"@helm/core": "workspace:*",
-		"@helm/ui": "workspace:*"
-	},
-	"peerDependencies": {
-		"react": "^18.3.1"
-	}
+  "name": "@helm/shell",
+  "version": "0.1.0",
+  "description": "Shared composed components and hooks bridging @helm/ui with @helm/core.",
+  "private": true,
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "dependencies": {
+    "@helm/actions": "workspace:*",
+    "@helm/core": "workspace:*",
+    "@helm/errors": "workspace:*",
+    "@helm/ui": "workspace:*",
+    "react-error-boundary": "^6.1.0"
+  },
+  "peerDependencies": {
+    "@wordpress/components": "^28.0.0",
+    "@wordpress/data": "^10.0.0",
+    "@wordpress/i18n": "^5.0.0",
+    "react": "^18.3.1"
+  }
 }

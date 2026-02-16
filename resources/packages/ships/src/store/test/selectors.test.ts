@@ -267,7 +267,7 @@ describe( 'getShipWithLoadout', () => {
 		expect( loadout.products.nav ).toBe( navProduct );
 	} );
 
-	it( 'throws a safe ShipLink error when a required slot is missing', () => {
+	it( 'throws a safe ship link error when a required slot is missing', () => {
 		const state = createState( {
 			ship: { ship: createShipState() },
 			systems: {
@@ -291,7 +291,7 @@ describe( 'getShipWithLoadout', () => {
 		expect( error?.cause ).toBeInstanceOf( HelmError );
 	} );
 
-	it( 'throws a safe ShipLink error when a preloaded product is missing', () => {
+	it( 'throws a safe ship link error when a preloaded product is missing', () => {
 		mockRegistry( getShipWithLoadout, {
 			[ DRIVE_PRODUCT_ID ]: driveProduct,
 			[ SENSOR_PRODUCT_ID ]: sensorProduct,
@@ -400,7 +400,7 @@ describe( 'getSystemStats', () => {
 		expect( stats.sensors.discovery ).toBe( 0 );
 	} );
 
-	it( 'throws a safe ShipLink error when a preloaded product is missing', () => {
+	it( 'throws a safe ship link error when a preloaded product is missing', () => {
 		mockRegistry( getSystemStats, {
 			[ DRIVE_PRODUCT_ID ]: driveProduct,
 			[ SENSOR_PRODUCT_ID ]: sensorProduct,

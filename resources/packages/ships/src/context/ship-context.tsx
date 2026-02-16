@@ -25,9 +25,10 @@ export function ShipProvider( {
 	shipId,
 	children,
 }: {
-	shipId: number;
+	shipId: number | null | undefined;
 	children: React.ReactNode;
 } ) {
+	assert( shipId, ErrorCode.ShipsNoProvider, 'ShipProvider requires a shipId.' );
 	const ship = useSuspenseSelect(
 		( select ) => select( store ).getShip( shipId ),
 		[ shipId ],
@@ -43,13 +44,13 @@ export function ShipProvider( {
 	if ( ! ship ) {
 		throw HelmError.safe(
 			ErrorCode.ShipsUnavailable,
-			__( 'ShipLink connection lost — ship state unavailable', 'helm' ),
+			__( 'Ship link connection lost — ship state unavailable', 'helm' ),
 		);
 	}
 	if ( ! systems ) {
 		throw HelmError.safe(
 			ErrorCode.ShipsSystemsUnavailable,
-			__( 'ShipLink connection lost — system data unavailable', 'helm' ),
+			__( 'Ship link connection lost — system data unavailable', 'helm' ),
 		);
 	}
 
