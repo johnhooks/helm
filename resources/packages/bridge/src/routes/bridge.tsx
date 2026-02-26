@@ -163,8 +163,15 @@ export function BridgePage() {
 		if ( ! selectedStar ) {
 			return;
 		}
-		draftCreate( { type: 'scan_route', params: { target_node_id: selectedStar.node_id } } );
-	}, [ selectedStar, draftCreate ]);
+		draftCreate( {
+			type: 'scan_route',
+			params: {
+				target_node_id: selectedStar.node_id,
+				source_node_id: currentNodeId,
+				distance_ly: selectedDistance,
+			},
+		} );
+	}, [ selectedStar, currentNodeId, selectedDistance, draftCreate ]);
 
 	const handleContextMenuClose = useCallback(() => {
 		setStarSelectEvent(null);

@@ -38,4 +38,7 @@ export enum ErrorCode {
 	ActionsNoDraft = 'helm.actions.no_draft',
 	ActionsMissingFill = 'helm.actions.missing_fill',
 	ActionsRenderFailed = 'helm.actions.render_failed',
+
+	// Nav errors
+	NavNodeNotFound = 'helm.nav.node_not_found',
 }

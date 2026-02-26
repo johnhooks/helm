@@ -8,7 +8,7 @@ import { createIndexQueryId } from './utils';
 import li from 'li';
 
 export const createAction =
-	( shipId: number, actionType: ShipActionType, params: Record< string, unknown > = {} ): Thunk< Action, typeof store > =>
+	( shipId: number, actionType: ShipActionType, params: DraftAction[ 'params' ] = {} ): Thunk< Action, typeof store > =>
 	async ( { dispatch } ) => {
 		dispatch( { type: 'CREATE_ACTION_START' } );
 

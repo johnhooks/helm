@@ -1,7 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { DraftAction, ShipAction } from '@helm/actions';
-import { ShipActionSlot } from '../ship-action-slot';
-import { JumpActionFill } from './jump-action-fill';
+import { DraftJumpCard } from './draft-jump-card';
+import { ActiveJumpCard } from './active-jump-card';
+import { CompleteJumpCard } from './complete-jump-card';
 
 const meta = {
 	title: 'Ship Actions/Jump',
@@ -15,18 +16,15 @@ const meta = {
 export default meta;
 type Story = StoryObj< typeof meta >;
 
-const baseAction: ShipAction = {
+const baseAction: ShipAction< 'jump' > = {
 	id: 201,
 	ship_post_id: 42,
 	type: 'jump',
 	status: 'pending',
 	params: {
-		target_name: 'Tau Ceti',
+		target_node_id: 7,
+		source_node_id: 1,
 		distance_ly: 11.9,
-		duration: '4d 2h',
-		speed_ly_per_day: 3.2,
-		power_cost: 12,
-		progress: 18,
 	},
 	result: null,
 	deferred_until: new Date( Date.now() + 1000 * 60 * 60 * 24 ).toISOString(),
@@ -34,61 +32,74 @@ const baseAction: ShipAction = {
 	updated_at: new Date().toISOString(),
 };
 
-const baseDraft: DraftAction = {
+const baseDraft: DraftAction< 'jump' > = {
 	type: 'jump',
 	params: {
-		target_name: 'Tau Ceti',
+		target_node_id: 7,
+		source_node_id: 1,
 		distance_ly: 11.9,
-		duration: '4d 2h',
-		speed_ly_per_day: 3.2,
-		power_cost: 12,
 	},
 };
 
-function renderSlot( props: { action?: ShipAction; draft?: DraftAction } ) {
-	const type = props.action?.type ?? props.draft?.type ?? 'jump';
+const TARGET_NAME = 'Tau Ceti';
+const noop = () => {};
+const draftProps = { onCancel: noop, onSubmit: noop, isSubmitting: false };
+
+function Wrapper( { children }: { children: React.ReactNode } ) {
 	return (
-		<>
-			<JumpActionFill />
-			<div style={ { width: 380, display: 'flex', flexDirection: 'column', gap: 6 } }>
-				<ShipActionSlot
-					type={ type }
-					action={ props.action }
-					draft={ props.draft }
-				/>
-			</div>
-		</>
+		<div style={ { width: 380, display: 'flex', flexDirection: 'column', gap: 6 } }>
+			{ children }
+		</div>
 	);
 }
 
 export const Draft: Story = {
-	render: () => renderSlot( { draft: baseDraft } ),
+	render: () => (
+		<Wrapper>
+			<DraftJumpCard draft={ baseDraft } targetName={ TARGET_NAME } { ...draftProps } />
+		</Wrapper>
+	),
 };
 
 export const Running: Story = {
-	render: () => renderSlot( { action: { ...baseAction, status: 'running' } } ),
+	render: () => (
+		<Wrapper>
+			<ActiveJumpCard
+				action={ { ...baseAction, status: 'running', result: { from_node_id: 1, to_node_id: 7, distance: 11.9, core_cost: 12, duration: 345600 } } }
+				targetName={ TARGET_NAME }
+			/>
+		</Wrapper>
+	),
 };
 
 export const Fulfilled: Story = {
-	render: () =>
-		renderSlot( {
-			action: {
-				...baseAction,
-				status: 'fulfilled',
-				result: {},
-				deferred_until: null,
-			},
-		} ),
+	render: () => (
+		<Wrapper>
+			<CompleteJumpCard
+				action={ {
+					...baseAction,
+					status: 'fulfilled',
+					result: { from_node_id: 1, to_node_id: 7, distance: 11.9, core_cost: 12, duration: 345600, remaining_core_life: 88, core_before: 100 },
+					deferred_until: null,
+				} }
+				targetName={ TARGET_NAME }
+			/>
+		</Wrapper>
+	),
 };
 
 export const Failed: Story = {
-	render: () =>
-		renderSlot( {
-			action: {
-				...baseAction,
-				status: 'failed',
-				result: { cause: 'Blackhole' },
-				deferred_until: null,
-			},
-		} ),
+	render: () => (
+		<Wrapper>
+			<CompleteJumpCard
+				action={ {
+					...baseAction,
+					status: 'failed',
+					result: { from_node_id: 1, to_node_id: 7, distance: 11.9, core_cost: 12, duration: 345600, cause: 'Blackhole' },
+					deferred_until: null,
+				} }
+				targetName={ TARGET_NAME }
+			/>
+		</Wrapper>
+	),
 };

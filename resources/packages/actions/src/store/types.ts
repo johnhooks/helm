@@ -1,4 +1,5 @@
 import type { HelmError } from '@helm/errors';
+import type { ActionContract } from '../contracts';
 
 export type ShipActionType =
 	| 'scan_route'
@@ -13,19 +14,28 @@ export type ShipActionType =
 	| 'repair'
 	| 'upgrade';
 
-export interface ShipAction {
+export type ShipActionStatus = 'pending' | 'running' | 'fulfilled' | 'partial' | 'failed';
+
+export interface ShipAction< T extends ShipActionType = ShipActionType > {
 	id: number;
 	ship_post_id: number;
-	type: ShipActionType;
-	status: 'pending' | 'running' | 'fulfilled' | 'partial' | 'failed';
-	params: Record< string, unknown >;
-	result: Record< string, unknown > | null;
+	type: T;
+	status: ShipActionStatus;
+	params: ActionContract< T >[ 'params' ];
+	result:
+		| ActionContract< T >[ 'activeResult' ]
+		| ActionContract< T >[ 'fulfilledResult' ]
+		| ActionContract< T >[ 'failedResult' ]
+		| null;
 	deferred_until: string | null;
 	created_at: string;
 	updated_at: string;
 }
 
-export type DraftAction = Pick< ShipAction, 'type' | 'params' >;
+export type DraftAction< T extends ShipActionType = ShipActionType > = {
+	type: T;
+	params: ActionContract< T >[ 'params' ];
+};
 
 export interface QueryMeta {
 	next: string | null;

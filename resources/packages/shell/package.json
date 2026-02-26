@@ -9,6 +9,8 @@
     "@helm/actions": "workspace:*",
     "@helm/core": "workspace:*",
     "@helm/errors": "workspace:*",
+    "@helm/nav": "workspace:*",
+    "@helm/ships": "workspace:*",
     "@helm/ui": "workspace:*",
     "react-error-boundary": "^6.1.0"
   },
