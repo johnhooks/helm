@@ -48,7 +48,9 @@
       "@helm/core": ["resources/packages/core/src"],
       "@helm/core/*": ["resources/packages/core/src/*"],
       "@helm/shell": ["resources/packages/shell/src"],
-      "@helm/shell/*": ["resources/packages/shell/src/*"]
+      "@helm/shell/*": ["resources/packages/shell/src/*"],
+      "@helm/formulas": ["resources/packages/formulas/src"],
+      "@helm/formulas/*": ["resources/packages/formulas/src/*"]
     }
   },
   "include": [
@@ -58,5 +60,5 @@
     "tests-e2e/**/*.ts",
     "vitest.setup.ts"
   ],
-  "exclude": ["node_modules", "build", "vendor"]
+  "exclude": ["node_modules", "build", "vendor", "resources/workbench"]
 }

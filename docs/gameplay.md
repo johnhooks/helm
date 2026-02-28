@@ -6,6 +6,32 @@ How Helm actually plays. The loops, the progression, the feel.
 
 This is the early days of interstellar exploration. Ships are barely equipped to handle the journey between stars. Everything degrades, nothing is permanent, and the void is vast. You check in between meetings, before bed, over morning coffee. "What did my ship find?"
 
+## Submarine Warfare in Space
+
+All gameplay in Helm follows the logic of submarine warfare. This isn't a metaphor bolted onto space combat — it's the fundamental model for how ships interact with space and each other.
+
+**You are blind by default.** Space is dark. You know nothing about a system until you actively scan it. Other ships are invisible unless they're doing something that produces emissions. Sitting idle in a system is sitting silent — undetectable.
+
+**Action creates signal.** Every active operation — scanning, mining, jumping, salvaging — produces emissions that can be detected by other ships. The more aggressively you act, the louder you are. A ship running a deep scan at high effort is broadcasting its presence to anyone listening. A ship sitting dark is a ghost.
+
+**Active sonar reveals your position.** PNP scanning (looking for other ships) is the loudest thing you can do. You find targets by broadcasting sweep pulses — and every pulse tells everyone in range that you're hunting. The hunter has to howl to find the prey.
+
+**Patience is a tactic.** Sitting still, listening, waiting — these are valid and powerful strategies. The wolf who parks near a wreck and waits for a salvager to light up is using silence as a weapon. The miner who scans for PNP emissions before starting extraction is using patience as defense.
+
+**Position is abstract.** A system is a location, not a coordinate space. You're *in* a system — mining its belts, scanning its space, docked at its station. You don't navigate within a system. This is like a submarine operating in a patrol zone, not a specific GPS coordinate. The abstraction keeps the game simple while preserving all the interesting detection and engagement dynamics.
+
+This model unifies everything:
+- **Mining:** You're in a system, extracting resources, creating emissions. Detectable.
+- **Scanning:** You're in a system, sweeping for contacts. Very detectable.
+- **Station building:** You're in a system, constructing. Detectable during active construction.
+- **Siege:** Multiple ships in a system, all acting aggressively. The loudest event possible.
+- **Lying in wait:** You're in a system, doing nothing. Invisible.
+- **Interdiction:** You detect a target, engage. The engagement creates emissions visible to everyone else in the system.
+
+**No visual space.** There's no 3D world because there shouldn't be. In real space, you'd never *see* another ship. Distances are too vast, objects are too small, and combat happens across millions of kilometers. The fantasy of two ships shooting at each other through a cockpit window is pure fiction. What's real is the data — power levels, sweep patterns, detection probabilities, shield state, envelope phases. The LCARS interface *is* the game, just like a submarine crew reads sonar displays and instrument panels, not the ocean. The instruments tell the story. A bearing change on a readout is more tense than any rendered explosion.
+
+The submarine model is why detection is hard, why idle ships are safe, why wolf packs are loud, why scavengers work during sieges for cover noise, and why the game feels like a slow, tense ocean instead of a frantic battlefield. Every design decision flows from this premise.
+
 ## The Core Loop
 
 ```
@@ -263,6 +289,22 @@ This creates a secondary market more interesting than raw materials:
 
 A ship can only take what fits in its cargo hold. A raider grabs the high-value pieces and leaves. A salvager comes later for the rest. Multiple players might pick over the same wreck. What's left gets less valuable each time until someone scraps the hull for raw materials.
 
+### Wreck Discovery
+
+Wrecks are passive — they sit at coordinates emitting nothing. Finding them requires active scanning, which means the salvager has to look. But different contexts create different discovery dynamics:
+
+**Peaceful salvage.** Scan a system, find an old wreck, salvage at leisure. Nobody around, no pressure. The standard loop. Most salvage happens this way — old wrecks from core life failures, abandoned ships, ancient derelicts in deep space.
+
+**Post-battle salvage.** After a station siege or major engagement, the system is littered with fresh wrecks from both sides. These contain high-value components — combat-fitted ships carry expensive gear with deep usage history. The system becomes a salvage rush.
+
+**Salvage during combat.** The most interesting scenario. During an active siege, both sides are scanning aggressively — PNP scans for reinforcements, system scans for tactical awareness. The system is loud with emissions. A salvager working during the chaos benefits from the noise — their salvage emissions get lost in the background. But they're operating in an active combat zone. Stray interdiction fields, combat ships looking for soft targets, and the risk of being mistaken for a combatant.
+
+The optimal scavenger play is to work *during* the siege, not after. During the siege, the noise covers you. After the siege, the system goes quiet, the scanning stops, and the lone salvager is the only emission source — suddenly exposed. But working during the siege means accepting real danger for better cover.
+
+**The covert salvager's dilemma.** A wreck is passive and undetectable. A ship *salvaging* a wreck is active — running extraction equipment, creating emissions, just like mining creates a signature. The salvager is invisible while traveling and scanning. The moment they start extracting, they light up. Grab and run, or take time to strip the wreck properly? Every minute extracting is a minute broadcasting your position.
+
+This creates a natural food chain around major events. The siege commanders fight over the station. The scavengers fight over the scraps. The scouts sell intel on wreck locations. The haulers move recovered components to market. A single siege generates gameplay for dozens of players who never fired a shot.
+
 ## Player Progression
 
 Player experience is separate from ship/component state. It persists across ships. Lose your Pioneer, grieve, commission a new one — but you're not starting from zero.
@@ -309,6 +351,8 @@ These aren't classes — they're emergent roles based on how people choose to pl
 **The Smuggler** — Cloaked ship, quick mining runs into other people's territory. Grabs a load and vanishes. Low overhead, high agility.
 
 **The Salvager** — Scans for wrecks, assesses component value, repairs and resells. Knows the repair math cold. Haunts old battlefields and deep space routes where ships ran out of core life.
+
+**The Vulture** — A specialized salvager who follows conflict. Monitors siege broadcasts, tracks pirate activity, and shows up where ships are being destroyed. Works during active combat for the cover of scan noise. Knows the risk calculus: how long to extract before the emissions give them away. Lives on the edge of someone else's fight.
 
 **The Automator** — Webhook handlers, API scripts, optimized logistics chains. Plays the game through code. Their WordPress instance is their bridge. May run bot fleets that grind component usage — and that's fine.
 

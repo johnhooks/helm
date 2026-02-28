@@ -42,10 +42,10 @@
       "minimum": 0,
       "description": "Per-time rate value (e.g., regeneration per hour)."
     },
-    "range": {
+    "sustain": {
       "type": ["number", "null"],
       "minimum": 0,
-      "description": "Distance value in light-years."
+      "description": "Comfort range / sustain value in light-years."
     },
     "capacity": {
       "type": ["number", "null"],

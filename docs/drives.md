@@ -36,7 +36,7 @@ A fast drive means less waiting. An efficient drive means your core lasts longer
 
 ## Drive Types
 
-The first generation of warp drives are the **DR series** - rugged, proven designs with different tuning for different needs.
+The first generation of warp drives are the **DR series** from **DR-Series Propulsion** (officially "Deep Range Systems," but nobody calls them that). They build drives and only drives. See `manufacturers.md` for their full story.
 
 | Model | Speed | Power Appetite | Character |
 |-------|-------|----------------|-----------|
@@ -150,7 +150,18 @@ Could drives be damaged separately from cores?
 
 ### Beyond the DR Series
 
-Future drive lines might offer different tradeoffs:
-- **Stealth drives** - Slower but harder to detect
-- **Survey drives** - Bonus to scanning during transit?
-- **Emergency drives** - One-time boost, then damaged
+The DR Mk I line is the starting point.
+
+**Mark progression:**
+- **DR Mk II** — The speed/efficiency tradeoff stays, but softens. The DR-705 Mk II is still the fastest drive, but its consumption drops from 1.5x to maybe 1.3x. Still hungry, less reckless.
+- **DR Mk III** — Endgame drives. Higher amplitude, better sustain, more refined. A DR-305 Mk III is genuinely fast by Mk I standards while remaining efficient.
+
+**New archetypes at higher marks:**
+- **Stealth drives** — Slower, but generate minimal signature. Hard to detect during transit. Scout hull essential.
+- **Survey drives** — Bonus to scanning during transit. Slower jump speed, but the journey is productive.
+- **Emergency drives** — One-time maximum boost, then damaged. The "get out alive" option.
+
+**Crossover drives:**
+- A shield company's drive that regenerates shields during warp transit — see `manufacturers.md`
+- A core manufacturer's drive that's exceptionally gentle on core life but slow
+- Weird, niche, interesting. Not better, just different.

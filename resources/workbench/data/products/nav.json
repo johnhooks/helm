@@ -1,0 +1,50 @@
+{
+  "$schema": "https://helm.okaywp.com/resources/schemas/nav.json",
+  "items": [
+    {
+      "slug": "nav_tier_1",
+      "type": "nav",
+      "label": "Nav Computer Tier 1",
+      "version": 1,
+      "footprint": 0,
+      "mult_a": 0.3,
+      "mult_b": 0.5
+    },
+    {
+      "slug": "nav_tier_2",
+      "type": "nav",
+      "label": "Nav Computer Tier 2",
+      "version": 1,
+      "footprint": 0,
+      "mult_a": 0.45,
+      "mult_b": 0.6
+    },
+    {
+      "slug": "nav_tier_3",
+      "type": "nav",
+      "label": "Nav Computer Tier 3",
+      "version": 1,
+      "footprint": 0,
+      "mult_a": 0.6,
+      "mult_b": 0.7
+    },
+    {
+      "slug": "nav_tier_4",
+      "type": "nav",
+      "label": "Nav Computer Tier 4",
+      "version": 1,
+      "footprint": 0,
+      "mult_a": 0.75,
+      "mult_b": 0.85
+    },
+    {
+      "slug": "nav_tier_5",
+      "type": "nav",
+      "label": "Nav Computer Tier 5",
+      "version": 1,
+      "footprint": 0,
+      "mult_a": 0.9,
+      "mult_b": 1.0
+    }
+  ]
+}

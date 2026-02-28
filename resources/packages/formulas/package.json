@@ -1,0 +1,11 @@
+{
+	"name": "@helm/formulas",
+	"version": "0.1.0",
+	"description": "Canonical game math for Helm ship systems",
+	"private": true,
+	"main": "src/index.ts",
+	"types": "src/index.ts",
+	"dependencies": {
+		"@helm/types": "workspace:*"
+	}
+}

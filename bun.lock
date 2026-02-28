@@ -180,6 +180,13 @@
         "@wordpress/i18n": "^5.0.0",
       },
     },
+    "resources/packages/formulas": {
+      "name": "@helm/formulas",
+      "version": "0.1.0",
+      "dependencies": {
+        "@helm/types": "workspace:*",
+      },
+    },
     "resources/packages/logger": {
       "name": "@helm/logger",
       "version": "0.1.0",
@@ -266,6 +273,18 @@
         "@wordpress/icons": "^10.0.0",
         "react": "^18.3.1",
         "react-dom": "^18.3.1",
+      },
+    },
+    "resources/workbench": {
+      "name": "@helm/workbench",
+      "version": "0.1.0",
+      "dependencies": {
+        "@helm/formulas": "workspace:*",
+        "@helm/types": "workspace:*",
+      },
+      "devDependencies": {
+        "typescript": "^5.3.0",
+        "vitest": "^2.0.0",
       },
     },
   },
@@ -666,6 +685,8 @@
 
     "@helm/errors": ["@helm/errors@workspace:resources/packages/errors"],
 
+    "@helm/formulas": ["@helm/formulas@workspace:resources/packages/formulas"],
+
     "@helm/logger": ["@helm/logger@workspace:resources/packages/logger"],
 
     "@helm/nav": ["@helm/nav@workspace:resources/packages/nav"],
@@ -681,6 +702,8 @@
     "@helm/types": ["@helm/types@workspace:resources/packages/types"],
 
     "@helm/ui": ["@helm/ui@workspace:resources/packages/ui"],
+
+    "@helm/workbench": ["@helm/workbench@workspace:resources/workbench"],
 
     "@humanwhocodes/config-array": ["@humanwhocodes/config-array@0.13.0", "", { "dependencies": { "@humanwhocodes/object-schema": "^2.0.3", "debug": "^4.3.1", "minimatch": "^3.0.5" } }, "sha512-DZLEEqFWQFiyK6h5YIeynKx7JlvCYWL0cImfSRXZ9l4Sg2efkFGTuFf6vzXjK1cq6IYkU+Eg/JizXw+TD2vRNw=="],
 

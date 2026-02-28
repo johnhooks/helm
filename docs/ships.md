@@ -55,6 +55,32 @@ Total Internal Space:    300 m³
 
 The Pioneer is the only hull for now. Future generations may offer different slot counts, base stats, or special capabilities. But the first era of exploration happens on Pioneers.
 
+### Power Budget
+
+A ship can't run everything at full spec. Every component draws power from the core, and total draw competes against core output.
+
+```
+POWER BUDGET
+├── Core Output (base × power mode)
+│   ├── Epoch-E Normal: 0.9 × 1.0 = 0.9
+│   ├── Epoch-S Normal: 1.0 × 1.0 = 1.0
+│   └── Epoch-R Normal: 1.1 × 1.0 = 1.1
+│
+├── Component Draw (sum of all installed)
+│   ├── Drive consumption:   0.6 - 1.5
+│   ├── Sensor draw:         varies
+│   ├── Shield draw:         varies
+│   └── Equipment draw:      varies
+│
+└── Performance Ratio
+    ├── output >= draw: everything runs at 100%
+    └── output < draw:  systems underperform proportionally
+```
+
+This is the constraint that prevents "just install the best of everything." A Boost drive (1.5x consumption) + a DeepScan sensor + heavy shields will exceed what most cores can feed. Something has to give — either pick a smaller component, upgrade the core, or accept degraded performance across the board.
+
+The interesting tension: upgrading one component might push total draw past the budget, making another component worse. A pilot who understands their power budget builds a more capable ship than one who chases top-spec parts.
+
 ## Components
 
 Core components that every ship has. See `plans/.wip/ship-systems.md` for technical details.
@@ -110,6 +136,60 @@ Protection. Less relevant until combat exists, but shields also protect against 
 | Aegis Gamma | 200 | 5/hr | 35 m³ |
 
 Heavy shields need emitter arrays and capacitor banks.
+
+## Product Evolution
+
+Components improve along two axes — **marks** and **versions**.
+
+### Marks (New Hardware)
+
+A mark is a new generation of hardware. ACU Mk I → ACU Mk II → ACU Mk III. Each mark is a significant capability jump — better base stats, sometimes new capabilities that didn't exist at lower marks. Getting a new mark means acquiring new physical equipment: manufacturing it, buying it, or salvaging it.
+
+Marks don't just scale numbers up uniformly. Higher marks shift the tradeoff curve — the archetype's weakness becomes less punishing while the strength grows. A DSC Mk I (DeepScan) has great range but terrible survey speed. A DSC Mk III still has the best range, but the survey penalty has softened from 2.0x to maybe 1.4x. The archetype identity persists, but it becomes more capable overall.
+
+New marks also introduce entirely new archetypes that don't exist at lower tiers. A Mk I sensor comes in three flavors (DSC, VRS, ACU). Mk II might add a fourth — a military-spec array that trades range for ship detection capability. Mk III might add a fifth. The design space expands as the tech evolves.
+
+### Versions (Firmware Updates)
+
+Within a mark, versions are software/firmware updates. ACU Mk I v1 → ACU Mk I v2. Small stat tweaks — a rebalance, an efficiency improvement, a bug fix from the manufacturer. The hardware doesn't change. The product row in the database gets a new version number and a `released_at` timestamp that gates when it becomes available.
+
+Versions are how balance changes ship without breaking existing loadouts. Your ACU Mk I v1 still works. The v2 is available at stations when you next refit. Maybe someday the pilot has to "update firmware" on their installed component — and sometimes the update fails, introducing a quirk. (Manufacturers aren't perfect.)
+
+### Progression Shape
+
+```
+SENSOR EVOLUTION (example)
+
+Mk I (launch)
+├── DSC Mk I    — deep range, slow survey
+├── VRS Mk I    — balanced
+└── ACU Mk I    — short range, fast/accurate
+
+Mk II (mid-game)
+├── DSC Mk II   — deeper range, survey penalty softened
+├── VRS Mk II   — better all-around
+├── ACU Mk II   — moderate range now, very fast
+└── NEW: MIL Mk II — military detection array
+
+Mk III (endgame)
+├── DSC Mk III  — extreme range, reasonable survey speed
+├── VRS Mk III  — genuinely good at both roles
+├── ACU Mk III  — competitive range, surgical precision
+├── MIL Mk III  — tracking and targeting specialist
+└── NEW: ??? Mk III — something weird from a crossover manufacturer
+```
+
+Each mark within each archetype also gets firmware versions (v1, v2, v3) for tuning over time.
+
+### Manufacturer Crossovers
+
+Components come from manufacturers — Epoch Labs makes cores, the Aegis Foundry makes shields, and so on. Each manufacturer has a philosophy and a specialty. See `manufacturers.md` for full details.
+
+The interesting wrinkle: manufacturers sometimes release products outside their core competency. Aegis (shields) releases a drive. Epoch Labs (cores) releases a sensor array. These crossover products are objectively worse in their adopted category — but they carry some unique property from the manufacturer's home domain that can't exist in a native product.
+
+An Aegis drive might regenerate shields during warp transit. An Epoch sensor might bypass the normal power cost by tapping the core directly. These aren't better — they're *different* in a way that creates builds nobody planned for.
+
+Crossover products don't appear at Mk I. They show up at Mk II or Mk III, when the manufacturer has had time to experiment outside their comfort zone.
 
 ## Equipment
 
@@ -586,13 +666,132 @@ Two Pioneers with identical loadouts play differently because of their component
 
 The ship is the character. The components are its organs. And when it dies, those organs can live on in someone else's ship.
 
-## Future Hulls
+## Hull Evolution
 
-The Pioneer won't be the only hull forever. Future generations might include:
+The Pioneer won't be the only hull forever. Hulls are how ship classes emerge — not through a class selector at creation, but through the physical constraints of the frame you fly.
 
-- **Larger frames** — more equipment slots, more internal space, more expensive
-- **Specialized frames** — built-in mining capability, extra sensor arrays
-- **Salvaged frames** — alien hulls found in derelicts, unusual slot configurations
-- **Player-built frames** — manufacturing endgame, custom designs
+### How Hulls Create Classes
 
-But for the first era of Helm, everyone flies a Pioneer. The variety comes from what you do with it.
+A hull defines:
+- **Slot layout** — how many of each slot type, and which special slots exist
+- **Internal space** — total footprint budget
+- **Hull integrity** — how much damage it can take
+- **Special capabilities** — things only this hull can do (cloak, dual cores, weapon hardpoints)
+- **Buffs and constraints** — hull-specific modifiers
+
+A "scout" isn't someone who picked scout components from a menu. It's someone flying a hull with a cloak slot, tight internals, and a speed bonus. They fill it with whatever components fit their playstyle, but the hull defines what's possible.
+
+### Planned Hull Types
+
+```
+SCOUT HULL
+├── Component Slots
+│   ├── Warp Core      (1 slot)
+│   ├── Drive          (1 slot)
+│   ├── Sensors        (1 slot)
+│   ├── Shields        (1 slot)
+│   ├── Nav Computer   (tier 1-5)
+│   ├── Cloak Module   (1 slot — scout-only)
+│   └── Equipment      (2 slots)
+│
+├── Base Stats
+│   ├── Hull Integrity: 75
+│   ├── Total Internal Space: 250 m³
+│   └── Speed Bonus: +15% jump amplitude
+│
+└── Character
+    ├── Light, fast, fragile
+    ├── Cloak enables stealth gameplay
+    ├── Less equipment capacity — specialist, not generalist
+    └── "First in, first out, nobody knew you were there."
+
+SURVEYOR HULL
+├── Component Slots
+│   ├── Warp Core      (1 slot)
+│   ├── Drive          (1 slot)
+│   ├── Sensors        (2 slots — surveyor-only, dual array)
+│   ├── Shields        (1 slot)
+│   ├── Nav Computer   (tier 1-5)
+│   └── Equipment      (3 slots)
+│
+├── Base Stats
+│   ├── Hull Integrity: 100
+│   ├── Total Internal Space: 325 m³
+│   └── Survey Bonus: +20% scan speed
+│
+└── Character
+    ├── Built for thorough exploration
+    ├── Dual sensor slots — run a DSC + ACU simultaneously
+    ├── Generous equipment capacity for mining/deployment
+    └── "The scout found the system. I found everything in it."
+
+COMBAT HULL
+├── Component Slots
+│   ├── Warp Core      (1 slot — or 2 slots for heavy combat)
+│   ├── Drive          (1 slot)
+│   ├── Sensors        (1 slot)
+│   ├── Shields        (2 slots — combat-only, layered shields)
+│   ├── Nav Computer   (tier 1-5)
+│   ├── Weapon Mounts  (2-3 slots — combat-only)
+│   └── Equipment      (2 slots)
+│
+├── Base Stats
+│   ├── Hull Integrity: 200
+│   ├── Total Internal Space: 350 m³
+│   └── Armor Bonus: +10% damage reduction
+│
+└── Character
+    ├── Heavy, durable, dangerous
+    ├── Weapon mounts enable offensive capability
+    ├── Dual shields for layered defense
+    ├── Less cargo — combat ships aren't haulers
+    └── "The only ship that wants to find trouble."
+```
+
+The Pioneer remains the starting hull for all players. Hull upgrades are a significant mid-game milestone — acquiring a specialized hull means committing to a role, at least until you refit.
+
+### Hulls and Power Budget
+
+Bigger hulls with more slots make the power budget even more critical. A combat hull with dual shields, weapons, and a hot drive will massively exceed a single core's output. This creates a natural gear check — you can't just fill every slot with top-spec components. The pilot who understands their power budget and makes smart tradeoffs outperforms the one who installs the most expensive parts.
+
+Some hulls might support dual cores. Two Epoch-E cores in a combat hull give enormous output and longevity but eat 40 m³ of internal space. Two Epoch-R cores give frightening power output but burn through core life at an alarming rate. The hull enables the choice; the physics constrain it.
+
+## Ship Visualization
+
+The ship is not a 3D model flying through space. You are *inside* the ship. Your understanding of it comes from the ShipLink UI — readouts, graphs, diagrams, status indicators.
+
+The ship is represented as an **LCARS schematic** — an SVG diagram showing the hull layout with labeled bays for each module slot. Each bay shows what's installed, its status, power draw, and condition. Upgrading a component means swapping a module in the diagram. The ship isn't a thing you look at from outside; it's a system you read from within.
+
+```
+SHIP SCHEMATIC (conceptual)
+┌─────────────────────────────────────────────┐
+│                PIONEER FRAME                 │
+│                                              │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  │
+│  │ CORE     │  │ DRIVE    │  │ SENSORS  │  │
+│  │ Epoch-S  │  │ DR-505   │  │ VRS Mk I │  │
+│  │ 25 m³    │  │ 30 m³    │  │ 25 m³    │  │
+│  │ ■■■■■■□□ │  │ ■■■■■□□□ │  │ ■■■■■■■□ │  │
+│  └──────────┘  └──────────┘  └──────────┘  │
+│                                              │
+│  ┌──────────┐  ┌──────────┐                 │
+│  │ SHIELDS  │  │ NAV      │                 │
+│  │ Aegis β  │  │ Tier 3   │                 │
+│  │ 20 m³    │  │ 0 m³     │                 │
+│  │ ■■■■■■□□ │  │ ■■■■■■□□ │                 │
+│  └──────────┘  └──────────┘                 │
+│                                              │
+│  EQUIPMENT                                   │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  │
+│  │ Mining   │  │ Platform │  │ Repair   │  │
+│  │ Laser    │  │ Deployer │  │ Module   │  │
+│  │ 10 m³    │  │ 25 m³    │  │ 15 m³    │  │
+│  └──────────┘  └──────────┘  └──────────┘  │
+│                                              │
+│  INTERNAL SPACE: 150/300 m³ used             │
+│  CARGO CAPACITY: 150 m³                      │
+│  POWER BUDGET:   0.85 output / 1.0 draw      │
+└─────────────────────────────────────────────┘
+```
+
+Different hull types have different schematic layouts. A combat hull shows weapon mounts and dual shield bays. A scout hull shows the cloak module. The diagram *is* the ship's identity — players recognize hull types by their schematic shape, not by a model rotating in 3D space.

@@ -14,7 +14,7 @@ export function createProduct(
 		hp: null,
 		footprint: 4,
 		rate: 0.5,
-		range: null,
+		sustain: null,
 		capacity: null,
 		chance: null,
 		mult_a: 1.0,

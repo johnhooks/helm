@@ -16,10 +16,10 @@
             "type": "object",
             "properties": {
               "type": { "const": "drive" },
-              "range": {
+              "sustain": {
                 "type": "number",
                 "minimum": 0,
-                "description": "Maximum jump range / sustain (light-years)."
+                "description": "Comfort range sustain (light-years)."
               },
               "mult_a": {
                 "type": "number",
@@ -37,7 +37,7 @@
                 "description": "Drive amplitude factor."
               }
             },
-            "required": ["range", "mult_a", "mult_b", "mult_c"]
+            "required": ["sustain", "mult_a", "mult_b", "mult_c"]
           }
         ]
       }

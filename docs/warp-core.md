@@ -35,7 +35,9 @@ A "hot" core regenerates power quickly but burns out faster per jump. A "cold" c
 
 ## Epoch Series
 
-The first generation of warp cores are the **Epoch series** - humanity's initial steps into interstellar travel. All three variants share the same base platform with different tuning.
+The first generation of warp cores are the **Epoch series** from **Epoch Labs** — the company that grew out of the CERN Subspace Research Division. See `manufacturers.md` for their full history.
+
+All three variants share the same base platform with different tuning. Epoch trusts the pilot to choose the tradeoff that matches their mission.
 
 | Model | Type | Philosophy |
 |-------|------|------------|
@@ -167,8 +169,15 @@ Could cores be damaged (not just depleted)?
 
 ### Beyond Epoch
 
-Future core series:
-- **Next-generation** - What comes after Epoch? (Horizon? Zenith?)
-- **Specialized** - Purpose-built for exploration, combat, hauling
-- **Experimental** - High risk, high reward, unstable prototypes
-- **Salvaged** - Ancient/alien technology found in derelicts
+The Epoch Mk I line is the foundation, not the ceiling.
+
+**Mark progression:**
+- **Epoch Mk II** — Improved across the board. The E/S/R tradeoff persists but the weaknesses soften. An Epoch-E Mk II still regens slowly, but 7/hr instead of 5/hr. The identity stays; the penalty shrinks.
+- **Epoch Mk III** — Endgame cores. Higher life, better regen, more output. The gap between E and R narrows — they're all genuinely good, just tuned differently.
+
+**Firmware versions** within each mark refine the tuning. Epoch-S Mk I v2 might improve regen by 5% over v1. Small changes, released over time, keeping the meta fresh.
+
+**New entrants:**
+- **Next-generation labs** — Companies that didn't exist at launch. Different core architectures with tradeoffs Epoch never considered.
+- **Crossover cores** — A sensor company builds a core that extends scan range while it's running. Bad output, great passive bonus. See `manufacturers.md`.
+- **Salvaged technology** — Ancient/alien cores found in deep-space derelicts. Properties that don't follow normal physics. Rare, unreproducible, highly sought after.

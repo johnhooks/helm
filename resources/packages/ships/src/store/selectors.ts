@@ -58,13 +58,13 @@ export const getSystemStats = createRegistrySelector(
 				condition: slots.core.condition * 100,
 			},
 			navigation: {
-				range: products.drive.range ?? 0,
+				range: products.drive.sustain ?? 0,
 				speed: products.drive.mult_a ?? 0,
 				draw: products.drive.mult_b ?? 0,
 				condition: slots.drive.condition * 100,
 			},
 			sensors: {
-				range: products.sensor.range ?? 0,
+				range: products.sensor.sustain ?? 0,
 				scanDuration: products.sensor.mult_a ?? 0,
 				discovery: ( products.sensor.chance ?? 0 ) * 100,
 				condition: slots.sensor.condition * 100,

@@ -16,10 +16,10 @@
             "type": "object",
             "properties": {
               "type": { "const": "sensor" },
-              "range": {
+              "sustain": {
                 "type": "number",
                 "minimum": 0,
-                "description": "Maximum scan range (light-years)."
+                "description": "Comfort scan range sustain (light-years)."
               },
               "chance": {
                 "type": "number",
@@ -33,7 +33,7 @@
                 "description": "Survey duration multiplier. Lower = faster surveys."
               }
             },
-            "required": ["range", "chance", "mult_a"]
+            "required": ["sustain", "chance", "mult_a"]
           }
         ]
       }

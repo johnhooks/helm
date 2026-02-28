@@ -4,7 +4,8 @@
     "description": "Starship Operating System built on WordPress",
     "private": true,
     "workspaces": [
-        "resources/packages/*"
+        "resources/packages/*",
+        "resources/workbench"
     ],
     "scripts": {
         "build": "wp-scripts build",
@@ -23,6 +24,7 @@
         "test:e2e:report": "playwright show-report artifacts/playwright-report",
         "storybook": "storybook dev -p 6006",
         "storybook:build": "storybook build -o artifacts/storybook",
+        "wb": "bun resources/workbench/src/cli.ts",
         "bench": "bun ./resources/packages/benchmark/benchmarks/nodes.ts",
         "bench:nodes": "bun ./resources/packages/benchmark/benchmarks/nodes.ts",
         "bench:compare": "bun ./resources/packages/benchmark/benchmarks/compare.ts",

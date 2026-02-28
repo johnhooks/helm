@@ -147,7 +147,7 @@ const driveProduct = createProductEmbed( {
 	type: 'drive',
 	slug: 'pulse_i',
 	label: 'Pulse-I Drive',
-	range: 80,
+	sustain: 80,
 	mult_a: 4.0,
 	mult_b: 1.5,
 } );
@@ -157,7 +157,7 @@ const sensorProduct = createProductEmbed( {
 	type: 'sensor',
 	slug: 'sweep_i',
 	label: 'Sweep-I Sensor',
-	range: 12,
+	sustain: 12,
 	mult_a: 1.0,
 	chance: 0.45,
 } );
@@ -381,8 +381,8 @@ describe( 'getSystemStats', () => {
 	it( 'defaults nullable product fields to zero', () => {
 		mockRegistry( getSystemStats, {
 			[ CORE_PRODUCT_ID ]: createProductEmbed( { id: CORE_PRODUCT_ID, rate: null, mult_a: null } ),
-			[ DRIVE_PRODUCT_ID ]: createProductEmbed( { id: DRIVE_PRODUCT_ID, range: null, mult_a: null, mult_b: null } ),
-			[ SENSOR_PRODUCT_ID ]: createProductEmbed( { id: SENSOR_PRODUCT_ID, range: null, mult_a: null, chance: null } ),
+			[ DRIVE_PRODUCT_ID ]: createProductEmbed( { id: DRIVE_PRODUCT_ID, sustain: null, mult_a: null, mult_b: null } ),
+			[ SENSOR_PRODUCT_ID ]: createProductEmbed( { id: SENSOR_PRODUCT_ID, sustain: null, mult_a: null, chance: null } ),
 			[ SHIELD_PRODUCT_ID ]: shieldProduct,
 			[ NAV_PRODUCT_ID ]: navProduct,
 		} );

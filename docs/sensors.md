@@ -61,7 +61,7 @@ Surveyors thoroughly document what's in each system - planets, resources, opport
 
 ## Sensor Types
 
-First-generation sensors come from three competing manufacturers, each optimizing for different use cases. All are Mk I (first generation) - future upgrades will be Mk II, III, etc.
+First-generation sensors come from three competing manufacturers — **Deep Scan Dynamics**, **Versa Instruments**, and **Acuity Systems** — each optimizing for different use cases. See `manufacturers.md` for their full stories. All are Mk I (first generation) — future upgrades will be Mk II, III, etc.
 
 | Model | Base Range | Survey Speed | Accuracy | Character |
 |-------|------------|--------------|----------|-----------|
@@ -201,9 +201,25 @@ If PvP becomes relevant:
 - Some ships might optimize for low sensor signature
 - Cat-and-mouse gameplay between detection and stealth
 
+### Mark Progression
+
+- **Mk II** — Each archetype improves. DSC Mk II sees further (24 ly) with less survey penalty (1.6x instead of 2.0x). ACU Mk II gains moderate range (8 ly) while keeping its precision edge. The identities persist; the weaknesses soften.
+- **Mk III** — Endgame sensors. A DSC Mk III has extreme range with reasonable survey speed. An ACU Mk III is competitive in range while remaining surgical. The gap between archetypes narrows but never closes — the tradeoff always matters.
+
+**New archetypes at higher marks:**
+- **MIL (Military Detection Array)** — Appears at Mk II. Optimized for ship detection and tracking, not exploration. Short range for route scanning, but identifies ship types, loadouts, and heading at distance. The combat pilot's sensor.
+- **Science arrays** — Anomaly analysis, research bonuses, unknown signal decryption. The surveyor who wants to understand, not just catalog.
+
+### Crossover Sensors
+
+Manufacturers from other domains build sensors that reflect their home expertise:
+- An Epoch sensor that draws from core life instead of power — scan endlessly if you're willing to burn the core
+- A DSC shield that boosts passive sensor range while active — the defense company that couldn't stop thinking about distance
+- See `manufacturers.md` for the full crossover concept
+
 ### Specialized Arrays
 
-Beyond the SR series:
-- **Mining sensors** - Bonus to resource detection
-- **Combat sensors** - Tracking and targeting
-- **Science sensors** - Anomaly analysis, research bonuses
+Beyond the founding manufacturers:
+- **Mining sensors** — Bonus to resource detection and composition analysis
+- **Combat sensors** — Tracking, targeting, signature analysis
+- **Science sensors** — Anomaly analysis, research bonuses

@@ -9,7 +9,7 @@ export interface Product {
 	hp: number | null;
 	footprint: number;
 	rate: number | null;
-	range: number | null;
+	sustain: number | null;
 	capacity: number | null;
 	chance: number | null;
 	mult_a: number | null;
