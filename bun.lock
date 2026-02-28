@@ -265,6 +265,18 @@
         "@wordpress/i18n": "^5.0.0",
       },
     },
+    "resources/packages/stellar": {
+      "name": "@helm/stellar",
+      "version": "0.1.0",
+      "dependencies": {
+        "@helm/types": "workspace:*",
+        "@helm/ui": "workspace:*",
+      },
+      "peerDependencies": {
+        "react": "^18.3.1",
+        "react-dom": "^18.3.1",
+      },
+    },
     "resources/packages/types": {
       "name": "@helm/types",
       "version": "0.1.0",
@@ -709,6 +721,8 @@
     "@helm/shell": ["@helm/shell@workspace:resources/packages/shell"],
 
     "@helm/ships": ["@helm/ships@workspace:resources/packages/ships"],
+
+    "@helm/stellar": ["@helm/stellar@workspace:resources/packages/stellar"],
 
     "@helm/types": ["@helm/types@workspace:resources/packages/types"],
 

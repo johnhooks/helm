@@ -110,6 +110,10 @@ export type { CountdownProps } from "./components/countdown";
 export { SideDrawer } from "./components/side-drawer";
 export type { SideDrawerProps } from "./components/side-drawer";
 
+// System Map
+export { SystemMap, planetSizeMap } from "./components/system-map";
+export type { SystemMapProps, GlyphSize } from "./components/system-map";
+
 // Glyphs
 export { PlanetGlyph, PLANET_TYPES } from "./components/glyphs";
 export type { PlanetGlyphProps, PlanetType } from "./components/glyphs";

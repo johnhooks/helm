@@ -52,7 +52,9 @@
       "@helm/formulas": ["resources/packages/formulas/src"],
       "@helm/formulas/*": ["resources/packages/formulas/src/*"],
       "@helm/holodeck": ["resources/packages/holodeck/src"],
-      "@helm/holodeck/*": ["resources/packages/holodeck/src/*"]
+      "@helm/holodeck/*": ["resources/packages/holodeck/src/*"],
+      "@helm/stellar": ["resources/packages/stellar/src"],
+      "@helm/stellar/*": ["resources/packages/stellar/src/*"]
     }
   },
   "include": [

@@ -9,6 +9,7 @@ const config: StorybookConfig = {
     "../resources/packages/ui/src/**/*.mdx",
     "../resources/packages/ui/src/**/*.stories.@(js|jsx|mjs|ts|tsx)",
     "../resources/packages/shell/src/**/*.stories.@(js|jsx|mjs|ts|tsx)",
+    "../resources/packages/stellar/src/**/*.stories.@(js|jsx|mjs|ts|tsx)",
   ],
   framework: {
     name: "@storybook/react-vite",
@@ -27,6 +28,8 @@ const config: StorybookConfig = {
           "@helm/actions": join(__dirname, "../resources/packages/actions/src"),
           "@helm/shell": join(__dirname, "../resources/packages/shell/src"),
           "@helm/errors": join(__dirname, "../resources/packages/errors/src"),
+          "@helm/stellar": join(__dirname, "../resources/packages/stellar/src"),
+          "@helm/types": join(__dirname, "../resources/packages/types/src"),
         },
         dedupe: ["react", "react-dom"],
       },

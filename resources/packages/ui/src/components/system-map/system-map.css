@@ -1,0 +1,111 @@
+.helm-system-map {
+	display: grid;
+	grid-auto-flow: column;
+	grid-auto-columns: auto;
+	/* Row height accommodates the largest companion circle (80px + 8px padding each side) */
+	grid-template-rows: 96px auto auto;
+	justify-content: start;
+	align-items: center;
+	overflow-x: auto;
+	padding: 8px 16px 0;
+	column-gap: 16px;
+	row-gap: 6px;
+}
+
+/* Primary star — cropped arc of a massive circle */
+.helm-system-map__star {
+	width: 40px;
+	height: 100%;
+	position: relative;
+}
+
+/* Clip container — hides the bulk of the circle, showing only the arc edge */
+.helm-system-map__star-clip {
+	position: absolute;
+	inset: 0;
+	overflow: hidden;
+}
+
+.helm-system-map__star-circle {
+	display: block;
+	position: absolute;
+	right: 0;
+	top: 50%;
+	transform: translateY(-50%);
+	border-radius: 50%;
+	/* width, height, and background set inline */
+}
+
+/* Glow — pseudo on the outer container, outside the clip */
+.helm-system-map__star::after {
+	content: "";
+	position: absolute;
+	right: 0;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 20px;
+	height: 48px;
+	border-radius: 50%;
+	background: var(--star-color, #fff4ea);
+	opacity: 0.4;
+	filter: blur(8px);
+	pointer-events: none;
+}
+
+/* Glyph cell — shared by planets, companion stars, and compact types */
+.helm-system-map__glyph {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	/* Breathing room for planetary rings (2px box-shadow) */
+	padding: 8px;
+	/* Reset button styles */
+	background: none;
+	border: none;
+	color: inherit;
+	font-family: inherit;
+}
+
+button.helm-system-map__glyph {
+	cursor: pointer;
+}
+
+button.helm-system-map__glyph:focus-visible {
+	outline: 2px solid var(--helm-tone);
+	outline-offset: 2px;
+}
+
+/* Star glow — companion circles and compact stellar glyphs */
+.helm-system-map__glyph--star {
+	filter: drop-shadow(0 0 8px rgba(255, 255, 240, 0.5));
+}
+
+/* Unscanned planet dimming */
+.helm-system-map__glyph--unscanned {
+	opacity: 0.3;
+	filter: grayscale(1);
+}
+
+/* Label row */
+.helm-system-map__label {
+	font-family: Antonio, sans-serif;
+	font-size: 11px;
+	letter-spacing: 0.04em;
+	color: var(--helm-ui-color-text, #f0e6d2);
+	white-space: nowrap;
+	text-align: center;
+}
+
+.helm-system-map__label--muted {
+	color: var(--helm-ui-color-muted, #a39a88);
+}
+
+/* Orbit distance row */
+.helm-system-map__orbit {
+	font-family: Antonio, sans-serif;
+	font-size: 9px;
+	letter-spacing: 0.08em;
+	color: var(--helm-ui-color-muted, #a39a88);
+	white-space: nowrap;
+	text-align: center;
+}

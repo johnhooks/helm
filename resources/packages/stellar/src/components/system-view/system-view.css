@@ -1,0 +1,42 @@
+.helm-system-view {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	font-family: Antonio, sans-serif;
+}
+
+/* Header area */
+.helm-system-view__header {
+	display: flex;
+	align-items: baseline;
+	gap: 12px;
+	padding: 16px 16px 12px;
+	border-bottom: 1px solid var(--helm-ui-color-border, #2a2a2a);
+}
+
+.helm-system-view__name {
+	font-size: 18px;
+	letter-spacing: 0.06em;
+	color: var(--helm-ui-color-text, #f0e6d2);
+	text-transform: uppercase;
+}
+
+.helm-system-view__spectral {
+	font-size: 11px;
+	letter-spacing: 0.1em;
+	color: var(--helm-ui-color-muted, #a39a88);
+	text-transform: uppercase;
+}
+
+.helm-system-view__body-count {
+	font-size: 11px;
+	letter-spacing: 0.1em;
+	color: var(--helm-ui-color-muted, #a39a88);
+	margin-left: auto;
+}
+
+/* Map area — compact strip, not stretched */
+.helm-system-view__map {
+	display: flex;
+	align-items: center;
+}
