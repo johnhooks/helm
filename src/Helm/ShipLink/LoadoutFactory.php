@@ -48,7 +48,7 @@ final class LoadoutFactory
                     i.created_at AS i_created_at, i.updated_at AS i_updated_at,
                     p.id AS p_id, p.slug, p.type, p.label, p.version, p.hp,
                     p.footprint, p.rate, p.`range`, p.capacity, p.chance,
-                    p.mult_a, p.mult_b, p.mult_c,
+                    p.mult_a, p.mult_b, p.mult_c, p.mult_d, p.mult_e, p.mult_f,
                     p.created_at AS p_created_at, p.updated_at AS p_updated_at
                 FROM {$inventoryTable} i
                 JOIN {$productsTable} p ON p.id = i.product_id
@@ -93,6 +93,9 @@ final class LoadoutFactory
                 'mult_a' => $row['mult_a'],
                 'mult_b' => $row['mult_b'],
                 'mult_c' => $row['mult_c'],
+                'mult_d' => $row['mult_d'],
+                'mult_e' => $row['mult_e'],
+                'mult_f' => $row['mult_f'],
                 'created_at' => $row['p_created_at'],
                 'updated_at' => $row['p_updated_at'],
             ], Model::BUILD_MODE_IGNORE_MISSING | Model::BUILD_MODE_IGNORE_EXTRA);
