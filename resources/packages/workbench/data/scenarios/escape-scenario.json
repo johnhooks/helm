@@ -1,0 +1,30 @@
+{
+  "name": "Escape Scenario",
+  "description": "Target detects wolf, activates ECM, spools drive and escapes. Tests detection → reaction → escape window.",
+  "ships": {
+    "wolf": {
+      "hull": "striker",
+      "core": "epoch_s",
+      "drive": "dr_505",
+      "sensor": "vrs_mk1",
+      "shield": "aegis_delta",
+      "nav": "nav_tier_3",
+      "equipment": ["phaser_array"]
+    },
+    "prey": {
+      "hull": "pioneer",
+      "core": "epoch_s",
+      "drive": "dr_505",
+      "sensor": "vrs_mk1",
+      "shield": "aegis_delta",
+      "nav": "nav_tier_3",
+      "equipment": ["ecm_mk1", "mining_laser"]
+    }
+  },
+  "actions": [
+    { "t": 0, "ship": "wolf", "type": "fire_phaser", "params": { "target": "prey", "duration": 600 } },
+    { "t": 120, "ship": "prey", "type": "activate_ecm" },
+    { "t": 300, "ship": "prey", "type": "jump", "params": { "distance": 2 } },
+    { "t": 600, "ship": "wolf", "type": "wait" }
+  ]
+}

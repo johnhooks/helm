@@ -4,15 +4,15 @@ A long-term strategy for ship component evolution in Helm. This is a compass, no
 
 ## Principles
 
-**Products are content.** Other games ship expansion packs. Helm ships products. A firmware update is a patch note from Epoch Labs. A new mark is a product launch event. A crossover product is a manufacturer making headlines. The release cadence *is* the game's content engine.
+**Products are content.** Other games ship expansion packs. Helm ships products. A new mark is a product launch event. A crossover product is a manufacturer making headlines. A balance-driven version change is a retooled production line with economic ripples. The release cadence *is* the game's content engine.
 
-**Options, not obsolescence.** New products don't replace old ones. A Mk I v3 sensor with 10,000 usage is worth more than a fresh Mk II. New releases add choices to the landscape — they don't invalidate what players already have.
+**Options, not obsolescence.** New products don't replace old ones. A Mk I sensor with 10,000 usage is worth more than a fresh Mk II. New releases add choices to the landscape — they don't invalidate what players already have.
 
-**Keep the meta moving.** The "best build" should shift periodically. Not violently — nobody's loadout becomes garbage. But the calculus changes. A firmware update makes a previously mediocre pairing viable. A new archetype opens a niche nobody was filling.
+**Balance creates scarcity.** When a product is too strong, the manufacturer releases a new version with the nerf. The old version stops manufacturing but persists in the economy. Players who own it keep it. The market prices it. History isn't erased — it becomes collectible.
 
-**Reward attention without punishing absence.** Firmware updates improve existing hardware at next refit. New marks are options, not requirements. A pilot who steps away for a month returns to more choices, not a power gap.
+**Reward attention without punishing absence.** New marks are options, not requirements. A pilot who steps away for a month returns to more choices, not a power gap. Their existing gear is exactly as they left it.
 
-**Manufacturer stories.** Each release is a lore beat. Epoch Labs pushing firmware is different from DSC dropping a crossover shield. Products are events in a fictional industrial world that players participate in.
+**Manufacturer stories.** Each release is a lore beat. Epoch Labs retooling a core line is different from DSC dropping a crossover shield. Products are events in a fictional industrial world that players participate in.
 
 ## Current State: Mk I v1
 
@@ -43,8 +43,8 @@ Nine core products across five component types, one hull.
 | Product | Identity | Capacity | Regen | Footprint |
 |---------|----------|----------|-------|-----------|
 | Aegis Alpha | Fast recovery, light | 50 | 20/hr | 10 m³ |
-| Aegis Beta | Balanced coverage | 100 | 10/hr | 20 m³ |
-| Aegis Gamma | Heavy absorption, slow | 200 | 5/hr | 35 m³ |
+| Aegis Delta | Balanced coverage | 100 | 10/hr | 20 m³ |
+| Aegis Eta | Heavy absorption, slow | 200 | 5/hr | 35 m³ |
 
 ### Nav Computers
 | Product | Skill | Efficiency |
@@ -58,39 +58,31 @@ Linear progression. No manufacturer identity. No tradeoffs. (Revisit at Mk II?)
 |------|-------|-----------|-------------|-------|
 | Pioneer | 300 m³ | 100 | 3 | The only hull. Generalist. |
 
-## Version Grammar
+## Versions as Balance Patches
 
-Within a mark, firmware versions soften weaknesses while preserving archetype identity. Strong stats nudge up slightly. Weak stats improve more noticeably. Footprint stays constant.
+Versions are manufacturing runs, not firmware updates. A product ships as v1. It stays v1 forever — unless gameplay reveals a balance problem. Then the manufacturer retools the production line and releases v2. The v1 units already in the game stay exactly as they are.
 
-```
-v1:  Baseline. Sharp tradeoffs. Players learn the system by feeling the edges.
-v2:  Weakness softens. Strength nudges. "We heard your field reports."
-v3:  Mk ceiling. Still has identity, less punishing. The mature product.
-```
+There is no version grammar. No predictable v1→v2→v3 progression. A version change is whatever the balance fix requires — a stat nerf, a buff, an envelope rework, a tuning range adjustment. The delta between versions is driven by gameplay data, not a formula.
 
-Example shape (not final numbers):
+Most products may never need a v2. Some might need one quickly. The version number is a manufacturing history, not a progression track.
 
-```
-DSC Mk I sensor across versions:
-         range    survey_mult    chance    footprint
-v1:      7.0      2.0x           0.60      40 m³
-v2:      ~7.3     ~1.7x          ~0.63     40 m³
-v3:      ~7.5     ~1.5x          ~0.65     40 m³
-```
+### What Happens When a Version Ships
 
-The DSC is still "sees far, surveys slow" at v3. But the survey penalty dropped from 2.0x to 1.5x. A DSC at v3 is a meaningfully nicer experience than v1 without losing its character.
+1. The new version gets a `released_at` timestamp.
+2. Stations and factories switch to producing the new version.
+3. The old version stops manufacturing — no more units enter the economy.
+4. Every existing unit of the old version remains as-is. Players can use, repair, buy, sell, and salvage them.
+5. Over time, old versions become scarcer as units break down, get scrapped, or sit in wrecks.
 
-### Version Release Pattern
+### Economic Consequences
 
-Staggered by manufacturer, not simultaneous. The order reflects personality:
+A version change is a market event:
 
-1. **Epoch Labs** — conservative, methodical, well-funded. First to ship.
-2. **VRS** — generalists, always keeping pace.
-3. **Aegis** — military thoroughness. Tests extensively before release.
-4. **DR-Series / ACU** — different reasons for the delay (small team / perfectionist).
-5. **DSC** — frontier company, small operation, too busy building antennas.
+- **Nerfed product (v1 was strong):** v1 units become legacy hardware. Scarce, sought-after, priced accordingly. Collectors hoard them. The supply curve only goes down.
+- **Buffed product (v1 was weak):** v1 units become cheap junk. New players pick them up as beaters. Veterans dump their old stock.
+- **Reverted product (v3 closer to v1):** The collectors suddenly have competition. Price dynamics shift again.
 
-Each firmware drop is a small content event. The meta shifts slightly with each one. By the time all v2s are out, the landscape has evolved. The power ratio problem on scout builds eases. The DSC becomes less punishing to survey with.
+This means balance changes aren't just mechanical — they're economic events with lore weight. "DR-Series retooled the 705 line" is news.
 
 ## Phase Map
 
@@ -99,47 +91,42 @@ These are sequential phases, not calendar dates. Each phase might span weeks or 
 ### Phase 1 — The Pioneer Age
 **Products:** Mk I v1 across the board.
 **Hulls:** Pioneer only.
-**What happens:** Players explore near Sol. They discover tradeoffs through real consequences. The community forms opinions. The meta is simple and legible. This is the learning phase.
+**What happens:** Players explore near Sol. They discover tradeoffs through real consequences. The community forms opinions. The meta is simple and legible. This is the learning phase. Balance issues emerge — some are intentional tension, some are gaps. We watch.
 
-### Phase 2 — First Firmware Wave
-**Products:** Mk I v2, staggered by manufacturer.
+### Phase 2 — First Balance Patches
+**Products:** Mk I, with targeted version bumps where gameplay demands it.
 **Hulls:** Pioneer only.
-**What happens:** Each manufacturer drops v2 on their own schedule. Each drop shifts the meta slightly. By the end, the landscape is softer. Scout builds become less painful. Surveyors get a bit more reach. The game feels like it's being actively developed by fictional companies.
+**What happens:** Not every product gets a v2. Only the ones where the data says something's off. Maybe the DR-705 is too punishing on core life. Maybe the DSC survey penalty is driving players away from long-range scanning. Each retooled product is a content event with economic consequences — the old units become legacy hardware.
 
 ### Phase 3 — Hull Introduction
-**Products:** Mk I v2 everywhere, v3 starting to roll out.
+**Products:** Mk I (some at v1, some at v2 where balanced).
 **Hulls:** Scout and Surveyor join Pioneer.
 **What happens:** The first structural change. Pilots who've been flying Pioneers for months now choose: stay generalist, or commit to a role. Hull choice matters because of special slots (cloak, dual sensors) and different space/integrity budgets, not because of component stats. Component stats are hull-agnostic.
 
-This should happen *after* firmware maturity so pilots understand the component landscape before choosing a specialized frame.
+This should happen after pilots understand the component landscape from real play.
 
-### Phase 4 — Mature Mk I
-**Products:** Mk I v3 across all manufacturers.
+### Phase 4 — Mk II Hardware
+**Products:** Mk II v1 begins appearing alongside Mk I.
 **Hulls:** Pioneer, Scout, Surveyor.
-**What happens:** The Mk I line is at its ceiling. Products feel polished. The meta is well-understood. Players have worn-in components with real usage buffs. The game risks feeling solved. Which is exactly when...
+**What happens:** New physical products. Must be manufactured or purchased. Three things arrive:
 
-### Phase 5 — Mk II Hardware
-**Products:** Mk II v1 begins appearing alongside mature Mk I.
-**Hulls:** Pioneer, Scout, Surveyor.
-**What happens:** New physical products. Must be manufactured or purchased — not a firmware update. Three things arrive:
-
-1. **Improved existing archetypes.** Same identity, higher baseline. The tradeoff curve is the same shape as Mk I v3 but shifted up.
+1. **Improved existing archetypes.** Same identity, higher baseline. The tradeoff curve is the same shape but shifted up.
 2. **New archetypes.** A fourth option in some categories. Fills niches players have been asking for.
 3. **Crossover products.** Manufacturers release components outside their domain. Objectively worse on standard metrics, but carrying a mechanical property from the home domain that native products can't have.
 
-Mk II starts its own version cycle (v1 → v2 → v3). The Mk I line remains available — it's cheaper, well-understood, and high-usage Mk I components still outperform fresh Mk II in practice.
+The Mk I line remains available — it's cheaper, well-understood, and high-usage Mk I components still outperform fresh Mk II in practice.
 
-### Phase 6+ — The Long Game
-The grammar repeats. Mk II firmware versions roll out. More crossover products appear. Maybe a new manufacturer enters the market. Mk III appears on the distant horizon. Each phase follows the same pattern: **new products create options, firmware versions tune the meta, manufacturer stories give releases narrative weight.**
+### Phase 5+ — The Long Game
+More marks. More crossover products. Maybe a new manufacturer enters the market. Version bumps happen when balance demands them — at any mark level. Each phase follows the same pattern: **new marks create options, version changes tune the meta through economic scarcity, manufacturer stories give releases narrative weight.**
 
-The ecosystem deepens over years. No two ships feel the same — not because of combinatorial explosion, but because each component carries its own history, firmware, and wear.
+The ecosystem deepens over years. No two ships feel the same — not because of combinatorial explosion, but because each component carries its own manufacturing run, usage history, and wear.
 
 ## Open Questions
 
 Decisions we'll make when gameplay teaches us the answers.
 
-### Version count per mark
-Currently assuming 3 (v1/v2/v3). Could be 2 or 4. Depends on how much tuning room we need and how often we want to ship content events.
+### Version cadence
+No fixed count per mark. Versions happen when balance demands it. Some products may stay at v1 forever. The question is how quickly we should act on balance data — too fast and the economy never settles, too slow and the meta stagnates.
 
 ### Surveyor hull cost
 The current data gives Surveyor 325 m³, same integrity as Pioneer, same equipment slots, plus dual sensors and a survey bonus. That's strictly better. What does the Surveyor sacrifice? Candidates: slower base speed, higher refit cost, higher minimum power draw from dual array, reduced jump range.
@@ -154,7 +141,7 @@ Crossover products introduce conditional effects ("shields regen during jumps", 
 What niches are missing? The docs mention a MIL military sensor array. What about drives, cores, shields? This depends entirely on what gameplay reveals as gaps.
 
 ### The scout power problem
-The "obvious" scout build (Epoch-R + DR-705) runs a 0.73 power ratio at v1. Is this intentional (scouts must compromise) or a gap that firmware versions should close? By v3, the DR-705 consumption might drop enough to hit 0.85+. Or maybe that tension is the whole point.
+The "obvious" scout build (Epoch-R + DR-705) runs a 0.73 power ratio at v1. Is this intentional (scouts must compromise) or a balance gap? If it's a gap, a v2 DR-705 with lower consumption could fix it — and the original v1 units with the higher consumption become legacy hardware that some pilots might prefer for the raw amplitude. Or maybe that tension is the whole point.
 
 ## Using the Workbench
 
@@ -183,4 +170,4 @@ bun run wb matrix --vary=core,drive 2>/dev/null \
     cargo: .report.footprint.cargo}] | sort_by(-.jumpRange)'
 ```
 
-When we add v2/v3 product data, the workbench becomes the verification layer — run the matrix, check that the version grammar holds, confirm that archetype identities survive the tuning.
+When considering a version bump, the workbench is the verification layer — model the proposed change, run the matrix, confirm that archetype identities survive the adjustment and the economic implications make sense.

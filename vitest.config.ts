@@ -14,6 +14,7 @@ export default defineConfig({
             ['resources/packages/ships/**', 'node'],
             ['resources/packages/products/**', 'node'],
             ['resources/packages/actions/**', 'node'],
+            ['resources/packages/workbench/**', 'node'],
         ],
         setupFiles: ['./vitest.setup.ts'],
         include: ['resources/packages/**/*.{test,spec}.{ts,tsx}'],

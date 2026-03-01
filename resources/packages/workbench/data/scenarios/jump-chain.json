@@ -1,0 +1,21 @@
+{
+  "name": "Jump Chain",
+  "description": "Ship jumps 5 times, tracks core life and power recovery between jumps.",
+  "ships": {
+    "explorer": {
+      "hull": "pioneer",
+      "core": "epoch_s",
+      "drive": "dr_505",
+      "sensor": "vrs_mk1",
+      "shield": "aegis_delta",
+      "nav": "nav_tier_3"
+    }
+  },
+  "actions": [
+    { "t": 0, "ship": "explorer", "type": "jump", "params": { "distance": 3 } },
+    { "t": 3600, "ship": "explorer", "type": "jump", "params": { "distance": 3 } },
+    { "t": 7200, "ship": "explorer", "type": "jump", "params": { "distance": 3 } },
+    { "t": 10800, "ship": "explorer", "type": "jump", "params": { "distance": 3 } },
+    { "t": 14400, "ship": "explorer", "type": "jump", "params": { "distance": 3 } }
+  ]
+}

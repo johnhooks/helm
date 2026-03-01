@@ -11,18 +11,18 @@
       "capacity": 50.0
     },
     {
-      "slug": "aegis_beta",
+      "slug": "aegis_delta",
       "type": "shield",
-      "label": "Aegis Beta",
+      "label": "Aegis Delta",
       "version": 1,
       "footprint": 20,
       "rate": 10.0,
       "capacity": 100.0
     },
     {
-      "slug": "aegis_gamma",
+      "slug": "aegis_eta",
       "type": "shield",
-      "label": "Aegis Gamma",
+      "label": "Aegis Eta",
       "version": 1,
       "footprint": 35,
       "rate": 5.0,

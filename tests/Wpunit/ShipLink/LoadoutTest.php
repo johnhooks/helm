@@ -115,7 +115,7 @@ class LoadoutTest extends WPTestCase
 
         $shield = $loadout->shield();
 
-        $this->assertSame('aegis_beta', $shield->slug());
+        $this->assertSame('aegis_delta', $shield->slug());
         $this->assertSame(100.0, $shield->product()->capacity); // max_capacity
     }
 
@@ -135,7 +135,7 @@ class LoadoutTest extends WPTestCase
         $shipPost = $this->tester->haveShip();
         $loadout = $this->loadoutFactory->build($shipPost->postId());
 
-        // epoch_s=25 + dr_505=30 + vrs_mk1=25 + aegis_beta=20 + nav_tier_1=0
+        // epoch_s=25 + dr_505=30 + vrs_mk1=25 + aegis_delta=20 + nav_tier_1=0
         $this->assertSame(100, $loadout->totalFootprint());
     }
 
@@ -221,7 +221,7 @@ class LoadoutTest extends WPTestCase
         $this->assertSame(750, $loadout->core()->life());
         $this->assertSame('dr_505', $loadout->drive()->slug());
         $this->assertSame('vrs_mk1', $loadout->sensor()->slug());
-        $this->assertSame('aegis_beta', $loadout->shield()->slug());
+        $this->assertSame('aegis_delta', $loadout->shield()->slug());
         $this->assertSame('nav_tier_1', $loadout->nav()->slug());
     }
 

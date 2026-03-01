@@ -16,13 +16,13 @@ use Helm\StellarWP\Models\ModelPropertyDefinition;
  * via product_id.
  *
  * Generic stat columns - each component type uses a subset:
- * | Type   | rate  | range   | capacity | chance  | mult_a   | mult_b      | mult_c    |
- * |--------|-------|---------|----------|---------|----------|-------------|-----------|
- * | core   | regen | -       | (hp)     | -       | output   | cost        | -         |
- * | drive  | -     | sustain | -        | -       | speed    | consumption | amplitude |
- * | sensor | -     | range   | -        | success | duration | -           | -         |
- * | shield | regen | -       | capacity | -       | -        | -           | -         |
- * | nav    | -     | -       | -        | -       | skill    | efficiency  | -         |
+ * | Type   | rate  | range   | capacity | chance  | mult_a   | mult_b      | mult_c    | mult_d              | mult_e | mult_f |
+ * |--------|-------|---------|----------|---------|----------|-------------|-----------|---------------------|--------|--------|
+ * | core   | regen | -       | (hp)     | -       | output   | cost        | -         | -                   | -      | -      |
+ * | drive  | -     | sustain | -        | -       | speed    | consumption | amplitude | transit shield frac  | -      | -      |
+ * | sensor | -     | range   | -        | success | duration | -           | -         | core resonance split | -      | -      |
+ * | shield | regen | -       | capacity | -       | -        | -           | -         | sensor range bonus   | -      | -      |
+ * | nav    | -     | -       | -        | -       | skill    | efficiency  | -         | -                   | -      | -      |
  *
  * @property int $id
  * @property string $slug
@@ -38,6 +38,9 @@ use Helm\StellarWP\Models\ModelPropertyDefinition;
  * @property ?float $mult_a
  * @property ?float $mult_b
  * @property ?float $mult_c
+ * @property ?float $mult_d
+ * @property ?float $mult_e
+ * @property ?float $mult_f
  * @property DateTimeImmutable $created_at
  * @property DateTimeImmutable $updated_at
  */
@@ -102,6 +105,18 @@ final class Product extends Model
                 ->castWith(static fn ($v) => $v === null || $v === '' ? null : (float) $v),
 
             'mult_c' => (new ModelPropertyDefinition())
+                ->type('float')
+                ->castWith(static fn ($v) => $v === null || $v === '' ? null : (float) $v),
+
+            'mult_d' => (new ModelPropertyDefinition())
+                ->type('float')
+                ->castWith(static fn ($v) => $v === null || $v === '' ? null : (float) $v),
+
+            'mult_e' => (new ModelPropertyDefinition())
+                ->type('float')
+                ->castWith(static fn ($v) => $v === null || $v === '' ? null : (float) $v),
+
+            'mult_f' => (new ModelPropertyDefinition())
                 ->type('float')
                 ->castWith(static fn ($v) => $v === null || $v === '' ? null : (float) $v),
 

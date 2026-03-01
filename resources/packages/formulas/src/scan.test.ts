@@ -7,18 +7,21 @@ const vrsMk1: Product = {
 	id: 1, slug: 'vrs_mk1', type: 'sensor', label: 'VRS Mk I', version: 1,
 	footprint: 25, hp: null, rate: null, sustain: 5.0, capacity: null,
 	chance: 0.7, mult_a: 1.0, mult_b: null, mult_c: null,
+	mult_d: null, mult_e: null, mult_f: null,
 };
 
 const dscMk1: Product = {
 	id: 2, slug: 'dsc_mk1', type: 'sensor', label: 'DSC Mk I', version: 1,
 	footprint: 40, hp: null, rate: null, sustain: 7.0, capacity: null,
 	chance: 0.6, mult_a: 2.0, mult_b: null, mult_c: null,
+	mult_d: null, mult_e: null, mult_f: null,
 };
 
 const acuMk1: Product = {
 	id: 3, slug: 'acu_mk1', type: 'sensor', label: 'ACU Mk I', version: 1,
 	footprint: 15, hp: null, rate: null, sustain: 3.0, capacity: null,
 	chance: 0.85, mult_a: 0.5, mult_b: null, mult_c: null,
+	mult_d: null, mult_e: null, mult_f: null,
 };
 
 const constants = DEFAULT_CONSTANTS;

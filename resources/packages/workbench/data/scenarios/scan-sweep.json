@@ -1,0 +1,21 @@
+{
+  "name": "Scan Sweep",
+  "description": "Ship scans at varying distances, tracks power budget across scan operations.",
+  "ships": {
+    "scanner": {
+      "hull": "surveyor",
+      "core": "epoch_s",
+      "drive": "dr_505",
+      "sensor": "vrs_mk1",
+      "shield": "aegis_delta",
+      "nav": "nav_tier_3"
+    }
+  },
+  "actions": [
+    { "t": 0, "ship": "scanner", "type": "scan", "params": { "distance": 1 } },
+    { "t": 1800, "ship": "scanner", "type": "scan", "params": { "distance": 2 } },
+    { "t": 3600, "ship": "scanner", "type": "scan", "params": { "distance": 3 } },
+    { "t": 5400, "ship": "scanner", "type": "scan", "params": { "distance": 5 } },
+    { "t": 10800, "ship": "scanner", "type": "scan", "params": { "distance": 7 } }
+  ]
+}

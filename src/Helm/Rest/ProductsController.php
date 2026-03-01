@@ -129,6 +129,9 @@ final class ProductsController
             'mult_a'    => $product->mult_a,
             'mult_b'    => $product->mult_b,
             'mult_c'    => $product->mult_c,
+            'mult_d'    => $product->mult_d,
+            'mult_e'    => $product->mult_e,
+            'mult_f'    => $product->mult_f,
         ];
     }
 

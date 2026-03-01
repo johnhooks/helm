@@ -1,8 +1,33 @@
 # DSP: The Scanning Engine
 
-The scanning and detection system in Helm is digital signal processing. Not a metaphor — the actual math. The formulas that compute detection probability, signal integration, noise rejection, and emission masking are DSP operations running at game-time scales instead of audio-time scales.
+The scanning and detection system in Helm borrows from digital signal processing — the vocabulary, the concepts, and where the math works out, the actual formulas. But gameplay takes precedence over physics. DSP *influences* probabilities and information quality. It doesn't create binary pass/fail outcomes.
 
-Audio DSP processes 44,100 samples per second. Helm DSP processes a sample every few minutes. The operations are identical.
+## Design Philosophy: Influence, Not Brick Walls
+
+DSP concepts serve as inspiration and, where possible, real math. But we never let the physics override fun:
+
+- **The sigmoid is gradual.** Detection probability transitions smoothly over a wide SNR range (steepness=0.5, ~8.8 SNR width from 10%→90%). No cliff edges where one more unit of noise makes something completely invisible.
+- **Ship noise is attenuated.** Sensors do spectral filtering — they don't blindly sum every EM source. Ship emissions contribute only 30% to the noise floor (shipNoiseFactor=0.3). Busy systems are harder, not impossible.
+- **Passive never gives certainty.** Passive listening is free and silent — it caps at 95% confidence (passiveConfidenceCap=0.95). Want 100%? Escalate to an active scan, which reveals your position. This preserves the cost hierarchy: free information is uncertain, certain information costs emission.
+- **Equipment and experience are multipliers.** A "correlator module" doesn't literally run cross-correlation. It shifts information tier thresholds down. A "veteran sensor" doesn't literally sharpen templates. It reduces the confidence needed to classify signals. The *concept* is DSP. The *implementation* is gameplay math.
+- **Two experience sources.** Pilot skill is permanent — it lives on the WP user and survives ship loss. Months of scanning build intuition. Component drift lives on the hardware and dies with the ship. A sensor used for 500 hours of passive belt scanning develops sharper templates for continuous signals. Both matter, but losing a ship hurts without being catastrophic.
+
+### What's Real DSP vs Inspired-by-DSP
+
+| Concept | Implementation | Notes |
+|---------|---------------|-------|
+| SNR (signal/noise) | Real formula | signal ÷ noise, directly used |
+| Integration gain (√N) | Real formula | Averaging samples improves detection — textbook DSP |
+| RMS noise combination | Real formula | Uncorrelated sources add in quadrature |
+| Sigmoid detection curve | Inspired | Real detectors use Q-functions; our sigmoid captures the shape |
+| Matched filter gain | Inspired | Real matched filters correlate waveforms; we use affinity multipliers |
+| Spectral masking | Inspired | Real masking is frequency-domain overlap; we add correlated noise |
+| Ship noise factor | Gameplay | Models "spectral filtering" but is just a 0.3× multiplier |
+| Information tiers | Gameplay | Confidence→what-you-learn mapping, no DSP analog |
+| Equipment modifiers | Gameplay | Shift thresholds and multiply parameters, not real filters |
+| Component drift | Gameplay | Veteran bonus as threshold shift, not actual template sharpening |
+
+The goal: a player who knows synths or signal processing recognizes the vocabulary. A player who doesn't just sees "better equipment = detect more." Both experiences are valid.
 
 ## Why This Matters
 
@@ -124,6 +149,53 @@ Two detection modes for two types of signals:
 
 The ACU's rapid sweep style is optimized for pulse detection — it samples frequently, catching transient events. The DSC's long dwell is optimized for continuous detection — it integrates deeply, finding sustained operations.
 
+### Drive Signatures and the Oscillator-Envelope Model
+
+The drive isn't a static emission source — it's an oscillator shaped by an envelope. The synth model applies directly.
+
+**The oscillator** is the drive's fundamental EM pattern. Each drive model has a characteristic waveform — the DR-305's gentle hum sounds nothing like the DR-705's aggressive roar. This is the drive's "voice" in the EM spectrum.
+
+**The envelope** shapes the oscillator's amplitude through the jump lifecycle:
+
+- **Spool (Attack)** — The oscillator ramps up as the drive field forms. Frequency rises from low to operating pitch. This frequency sweep is a **chirp** — a signal that cuts across the spectrum in a short window. Chirps are extremely distinctive in DSP terms because they're broadband energy in a compressed timeframe. This is why spool reads as a pulse to sensors. Happens in the **origin** system — the ship is still here, lighting up every sensor.
+
+- **Sustain** — The oscillator locks to its operating frequency. Steady, narrow-band, continuous. The envelope holds flat. This phase happens during transit — neither origin nor destination system sees it (the ship is in warp).
+
+- **Cooldown (Release)** — The oscillator frequency drops back down as the drive field collapses. Reverse chirp, decaying amplitude. Happens in the **destination** system — a ship just arrived and its drive is winding down.
+
+The emission at any moment is `oscillator(t) × envelope(t)`. The three emission profiles (`drive_spool` at 4.0, `drive_sustain` at 2.0, `drive_cooldown` at 1.5) are flat snapshots of this product at each phase. When the envelope system is implemented, these become continuous functions.
+
+**Each drive model has a different oscillator AND envelope shape:**
+
+- **DR-305 (Civilian)** — 3-minute spool, 2-minute cooldown. Narrow frequency sweep, low operating frequency, soft attack, quick release. Quiet, unassuming. Hard to distinguish from background noise.
+- **DR-505 (Industrial)** — 4-minute spool, 3-minute cooldown. Big ship, long vulnerability window — but compensates with heavier hull. Moderate sweep, moderate frequency, balanced envelope.
+- **DR-705 (Military)** — 2-minute spool, 2.5-minute cooldown. Fast combat-optimized drive. Wide frequency sweep, high operating frequency, sharp attack, arrives hot. Screams across the spectrum. Unmistakable signature.
+
+**This is what makes matched filtering powerful.** The sensor isn't just detecting "energy" — it's correlating against a known chirp pattern. The frequency sweep rate is a fingerprint. An ACU with strong pulse gain (1.5) locks onto the sharp spool chirp. A DSC with strong continuous gain (1.5) picks up the sustained hum and the long cooldown tail. The spectral type isn't an inherent property of the phase — it emerges from how the envelope shapes the oscillator at that moment.
+
+### Signature Analysis and Information Hierarchy
+
+Detection confidence is the first layer — "something is there." The real gameplay is in what the signature *tells you*. The EM characteristics carry information about the source ship.
+
+**What signatures reveal:**
+
+- **Emission power** — How big/hot the drive is. A DR-705 at full throttle has a completely different amplitude than a DR-305 at economy. You don't just detect "a spool" — you detect "a loud, aggressive spool."
+- **Chirp pattern** — Which drive model. The frequency sweep rate is a fingerprint unique to each drive type.
+- **Composite signature** — The combination of active emissions paints a picture. Spool + shield_regen + high core hum = combat configuration. Gentle spool + mining = civilian hauler heading to a belt.
+- **Suppressed signatures** — A ship actively dampening its emissions. The signal is faint, narrow, deliberately quiet — but the suppression itself is information. "This ship is trying to hide."
+
+**Information hierarchy — escalating detail at escalating cost:**
+
+| Method | What you learn | Time | Your emission |
+|--------|---------------|------|---------------|
+| **Passive listening** | Indirect inference: drive class, power estimate, combat vs civilian profile. Confidence builds over hours. | Hours | Zero |
+| **Active scan** | Specific facts: hull type, mass class. You're bouncing a signal off them. | Minutes | Moderate (PNP = 5.0) |
+| **Deep scan** | Full readout: loadout, cargo, detailed systems. The most invasive scan type. | Fast | Massive (10.0+) |
+
+Each level gives more information but costs more emission. The scanner becomes scannable. A deep scan is so loud that every ship in the system detects it — it's an aggressive act, equivalent to pointing a spotlight at someone in a dark room. Everyone sees the spotlight.
+
+**Integration refines classification over time.** At 2 hours, your DSC says "drive activity detected." At 6 hours: "DR-700 class, combat configuration, shield regen active." At 12 hours: "consistent emission pattern, probably mining — not a threat." The picture sharpens. Patient observation doesn't just increase detection confidence — it refines what you know about the source. This is the core PVP mechanic: time investment converts uncertainty into actionable intelligence.
+
 ## Emission Profiles by Action
 
 Each action produces a characteristic emission signature. These are the "source signals" in the DSP chain.
@@ -213,6 +285,22 @@ The DSP pipeline runs inside the engine layer (see `docs/plans/simulation-testin
       - If yes: fire detection event with confidence level
 ```
 
+### Passive Tick and the EM Snapshot Cache
+
+Passive detection is fundamentally different from action checkpoints. An action checkpoint resolves work — a scan completes, a jump finishes, ore is extracted. Passive detection is a pure read. The sensor isn't doing anything. It's asking "what would I have heard since last time I checked?"
+
+This means passive ticks are cheap in a way action checkpoints aren't. The computation is read-only and the inputs change infrequently. The system's electromagnetic environment — the noise floor and the set of active emission sources — only changes when a ship *does something*: starts an action, completes an action, arrives, departs. Between those events, the environment is static.
+
+This gives us a two-layer model:
+
+**System EM snapshot.** A cached representation of the electromagnetic environment for a system. Contains the noise floor, all active emission sources with their power and spectral type, and any environmental modifiers (belt noise, ECM, storms). The snapshot is invalidated and recomputed when any action starts, stops, or completes in the system — the events that actually change the EM landscape.
+
+**Per-ship passive read.** When a ship's passive tick fires, it evaluates its sensor against the cached snapshot. The only per-ship inputs are sensor affinity, integration time (how long since the ship started observing), and self-interference (the ship's own emissions). This is a handful of formula evaluations per emission source — fast enough that the tick cost is dominated by scheduling, not computation.
+
+**Tick rate as a tunable.** How often a ship checks its passive readout is a gameplay-meaningful parameter. A faster tick means more responsive awareness — you notice the PNP scan within minutes instead of an hour. But faster ticking has a cost (engine scheduling overhead, and potentially a gameplay cost like power draw or sensor wear). Sensor quality or signal processor addons could affect tick rate, making it a meaningful stat: the DSC's long dwell time might naturally produce fewer but deeper ticks, while the ACU's rapid sweep style produces frequent shallow ticks.
+
+The cache is the real efficiency win. A system with 30 ships doesn't need 30 independent noise floor calculations every tick. It needs one snapshot, recomputed only when the environment actually changes. The per-ship evaluation against that snapshot is trivial. This scales well — even busy systems with frequent action events will have stable windows between events where the snapshot holds.
+
 ### What the Simulation Tests
 
 The DSP engine is where simulation testing (see `docs/plans/simulation-testing.md`) becomes essential. The questions are signal processing questions:
@@ -244,7 +332,14 @@ For gameplay purposes, a simplified sigmoid approximation works:
 Pd = 1 / (1 + e^(-k × (SNR - threshold)))
 ```
 
-Where `k` controls the steepness of the detection curve and `threshold` is the minimum SNR for 50% detection probability.
+Where `k` controls the steepness of the detection curve (default 0.5 — very gradual, the 10%-90% transition spans ~8.8 SNR units) and `threshold` is the minimum SNR for 50% detection probability.
+
+The wide sigmoid is deliberate. Detection probability changes *gradually* as conditions change — no cliff edges. A PNP scan registers as ~18% confidence in a single 5-minute sample, building to ~89% over 30 minutes of sustained scanning. Awareness comes first, confidence follows.
+
+Two thresholds serve two detection modes:
+
+- **Active threshold (1.0)** — Per-sweep detection for active scanning. Responsive, resolves in minutes. Each sweep is an independent detection attempt; cumulative probability across N sweeps is `1 - (1-p)^N`.
+- **Passive threshold (8.0)** — Integrated passive detection. High bar — requires hours of observation for moderate signals. Integration gain (√N from 5-minute sampling) builds SNR toward the threshold over time. Even with perfect conditions, passive detection caps at 95% confidence — free information is never certain.
 
 ### Integration Gain
 
@@ -252,15 +347,48 @@ Where `k` controls the steepness of the detection curve and `threshold` is the m
 SNR_integrated = SNR_single × √N
 ```
 
-Where `N` is the number of integrated samples. Passive detection improves with the square root of observation time. Doubling integration time gives ~1.4x SNR improvement, not 2x. Diminishing returns that make patience valuable but not infinitely so.
+Where `N` is the number of integrated samples (one every 5 minutes by default, tunable from 1-10 minutes). Passive detection improves with the square root of observation time. Doubling integration time gives ~1.4x SNR improvement, not 2x. Diminishing returns that make patience valuable but not infinitely so.
+
+**Scan frequency is a tactical choice.** A 1-minute scanner catches every drive spool (2-4 minutes) but costs more in engine ticks. A 10-minute scanner is efficient but has only a 20% chance of catching a military spool during the window. The default 5 minutes balances responsiveness with efficiency.
 
 ### Noise Floor
 
 ```
-N_total = N_stellar + N_random + Σ(E_ship) + N_ecm + N_belt
+N_total = N_stellar + shipNoiseFactor × √Σ(E_ship²) + N_belt + N_ecm + N_random
 ```
 
-Simple additive model. All noise sources contribute linearly to the total noise power. The engine sums them per system at each checkpoint.
+Ship emissions combine as RMS (root-sum-of-squares), then attenuated by `shipNoiseFactor` (default 0.3). This models spectral filtering and spatial separation — your sensor doesn't blindly sum every EM source. 100 miners at emission 1.0 each produce 0.3 × √100 = 3.0 ship noise, not 100.
+
+Environmental sources (belt noise, ECM, random events) add linearly because they represent specific, coherent effects that don't average out.
+
+### Information Tiers
+
+Detection confidence maps to what the sensor reveals:
+
+| Tier | Threshold | What You Learn |
+|------|-----------|---------------|
+| anomaly | 0.15 | "EM activity detected, bearing 040" |
+| class | 0.40 | "continuous emission — likely mining or industrial" |
+| type | 0.65 | "signature consistent with DR-305 class drive" |
+| analysis | 0.85 | "DR-305, spool phase, estimated power 1.2" |
+
+Equipment bonuses (correlator modules, signal processors) and experience bonuses (component drift, veteran sensors) shift these thresholds down. A correlator (bonus=0.05) shifts anomaly from 0.15→0.10. Stacked with a veteran bonus (0.03): 0.10→0.07.
+
+### Modifier Pipeline
+
+All modifiers are multiplicative (1.0 = no change), feeding into existing formula parameters:
+
+| Modifier | What It Affects | Survives Ship Loss? | Example |
+|----------|----------------|--------------------|---------|
+| emissionMod | tunedEmission() signal power | On hardware | Signal processor amplifier |
+| sensorMod | sensorPassiveAffinity | On hardware | Sensor quality/condition |
+| pilotSkill | Effective sensor affinity + tier thresholds | **Permanent (WP user)** | Veteran scanner (1.0→1.25 over months) |
+| componentDrift | matchedFilterGain | On hardware | 500hr belt scanning → sharper continuous templates |
+| equipmentBonus | Tier thresholds via adjustedThresholds() | On hardware | Correlator module |
+| selfInterferenceMod | Own emission in noise floor | On hardware | Drive dampeners / filter module |
+| environmentMod | stellarNoise() modifier | N/A | Ion storm, solar flare |
+
+**Caps prevent god-mode stacking.** The combined ceiling for a fully-kitted elite pilot is ~65% better detection and 15% lower tier thresholds — meaningful but not omniscient. See `DSP_MODIFIER_CAPS` in `types.ts`.
 
 ### Spectral Masking
 

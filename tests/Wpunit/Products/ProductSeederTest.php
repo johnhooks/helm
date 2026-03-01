@@ -82,11 +82,11 @@ class ProductSeederTest extends WPTestCase
         $this->assertSame(0.7, $vrs->chance);
 
         // Verify a shield product
-        $aegisBeta = $this->repository->findBySlug('aegis_beta');
-        $this->assertNotNull($aegisBeta);
-        $this->assertSame('shield', $aegisBeta->type);
-        $this->assertSame(10.0, $aegisBeta->rate);
-        $this->assertSame(100.0, $aegisBeta->capacity);
+        $aegisDelta = $this->repository->findBySlug('aegis_delta');
+        $this->assertNotNull($aegisDelta);
+        $this->assertSame('shield', $aegisDelta->type);
+        $this->assertSame(10.0, $aegisDelta->rate);
+        $this->assertSame(100.0, $aegisDelta->capacity);
 
         // Verify a nav product
         $navTier1 = $this->repository->findBySlug('nav_tier_1');

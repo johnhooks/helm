@@ -1,0 +1,128 @@
+{
+  "$schema": "https://helm.okaywp.com/resources/schemas/shield.json",
+  "items": [
+    {
+      "slug": "aegis_alpha",
+      "type": "shield",
+      "label": "Aegis Alpha",
+      "version": 1,
+      "footprint": 10,
+      "rate": 20.0,
+      "capacity": 50.0,
+      "draw": 3.0,
+      "tuning": { "param": "priority", "min": 0.25, "max": 2.0 }
+    },
+    {
+      "slug": "aegis_delta",
+      "type": "shield",
+      "label": "Aegis Delta",
+      "version": 1,
+      "footprint": 20,
+      "rate": 10.0,
+      "capacity": 100.0,
+      "draw": 5.0,
+      "tuning": { "param": "priority", "min": 0.5, "max": 2.0 }
+    },
+    {
+      "slug": "aegis_eta",
+      "type": "shield",
+      "label": "Aegis Eta",
+      "version": 1,
+      "footprint": 35,
+      "rate": 5.0,
+      "capacity": 200.0,
+      "draw": 8.0,
+      "tuning": { "param": "priority", "min": 0.5, "max": 3.0 }
+    },
+    {
+      "slug": "aegis_beta",
+      "type": "shield",
+      "label": "Aegis Beta",
+      "version": 1,
+      "footprint": 12,
+      "rate": 26.0,
+      "capacity": 75.0,
+      "draw": 3.0,
+      "tuning": { "param": "priority", "min": 0.25, "max": 2.0 }
+    },
+    {
+      "slug": "aegis_epsilon",
+      "type": "shield",
+      "label": "Aegis Epsilon",
+      "version": 1,
+      "footprint": 25,
+      "rate": 14.0,
+      "capacity": 140.0,
+      "draw": 5.0,
+      "tuning": { "param": "priority", "min": 0.5, "max": 2.0 }
+    },
+    {
+      "slug": "aegis_theta",
+      "type": "shield",
+      "label": "Aegis Theta",
+      "version": 1,
+      "footprint": 40,
+      "rate": 8.0,
+      "capacity": 275.0,
+      "draw": 8.0,
+      "tuning": { "param": "priority", "min": 0.5, "max": 3.0 }
+    },
+    {
+      "slug": "dsc_shield_mk2",
+      "type": "shield",
+      "label": "DSC Shield Mk II",
+      "version": 1,
+      "footprint": 18,
+      "rate": 6.0,
+      "capacity": 25.0,
+      "draw": 2.0,
+      "mult_d": 0.4,
+      "tuning": { "param": "priority", "min": 0.25, "max": 1.5 }
+    },
+    {
+      "slug": "aegis_gamma",
+      "type": "shield",
+      "label": "Aegis Gamma",
+      "version": 1,
+      "footprint": 15,
+      "rate": 32.0,
+      "capacity": 100.0,
+      "draw": 3.0,
+      "tuning": { "param": "priority", "min": 0.25, "max": 2.0 }
+    },
+    {
+      "slug": "aegis_zeta",
+      "type": "shield",
+      "label": "Aegis Zeta",
+      "version": 1,
+      "footprint": 30,
+      "rate": 18.0,
+      "capacity": 180.0,
+      "draw": 5.0,
+      "tuning": { "param": "priority", "min": 0.5, "max": 2.0 }
+    },
+    {
+      "slug": "aegis_iota",
+      "type": "shield",
+      "label": "Aegis Iota",
+      "version": 1,
+      "footprint": 50,
+      "rate": 11.0,
+      "capacity": 350.0,
+      "draw": 8.0,
+      "tuning": { "param": "priority", "min": 0.5, "max": 3.0 }
+    },
+    {
+      "slug": "dsc_shield_mk3",
+      "type": "shield",
+      "label": "DSC Shield Mk III",
+      "version": 1,
+      "footprint": 22,
+      "rate": 8.0,
+      "capacity": 35.0,
+      "draw": 2.0,
+      "mult_d": 0.5,
+      "tuning": { "param": "priority", "min": 0.25, "max": 1.5 }
+    }
+  ]
+}

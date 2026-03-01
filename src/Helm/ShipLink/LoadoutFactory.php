@@ -107,7 +107,7 @@ final class LoadoutFactory
     /**
      * Create default components and inventory items for a new ship.
      *
-     * Standard starter loadout: Epoch-S, DR-505, VRS Mk I, Aegis Beta, Nav Tier 1.
+     * Standard starter loadout: Epoch-S, DR-505, VRS Mk I, Aegis Delta, Nav Tier 1.
      */
     public function buildDefaults(int $shipPostId, int $ownerId): Loadout
     {
@@ -115,7 +115,7 @@ final class LoadoutFactory
             ShipFittingSlot::Core->value => 'epoch_s',
             ShipFittingSlot::Drive->value => 'dr_505',
             ShipFittingSlot::Sensor->value => 'vrs_mk1',
-            ShipFittingSlot::Shield->value => 'aegis_beta',
+            ShipFittingSlot::Shield->value => 'aegis_delta',
             ShipFittingSlot::Nav->value => 'nav_tier_1',
         ];
 

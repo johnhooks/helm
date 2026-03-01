@@ -1,0 +1,113 @@
+{
+  "$schema": "https://helm.okaywp.com/resources/schemas/core.json",
+  "items": [
+    {
+      "slug": "epoch_e",
+      "type": "core",
+      "label": "Epoch-E Endurance",
+      "version": 1,
+      "hp": 1000,
+      "footprint": 20,
+      "rate": 5.0,
+      "capacity": 80,
+      "mult_a": 0.9,
+      "mult_b": 0.75
+    },
+    {
+      "slug": "epoch_s",
+      "type": "core",
+      "label": "Epoch-S Standard",
+      "version": 1,
+      "hp": 750,
+      "footprint": 25,
+      "rate": 10.0,
+      "capacity": 100,
+      "mult_a": 1.0,
+      "mult_b": 1.0
+    },
+    {
+      "slug": "epoch_r",
+      "type": "core",
+      "label": "Epoch-R Rapid",
+      "version": 1,
+      "hp": 500,
+      "footprint": 35,
+      "rate": 20.0,
+      "capacity": 120,
+      "mult_a": 1.1,
+      "mult_b": 1.5
+    },
+    {
+      "slug": "epoch_e2",
+      "type": "core",
+      "label": "Epoch-E2",
+      "version": 1,
+      "hp": 1300,
+      "footprint": 25,
+      "rate": 8.0,
+      "capacity": 90,
+      "mult_a": 0.95,
+      "mult_b": 0.65
+    },
+    {
+      "slug": "epoch_s2",
+      "type": "core",
+      "label": "Epoch-S2",
+      "version": 1,
+      "hp": 950,
+      "footprint": 30,
+      "rate": 14.0,
+      "capacity": 110,
+      "mult_a": 1.05,
+      "mult_b": 0.90
+    },
+    {
+      "slug": "epoch_r2",
+      "type": "core",
+      "label": "Epoch-R2",
+      "version": 1,
+      "hp": 700,
+      "footprint": 40,
+      "rate": 26.0,
+      "capacity": 130,
+      "mult_a": 1.18,
+      "mult_b": 1.25
+    },
+    {
+      "slug": "epoch_e3",
+      "type": "core",
+      "label": "Epoch-E3",
+      "version": 1,
+      "hp": 1600,
+      "footprint": 30,
+      "rate": 12.0,
+      "capacity": 100,
+      "mult_a": 0.98,
+      "mult_b": 0.55
+    },
+    {
+      "slug": "epoch_s3",
+      "type": "core",
+      "label": "Epoch-S3",
+      "version": 1,
+      "hp": 1150,
+      "footprint": 35,
+      "rate": 18.0,
+      "capacity": 120,
+      "mult_a": 1.10,
+      "mult_b": 0.80
+    },
+    {
+      "slug": "epoch_r3",
+      "type": "core",
+      "label": "Epoch-R3",
+      "version": 1,
+      "hp": 900,
+      "footprint": 50,
+      "rate": 32.0,
+      "capacity": 150,
+      "mult_a": 1.25,
+      "mult_b": 1.10
+    }
+  ]
+}

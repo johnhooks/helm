@@ -200,9 +200,9 @@ class ProductRepositoryTest extends WPTestCase
         $this->assertNotNull($vrs);
         $this->assertSame('sensor', $vrs->type);
 
-        $aegisBeta = $this->repository->findBySlug('aegis_beta');
-        $this->assertNotNull($aegisBeta);
-        $this->assertSame('shield', $aegisBeta->type);
+        $aegisDelta = $this->repository->findBySlug('aegis_delta');
+        $this->assertNotNull($aegisDelta);
+        $this->assertSame('shield', $aegisDelta->type);
 
         $navTier1 = $this->repository->findBySlug('nav_tier_1');
         $this->assertNotNull($navTier1);

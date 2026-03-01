@@ -1,0 +1,25 @@
+{
+  "items": [
+    {
+      "slug": "phaser_array",
+      "type": "weapon",
+      "label": "Phaser Array",
+      "version": 1,
+      "footprint": 15,
+      "draw": 0.35,
+      "rate": 5.0,
+      "mult_a": 5.0
+    },
+    {
+      "slug": "torpedo_launcher",
+      "type": "weapon",
+      "label": "Torpedo Launcher",
+      "version": 1,
+      "footprint": 25,
+      "capacity": 4,
+      "mult_a": 50.0,
+      "mult_b": 0.7,
+      "mult_c": 300
+    }
+  ]
+}

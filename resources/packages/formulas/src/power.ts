@@ -15,3 +15,11 @@ export function perfRatio(coreOutputValue: number, drive: Product): number {
 	}
 	return Math.min(1.0, coreOutputValue / consumption);
 }
+
+/**
+ * Capacitor size derived from core capacity field.
+ * Determines the maximum stored power available for actions.
+ */
+export function capacitor(core: Product): number {
+	return core.capacity ?? 100;
+}

@@ -52,6 +52,9 @@ export function createProductEmbed(
 		mult_a: 1.0,
 		mult_b: 0.8,
 		mult_c: null,
+		mult_d: null,
+		mult_e: null,
+		mult_f: null,
 		...overrides,
 	};
 }

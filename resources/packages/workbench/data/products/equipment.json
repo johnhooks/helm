@@ -1,0 +1,41 @@
+{
+  "items": [
+    {
+      "slug": "pds_mk1",
+      "type": "equipment",
+      "label": "Point Defense System Mk I",
+      "version": 1,
+      "footprint": 10,
+      "draw": 0.1,
+      "mult_a": 0.6
+    },
+    {
+      "slug": "ecm_mk1",
+      "type": "equipment",
+      "label": "ECM Suite Mk I",
+      "version": 1,
+      "footprint": 15,
+      "draw": 0.2,
+      "mult_a": 0.3
+    },
+    {
+      "slug": "veil_array",
+      "type": "cloak",
+      "label": "Veil Array",
+      "version": 1,
+      "footprint": 20,
+      "draw": 0.4,
+      "mult_a": 0.7
+    },
+    {
+      "slug": "mining_laser",
+      "type": "equipment",
+      "label": "Mining Laser",
+      "version": 1,
+      "footprint": 20,
+      "draw": 0.15,
+      "rate": 1.0,
+      "mult_a": 1.0
+    }
+  ]
+}

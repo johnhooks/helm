@@ -15,6 +15,9 @@ export interface Product {
 	mult_a: number | null;
 	mult_b: number | null;
 	mult_c: number | null;
+	mult_d: number | null;
+	mult_e: number | null;
+	mult_f: number | null;
 }
 
 export type ProductEmbed = WithRestLinks< Product >;

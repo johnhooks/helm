@@ -207,13 +207,13 @@ Aegis Alpha (high capacity, slow regen):
   recovery. The shield for ships that need capacity but can't spare
   power for fast regen.
 
-Aegis Beta (balanced):
+Aegis Delta (balanced):
   Specialization: Adaptive Cycling
   Priority range: 0.5–2.0 (standard)
   Regen efficiency improves at priority 1.0 (10% bonus to rate).
   No extremes, no penalties — the reliable choice.
 
-Aegis Gamma (low capacity, fast regen):
+Aegis Eta (low capacity, fast regen):
   Specialization: Rapid Recovery
   Priority range: 0.5–3.0 (standard max is 2.0)
   Can push priority to 3.0 — shields come up fast at the cost of
@@ -582,7 +582,7 @@ helm_components
 ├── life            FLOAT NULL      -- remaining life (cores)
 ├── usage_count     INT DEFAULT 0   -- total uses for experience curve
 ├── condition       FLOAT DEFAULT 1 -- 0.0–1.0 degradation
-├── version         INT DEFAULT 1   -- firmware version installed
+├── version         INT DEFAULT 1   -- manufacturing run (from product catalog)
 ├── created_at      DATETIME
 ├── updated_at      DATETIME
 ```
@@ -661,4 +661,4 @@ bun run wb matrix --vary=drive --jump.throttle=0.5,1.0,2.0
 - **`baseJumpPowerPerLy` tuning.** Needs playtesting. Constraint: comfort-range jump should leave ~30-50% power remaining.
 - **Experience widening specializations.** How much should the range extend? Linear with buffFactor? Capped? Needs a formula.
 - **Nav computer experience.** Weakest candidate — no mechanical wear, no obvious nerf. Revisit when nav has manufacturer identity.
-- **Firmware versions.** When a manufacturer releases v2, does the component auto-update or does the pilot choose at a station?
+- **Version as manufacturing run.** Resolved: versions are manufacturing runs, not firmware. When a manufacturer releases v2, existing v1 units stay as-is. Only v2 is manufactured going forward. Old versions persist in the economy as legacy hardware — tradeable, repairable, but no longer produced.

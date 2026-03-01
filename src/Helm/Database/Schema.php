@@ -44,7 +44,7 @@ final class Schema
      * Current schema version.
      * Increment when making schema changes.
      */
-    public const VERSION = 2;
+    public const VERSION = 3;
 
     /**
      * Option key for stored schema version.
@@ -351,6 +351,9 @@ CREATE TABLE {$prefix}helm_products (
     mult_a float DEFAULT NULL,
     mult_b float DEFAULT NULL,
     mult_c float DEFAULT NULL,
+    mult_d float DEFAULT NULL,
+    mult_e float DEFAULT NULL,
+    mult_f float DEFAULT NULL,
     created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY  (id),

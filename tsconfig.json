@@ -60,5 +60,5 @@
     "tests-e2e/**/*.ts",
     "vitest.setup.ts"
   ],
-  "exclude": ["node_modules", "build", "vendor", "resources/workbench"]
+  "exclude": ["node_modules", "build", "vendor"]
 }

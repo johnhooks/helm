@@ -138,7 +138,7 @@ Validate these whenever formulas or product data change:
 
 9. **Component differentiation** — Each product in a slot has a meaningfully different profile. No two cores/drives/sensors/shields should produce identical reports. Use matrix commands to verify.
 
-10. **Draw headroom** — Shield draw at max priority doesn't exceed capacitor for any hull. Aegis Gamma at priority 3.0 draws 24 — well under any hull's capacitor.
+10. **Draw headroom** — Shield draw at max priority doesn't exceed capacitor for any hull. Aegis Eta at priority 3.0 draws 24 — well under any hull's capacitor.
 
 ## How to Read the Numbers
 

@@ -275,7 +275,7 @@
         "react-dom": "^18.3.1",
       },
     },
-    "resources/workbench": {
+    "resources/packages/workbench": {
       "name": "@helm/workbench",
       "version": "0.1.0",
       "dependencies": {
@@ -703,7 +703,7 @@
 
     "@helm/ui": ["@helm/ui@workspace:resources/packages/ui"],
 
-    "@helm/workbench": ["@helm/workbench@workspace:resources/workbench"],
+    "@helm/workbench": ["@helm/workbench@workspace:resources/packages/workbench"],
 
     "@humanwhocodes/config-array": ["@humanwhocodes/config-array@0.13.0", "", { "dependencies": { "@humanwhocodes/object-schema": "^2.0.3", "debug": "^4.3.1", "minimatch": "^3.0.5" } }, "sha512-DZLEEqFWQFiyK6h5YIeynKx7JlvCYWL0cImfSRXZ9l4Sg2efkFGTuFf6vzXjK1cq6IYkU+Eg/JizXw+TD2vRNw=="],
 
