@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
-import { PropulsionSystem } from '../systems/propulsion';
-import { PowerSystem } from '../systems/power';
+import { PropulsionSystem } from './propulsion';
+import { PowerSystem } from './power';
 import { createInternalState } from '../state';
-import { makeLoadout } from './helpers';
+import { makeLoadout } from '../test-helpers';
 import type { Constants } from '@helm/formulas';
 
 function createPropulsionSystem(

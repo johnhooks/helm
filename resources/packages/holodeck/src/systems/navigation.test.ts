@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { NavigationSystem } from '../systems/navigation';
+import { NavigationSystem } from './navigation';
 import { createInternalState } from '../state';
-import { makeLoadout, makeComponent, makeNav } from './helpers';
+import { makeLoadout, makeComponent, makeNav } from '../test-helpers';
 
 function createNavSystem(
 	overrides: Parameters<typeof createInternalState>[1] = {},

@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { ShieldSystem } from '../systems/shields';
+import { ShieldSystem } from './shields';
 import { createInternalState } from '../state';
-import { makeLoadout, makeComponent, makeShield } from './helpers';
+import { makeLoadout, makeComponent, makeShield } from '../test-helpers';
 
 function createShieldSystem(
 	overrides: Parameters<typeof createInternalState>[1] = {},

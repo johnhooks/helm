@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
-import { createShip } from '../factory';
-import { createClock } from '../clock';
-import { createRng } from '../rng';
-import { makeLoadout } from './helpers';
+import { createShip } from './factory';
+import { createClock } from './clock';
+import { createRng } from './rng';
+import { makeLoadout } from './test-helpers';
 
 function setup(config?: Parameters<typeof createShip>[3]) {
 	const loadout = makeLoadout();

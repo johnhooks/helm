@@ -3,6 +3,7 @@ import { DEFAULT_CONSTANTS } from '@helm/formulas';
 import type { Clock } from './clock';
 import type { Rng } from './rng';
 import type { InternalShipState } from './state';
+import { createInternalState } from './state';
 import type { ShipState } from './types/ship-state';
 import { PowerSystem } from './systems/power';
 import { PropulsionSystem } from './systems/propulsion';
@@ -21,22 +22,34 @@ export class Ship {
 	readonly navigation: NavigationSystem;
 	readonly cargo: CargoSystem;
 
+	private readonly constants: Constants;
+
 	constructor(
 		private readonly state: InternalShipState,
 		private readonly clock: Clock,
 		readonly rng: Rng,
 		constants?: Constants,
 	) {
-		const c = constants ?? DEFAULT_CONSTANTS;
+		this.constants = constants ?? DEFAULT_CONSTANTS;
 		const loadout = state.loadout;
 
 		this.power = new PowerSystem(state, loadout);
 		this.shields = new ShieldSystem(state, loadout);
 		this.hull = new HullSystem(state);
-		this.navigation = new NavigationSystem(state, loadout, c);
+		this.navigation = new NavigationSystem(state, loadout, this.constants);
 		this.cargo = new CargoSystem(state);
-		this.propulsion = new PropulsionSystem(state, loadout, this.power, c);
-		this.sensors = new SensorSystem(state, loadout, this.power, c);
+		this.propulsion = new PropulsionSystem(
+			state,
+			loadout,
+			this.power,
+			this.constants,
+		);
+		this.sensors = new SensorSystem(
+			state,
+			loadout,
+			this.power,
+			this.constants,
+		);
 	}
 
 	resolve(): ShipState {
@@ -57,6 +70,22 @@ export class Ship {
 			ammo: { ...this.state.ammo },
 			pilot: { ...this.state.pilot },
 		};
+	}
+
+	createClone(clock: Clock, rng: Rng): Ship {
+		const clonedState = createInternalState(this.state.loadout, {
+			id: this.state.id,
+			shieldPriority: this.state.shieldPriority,
+			nodeId: this.state.nodeId,
+			cargo: { ...this.state.cargo },
+			ammo: { ...this.state.ammo },
+			hullIntegrity: this.state.hullIntegrity,
+			coreLife: this.state.coreLife,
+			powerFullAt: this.state.powerFullAt,
+			shieldsFullAt: this.state.shieldsFullAt,
+			pilot: { ...this.state.pilot },
+		});
+		return new Ship(clonedState, clock, rng, this.constants);
 	}
 
 	consumePower(amount: number): void {

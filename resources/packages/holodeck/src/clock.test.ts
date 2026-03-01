@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { createClock } from '../clock';
+import { createClock } from './clock';
 
 describe('Clock', () => {
 	it('starts at 0 by default', () => {

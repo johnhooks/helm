@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { CargoSystem } from '../systems/cargo';
+import { CargoSystem } from './cargo';
 import { createInternalState } from '../state';
-import { makeLoadout } from './helpers';
+import { makeLoadout } from '../test-helpers';
 
 function createCargoSystem(
 	cargo: Record<string, number> = {},

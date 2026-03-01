@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { HullSystem } from '../systems/hull';
+import { HullSystem } from './hull';
 import { createInternalState } from '../state';
-import { makeLoadout } from './helpers';
+import { makeLoadout } from '../test-helpers';
 
 function createHullSystem(hullIntegrity?: number) {
 	const loadout = makeLoadout();

@@ -1,9 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { SensorSystem } from '../systems/sensors';
-import { PowerSystem } from '../systems/power';
+import { SensorSystem } from './sensors';
+import { PowerSystem } from './power';
 import { createInternalState } from '../state';
 import type { InternalStateConfig } from '../state';
-import { makeLoadout } from './helpers';
+import { makeLoadout } from '../test-helpers';
 
 function createSensorSystem(
 	overrides: InternalStateConfig = {},

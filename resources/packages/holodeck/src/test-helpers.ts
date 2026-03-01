@@ -1,8 +1,8 @@
 import type { Product } from '@helm/types';
-import type { Hull } from '../types/hull';
-import type { InstalledComponent } from '../types/component';
-import type { Loadout } from '../types/loadout';
-import { getHull } from '../data/hulls';
+import type { Hull } from './types/hull';
+import type { InstalledComponent } from './types/component';
+import type { Loadout } from './types/loadout';
+import { getHull } from './data/hulls';
 
 /**
  * Build a partial product with sensible defaults.

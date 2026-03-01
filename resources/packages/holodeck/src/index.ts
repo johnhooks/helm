@@ -45,3 +45,13 @@ export { ShieldSystem } from './systems/shields';
 export { HullSystem } from './systems/hull';
 export { NavigationSystem } from './systems/navigation';
 export { CargoSystem } from './systems/cargo';
+
+// Actions
+export { ActionError, ActionErrorCode } from './actions/types';
+export type { Action, ActionHandler, ActionIntent, ActionOutcome, ActionPreview } from './actions/types';
+export { registerHandler, getHandler } from './actions/registry';
+export { jumpHandler } from './actions/jump';
+export { scanRouteHandler } from './actions/scan-route';
+
+// Engine
+export { Engine, createEngine } from './actions/engine';

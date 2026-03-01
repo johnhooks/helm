@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { PowerSystem } from '../systems/power';
+import { PowerSystem } from './power';
 import { createInternalState } from '../state';
-import { makeLoadout, makeComponent, makeCore } from './helpers';
+import { makeLoadout, makeComponent, makeCore } from '../test-helpers';
 
 function createPowerSystem(
 	overrides: Parameters<typeof createInternalState>[1] = {},

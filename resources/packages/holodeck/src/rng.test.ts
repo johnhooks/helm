@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { createRng } from '../rng';
+import { createRng } from './rng';
 
 describe('Rng', () => {
 	it('produces values in [0, 1)', () => {

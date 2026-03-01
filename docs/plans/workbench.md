@@ -40,7 +40,7 @@ Types that both the frontend and other packages need. This package already exist
 
 ### @helm/formulas — The Reference Math
 
-Pure computation functions. No state, no side effects. Already exists and is solid. The holodeck calls these — it doesn't replace them or duplicate them.
+Pure computation functions. No state, no side effects. Already exists and is solid. The holodeck calls these — it doesn't replace them or duplicate them. Also owns the experience curve (`buffFactor`, `skillMultiplier`) and the `PilotSkills` type — pre-computed multipliers derived from player action counters that flow through scan and navigation formulas.
 
 ### @helm/holodeck — The Simulation Engine
 
@@ -139,100 +139,86 @@ The workbench currently has three loosely connected layers:
 
 3. **Discrete-event sim** (`src/sim/engine.ts`) — A toy simulator that steps through scripted actions. No timestamp-based state, no action validation, no real duration modeling, non-deterministic RNG, no spatial awareness. It's a prototype that answered early questions but can't validate real gameplay.
 
-### The Gaps
+### What's Been Built (Stages 1–3)
 
-- **No ship state model.** The game needs timestamp-based state computation — `power_full_at` and `shields_full_at` are timestamps, not current values. Power is computed on demand from "when will it be full?" and the regen rate. The workbench stores `power: number` as a flat float. This means we can't validate the timing mechanics that define Helm's gameplay.
+- **Shared catalog data.** Products and hulls moved from workbench to `tests/_data/catalog/`. Holodeck, workbench, and PHP tests all consume the same JSON.
+- **Holodeck engine.** `@helm/holodeck` with Clock, seeded RNG, `InternalShipState`, 7 system classes (Power, Propulsion, Sensors, Shields, Hull, Navigation, Cargo), Ship orchestrator with mutations and `resolve()`. Timestamp-based state (`powerFullAt`/`shieldsFullAt`), PowerMode multipliers, deterministic RNG.
+- **Pilot skills.** Experience curve (`buffFactor`/`skillMultiplier`) in `@helm/formulas`, `PilotSkills` type with 7 skill categories. Wired through holodeck: `pilot.scanning` boosts scan success chance, `pilot.jumping` boosts discovery probability. Workbench CLI exposes `--pilot-scanning`, `--pilot-jumping` flags.
+- **Date test time.** Carbon-inspired `Date::setTestNow()`/`advanceTestNow()`/`withTestNow()` on the PHP Date class for simulation time control.
+- **Action lifecycle.** Validate → handle → defer → resolve pipeline. Jump and ScanRoute handlers. Engine class owns the lifecycle across ships; Ship is the state + mutation layer. Action preview via ship cloning. Handler registry for extensibility.
 
-- **No action lifecycle.** The game needs validate → handle → defer → resolve. The workbench sim just executes actions instantly at scripted timestamps. No validation ("do you have enough power?"), no duration ("this jump takes 3 hours"), no deferral, no conflicts ("you're already jumping").
+### Remaining Gaps
 
-- **No PowerMode.** The game needs Efficiency/Normal/Overdrive modes that change output multipliers and decay rates. Efficiency mode's zero-decay is a core gameplay mechanic (safe harbor). The workbench doesn't model this, so we can't validate power mode tradeoffs.
-
-- **No spatial model.** Ships have `position: number` — a scalar. No nodes, no edges, no distance between ships. Detection assumes proximity. Escape has no meaning.
-
-- **No determinism.** Torpedo hits and scan success use `Math.random()`. Scenarios aren't reproducible. This contradicts the "same seed = same content" design principle.
-
-- **No shared vocabulary.** The PHP engine has ActionType (12 types), ActionStatus (5 states), PowerMode (3 modes), ShipFittingSlot (8 slots) as enums. The workbench has its own ad-hoc types that don't match. When we add a new action type in the workbench, there's no mechanism to ensure PHP stays aligned.
+- **No spatial model.** Ships have `nodeId: number` but no navigation graph. No edges, no distance between ships. Detection assumes proximity. Escape has no meaning.
 
 - **Analysis output is unusable.** The `analyse` command produces ~84,000 lines of raw JSON. An agent can't read it without writing custom jq pipelines. There's no summary, no verdicts, no flagging of problems.
 
 ## Stages
 
-### Stage 1: Data Foundation
+### Stage 1: Data Foundation ✓
 
-**What:** Establish shared game data and test fixtures. Audit existing data for PHP alignment.
+**Status:** Complete. `4d77228`, `ed6fa0b`, `4e23c1b`
 
-**Why:** Everything else depends on having correct, shared data. The product and hull definitions currently live inside the workbench where only it can access them. Moving them to `tests/_data/catalog/` makes them available to the holodeck, workbench, and PHP tests from a single source. Formula fixtures establish the contract testing pattern between TS and PHP.
+- Product JSON moved to `tests/_data/catalog/products/`
+- Hull definitions in `tests/_data/catalog/hulls.json`
+- Workbench and holodeck both load from shared catalog
+- `wp helm export graph` command built (`src/Helm/CLI/ExportCommand.php`)
+- Product stat grid documented in `docs/catalog.md`
+- Formula fixtures established in `tests/_data/formulas/`
 
-**Scope:**
-- Move product JSON from `workbench/data/products/` to `tests/_data/catalog/products/`
-- Move hull definitions from `workbench/src/data/hulls.ts` to `tests/_data/catalog/hulls.json`
-- Update workbench loaders to read from `tests/_data/catalog/` instead of local `data/`
-- ~~`wp helm export graph` WP-CLI command~~ **Done.** See `src/Helm/CLI/ExportCommand.php`. Export a 20 ly sphere from lando and commit it:
-  ```bash
-  lando wp helm export graph --node=1 --radius=10 > tests/_data/catalog/graph.json
-  ```
-- Product stat grid documentation (which mult_* means what per component type)
-- Hull definitions alignment check
-- Audit catalog data against PHP seeder data
-- Create `tests/_data/formulas/` structure with initial formula fixtures
-- First PHP test suite that runs formula fixtures against PHP implementations
+**Still open:** First PHP test suite running formula fixtures against PHP implementations, catalog audit against PHP seeder data.
 
-### Stage 2: Holodeck — Ship State and Systems
+### Stage 2: Holodeck — Ship State and Systems ✓
 
-**What:** Create `@helm/holodeck` package. Implement ship state with timestamp-based computation and seven system classes.
+**Status:** Complete. `1d18ac4`, `00042c6`
 
-**Why:** This is the core of the holodeck's value. Without timestamp-based state, we can't validate the timing mechanics that define Helm's gameplay. Jump spool takes 4 minutes. Shield regen fills at 10/hr. Power reaches full at a specific timestamp. These interactions are where bugs live, and we currently can't test them.
+- `@helm/holodeck` package with Clock, seeded RNG, `InternalShipState`, 7 system classes, Ship orchestrator
+- Timestamp-based state (`powerFullAt`/`shieldsFullAt`), PowerMode multipliers (efficiency/normal/overdrive)
+- All systems delegate to `@helm/formulas` — no reimplemented math
+- Pilot skills (`buffFactor`/`skillMultiplier` in formulas, `PilotSkills` type, wired into Sensors and Navigation)
+- Product catalog and loadout builder in holodeck (`buildLoadout()` resolves slugs to typed `Loadout`)
+- 117 holodeck tests, 698 total JS tests passing
 
-**Scope:**
-- New `@helm/holodeck` package, imports `@helm/types` and `@helm/formulas`, loads catalog from `tests/_data/catalog/`
-- Define holodeck-owned types: ActionType, ActionStatus, PowerMode, ShipFittingSlot enums; action param/result interfaces
-- Ship class as the state orchestrator (only mutator, systems are read-only)
-- PowerSystem with `full_at` timestamp computation, PowerMode multipliers, capacitor, regen rate, core life tracking
-- Propulsion with jump duration, core cost, performance ratio, comfort range
-- Sensors with scan range, cost, duration, success chance
-- Shields with `full_at` timestamp computation, capacity (hull-multiplied), regen rate, damage absorption
-- Hull with integrity, damage, destruction detection
-- Navigation with position (node ID), discovery probability
-- Cargo as a simple inventory (slug → quantity)
-- Clock abstraction for time control (advance, advanceTo, now)
-- Deterministic seeded RNG
-- Shared fixtures in `tests/_data/ship-state/` covering timestamp computations
-- Extract any pure functions useful to the frontend into `@helm/types` or `@helm/formulas`
+### Stage 2.5: Workbench — Holodeck CLI Integration ✓
 
-### Stage 2.5: Workbench — Holodeck CLI Integration
+**Status:** Complete. `4e23c1b`, `00042c6`
 
-**What:** Wire the holodeck into the workbench CLI so we can see holodeck results without writing ad-hoc scripts.
+- **Loadout builder** — `buildLoadout(hullSlug, componentSlugs?, equipmentSlugs?)` in holodeck resolves catalog slugs to typed `Loadout` with `InstalledComponent` wrappers
+- **`bun run wb ship`** — Resolve a holodeck Ship and dump full state snapshot. Flags: `--hull`, `--core`, `--drive`, `--mode`, `--power-at`, `--shields-at`, `--pilot-scanning`, `--pilot-jumping`
+- **`bun run wb timeline`** — Run mutation sequences (consume power, take damage, advance time) and show state at each step
+- All existing workbench commands (`analyse`, `balance`, `matrix`, `compare`, `report`) updated to use holodeck catalog
 
-**Why:** The holodeck engine works (698 tests prove it) but has no CLI — it's only visible through the test runner. We need a feedback loop before building the action lifecycle. Without it, Stages 3 and 4 would be developed blind. The workbench is the operator; the holodeck is the engine. This stage connects them.
+### Stage 3: Holodeck — Action Lifecycle ✓
 
-**Scope:**
-- **Loadout adapter** — Bridge workbench's product catalog (`WorkbenchProduct`) to the holodeck's `Loadout` type. The workbench already loads all products from JSON with `getProduct(slug)`. The adapter takes product slugs + hull slug and produces a holodeck `Loadout` (hull + `InstalledComponent` wrappers). Lives in the workbench, not the holodeck.
-- **`bun run wb ship`** — Resolve a holodeck Ship from the product catalog and dump the full state snapshot. Flags: `--hull=pioneer`, `--core=epoch_s`, `--drive=dr_505`, `--mode=overdrive`, `--power-at=3600`, `--shields-at=7200`. Shows: resolved power/shield/hull, system capabilities (scan range, jump comfort, regen rates), and power mode effects. JSON output like all other workbench commands.
-- **`bun run wb timeline`** — Run a simple sequence of mutations (consume power, take damage, advance time) and show the ship state at each step. Takes inline flags or a JSON file. This is not the action lifecycle (Stage 3) — it's direct Ship mutations with clock advances, enough to see regen curves and damage interactions.
-- **Hull × loadout sweep** — Extend the existing `matrix` command (or add a flag) to produce holodeck-resolved snapshots instead of static formula reports. Same matrix logic, but the numbers come from the holodeck Ship rather than raw formula calls.
+**Status:** Complete. Action handlers, registry, and Engine extracted.
 
-**Not in scope:**
-- Action lifecycle (Stage 3)
-- Scenario JSON format (Stage 5)
-- Replacing the existing sim engine (that happens incrementally as the holodeck gains capabilities)
-
-### Stage 3: Holodeck — Action Lifecycle
-
-**What:** Implement the validate → handle → defer → resolve action pipeline.
+**What:** Implement the validate → handle → defer → resolve action pipeline, with clean separation between Ship (state + mutations) and Engine (action lifecycle).
 
 **Why:** Actions are how gameplay happens. The three-phase lifecycle (validate preconditions, handle costs/duration, resolve effects) is where game rules live. The holodeck needs this to answer questions like "what happens when a Specter tries to jump with 5% power?" or "can you scan while a jump is spooling?"
 
-**Scope:**
-- Action model using ActionType/ActionStatus from `@helm/holodeck`
-- ActionFactory that validates and handles
-- Validators for implemented action types (Jump, ScanRoute at minimum)
-- Handlers that compute duration and seed result data
-- Resolvers that mutate ship state on completion
-- One-action-at-a-time enforcement (current_action_id)
-- Time advancement that resolves deferred actions in order
-- Action queue inspection (what's pending, what's running, what completed)
-- Shared fixtures in `tests/_data/actions/` covering action lifecycles
-- Action preview function (given ship state + proposed action, return projected state) — extractable to frontend for draft action UX
+**Architecture:** Mirrors PHP's separation of concerns:
+
+| Holodeck | PHP Equivalent | Responsibility |
+|---|---|---|
+| `Engine.submitAction()` | `ActionFactory::create()` | Validate, handle, create action record |
+| `Engine.advance()` | `ActionProcessor::processReadyActions()` | Advance clock, resolve ready actions across all ships |
+| `handler.resolve()` (via Engine) | `ActionResolver::resolve()` | Execute mutations on ship state |
+| `Engine.previewAction()` | (no PHP equiv — dry run) | Clone ship, simulate, return projected state |
+| `Ship` | `ShipLink` / `Simulation` | State container + mutation methods |
+| `registry` | DI container + `ActionType::getHandlerClass()` | Handler lookup by type |
+
+Ship owns state and mutations (`resolve()`, `consumePower()`, `moveToNode()`, etc.) plus `createClone()` for preview support. Engine owns the action lifecycle (`submitAction`, `advance`, `advanceUntilIdle`, `previewAction`, `getCurrentAction`, `getActions`). This enables multi-ship orchestration in Stage 4 — Engine has cross-ship visibility and a central timeline.
+
+**Delivered:**
+- Action model (ActionType, ActionStatus, Action, ActionIntent, ActionOutcome, ActionPreview)
+- Handler interface with validate/handle/resolve phases
+- Handler registry (registerHandler/getHandler)
+- Jump and ScanRoute handlers with full validation
+- Engine class owning the action lifecycle across ships
+- One-action-at-a-time enforcement per ship
+- Time advancement that resolves deferred actions
+- Action preview via ship cloning (doesn't mutate real state or consume real RNG)
+- Action history inspection (getCurrentAction, getActions with optional ship filter)
 
 ### Stage 3.5: Workbench — Action CLI Integration
 
@@ -320,6 +306,7 @@ The LCARS bridge dashboard needs to show live ship state:
 - Core life remaining with projected jumps-until-death
 - Draft action preview (show the projected ship state before committing an action)
 - Power mode effects (show how switching modes changes all the numbers)
+- Pilot skill progression (show current multipliers and progress toward next plateau)
 
 The frontend never imports from `@helm/holodeck`. When holodeck work produces a function or type the frontend needs, it gets extracted into `@helm/formulas` (pure computation like `getCurrentPower(fullAt, max, regenRate, now)`) or `@helm/types` (shared interfaces). Both the holodeck and the frontend then import from the shared package. The holodeck is where we design and validate; the shared packages are what ships to production.
 
