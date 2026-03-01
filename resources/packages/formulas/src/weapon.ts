@@ -22,6 +22,15 @@ export function phaserShieldDrain(baseDrainRate: number, priority: number): numb
 	return baseDrainRate * priority;
 }
 
+/**
+ * Phaser hull damage rate when hitting bare hull (no shields).
+ * Shields dissipate phaser energy; bare hull takes full thermal impact.
+ * Returns damage per hour against hull.
+ */
+export function phaserHullDamage(baseDrainRate: number, priority: number, hullDamageMult: number): number {
+	return phaserShieldDrain(baseDrainRate, priority) * hullDamageMult;
+}
+
 // ── Torpedo ─────────────────────────────────────────────────
 
 /**

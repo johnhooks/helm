@@ -1,234 +1,302 @@
-# Ship Workbench
+# Workbench Plan
 
-A standalone design tool for testing ship loadouts, comparing builds, and balancing game mechanics before committing to the progression plan.
+The workbench is a TypeScript playground for designing and validating Helm's game mechanics. It lets us run thousands of scenarios in seconds without WordPress, databases, or Docker — figuring out the basics before committing to PHP implementation.
 
-## Why
+This document captures what the workbench needs to become, broken into stages. Each stage is a self-contained session with its own detailed plan.
 
-We need to plan ship progression — what Mk II and Mk III components look like, what crossover products do, how power budgets constrain builds, what the maxed-out scout/surveyor/combat ships feel like. Making those decisions without being able to see the numbers interact is guessing.
+## Why TypeScript
 
-The workbench lets us:
+PHP is the authority. WordPress is the game server. That isn't changing. But TypeScript gives us:
 
-- Spec out a loadout and instantly see its capabilities (scan range, jump range, speed, cargo, power budget)
-- Compare two loadouts side by side
-- Tweak a product stat and watch how it ripples through the system
-- Test hypothetical products (Mk II, crossovers) before defining them in the real data files
-- Visualize tradeoff curves — "what does the power budget look like as I upgrade each component?"
-- Validate the formulas match what the server computes
+- **Iteration speed.** Change a formula, run 500 scenarios, see results in under a second. No container rebuild, no database state to manage.
+- **Frontend reuse.** The LCARS dashboard needs the same mechanics to render live ship state — power curves, drive envelopes, sensor readouts, shield regen timers. Code designed in the holodeck carries directly into the bridge application.
+- **Agent accessibility.** An AI agent can run the workbench, read the output, and reason about game balance without needing a running WordPress instance.
 
-This is the tool that tells us whether our game design works before we build it.
+The relationship between TypeScript and PHP:
 
-## Architecture
+- **PHP is the authority.** The game server saves state, resolves actions, enforces rules for real players. When a player jumps, PHP decides what happens. That isn't changing.
+- **`@helm/formulas` is the reference for the math.** The pure computations — jump duration, scan cost, detection probability, strain curves — are defined and validated in TypeScript first. PHP reimplements these formulas. When the numbers disagree, we fix PHP to match. The math is designed here, not reverse-engineered from PHP.
+- **The workbench figures out the basics first.** We validate that game mechanics produce the gameplay we designed *before* committing to the PHP implementation. The PHP engine has already evolved significantly — some of that evolution happened without workbench validation, and we've had to course-correct. The workbench is where we get the design right. PHP is where we make it real.
+- **The double-work is intentional.** Designing in TS then implementing in PHP is "design it, then build it." The design phase is fast and cheap. The implementation phase is deliberate and permanent. This is better than experimenting directly in PHP where experiments become committed code that spiders through the application.
 
-### Standalone Vite SPA
-
-The workbench is **not** a WordPress plugin. It's a standalone Vite + React application with no WordPress dependencies. Different goals, different UI needs.
+## Package Architecture
 
 ```
-resources/workbench/
-├── index.html
-├── vite.config.ts
-├── src/
-│   ├── main.tsx
-│   ├── data/              — product catalog loader
-│   ├── formulas/          — ship calculation functions
-│   ├── components/        — UI (tables, sliders, charts)
-│   └── store/             — loadout state management
-└── package.json
+resources/packages/
+├── types/           @helm/types      — Shared domain types (used by frontend, holodeck, workbench)
+├── formulas/        @helm/formulas   — Pure math, reference implementation
+├── holodeck/        @helm/holodeck   — Ship simulation engine (design-time only)
+└── workbench/       @helm/workbench  — Analysis + reporting (consumes holodeck)
+
+tests/
+└── _data/                            — Shared test fixtures (JSON, consumed by vitest + wpunit)
 ```
 
-Lives in the Helm monorepo as a workspace but has no imports from `@helm/*` packages. No `@wordpress/components`, no LCARS. Uses whatever UI library makes iteration fastest — probably something like Radix + a charting library (Recharts, visx, or similar).
+### @helm/types — The Shared Vocabulary
 
-### Why Not WordPress
+Types that both the frontend and other packages need. This package already exists with `ShipState`, `Product`, `SystemComponent`, `ShipLoadout`, `NavNode`, system stats interfaces, and frontend data plumbing (`Registry`, `DispatchFunction`, REST types).
 
-- **Speed** — `bun run workbench` and you're tweaking numbers. No Docker, no PHP, no plugin activation.
-- **Different UI** — The workbench needs tables, sliders, comparison panels, and charts. Not LCARS readouts.
-- **Different audience** — This is a game design tool for us, not a player-facing feature.
-- **No coupling** — Changes to the game UI don't break the workbench. Changes to the workbench don't affect the game.
+`@helm/types` stays focused on what it has today. New game mechanics types (ActionType, PowerMode, ShipFittingSlot, etc.) do **not** land here upfront — they incubate in the holodeck where they can evolve freely without prematurely committing the shared vocabulary. When a type stabilizes in the holodeck and the frontend or PHP implementation actually needs it, it gets backported to `@helm/types`.
 
-### Why Not Share Components
+### @helm/formulas — The Reference Math
 
-The `@helm/ui` components depend on `@wordpress/components` and are built for the LCARS game aesthetic. The workbench needs data-dense comparison UIs — spreadsheet-like tables, range sliders, overlaid charts. Different problem, different components.
+Pure computation functions. No state, no side effects. Already exists and is solid. The holodeck calls these — it doesn't replace them or duplicate them.
 
-What IS shared: the product data files and the formulas. Those are the source of truth.
+### @helm/holodeck — The Simulation Engine
 
-## Data
+A TypeScript implementation of ShipLink's concepts. Not a port of the PHP code — a reimplementation of the same rules so we can run gameplay sequences at speed and validate mechanics before PHP implementation.
 
-### Product Catalog
+The holodeck imports from `@helm/types` and `@helm/formulas`, then defines its own types for game mechanics that don't exist yet in the shared vocabulary — `ActionType`, `ActionStatus`, `PowerMode`, `ShipFittingSlot`, action param/result interfaces, and anything else the simulation needs. It re-exports these so the workbench (and eventually other consumers) can import them from `@helm/holodeck`. When a type stabilizes and is needed by the frontend or PHP, it gets backported to `@helm/types` and the holodeck switches to importing it instead of owning it.
 
-The workbench loads the same JSON files the server uses for seeding:
+The holodeck is a design-time package — it is never imported by frontend code. When holodeck work reveals a function or type that the frontend needs, that code gets extracted into `@helm/formulas` (pure math) or `@helm/types` (shared interfaces). The holodeck then imports from the shared package instead of owning it. The holodeck is where we figure out the right shape; the shared packages are where reusable pieces land.
 
-```
-data/products/
-├── core.json
-├── drive.json
-├── sensor.json
-├── shield.json
-├── nav.json
-└── resource.json
-```
+The holodeck is a separate package from the workbench because:
+- It maps directly to `src/Helm/ShipLink/` in PHP. Separate package = easier to compare.
+- The workbench is analysis and reporting. The holodeck is the simulation. Different concerns, different change rates.
 
-At startup, the workbench reads these and builds an in-memory product catalog. No database needed for existing products.
+### @helm/workbench — Analysis and Reporting
 
-### Hypothetical Products
+The workbench is the analysis brain. It knows what questions to ask, runs the numbers, interprets the results, and produces verdicts. The holodeck is one of its inputs — the workbench drives the holodeck, not the other way around.
 
-The workbench also supports creating hypothetical products that don't exist in the real data files. This is how we test Mk II concepts, crossover products, and balance ideas:
+Two modes of analysis:
 
-- Create a "DSC Mk II" with tweaked stats
-- Create an "Aegis Drive" crossover and see how it affects a combat build
-- Adjust a single stat with a slider and watch the ripple effects
+1. **Static analysis** (formulas only) — Loadout capability snapshots, component matrices, balance outlier detection. Calls `@helm/formulas` directly. No simulation needed. This is the workbench's strongest piece today.
 
-Hypothetical products live in the workbench's local state only. When we're happy with the numbers, we manually add them to the real data files.
+2. **Dynamic analysis** (holodeck-powered) — Gameplay sequences, combat matchups, mining throughput, action lifecycle validation. Feeds scenario JSON into the holodeck engine, collects results, and interprets them at scale. "Run 200 combat matchups and tell me which weapon is broken."
 
-### Persistence
+Both modes produce the same kind of output: structured data with verdicts, outlier flags, and regression detection. The workbench is the reporter and the analyzer; the holodeck is just one of its engines.
 
-Start with **localStorage**. Saved loadouts, hypothetical products, and comparison sets persist across browser sessions. No backend, no database.
+### tests/_data/ — Shared Game Data and Test Fixtures
 
-If we outgrow localStorage (unlikely for a design tool), add **sql.js** (SQLite compiled to WASM). Runs entirely in the browser, no server. Import/export as a `.sqlite` file.
+The canonical source for all pre-implementation game data. This is not just test fixtures — it's the shared data layer that the holodeck, workbench, and PHP tests all consume. No package owns this data; it lives outside the package tree so every consumer has equal access.
 
-## Formulas
+Two kinds of data live here:
 
-The workbench implements the same calculations as the server. These are the TypeScript duplicates of the PHP formulas — the approach we chose in `plans/.wip/client-ship-calculations.md`.
-
-```typescript
-// Scan calculations
-scanCost(distance: number): number
-scanDuration(distance: number, sensorMultA: number): number
-scanRange(sensorBaseRange: number, coreOutput: number): number
-scanFeasible(currentPower: number, cost: number, distance: number, range: number): boolean
-
-// Jump calculations
-jumpCoreCost(distance: number, coreMultB: number, driveMultB: number): number
-jumpDuration(distance: number, driveAmplitude: number, coreOutput: number, perfRatio: number): number
-jumpMaxRange(driveSustain: number, coreOutput: number, perfRatio: number): number
-jumpFeasible(distance: number, maxRange: number, coreLife: number, coreCost: number): boolean
-
-// Power calculations
-perfRatio(coreOutput: number, driveConsumption: number): number
-coreOutput(coreMultA: number, powerModeOutput: number): number
-regenRate(coreRate: number, powerModeRegen: number): number
-currentPower(powerMax: number, secondsUntilFull: number, regenRate: number): number
-
-// Power budget
-totalDraw(loadout: Loadout): number
-budgetRatio(coreOutput: number, totalDraw: number): number
-```
-
-These same functions will eventually be used in the game client (`@helm/shell` or a shared `@helm/calc` package). The workbench is where we validate them first.
-
-## UI Concepts
-
-### Loadout Builder
-
-Pick a hull, fill each slot from the product catalog (or hypotheticals). See the resulting ship:
-
-```
-LOADOUT: "Scout Alpha"
-┌─────────────────────────────────────────────┐
-│ Hull: Pioneer Frame (300 m³)                │
-│                                              │
-│ Core:    Epoch-R         35 m³   output: 1.1 │
-│ Drive:   DR-705          45 m³   draw: 1.5   │
-│ Sensor:  DSC Mk I        40 m³   draw: 0.4   │
-│ Shield:  Aegis Alpha     10 m³   draw: 0.1   │
-│ Nav:     Tier 3           0 m³               │
-│ Equip 1: Cloak           20 m³   draw: 0.3   │
-│ Equip 2: Probe Launcher  10 m³               │
-│ Equip 3: (empty)                             │
-│                                              │
-│ FOOTPRINT:  160 / 300 m³                     │
-│ CARGO:      140 m³                           │
-│ POWER:      1.1 output / 2.3 draw → 48%     │
-│                                              │
-│ CAPABILITIES                                 │
-│ Scan range:    22 ly (reduced → 10.6 ly)     │
-│ Jump range:    5 ly  (reduced → 2.4 ly)      │
-│ Jump speed:    2.0x  (reduced → 0.96x)       │
-│ Shield cap:    50                             │
-│ Shield regen:  20/hr                          │
-└─────────────────────────────────────────────┘
-```
-
-The "reduced" values show the effect of power budget — when draw exceeds output, everything underperforms.
-
-### Comparison View
-
-Two loadouts side by side. Differences highlighted. Quick toggle to swap one component and see the delta:
-
-```
-COMPARE: Scout Alpha vs Scout Beta
-                    Alpha       Beta        Delta
-Scan range:         10.6 ly     14.2 ly     +34%
-Jump range:          2.4 ly      4.1 ly     +71%
-Jump speed:          0.96x       0.8x       -17%
-Cargo:             140 m³       125 m³       -11%
-Power ratio:         48%         72%
-Shield cap:          50          100         +100%
-```
-
-### Stat Slider
-
-Select a product stat and drag a slider. Watch the loadout capabilities update in real time:
-
-- "What if DSC Mk II range was 24 ly instead of 20?" → drag → see scan range and power budget change
-- "What if the Aegis drive consumption was 0.8 instead of 1.2?" → drag → see power ratio improve
-- "What if we added a power draw stat to shields?" → add field → see how it changes the budget
-
-This is the primary balance design tool. Tweak numbers, see consequences, find the sweet spot.
-
-### Power Budget Chart
-
-Visual breakdown of where power goes:
-
-```
-POWER BUDGET: Scout Alpha
-
-Output: ████████████████████░░░░░░░░░░░░░░░ 1.1
-
-Draw:   ██████████████████████████████████████████ 2.3
-        ├── Drive:  ████████████████████████████ 1.5
-        ├── Sensor: ██████████ 0.4
-        ├── Shield: ██ 0.1
-        └── Cloak:  ██████ 0.3
-
-Deficit: ████████████████████ 1.2 → 48% performance
-```
-
-### Capability Radar
-
-Spider chart showing a loadout's profile across dimensions:
-
-- Scan range
-- Jump range
-- Jump speed
-- Cargo capacity
-- Shield strength
-- Power headroom
-
-Overlay two loadouts on the same radar to see their shapes.
-
-## What This Isn't
-
-- **Not a player tool** — This is for game design, not for players to plan builds (though a player-facing version could come later)
-- **Not connected to the game** — No API calls, no live data, no WordPress
-- **Not pixel-perfect** — Function over form. If it's ugly but useful, it's done.
-- **Not the formula authority** — The PHP server is the authority. The workbench duplicates the formulas for design convenience. If they drift, the server wins.
-
-## Development
+**Catalog data** — The game's product definitions, hull definitions, and navigation graph as JSON. Products and hulls currently live in the workbench (`workbench/data/products/`, `workbench/src/data/hulls.ts`) and move here. The navigation graph is exported from the local development environment (lando), which has the seeded star catalog and generated node data:
 
 ```bash
-# Start the workbench
-bun run workbench        # → vite dev server on localhost:5174
-
-# Build (if we ever need to)
-bun run workbench:build
+# Requires a running lando instance with seeded data (see docs/dev/getting-started.md)
+lando wp helm export graph --node=1 --radius=10 > tests/_data/catalog/graph.json
 ```
 
-Lives in the bun workspace, gets its own scripts in the root `package.json`.
+The celestial data is static (real HYG star catalog) and the graph changes slowly through gameplay exploration. Re-export when the graph has meaningfully changed. The export includes nodes (3D coordinates, type), star metadata for system nodes (spectral class, luminosity, temperature — needed for noise floor calculations), and edges (connections with distances and traversal counts). When PHP seeders are built, they read from the same catalog files — one source of truth, no drift.
 
-## Open Questions
+**Test fixtures** — Input/expected pairs for contract tests, following the Codeception convention already established in the project. Both vitest (for holodeck/formulas) and wpunit (for PHP ShipLink) load the same fixtures.
 
-- Do we need hull definitions in the workbench before hulls exist in the game? Probably yes — the whole point is to design hulls and test what they feel like.
-- Should hypothetical products be exportable as JSON that matches the `data/products/` format? Would make the design→implementation pipeline smoother.
-- How do we handle component wear curves in the workbench? A slider for usage count that adjusts buff/nerf values?
-- Do we model equipment power draw? Currently equipment doesn't have a draw stat. The power budget concept might require adding one.
-- Should the workbench track firmware versions (v1, v2) or just treat each product as a bag of stats to tweak?
+```
+tests/_data/
+├── catalog/
+│   ├── hulls.json
+│   ├── graph.json
+│   └── products/
+│       ├── core.json
+│       ├── drive.json
+│       ├── sensor.json
+│       ├── shield.json
+│       ├── nav.json
+│       └── equipment.json
+├── formulas/
+│   ├── jump-duration.json
+│   ├── scan-cost-with-strain.json
+│   └── detection-probability.json
+├── ship-state/
+│   ├── power-from-timestamp.json
+│   └── shield-regen-to-full.json
+└── actions/
+    ├── jump-validates-power.json
+    └── scan-route-lifecycle.json
+```
+
+Catalog files are the game data itself — hull stats, product specs, component properties. Test fixtures are `{ input, expected }` pairs. The TS test and PHP test both load a fixture, run their implementation, and assert the same expected values. When the numbers disagree, you know exactly where the drift is.
+
+## Keeping PHP and TypeScript Aligned
+
+### Contract Tests, Not Implementation Tests
+
+The shared fixtures test *behavior*: "Given a ship with this state and this loadout, `getCurrentPower()` at this timestamp returns this value." Both implementations can be structured however they want internally. The contract is the input/output pair.
+
+### Formula Parity Is the Foundation
+
+`@helm/formulas` has thorough tests. The PHP formula implementations need a matching test suite that runs the same inputs and asserts matching outputs. If the formulas agree, higher-level discrepancies are in the composition layer, not the math.
+
+### Naming Alignment
+
+Not identical class structures, but matching names on the contracts. If PHP has `PowerSystem::getCurrentPower()`, holodeck has `PowerSystem.getCurrentPower()`. If PHP has `ActionType::Jump`, types has `ActionType.Jump`. Reading one should let you find the corresponding concept in the other.
+
+### Types Flow: Holodeck → @helm/types → PHP
+
+New game mechanics types incubate in the holodeck where they can evolve without friction. When a type stabilizes — the shape is settled and the frontend or PHP implementation needs it — it gets backported to `@helm/types`. That promotion is the signal that PHP needs to match. The holodeck then switches from owning the type to importing it from `@helm/types`.
+
+This means `@helm/types` only grows when types are ready for real implementation. The holodeck is free to experiment without polluting the shared vocabulary with unstable interfaces.
+
+## What We Have Today
+
+The workbench currently has three loosely connected layers:
+
+1. **Static reports** (`computeShipReport`) — Compute a loadout's capabilities as a snapshot. No time, no state, no interaction. This is the strongest piece.
+
+2. **Formula analysis** (analyse, dsp, detection commands) — Large batteries that exercise formulas across parameter spaces. Good for regression testing the math, but output is raw JSON that requires heavy post-processing to interpret.
+
+3. **Discrete-event sim** (`src/sim/engine.ts`) — A toy simulator that steps through scripted actions. No timestamp-based state, no action validation, no real duration modeling, non-deterministic RNG, no spatial awareness. It's a prototype that answered early questions but can't validate real gameplay.
+
+### The Gaps
+
+- **No ship state model.** The game needs timestamp-based state computation — `power_full_at` and `shields_full_at` are timestamps, not current values. Power is computed on demand from "when will it be full?" and the regen rate. The workbench stores `power: number` as a flat float. This means we can't validate the timing mechanics that define Helm's gameplay.
+
+- **No action lifecycle.** The game needs validate → handle → defer → resolve. The workbench sim just executes actions instantly at scripted timestamps. No validation ("do you have enough power?"), no duration ("this jump takes 3 hours"), no deferral, no conflicts ("you're already jumping").
+
+- **No PowerMode.** The game needs Efficiency/Normal/Overdrive modes that change output multipliers and decay rates. Efficiency mode's zero-decay is a core gameplay mechanic (safe harbor). The workbench doesn't model this, so we can't validate power mode tradeoffs.
+
+- **No spatial model.** Ships have `position: number` — a scalar. No nodes, no edges, no distance between ships. Detection assumes proximity. Escape has no meaning.
+
+- **No determinism.** Torpedo hits and scan success use `Math.random()`. Scenarios aren't reproducible. This contradicts the "same seed = same content" design principle.
+
+- **No shared vocabulary.** The PHP engine has ActionType (12 types), ActionStatus (5 states), PowerMode (3 modes), ShipFittingSlot (8 slots) as enums. The workbench has its own ad-hoc types that don't match. When we add a new action type in the workbench, there's no mechanism to ensure PHP stays aligned.
+
+- **Analysis output is unusable.** The `analyse` command produces ~84,000 lines of raw JSON. An agent can't read it without writing custom jq pipelines. There's no summary, no verdicts, no flagging of problems.
+
+## Stages
+
+### Stage 1: Data Foundation
+
+**What:** Establish shared game data and test fixtures. Audit existing data for PHP alignment.
+
+**Why:** Everything else depends on having correct, shared data. The product and hull definitions currently live inside the workbench where only it can access them. Moving them to `tests/_data/catalog/` makes them available to the holodeck, workbench, and PHP tests from a single source. Formula fixtures establish the contract testing pattern between TS and PHP.
+
+**Scope:**
+- Move product JSON from `workbench/data/products/` to `tests/_data/catalog/products/`
+- Move hull definitions from `workbench/src/data/hulls.ts` to `tests/_data/catalog/hulls.json`
+- Update workbench loaders to read from `tests/_data/catalog/` instead of local `data/`
+- ~~`wp helm export graph` WP-CLI command~~ **Done.** See `src/Helm/CLI/ExportCommand.php`. Export a 20 ly sphere from lando and commit it:
+  ```bash
+  lando wp helm export graph --node=1 --radius=10 > tests/_data/catalog/graph.json
+  ```
+- Product stat grid documentation (which mult_* means what per component type)
+- Hull definitions alignment check
+- Audit catalog data against PHP seeder data
+- Create `tests/_data/formulas/` structure with initial formula fixtures
+- First PHP test suite that runs formula fixtures against PHP implementations
+
+### Stage 2: Holodeck — Ship State and Systems
+
+**What:** Create `@helm/holodeck` package. Implement ship state with timestamp-based computation and seven system classes.
+
+**Why:** This is the core of the holodeck's value. Without timestamp-based state, we can't validate the timing mechanics that define Helm's gameplay. Jump spool takes 4 minutes. Shield regen fills at 10/hr. Power reaches full at a specific timestamp. These interactions are where bugs live, and we currently can't test them.
+
+**Scope:**
+- New `@helm/holodeck` package, imports `@helm/types` and `@helm/formulas`, loads catalog from `tests/_data/catalog/`
+- Define holodeck-owned types: ActionType, ActionStatus, PowerMode, ShipFittingSlot enums; action param/result interfaces
+- Ship class as the state orchestrator (only mutator, systems are read-only)
+- PowerSystem with `full_at` timestamp computation, PowerMode multipliers, capacitor, regen rate, core life tracking
+- Propulsion with jump duration, core cost, performance ratio, comfort range
+- Sensors with scan range, cost, duration, success chance
+- Shields with `full_at` timestamp computation, capacity (hull-multiplied), regen rate, damage absorption
+- Hull with integrity, damage, destruction detection
+- Navigation with position (node ID), discovery probability
+- Cargo as a simple inventory (slug → quantity)
+- Clock abstraction for time control (advance, advanceTo, now)
+- Deterministic seeded RNG
+- Shared fixtures in `tests/_data/ship-state/` covering timestamp computations
+- Extract any pure functions useful to the frontend into `@helm/types` or `@helm/formulas`
+
+### Stage 3: Holodeck — Action Lifecycle
+
+**What:** Implement the validate → handle → defer → resolve action pipeline.
+
+**Why:** Actions are how gameplay happens. The three-phase lifecycle (validate preconditions, handle costs/duration, resolve effects) is where game rules live. The holodeck needs this to answer questions like "what happens when a Specter tries to jump with 5% power?" or "can you scan while a jump is spooling?"
+
+**Scope:**
+- Action model using ActionType/ActionStatus from `@helm/holodeck`
+- ActionFactory that validates and handles
+- Validators for implemented action types (Jump, ScanRoute at minimum)
+- Handlers that compute duration and seed result data
+- Resolvers that mutate ship state on completion
+- One-action-at-a-time enforcement (current_action_id)
+- Time advancement that resolves deferred actions in order
+- Action queue inspection (what's pending, what's running, what completed)
+- Shared fixtures in `tests/_data/actions/` covering action lifecycles
+- Action preview function (given ship state + proposed action, return projected state) — extractable to frontend for draft action UX
+
+### Stage 4: Holodeck — Multi-Ship and Environment
+
+**What:** Add spatial awareness, multi-ship systems, and environmental context.
+
+**Why:** Helm's most interesting mechanics are emergent from multi-ship interaction. Detection, combat, interdiction, and the economy all depend on ships coexisting in systems and affecting each other. The holodeck can't validate any of these without a spatial model.
+
+**Scope:**
+- Load navigation graph from `tests/_data/catalog/graph.json` (exported from live game via `wp helm export graph`)
+- System/node model (ships exist at nodes, nodes have 3D coordinates and star metadata)
+- Stellar environment from real star data (spectral class → noise floor, belt density, traffic)
+- Multi-ship awareness (which ships share a node)
+- Emission tracking (actions produce emissions, engine tracks them)
+- Detection integration (passive detection between ships at the same node)
+- Drive envelope integration (spool/sustain/cooldown phases produce emissions over time)
+- Environmental modifiers from real stellar data that affect formula inputs
+
+### Stage 5: Analysis Framework
+
+**What:** Rebuild the workbench analysis layer to consume the holodeck engine instead of raw formulas.
+
+**Why:** The current analysis commands produce raw data that requires manual interpretation. The new analysis layer should run scenarios through the holodeck, compare results against design goals, and produce structured verdicts. "Is the game balanced?" should be answerable by running one command and reading the output.
+
+**Scope:**
+- Scenario definition format (ships, loadouts, action sequences, assertions)
+- Scenario runner that feeds scenarios through the holodeck
+- Verdict logic (PASS/WARN/FAIL against named design goals)
+- Matrix runner (hull × component × tuning sweeps through the engine, not just static reports)
+- Baseline save/load for regression detection
+- Diff engine for comparing two analysis runs
+- Pre-built scenario library covering the design questions from simulation-testing.md
+- Static report (`computeShipReport`) preserved as a convenience for quick loadout checks
+
+### Stage 6: Report Generation
+
+**What:** Build the report layer that turns analysis data into readable markdown documents.
+
+**Why:** The workbench's output needs to be useful without post-processing. A generated report should tell you the state of game balance, what changed since last run, and what needs attention. It should be readable by both humans reviewing game design and agents doing balance work.
+
+**Scope:**
+- Report generator that reads analysis results and writes markdown files
+- Summary report (top-level findings, flags, key metrics)
+- Per-category deep-dive reports (combat balance, detection/stealth, economy, progression)
+- Regression report (what changed since the last baseline)
+- Reports written to `reports/` directory, gitignored or committed as design artifacts
+- CLI command: `bun run wb report` generates the full report suite
+
+## Migration
+
+The existing workbench code doesn't get thrown away — it gets reorganized:
+
+- **`@helm/formulas`** — Stays as-is. The holodeck calls formulas, it doesn't replace them.
+- **`@helm/types`** — Stays as-is. New game mechanics types incubate in the holodeck. Types get backported to `@helm/types` when they stabilize and the frontend or PHP needs them.
+- **`computeShipReport()`** — Stays in the workbench as a convenience function for quick static analysis.
+- **Product/hull data** — Moves from `workbench/data/` to `tests/_data/catalog/` in Stage 1. Workbench loaders repoint to the shared location. Holodeck and PHP tests consume the same files.
+- **DSP analysis commands** — Migrate into the analysis framework as scenario categories (Stage 5). The formula-level DSP analysis is still valuable.
+- **Sim engine** — Replaced by the holodeck (Stages 2-4). Tests migrate to cover the new implementation.
+- **CLI commands** — Collapse from 12 commands to a focused set.
+
+## What Carries to Frontend
+
+The LCARS bridge dashboard needs to show live ship state:
+
+- Power capacitor gauge (filling toward `full_at`)
+- Shield strength gauge (same `full_at` pattern)
+- Drive envelope visualization (which phase, current power draw)
+- Sensor scan progress and detection confidence
+- Jump progress with ETA
+- Core life remaining with projected jumps-until-death
+- Draft action preview (show the projected ship state before committing an action)
+- Power mode effects (show how switching modes changes all the numbers)
+
+The frontend never imports from `@helm/holodeck`. When holodeck work produces a function or type the frontend needs, it gets extracted into `@helm/formulas` (pure computation like `getCurrentPower(fullAt, max, regenRate, now)`) or `@helm/types` (shared interfaces). Both the holodeck and the frontend then import from the shared package. The holodeck is where we design and validate; the shared packages are what ships to production.
+
+## Decisions
+
+Resolved questions captured here for context.
+
+- **Where's the line between workbench and game server?** The workbench owns static loadout analysis — sweep the component matrix, flag outliers, validate balance. The holodeck owns gameplay simulation — timestamp-based state, action lifecycles, multi-ship interaction. PHP owns persistence, real-time operations, and is the authority for game state. When the workbench or holodeck reveals a formula needs tuning, we update `@helm/formulas` first, then update PHP to match.
+- **Type extraction cadence.** Types incubate in the holodeck and get backported to `@helm/types` when the shape is settled and the frontend or PHP implementation needs them. The holodeck re-exports its own types so the workbench can import them immediately.
+- **Game data ownership.** Product catalog and hull definitions live in `tests/_data/catalog/` as the single source of truth. The workbench, holodeck, and PHP tests all read from there.
+- **Cargo and economy.** The holodeck models cargo (slug → quantity) and mining operations — enough to answer "how long to fill a hold with different loadouts?" Full trade/manufacturing is out of scope; the holodeck validates extraction and capacity, not the economy.
+- **Navigation graph.** Exported from the running game instance via `wp helm export graph`. 10 ly radius around Sol (~275 systems, 132K). The celestial data is static (real HYG star catalog) and the graph doesn't change much because exploration is slow and game-engine-driven. The export produces nodes (3D coordinates in light-years, star metadata for noise floors), edges (connections with distances), and stellar environment data. This lands in `tests/_data/catalog/graph.json` alongside products and hulls. Ships are at nodes (`node_id`). Detection and combat are system-scoped (same node = can interact). Jump costs depend on edge distance. Long-distance navigation tests should start from the edge of the sphere and traverse across, giving ~20 ly of travel distance from a 10 ly radius. No procedural generation in the holodeck — real game world data.
+- **Scenario authoring.** JSON files. They enable interop between JS holodeck tests and PHP implementation tests — same scenario files, both sides validate their implementation produces matching results. This is more valuable than authoring convenience.

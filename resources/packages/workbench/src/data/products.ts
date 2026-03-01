@@ -28,7 +28,7 @@ type RawProduct = {
 	draw?: number;
 	tuning?: { param: string; min: number; max: number };
 	dsp?:
-		| { active: number; passive: number; pulseGain: number; continuousGain: number }
+		| { active: number; passive: number; pulseGain: number; continuousGain: number; pvpGain: number }
 		| {
 				spool: { duration: number; peakPower: number; curve: number };
 				sustain: { duration: number; peakPower: number; curve: number };

@@ -1,0 +1,8 @@
+[
+	{ "test": "coreOutput",  "input": { "mult_a": 1.0 },                      "expected": 1.0 },
+	{ "test": "coreOutput",  "input": { "mult_a": 0.9 },                      "expected": 0.9 },
+	{ "test": "regenRate",   "input": { "rate": 10.0 },                       "expected": 10.0 },
+	{ "test": "perfRatio",   "input": { "output": 1.0, "mult_b": 1.0 },      "expected": 1.0 },
+	{ "test": "perfRatio",   "input": { "output": 0.9, "mult_b": 1.5 },      "expected": 0.6 },
+	{ "test": "capacitor",   "input": { "capacity": 100 },                    "expected": 100 }
+]

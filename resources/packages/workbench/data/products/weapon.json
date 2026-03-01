@@ -8,7 +8,7 @@
       "footprint": 15,
       "draw": 0.35,
       "rate": 5.0,
-      "mult_a": 5.0
+      "mult_a": 35.0
     },
     {
       "slug": "torpedo_launcher",
@@ -17,8 +17,8 @@
       "version": 1,
       "footprint": 25,
       "capacity": 4,
-      "mult_a": 50.0,
-      "mult_b": 0.7,
+      "mult_a": 75.0,
+      "mult_b": 0.70,
       "mult_c": 300
     }
   ]

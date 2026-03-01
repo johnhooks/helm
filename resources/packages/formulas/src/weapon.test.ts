@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
-	phaserDraw, phaserShieldDrain,
+	phaserDraw, phaserShieldDrain, phaserHullDamage,
 	torpedoHitChance, torpedoDamage,
 	pdsInterception, ecmLockDegradation,
 	shieldAbsorption,
@@ -27,6 +27,22 @@ describe('phaserShieldDrain', () => {
 
 	it('double drain at priority 2.0', () => {
 		expect(phaserShieldDrain(5.0, 2.0)).toBe(10.0);
+	});
+});
+
+describe('phaserHullDamage', () => {
+	it('applies multiplier to drain rate', () => {
+		// 35/hr drain × 40 mult = 1400/hr hull damage
+		expect(phaserHullDamage(35.0, 1.0, 40)).toBe(1400);
+	});
+
+	it('zero drain = zero hull damage', () => {
+		expect(phaserHullDamage(0, 1.0, 40)).toBe(0);
+	});
+
+	it('priority scaling works', () => {
+		// priority 1.5 → 35 × 1.5 × 40 = 2100/hr
+		expect(phaserHullDamage(35.0, 1.5, 40)).toBe(2100);
 	});
 });
 

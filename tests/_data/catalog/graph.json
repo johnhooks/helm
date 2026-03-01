@@ -1,0 +1,4696 @@
+{
+    "meta": {
+        "exportedAt": "2026-03-01T16:28:08+00:00",
+        "nodeCount": 275,
+        "systemCount": 275,
+        "waypointCount": 0,
+        "edgeCount": 1,
+        "center": 1,
+        "radius": 10
+    },
+    "nodes": [
+        {
+            "id": 1,
+            "type": "system",
+            "x": 0,
+            "y": 0,
+            "z": 0,
+            "star": {
+                "catalogId": "SOL",
+                "name": "Sol",
+                "spectralType": "G2V",
+                "spectralClass": "G",
+                "distanceLy": 0,
+                "luminosity": 1,
+                "temperature": 5778,
+                "mass": 1
+            }
+        },
+        {
+            "id": 2,
+            "type": "system",
+            "x": -0.4723,
+            "y": -0.3615,
+            "z": -1.1512,
+            "star": {
+                "catalogId": "HIP_70890",
+                "name": "Proxima Centauri",
+                "spectralType": "M5Ve",
+                "spectralClass": "M",
+                "distanceLy": 4.2267,
+                "luminosity": 5.77e-5,
+                "temperature": 2900,
+                "mass": 0.1221
+            }
+        },
+        {
+            "id": 3,
+            "type": "system",
+            "x": -0.4952,
+            "y": -0.414,
+            "z": -1.1567,
+            "star": {
+                "catalogId": "HIP_71681",
+                "name": "Toliman",
+                "spectralType": "K1V",
+                "spectralClass": "K",
+                "distanceLy": 4.3209,
+                "luminosity": 0.44096082,
+                "temperature": 5033,
+                "mass": 0.7611
+            }
+        },
+        {
+            "id": 4,
+            "type": "system",
+            "x": -0.0174,
+            "y": -1.8166,
+            "z": 0.1491,
+            "star": {
+                "catalogId": "HIP_87937",
+                "name": "Barnard's Star",
+                "spectralType": "sdM4",
+                "spectralClass": "Unknown",
+                "distanceLy": 5.9484,
+                "luminosity": 0.00044259,
+                "temperature": 3195,
+                "mass": 0.162
+            }
+        },
+        {
+            "id": 5,
+            "type": "system",
+            "x": -2.2828,
+            "y": 0.6493,
+            "z": 0.2921,
+            "star": {
+                "catalogId": "HYG_118720",
+                "name": "Wolf 359",
+                "spectralType": "M6",
+                "spectralClass": "M",
+                "distanceLy": 7.7971,
+                "luminosity": 2.076e-5,
+                "temperature": 2833,
+                "mass": 0.2033
+            }
+        },
+        {
+            "id": 6,
+            "type": "system",
+            "x": -1.998,
+            "y": 0.5043,
+            "z": 1.4955,
+            "star": {
+                "catalogId": "HIP_54035",
+                "name": "Lalande 21185",
+                "spectralType": "M2V",
+                "spectralClass": "M",
+                "distanceLy": 8.3069,
+                "luminosity": 0.00570164,
+                "temperature": 3719,
+                "mass": 0.3899
+            }
+        },
+        {
+            "id": 7,
+            "type": "system",
+            "x": 2.2705,
+            "y": 1.047,
+            "z": -0.81,
+            "star": {
+                "catalogId": "HYG_118079",
+                "name": null,
+                "spectralType": "dM5.5e",
+                "spectralClass": "Unknown",
+                "distanceLy": 8.5671,
+                "luminosity": 5.634e-5,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 8,
+            "type": "system",
+            "x": -0.4943,
+            "y": 2.4767,
+            "z": -0.7585,
+            "star": {
+                "catalogId": "HIP_32349",
+                "name": "Sirius",
+                "spectralType": "A0m...",
+                "spectralClass": "A",
+                "distanceLy": 8.6011,
+                "luminosity": 22.82443312,
+                "temperature": 10000,
+                "mass": 2.1
+            }
+        },
+        {
+            "id": 9,
+            "type": "system",
+            "x": 0.5859,
+            "y": -2.6525,
+            "z": -1.2001,
+            "star": {
+                "catalogId": "HIP_92403",
+                "name": "Ross 154",
+                "spectralType": "M3.5Ve",
+                "spectralClass": "M",
+                "distanceLy": 9.6862,
+                "luminosity": 0.00054651,
+                "temperature": 3267,
+                "mass": 0.3267
+            }
+        },
+        {
+            "id": 10,
+            "type": "system",
+            "x": 2.2626,
+            "y": -0.179,
+            "z": 2.2053,
+            "star": {
+                "catalogId": "HYG_119585",
+                "name": "Ross 248",
+                "spectralType": "dM6  e",
+                "spectralClass": "Unknown",
+                "distanceLy": 10.3346,
+                "luminosity": 0.00010607,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 11,
+            "type": "system",
+            "x": 1.899,
+            "y": 2.5414,
+            "z": -0.5285,
+            "star": {
+                "catalogId": "HIP_16537",
+                "name": "Ran",
+                "spectralType": "K2V",
+                "spectralClass": "K",
+                "distanceLy": 10.4895,
+                "luminosity": 0.29295438,
+                "temperature": 4867,
+                "mass": 0.82
+            }
+        },
+        {
+            "id": 12,
+            "type": "system",
+            "x": 2.5815,
+            "y": -0.6214,
+            "z": -1.9188,
+            "star": {
+                "catalogId": "HIP_114046",
+                "name": "Lacaille 9352",
+                "spectralType": "M2/M3V",
+                "spectralClass": "M",
+                "distanceLy": 10.6845,
+                "luminosity": 0.01073495,
+                "temperature": 3688,
+                "mass": 0.489
+            }
+        },
+        {
+            "id": 13,
+            "type": "system",
+            "x": -3.3499,
+            "y": 0.1794,
+            "z": 0.0471,
+            "star": {
+                "catalogId": "HIP_57548",
+                "name": "Ross 128",
+                "spectralType": "M4.5V",
+                "spectralClass": "M",
+                "distanceLy": 10.9435,
+                "luminosity": 0.00034962,
+                "temperature": 3192,
+                "mass": 0.168
+            }
+        },
+        {
+            "id": 14,
+            "type": "system",
+            "x": 3.0699,
+            "y": -1.1393,
+            "z": -0.8959,
+            "star": {
+                "catalogId": "HYG_119518",
+                "name": "EZ Aqr",
+                "spectralType": "M5  e",
+                "spectralClass": "M",
+                "distanceLy": 11.0825,
+                "luminosity": 8.678e-5,
+                "temperature": 2978,
+                "mass": 0.2444
+            }
+        },
+        {
+            "id": 15,
+            "type": "system",
+            "x": 0.3242,
+            "y": -1.7164,
+            "z": 2.9804,
+            "star": {
+                "catalogId": "HIP_91772",
+                "name": "Struve 2398 B",
+                "spectralType": "K5",
+                "spectralClass": "K",
+                "distanceLy": 11.2671,
+                "luminosity": 0.00137025,
+                "temperature": 4367,
+                "mass": 0.6056
+            }
+        },
+        {
+            "id": 16,
+            "type": "system",
+            "x": 1.9794,
+            "y": -1.8636,
+            "z": 2.1819,
+            "star": {
+                "catalogId": "HIP_104214",
+                "name": null,
+                "spectralType": "K5V",
+                "spectralClass": "K",
+                "distanceLy": 11.3714,
+                "luminosity": 0.08806432,
+                "temperature": 4367,
+                "mass": 0.6056
+            }
+        },
+        {
+            "id": 17,
+            "type": "system",
+            "x": -1.4623,
+            "y": 3.161,
+            "z": 0.3186,
+            "star": {
+                "catalogId": "HYG_118493",
+                "name": null,
+                "spectralType": "DA",
+                "spectralClass": "Unknown",
+                "distanceLy": 11.407,
+                "luminosity": 0.00055924,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 18,
+            "type": "system",
+            "x": 2.5578,
+            "y": 0.2055,
+            "z": 2.48,
+            "star": {
+                "catalogId": "HYG_117979",
+                "name": null,
+                "spectralType": "M6 Ve",
+                "spectralClass": "M",
+                "distanceLy": 11.6372,
+                "luminosity": 0.00041764,
+                "temperature": 2833,
+                "mass": 0.2033
+            }
+        },
+        {
+            "id": 19,
+            "type": "system",
+            "x": 1.7326,
+            "y": -0.9667,
+            "z": -3.0303,
+            "star": {
+                "catalogId": "HIP_108870",
+                "name": "Epsilon Indi",
+                "spectralType": "K5V",
+                "spectralClass": "K",
+                "distanceLy": 11.8147,
+                "luminosity": 0.15205475,
+                "temperature": 4367,
+                "mass": 0.6056
+            }
+        },
+        {
+            "id": 20,
+            "type": "system",
+            "x": -1.9685,
+            "y": 2.5694,
+            "z": 1.6335,
+            "star": {
+                "catalogId": "HYG_118541",
+                "name": null,
+                "spectralType": "M6.5",
+                "spectralClass": "M",
+                "distanceLy": 11.8258,
+                "luminosity": 1.364e-5,
+                "temperature": 2833,
+                "mass": 0.2033
+            }
+        },
+        {
+            "id": 21,
+            "type": "system",
+            "x": 3.1541,
+            "y": 1.5395,
+            "z": -1.0023,
+            "star": {
+                "catalogId": "HIP_8102",
+                "name": "Tau Ceti",
+                "spectralType": "G8V",
+                "spectralClass": "G",
+                "distanceLy": 11.9053,
+                "luminosity": 0.46644453,
+                "temperature": 5289,
+                "mass": 0.783
+            }
+        },
+        {
+            "id": 22,
+            "type": "system",
+            "x": 3.3538,
+            "y": 1.098,
+            "z": -1.0788,
+            "star": {
+                "catalogId": "HIP_5643",
+                "name": null,
+                "spectralType": "M5.5Ve",
+                "spectralClass": "M",
+                "distanceLy": 12.0348,
+                "luminosity": 0.0001714,
+                "temperature": 2978,
+                "mass": 0.2444
+            }
+        },
+        {
+            "id": 23,
+            "type": "system",
+            "x": -0.4826,
+            "y": -1.6432,
+            "z": -3.2758,
+            "star": {
+                "catalogId": "HIP_82724",
+                "name": null,
+                "spectralType": "Mp",
+                "spectralClass": "M",
+                "distanceLy": 12.056,
+                "luminosity": 0.00021657,
+                "temperature": 2978,
+                "mass": 0.2444
+            }
+        },
+        {
+            "id": 24,
+            "type": "system",
+            "x": -1.4095,
+            "y": 3.5149,
+            "z": 0.3464,
+            "star": {
+                "catalogId": "HIP_36208",
+                "name": "Luyten's Star",
+                "spectralType": "M5",
+                "spectralClass": "M",
+                "distanceLy": 12.4024,
+                "luminosity": 0.00145881,
+                "temperature": 3382,
+                "mass": 0.29
+            }
+        },
+        {
+            "id": 25,
+            "type": "system",
+            "x": 0.579,
+            "y": 2.7052,
+            "z": -2.7682,
+            "star": {
+                "catalogId": "HIP_24186",
+                "name": "Kapteyn's Star",
+                "spectralType": "M0V",
+                "spectralClass": "M",
+                "distanceLy": 12.7573,
+                "luminosity": 0.0038089,
+                "temperature": 3550,
+                "mass": 0.281
+            }
+        },
+        {
+            "id": 26,
+            "type": "system",
+            "x": 2.33,
+            "y": -2.0032,
+            "z": -2.4765,
+            "star": {
+                "catalogId": "HIP_105090",
+                "name": "Lacaille 8760",
+                "spectralType": "M1/M2V",
+                "spectralClass": "M",
+                "distanceLy": 12.8708,
+                "luminosity": 0.02860224,
+                "temperature": 3556,
+                "mass": 0.4089
+            }
+        },
+        {
+            "id": 27,
+            "type": "system",
+            "x": 1.968,
+            "y": -0.8355,
+            "z": 3.3815,
+            "star": {
+                "catalogId": "HIP_110893",
+                "name": "Kruger 60",
+                "spectralType": "M2V",
+                "spectralClass": "M",
+                "distanceLy": 13.0495,
+                "luminosity": 0.00203423,
+                "temperature": 3411,
+                "mass": 0.3678
+            }
+        },
+        {
+            "id": 28,
+            "type": "system",
+            "x": -0.526,
+            "y": 4.0784,
+            "z": -0.202,
+            "star": {
+                "catalogId": "HYG_118428",
+                "name": null,
+                "spectralType": "Unknown",
+                "spectralClass": "Unknown",
+                "distanceLy": 13.4282,
+                "luminosity": 2.134e-5,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 29,
+            "type": "system",
+            "x": -0.5412,
+            "y": -1.843,
+            "z": -3.6748,
+            "star": {
+                "catalogId": "HIP_82725",
+                "name": null,
+                "spectralType": "Unknown",
+                "spectralClass": "Unknown",
+                "distanceLy": 13.5241,
+                "luminosity": 0.00030704,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 30,
+            "type": "system",
+            "x": 4.147,
+            "y": 0.9035,
+            "z": 0.4003,
+            "star": {
+                "catalogId": "HIP_3829",
+                "name": "Van Maanen's Star",
+                "spectralType": "DG",
+                "spectralClass": "Unknown",
+                "distanceLy": 13.9027,
+                "luminosity": 0.00017832,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 31,
+            "type": "system",
+            "x": 1.7985,
+            "y": 2.4754,
+            "z": -3.0081,
+            "star": {
+                "catalogId": "HYG_118236",
+                "name": null,
+                "spectralType": "M4.5",
+                "spectralClass": "M",
+                "distanceLy": 13.998,
+                "luminosity": 9.845e-5,
+                "temperature": 2953,
+                "mass": 0.12
+            }
+        },
+        {
+            "id": 32,
+            "type": "system",
+            "x": -1.5975,
+            "y": -3.871,
+            "z": -0.9409,
+            "star": {
+                "catalogId": "HIP_80824",
+                "name": "Wolf 1061",
+                "spectralType": "M4",
+                "spectralClass": "M",
+                "distanceLy": 13.9993,
+                "luminosity": 0.00146285,
+                "temperature": 3342,
+                "mass": 0.294
+            }
+        },
+        {
+            "id": 33,
+            "type": "system",
+            "x": -4.2086,
+            "y": -0.6156,
+            "z": 0.6752,
+            "star": {
+                "catalogId": "HYG_118830",
+                "name": null,
+                "spectralType": "dM5.5eJ",
+                "spectralClass": "Unknown",
+                "distanceLy": 14.0462,
+                "luminosity": 9.827e-5,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 34,
+            "type": "system",
+            "x": 3.4488,
+            "y": 0.0814,
+            "z": -2.6335,
+            "star": {
+                "catalogId": "HIP_439",
+                "name": null,
+                "spectralType": "M2V",
+                "spectralClass": "M",
+                "distanceLy": 14.1548,
+                "luminosity": 0.00617732,
+                "temperature": 3411,
+                "mass": 0.3678
+            }
+        },
+        {
+            "id": 35,
+            "type": "system",
+            "x": -3.1077,
+            "y": 3.1367,
+            "z": 0.658,
+            "star": {
+                "catalogId": "HYG_118583",
+                "name": null,
+                "spectralType": "k",
+                "spectralClass": "Unknown",
+                "distanceLy": 14.5606,
+                "luminosity": 0.00076489,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 36,
+            "type": "system",
+            "x": 3.7663,
+            "y": 2.1792,
+            "z": 1.0088,
+            "star": {
+                "catalogId": "HYG_118100",
+                "name": null,
+                "spectralType": "dM8  e",
+                "spectralClass": "Unknown",
+                "distanceLy": 14.5736,
+                "luminosity": 0.00021301,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 37,
+            "type": "system",
+            "x": -2.0465,
+            "y": 0.6994,
+            "z": -3.9329,
+            "star": {
+                "catalogId": "HYG_118704",
+                "name": null,
+                "spectralType": "m",
+                "spectralClass": "Unknown",
+                "distanceLy": 14.6389,
+                "luminosity": 4.742e-5,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 38,
+            "type": "system",
+            "x": -4.2204,
+            "y": 1.367,
+            "z": -0.8894,
+            "star": {
+                "catalogId": "HYG_118707",
+                "name": null,
+                "spectralType": "M6.5",
+                "spectralClass": "M",
+                "distanceLy": 14.7582,
+                "luminosity": 1.026e-5,
+                "temperature": 2833,
+                "mass": 0.2033
+            }
+        },
+        {
+            "id": 39,
+            "type": "system",
+            "x": -0.1716,
+            "y": -1.6625,
+            "z": 4.2082,
+            "star": {
+                "catalogId": "HIP_86162",
+                "name": null,
+                "spectralType": "M3.5Vvar",
+                "spectralClass": "M",
+                "distanceLy": 14.769,
+                "luminosity": 0.00390841,
+                "temperature": 3267,
+                "mass": 0.4
+            }
+        },
+        {
+            "id": 40,
+            "type": "system",
+            "x": -0.4229,
+            "y": -3.0737,
+            "z": -3.315,
+            "star": {
+                "catalogId": "HIP_85523",
+                "name": null,
+                "spectralType": "K5",
+                "spectralClass": "K",
+                "distanceLy": 14.8091,
+                "luminosity": 0.0031798,
+                "temperature": 3600,
+                "mass": 0.35
+            }
+        },
+        {
+            "id": 41,
+            "type": "system",
+            "x": -1.9552,
+            "y": 0.122,
+            "z": -4.171,
+            "star": {
+                "catalogId": "HIP_57367",
+                "name": null,
+                "spectralType": "DC:",
+                "spectralClass": "Unknown",
+                "distanceLy": 15.0296,
+                "luminosity": 0.00046473,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 42,
+            "type": "system",
+            "x": 4.3529,
+            "y": -1.3043,
+            "z": -1.1552,
+            "star": {
+                "catalogId": "HIP_113020",
+                "name": null,
+                "spectralType": "M5",
+                "spectralClass": "M",
+                "distanceLy": 15.2925,
+                "luminosity": 0.00165196,
+                "temperature": 2978,
+                "mass": 0.32
+            }
+        },
+        {
+            "id": 43,
+            "type": "system",
+            "x": 4.6544,
+            "y": 0.1367,
+            "z": -0.6163,
+            "star": {
+                "catalogId": "HYG_117960",
+                "name": null,
+                "spectralType": "M5-5.5",
+                "spectralClass": "M",
+                "distanceLy": 15.3267,
+                "luminosity": 6.081e-5,
+                "temperature": 3024,
+                "mass": 0.12
+            }
+        },
+        {
+            "id": 44,
+            "type": "system",
+            "x": 1.6065,
+            "y": -2.9617,
+            "z": 3.3012,
+            "star": {
+                "catalogId": "HYG_119312",
+                "name": null,
+                "spectralType": "M5.5 V e",
+                "spectralClass": "M",
+                "distanceLy": 15.3848,
+                "luminosity": 8.379e-5,
+                "temperature": 2978,
+                "mass": 0.2444
+            }
+        },
+        {
+            "id": 45,
+            "type": "system",
+            "x": -3.4054,
+            "y": 0.8252,
+            "z": 3.3277,
+            "star": {
+                "catalogId": "HYG_118727",
+                "name": null,
+                "spectralType": "M6  e",
+                "spectralClass": "M",
+                "distanceLy": 15.7608,
+                "luminosity": 3.535e-5,
+                "temperature": 2833,
+                "mass": 0.2033
+            }
+        },
+        {
+            "id": 46,
+            "type": "system",
+            "x": -2.8184,
+            "y": 1.4458,
+            "z": 3.7028,
+            "star": {
+                "catalogId": "HIP_49908",
+                "name": null,
+                "spectralType": "K8V",
+                "spectralClass": "K",
+                "distanceLy": 15.8939,
+                "luminosity": 0.04738054,
+                "temperature": 3867,
+                "mass": 0.4889
+            }
+        },
+        {
+            "id": 47,
+            "type": "system",
+            "x": -4.1775,
+            "y": 1.9567,
+            "z": 1.6672,
+            "star": {
+                "catalogId": "HYG_118676",
+                "name": null,
+                "spectralType": "M4.5Ve",
+                "spectralClass": "M",
+                "distanceLy": 15.996,
+                "luminosity": 0.00364083,
+                "temperature": 3122,
+                "mass": 0.2856
+            }
+        },
+        {
+            "id": 48,
+            "type": "system",
+            "x": 2.6084,
+            "y": -1.9377,
+            "z": -3.7391,
+            "star": {
+                "catalogId": "HIP_106440",
+                "name": null,
+                "spectralType": "M1V",
+                "spectralClass": "M",
+                "distanceLy": 16.1568,
+                "luminosity": 0.00734514,
+                "temperature": 3556,
+                "mass": 0.45
+            }
+        },
+        {
+            "id": 49,
+            "type": "system",
+            "x": 2.1795,
+            "y": 4.4329,
+            "z": -0.6637,
+            "star": {
+                "catalogId": "HIP_19849",
+                "name": "Keid",
+                "spectralType": "K1V",
+                "spectralClass": "K",
+                "distanceLy": 16.2572,
+                "luminosity": 0.36576319,
+                "temperature": 5033,
+                "mass": 0.7611
+            }
+        },
+        {
+            "id": 50,
+            "type": "system",
+            "x": 4.7792,
+            "y": 0.3231,
+            "z": -1.3857,
+            "star": {
+                "catalogId": "HIP_1242",
+                "name": null,
+                "spectralType": "M:",
+                "spectralClass": "M",
+                "distanceLy": 16.2647,
+                "luminosity": 0.00054903,
+                "temperature": 2978,
+                "mass": 0.2444
+            }
+        },
+        {
+            "id": 51,
+            "type": "system",
+            "x": -0.363,
+            "y": -3.615,
+            "z": -3.5479,
+            "star": {
+                "catalogId": "HIP_86214",
+                "name": null,
+                "spectralType": "M5",
+                "spectralClass": "M",
+                "distanceLy": 16.5645,
+                "luminosity": 0.00094537,
+                "temperature": 3028,
+                "mass": 0.27
+            }
+        },
+        {
+            "id": 52,
+            "type": "system",
+            "x": 0.1209,
+            "y": -5.0771,
+            "z": 0.2217,
+            "star": {
+                "catalogId": "HIP_88601",
+                "name": null,
+                "spectralType": "K0V SB",
+                "spectralClass": "K",
+                "distanceLy": 16.5798,
+                "luminosity": 0.55004725,
+                "temperature": 5200,
+                "mass": 0.8
+            }
+        },
+        {
+            "id": 53,
+            "type": "system",
+            "x": 3.4788,
+            "y": -1.15,
+            "z": 3.5797,
+            "star": {
+                "catalogId": "HIP_112460",
+                "name": null,
+                "spectralType": "M4.5Ve",
+                "spectralClass": "M",
+                "distanceLy": 16.707,
+                "luminosity": 0.00174904,
+                "temperature": 3122,
+                "mass": 0.2856
+            }
+        },
+        {
+            "id": 54,
+            "type": "system",
+            "x": 2.3555,
+            "y": -4.4873,
+            "z": 0.7907,
+            "star": {
+                "catalogId": "HIP_97649",
+                "name": "Altair",
+                "spectralType": "A7IV-V",
+                "spectralClass": "A",
+                "distanceLy": 16.7302,
+                "luminosity": 11.37627286,
+                "temperature": 8056,
+                "mass": 1.5556
+            }
+        },
+        {
+            "id": 55,
+            "type": "system",
+            "x": -3.4508,
+            "y": 3.5039,
+            "z": 1.767,
+            "star": {
+                "catalogId": "HYG_118578",
+                "name": null,
+                "spectralType": "m",
+                "spectralClass": "Unknown",
+                "distanceLy": 17.0495,
+                "luminosity": 5.655e-5,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 56,
+            "type": "system",
+            "x": -4.3128,
+            "y": -2.2702,
+            "z": 2.1473,
+            "star": {
+                "catalogId": "HIP_67593",
+                "name": null,
+                "spectralType": "Unknown",
+                "spectralClass": "Unknown",
+                "distanceLy": 17.3707,
+                "luminosity": 0.00011717,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 57,
+            "type": "system",
+            "x": -1.0477,
+            "y": 0.0563,
+            "z": 5.2467,
+            "star": {
+                "catalogId": "HIP_57544",
+                "name": null,
+                "spectralType": "M4",
+                "spectralClass": "M",
+                "distanceLy": 17.4546,
+                "luminosity": 0.00119344,
+                "temperature": 3122,
+                "mass": 0.2856
+            }
+        },
+        {
+            "id": 58,
+            "type": "system",
+            "x": -0.0014,
+            "y": 5.3617,
+            "z": 0.2535,
+            "star": {
+                "catalogId": "HYG_118406",
+                "name": null,
+                "spectralType": "M4",
+                "spectralClass": "M",
+                "distanceLy": 17.5071,
+                "luminosity": 0.00073722,
+                "temperature": 3122,
+                "mass": 0.2856
+            }
+        },
+        {
+            "id": 59,
+            "type": "system",
+            "x": -4.6655,
+            "y": -2.3193,
+            "z": 1.3855,
+            "star": {
+                "catalogId": "HIP_67155",
+                "name": null,
+                "spectralType": "M3V",
+                "spectralClass": "M",
+                "distanceLy": 17.5834,
+                "luminosity": 0.01045201,
+                "temperature": 3267,
+                "mass": 0.3267
+            }
+        },
+        {
+            "id": 60,
+            "type": "system",
+            "x": 1.0737,
+            "y": 2.6307,
+            "z": 4.7254,
+            "star": {
+                "catalogId": "HYG_118311",
+                "name": null,
+                "spectralType": "DC5",
+                "spectralClass": "Unknown",
+                "distanceLy": 17.9839,
+                "luminosity": 0.00027977,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 61,
+            "type": "system",
+            "x": -2.5893,
+            "y": -0.0544,
+            "z": -4.8712,
+            "star": {
+                "catalogId": "HIP_58910",
+                "name": null,
+                "spectralType": "F0Ib-II",
+                "spectralClass": "F",
+                "distanceLy": 17.9937,
+                "luminosity": 0.02484277,
+                "temperature": 7500,
+                "mass": 1.4
+            }
+        },
+        {
+            "id": 62,
+            "type": "system",
+            "x": -1.1066,
+            "y": 4.538,
+            "z": 3.0645,
+            "star": {
+                "catalogId": "HIP_33226",
+                "name": null,
+                "spectralType": "K:...",
+                "spectralClass": "K",
+                "distanceLy": 18.2201,
+                "luminosity": 0.00300885,
+                "temperature": 4367,
+                "mass": 0.6056
+            }
+        },
+        {
+            "id": 63,
+            "type": "system",
+            "x": -1.1027,
+            "y": -4.5361,
+            "z": -3.1212,
+            "star": {
+                "catalogId": "HIP_83609",
+                "name": null,
+                "spectralType": "G0",
+                "spectralClass": "G",
+                "distanceLy": 18.3153,
+                "luminosity": 0.00548025,
+                "temperature": 6000,
+                "mass": 1.04
+            }
+        },
+        {
+            "id": 64,
+            "type": "system",
+            "x": 0.7013,
+            "y": 5.6018,
+            "z": -0.3628,
+            "star": {
+                "catalogId": "HIP_25878",
+                "name": null,
+                "spectralType": "M1V",
+                "spectralClass": "M",
+                "distanceLy": 18.451,
+                "luminosity": 0.01808007,
+                "temperature": 3556,
+                "mass": 0.4089
+            }
+        },
+        {
+            "id": 65,
+            "type": "system",
+            "x": 1.3763,
+            "y": -3.7404,
+            "z": -4.0642,
+            "star": {
+                "catalogId": "HYG_119276",
+                "name": null,
+                "spectralType": "M4.5",
+                "spectralClass": "M",
+                "distanceLy": 18.5632,
+                "luminosity": 0.00036174,
+                "temperature": 3122,
+                "mass": 0.2856
+            }
+        },
+        {
+            "id": 66,
+            "type": "system",
+            "x": 3.7363,
+            "y": -3.9874,
+            "z": -1.668,
+            "star": {
+                "catalogId": "HIP_103039",
+                "name": null,
+                "spectralType": "Unknown",
+                "spectralClass": "Unknown",
+                "distanceLy": 18.6343,
+                "luminosity": 0.00077553,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 67,
+            "type": "system",
+            "x": -1.5779,
+            "y": -5.4552,
+            "z": -0.8323,
+            "star": {
+                "catalogId": "HYG_119112",
+                "name": null,
+                "spectralType": "Unknown",
+                "spectralClass": "Unknown",
+                "distanceLy": 18.7197,
+                "luminosity": 0.00314485,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 68,
+            "type": "system",
+            "x": -0.2463,
+            "y": 5.3339,
+            "z": -2.1427,
+            "star": {
+                "catalogId": "HIP_29295",
+                "name": null,
+                "spectralType": "M1/M2V",
+                "spectralClass": "M",
+                "distanceLy": 18.7651,
+                "luminosity": 0.01584893,
+                "temperature": 3556,
+                "mass": 0.509
+            }
+        },
+        {
+            "id": 69,
+            "type": "system",
+            "x": 0.7845,
+            "y": -1.84,
+            "z": 5.3962,
+            "star": {
+                "catalogId": "HIP_96100",
+                "name": "Alsafi",
+                "spectralType": "K0V",
+                "spectralClass": "K",
+                "distanceLy": 18.7693,
+                "luminosity": 0.3908409,
+                "temperature": 5200,
+                "mass": 0.8
+            }
+        },
+        {
+            "id": 70,
+            "type": "system",
+            "x": -1.1411,
+            "y": 4.6801,
+            "z": 3.1608,
+            "star": {
+                "catalogId": "HYG_118447",
+                "name": null,
+                "spectralType": "dM4",
+                "spectralClass": "Unknown",
+                "distanceLy": 18.7879,
+                "luminosity": 0.00286286,
+                "temperature": 3342,
+                "mass": 0.35
+            }
+        },
+        {
+            "id": 71,
+            "type": "system",
+            "x": -2.6422,
+            "y": 2.3299,
+            "z": 4.622,
+            "star": {
+                "catalogId": "HIP_45343",
+                "name": null,
+                "spectralType": "M0V",
+                "spectralClass": "M",
+                "distanceLy": 18.9539,
+                "luminosity": 0.0258464,
+                "temperature": 3700,
+                "mass": 0.45
+            }
+        },
+        {
+            "id": 72,
+            "type": "system",
+            "x": 0.4428,
+            "y": 5.6749,
+            "z": 1.2608,
+            "star": {
+                "catalogId": "HIP_26857",
+                "name": null,
+                "spectralType": "M5",
+                "spectralClass": "M",
+                "distanceLy": 19.0123,
+                "luminosity": 0.0007034,
+                "temperature": 2978,
+                "mass": 0.2444
+            }
+        },
+        {
+            "id": 73,
+            "type": "system",
+            "x": -0.1844,
+            "y": -3.1429,
+            "z": -4.9075,
+            "star": {
+                "catalogId": "HIP_86990",
+                "name": null,
+                "spectralType": "M5",
+                "spectralClass": "M",
+                "distanceLy": 19.0201,
+                "luminosity": 0.00148457,
+                "temperature": 2978,
+                "mass": 0.2444
+            }
+        },
+        {
+            "id": 74,
+            "type": "system",
+            "x": -3.8871,
+            "y": -3.8021,
+            "z": -2.1326,
+            "star": {
+                "catalogId": "HIP_73184",
+                "name": null,
+                "spectralType": "K4V",
+                "spectralClass": "K",
+                "distanceLy": 19.0488,
+                "luminosity": 0.15303825,
+                "temperature": 4533,
+                "mass": 0.6444
+            }
+        },
+        {
+            "id": 75,
+            "type": "system",
+            "x": 1.9256,
+            "y": -5.5201,
+            "z": 0.5289,
+            "star": {
+                "catalogId": "HIP_94761",
+                "name": null,
+                "spectralType": "M3.5V",
+                "spectralClass": "M",
+                "distanceLy": 19.145,
+                "luminosity": 0.00674839,
+                "temperature": 3534,
+                "mass": 0.484
+            }
+        },
+        {
+            "id": 76,
+            "type": "system",
+            "x": -2.9934,
+            "y": 4.5796,
+            "z": -2.1608,
+            "star": {
+                "catalogId": "HYG_118532",
+                "name": null,
+                "spectralType": "M4",
+                "spectralClass": "M",
+                "distanceLy": 19.1858,
+                "luminosity": 0.00043571,
+                "temperature": 3122,
+                "mass": 0.2856
+            }
+        },
+        {
+            "id": 77,
+            "type": "system",
+            "x": -2.6784,
+            "y": -3.5613,
+            "z": -3.9114,
+            "star": {
+                "catalogId": "HIP_76074",
+                "name": null,
+                "spectralType": "M0",
+                "spectralClass": "M",
+                "distanceLy": 19.3381,
+                "luminosity": 0.00578096,
+                "temperature": 3700,
+                "mass": 0.45
+            }
+        },
+        {
+            "id": 78,
+            "type": "system",
+            "x": -1.027,
+            "y": -5.2048,
+            "z": -2.657,
+            "star": {
+                "catalogId": "HIP_84405",
+                "name": "Guniibuu",
+                "spectralType": "K2:III:",
+                "spectralClass": "K",
+                "distanceLy": 19.3518,
+                "luminosity": 0.56806757,
+                "temperature": 4867,
+                "mass": 0.7222
+            }
+        },
+        {
+            "id": 79,
+            "type": "system",
+            "x": 3.0984,
+            "y": 0.6738,
+            "z": 5.0386,
+            "star": {
+                "catalogId": "HYG_118021",
+                "name": null,
+                "spectralType": "K7 V",
+                "spectralClass": "K",
+                "distanceLy": 19.4151,
+                "luminosity": 0.03059145,
+                "temperature": 4033,
+                "mass": 0.5278
+            }
+        },
+        {
+            "id": 80,
+            "type": "system",
+            "x": -2.6219,
+            "y": 5.336,
+            "z": 0.3691,
+            "star": {
+                "catalogId": "HIP_37766",
+                "name": null,
+                "spectralType": "M4.5Ve",
+                "spectralClass": "M",
+                "distanceLy": 19.4278,
+                "luminosity": 0.00103276,
+                "temperature": 3122,
+                "mass": 0.2856
+            }
+        },
+        {
+            "id": 81,
+            "type": "system",
+            "x": -1.014,
+            "y": -5.2439,
+            "z": -2.6683,
+            "star": {
+                "catalogId": "HIP_84478",
+                "name": null,
+                "spectralType": "K5V",
+                "spectralClass": "K",
+                "distanceLy": 19.4731,
+                "luminosity": 0.09120108,
+                "temperature": 4367,
+                "mass": 0.6056
+            }
+        },
+        {
+            "id": 83,
+            "type": "system",
+            "x": 5.9651,
+            "y": -0.2811,
+            "z": 0.2504,
+            "star": {
+                "catalogId": "HIP_117473",
+                "name": null,
+                "spectralType": "M2V",
+                "spectralClass": "M",
+                "distanceLy": 19.4963,
+                "luminosity": 0.00796526,
+                "temperature": 3411,
+                "mass": 0.3678
+            }
+        },
+        {
+            "id": 82,
+            "type": "system",
+            "x": -0.8661,
+            "y": -4.0864,
+            "z": 4.2755,
+            "star": {
+                "catalogId": "HIP_84140",
+                "name": null,
+                "spectralType": "K5",
+                "spectralClass": "K",
+                "distanceLy": 19.4963,
+                "luminosity": 0.0058776,
+                "temperature": 4367,
+                "mass": 0.6056
+            }
+        },
+        {
+            "id": 84,
+            "type": "system",
+            "x": 2.6322,
+            "y": -4.0844,
+            "z": -3.5434,
+            "star": {
+                "catalogId": "HIP_99461",
+                "name": null,
+                "spectralType": "K2V",
+                "spectralClass": "K",
+                "distanceLy": 19.6183,
+                "luminosity": 0.23463889,
+                "temperature": 4867,
+                "mass": 0.7222
+            }
+        },
+        {
+            "id": 85,
+            "type": "system",
+            "x": 2.8392,
+            "y": 3.3815,
+            "z": -4.1275,
+            "star": {
+                "catalogId": "HIP_15510",
+                "name": "82 G. Eri",
+                "spectralType": "G8V",
+                "spectralClass": "G",
+                "distanceLy": 19.7109,
+                "luminosity": 0.62863709,
+                "temperature": 5368,
+                "mass": 0.79
+            }
+        },
+        {
+            "id": 86,
+            "type": "system",
+            "x": -4.6262,
+            "y": -3.6891,
+            "z": -1.3139,
+            "star": {
+                "catalogId": "HIP_71253",
+                "name": null,
+                "spectralType": "M4",
+                "spectralClass": "M",
+                "distanceLy": 19.7683,
+                "luminosity": 0.00094886,
+                "temperature": 3122,
+                "mass": 0.2856
+            }
+        },
+        {
+            "id": 87,
+            "type": "system",
+            "x": 1.3138,
+            "y": -2.0877,
+            "z": -5.588,
+            "star": {
+                "catalogId": "HIP_99240",
+                "name": "Delta Pavonis",
+                "spectralType": "G5IV-Vvar",
+                "spectralClass": "G",
+                "distanceLy": 19.9229,
+                "luminosity": 1.23594743,
+                "temperature": 5556,
+                "mass": 0.9067
+            }
+        },
+        {
+            "id": 88,
+            "type": "system",
+            "x": 1.5261,
+            "y": 5.8957,
+            "z": -0.7418,
+            "star": {
+                "catalogId": "HYG_118344",
+                "name": null,
+                "spectralType": "m",
+                "spectralClass": "Unknown",
+                "distanceLy": 20.0097,
+                "luminosity": 0.00047381,
+                "temperature": 3159,
+                "mass": 0.164
+            }
+        },
+        {
+            "id": 89,
+            "type": "system",
+            "x": -0.1044,
+            "y": -2.0098,
+            "z": 5.8035,
+            "star": {
+                "catalogId": "HYG_119184",
+                "name": null,
+                "spectralType": "DXP9",
+                "spectralClass": "Unknown",
+                "distanceLy": 20.0341,
+                "luminosity": 7.191e-5,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 90,
+            "type": "system",
+            "x": -2.5018,
+            "y": 5.5916,
+            "z": 0.7609,
+            "star": {
+                "catalogId": "HYG_118488",
+                "name": null,
+                "spectralType": "m",
+                "spectralClass": "Unknown",
+                "distanceLy": 20.133,
+                "luminosity": 0.00017092,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 91,
+            "type": "system",
+            "x": 5.7678,
+            "y": -0.7115,
+            "z": 2.108,
+            "star": {
+                "catalogId": "HIP_116132",
+                "name": null,
+                "spectralType": "M6Ve",
+                "spectralClass": "M",
+                "distanceLy": 20.163,
+                "luminosity": 0.0031798,
+                "temperature": 2833,
+                "mass": 0.2033
+            }
+        },
+        {
+            "id": 92,
+            "type": "system",
+            "x": -1.7031,
+            "y": -5.8887,
+            "z": -0.8982,
+            "star": {
+                "catalogId": "HIP_82817",
+                "name": null,
+                "spectralType": "M3Ve",
+                "spectralClass": "M",
+                "distanceLy": 20.2067,
+                "luminosity": 0.00824138,
+                "temperature": 3267,
+                "mass": 0.3267
+            }
+        },
+        {
+            "id": 93,
+            "type": "system",
+            "x": 2.4102,
+            "y": -3.6452,
+            "z": -4.395,
+            "star": {
+                "catalogId": "HIP_99701",
+                "name": null,
+                "spectralType": "M0V",
+                "spectralClass": "M",
+                "distanceLy": 20.2155,
+                "luminosity": 0.02169702,
+                "temperature": 3700,
+                "mass": 0.45
+            }
+        },
+        {
+            "id": 94,
+            "type": "system",
+            "x": -1.8485,
+            "y": 1.26,
+            "z": -5.7932,
+            "star": {
+                "catalogId": "HYG_118644",
+                "name": null,
+                "spectralType": "m",
+                "spectralClass": "Unknown",
+                "distanceLy": 20.2582,
+                "luminosity": 0.00025966,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 95,
+            "type": "system",
+            "x": -3.9283,
+            "y": -3.8147,
+            "z": -2.9318,
+            "star": {
+                "catalogId": "HYG_118995",
+                "name": null,
+                "spectralType": "dM8",
+                "spectralClass": "Unknown",
+                "distanceLy": 20.2582,
+                "luminosity": 5.09e-6,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 96,
+            "type": "system",
+            "x": -3.9698,
+            "y": -4.7079,
+            "z": -0.8351,
+            "star": {
+                "catalogId": "HIP_74995",
+                "name": null,
+                "spectralType": "M5",
+                "spectralClass": "M",
+                "distanceLy": 20.2696,
+                "luminosity": 0.00198976,
+                "temperature": 3500,
+                "mass": 0.295
+            }
+        },
+        {
+            "id": 97,
+            "type": "system",
+            "x": -1.4814,
+            "y": 4.6963,
+            "z": 3.9212,
+            "star": {
+                "catalogId": "HIP_34603",
+                "name": null,
+                "spectralType": "M5Ve",
+                "spectralClass": "M",
+                "distanceLy": 20.5299,
+                "luminosity": 0.00075509,
+                "temperature": 2978,
+                "mass": 0.2444
+            }
+        },
+        {
+            "id": 98,
+            "type": "system",
+            "x": -0.9162,
+            "y": -4.3223,
+            "z": 4.5222,
+            "star": {
+                "catalogId": "HYG_119134",
+                "name": null,
+                "spectralType": "M3.5",
+                "spectralClass": "M",
+                "distanceLy": 20.6206,
+                "luminosity": 0.00240769,
+                "temperature": 3267,
+                "mass": 0.3267
+            }
+        },
+        {
+            "id": 99,
+            "type": "system",
+            "x": -2.9065,
+            "y": 2.5622,
+            "z": 5.0837,
+            "star": {
+                "catalogId": "HIP_120005",
+                "name": null,
+                "spectralType": "K2",
+                "spectralClass": "K",
+                "distanceLy": 20.8472,
+                "luminosity": 0.02959375,
+                "temperature": 4867,
+                "mass": 0.7222
+            }
+        },
+        {
+            "id": 100,
+            "type": "system",
+            "x": -5.7371,
+            "y": -1.7277,
+            "z": 2.2778,
+            "star": {
+                "catalogId": "HYG_118865",
+                "name": null,
+                "spectralType": "m",
+                "spectralClass": "Unknown",
+                "distanceLy": 20.9076,
+                "luminosity": 0.00033235,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 101,
+            "type": "system",
+            "x": 0.136,
+            "y": 6.4414,
+            "z": -0.4697,
+            "star": {
+                "catalogId": "HYG_118399",
+                "name": null,
+                "spectralType": "DZ9",
+                "spectralClass": "Unknown",
+                "distanceLy": 21.0694,
+                "luminosity": 6.031e-5,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 102,
+            "type": "system",
+            "x": -1.5251,
+            "y": -3.4829,
+            "z": 5.292,
+            "star": {
+                "catalogId": "HIP_80459",
+                "name": null,
+                "spectralType": "M2",
+                "spectralClass": "M",
+                "distanceLy": 21.2536,
+                "luminosity": 0.00328095,
+                "temperature": 3499,
+                "mass": 0.3
+            }
+        },
+        {
+            "id": 103,
+            "type": "system",
+            "x": -6.3952,
+            "y": -0.5316,
+            "z": 1.262,
+            "star": {
+                "catalogId": "HYG_118812",
+                "name": null,
+                "spectralType": "dM   e",
+                "spectralClass": "Unknown",
+                "distanceLy": 21.3313,
+                "luminosity": 0.00011148,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 104,
+            "type": "system",
+            "x": 3.4756,
+            "y": -0.7185,
+            "z": 5.5004,
+            "star": {
+                "catalogId": "HIP_114622",
+                "name": null,
+                "spectralType": "K3Vvar",
+                "spectralClass": "K",
+                "distanceLy": 21.3508,
+                "luminosity": 0.22080047,
+                "temperature": 4699,
+                "mass": 0.81
+            }
+        },
+        {
+            "id": 105,
+            "type": "system",
+            "x": -5.9314,
+            "y": 1.5874,
+            "z": 2.5853,
+            "star": {
+                "catalogId": "HIP_53767",
+                "name": null,
+                "spectralType": "M3",
+                "spectralClass": "M",
+                "distanceLy": 21.7292,
+                "luminosity": 0.00376011,
+                "temperature": 3267,
+                "mass": 0.3267
+            }
+        },
+        {
+            "id": 106,
+            "type": "system",
+            "x": -4.6417,
+            "y": -4.3054,
+            "z": 2.1922,
+            "star": {
+                "catalogId": "HYG_118988",
+                "name": null,
+                "spectralType": "K4 Ve",
+                "spectralClass": "K",
+                "distanceLy": 21.8515,
+                "luminosity": 0.06367955,
+                "temperature": 4533,
+                "mass": 0.6444
+            }
+        },
+        {
+            "id": 107,
+            "type": "system",
+            "x": 5.0623,
+            "y": -3.898,
+            "z": 2.0321,
+            "star": {
+                "catalogId": "HIP_106106",
+                "name": null,
+                "spectralType": "M4",
+                "spectralClass": "M",
+                "distanceLy": 21.8678,
+                "luminosity": 0.00288935,
+                "temperature": 3122,
+                "mass": 0.2856
+            }
+        },
+        {
+            "id": 108,
+            "type": "system",
+            "x": -1.8475,
+            "y": -6.3821,
+            "z": -0.972,
+            "star": {
+                "catalogId": "HIP_82809",
+                "name": null,
+                "spectralType": "M4",
+                "spectralClass": "M",
+                "distanceLy": 21.9014,
+                "luminosity": 0.00079799,
+                "temperature": 3122,
+                "mass": 0.2856
+            }
+        },
+        {
+            "id": 109,
+            "type": "system",
+            "x": -3.635,
+            "y": 5.5996,
+            "z": 1.0306,
+            "star": {
+                "catalogId": "HYG_118530",
+                "name": null,
+                "spectralType": "dM5",
+                "spectralClass": "Unknown",
+                "distanceLy": 22.0377,
+                "luminosity": 0.00029349,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 110,
+            "type": "system",
+            "x": -6.4096,
+            "y": 1.9943,
+            "z": 0.8014,
+            "star": {
+                "catalogId": "HIP_53020",
+                "name": null,
+                "spectralType": "M4:",
+                "spectralClass": "M",
+                "distanceLy": 22.0495,
+                "luminosity": 0.00087902,
+                "temperature": 3122,
+                "mass": 0.2856
+            }
+        },
+        {
+            "id": 111,
+            "type": "system",
+            "x": 2.6098,
+            "y": -0.9756,
+            "z": -6.206,
+            "star": {
+                "catalogId": "HYG_119513",
+                "name": null,
+                "spectralType": "m",
+                "spectralClass": "Unknown",
+                "distanceLy": 22.1874,
+                "luminosity": 0.00105974,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 112,
+            "type": "system",
+            "x": -0.8185,
+            "y": -6.135,
+            "z": 2.8408,
+            "star": {
+                "catalogId": "HIP_85605",
+                "name": null,
+                "spectralType": "Unknown",
+                "spectralClass": "Unknown",
+                "distanceLy": 22.2115,
+                "luminosity": 0.00112305,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 113,
+            "type": "system",
+            "x": -0.9976,
+            "y": -5.5106,
+            "z": -3.9198,
+            "star": {
+                "catalogId": "HIP_84709",
+                "name": null,
+                "spectralType": "K4V",
+                "spectralClass": "K",
+                "distanceLy": 22.295,
+                "luminosity": 0.1760354,
+                "temperature": 4533,
+                "mass": 0.6444
+            }
+        },
+        {
+            "id": 114,
+            "type": "system",
+            "x": 6.3116,
+            "y": -1.7925,
+            "z": 1.9502,
+            "star": {
+                "catalogId": "HIP_113296",
+                "name": null,
+                "spectralType": "M2:",
+                "spectralClass": "M",
+                "distanceLy": 22.3257,
+                "luminosity": 0.01376575,
+                "temperature": 3411,
+                "mass": 0.3678
+            }
+        },
+        {
+            "id": 115,
+            "type": "system",
+            "x": -1.2389,
+            "y": 2.2996,
+            "z": -6.3982,
+            "star": {
+                "catalogId": "HYG_118510",
+                "name": null,
+                "spectralType": "DQ9",
+                "spectralClass": "Unknown",
+                "distanceLy": 22.5403,
+                "luminosity": 9.71e-5,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 116,
+            "type": "system",
+            "x": 2.2593,
+            "y": -2.3948,
+            "z": 6.2324,
+            "star": {
+                "catalogId": "HIP_103096",
+                "name": null,
+                "spectralType": "M2V",
+                "spectralClass": "M",
+                "distanceLy": 22.9898,
+                "luminosity": 0.01645887,
+                "temperature": 3411,
+                "mass": 0.3678
+            }
+        },
+        {
+            "id": 117,
+            "type": "system",
+            "x": -6.5158,
+            "y": 2.7348,
+            "z": 0.1037,
+            "star": {
+                "catalogId": "HIP_51317",
+                "name": null,
+                "spectralType": "M2",
+                "spectralClass": "M",
+                "distanceLy": 23.0498,
+                "luminosity": 0.00600344,
+                "temperature": 3579,
+                "mass": 0.426
+            }
+        },
+        {
+            "id": 118,
+            "type": "system",
+            "x": 5.5385,
+            "y": 4.4882,
+            "z": 0.861,
+            "star": {
+                "catalogId": "HIP_12114",
+                "name": "268 G. Cet",
+                "spectralType": "K3V",
+                "spectralClass": "K",
+                "distanceLy": 23.419,
+                "luminosity": 0.21697016,
+                "temperature": 4700,
+                "mass": 0.6833
+            }
+        },
+        {
+            "id": 119,
+            "type": "system",
+            "x": -5.5593,
+            "y": -0.9507,
+            "z": -4.4662,
+            "star": {
+                "catalogId": "HYG_118835",
+                "name": null,
+                "spectralType": "M4",
+                "spectralClass": "M",
+                "distanceLy": 23.4643,
+                "luminosity": 0.00036141,
+                "temperature": 3122,
+                "mass": 0.2856
+            }
+        },
+        {
+            "id": 120,
+            "type": "system",
+            "x": 7.1665,
+            "y": -0.7793,
+            "z": -0.3009,
+            "star": {
+                "catalogId": "HYG_119571",
+                "name": null,
+                "spectralType": "M5",
+                "spectralClass": "M",
+                "distanceLy": 23.5322,
+                "luminosity": 6.031e-5,
+                "temperature": 2978,
+                "mass": 0.2444
+            }
+        },
+        {
+            "id": 121,
+            "type": "system",
+            "x": 0.243,
+            "y": -2.93,
+            "z": 6.6635,
+            "star": {
+                "catalogId": "HYG_119212",
+                "name": null,
+                "spectralType": "m",
+                "spectralClass": "Unknown",
+                "distanceLy": 23.7549,
+                "luminosity": 0.00018741,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 122,
+            "type": "system",
+            "x": 1.1923,
+            "y": -6.5683,
+            "z": 3.0824,
+            "star": {
+                "catalogId": "HYG_119229",
+                "name": null,
+                "spectralType": "k-m",
+                "spectralClass": "Unknown",
+                "distanceLy": 23.9819,
+                "luminosity": 0.00051618,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 123,
+            "type": "system",
+            "x": -1.1763,
+            "y": -5.2545,
+            "z": 5.1422,
+            "star": {
+                "catalogId": "HIP_83945",
+                "name": null,
+                "spectralType": "M3",
+                "spectralClass": "M",
+                "distanceLy": 24.2839,
+                "luminosity": 0.00094537,
+                "temperature": 3267,
+                "mass": 0.3267
+            }
+        },
+        {
+            "id": 124,
+            "type": "system",
+            "x": 7.2584,
+            "y": 1.5555,
+            "z": 0.6861,
+            "star": {
+                "catalogId": "HIP_3765",
+                "name": "96 G. Psc",
+                "spectralType": "K2V",
+                "spectralClass": "K",
+                "distanceLy": 24.3146,
+                "luminosity": 0.24479357,
+                "temperature": 4867,
+                "mass": 0.7222
+            }
+        },
+        {
+            "id": 125,
+            "type": "system",
+            "x": 6.482,
+            "y": -2.9161,
+            "z": -2.2557,
+            "star": {
+                "catalogId": "HYG_119492",
+                "name": null,
+                "spectralType": "M4",
+                "spectralClass": "M",
+                "distanceLy": 24.3218,
+                "luminosity": 0.00024277,
+                "temperature": 3122,
+                "mass": 0.2856
+            }
+        },
+        {
+            "id": 126,
+            "type": "system",
+            "x": 1.6353,
+            "y": 0.1845,
+            "z": -7.2752,
+            "star": {
+                "catalogId": "HIP_2021",
+                "name": null,
+                "spectralType": "G2IV",
+                "spectralClass": "G",
+                "distanceLy": 24.3273,
+                "luminosity": 3.60744734,
+                "temperature": 5822,
+                "mass": 0.9867
+            }
+        },
+        {
+            "id": 127,
+            "type": "system",
+            "x": 5.1098,
+            "y": 4.452,
+            "z": 3.2359,
+            "star": {
+                "catalogId": "HIP_12781",
+                "name": null,
+                "spectralType": "M3.5Ve",
+                "spectralClass": "M",
+                "distanceLy": 24.4937,
+                "luminosity": 0.00295937,
+                "temperature": 3267,
+                "mass": 0.3267
+            }
+        },
+        {
+            "id": 129,
+            "type": "system",
+            "x": 6.6517,
+            "y": 0.7197,
+            "z": -3.4308,
+            "star": {
+                "catalogId": "HYG_117987",
+                "name": null,
+                "spectralType": "M5.5",
+                "spectralClass": "M",
+                "distanceLy": 24.5599,
+                "luminosity": 3.354e-5,
+                "temperature": 2978,
+                "mass": 0.2444
+            }
+        },
+        {
+            "id": 128,
+            "type": "system",
+            "x": -6.9609,
+            "y": -1.6705,
+            "z": -2.3307,
+            "star": {
+                "catalogId": "HIP_62951",
+                "name": null,
+                "spectralType": "A2",
+                "spectralClass": "A",
+                "distanceLy": 24.5543,
+                "luminosity": 0.0194805,
+                "temperature": 9444,
+                "mass": 1.9444
+            }
+        },
+        {
+            "id": 130,
+            "type": "system",
+            "x": 6.3708,
+            "y": 3.0557,
+            "z": 2.6093,
+            "star": {
+                "catalogId": "HIP_7981",
+                "name": null,
+                "spectralType": "K1V",
+                "spectralClass": "K",
+                "distanceLy": 24.5674,
+                "luminosity": 0.39627803,
+                "temperature": 5033,
+                "mass": 0.7611
+            }
+        },
+        {
+            "id": 131,
+            "type": "system",
+            "x": 0.2385,
+            "y": -7.2412,
+            "z": -2.0728,
+            "star": {
+                "catalogId": "HYG_119199",
+                "name": null,
+                "spectralType": "m",
+                "spectralClass": "Unknown",
+                "distanceLy": 24.5785,
+                "luminosity": 0.00017474,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 132,
+            "type": "system",
+            "x": 4.1496,
+            "y": 1.2739,
+            "z": 6.1809,
+            "star": {
+                "catalogId": "HYG_118043",
+                "name": null,
+                "spectralType": "Unknown",
+                "spectralClass": "Unknown",
+                "distanceLy": 24.6342,
+                "luminosity": 0.00197879,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 133,
+            "type": "system",
+            "x": -0.0194,
+            "y": 3.8276,
+            "z": 6.5244,
+            "star": {
+                "catalogId": "HYG_118405",
+                "name": null,
+                "spectralType": "m",
+                "spectralClass": "Unknown",
+                "distanceLy": 24.6714,
+                "luminosity": 0.00103181,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 134,
+            "type": "system",
+            "x": 6.2354,
+            "y": -1.7762,
+            "z": -3.9833,
+            "star": {
+                "catalogId": "HIP_113283",
+                "name": null,
+                "spectralType": "K4Vp",
+                "spectralClass": "K",
+                "distanceLy": 24.8179,
+                "luminosity": 0.12906248,
+                "temperature": 4533,
+                "mass": 0.6444
+            }
+        },
+        {
+            "id": 135,
+            "type": "system",
+            "x": 5.1314,
+            "y": 5.2144,
+            "z": -2.1795,
+            "star": {
+                "catalogId": "HYG_118187",
+                "name": null,
+                "spectralType": "M3",
+                "spectralClass": "M",
+                "distanceLy": 24.8974,
+                "luminosity": 0.00096739,
+                "temperature": 3267,
+                "mass": 0.3267
+            }
+        },
+        {
+            "id": 136,
+            "type": "system",
+            "x": 5.1314,
+            "y": 5.2144,
+            "z": -2.1797,
+            "star": {
+                "catalogId": "HYG_119616",
+                "name": null,
+                "spectralType": "M3",
+                "spectralClass": "M",
+                "distanceLy": 24.8974,
+                "luminosity": 0.00272898,
+                "temperature": 3267,
+                "mass": 0.3267
+            }
+        },
+        {
+            "id": 137,
+            "type": "system",
+            "x": -6.9575,
+            "y": -2.8818,
+            "z": 1.379,
+            "star": {
+                "catalogId": "HIP_65859",
+                "name": null,
+                "spectralType": "M1V",
+                "spectralClass": "M",
+                "distanceLy": 24.9699,
+                "luminosity": 0.01224616,
+                "temperature": 3728,
+                "mass": 0.51
+            }
+        },
+        {
+            "id": 138,
+            "type": "system",
+            "x": 0.9606,
+            "y": -5.908,
+            "z": 4.8097,
+            "star": {
+                "catalogId": "HIP_91262",
+                "name": "Vega",
+                "spectralType": "A0Vvar",
+                "spectralClass": "A",
+                "distanceLy": 25.0445,
+                "luminosity": 49.93441887,
+                "temperature": 10000,
+                "mass": 2.1
+            }
+        },
+        {
+            "id": 139,
+            "type": "system",
+            "x": -1.1456,
+            "y": -7.6094,
+            "z": 0.2837,
+            "star": {
+                "catalogId": "HIP_85295",
+                "name": null,
+                "spectralType": "K7V",
+                "spectralClass": "K",
+                "distanceLy": 25.116,
+                "luminosity": 0.04979664,
+                "temperature": 4033,
+                "mass": 0.5278
+            }
+        },
+        {
+            "id": 140,
+            "type": "system",
+            "x": 6.4505,
+            "y": -1.7995,
+            "z": -3.8078,
+            "star": {
+                "catalogId": "HIP_113368",
+                "name": "Fomalhaut",
+                "spectralType": "A3V",
+                "spectralClass": "A",
+                "distanceLy": 25.1258,
+                "luminosity": 17.58733354,
+                "temperature": 9167,
+                "mass": 1.8667
+            }
+        },
+        {
+            "id": 141,
+            "type": "system",
+            "x": -0.9008,
+            "y": 3.4859,
+            "z": 6.8651,
+            "star": {
+                "catalogId": "HYG_118451",
+                "name": null,
+                "spectralType": "m",
+                "spectralClass": "Unknown",
+                "distanceLy": 25.2833,
+                "luminosity": 0.00018147,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 142,
+            "type": "system",
+            "x": -1.8783,
+            "y": 7.0747,
+            "z": 2.5705,
+            "star": {
+                "catalogId": "HYG_118455",
+                "name": null,
+                "spectralType": "m",
+                "spectralClass": "Unknown",
+                "distanceLy": 25.3032,
+                "luminosity": 6.132e-5,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 143,
+            "type": "system",
+            "x": 0.1733,
+            "y": -7.7461,
+            "z": -0.4103,
+            "star": {
+                "catalogId": "HIP_88574",
+                "name": null,
+                "spectralType": "M2V",
+                "spectralClass": "M",
+                "distanceLy": 25.3051,
+                "luminosity": 0.00936699,
+                "temperature": 3411,
+                "mass": 0.3678
+            }
+        },
+        {
+            "id": 144,
+            "type": "system",
+            "x": -5.5486,
+            "y": -0.9976,
+            "z": -5.3623,
+            "star": {
+                "catalogId": "HIP_61874",
+                "name": null,
+                "spectralType": "M4",
+                "spectralClass": "M",
+                "distanceLy": 25.3779,
+                "luminosity": 0.00066988,
+                "temperature": 3122,
+                "mass": 0.2856
+            }
+        },
+        {
+            "id": 145,
+            "type": "system",
+            "x": 5.6891,
+            "y": 0.054,
+            "z": -5.3363,
+            "star": {
+                "catalogId": "HYG_119615",
+                "name": null,
+                "spectralType": "DA5",
+                "spectralClass": "Unknown",
+                "distanceLy": 25.4411,
+                "luminosity": 0.00031945,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 146,
+            "type": "system",
+            "x": 3.9459,
+            "y": 1.8357,
+            "z": -6.5001,
+            "star": {
+                "catalogId": "HIP_7751",
+                "name": "p Eridani",
+                "spectralType": "K0V",
+                "spectralClass": "K",
+                "distanceLy": 25.5129,
+                "luminosity": 0.26472807,
+                "temperature": 5200,
+                "mass": 0.8
+            }
+        },
+        {
+            "id": 147,
+            "type": "system",
+            "x": -7.0011,
+            "y": 3.5559,
+            "z": -0.5141,
+            "star": {
+                "catalogId": "HIP_49986",
+                "name": null,
+                "spectralType": "M3",
+                "spectralClass": "M",
+                "distanceLy": 25.6655,
+                "luminosity": 0.01066596,
+                "temperature": 3267,
+                "mass": 0.3267
+            }
+        },
+        {
+            "id": 148,
+            "type": "system",
+            "x": -6.3753,
+            "y": -2.6987,
+            "z": 3.8808,
+            "star": {
+                "catalogId": "HYG_118894",
+                "name": null,
+                "spectralType": "M4  e",
+                "spectralClass": "M",
+                "distanceLy": 25.8854,
+                "luminosity": 0.00091033,
+                "temperature": 3122,
+                "mass": 0.2856
+            }
+        },
+        {
+            "id": 149,
+            "type": "system",
+            "x": 0.1242,
+            "y": 7.9576,
+            "z": 0.7473,
+            "star": {
+                "catalogId": "HYG_118400",
+                "name": null,
+                "spectralType": "DAP9",
+                "spectralClass": "Unknown",
+                "distanceLy": 26.0716,
+                "luminosity": 0.00012753,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 150,
+            "type": "system",
+            "x": 2.0285,
+            "y": -2.6309,
+            "z": 7.2728,
+            "star": {
+                "catalogId": "HIP_101180",
+                "name": null,
+                "spectralType": "M3",
+                "spectralClass": "M",
+                "distanceLy": 26.0778,
+                "luminosity": 0.00338532,
+                "temperature": 3267,
+                "mass": 0.3267
+            }
+        },
+        {
+            "id": 151,
+            "type": "system",
+            "x": -1.4301,
+            "y": 5.5521,
+            "z": -5.5931,
+            "star": {
+                "catalogId": "HIP_33499",
+                "name": null,
+                "spectralType": "M4+...",
+                "spectralClass": "M",
+                "distanceLy": 26.1238,
+                "luminosity": 0.00264972,
+                "temperature": 3122,
+                "mass": 0.2856
+            }
+        },
+        {
+            "id": 152,
+            "type": "system",
+            "x": 6.2909,
+            "y": -4.77,
+            "z": -1.3623,
+            "star": {
+                "catalogId": "HYG_119418",
+                "name": null,
+                "spectralType": "Unknown",
+                "spectralClass": "Unknown",
+                "distanceLy": 26.13,
+                "luminosity": 6.132e-5,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 153,
+            "type": "system",
+            "x": 7.6648,
+            "y": -2.2744,
+            "z": -0.9509,
+            "star": {
+                "catalogId": "HYG_119536",
+                "name": null,
+                "spectralType": "DZ9+",
+                "spectralClass": "Unknown",
+                "distanceLy": 26.2605,
+                "luminosity": 3.102e-5,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 154,
+            "type": "system",
+            "x": -2.1743,
+            "y": -4.8925,
+            "z": 6.0202,
+            "star": {
+                "catalogId": "HIP_80346",
+                "name": null,
+                "spectralType": "M3",
+                "spectralClass": "M",
+                "distanceLy": 26.2774,
+                "luminosity": 0.00440961,
+                "temperature": 3267,
+                "mass": 0.3267
+            }
+        },
+        {
+            "id": 155,
+            "type": "system",
+            "x": 0.2194,
+            "y": -2.3817,
+            "z": 7.6945,
+            "star": {
+                "catalogId": "HIP_89937",
+                "name": null,
+                "spectralType": "F7Vvar",
+                "spectralClass": "F",
+                "distanceLy": 26.2797,
+                "luminosity": 2.14980961,
+                "temperature": 6333,
+                "mass": 1.12
+            }
+        },
+        {
+            "id": 156,
+            "type": "system",
+            "x": 0.9276,
+            "y": -6.0966,
+            "z": 5.1969,
+            "star": {
+                "catalogId": "HYG_119224",
+                "name": null,
+                "spectralType": "M3  p",
+                "spectralClass": "M",
+                "distanceLy": 26.3029,
+                "luminosity": 0.00153179,
+                "temperature": 3267,
+                "mass": 0.3267
+            }
+        },
+        {
+            "id": 157,
+            "type": "system",
+            "x": 2.4137,
+            "y": 7.6368,
+            "z": 0.9779,
+            "star": {
+                "catalogId": "HIP_22449",
+                "name": "Tabit",
+                "spectralType": "F6V",
+                "spectralClass": "F",
+                "distanceLy": 26.3156,
+                "luminosity": 3.00330888,
+                "temperature": 6500,
+                "mass": 1.16
+            }
+        },
+        {
+            "id": 158,
+            "type": "system",
+            "x": -0.7382,
+            "y": -7.6283,
+            "z": 2.578,
+            "star": {
+                "catalogId": "HIP_86287",
+                "name": null,
+                "spectralType": "M1",
+                "spectralClass": "M",
+                "distanceLy": 26.373,
+                "luminosity": 0.00808351,
+                "temperature": 3656,
+                "mass": 0.426
+            }
+        },
+        {
+            "id": 161,
+            "type": "system",
+            "x": 6.5143,
+            "y": -0.4811,
+            "z": 4.84,
+            "star": {
+                "catalogId": "HYG_119588",
+                "name": null,
+                "spectralType": "k",
+                "spectralClass": "Unknown",
+                "distanceLy": 26.5168,
+                "luminosity": 0.00053951,
+                "temperature": 3296,
+                "mass": 0.21
+            }
+        },
+        {
+            "id": 160,
+            "type": "system",
+            "x": -1.2973,
+            "y": 1.1182,
+            "z": -7.9476,
+            "star": {
+                "catalogId": "HYG_118621",
+                "name": null,
+                "spectralType": "m",
+                "spectralClass": "Unknown",
+                "distanceLy": 26.5168,
+                "luminosity": 0.00033113,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 159,
+            "type": "system",
+            "x": 2.2481,
+            "y": 4.8772,
+            "z": -6.1039,
+            "star": {
+                "catalogId": "HYG_118293",
+                "name": null,
+                "spectralType": "DA8",
+                "spectralClass": "Unknown",
+                "distanceLy": 26.5168,
+                "luminosity": 0.00010375,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 162,
+            "type": "system",
+            "x": -7.82,
+            "y": -2.1159,
+            "z": 0.8065,
+            "star": {
+                "catalogId": "HYG_118861",
+                "name": null,
+                "spectralType": "dM5  e",
+                "spectralClass": "Unknown",
+                "distanceLy": 26.5599,
+                "luminosity": 0.00025212,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 163,
+            "type": "system",
+            "x": 4.1101,
+            "y": 1.912,
+            "z": -6.7701,
+            "star": {
+                "catalogId": "HD_10361",
+                "name": "p Eridani",
+                "spectralType": "K2 V",
+                "spectralClass": "K",
+                "distanceLy": 26.5706,
+                "luminosity": 0.27669416,
+                "temperature": 4867,
+                "mass": 0.7222
+            }
+        },
+        {
+            "id": 164,
+            "type": "system",
+            "x": 2.0015,
+            "y": -6.576,
+            "z": 4.3865,
+            "star": {
+                "catalogId": "HYG_119260",
+                "name": null,
+                "spectralType": "M3.5 J",
+                "spectralClass": "M",
+                "distanceLy": 26.6032,
+                "luminosity": 0.0010452,
+                "temperature": 3267,
+                "mass": 0.3267
+            }
+        },
+        {
+            "id": 165,
+            "type": "system",
+            "x": -7.4526,
+            "y": -3.3392,
+            "z": 0.5252,
+            "star": {
+                "catalogId": "HYG_118902",
+                "name": null,
+                "spectralType": "DZ9",
+                "spectralClass": "Unknown",
+                "distanceLy": 26.6903,
+                "luminosity": 8.054e-5,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 166,
+            "type": "system",
+            "x": 2.996,
+            "y": 0.9501,
+            "z": -7.5675,
+            "star": {
+                "catalogId": "HIP_5496",
+                "name": null,
+                "spectralType": "K",
+                "spectralClass": "K",
+                "distanceLy": 26.7252,
+                "luminosity": 0.00702749,
+                "temperature": 4367,
+                "mass": 0.6056
+            }
+        },
+        {
+            "id": 167,
+            "type": "system",
+            "x": -5.4481,
+            "y": 0.2145,
+            "z": 6.1361,
+            "star": {
+                "catalogId": "HYG_118777",
+                "name": null,
+                "spectralType": "m",
+                "spectralClass": "Unknown",
+                "distanceLy": 26.7781,
+                "luminosity": 0.00029431,
+                "temperature": 3280,
+                "mass": 0.1639
+            }
+        },
+        {
+            "id": 168,
+            "type": "system",
+            "x": 7.3345,
+            "y": -1.9561,
+            "z": -3.148,
+            "star": {
+                "catalogId": "HIP_113576",
+                "name": null,
+                "spectralType": "K5/M0V",
+                "spectralClass": "K",
+                "distanceLy": 26.8022,
+                "luminosity": 0.0414572,
+                "temperature": 4367,
+                "mass": 0.6056
+            }
+        },
+        {
+            "id": 169,
+            "type": "system",
+            "x": 2.4932,
+            "y": 0.6977,
+            "z": 7.8191,
+            "star": {
+                "catalogId": "HIP_4856",
+                "name": null,
+                "spectralType": "M3.5e",
+                "spectralClass": "M",
+                "distanceLy": 26.8642,
+                "luminosity": 0.00602005,
+                "temperature": 3267,
+                "mass": 0.3267
+            }
+        },
+        {
+            "id": 170,
+            "type": "system",
+            "x": 0.3779,
+            "y": -3.8457,
+            "z": 7.2823,
+            "star": {
+                "catalogId": "HYG_119218",
+                "name": null,
+                "spectralType": "m",
+                "spectralClass": "Unknown",
+                "distanceLy": 26.8883,
+                "luminosity": 0.00025609,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 171,
+            "type": "system",
+            "x": 6.5148,
+            "y": -4.9401,
+            "z": -1.4109,
+            "star": {
+                "catalogId": "HIP_106255",
+                "name": null,
+                "spectralType": "M4e...",
+                "spectralClass": "M",
+                "distanceLy": 27.0625,
+                "luminosity": 0.00098628,
+                "temperature": 3122,
+                "mass": 0.2856
+            }
+        },
+        {
+            "id": 172,
+            "type": "system",
+            "x": -0.4344,
+            "y": -7.3437,
+            "z": 3.8657,
+            "star": {
+                "catalogId": "HIP_86974",
+                "name": null,
+                "spectralType": "G5IV",
+                "spectralClass": "G",
+                "distanceLy": 27.1052,
+                "luminosity": 2.57750787,
+                "temperature": 5556,
+                "mass": 0.9067
+            }
+        },
+        {
+            "id": 173,
+            "type": "system",
+            "x": -0.8222,
+            "y": 7.6016,
+            "z": 3.3142,
+            "star": {
+                "catalogId": "HYG_118425",
+                "name": null,
+                "spectralType": "M4.5",
+                "spectralClass": "M",
+                "distanceLy": 27.1796,
+                "luminosity": 0.00036108,
+                "temperature": 3122,
+                "mass": 0.2856
+            }
+        },
+        {
+            "id": 174,
+            "type": "system",
+            "x": -2.795,
+            "y": -5.9979,
+            "z": -5.0828,
+            "star": {
+                "catalogId": "HIP_80018",
+                "name": null,
+                "spectralType": "M4",
+                "spectralClass": "M",
+                "distanceLy": 27.2138,
+                "luminosity": 0.00362076,
+                "temperature": 3122,
+                "mass": 0.2856
+            }
+        },
+        {
+            "id": 175,
+            "type": "system",
+            "x": -8.0697,
+            "y": -1.7132,
+            "z": 1.4177,
+            "star": {
+                "catalogId": "HIP_62452",
+                "name": "Gar",
+                "spectralType": "M4",
+                "spectralClass": "M",
+                "distanceLy": 27.3002,
+                "luminosity": 0.00169668,
+                "temperature": 3317,
+                "mass": 0.312
+            }
+        },
+        {
+            "id": 176,
+            "type": "system",
+            "x": -5.1784,
+            "y": 0.3775,
+            "z": -6.6075,
+            "star": {
+                "catalogId": "HYG_118769",
+                "name": null,
+                "spectralType": "K0",
+                "spectralClass": "K",
+                "distanceLy": 27.4082,
+                "luminosity": 0.00441367,
+                "temperature": 5200,
+                "mass": 0.8
+            }
+        },
+        {
+            "id": 177,
+            "type": "system",
+            "x": -6.2662,
+            "y": -0.9293,
+            "z": 5.5765,
+            "star": {
+                "catalogId": "HIP_61317",
+                "name": "Chara",
+                "spectralType": "G0V",
+                "spectralClass": "G",
+                "distanceLy": 27.5259,
+                "luminosity": 1.2496834,
+                "temperature": 6000,
+                "mass": 1.04
+            }
+        },
+        {
+            "id": 179,
+            "type": "system",
+            "x": -8.4433,
+            "y": -0.5266,
+            "z": 0.0917,
+            "star": {
+                "catalogId": "HYG_118805",
+                "name": null,
+                "spectralType": "m",
+                "spectralClass": "Unknown",
+                "distanceLy": 27.5934,
+                "luminosity": 0.00020082,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 178,
+            "type": "system",
+            "x": 6.8069,
+            "y": 4.6138,
+            "z": 1.9886,
+            "star": {
+                "catalogId": "HYG_118128",
+                "name": null,
+                "spectralType": "m",
+                "spectralClass": "Unknown",
+                "distanceLy": 27.5934,
+                "luminosity": 3.012e-5,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 180,
+            "type": "system",
+            "x": 5.6085,
+            "y": 6.3043,
+            "z": 0.7049,
+            "star": {
+                "catalogId": "HYG_118201",
+                "name": null,
+                "spectralType": "m",
+                "spectralClass": "Unknown",
+                "distanceLy": 27.6169,
+                "luminosity": 0.00018863,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 181,
+            "type": "system",
+            "x": 7.7753,
+            "y": 2.5048,
+            "z": 2.2561,
+            "star": {
+                "catalogId": "HYG_118048",
+                "name": null,
+                "spectralType": "m",
+                "spectralClass": "Unknown",
+                "distanceLy": 27.6404,
+                "luminosity": 0.00011282,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 182,
+            "type": "system",
+            "x": 2.2957,
+            "y": -7.6166,
+            "z": 3.0358,
+            "star": {
+                "catalogId": "HIP_93873",
+                "name": null,
+                "spectralType": "M2",
+                "spectralClass": "M",
+                "distanceLy": 27.7699,
+                "luminosity": 0.00310742,
+                "temperature": 3411,
+                "mass": 0.3678
+            }
+        },
+        {
+            "id": 183,
+            "type": "system",
+            "x": 1.9724,
+            "y": 7.6909,
+            "z": -3.0884,
+            "star": {
+                "catalogId": "HYG_118345",
+                "name": null,
+                "spectralType": "Unknown",
+                "spectralClass": "Unknown",
+                "distanceLy": 27.7862,
+                "luminosity": 0.00398841,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 184,
+            "type": "system",
+            "x": 4.0318,
+            "y": 7.2041,
+            "z": -2.2356,
+            "star": {
+                "catalogId": "HIP_18899",
+                "name": null,
+                "spectralType": "Unknown",
+                "spectralClass": "Unknown",
+                "distanceLy": 27.8958,
+                "luminosity": 0.00436918,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 185,
+            "type": "system",
+            "x": -7.6512,
+            "y": -2.7247,
+            "z": -2.6878,
+            "star": {
+                "catalogId": "HIP_64924",
+                "name": null,
+                "spectralType": "G5V",
+                "spectralClass": "G",
+                "distanceLy": 27.903,
+                "luminosity": 0.80984145,
+                "temperature": 5577,
+                "mass": 0.942
+            }
+        },
+        {
+            "id": 186,
+            "type": "system",
+            "x": -5.8717,
+            "y": 6.2091,
+            "z": -0.5212,
+            "star": {
+                "catalogId": "HYG_118572",
+                "name": null,
+                "spectralType": "m",
+                "spectralClass": "Unknown",
+                "distanceLy": 27.9242,
+                "luminosity": 1.93e-6,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 187,
+            "type": "system",
+            "x": -7.0039,
+            "y": 0.2714,
+            "z": 4.9576,
+            "star": {
+                "catalogId": "HIP_57802",
+                "name": null,
+                "spectralType": "M1V",
+                "spectralClass": "M",
+                "distanceLy": 28.0011,
+                "luminosity": 0.0080094,
+                "temperature": 3556,
+                "mass": 0.4089
+            }
+        },
+        {
+            "id": 188,
+            "type": "system",
+            "x": 3.6319,
+            "y": 0.3189,
+            "z": -7.7742,
+            "star": {
+                "catalogId": "HIP_1599",
+                "name": "Zeta Tucanae",
+                "spectralType": "F9V",
+                "spectralClass": "F",
+                "distanceLy": 28.0057,
+                "luminosity": 1.30496841,
+                "temperature": 6000,
+                "mass": 1.04
+            }
+        },
+        {
+            "id": 189,
+            "type": "system",
+            "x": 2.0786,
+            "y": -0.5984,
+            "z": -8.3388,
+            "star": {
+                "catalogId": "HIP_113229",
+                "name": null,
+                "spectralType": "K",
+                "spectralClass": "K",
+                "distanceLy": 28.1,
+                "luminosity": 0.00438935,
+                "temperature": 4367,
+                "mass": 0.6056
+            }
+        },
+        {
+            "id": 190,
+            "type": "system",
+            "x": -3.1925,
+            "y": 5.6305,
+            "z": 5.6871,
+            "star": {
+                "catalogId": "HIP_38956",
+                "name": null,
+                "spectralType": "M4V",
+                "spectralClass": "M",
+                "distanceLy": 28.1023,
+                "luminosity": 0.00100647,
+                "temperature": 3122,
+                "mass": 0.2856
+            }
+        },
+        {
+            "id": 191,
+            "type": "system",
+            "x": 7.5857,
+            "y": -2.8077,
+            "z": -3.0437,
+            "star": {
+                "catalogId": "HYG_119519",
+                "name": null,
+                "spectralType": "dM4  e",
+                "spectralClass": "Unknown",
+                "distanceLy": 28.1874,
+                "luminosity": 0.0017108,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 192,
+            "type": "system",
+            "x": 0.1991,
+            "y": 8.1239,
+            "z": 3.0022,
+            "star": {
+                "catalogId": "HIP_27913",
+                "name": null,
+                "spectralType": "G0V",
+                "spectralClass": "G",
+                "distanceLy": 28.2559,
+                "luminosity": 1.14604059,
+                "temperature": 6000,
+                "mass": 1.04
+            }
+        },
+        {
+            "id": 193,
+            "type": "system",
+            "x": -0.3165,
+            "y": 2.1319,
+            "z": -8.4095,
+            "star": {
+                "catalogId": "HIP_31292",
+                "name": null,
+                "spectralType": "Unknown",
+                "spectralClass": "Unknown",
+                "distanceLy": 28.3146,
+                "luminosity": 0.00179143,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 194,
+            "type": "system",
+            "x": -6.1137,
+            "y": -4.1648,
+            "z": 4.5708,
+            "star": {
+                "catalogId": "HYG_118955",
+                "name": null,
+                "spectralType": "m",
+                "spectralClass": "Unknown",
+                "distanceLy": 28.3615,
+                "luminosity": 0.00037914,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 195,
+            "type": "system",
+            "x": -1.9601,
+            "y": 8.4396,
+            "z": -0.7867,
+            "star": {
+                "catalogId": "HYG_118446",
+                "name": null,
+                "spectralType": "M2",
+                "spectralClass": "M",
+                "distanceLy": 28.3762,
+                "luminosity": 0.00607016,
+                "temperature": 3411,
+                "mass": 0.3678
+            }
+        },
+        {
+            "id": 196,
+            "type": "system",
+            "x": 2.2126,
+            "y": 8.3768,
+            "z": -0.873,
+            "star": {
+                "catalogId": "HIP_23311",
+                "name": null,
+                "spectralType": "K3V",
+                "spectralClass": "K",
+                "distanceLy": 28.401,
+                "luminosity": 0.21478305,
+                "temperature": 4700,
+                "mass": 0.6833
+            }
+        },
+        {
+            "id": 197,
+            "type": "system",
+            "x": 2.3645,
+            "y": -7.8291,
+            "z": 3.1192,
+            "star": {
+                "catalogId": "HIP_93899",
+                "name": null,
+                "spectralType": "M2",
+                "spectralClass": "M",
+                "distanceLy": 28.5475,
+                "luminosity": 0.00331436,
+                "temperature": 3411,
+                "mass": 0.3678
+            }
+        },
+        {
+            "id": 198,
+            "type": "system",
+            "x": 5.2482,
+            "y": -6.852,
+            "z": 1.4735,
+            "star": {
+                "catalogId": "HYG_119346",
+                "name": null,
+                "spectralType": "dM6  e",
+                "spectralClass": "Unknown",
+                "distanceLy": 28.5602,
+                "luminosity": 0.00040253,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 199,
+            "type": "system",
+            "x": -5.0833,
+            "y": 6.5281,
+            "z": 2.9137,
+            "star": {
+                "catalogId": "HYG_118543",
+                "name": null,
+                "spectralType": "Unknown",
+                "spectralClass": "Unknown",
+                "distanceLy": 28.6101,
+                "luminosity": 0.00031477,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 200,
+            "type": "system",
+            "x": -8.2542,
+            "y": 1.1134,
+            "z": 2.7522,
+            "star": {
+                "catalogId": "HYG_118756",
+                "name": null,
+                "spectralType": "DC8",
+                "spectralClass": "Unknown",
+                "distanceLy": 28.6101,
+                "luminosity": 0.00020417,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 201,
+            "type": "system",
+            "x": -1.0724,
+            "y": -5.9379,
+            "z": -6.3889,
+            "star": {
+                "catalogId": "HYG_119141",
+                "name": null,
+                "spectralType": "M0 V",
+                "spectralClass": "M",
+                "distanceLy": 28.658,
+                "luminosity": 0.02246984,
+                "temperature": 3700,
+                "mass": 0.45
+            }
+        },
+        {
+            "id": 202,
+            "type": "system",
+            "x": -4.1236,
+            "y": 7.7627,
+            "z": -0.0004,
+            "star": {
+                "catalogId": "HYG_118503",
+                "name": null,
+                "spectralType": "m",
+                "spectralClass": "Unknown",
+                "distanceLy": 28.6603,
+                "luminosity": 0.00026767,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 203,
+            "type": "system",
+            "x": 1.2088,
+            "y": 8.6016,
+            "z": 1.476,
+            "star": {
+                "catalogId": "HIP_25578",
+                "name": null,
+                "spectralType": "M5",
+                "spectralClass": "M",
+                "distanceLy": 28.7363,
+                "luminosity": 0.00068865,
+                "temperature": 2978,
+                "mass": 0.2444
+            }
+        },
+        {
+            "id": 204,
+            "type": "system",
+            "x": -8.3573,
+            "y": -0.9107,
+            "z": -2.7709,
+            "star": {
+                "catalogId": "HIP_60559",
+                "name": null,
+                "spectralType": "M4",
+                "spectralClass": "M",
+                "distanceLy": 28.8684,
+                "luminosity": 0.00209894,
+                "temperature": 3122,
+                "mass": 0.2856
+            }
+        },
+        {
+            "id": 205,
+            "type": "system",
+            "x": -7.4455,
+            "y": 0.8006,
+            "z": -4.778,
+            "star": {
+                "catalogId": "HIP_56528",
+                "name": null,
+                "spectralType": "M2V",
+                "spectralClass": "M",
+                "distanceLy": 28.9711,
+                "luminosity": 0.00818842,
+                "temperature": 3411,
+                "mass": 0.48
+            }
+        },
+        {
+            "id": 206,
+            "type": "system",
+            "x": 6.8084,
+            "y": -3.8827,
+            "z": 4.2214,
+            "star": {
+                "catalogId": "HIP_108706",
+                "name": null,
+                "spectralType": "Unknown",
+                "spectralClass": "Unknown",
+                "distanceLy": 29.0354,
+                "luminosity": 0.00110459,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 207,
+            "type": "system",
+            "x": -4.8436,
+            "y": 5.6941,
+            "z": -4.8438,
+            "star": {
+                "catalogId": "HYG_118557",
+                "name": null,
+                "spectralType": "DA6",
+                "spectralClass": "Unknown",
+                "distanceLy": 29.0432,
+                "luminosity": 0.00122236,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 208,
+            "type": "system",
+            "x": 4.418,
+            "y": -6.5939,
+            "z": -4.0499,
+            "star": {
+                "catalogId": "HIP_99825",
+                "name": null,
+                "spectralType": "K3V",
+                "spectralClass": "K",
+                "distanceLy": 29.0641,
+                "luminosity": 0.35318317,
+                "temperature": 5166,
+                "mass": 0.8
+            }
+        },
+        {
+            "id": 209,
+            "type": "system",
+            "x": -3.5942,
+            "y": 0.6324,
+            "z": 8.1379,
+            "star": {
+                "catalogId": "HIP_55360",
+                "name": null,
+                "spectralType": "M1Vvar",
+                "spectralClass": "M",
+                "distanceLy": 29.0872,
+                "luminosity": 0.01307374,
+                "temperature": 3556,
+                "mass": 0.4089
+            }
+        },
+        {
+            "id": 210,
+            "type": "system",
+            "x": 1.8134,
+            "y": -5.6762,
+            "z": -6.6363,
+            "star": {
+                "catalogId": "HIP_94223",
+                "name": null,
+                "spectralType": "Unknown",
+                "spectralClass": "Unknown",
+                "distanceLy": 29.0899,
+                "luminosity": 0.0053555,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 211,
+            "type": "system",
+            "x": 0.5589,
+            "y": 8.2315,
+            "z": -3.4088,
+            "star": {
+                "catalogId": "HIP_27072",
+                "name": "Gamma Leporis",
+                "spectralType": "F7V",
+                "spectralClass": "F",
+                "distanceLy": 29.1159,
+                "luminosity": 2.54448562,
+                "temperature": 6333,
+                "mass": 1.12
+            }
+        },
+        {
+            "id": 214,
+            "type": "system",
+            "x": -8.6131,
+            "y": -0.3792,
+            "z": -2.3217,
+            "star": {
+                "catalogId": "HYG_118800",
+                "name": null,
+                "spectralType": "m",
+                "spectralClass": "Unknown",
+                "distanceLy": 29.1212,
+                "luminosity": 0.00104136,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 212,
+            "type": "system",
+            "x": 7.5636,
+            "y": 4.466,
+            "z": 1.6022,
+            "star": {
+                "catalogId": "HYG_118104",
+                "name": null,
+                "spectralType": "m",
+                "spectralClass": "Unknown",
+                "distanceLy": 29.1212,
+                "luminosity": 3.959e-5,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 215,
+            "type": "system",
+            "x": -7.2888,
+            "y": -4.1731,
+            "z": -3.0297,
+            "star": {
+                "catalogId": "HYG_118938",
+                "name": null,
+                "spectralType": "K2 :",
+                "spectralClass": "K",
+                "distanceLy": 29.1212,
+                "luminosity": 0.00043813,
+                "temperature": 4867,
+                "mass": 0.7222
+            }
+        },
+        {
+            "id": 213,
+            "type": "system",
+            "x": -3.6123,
+            "y": 7.7163,
+            "z": -2.6722,
+            "star": {
+                "catalogId": "HYG_118495",
+                "name": null,
+                "spectralType": "DZQ6",
+                "spectralClass": "Unknown",
+                "distanceLy": 29.1212,
+                "luminosity": 0.00043813,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 216,
+            "type": "system",
+            "x": 8.6353,
+            "y": -0.546,
+            "z": -2.5092,
+            "star": {
+                "catalogId": "HYG_119591",
+                "name": null,
+                "spectralType": "m",
+                "spectralClass": "Unknown",
+                "distanceLy": 29.3834,
+                "luminosity": 0.000112,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 217,
+            "type": "system",
+            "x": 4.0236,
+            "y": 1.1409,
+            "z": 7.9886,
+            "star": {
+                "catalogId": "HYG_118037",
+                "name": null,
+                "spectralType": "M5",
+                "spectralClass": "M",
+                "distanceLy": 29.4098,
+                "luminosity": 0.00024322,
+                "temperature": 2978,
+                "mass": 0.2444
+            }
+        },
+        {
+            "id": 218,
+            "type": "system",
+            "x": -0.3282,
+            "y": 2.2141,
+            "z": -8.7366,
+            "star": {
+                "catalogId": "HIP_31293",
+                "name": null,
+                "spectralType": "Unknown",
+                "spectralClass": "Unknown",
+                "distanceLy": 29.4154,
+                "luminosity": 0.00513334,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 219,
+            "type": "system",
+            "x": -6.7848,
+            "y": 4.9282,
+            "z": -3.3305,
+            "star": {
+                "catalogId": "HIP_47103",
+                "name": null,
+                "spectralType": "K",
+                "spectralClass": "K",
+                "distanceLy": 29.431,
+                "luminosity": 0.00306761,
+                "temperature": 3505,
+                "mass": 0.342
+            }
+        },
+        {
+            "id": 220,
+            "type": "system",
+            "x": 5.0065,
+            "y": 7.3702,
+            "z": -1.5331,
+            "star": {
+                "catalogId": "HIP_17378",
+                "name": "Rana",
+                "spectralType": "K0IV",
+                "spectralClass": "K",
+                "distanceLy": 29.4871,
+                "luminosity": 2.78227466,
+                "temperature": 5200,
+                "mass": 0.8
+            }
+        },
+        {
+            "id": 221,
+            "type": "system",
+            "x": -7.1877,
+            "y": 0.2202,
+            "z": 5.5616,
+            "star": {
+                "catalogId": "HIP_57939",
+                "name": "Groombridge 1830",
+                "spectralType": "G8Vp",
+                "spectralClass": "G",
+                "distanceLy": 29.6531,
+                "luminosity": 0.19462562,
+                "temperature": 5289,
+                "mass": 0.8267
+            }
+        },
+        {
+            "id": 222,
+            "type": "system",
+            "x": 8.0356,
+            "y": -4.1977,
+            "z": -0.7359,
+            "star": {
+                "catalogId": "HIP_109388",
+                "name": null,
+                "spectralType": "M3",
+                "spectralClass": "M",
+                "distanceLy": 29.6668,
+                "luminosity": 0.00493856,
+                "temperature": 3467,
+                "mass": 0.45
+            }
+        },
+        {
+            "id": 223,
+            "type": "system",
+            "x": -5.1043,
+            "y": 7.5579,
+            "z": 0.2074,
+            "star": {
+                "catalogId": "HIP_40501",
+                "name": null,
+                "spectralType": "Unknown",
+                "spectralClass": "Unknown",
+                "distanceLy": 29.7533,
+                "luminosity": 0.00673597,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 224,
+            "type": "system",
+            "x": -7.6761,
+            "y": -2.4894,
+            "z": 4.2687,
+            "star": {
+                "catalogId": "HIP_64394",
+                "name": null,
+                "spectralType": "G0V",
+                "spectralClass": "G",
+                "distanceLy": 29.7751,
+                "luminosity": 1.4750271,
+                "temperature": 6000,
+                "mass": 1.04
+            }
+        },
+        {
+            "id": 225,
+            "type": "system",
+            "x": 5.8844,
+            "y": 6.9732,
+            "z": 0.5373,
+            "star": {
+                "catalogId": "HIP_15457",
+                "name": "Kappa1 Ceti",
+                "spectralType": "G5Vvar",
+                "spectralClass": "G",
+                "distanceLy": 29.8103,
+                "luminosity": 0.84333476,
+                "temperature": 5556,
+                "mass": 0.9067
+            }
+        },
+        {
+            "id": 226,
+            "type": "system",
+            "x": 7.4476,
+            "y": 4.5229,
+            "z": -2.7665,
+            "star": {
+                "catalogId": "HIP_9724",
+                "name": null,
+                "spectralType": "M3",
+                "spectralClass": "M",
+                "distanceLy": 29.8185,
+                "luminosity": 0.00610942,
+                "temperature": 3267,
+                "mass": 0.3267
+            }
+        },
+        {
+            "id": 227,
+            "type": "system",
+            "x": -1.5294,
+            "y": 5.3388,
+            "z": 7.2919,
+            "star": {
+                "catalogId": "HYG_118459",
+                "name": null,
+                "spectralType": "M4.5",
+                "spectralClass": "M",
+                "distanceLy": 29.8951,
+                "luminosity": 0.00035027,
+                "temperature": 3122,
+                "mass": 0.2856
+            }
+        },
+        {
+            "id": 228,
+            "type": "system",
+            "x": 2.1506,
+            "y": 8.52,
+            "z": -2.7493,
+            "star": {
+                "catalogId": "HIP_23512",
+                "name": null,
+                "spectralType": "K:",
+                "spectralClass": "K",
+                "distanceLy": 30.0302,
+                "luminosity": 0.00152897,
+                "temperature": 4367,
+                "mass": 0.6056
+            }
+        },
+        {
+            "id": 229,
+            "type": "system",
+            "x": -6.9995,
+            "y": 0.4122,
+            "z": -5.9886,
+            "star": {
+                "catalogId": "HIP_57443",
+                "name": null,
+                "spectralType": "G3/G5V",
+                "spectralClass": "G",
+                "distanceLy": 30.0742,
+                "luminosity": 0.81959632,
+                "temperature": 5630,
+                "mass": 0.85
+            }
+        },
+        {
+            "id": 230,
+            "type": "system",
+            "x": 3.0258,
+            "y": -2.3973,
+            "z": -8.4186,
+            "star": {
+                "catalogId": "HIP_105858",
+                "name": null,
+                "spectralType": "F6V",
+                "spectralClass": "F",
+                "distanceLy": 30.2079,
+                "luminosity": 1.54596622,
+                "temperature": 6500,
+                "mass": 1.16
+            }
+        },
+        {
+            "id": 231,
+            "type": "system",
+            "x": 1.9599,
+            "y": 8.5889,
+            "z": -2.8917,
+            "star": {
+                "catalogId": "HIP_23932",
+                "name": null,
+                "spectralType": "M5",
+                "spectralClass": "M",
+                "distanceLy": 30.2415,
+                "luminosity": 0.00578629,
+                "temperature": 2978,
+                "mass": 0.2444
+            }
+        },
+        {
+            "id": 232,
+            "type": "system",
+            "x": 2.8943,
+            "y": 8.2798,
+            "z": 3.013,
+            "star": {
+                "catalogId": "HIP_21932",
+                "name": null,
+                "spectralType": "M2",
+                "spectralClass": "M",
+                "distanceLy": 30.2474,
+                "luminosity": 0.00784152,
+                "temperature": 3411,
+                "mass": 0.5
+            }
+        },
+        {
+            "id": 233,
+            "type": "system",
+            "x": 6.8404,
+            "y": 4.184,
+            "z": -4.6625,
+            "star": {
+                "catalogId": "HIP_9786",
+                "name": null,
+                "spectralType": "K:...",
+                "spectralClass": "K",
+                "distanceLy": 30.2529,
+                "luminosity": 0.00103467,
+                "temperature": 4367,
+                "mass": 0.6056
+            }
+        },
+        {
+            "id": 234,
+            "type": "system",
+            "x": -0.0649,
+            "y": 5.9793,
+            "z": 7.092,
+            "star": {
+                "catalogId": "HYG_118409",
+                "name": null,
+                "spectralType": "m",
+                "spectralClass": "Unknown",
+                "distanceLy": 30.2555,
+                "luminosity": 0.00012212,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 235,
+            "type": "system",
+            "x": -6.9902,
+            "y": -3.3612,
+            "z": 5.093,
+            "star": {
+                "catalogId": "HIP_66906",
+                "name": null,
+                "spectralType": "M:",
+                "spectralClass": "M",
+                "distanceLy": 30.264,
+                "luminosity": 0.00115664,
+                "temperature": 2978,
+                "mass": 0.2444
+            }
+        },
+        {
+            "id": 236,
+            "type": "system",
+            "x": 2.8841,
+            "y": -3.8943,
+            "z": 7.9303,
+            "star": {
+                "catalogId": "HYG_119344",
+                "name": null,
+                "spectralType": "M5",
+                "spectralClass": "M",
+                "distanceLy": 30.312,
+                "luminosity": 0.00018214,
+                "temperature": 2978,
+                "mass": 0.2444
+            }
+        },
+        {
+            "id": 237,
+            "type": "system",
+            "x": -0.058,
+            "y": 1.2858,
+            "z": 9.2839,
+            "star": {
+                "catalogId": "HIP_29277",
+                "name": null,
+                "spectralType": "M3",
+                "spectralClass": "M",
+                "distanceLy": 30.5703,
+                "luminosity": 0.00491587,
+                "temperature": 3267,
+                "mass": 0.3267
+            }
+        },
+        {
+            "id": 238,
+            "type": "system",
+            "x": 0.383,
+            "y": 9.3913,
+            "z": -0.2345,
+            "star": {
+                "catalogId": "HIP_27604",
+                "name": null,
+                "spectralType": "F0",
+                "spectralClass": "F",
+                "distanceLy": 30.6652,
+                "luminosity": 0.01362699,
+                "temperature": 7500,
+                "mass": 1.4
+            }
+        },
+        {
+            "id": 239,
+            "type": "system",
+            "x": 6.3314,
+            "y": 6.4348,
+            "z": -2.6901,
+            "star": {
+                "catalogId": "HIP_14101",
+                "name": null,
+                "spectralType": "Unknown",
+                "spectralClass": "Unknown",
+                "distanceLy": 30.7229,
+                "luminosity": 0.00534564,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 240,
+            "type": "system",
+            "x": -5.8434,
+            "y": 4.1002,
+            "z": -6.2202,
+            "star": {
+                "catalogId": "HIP_47425",
+                "name": null,
+                "spectralType": "M:",
+                "spectralClass": "M",
+                "distanceLy": 30.8772,
+                "luminosity": 0.00402161,
+                "temperature": 2978,
+                "mass": 0.2444
+            }
+        },
+        {
+            "id": 241,
+            "type": "system",
+            "x": -0.4826,
+            "y": -6.8724,
+            "z": 6.51,
+            "star": {
+                "catalogId": "HIP_86776",
+                "name": null,
+                "spectralType": "M3",
+                "spectralClass": "M",
+                "distanceLy": 30.9153,
+                "luminosity": 0.00498425,
+                "temperature": 3267,
+                "mass": 0.3267
+            }
+        },
+        {
+            "id": 242,
+            "type": "system",
+            "x": -1.4495,
+            "y": -5.7498,
+            "z": 7.4295,
+            "star": {
+                "catalogId": "HYG_119126",
+                "name": null,
+                "spectralType": "k-m",
+                "spectralClass": "Unknown",
+                "distanceLy": 31.0034,
+                "luminosity": 0.00029648,
+                "temperature": 3273,
+                "mass": 0.1842
+            }
+        },
+        {
+            "id": 243,
+            "type": "system",
+            "x": 3.3,
+            "y": 8.8041,
+            "z": -1.4587,
+            "star": {
+                "catalogId": "HYG_118323",
+                "name": null,
+                "spectralType": "DQ7",
+                "spectralClass": "Unknown",
+                "distanceLy": 31.0328,
+                "luminosity": 0.00024479,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 244,
+            "type": "system",
+            "x": 5.0674,
+            "y": 8.0108,
+            "z": -1.0121,
+            "star": {
+                "catalogId": "HYG_118263",
+                "name": null,
+                "spectralType": "dM4",
+                "spectralClass": "Unknown",
+                "distanceLy": 31.0921,
+                "luminosity": 0.0006059,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 245,
+            "type": "system",
+            "x": -7.965,
+            "y": 0.89,
+            "z": -5.1716,
+            "star": {
+                "catalogId": "HYG_118760",
+                "name": null,
+                "spectralType": "m",
+                "spectralClass": "Unknown",
+                "distanceLy": 31.1097,
+                "luminosity": 7.921e-5,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 246,
+            "type": "system",
+            "x": -2.2493,
+            "y": -6.2488,
+            "z": -6.879,
+            "star": {
+                "catalogId": "HYG_119102",
+                "name": null,
+                "spectralType": "M3",
+                "spectralClass": "M",
+                "distanceLy": 31.1812,
+                "luminosity": 0.00067422,
+                "temperature": 3267,
+                "mass": 0.3267
+            }
+        },
+        {
+            "id": 247,
+            "type": "system",
+            "x": -2.5884,
+            "y": -9.1935,
+            "z": -0.7266,
+            "star": {
+                "catalogId": "HYG_119115",
+                "name": null,
+                "spectralType": "dM3.5",
+                "spectralClass": "Unknown",
+                "distanceLy": 31.2409,
+                "luminosity": 0.00097814,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 248,
+            "type": "system",
+            "x": 7.2735,
+            "y": 0.1487,
+            "z": -6.2587,
+            "star": {
+                "catalogId": "HYG_117956",
+                "name": null,
+                "spectralType": "M3.5",
+                "spectralClass": "M",
+                "distanceLy": 31.3009,
+                "luminosity": 0.00058668,
+                "temperature": 3267,
+                "mass": 0.3267
+            }
+        },
+        {
+            "id": 249,
+            "type": "system",
+            "x": -7.9223,
+            "y": 0.6565,
+            "z": 5.4028,
+            "star": {
+                "catalogId": "HIP_56997",
+                "name": null,
+                "spectralType": "G8Vvar",
+                "spectralClass": "G",
+                "distanceLy": 31.3491,
+                "luminosity": 0.60478359,
+                "temperature": 5289,
+                "mass": 0.8267
+            }
+        },
+        {
+            "id": 251,
+            "type": "system",
+            "x": 3.7599,
+            "y": 8.2619,
+            "z": 3.1717,
+            "star": {
+                "catalogId": "HYG_118289",
+                "name": null,
+                "spectralType": "dM4.5e",
+                "spectralClass": "Unknown",
+                "distanceLy": 31.3612,
+                "luminosity": 0.00055719,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 250,
+            "type": "system",
+            "x": 4.8489,
+            "y": 7.8118,
+            "z": 2.8144,
+            "star": {
+                "catalogId": "HYG_118265",
+                "name": null,
+                "spectralType": "M4.5",
+                "spectralClass": "M",
+                "distanceLy": 31.3612,
+                "luminosity": 0.00026669,
+                "temperature": 3122,
+                "mass": 0.2856
+            }
+        },
+        {
+            "id": 252,
+            "type": "system",
+            "x": -6.714,
+            "y": -6.3985,
+            "z": 2.6772,
+            "star": {
+                "catalogId": "HIP_72944",
+                "name": null,
+                "spectralType": "M2Ve",
+                "spectralClass": "M",
+                "distanceLy": 31.4851,
+                "luminosity": 0.00733162,
+                "temperature": 3411,
+                "mass": 0.3678
+            }
+        },
+        {
+            "id": 253,
+            "type": "system",
+            "x": -7.6869,
+            "y": 5.8588,
+            "z": 0.0544,
+            "star": {
+                "catalogId": "HIP_46655",
+                "name": null,
+                "spectralType": "K:...",
+                "spectralClass": "K",
+                "distanceLy": 31.5249,
+                "luminosity": 0.00168422,
+                "temperature": 4367,
+                "mass": 0.6056
+            }
+        },
+        {
+            "id": 254,
+            "type": "system",
+            "x": -3.8647,
+            "y": -2.9831,
+            "z": 8.3605,
+            "star": {
+                "catalogId": "HYG_118976",
+                "name": null,
+                "spectralType": "M6.5",
+                "spectralClass": "M",
+                "distanceLy": 31.5735,
+                "luminosity": 5.75e-6,
+                "temperature": 2833,
+                "mass": 0.2033
+            }
+        },
+        {
+            "id": 255,
+            "type": "system",
+            "x": -1.7728,
+            "y": -9.4258,
+            "z": -1.3268,
+            "star": {
+                "catalogId": "HIP_84581",
+                "name": null,
+                "spectralType": "Unknown",
+                "spectralClass": "Unknown",
+                "distanceLy": 31.5797,
+                "luminosity": 0.00299226,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 256,
+            "type": "system",
+            "x": -5.8854,
+            "y": -0.9815,
+            "z": -7.6374,
+            "star": {
+                "catalogId": "HIP_61629",
+                "name": null,
+                "spectralType": "M3",
+                "spectralClass": "M",
+                "distanceLy": 31.6104,
+                "luminosity": 0.00449573,
+                "temperature": 3267,
+                "mass": 0.3267
+            }
+        },
+        {
+            "id": 257,
+            "type": "system",
+            "x": -0.6927,
+            "y": -6.3833,
+            "z": -7.3038,
+            "star": {
+                "catalogId": "HIP_86057",
+                "name": null,
+                "spectralType": "K5",
+                "spectralClass": "K",
+                "distanceLy": 31.718,
+                "luminosity": 0.00730466,
+                "temperature": 4367,
+                "mass": 0.456
+            }
+        },
+        {
+            "id": 258,
+            "type": "system",
+            "x": -7.6238,
+            "y": -5.4168,
+            "z": -2.7274,
+            "star": {
+                "catalogId": "HIP_70185",
+                "name": null,
+                "spectralType": "Unknown",
+                "spectralClass": "Unknown",
+                "distanceLy": 31.7735,
+                "luminosity": 0.00034451,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 259,
+            "type": "system",
+            "x": -1.5008,
+            "y": 9.1697,
+            "z": 2.9412,
+            "star": {
+                "catalogId": "HIP_31635",
+                "name": null,
+                "spectralType": "M1:",
+                "spectralClass": "M",
+                "distanceLy": 31.7891,
+                "luminosity": 0.01163054,
+                "temperature": 3803,
+                "mass": 0.439
+            }
+        },
+        {
+            "id": 260,
+            "type": "system",
+            "x": -3.4774,
+            "y": -9.1015,
+            "z": -0.3955,
+            "star": {
+                "catalogId": "HIP_81300",
+                "name": null,
+                "spectralType": "K2V",
+                "spectralClass": "K",
+                "distanceLy": 31.8045,
+                "luminosity": 0.40738028,
+                "temperature": 4867,
+                "mass": 0.7222
+            }
+        },
+        {
+            "id": 262,
+            "type": "system",
+            "x": -7.5755,
+            "y": 2.397,
+            "z": 5.6773,
+            "star": {
+                "catalogId": "HYG_118710",
+                "name": null,
+                "spectralType": "m",
+                "spectralClass": "Unknown",
+                "distanceLy": 31.8511,
+                "luminosity": 0.00051428,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 261,
+            "type": "system",
+            "x": 6.9401,
+            "y": 5.5012,
+            "z": 4.1157,
+            "star": {
+                "catalogId": "HYG_118152",
+                "name": null,
+                "spectralType": "M4",
+                "spectralClass": "M",
+                "distanceLy": 31.8511,
+                "luminosity": 0.0005435,
+                "temperature": 3122,
+                "mass": 0.2856
+            }
+        },
+        {
+            "id": 263,
+            "type": "system",
+            "x": -2.625,
+            "y": -7.7447,
+            "z": 5.4145,
+            "star": {
+                "catalogId": "HIP_82003",
+                "name": null,
+                "spectralType": "K7V",
+                "spectralClass": "K",
+                "distanceLy": 31.9887,
+                "luminosity": 0.04821698,
+                "temperature": 4033,
+                "mass": 0.5278
+            }
+        },
+        {
+            "id": 264,
+            "type": "system",
+            "x": 6.1122,
+            "y": -7.2476,
+            "z": 2.6289,
+            "star": {
+                "catalogId": "HYG_119360",
+                "name": null,
+                "spectralType": "dM4-5",
+                "spectralClass": "Unknown",
+                "distanceLy": 32.1019,
+                "luminosity": 0.00035843,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 265,
+            "type": "system",
+            "x": -5.7161,
+            "y": 3.8375,
+            "z": -7.074,
+            "star": {
+                "catalogId": "HIP_47780",
+                "name": "A\u00f1a\u00f1uca",
+                "spectralType": "M1:",
+                "spectralClass": "M",
+                "distanceLy": 32.1939,
+                "luminosity": 0.00693107,
+                "temperature": 3522,
+                "mass": 0.455
+            }
+        },
+        {
+            "id": 266,
+            "type": "system",
+            "x": 7.3058,
+            "y": 1.4013,
+            "z": -6.5339,
+            "star": {
+                "catalogId": "HYG_118012",
+                "name": null,
+                "spectralType": "M4",
+                "spectralClass": "M",
+                "distanceLy": 32.2927,
+                "luminosity": 0.00049113,
+                "temperature": 3122,
+                "mass": 0.2856
+            }
+        },
+        {
+            "id": 267,
+            "type": "system",
+            "x": 5.585,
+            "y": -6.3595,
+            "z": -5.1543,
+            "star": {
+                "catalogId": "HIP_102409",
+                "name": null,
+                "spectralType": "M1Ve",
+                "spectralClass": "M",
+                "distanceLy": 32.3214,
+                "luminosity": 0.02558586,
+                "temperature": 3556,
+                "mass": 0.4089
+            }
+        },
+        {
+            "id": 268,
+            "type": "system",
+            "x": 9.0258,
+            "y": 1.6494,
+            "z": -3.7726,
+            "star": {
+                "catalogId": "HYG_118009",
+                "name": null,
+                "spectralType": "DQ9",
+                "spectralClass": "Unknown",
+                "distanceLy": 32.3566,
+                "luminosity": 0.00013219,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 269,
+            "type": "system",
+            "x": 4.4513,
+            "y": 1.248,
+            "z": 8.8223,
+            "star": {
+                "catalogId": "HIP_4872",
+                "name": null,
+                "spectralType": "K5V...",
+                "spectralClass": "K",
+                "distanceLy": 32.4858,
+                "luminosity": 0.01295388,
+                "temperature": 3805,
+                "mass": 0.515
+            }
+        },
+        {
+            "id": 270,
+            "type": "system",
+            "x": 4.4216,
+            "y": 3.8182,
+            "z": -8.0755,
+            "star": {
+                "catalogId": "HIP_12703",
+                "name": null,
+                "spectralType": "Unknown",
+                "spectralClass": "Unknown",
+                "distanceLy": 32.5083,
+                "luminosity": 0.00118359,
+                "temperature": null,
+                "mass": null
+            }
+        },
+        {
+            "id": 271,
+            "type": "system",
+            "x": -1.2799,
+            "y": -9.8475,
+            "z": 0.9647,
+            "star": {
+                "catalogId": "HIP_85665",
+                "name": null,
+                "spectralType": "M1V...",
+                "spectralClass": "M",
+                "distanceLy": 32.5409,
+                "luminosity": 0.01606941,
+                "temperature": 3556,
+                "mass": 0.4089
+            }
+        },
+        {
+            "id": 272,
+            "type": "system",
+            "x": -3.2789,
+            "y": 3.861,
+            "z": 8.599,
+            "star": {
+                "catalogId": "HYG_118554",
+                "name": null,
+                "spectralType": "m",
+                "spectralClass": "Unknown",
+                "distanceLy": 32.5504,
+                "luminosity": 8.287e-5,
+                "temperature": 3141,
+                "mass": 0.123
+            }
+        },
+        {
+            "id": 273,
+            "type": "system",
+            "x": 2.4788,
+            "y": -0.0667,
+            "z": -9.6805,
+            "star": {
+                "catalogId": "HIP_117828",
+                "name": null,
+                "spectralType": "M...",
+                "spectralClass": "M",
+                "distanceLy": 32.5928,
+                "luminosity": 0.00877405,
+                "temperature": 2978,
+                "mass": 0.2444
+            }
+        },
+        {
+            "id": 276,
+            "type": "system",
+            "x": 3.8124,
+            "y": 2.2359,
+            "z": 8.9703,
+            "star": {
+                "catalogId": "HYG_118101",
+                "name": null,
+                "spectralType": "M4",
+                "spectralClass": "M",
+                "distanceLy": 32.6156,
+                "luminosity": 0.00337287,
+                "temperature": 3122,
+                "mass": 0.2856
+            }
+        },
+        {
+            "id": 275,
+            "type": "system",
+            "x": 8.7981,
+            "y": 4.6322,
+            "z": -1.0659,
+            "star": {
+                "catalogId": "HYG_118092",
+                "name": null,
+                "spectralType": "m",
+                "spectralClass": "Unknown",
+                "distanceLy": 32.6156,
+                "luminosity": 0.00012589,
+                "temperature": null,
+                "mass": null
+            }
+        }
+    ],
+    "edges": [
+        {
+            "from": 1,
+            "to": 2,
+            "distance": 1.295767,
+            "traversals": 0
+        }
+    ]
+}

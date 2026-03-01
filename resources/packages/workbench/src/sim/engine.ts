@@ -15,10 +15,11 @@ import {
 	scanPowerCost, scanComfortRange, scanSuccessChance,
 	shieldRegenRate, shieldDraw,
 	perfRatio,
-	phaserDraw, phaserShieldDrain,
+	phaserDraw, phaserShieldDrain, phaserHullDamage,
 	torpedoHitChance, torpedoDamage,
 	pdsInterception, ecmLockDegradation,
 	shieldAbsorption,
+	DEFAULT_DSP_CONSTANTS,
  DEFAULT_CONSTANTS, DEFAULT_TUNING } from '@helm/formulas';
 import type { Constants, ActionTuning } from '@helm/formulas';
 
@@ -32,7 +33,8 @@ import type { Scenario, SimAction } from './types';
 
 function initShipState(slug: string, loadout: Loadout, equipment: WorkbenchProduct[], _tuning: ActionTuning): ShipState {
 	const cap = capacitor(loadout.core);
-	const shieldCap = loadout.shield.capacity ?? 0;
+	const shieldMult = loadout.hull.shieldCapacityMultiplier ?? 1.0;
+	const shieldCap = (loadout.shield.capacity ?? 0) * shieldMult;
 
 	const ammo: Record<string, number> = {};
 	for (const eq of equipment) {
@@ -48,7 +50,7 @@ function initShipState(slug: string, loadout: Loadout, equipment: WorkbenchProdu
 		power: cap,
 		coreLife: loadout.core.hp ?? 0,
 		shield: shieldCap,
-		hull: 100, // default hull integrity
+		hull: loadout.hull.hullIntegrity,
 		ammo,
 		position: 0,
 		activeEquipment: new Set(),
@@ -116,7 +118,8 @@ function advanceTime(
 	ship.power = Math.max(0, ship.power - totalEquipDraw * elapsedHours);
 
 	// Shield regen
-	const shieldCap = ship.loadout.shield.capacity ?? 0;
+	const shieldMult = ship.loadout.hull.shieldCapacityMultiplier ?? 1.0;
+	const shieldCap = (ship.loadout.shield.capacity ?? 0) * shieldMult;
 	const shieldRate = shieldRegenRate(ship.loadout.shield.rate ?? 0, tuning.priority);
 	const shieldGain = shieldRate * elapsedHours;
 	if (shieldGain > 0 && ship.shield < shieldCap) {
@@ -212,10 +215,34 @@ function executeAction(
 			target.shield = Math.max(0, target.shield - totalDrain);
 			const actualDrain = beforeShield - target.shield;
 
-			events.push({ type: 'phaser_drain', ship: ship.slug, target: targetSlug, shieldDrain: actualDrain });
+			// Hull damage overflow — when shields are down, phasers burn hull
+			let hullDmg = 0;
+			const hullDamageMult = DEFAULT_DSP_CONSTANTS.phaserHullDamageMult;
+			if (beforeShield <= 0) {
+				// Shields were already down — full duration hits hull
+				const hullDmgRate = phaserHullDamage(phaser.mult_a ?? 0, tuning.priority, hullDamageMult);
+				hullDmg = hullDmgRate * durationHours;
+			} else if (target.shield <= 0) {
+				// Shields depleted mid-burst — remaining time hits hull
+				const shieldDepletionFraction = beforeShield / totalDrain;
+				const remainingHours = durationHours * (1 - shieldDepletionFraction);
+				const hullDmgRate = phaserHullDamage(phaser.mult_a ?? 0, tuning.priority, hullDamageMult);
+				hullDmg = hullDmgRate * remainingHours;
+			}
+
+			if (hullDmg > 0) {
+				target.hull = Math.max(0, target.hull - hullDmg);
+			}
+
+			events.push({ type: 'phaser_drain', ship: ship.slug, target: targetSlug, shieldDrain: actualDrain, hullDamage: hullDmg > 0 ? hullDmg : undefined });
 
 			if (target.shield <= 0 && beforeShield > 0) {
 				events.push({ type: 'shield_depleted', ship: targetSlug });
+			}
+
+			if (target.hull <= 0 && hullDmg > 0) {
+				target.hull = 0;
+				events.push({ type: 'ship_destroyed', ship: targetSlug });
 			}
 			break;
 		}

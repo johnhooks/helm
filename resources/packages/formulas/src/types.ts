@@ -36,6 +36,7 @@ export const DEFAULT_CONSTANTS: Constants = {
  */
 export type EmissionType =
 	| 'pnp_scan'
+	| 'pvp_scan'
 	| 'belt_scan'
 	| 'system_survey'
 	| 'planet_scan'
@@ -80,6 +81,7 @@ export interface SensorAffinity {
 	passive: number;
 	pulseGain: number;
 	continuousGain: number;
+	pvpGain: number;
 }
 
 /**
@@ -115,6 +117,46 @@ export interface DSPConstants {
 	 *  and silent — it should never give certainty. Want 100%? Use active scan.
 	 */
 	passiveConfidenceCap: number;
+	/**
+	 * Power cost per PVP scan action (capacitor units).
+	 * PVP scanning is expensive — a few scans can drain the capacitor.
+	 */
+	pvpScanPowerCost: number;
+	/**
+	 * Number of sweeps per PVP scan action. Fewer than PNP (focused burst).
+	 */
+	pvpSweepsPerScan: number;
+	/**
+	 * SNR threshold for PVP detection (higher bar than regular active).
+	 * Finding a specific ship for targeting lock is harder than detecting
+	 * "something is out there".
+	 */
+	pvpDetectionThreshold: number;
+	/**
+	 * Duration of a PVP scan action in seconds. Not instant — gives the
+	 * target time to detect the ping and react. Creates the "race" mechanic.
+	 */
+	pvpScanDurationSeconds: number;
+	/**
+	 * Base time in seconds to acquire weapons lock after detection.
+	 * Actual lock time = baseLockSeconds / pvpGain.
+	 * ACU (1.5) locks in ~87s. DSC (0.4) locks in ~325s.
+	 * This creates the "race" — DSC detects first but locks slow,
+	 * ACU detects later but locks fast.
+	 */
+	baseLockSeconds: number;
+	/**
+	 * Hull damage multiplier when phasers hit bare hull (no shields).
+	 * Shields absorb/dissipate phaser energy efficiently; bare hull
+	 * takes full thermal impact. drainRate × mult = hull damage/hr.
+	 */
+	phaserHullDamageMult: number;
+	/**
+	 * Torpedo flight time in seconds from launch to impact.
+	 * Creates a window for the target to kill the attacker before
+	 * torpedoes arrive — the core of the Striker vs Specter race.
+	 */
+	torpedoFlightSeconds: number;
 }
 
 // ---------------------------------------------------------------------------
@@ -152,6 +194,7 @@ export interface DriveEnvelope {
  */
 export const DEFAULT_EMISSION_PROFILES: Record<EmissionType, EmissionProfile> = {
 	pnp_scan:       { base: 5.0,  spectralType: 'pulse' },
+	pvp_scan:       { base: 8.0,  spectralType: 'pulse' },
 	belt_scan:      { base: 3.0,  spectralType: 'sweep' },
 	system_survey:  { base: 2.0,  spectralType: 'sweep' },
 	planet_scan:    { base: 0.8,  spectralType: 'sweep' },
@@ -167,13 +210,20 @@ export const DEFAULT_EMISSION_PROFILES: Record<EmissionType, EmissionProfile> = 
 };
 
 export const DEFAULT_DSP_CONSTANTS: DSPConstants = {
-	detectionThreshold: 8.0,    // passive: high bar — integration builds toward it over hours
+	detectionThreshold: 6.0,    // passive: integration builds toward it over hours
 	activeThreshold: 1.0,       // active: per-sweep detection stays responsive
 	detectionSteepness: 0.5,    // very gradual sigmoid — wide transition zone (10%-90% spans ~8.8 SNR)
 	samplePeriodSeconds: 300,   // 5 minutes between passive samples (tunable 1-10 min)
 	baseSweepCount: 6,
 	shipNoiseFactor: 0.3,       // spectral filtering, spatial separation, matched filter rejection
 	passiveConfidenceCap: 0.95, // passive is free — never gives certainty
+	pvpScanPowerCost: 15,       // ~7 scans before dry on standard capacitor
+	pvpSweepsPerScan: 2,        // focused burst — fewer than PNP's 6
+	pvpDetectionThreshold: 3.0, // harder than active (1.0) — targeting lock, not just detection
+	pvpScanDurationSeconds: 120, // 2 minutes per scan — target has time to react
+	baseLockSeconds: 130,       // lock time = 130 / pvpGain. ACU: ~87s, DSC: ~325s.
+	phaserHullDamageMult: 40,   // bare hull: 35/hr drain × 40 = 1400/hr = ~23/min. Kills 60-hull Specter in ~154s.
+	torpedoFlightSeconds: 120,  // 2 minutes flight time — Striker has a window to kill before torpedoes arrive.
 };
 
 /**
@@ -227,14 +277,14 @@ export const DEFAULT_DRIVE_ENVELOPES: Record<string, DriveEnvelope> = {
 /**
  * Sensor affinity presets — one per sensor class.
  *
- * ACU: aggressive hunter. High active affinity, strong pulse matched filter.
- * VRS: balanced generalist. Moderate across the board.
- * DSC: patient listener. High passive affinity, strong continuous matched filter.
+ * ACU: aggressive hunter. High active affinity, strong pulse matched filter, best PVP scanner.
+ * VRS: balanced generalist. Moderate across the board, decent PVP.
+ * DSC: patient listener. High passive affinity, strong continuous matched filter, poor PVP.
  */
 export const SENSOR_AFFINITIES: Record<string, SensorAffinity> = {
-	acu: { active: 1.4, passive: 0.6, pulseGain: 1.5, continuousGain: 0.7 },
-	vrs: { active: 1.0, passive: 1.0, pulseGain: 1.0, continuousGain: 1.0 },
-	dsc: { active: 0.7, passive: 1.4, pulseGain: 0.7, continuousGain: 1.5 },
+	acu: { active: 1.4, passive: 0.6, pulseGain: 1.5, continuousGain: 0.7, pvpGain: 1.5 },
+	vrs: { active: 1.0, passive: 1.0, pulseGain: 1.0, continuousGain: 1.0, pvpGain: 0.8 },
+	dsc: { active: 0.7, passive: 1.4, pulseGain: 0.7, continuousGain: 1.5, pvpGain: 0.4 },
 };
 
 // ---------------------------------------------------------------------------

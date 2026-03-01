@@ -50,13 +50,16 @@
       "@helm/shell": ["resources/packages/shell/src"],
       "@helm/shell/*": ["resources/packages/shell/src/*"],
       "@helm/formulas": ["resources/packages/formulas/src"],
-      "@helm/formulas/*": ["resources/packages/formulas/src/*"]
+      "@helm/formulas/*": ["resources/packages/formulas/src/*"],
+      "@helm/holodeck": ["resources/packages/holodeck/src"],
+      "@helm/holodeck/*": ["resources/packages/holodeck/src/*"]
     }
   },
   "include": [
     "global.d.ts",
     "resources/packages/**/*.ts",
     "resources/packages/**/*.tsx",
+    "tests/_data/**/*.json",
     "tests-e2e/**/*.ts",
     "vitest.setup.ts"
   ],

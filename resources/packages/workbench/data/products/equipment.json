@@ -7,7 +7,7 @@
       "version": 1,
       "footprint": 10,
       "draw": 0.1,
-      "mult_a": 0.6
+      "mult_a": 0.45
     },
     {
       "slug": "ecm_mk1",

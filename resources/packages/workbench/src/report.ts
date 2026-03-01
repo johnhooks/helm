@@ -42,7 +42,8 @@ function formatPower(loadout: Loadout): ShipReport['power'] {
 }
 
 function formatScan(loadout: Loadout, output: number, effort: number, constants: Constants): ShipReport['scan'] {
-	const comfort = scanComfortRange(loadout.sensor, output);
+	const scanMult = loadout.hull.scanComfortMultiplier ?? 1.0;
+	const comfort = scanComfortRange(loadout.sensor, output) * scanMult;
 	const durationPerLy = Math.ceil(constants.baseScanSecondsPerLy * (loadout.sensor.mult_a ?? 0) * effort);
 	const baseChance = loadout.sensor.chance ?? 0;
 
@@ -100,7 +101,8 @@ function formatJump(
 }
 
 function formatShield(loadout: Loadout, priority: number): ShipReport['shield'] {
-	const capacity = loadout.shield.capacity ?? 0;
+	const shieldMult = loadout.hull.shieldCapacityMultiplier ?? 1.0;
+	const capacity = (loadout.shield.capacity ?? 0) * shieldMult;
 	const regen = shieldRegenRate(loadout.shield.rate ?? 0, priority);
 	const draw = shieldDraw(loadout.shield.draw ?? 0, priority);
 	const time = shieldTimeToFull(capacity, regen);

@@ -15,6 +15,7 @@ export default defineConfig({
             ['resources/packages/products/**', 'node'],
             ['resources/packages/actions/**', 'node'],
             ['resources/packages/workbench/**', 'node'],
+            ['resources/packages/holodeck/**', 'node'],
         ],
         setupFiles: ['./vitest.setup.ts'],
         include: ['resources/packages/**/*.{test,spec}.{ts,tsx}'],
@@ -40,6 +41,7 @@ export default defineConfig({
             '@helm/admin-settings': path.resolve(__dirname, 'resources/packages/admin-settings/src'),
             '@helm/actions': path.resolve(__dirname, 'resources/packages/actions/src'),
             '@helm/router': path.resolve(__dirname, 'resources/packages/router/src'),
+            '@helm/holodeck': path.resolve(__dirname, 'resources/packages/holodeck/src'),
         },
     },
 });

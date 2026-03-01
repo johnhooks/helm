@@ -1,0 +1,32 @@
+[
+	{
+		"test": "jumpDuration",
+		"label": "default loadout, 10 ly",
+		"input": { "distance": 10, "mult_b": 1.0, "throttle": 1.0, "perfRatio": 1.0 },
+		"expected": { "within": 0.01 }
+	},
+	{
+		"test": "jumpCoreCost",
+		"label": "default loadout, 10 ly within comfort",
+		"input": { "distance": 10, "comfortRange": 15, "hp": 1000 },
+		"expected": { "within": 0.01 }
+	},
+	{
+		"test": "jumpComfortRange",
+		"label": "default loadout",
+		"input": { "mult_a": 1.0, "mult_b": 1.0 },
+		"expected": { "within": 0.01 }
+	},
+	{
+		"test": "jumpDuration",
+		"label": "limp-home throttle 0.5",
+		"input": { "distance": 10, "mult_b": 1.0, "throttle": 0.5, "perfRatio": 1.0 },
+		"expected": { "within": 0.01 }
+	},
+	{
+		"test": "jumpCoreCost",
+		"label": "strain beyond comfort",
+		"input": { "distance": 20, "comfortRange": 10, "hp": 1000 },
+		"expected": { "within": 0.01 }
+	}
+]

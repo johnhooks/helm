@@ -20,6 +20,7 @@ final class Provider extends ServiceProvider
         $this->container->singleton(ShipCommand::class);
         $this->container->singleton(DbCommand::class);
         $this->container->singleton(ActionCommand::class);
+        $this->container->singleton(ExportCommand::class);
     }
 
     public function boot(): void
@@ -42,5 +43,6 @@ final class Provider extends ServiceProvider
         WP_CLI::add_command('helm ship', $this->container->get(ShipCommand::class));
         WP_CLI::add_command('helm db', $this->container->get(DbCommand::class));
         WP_CLI::add_command('helm action', $this->container->get(ActionCommand::class));
+        WP_CLI::add_command('helm export', $this->container->get(ExportCommand::class));
     }
 }

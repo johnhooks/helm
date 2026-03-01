@@ -1,8 +1,11 @@
 import type { Product } from '@helm/types';
 import type { ActionTuning, Constants, SensorAffinity, EnvelopePhaseShape, DriveEnvelope } from '@helm/formulas';
+import type { Hull } from '@helm/holodeck';
 export { DEFAULT_CONSTANTS, DEFAULT_TUNING } from '@helm/formulas';
 
 export type { ActionTuning, Constants };
+
+export type { Hull };
 
 export type ComponentType = 'core' | 'drive' | 'sensor' | 'shield' | 'nav' | 'weapon' | 'cloak' | 'equipment';
 
@@ -32,20 +35,6 @@ export interface WorkbenchProduct extends Product {
 	tuning: TuningConfig | null;
 	sensorDsp: SensorDSP | null;
 	driveDsp: DriveDSP | null;
-}
-
-export interface Hull {
-	slug: string;
-	label: string;
-	internalSpace: number;
-	slots: readonly ComponentType[];
-	equipmentSlots: number;
-	hullMass: number;
-	hullSignature: number;
-	weaponDrawMultiplier?: number;
-	stealthDrawMultiplier?: number;
-	amplitudeMultiplier?: number;
-	spoolMultiplier?: number;
 }
 
 export interface Loadout {

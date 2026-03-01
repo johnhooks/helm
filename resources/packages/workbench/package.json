@@ -9,6 +9,7 @@
 	},
 	"dependencies": {
 		"@helm/formulas": "workspace:*",
+		"@helm/holodeck": "workspace:*",
 		"@helm/types": "workspace:*"
 	},
 	"devDependencies": {

@@ -56,7 +56,7 @@ export { transitShieldRegenRate, transitShieldRecovered, coreResonanceCost, sens
 
 // Weapons
 export {
-	phaserDraw, phaserShieldDrain,
+	phaserDraw, phaserShieldDrain, phaserHullDamage,
 	torpedoHitChance, torpedoDamage,
 	pdsInterception, ecmLockDegradation,
 	shieldAbsorption,

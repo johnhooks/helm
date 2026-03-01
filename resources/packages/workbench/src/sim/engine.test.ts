@@ -145,7 +145,7 @@ describe('simulate', () => {
 		const torpedoEvent = snapshots[1].events.find((e) => e.type === 'torpedo_fired');
 		expect(torpedoEvent).toBeDefined();
 
-		// Ammo should be consumed
+		// Ammo should be consumed (starts at 4, fires 1)
 		expect(snapshots[1].ships.attacker.ammo.torpedo_launcher).toBe(3);
 	});
 
@@ -196,6 +196,84 @@ describe('simulate', () => {
 
 		// Position should accumulate
 		expect(snapshots[5].ships.ship1.position).toBe(15);
+	});
+
+	it('phaser deals hull damage when target has no shields', () => {
+		const scenario: Scenario = {
+			name: 'phaser hull damage',
+			description: 'Phaser vs shieldless target',
+			ships: {
+				attacker: {
+					...baseShip,
+					hull: 'striker',
+					equipment: ['phaser_array'],
+				},
+				target: {
+					...baseShip,
+					hull: 'specter', // 60 hull, 0.75 shield mult
+					shield: 'aegis_delta',
+				},
+			},
+			actions: [
+				// Fire long enough to deplete shields (75 HP at 0.75 mult) and hit hull
+				{ t: 0, ship: 'attacker', type: 'fire_phaser', params: { target: 'target', duration: 72000 } },
+			],
+		};
+
+		const snapshots = simulate(scenario);
+		const drainEvent = snapshots[1].events.find((e) => e.type === 'phaser_drain');
+		expect(drainEvent).toBeDefined();
+		if (drainEvent?.type === 'phaser_drain') {
+			expect(drainEvent.hullDamage).toBeDefined();
+			expect(drainEvent.hullDamage).toBeGreaterThan(0);
+		}
+
+		// Hull should be damaged
+		expect(snapshots[1].ships.target.hull).toBeLessThan(60);
+
+		// Ship should be destroyed (20 hours of phaser fire is more than enough)
+		const destroyEvent = snapshots[1].events.find((e) => e.type === 'ship_destroyed');
+		expect(destroyEvent).toBeDefined();
+	});
+
+	it('phaser overflow: shields deplete mid-burst, remaining hits hull', () => {
+		// Specter shield = 100 * 0.75 = 75 HP
+		// Phaser drain = 35/hr at priority 1.0
+		// Time to deplete 75 HP shield: 75/35 ≈ 2.14 hours
+		// Fire for 3 hours: ~0.86 hours of hull damage
+		// Hull damage rate: 35 * 40 = 1400/hr
+		// Expected hull damage: ~0.86 * 1400 ≈ 1200 (Specter has 60 hull, so destroyed)
+		const scenario: Scenario = {
+			name: 'phaser overflow',
+			description: 'Shield depletion then hull damage',
+			ships: {
+				attacker: {
+					...baseShip,
+					hull: 'striker',
+					equipment: ['phaser_array'],
+				},
+				target: {
+					...baseShip,
+					hull: 'specter',
+				},
+			},
+			actions: [
+				{ t: 0, ship: 'attacker', type: 'fire_phaser', params: { target: 'target', duration: 10800 } },
+			],
+		};
+
+		const snapshots = simulate(scenario);
+		const events = snapshots[1].events;
+
+		// Should have shield depletion event
+		expect(events.some((e) => e.type === 'shield_depleted')).toBe(true);
+
+		// Shield should be 0
+		expect(snapshots[1].ships.target.shield).toBe(0);
+
+		// Hull should be destroyed
+		expect(snapshots[1].ships.target.hull).toBe(0);
+		expect(events.some((e) => e.type === 'ship_destroyed')).toBe(true);
 	});
 
 	it('ECM reduces phaser effectiveness', () => {

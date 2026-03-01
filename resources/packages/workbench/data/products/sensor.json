@@ -12,7 +12,7 @@
       "mult_a": 2.0,
       "draw": 3.0,
       "tuning": { "param": "effort", "min": 0.5, "max": 3.0 },
-      "dsp": { "active": 0.70, "passive": 1.40, "pulseGain": 0.70, "continuousGain": 1.50 }
+      "dsp": { "active": 0.70, "passive": 1.40, "pulseGain": 0.70, "continuousGain": 1.50, "pvpGain": 0.40 }
     },
     {
       "slug": "vrs_mk1",
@@ -25,7 +25,7 @@
       "mult_a": 1.0,
       "draw": 2.0,
       "tuning": { "param": "effort", "min": 0.25, "max": 2.0 },
-      "dsp": { "active": 1.00, "passive": 1.00, "pulseGain": 1.00, "continuousGain": 1.00 }
+      "dsp": { "active": 1.00, "passive": 1.00, "pulseGain": 1.00, "continuousGain": 1.00, "pvpGain": 0.80 }
     },
     {
       "slug": "acu_mk1",
@@ -38,7 +38,7 @@
       "mult_a": 0.5,
       "draw": 1.0,
       "tuning": { "param": "effort", "min": 0.5, "max": 2.0 },
-      "dsp": { "active": 1.40, "passive": 0.60, "pulseGain": 1.50, "continuousGain": 0.70 }
+      "dsp": { "active": 1.40, "passive": 0.60, "pulseGain": 1.50, "continuousGain": 0.70, "pvpGain": 1.50 }
     },
     {
       "slug": "dsc_mk2",
@@ -51,7 +51,7 @@
       "mult_a": 1.4,
       "draw": 3.0,
       "tuning": { "param": "effort", "min": 0.5, "max": 3.0 },
-      "dsp": { "active": 0.80, "passive": 1.50, "pulseGain": 0.80, "continuousGain": 1.60 }
+      "dsp": { "active": 0.80, "passive": 1.50, "pulseGain": 0.80, "continuousGain": 1.60, "pvpGain": 0.45 }
     },
     {
       "slug": "vrs_mk2",
@@ -64,7 +64,7 @@
       "mult_a": 0.85,
       "draw": 2.0,
       "tuning": { "param": "effort", "min": 0.25, "max": 2.0 },
-      "dsp": { "active": 1.08, "passive": 1.08, "pulseGain": 1.08, "continuousGain": 1.08 }
+      "dsp": { "active": 1.08, "passive": 1.08, "pulseGain": 1.08, "continuousGain": 1.08, "pvpGain": 0.85 }
     },
     {
       "slug": "acu_mk2",
@@ -77,7 +77,7 @@
       "mult_a": 0.40,
       "draw": 1.0,
       "tuning": { "param": "effort", "min": 0.5, "max": 2.0 },
-      "dsp": { "active": 1.50, "passive": 0.70, "pulseGain": 1.60, "continuousGain": 0.80 }
+      "dsp": { "active": 1.50, "passive": 0.70, "pulseGain": 1.60, "continuousGain": 0.80, "pvpGain": 1.60 }
     },
     {
       "slug": "mil_mk2",
@@ -90,7 +90,7 @@
       "mult_a": 2.5,
       "draw": 4.0,
       "tuning": { "param": "effort", "min": 0.5, "max": 3.0 },
-      "dsp": { "active": 1.50, "passive": 0.80, "pulseGain": 1.40, "continuousGain": 0.85 }
+      "dsp": { "active": 1.50, "passive": 0.80, "pulseGain": 1.40, "continuousGain": 0.85, "pvpGain": 1.30 }
     },
     {
       "slug": "epoch_sensor_2",
@@ -104,7 +104,7 @@
       "draw": 0.5,
       "tuning": { "param": "effort", "min": 0.5, "max": 2.5 },
       "mult_d": 1.0,
-      "dsp": { "active": 0.50, "passive": 0.70, "pulseGain": 0.40, "continuousGain": 1.10 }
+      "dsp": { "active": 0.50, "passive": 0.70, "pulseGain": 0.40, "continuousGain": 1.10, "pvpGain": 0.30 }
     },
     {
       "slug": "dsc_mk3",
@@ -117,7 +117,7 @@
       "mult_a": 1.0,
       "draw": 3.0,
       "tuning": { "param": "effort", "min": 0.5, "max": 3.0 },
-      "dsp": { "active": 0.85, "passive": 1.60, "pulseGain": 0.85, "continuousGain": 1.70 }
+      "dsp": { "active": 0.85, "passive": 1.60, "pulseGain": 0.85, "continuousGain": 1.70, "pvpGain": 0.50 }
     },
     {
       "slug": "vrs_mk3",
@@ -130,7 +130,7 @@
       "mult_a": 0.70,
       "draw": 2.0,
       "tuning": { "param": "effort", "min": 0.25, "max": 2.0 },
-      "dsp": { "active": 1.13, "passive": 1.13, "pulseGain": 1.13, "continuousGain": 1.13 }
+      "dsp": { "active": 1.13, "passive": 1.13, "pulseGain": 1.13, "continuousGain": 1.13, "pvpGain": 0.90 }
     },
     {
       "slug": "acu_mk3",
@@ -143,7 +143,7 @@
       "mult_a": 0.32,
       "draw": 1.0,
       "tuning": { "param": "effort", "min": 0.5, "max": 2.0 },
-      "dsp": { "active": 1.60, "passive": 0.75, "pulseGain": 1.70, "continuousGain": 0.85 }
+      "dsp": { "active": 1.60, "passive": 0.75, "pulseGain": 1.70, "continuousGain": 0.85, "pvpGain": 1.70 }
     },
     {
       "slug": "mil_mk3",
@@ -156,7 +156,7 @@
       "mult_a": 2.0,
       "draw": 4.0,
       "tuning": { "param": "effort", "min": 0.5, "max": 3.0 },
-      "dsp": { "active": 1.55, "passive": 0.85, "pulseGain": 1.50, "continuousGain": 0.90 }
+      "dsp": { "active": 1.55, "passive": 0.85, "pulseGain": 1.50, "continuousGain": 0.90, "pvpGain": 1.40 }
     },
     {
       "slug": "epoch_sensor_3",
@@ -170,7 +170,7 @@
       "draw": 0.5,
       "tuning": { "param": "effort", "min": 0.5, "max": 2.5 },
       "mult_d": 1.0,
-      "dsp": { "active": 0.55, "passive": 0.75, "pulseGain": 0.45, "continuousGain": 1.15 }
+      "dsp": { "active": 0.55, "passive": 0.75, "pulseGain": 0.45, "continuousGain": 1.15, "pvpGain": 0.35 }
     }
   ]
 }

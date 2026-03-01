@@ -396,7 +396,7 @@ function sensorComparison(): DSPCategory {
 
 			return {
 				name: sensorKey,
-				description: `passive=${affinity.passive}, pulseGain=${affinity.pulseGain}, continuousGain=${affinity.continuousGain}.`,
+				description: `passive=${affinity.passive}, pulseGain=${affinity.pulseGain}, continuousGain=${affinity.continuousGain}, pvpGain=${affinity.pvpGain}.`,
 				input: {
 					sensor: sensorKey,
 					integrationSeconds: integrationTime,

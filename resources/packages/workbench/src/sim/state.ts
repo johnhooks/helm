@@ -46,7 +46,7 @@ export interface ShipState {
 export type SimEvent =
 	| { type: 'jump_complete'; ship: string; distance: number; coreCost: number }
 	| { type: 'scan_complete'; ship: string; success: boolean; chance: number }
-	| { type: 'phaser_drain'; ship: string; target: string; shieldDrain: number }
+	| { type: 'phaser_drain'; ship: string; target: string; shieldDrain: number; hullDamage?: number }
 	| { type: 'torpedo_fired'; ship: string; target: string; hit: boolean; damage: number }
 	| { type: 'torpedo_intercepted'; ship: string; target: string }
 	| { type: 'shield_depleted'; ship: string }

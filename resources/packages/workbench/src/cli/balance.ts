@@ -17,6 +17,7 @@ interface BalanceRow {
 	hull: string;
 	core?: string;
 	drive?: string;
+	hullIntegrity: number;
 	capacitor: number;
 	coreLife: number;
 	regenRate: number;
@@ -44,6 +45,7 @@ function extractRow(hull: Hull, report: ShipReport, extras?: Record<string, stri
 	return {
 		hull: hull.slug,
 		...extras,
+		hullIntegrity: hull.hullIntegrity,
 		capacitor: report.power.capacitor,
 		coreLife: report.power.coreLife,
 		regenRate: r(report.power.regenRate, 1),
@@ -67,7 +69,7 @@ function stddev(values: number[]): number {
 function flagOutliers(rows: BalanceRow[]): string[] {
 	const warnings: string[] = [];
 	const numericKeys: (keyof BalanceRow)[] = [
-		'capacitor', 'coreLife', 'regenRate', 'perfRatio',
+		'hullIntegrity', 'capacitor', 'coreLife', 'regenRate', 'perfRatio',
 		'jumpComfort', 'scanComfort', 'shieldCapacity', 'shieldRegen', 'cargo',
 	];
 
