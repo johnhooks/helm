@@ -199,6 +199,23 @@ The workbench currently has three loosely connected layers:
 - Shared fixtures in `tests/_data/ship-state/` covering timestamp computations
 - Extract any pure functions useful to the frontend into `@helm/types` or `@helm/formulas`
 
+### Stage 2.5: Workbench — Holodeck CLI Integration
+
+**What:** Wire the holodeck into the workbench CLI so we can see holodeck results without writing ad-hoc scripts.
+
+**Why:** The holodeck engine works (698 tests prove it) but has no CLI — it's only visible through the test runner. We need a feedback loop before building the action lifecycle. Without it, Stages 3 and 4 would be developed blind. The workbench is the operator; the holodeck is the engine. This stage connects them.
+
+**Scope:**
+- **Loadout adapter** — Bridge workbench's product catalog (`WorkbenchProduct`) to the holodeck's `Loadout` type. The workbench already loads all products from JSON with `getProduct(slug)`. The adapter takes product slugs + hull slug and produces a holodeck `Loadout` (hull + `InstalledComponent` wrappers). Lives in the workbench, not the holodeck.
+- **`bun run wb ship`** — Resolve a holodeck Ship from the product catalog and dump the full state snapshot. Flags: `--hull=pioneer`, `--core=epoch_s`, `--drive=dr_505`, `--mode=overdrive`, `--power-at=3600`, `--shields-at=7200`. Shows: resolved power/shield/hull, system capabilities (scan range, jump comfort, regen rates), and power mode effects. JSON output like all other workbench commands.
+- **`bun run wb timeline`** — Run a simple sequence of mutations (consume power, take damage, advance time) and show the ship state at each step. Takes inline flags or a JSON file. This is not the action lifecycle (Stage 3) — it's direct Ship mutations with clock advances, enough to see regen curves and damage interactions.
+- **Hull × loadout sweep** — Extend the existing `matrix` command (or add a flag) to produce holodeck-resolved snapshots instead of static formula reports. Same matrix logic, but the numbers come from the holodeck Ship rather than raw formula calls.
+
+**Not in scope:**
+- Action lifecycle (Stage 3)
+- Scenario JSON format (Stage 5)
+- Replacing the existing sim engine (that happens incrementally as the holodeck gains capabilities)
+
 ### Stage 3: Holodeck — Action Lifecycle
 
 **What:** Implement the validate → handle → defer → resolve action pipeline.
@@ -216,6 +233,22 @@ The workbench currently has three loosely connected layers:
 - Action queue inspection (what's pending, what's running, what completed)
 - Shared fixtures in `tests/_data/actions/` covering action lifecycles
 - Action preview function (given ship state + proposed action, return projected state) — extractable to frontend for draft action UX
+
+### Stage 3.5: Workbench — Action CLI Integration
+
+**What:** Wire the holodeck's action lifecycle into workbench CLI commands.
+
+**Why:** Same rationale as Stage 2.5 — the action pipeline needs a feedback loop before building multi-ship in Stage 4. "What happens when a Pioneer tries to jump 15 ly in efficiency mode?" should be answerable with a CLI command, not just a unit test.
+
+**Scope:**
+- **`bun run wb action`** — Submit an action to a holodeck Ship and show the result. `--hull=pioneer --action=jump --distance=10` → validates, shows duration/costs, resolves, shows final state. Covers the full validate → handle → resolve pipeline in one command.
+- **`bun run wb scenario <file.json>`** — Run a sequence of actions from a JSON file through the holodeck. This replaces/evolves the existing `simulate` command to use the holodeck engine instead of the workbench's toy sim. Actions are validated and resolved through the action lifecycle, not just applied as raw mutations.
+- **Action comparison** — "What's the difference between jumping 10 ly in normal vs efficiency mode?" Side-by-side output showing costs, duration, and projected state for each.
+- **Migrate existing sim tests** — Move tests from `src/sim/engine.test.ts` to use the holodeck-backed scenario runner where applicable. Tests that cover action lifecycle behaviors (jump costs power, scan has success chance, phaser drains shields) should validate against the holodeck, not the toy sim.
+
+**Not in scope:**
+- Multi-ship (Stage 4)
+- Full analysis framework rebuild (Stage 5)
 
 ### Stage 4: Holodeck — Multi-Ship and Environment
 
@@ -272,7 +305,7 @@ The existing workbench code doesn't get thrown away — it gets reorganized:
 - **`computeShipReport()`** — Stays in the workbench as a convenience function for quick static analysis.
 - **Product/hull data** — Moves from `workbench/data/` to `tests/_data/catalog/` in Stage 1. Workbench loaders repoint to the shared location. Holodeck and PHP tests consume the same files.
 - **DSP analysis commands** — Migrate into the analysis framework as scenario categories (Stage 5). The formula-level DSP analysis is still valuable.
-- **Sim engine** — Replaced by the holodeck (Stages 2-4). Tests migrate to cover the new implementation.
+- **Sim engine** — Incrementally replaced by the holodeck. Stage 2.5 adds holodeck-backed CLI commands alongside the existing sim. Stage 3.5 migrates the scenario runner to use the holodeck's action lifecycle. The old sim engine stays until the holodeck can handle everything it does.
 - **CLI commands** — Collapse from 12 commands to a focused set.
 
 ## What Carries to Frontend

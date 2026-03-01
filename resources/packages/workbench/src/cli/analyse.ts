@@ -1,7 +1,7 @@
 import { computeShipReport } from '../report';
-import { getProductsByType, getProduct, defaults } from '../data/products';
+import { getProductsByType, getProduct, DEFAULT_LOADOUT_SLUGS } from '../data/products';
 import { HULLS } from '../data/hulls';
-import type { ActionTuning, ComponentType, Constants, ShipReport, Loadout, Hull, WorkbenchProduct } from '../types';
+import type { ActionTuning, ComponentType, Constants, ShipReport, ReportLoadout, Hull, CatalogProduct } from '../types';
 import { DEFAULT_CONSTANTS, DEFAULT_TUNING } from '../types';
 
 interface Scenario {
@@ -32,22 +32,26 @@ interface Analysis {
 
 const defaultSlugs = {
 	hull: 'pioneer',
-	core: defaults.core.slug,
-	drive: defaults.drive.slug,
-	sensor: defaults.sensor.slug,
-	shield: defaults.shield.slug,
-	nav: defaults.nav.slug,
+	core: DEFAULT_LOADOUT_SLUGS.core,
+	drive: DEFAULT_LOADOUT_SLUGS.drive,
+	sensor: DEFAULT_LOADOUT_SLUGS.sensor,
+	shield: DEFAULT_LOADOUT_SLUGS.shield,
+	nav: DEFAULT_LOADOUT_SLUGS.nav,
 };
 
 function resolveHull(slug: string): Hull {
 	return HULLS.find((h) => h.slug === slug) ?? HULLS[0];
 }
 
-function resolveProduct(type: ComponentType, spec: string): WorkbenchProduct {
-	return getProduct(spec) ?? defaults[type as keyof typeof defaults];
+function resolveProduct(type: ComponentType, spec: string): CatalogProduct {
+	const p = getProduct(spec);
+	if (p) {return p;}
+	const fallback = getProduct(defaultSlugs[type as keyof typeof defaultSlugs]);
+	if (!fallback) {throw new Error(`No product found for ${type}: ${spec}`);}
+	return fallback;
 }
 
-function buildLoadout(overrides: Partial<Record<string, string>> = {}): Loadout {
+function buildLoadout(overrides: Partial<Record<string, string>> = {}): ReportLoadout {
 	const slugs = { ...defaultSlugs, ...overrides };
 	return {
 		hull: resolveHull(slugs.hull),
@@ -59,7 +63,7 @@ function buildLoadout(overrides: Partial<Record<string, string>> = {}): Loadout 
 	};
 }
 
-function slugsOf(loadout: Loadout): Record<string, string> {
+function slugsOf(loadout: ReportLoadout): Record<string, string> {
 	return {
 		hull: loadout.hull.slug,
 		core: loadout.core.slug,

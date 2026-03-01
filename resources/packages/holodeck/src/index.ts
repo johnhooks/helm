@@ -11,9 +11,18 @@ export type { InstalledComponent } from './types/component';
 export type { Loadout } from './types/loadout';
 export type { ShipState } from './types/ship-state';
 export type { ShipAction } from './types/action';
+export type { CatalogProduct, TuningConfig, DriveDSP } from './types/catalog';
 
 // Data
 export { HULLS, getHull } from './data/hulls';
+export {
+	getProduct, getProductsByType, getProductSlugs, getAllProducts,
+	DEFAULT_LOADOUT_SLUGS,
+} from './data/products';
+export type { ComponentType } from './data/products';
+
+// Loadout builder
+export { buildLoadout } from './loadout-builder';
 
 // Clock & RNG
 export { createClock } from './clock';

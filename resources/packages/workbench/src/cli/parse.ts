@@ -1,17 +1,18 @@
-import type { ActionTuning, Constants, ComponentType, Hull, Loadout } from '../types';
+import type { ActionTuning, Constants } from '@helm/formulas';
+import type { Loadout, CatalogProduct } from '@helm/holodeck';
+import { buildLoadout, DEFAULT_LOADOUT_SLUGS } from '@helm/holodeck';
+import type { ComponentType, ReportLoadout } from '../types';
 import { DEFAULT_CONSTANTS, DEFAULT_TUNING } from '../types';
-import { getProduct, getProductsByType, defaults } from '../data/products';
-import { HULLS } from '../data/hulls';
 
 export const COMPONENT_TYPES: ComponentType[] = ['core', 'drive', 'sensor', 'shield', 'nav'];
 
 export const DEFAULT_SLUGS: Record<string, string> = {
 	hull: 'pioneer',
-	core: defaults.core.slug,
-	drive: defaults.drive.slug,
-	sensor: defaults.sensor.slug,
-	shield: defaults.shield.slug,
-	nav: defaults.nav.slug,
+	core: DEFAULT_LOADOUT_SLUGS.core,
+	drive: DEFAULT_LOADOUT_SLUGS.drive,
+	sensor: DEFAULT_LOADOUT_SLUGS.sensor,
+	shield: DEFAULT_LOADOUT_SLUGS.shield,
+	nav: DEFAULT_LOADOUT_SLUGS.nav,
 };
 
 export interface ParsedFlags {
@@ -39,42 +40,27 @@ export function parseArgs(argv: string[] = process.argv.slice(2)): ParsedFlags {
 	return { flags, positional };
 }
 
-function resolveHull(slug: string): Hull {
-	const hull = HULLS.find((h) => h.slug === slug);
-	if (!hull) {
-		const valid = HULLS.map((h) => h.slug).join(', ');
-		throw new Error(`Unknown hull "${slug}". Valid: ${valid}`);
-	}
-	return hull;
-}
-
 export function hydrateLoadout(flags: Record<string, string>): Loadout {
 	const hullSlug = flags.hull ?? DEFAULT_SLUGS.hull;
-	const hull = resolveHull(hullSlug);
-
-	const components: Record<string, ReturnType<typeof getProduct>> = {};
+	const componentSlugs: Record<string, string> = {};
 	for (const type of COMPONENT_TYPES) {
-		const slug = flags[type] ?? DEFAULT_SLUGS[type];
-		const product = getProduct(slug);
-		if (!product) {
-			const valid = getProductsByType(type)
-				.map((p) => p.slug)
-				.join(', ');
-			throw new Error(`Unknown ${type} "${slug}". Valid: ${valid}`);
-		}
-		if (product.type !== type) {
-			throw new Error(`Product "${slug}" is type "${product.type}", expected "${type}"`);
-		}
-		components[type] = product;
+		componentSlugs[type] = flags[type] ?? DEFAULT_SLUGS[type];
 	}
+	return buildLoadout(hullSlug, componentSlugs);
+}
 
+/**
+ * Unwrap a holodeck Loadout (InstalledComponent wrappers) into a
+ * flat ReportLoadout for formula analysis.
+ */
+export function toReportLoadout(loadout: Loadout): ReportLoadout {
 	return {
-		hull,
-		core: components.core!,
-		drive: components.drive!,
-		sensor: components.sensor!,
-		shield: components.shield!,
-		nav: components.nav!,
+		hull: loadout.hull,
+		core: loadout.core.product as CatalogProduct,
+		drive: loadout.drive.product as CatalogProduct,
+		sensor: loadout.sensor.product as CatalogProduct,
+		shield: loadout.shield.product as CatalogProduct,
+		nav: loadout.nav.product as CatalogProduct,
 	};
 }
 
@@ -104,10 +90,10 @@ export function resolveConstants(flags: Record<string, string>): Constants {
 export function loadoutSlugs(loadout: Loadout): Record<string, string> {
 	return {
 		hull: loadout.hull.slug,
-		core: loadout.core.slug,
-		drive: loadout.drive.slug,
-		sensor: loadout.sensor.slug,
-		shield: loadout.shield.slug,
-		nav: loadout.nav.slug,
+		core: loadout.core.product.slug,
+		drive: loadout.drive.product.slug,
+		sensor: loadout.sensor.product.slug,
+		shield: loadout.shield.product.slug,
+		nav: loadout.nav.product.slug,
 	};
 }

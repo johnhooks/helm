@@ -2,6 +2,7 @@ import { computeShipReport } from '../report';
 import type { ParsedFlags } from './parse';
 import {
 	hydrateLoadout,
+	toReportLoadout,
 	resolveTuning,
 	resolveConstants,
 	loadoutSlugs,
@@ -92,8 +93,8 @@ export function compare({ flags }: ParsedFlags): void {
 	const loadoutA = hydrateLoadout(aFlags);
 	const loadoutB = hydrateLoadout(bFlags);
 
-	const reportA = computeShipReport(loadoutA, tuning, constants);
-	const reportB = computeShipReport(loadoutB, tuning, constants);
+	const reportA = computeShipReport(toReportLoadout(loadoutA), tuning, constants);
+	const reportB = computeShipReport(toReportLoadout(loadoutB), tuning, constants);
 
 	const delta = computeDelta(reportA, reportB);
 

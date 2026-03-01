@@ -8,9 +8,9 @@
 import { computeShipReport } from '../report';
 import type { ParsedFlags } from './parse';
 import { resolveTuning, resolveConstants, COMPONENT_TYPES } from './parse';
-import { getProductsByType, defaults } from '../data/products';
+import { getProductsByType, getProduct, DEFAULT_LOADOUT_SLUGS } from '../data/products';
 import { HULLS } from '../data/hulls';
-import type { ComponentType, Loadout, ShipReport, Hull, WorkbenchProduct } from '../types';
+import type { ComponentType, ReportLoadout, ShipReport, Hull, CatalogProduct } from '../types';
 import { r } from '../format';
 
 interface BalanceRow {
@@ -30,14 +30,21 @@ interface BalanceRow {
 	equipmentSlots: number;
 }
 
-function buildLoadout(hull: Hull, overrides: Partial<Record<ComponentType, WorkbenchProduct>> = {}): Loadout {
+function resolveDefault(type: string): CatalogProduct {
+	const slug = DEFAULT_LOADOUT_SLUGS[type as keyof typeof DEFAULT_LOADOUT_SLUGS];
+	const p = getProduct(slug);
+	if (!p) {throw new Error(`No default product for ${type}`);}
+	return p;
+}
+
+function buildLoadout(hull: Hull, overrides: Partial<Record<ComponentType, CatalogProduct>> = {}): ReportLoadout {
 	return {
 		hull,
-		core: overrides.core ?? defaults.core,
-		drive: overrides.drive ?? defaults.drive,
-		sensor: overrides.sensor ?? defaults.sensor,
-		shield: overrides.shield ?? defaults.shield,
-		nav: overrides.nav ?? defaults.nav,
+		core: overrides.core ?? resolveDefault('core'),
+		drive: overrides.drive ?? resolveDefault('drive'),
+		sensor: overrides.sensor ?? resolveDefault('sensor'),
+		shield: overrides.shield ?? resolveDefault('shield'),
+		nav: overrides.nav ?? resolveDefault('nav'),
 	};
 }
 
@@ -101,7 +108,7 @@ export function balance({ flags }: ParsedFlags): void {
 		const varySlots = varyRaw.split(',') as ComponentType[];
 
 		// Build combinations for varied slots
-		const slotProducts: Record<string, WorkbenchProduct[]> = {};
+		const slotProducts: Record<string, CatalogProduct[]> = {};
 		for (const slot of varySlots) {
 			if (COMPONENT_TYPES.includes(slot)) {
 				slotProducts[slot] = getProductsByType(slot);
@@ -112,7 +119,7 @@ export function balance({ flags }: ParsedFlags): void {
 			// Generate combos for varied slots
 			const combos = cartesian(varySlots.map((s) => slotProducts[s] ?? []));
 			for (const combo of combos) {
-				const overrides: Partial<Record<ComponentType, WorkbenchProduct>> = {};
+				const overrides: Partial<Record<ComponentType, CatalogProduct>> = {};
 				const extras: Record<string, string> = {};
 				varySlots.forEach((slot, i) => {
 					overrides[slot] = combo[i];
@@ -146,8 +153,8 @@ export function balance({ flags }: ParsedFlags): void {
 	console.log(JSON.stringify(output, null, 2)); // eslint-disable-line no-console
 }
 
-function cartesian(arrays: WorkbenchProduct[][]): WorkbenchProduct[][] {
-	return arrays.reduce<WorkbenchProduct[][]>(
+function cartesian(arrays: CatalogProduct[][]): CatalogProduct[][] {
+	return arrays.reduce<CatalogProduct[][]>(
 		(acc, arr) => acc.flatMap((combo) => arr.map((val) => [...combo, val])),
 		[[]],
 	);

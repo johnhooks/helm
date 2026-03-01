@@ -1,6 +1,6 @@
 # Workbench
 
-Design-time CLI for game balance analysis. Consumes `@helm/formulas`. All output is JSON to stdout.
+Design-time CLI for game balance analysis. Consumes `@helm/holodeck` for product catalog and ship simulation, `@helm/formulas` for calculations. All output is JSON to stdout.
 
 ```bash
 bun run wb <command> [flags]
@@ -26,6 +26,8 @@ Runs ~460 scenarios across 14 categories (baseline, tuning sweeps, power budget,
 | Do DSP formulas serve design goals? | `bun run wb dsp-progress` (PASS/WARN/FAIL verdicts) |
 | How does a combat matchup play out? | `bun run wb combat --attacker=striker --weapon=phaser_array --defender=pioneer` |
 | What are available components/hulls? | `bun run wb list products [--type=core]` / `bun run wb list hulls` |
+| What does a holodeck ship look like? | `bun run wb ship --hull=pioneer --core=epoch_s` |
+| How does power regen after consumption? | `bun run wb timeline --steps='[{"t":0,"action":"consumePower","amount":50},{"t":3600,"action":"resolve"}]'` |
 
 ## Tuning Flags
 

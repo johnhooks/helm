@@ -5,6 +5,7 @@ import type { ParsedFlags } from './parse';
 import type { ComponentType } from '../types';
 import {
 	hydrateLoadout,
+	toReportLoadout,
 	resolveTuning,
 	resolveConstants,
 	loadoutSlugs,
@@ -67,7 +68,7 @@ export function matrix({ flags }: ParsedFlags): void {
 		});
 
 		const loadout = hydrateLoadout(loadoutFlags);
-		const shipReport = computeShipReport(loadout, tuning, constants);
+		const shipReport = computeShipReport(toReportLoadout(loadout), tuning, constants);
 
 		return {
 			loadout: loadoutSlugs(loadout),

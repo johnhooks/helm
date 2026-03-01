@@ -11,6 +11,8 @@ import { balance } from './cli/balance';
 import { simulateCommand } from './cli/simulate';
 import { combat } from './cli/combat';
 import { detection } from './cli/detection';
+import { ship } from './cli/ship';
+import { timeline } from './cli/timeline';
 
 const parsed = parseArgs();
 const command = parsed.positional[0];
@@ -64,6 +66,14 @@ switch (command) {
 		detection();
 		break;
 
+	case 'ship':
+		ship(parsed);
+		break;
+
+	case 'timeline':
+		timeline(parsed);
+		break;
+
 	default:
 		console.error('Usage: bun wb <command> [options]'); // eslint-disable-line no-console
 		console.error(''); // eslint-disable-line no-console
@@ -81,6 +91,8 @@ switch (command) {
 		console.error('  simulate <scenario.json>      Run simulation scenario'); // eslint-disable-line no-console
 		console.error('  combat [--attacker=X ...]     Quick combat scenario'); // eslint-disable-line no-console
 		console.error('  detection                     Wolf × target detection matrix'); // eslint-disable-line no-console
+		console.error('  ship [--hull=X --core=Y ...]  Holodeck ship state snapshot'); // eslint-disable-line no-console
+		console.error('  timeline [--file=X]           Ship mutation timeline'); // eslint-disable-line no-console
 		console.error(''); // eslint-disable-line no-console
 		console.error('Tuning flags: --throttle=1.0 --effort=1.0 --priority=1.0'); // eslint-disable-line no-console
 		process.exit(1);

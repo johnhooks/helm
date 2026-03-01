@@ -8,9 +8,9 @@ import {
 	transitShieldRegenRate, transitShieldRecovered,
 	coreResonanceCost, sensorShieldCouplingMultiplier,
 } from '@helm/formulas';
-import type { Loadout, ShipReport } from './types';
+import type { ReportLoadout, ShipReport } from './types';
 
-function formatFootprint(loadout: Loadout): ShipReport['footprint'] {
+function formatFootprint(loadout: ReportLoadout): ShipReport['footprint'] {
 	const breakdown: Record<string, number> = {
 		core: loadout.core.footprint,
 		drive: loadout.drive.footprint,
@@ -27,7 +27,7 @@ function formatFootprint(loadout: Loadout): ShipReport['footprint'] {
 	};
 }
 
-function formatPower(loadout: Loadout): ShipReport['power'] {
+function formatPower(loadout: ReportLoadout): ShipReport['power'] {
 	const output = coreOutput(loadout.core);
 	const ratio = perfRatio(output, loadout.drive);
 	const regen = regenRate(loadout.core);
@@ -41,7 +41,7 @@ function formatPower(loadout: Loadout): ShipReport['power'] {
 	};
 }
 
-function formatScan(loadout: Loadout, output: number, effort: number, constants: Constants): ShipReport['scan'] {
+function formatScan(loadout: ReportLoadout, output: number, effort: number, constants: Constants): ShipReport['scan'] {
 	const scanMult = loadout.hull.scanComfortMultiplier ?? 1.0;
 	const comfort = scanComfortRange(loadout.sensor, output) * scanMult;
 	const durationPerLy = Math.ceil(constants.baseScanSecondsPerLy * (loadout.sensor.mult_a ?? 0) * effort);
@@ -67,7 +67,7 @@ function formatScan(loadout: Loadout, output: number, effort: number, constants:
 }
 
 function formatJump(
-	loadout: Loadout,
+	loadout: ReportLoadout,
 	output: number,
 	ratio: number,
 	throttle: number,
@@ -100,7 +100,7 @@ function formatJump(
 	};
 }
 
-function formatShield(loadout: Loadout, priority: number): ShipReport['shield'] {
+function formatShield(loadout: ReportLoadout, priority: number): ShipReport['shield'] {
 	const shieldMult = loadout.hull.shieldCapacityMultiplier ?? 1.0;
 	const capacity = (loadout.shield.capacity ?? 0) * shieldMult;
 	const regen = shieldRegenRate(loadout.shield.rate ?? 0, priority);
@@ -109,7 +109,7 @@ function formatShield(loadout: Loadout, priority: number): ShipReport['shield'] 
 	return { capacity, regenRate: regen, draw, timeToFull: time };
 }
 
-function formatNav(loadout: Loadout, constants: Constants): ShipReport['nav'] {
+function formatNav(loadout: ReportLoadout, constants: Constants): ShipReport['nav'] {
 	const skill = loadout.nav.mult_a ?? 0;
 	const efficiency = loadout.nav.mult_b ?? 0;
 	const depths = [0, 1, 2, 3, 4, 5];
@@ -123,7 +123,7 @@ function formatNav(loadout: Loadout, constants: Constants): ShipReport['nav'] {
 	};
 }
 
-function formatSignature(loadout: Loadout): ShipReport['signature'] {
+function formatSignature(loadout: ReportLoadout): ShipReport['signature'] {
 	return {
 		hullSignature: loadout.hull.hullSignature,
 		weaponDrawMultiplier: loadout.hull.weaponDrawMultiplier ?? 1.0,
@@ -132,7 +132,7 @@ function formatSignature(loadout: Loadout): ShipReport['signature'] {
 }
 
 function formatMechanics(
-	loadout: Loadout,
+	loadout: ReportLoadout,
 	shield: ShipReport['shield'],
 	jump: ShipReport['jump'],
 	scan: ShipReport['scan'],
@@ -174,7 +174,7 @@ function formatMechanics(
 }
 
 export function computeShipReport(
-	loadout: Loadout,
+	loadout: ReportLoadout,
 	tuning: ActionTuning,
 	constants: Constants,
 ): ShipReport {

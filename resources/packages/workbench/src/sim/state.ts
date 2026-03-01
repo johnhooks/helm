@@ -1,4 +1,4 @@
-import type { Loadout , WorkbenchProduct } from '../types';
+import type { ReportLoadout, CatalogProduct } from '../types';
 
 export interface ShipState {
 	/**
@@ -8,11 +8,11 @@ export interface ShipState {
 	/**
 	 * Ship loadout (hull + 5 core components).
 	 */
-	loadout: Loadout;
+	loadout: ReportLoadout;
 	/**
 	 * Equipped weapons and defensive gear.
 	 */
-	equipment: WorkbenchProduct[];
+	equipment: CatalogProduct[];
 	/**
 	 * Current capacitor level.
 	 */

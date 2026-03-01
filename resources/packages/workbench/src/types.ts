@@ -1,49 +1,29 @@
-import type { Product } from '@helm/types';
-import type { ActionTuning, Constants, SensorAffinity, EnvelopePhaseShape, DriveEnvelope } from '@helm/formulas';
-import type { Hull } from '@helm/holodeck';
+import type { ActionTuning, Constants } from '@helm/formulas';
+import type { Hull, CatalogProduct } from '@helm/holodeck';
 export { DEFAULT_CONSTANTS, DEFAULT_TUNING } from '@helm/formulas';
 
 export type { ActionTuning, Constants };
 
 export type { Hull };
 
-export type ComponentType = 'core' | 'drive' | 'sensor' | 'shield' | 'nav' | 'weapon' | 'cloak' | 'equipment';
-
-export interface TuningConfig {
-	param: 'effort' | 'throttle' | 'priority';
-	min: number;
-	max: number;
-}
+export type { CatalogProduct, TuningConfig, DriveDSP, ComponentType } from '@helm/holodeck';
+export type { SensorAffinity as SensorDSP } from '@helm/formulas';
+export type { EnvelopePhaseShape as DrivePhase } from '@helm/formulas';
 
 /**
- * Workbench-local alias — formulas SensorAffinity without re-declaring the shape.
+ * Flat loadout for report/formula analysis.
+ *
+ * Unlike holodeck's Loadout (which wraps products in InstalledComponent),
+ * this provides direct access to CatalogProduct fields (draw, tuning, dsp)
+ * needed by computeShipReport and other analysis functions.
  */
-export type SensorDSP = SensorAffinity;
-
-/**
- * Workbench-local alias — drive envelope phases without the label.
- */
-export type DriveDSP = Omit<DriveEnvelope, 'label'>;
-
-/**
- * Re-export phase shape for product data.
- */
-export type DrivePhase = EnvelopePhaseShape;
-
-export interface WorkbenchProduct extends Product {
-	draw: number | null;
-	tuning: TuningConfig | null;
-	sensorDsp: SensorDSP | null;
-	driveDsp: DriveDSP | null;
-}
-
-export interface Loadout {
+export interface ReportLoadout {
 	hull: Hull;
-	core: WorkbenchProduct;
-	drive: WorkbenchProduct;
-	sensor: WorkbenchProduct;
-	shield: WorkbenchProduct;
-	nav: WorkbenchProduct;
+	core: CatalogProduct;
+	drive: CatalogProduct;
+	sensor: CatalogProduct;
+	shield: CatalogProduct;
+	nav: CatalogProduct;
 }
 
 export interface ShipReport {

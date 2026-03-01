@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import type { ActionTuning } from '@helm/formulas';
 import { DEFAULT_CONSTANTS, DEFAULT_TUNING } from '@helm/formulas';
-import type { Loadout } from './types';
+import type { ReportLoadout } from './types';
 import { computeShipReport } from './report';
 import { getProduct } from './data/products';
 import { getHull } from './data/hulls';
@@ -18,7 +18,7 @@ function h(slug: string) {
 	return hull;
 }
 
-const defaultLoadout: Loadout = {
+const defaultLoadout: ReportLoadout = {
 	hull: h('pioneer'),
 	core: p('epoch_s'),
 	drive: p('dr_505'),
@@ -205,27 +205,27 @@ describe('computeShipReport', () => {
 
 	describe('hull mass affects jump comfort range', () => {
 		it('heavy hull (Bulwark, mass 1.4) reduces jump comfort range', () => {
-			const loadout: Loadout = { ...defaultLoadout, hull: h('bulwark') };
+			const loadout: ReportLoadout = { ...defaultLoadout, hull: h('bulwark') };
 			const report = computeShipReport(loadout, DEFAULT_TUNING, DEFAULT_CONSTANTS);
 			expect(report.jump.comfortRange).toBe(5.0); // 7.0 / 1.4
 		});
 
 		it('light hull (Scout, mass 0.7) increases jump comfort range', () => {
-			const loadout: Loadout = { ...defaultLoadout, hull: h('scout') };
+			const loadout: ReportLoadout = { ...defaultLoadout, hull: h('scout') };
 			const report = computeShipReport(loadout, DEFAULT_TUNING, DEFAULT_CONSTANTS);
 			expect(report.jump.comfortRange).toBe(10.0); // 7.0 / 0.7
 		});
 
 		it('hull mass does NOT affect scan comfort range', () => {
 			const pioneerReport = computeShipReport(defaultLoadout, DEFAULT_TUNING, DEFAULT_CONSTANTS);
-			const bulwarkLoadout: Loadout = { ...defaultLoadout, hull: h('bulwark') };
+			const bulwarkLoadout: ReportLoadout = { ...defaultLoadout, hull: h('bulwark') };
 			const bulwarkReport = computeShipReport(bulwarkLoadout, DEFAULT_TUNING, DEFAULT_CONSTANTS);
 			expect(bulwarkReport.scan.comfortRange).toBe(pioneerReport.scan.comfortRange);
 		});
 
 		it('heavy hull increases strain at same distance', () => {
 			const pioneerReport = computeShipReport(defaultLoadout, DEFAULT_TUNING, DEFAULT_CONSTANTS);
-			const bulwarkLoadout: Loadout = { ...defaultLoadout, hull: h('bulwark') };
+			const bulwarkLoadout: ReportLoadout = { ...defaultLoadout, hull: h('bulwark') };
 			const bulwarkReport = computeShipReport(bulwarkLoadout, DEFAULT_TUNING, DEFAULT_CONSTANTS);
 
 			// At distance 5: Pioneer comfort=7 → strain=1.0; Bulwark comfort=5 → strain=1.0
@@ -246,7 +246,7 @@ describe('computeShipReport', () => {
 		});
 
 		it('reports correct values for Striker', () => {
-			const loadout: Loadout = { ...defaultLoadout, hull: h('striker') };
+			const loadout: ReportLoadout = { ...defaultLoadout, hull: h('striker') };
 			const report = computeShipReport(loadout, DEFAULT_TUNING, DEFAULT_CONSTANTS);
 			expect(report.signature.hullSignature).toBe(1.3);
 			expect(report.signature.weaponDrawMultiplier).toBe(0.6);
@@ -257,7 +257,7 @@ describe('computeShipReport', () => {
 	describe('hull amplitude multiplier', () => {
 		it('Scout amplitude bonus reduces jump duration vs Pioneer', () => {
 			const pioneerReport = computeShipReport(defaultLoadout, DEFAULT_TUNING, DEFAULT_CONSTANTS);
-			const scoutLoadout: Loadout = { ...defaultLoadout, hull: h('scout') };
+			const scoutLoadout: ReportLoadout = { ...defaultLoadout, hull: h('scout') };
 			const scoutReport = computeShipReport(scoutLoadout, DEFAULT_TUNING, DEFAULT_CONSTANTS);
 
 			// At distance 1, Scout should have shorter duration due to amplitude bonus
@@ -268,7 +268,7 @@ describe('computeShipReport', () => {
 	});
 
 	describe('underpowered loadout', () => {
-		const loadout: Loadout = { ...defaultLoadout, drive: p('dr_705') };
+		const loadout: ReportLoadout = { ...defaultLoadout, drive: p('dr_705') };
 		const report = computeShipReport(loadout, DEFAULT_TUNING, DEFAULT_CONSTANTS);
 
 		it('perfRatio is below 1.0', () => {
@@ -300,7 +300,7 @@ describe('computeShipReport', () => {
 		});
 
 		describe('Aegis Testudo — Transit Shield Harmonics', () => {
-			const loadout: Loadout = { ...defaultLoadout, drive: p('aegis_testudo') };
+			const loadout: ReportLoadout = { ...defaultLoadout, drive: p('aegis_testudo') };
 			const report = computeShipReport(loadout, DEFAULT_TUNING, DEFAULT_CONSTANTS);
 
 			it('transit shield regen activates', () => {
@@ -337,7 +337,7 @@ describe('computeShipReport', () => {
 		});
 
 		describe('Epoch Sensor 2 — Core Resonance Scanning', () => {
-			const loadout: Loadout = { ...defaultLoadout, sensor: p('epoch_sensor_2') };
+			const loadout: ReportLoadout = { ...defaultLoadout, sensor: p('epoch_sensor_2') };
 			const report = computeShipReport(loadout, DEFAULT_TUNING, DEFAULT_CONSTANTS);
 
 			it('core resonance activates', () => {
@@ -371,7 +371,7 @@ describe('computeShipReport', () => {
 		});
 
 		describe('DSC Shield Mk II — Sensor-Shield Coupling', () => {
-			const loadout: Loadout = { ...defaultLoadout, shield: p('dsc_shield_mk2') };
+			const loadout: ReportLoadout = { ...defaultLoadout, shield: p('dsc_shield_mk2') };
 			const report = computeShipReport(loadout, DEFAULT_TUNING, DEFAULT_CONSTANTS);
 
 			it('coupling activates', () => {
@@ -389,7 +389,7 @@ describe('computeShipReport', () => {
 		});
 
 		describe('full crossover loadout — all three mechanics active', () => {
-			const loadout: Loadout = {
+			const loadout: ReportLoadout = {
 				...defaultLoadout,
 				drive: p('aegis_testudo'),
 				sensor: p('epoch_sensor_2'),
@@ -405,7 +405,7 @@ describe('computeShipReport', () => {
 		});
 
 		describe('tuning interaction — priority doubles transit shield regen', () => {
-			const loadout: Loadout = { ...defaultLoadout, drive: p('aegis_testudo') };
+			const loadout: ReportLoadout = { ...defaultLoadout, drive: p('aegis_testudo') };
 			const tuning: ActionTuning = { ...DEFAULT_TUNING, priority: 2.0 };
 			const report = computeShipReport(loadout, tuning, DEFAULT_CONSTANTS);
 

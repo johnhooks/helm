@@ -23,7 +23,7 @@ import {
  DEFAULT_CONSTANTS, DEFAULT_TUNING } from '@helm/formulas';
 import type { Constants, ActionTuning } from '@helm/formulas';
 
-import type { Loadout, WorkbenchProduct } from '../types';
+import type { ReportLoadout, CatalogProduct } from '../types';
 import { getProduct } from '../data/products';
 import { getHull } from '../data/hulls';
 import type { ShipState, SimEvent, SimulationSnapshot, SerializedShipState } from './state';
@@ -31,7 +31,7 @@ import type { Scenario, SimAction } from './types';
 
 // ── Initialization ──────────────────────────────────────────
 
-function initShipState(slug: string, loadout: Loadout, equipment: WorkbenchProduct[], _tuning: ActionTuning): ShipState {
+function initShipState(slug: string, loadout: ReportLoadout, equipment: CatalogProduct[], _tuning: ActionTuning): ShipState {
 	const cap = capacitor(loadout.core);
 	const shieldMult = loadout.hull.shieldCapacityMultiplier ?? 1.0;
 	const shieldCap = (loadout.shield.capacity ?? 0) * shieldMult;
@@ -57,7 +57,7 @@ function initShipState(slug: string, loadout: Loadout, equipment: WorkbenchProdu
 	};
 }
 
-function hydrateScenarioShip(spec: Scenario['ships'][string]): { loadout: Loadout; equipment: WorkbenchProduct[]; tuning: ActionTuning } {
+function hydrateScenarioShip(spec: Scenario['ships'][string]): { loadout: ReportLoadout; equipment: CatalogProduct[]; tuning: ActionTuning } {
 	const hull = getHull(spec.hull);
 	if (!hull) {throw new Error(`Unknown hull: ${spec.hull}`);}
 
@@ -67,7 +67,7 @@ function hydrateScenarioShip(spec: Scenario['ships'][string]): { loadout: Loadou
 		return p;
 	};
 
-	const loadout: Loadout = {
+	const loadout: ReportLoadout = {
 		hull,
 		core: resolve(spec.core),
 		drive: resolve(spec.drive),
