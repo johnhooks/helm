@@ -7,10 +7,11 @@
 
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
-import { createShip, createClock, createRng, PowerMode } from '@helm/holodeck';
+import { createShip, createClock, createRng } from '@helm/holodeck';
 import type { ShipState } from '@helm/holodeck';
+import type { PilotSkills } from '@helm/formulas';
 import type { ParsedFlags } from './parse';
-import { hydrateLoadout, resolveTuning, loadoutSlugs } from './parse';
+import { hydrateLoadout, loadoutSlugs, resolvePilot } from './parse';
 import { r } from '../format';
 
 interface TimelineStep {
@@ -18,7 +19,7 @@ interface TimelineStep {
 	action: string;
 	amount?: number;
 	nodeId?: number;
-	mode?: string;
+	priority?: number;
 	slug?: string;
 	quantity?: number;
 	count?: number;
@@ -32,7 +33,8 @@ interface TimelineFile {
 		sensor?: string;
 		shield?: string;
 		nav?: string;
-		mode?: string;
+		shieldPriority?: number;
+		pilot?: Partial<PilotSkills>;
 	};
 	steps: TimelineStep[];
 }
@@ -68,6 +70,8 @@ function resolveState(state: ShipState) {
 export function timeline({ flags }: ParsedFlags): void {
 	let steps: TimelineStep[];
 	const shipFlags: Record<string, string> = {};
+	let shieldPriority: number | undefined;
+	let filePilot: Partial<PilotSkills> | undefined;
 
 	if (flags.file) {
 		const fullPath = resolve(process.cwd(), flags.file);
@@ -75,8 +79,17 @@ export function timeline({ flags }: ParsedFlags): void {
 		const data: TimelineFile = JSON.parse(raw);
 		steps = data.steps;
 		if (data.ship) {
+			if (data.ship.pilot) {
+				filePilot = data.ship.pilot;
+			}
 			for (const [key, value] of Object.entries(data.ship)) {
-				if (value) {shipFlags[key] = value;}
+				if (key === 'shieldPriority' && typeof value === 'number') {
+					shieldPriority = value;
+				} else if (key === 'pilot') {
+					// handled above
+				} else if (value && typeof value === 'string') {
+					shipFlags[key] = value;
+				}
 			}
 		}
 	} else if (flags.steps) {
@@ -90,12 +103,22 @@ export function timeline({ flags }: ParsedFlags): void {
 	const mergedFlags = { ...shipFlags, ...flags };
 
 	const loadout = hydrateLoadout(mergedFlags);
-	const tuning = resolveTuning(mergedFlags);
-	const mode = (mergedFlags.mode as PowerMode) ?? PowerMode.Normal;
+
+	// File pilot overrides defaults, CLI --pilot.* flags override file
+	const pilot = resolvePilot({ ...shipFlags, ...flags });
+	if (filePilot) {
+		// Apply file pilot first (as defaults), then CLI flags win
+		for (const [key, value] of Object.entries(filePilot)) {
+			const k = key as keyof PilotSkills;
+			if (!((`pilot.${k}`) in flags)) {
+				pilot[k] = value;
+			}
+		}
+	}
 
 	const clock = createClock(0);
 	const rng = createRng(42);
-	const ship = createShip(loadout, clock, rng, { powerMode: mode, tuning });
+	const ship = createShip(loadout, clock, rng, { shieldPriority, pilot });
 
 	// Sort steps by time
 	const sorted = [...steps].sort((a, b) => a.t - b.t);
@@ -141,9 +164,9 @@ export function timeline({ flags }: ParsedFlags): void {
 				ship.moveToNode(step.nodeId ?? 0);
 				break;
 
-			case 'setPowerMode':
-				params = { mode: step.mode };
-				ship.setPowerMode((step.mode as PowerMode) ?? PowerMode.Normal);
+			case 'setShieldPriority':
+				params = { priority: step.priority };
+				ship.setShieldPriority(step.priority ?? 1.0);
 				break;
 
 			case 'addCargo':

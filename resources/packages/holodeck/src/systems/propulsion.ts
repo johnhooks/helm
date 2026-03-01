@@ -41,23 +41,23 @@ export class PropulsionSystem {
 		);
 	}
 
-	getJumpDuration(distance: number): number {
+	getJumpDuration(distance: number, throttle = 1.0): number {
 		return jumpDuration(
 			distance,
 			this.loadout.drive.product,
 			this.power.getOutputMultiplier(),
 			this.getPerformanceRatio(),
-			this.state.tuning.throttle,
+			throttle,
 			this.constants,
 		);
 	}
 
-	getJumpCoreCost(distance: number): number {
+	getJumpCoreCost(distance: number, throttle = 1.0): number {
 		return jumpCoreCost(
 			distance,
 			this.loadout.core.product,
 			this.loadout.drive.product,
-			this.state.tuning.throttle,
+			throttle,
 			this.getComfortRange(),
 		);
 	}
@@ -66,8 +66,8 @@ export class PropulsionSystem {
 		return jumpPowerCost(distance, this.constants, this.getComfortRange());
 	}
 
-	canReach(distance: number): boolean {
-		const coreCost = this.getJumpCoreCost(distance);
+	canReach(distance: number, throttle = 1.0): boolean {
+		const coreCost = this.getJumpCoreCost(distance, throttle);
 		return this.state.coreLife >= coreCost;
 	}
 }

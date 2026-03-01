@@ -50,8 +50,8 @@ describe('ShieldSystem', () => {
 			expect(sys.getRegenRate()).toBe(5);
 		});
 
-		it('scales with tuning priority', () => {
-			const sys = createShieldSystem({ tuning: { priority: 2.0 } });
+		it('scales with shield priority', () => {
+			const sys = createShieldSystem({ shieldPriority: 2.0 });
 			expect(sys.getRegenRate()).toBe(10);
 		});
 	});

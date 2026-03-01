@@ -28,7 +28,7 @@ export class ShieldSystem {
 
 	getRegenRate(): number {
 		const baseRate = this.loadout.shield.product.rate ?? 0;
-		return shieldRegenRate(baseRate, this.state.tuning.priority);
+		return shieldRegenRate(baseRate, this.state.shieldPriority);
 	}
 
 	getMaxStrength(): number {

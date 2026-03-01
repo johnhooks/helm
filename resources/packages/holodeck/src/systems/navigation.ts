@@ -36,6 +36,7 @@ export class NavigationSystem {
 			this.getEfficiency(),
 			hopDepth,
 			this.constants.hopDecayFactor,
+			this.state.pilot.jumping,
 		);
 	}
 }

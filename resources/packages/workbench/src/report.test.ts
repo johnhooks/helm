@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import type { ActionTuning } from '@helm/formulas';
-import { DEFAULT_CONSTANTS, DEFAULT_TUNING } from '@helm/formulas';
+import type { ActionTuning, PilotSkills } from '@helm/formulas';
+import { DEFAULT_CONSTANTS, DEFAULT_TUNING, DEFAULT_PILOT_SKILLS } from '@helm/formulas';
 import type { ReportLoadout } from './types';
 import { computeShipReport } from './report';
 import { getProduct } from './data/products';
@@ -414,6 +414,48 @@ describe('computeShipReport', () => {
 				expect(report.shield.regenRate).toBe(20.0);
 				expect(report.mechanics.transitShieldRegen!.regenRateInTransit).toBe(10.0);
 			});
+		});
+	});
+
+	describe('pilot skills', () => {
+		it('default pilot has no effect on scan or nav', () => {
+			const reportDefault = computeShipReport(defaultLoadout, DEFAULT_TUNING, DEFAULT_CONSTANTS);
+			const reportWithPilot = computeShipReport(defaultLoadout, DEFAULT_TUNING, DEFAULT_CONSTANTS, DEFAULT_PILOT_SKILLS);
+			expect(reportWithPilot.scan.sampleScans).toEqual(reportDefault.scan.sampleScans);
+			expect(reportWithPilot.nav.discoveryByDepth).toEqual(reportDefault.nav.discoveryByDepth);
+		});
+
+		it('pilot scanning skill boosts scan success chance', () => {
+			const pilot: PilotSkills = { ...DEFAULT_PILOT_SKILLS, scanning: 1.25 };
+			const reportDefault = computeShipReport(defaultLoadout, DEFAULT_TUNING, DEFAULT_CONSTANTS);
+			const reportSkilled = computeShipReport(defaultLoadout, DEFAULT_TUNING, DEFAULT_CONSTANTS, pilot);
+
+			for (let i = 0; i < reportDefault.scan.sampleScans.length; i++) {
+				expect(reportSkilled.scan.sampleScans[i].chance)
+					.toBeGreaterThanOrEqual(reportDefault.scan.sampleScans[i].chance);
+			}
+		});
+
+		it('pilot jumping skill boosts discovery probability', () => {
+			const pilot: PilotSkills = { ...DEFAULT_PILOT_SKILLS, jumping: 1.25 };
+			const reportDefault = computeShipReport(defaultLoadout, DEFAULT_TUNING, DEFAULT_CONSTANTS);
+			const reportSkilled = computeShipReport(defaultLoadout, DEFAULT_TUNING, DEFAULT_CONSTANTS, pilot);
+
+			for (let i = 0; i < reportDefault.nav.discoveryByDepth.length; i++) {
+				expect(reportSkilled.nav.discoveryByDepth[i].probability)
+					.toBeGreaterThanOrEqual(reportDefault.nav.discoveryByDepth[i].probability);
+			}
+		});
+
+		it('pilot skills do not affect power, jump, shield, or footprint', () => {
+			const pilot: PilotSkills = { ...DEFAULT_PILOT_SKILLS, scanning: 1.25, jumping: 1.25 };
+			const reportDefault = computeShipReport(defaultLoadout, DEFAULT_TUNING, DEFAULT_CONSTANTS);
+			const reportSkilled = computeShipReport(defaultLoadout, DEFAULT_TUNING, DEFAULT_CONSTANTS, pilot);
+
+			expect(reportSkilled.footprint).toEqual(reportDefault.footprint);
+			expect(reportSkilled.power).toEqual(reportDefault.power);
+			expect(reportSkilled.jump).toEqual(reportDefault.jump);
+			expect(reportSkilled.shield).toEqual(reportDefault.shield);
 		});
 	});
 });

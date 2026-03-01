@@ -8,6 +8,8 @@ export type { EnvelopePhaseShape, DriveEnvelope } from './types';
 export type { InformationTier, TierThresholds, DSPModifiers } from './types';
 export { DEFAULT_EMISSION_PROFILES, DEFAULT_DSP_CONSTANTS, SENSOR_AFFINITIES, DEFAULT_DRIVE_ENVELOPES } from './types';
 export { DEFAULT_TIER_THRESHOLDS, DSP_MODIFIER_CAPS, SCAN_FREQUENCY_RANGE } from './types';
+export type { PilotSkills } from './types';
+export { DEFAULT_PILOT_SKILLS, PILOT_SKILL_RANGE } from './types';
 
 // Power
 export { coreOutput, regenRate, perfRatio, capacitor } from './power';
@@ -23,6 +25,9 @@ export { shieldRegenRate, shieldDraw, shieldTimeToFull } from './shield';
 
 // Nav
 export { discoveryProbability } from './nav';
+
+// Experience
+export { buffFactor, skillMultiplier } from './experience';
 
 // DSP — Emission
 export { emissionPower, tunedEmission } from './emission';

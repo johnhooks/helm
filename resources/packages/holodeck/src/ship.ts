@@ -3,7 +3,6 @@ import { DEFAULT_CONSTANTS } from '@helm/formulas';
 import type { Clock } from './clock';
 import type { Rng } from './rng';
 import type { InternalShipState } from './state';
-import type { PowerMode } from './enums/power-mode';
 import type { ShipState } from './types/ship-state';
 import { PowerSystem } from './systems/power';
 import { PropulsionSystem } from './systems/propulsion';
@@ -45,7 +44,7 @@ export class Ship {
 		return {
 			id: this.state.id,
 			loadout: this.state.loadout,
-			powerMode: this.state.powerMode,
+			shieldPriority: this.state.shieldPriority,
 			power: this.power.getCurrentPower(now),
 			powerMax: this.power.getMaxPower(),
 			shield: this.shields.getCurrentStrength(now),
@@ -54,9 +53,9 @@ export class Ship {
 			hullMax: this.hull.getMaxIntegrity(),
 			coreLife: this.power.getCoreLife(),
 			nodeId: this.navigation.getCurrentPosition(),
-			tuning: { ...this.state.tuning },
 			cargo: { ...this.state.cargo },
 			ammo: { ...this.state.ammo },
+			pilot: { ...this.state.pilot },
 		};
 	}
 
@@ -97,8 +96,23 @@ export class Ship {
 			this.hull.calculateIntegrityAfterRepair(amount);
 	}
 
-	setPowerMode(mode: PowerMode): void {
-		this.state.powerMode = mode;
+	setShieldPriority(priority: number): void {
+		const now = this.clock.now();
+		const currentStrength = this.shields.getCurrentStrength(now);
+		this.state.shieldPriority = priority;
+
+		if (currentStrength >= this.state.shieldsMax) {
+			this.state.shieldsFullAt = null;
+		} else {
+			const rate = this.shields.getRegenRate();
+			if (rate <= 0) {
+				this.state.shieldsFullAt = Infinity;
+			} else {
+				const deficit = this.state.shieldsMax - currentStrength;
+				const hoursToFull = deficit / rate;
+				this.state.shieldsFullAt = now + hoursToFull * 3600;
+			}
+		}
 	}
 
 	addCargo(slug: string, quantity: number): void {

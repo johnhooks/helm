@@ -130,4 +130,24 @@ describe('scanSuccessChance', () => {
 		// Within comfort: (0.7 / 1.0) * 0.5 = 0.35
 		expect(scanSuccessChance(vrsMk1, 3, 5.0, 0.5)).toBeCloseTo(0.35);
 	});
+
+	it('pilotSkill default 1.0 matches no-arg behavior', () => {
+		expect(scanSuccessChance(vrsMk1, 5, 5.0, 1.0, 1.0))
+			.toBe(scanSuccessChance(vrsMk1, 5, 5.0, 1.0));
+	});
+
+	it('pilotSkill 1.25 raises ceiling and effective chance within comfort', () => {
+		// Within comfort, strain=1.0: min(0.7*1.25, (0.7/1.0)*1.0*1.25) = min(0.875, 0.875)
+		expect(scanSuccessChance(vrsMk1, 3, 5.0, 1.0, 1.25)).toBeCloseTo(0.875);
+	});
+
+	it('pilotSkill boosts chance past comfort range', () => {
+		// VRS at 2x comfort (10 ly, comfort 5): strain=2.0
+		// no skill: (0.7/2.0)*1.0 = 0.35
+		// with skill: (0.7/2.0)*1.0*1.25 = 0.4375
+		const noSkill = scanSuccessChance(vrsMk1, 10, 5.0, 1.0);
+		const withSkill = scanSuccessChance(vrsMk1, 10, 5.0, 1.0, 1.25);
+		expect(withSkill).toBeGreaterThan(noSkill);
+		expect(withSkill).toBeCloseTo(0.4375);
+	});
 });

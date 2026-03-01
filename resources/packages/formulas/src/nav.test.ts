@@ -35,4 +35,25 @@ describe('discoveryProbability', () => {
 		expect(prob).toBeLessThan(0.1);
 		expect(prob).toBeGreaterThan(0);
 	});
+
+	it('pilotSkill default 1.0 matches no-arg behavior', () => {
+		expect(discoveryProbability(0.6, 0.7, 0, 0.9, 1.0))
+			.toBe(discoveryProbability(0.6, 0.7, 0, 0.9));
+	});
+
+	it('pilotSkill boosts discovery probability', () => {
+		// 0.6 * 0.7 * 0.9^0 * 1.25 = 0.525
+		expect(discoveryProbability(0.6, 0.7, 0, 0.9, 1.25)).toBeCloseTo(0.525);
+	});
+
+	it('pilotSkill boost is still capped at 1.0', () => {
+		expect(discoveryProbability(1.0, 1.0, 0, 0.9, 1.25)).toBe(1.0);
+	});
+
+	it('pilotSkill boost compounds with depth decay', () => {
+		// depth=2: 0.6 * 0.7 * 0.9^2 * 1.25 = 0.42 * 0.81 * 1.25 = 0.42525
+		const base = discoveryProbability(0.6, 0.7, 2, 0.9);
+		const boosted = discoveryProbability(0.6, 0.7, 2, 0.9, 1.25);
+		expect(boosted).toBeCloseTo(base * 1.25);
+	});
 });

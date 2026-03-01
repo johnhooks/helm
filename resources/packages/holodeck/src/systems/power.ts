@@ -1,5 +1,4 @@
 import { coreOutput, regenRate as coreRegenRate } from '@helm/formulas';
-import { POWER_MODE_PROFILES } from '../enums/power-mode';
 import type { InternalShipState } from '../state';
 import type { Loadout } from '../types/loadout';
 
@@ -30,17 +29,11 @@ export class PowerSystem {
 	}
 
 	getRegenRate(): number {
-		const profile = POWER_MODE_PROFILES[this.state.powerMode];
-		return coreRegenRate(this.loadout.core.product) * profile.regen;
+		return coreRegenRate(this.loadout.core.product);
 	}
 
 	getOutputMultiplier(): number {
-		const profile = POWER_MODE_PROFILES[this.state.powerMode];
-		return coreOutput(this.loadout.core.product) * profile.output;
-	}
-
-	getDecayMultiplier(): number {
-		return POWER_MODE_PROFILES[this.state.powerMode].decay;
+		return coreOutput(this.loadout.core.product);
 	}
 
 	getMaxPower(): number {

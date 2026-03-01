@@ -49,21 +49,22 @@ export class SensorSystem {
 		return scanPowerCost(distance, this.constants, this.getComfortRange());
 	}
 
-	getScanDuration(distance: number): number {
+	getScanDuration(distance: number, effort = 1.0): number {
 		return scanDuration(
 			distance,
 			this.loadout.sensor.product,
-			this.state.tuning.effort,
+			effort,
 			this.constants,
 		);
 	}
 
-	getScanSuccessChance(distance: number): number {
+	getScanSuccessChance(distance: number, effort = 1.0): number {
 		return scanSuccessChance(
 			this.loadout.sensor.product,
 			distance,
 			this.getComfortRange(),
-			this.state.tuning.effort,
+			effort,
+			this.state.pilot.scanning,
 		);
 	}
 }

@@ -1,11 +1,10 @@
-import type { ActionTuning } from '@helm/formulas';
-import type { PowerMode } from '../enums/power-mode';
+import type { PilotSkills } from '@helm/formulas';
 import type { Loadout } from './loadout';
 
 export interface ShipState {
 	id: string;
 	loadout: Loadout;
-	powerMode: PowerMode;
+	shieldPriority: number;
 	power: number;
 	powerMax: number;
 	shield: number;
@@ -14,7 +13,7 @@ export interface ShipState {
 	hullMax: number;
 	coreLife: number;
 	nodeId: number | null;
-	tuning: ActionTuning;
 	cargo: Record<string, number>;
 	ammo: Record<string, number>;
+	pilot: PilotSkills;
 }

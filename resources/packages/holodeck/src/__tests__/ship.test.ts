@@ -2,7 +2,6 @@ import { describe, it, expect } from 'vitest';
 import { createShip } from '../factory';
 import { createClock } from '../clock';
 import { createRng } from '../rng';
-import { PowerMode } from '../enums/power-mode';
 import { makeLoadout } from './helpers';
 
 function setup(config?: Parameters<typeof createShip>[3]) {
@@ -28,9 +27,18 @@ describe('Ship', () => {
 			expect(state.hullMax).toBe(100);
 			expect(state.coreLife).toBe(500);
 			expect(state.nodeId).toBeNull();
-			expect(state.powerMode).toBe(PowerMode.Normal);
+			expect(state.shieldPriority).toBe(1.0);
 			expect(state.cargo).toEqual({});
 			expect(state.ammo).toEqual({});
+			expect(state.pilot).toEqual({
+				scanning: 1.0,
+				jumping: 1.0,
+				trading: 1.0,
+				mining: 1.0,
+				salvaging: 1.0,
+				phasers: 1.0,
+				torpedoes: 1.0,
+			});
 		});
 
 		it('reflects current clock time for power/shields', () => {
@@ -127,11 +135,33 @@ describe('Ship', () => {
 		});
 	});
 
-	describe('setPowerMode', () => {
-		it('changes power mode', () => {
+	describe('setShieldPriority', () => {
+		it('changes shield priority', () => {
 			const { ship } = setup();
-			ship.setPowerMode(PowerMode.Overdrive);
-			expect(ship.resolve().powerMode).toBe(PowerMode.Overdrive);
+			ship.setShieldPriority(2.0);
+			expect(ship.resolve().shieldPriority).toBe(2.0);
+		});
+
+		it('recalculates shieldsFullAt with new regen rate', () => {
+			const { ship, clock } = setup();
+			// Damage shields first to create a deficit
+			ship.absorbDamage(25);
+			// Shield at 25/50, rate=5/hr, fullAt=18000s
+
+			// Now double priority → rate becomes 10/hr
+			ship.setShieldPriority(2.0);
+			expect(ship.shields.getRegenRate()).toBe(10);
+
+			// Recovery should be faster: deficit=25, rate=10/hr → 9000s
+			clock.advanceTo(4500); // quarter of old time, half of new time
+			expect(ship.resolve().shield).toBeCloseTo(37.5);
+		});
+
+		it('sets shieldsFullAt to null when shields are full', () => {
+			const { ship } = setup();
+			ship.setShieldPriority(2.0);
+			// Shields already at max, so shieldsFullAt should remain null
+			expect(ship.resolve().shield).toBe(50);
 		});
 	});
 

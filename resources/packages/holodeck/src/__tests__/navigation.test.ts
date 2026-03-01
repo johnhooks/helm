@@ -51,4 +51,20 @@ describe('NavigationSystem', () => {
 		const sys = createNavSystem({}, { mult_a: 2.0, mult_b: 2.0 });
 		expect(sys.getDiscoveryProbability(0)).toBe(1.0);
 	});
+
+	it('pilot jumping skill boosts discovery probability', () => {
+		const rookie = createNavSystem();
+		const veteran = createNavSystem({ pilot: { jumping: 1.25 } });
+		const rookieProb = rookie.getDiscoveryProbability(0);
+		const veteranProb = veteran.getDiscoveryProbability(0);
+		expect(veteranProb).toBeGreaterThan(rookieProb);
+		// 0.8 * 0.9 * 1.25 = 0.9
+		expect(veteranProb).toBeCloseTo(0.9);
+	});
+
+	it('default pilot has no effect on discovery', () => {
+		const sys = createNavSystem();
+		// Default pilot jumping = 1.0
+		expect(sys.getDiscoveryProbability(0)).toBeCloseTo(0.72);
+	});
 });

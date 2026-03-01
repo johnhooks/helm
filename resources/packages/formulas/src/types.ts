@@ -392,6 +392,43 @@ export interface DSPModifiers {
  * This means an elite setup is ~65% more effective at detection and reads
  * information from 15% less confidence. Strong but not omniscient.
  */
+// ---------------------------------------------------------------------------
+// Pilot Skills — pre-computed multipliers from player action counters
+// ---------------------------------------------------------------------------
+
+/**
+ * Pre-computed skill multipliers derived from player action counters.
+ *
+ * Each field is a stat category label. The value is a multiplier (1.0→1.25)
+ * computed by skillMultiplier() from the player's lifetime action count
+ * for that category. The counters are the stats; the multipliers are what
+ * flow through formulas.
+ *
+ * Lives on the WP user (survives ship loss). PHP computes and stores
+ * these; the JS formula layer receives them as pre-computed values.
+ */
+export interface PilotSkills {
+	scanning: number;    // from helm_scans_completed
+	jumping: number;     // from helm_jumps_completed
+	trading: number;     // from helm_trades_completed
+	mining: number;      // from helm_mines_completed
+	salvaging: number;   // from helm_salvages_completed
+	phasers: number;     // from helm_phaser_engagements
+	torpedoes: number;   // from helm_torpedo_launches
+}
+
+export const DEFAULT_PILOT_SKILLS: PilotSkills = {
+	scanning: 1.0,
+	jumping: 1.0,
+	trading: 1.0,
+	mining: 1.0,
+	salvaging: 1.0,
+	phasers: 1.0,
+	torpedoes: 1.0,
+};
+
+export const PILOT_SKILL_RANGE = { min: 1.0, max: 1.25 } as const;
+
 export const DSP_MODIFIER_CAPS = {
 	/**
 	 * Pilot skill: 1.0 (rookie) to 1.25 (elite). Months of play.

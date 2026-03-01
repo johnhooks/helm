@@ -1,12 +1,11 @@
-import type { ActionTuning } from '@helm/formulas';
-import { capacitor } from '@helm/formulas';
-import type { PowerMode } from './enums/power-mode';
+import { capacitor, DEFAULT_PILOT_SKILLS } from '@helm/formulas';
+import type { PilotSkills } from '@helm/formulas';
 import type { Loadout } from './types/loadout';
 
 export interface InternalShipState {
 	id: string;
 	loadout: Loadout;
-	powerMode: PowerMode;
+	shieldPriority: number;
 	powerFullAt: number | null;
 	powerMax: number;
 	shieldsFullAt: number | null;
@@ -15,22 +14,22 @@ export interface InternalShipState {
 	hullMax: number;
 	coreLife: number;
 	nodeId: number | null;
-	tuning: ActionTuning;
 	cargo: Record<string, number>;
 	ammo: Record<string, number>;
+	pilot: PilotSkills;
 }
 
 export interface InternalStateConfig {
 	id?: string;
-	powerMode?: PowerMode;
+	shieldPriority?: number;
 	nodeId?: number | null;
-	tuning?: Partial<ActionTuning>;
 	cargo?: Record<string, number>;
 	ammo?: Record<string, number>;
 	hullIntegrity?: number;
 	coreLife?: number;
 	powerFullAt?: number | null;
 	shieldsFullAt?: number | null;
+	pilot?: Partial<PilotSkills>;
 }
 
 export function createInternalState(
@@ -48,7 +47,7 @@ export function createInternalState(
 	return {
 		id: config?.id ?? 'ship-1',
 		loadout,
-		powerMode: config?.powerMode ?? ('normal' as PowerMode),
+		shieldPriority: config?.shieldPriority ?? 1.0,
 		powerFullAt: config?.powerFullAt ?? null,
 		powerMax,
 		shieldsFullAt: config?.shieldsFullAt ?? null,
@@ -57,12 +56,8 @@ export function createInternalState(
 		hullMax,
 		coreLife,
 		nodeId: config?.nodeId ?? null,
-		tuning: {
-			effort: config?.tuning?.effort ?? 1.0,
-			throttle: config?.tuning?.throttle ?? 1.0,
-			priority: config?.tuning?.priority ?? 1.0,
-		},
 		cargo: config?.cargo ? { ...config.cargo } : {},
 		ammo: config?.ammo ? { ...config.ammo } : {},
+		pilot: { ...DEFAULT_PILOT_SKILLS, ...config?.pilot },
 	};
 }

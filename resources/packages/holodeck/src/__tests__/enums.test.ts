@@ -1,7 +1,5 @@
 import { describe, it, expect } from 'vitest';
 import {
-	PowerMode,
-	POWER_MODE_PROFILES,
 	ActionType,
 	actionRequiresTime,
 	actionLabel,
@@ -13,27 +11,6 @@ import {
 	EQUIPMENT_SLOTS,
 	isRequiredSlot,
 } from '../index';
-import fixtures from '../../../../../tests/_data/fixtures/power-mode.json';
-
-describe('PowerMode', () => {
-	it('has 3 modes', () => {
-		const values = Object.values(PowerMode);
-		expect(values).toHaveLength(3);
-		expect(values).toContain('efficiency');
-		expect(values).toContain('normal');
-		expect(values).toContain('overdrive');
-	});
-
-	it('profiles match fixture multipliers', () => {
-		for (const row of fixtures) {
-			const profile = POWER_MODE_PROFILES[row.slug as PowerMode];
-			expect(profile, `missing profile for ${row.slug}`).toBeDefined();
-			expect(profile.output).toBe(row.output);
-			expect(profile.decay).toBe(row.decay);
-			expect(profile.regen).toBe(row.regen);
-		}
-	});
-});
 
 describe('ActionType', () => {
 	it('has 11 types', () => {

@@ -1,4 +1,5 @@
-import type { ActionTuning, Constants } from '@helm/formulas';
+import type { ActionTuning, Constants, PilotSkills } from '@helm/formulas';
+import { DEFAULT_PILOT_SKILLS } from '@helm/formulas';
 import type { Loadout, CatalogProduct } from '@helm/holodeck';
 import { buildLoadout, DEFAULT_LOADOUT_SLUGS } from '@helm/holodeck';
 import type { ComponentType, ReportLoadout } from '../types';
@@ -85,6 +86,21 @@ export function resolveConstants(flags: Record<string, string>): Constants {
 	}
 
 	return constants;
+}
+
+export function resolvePilot(flags: Record<string, string>): PilotSkills {
+	const pilot = { ...DEFAULT_PILOT_SKILLS };
+
+	for (const [key, value] of Object.entries(flags)) {
+		if (key.startsWith('pilot.')) {
+			const name = key.slice(6) as keyof PilotSkills;
+			if (name in pilot) {
+				pilot[name] = parseFloat(value);
+			}
+		}
+	}
+
+	return pilot;
 }
 
 export function loadoutSlugs(loadout: Loadout): Record<string, string> {

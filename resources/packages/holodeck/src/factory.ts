@@ -1,7 +1,6 @@
-import type { Constants, ActionTuning } from '@helm/formulas';
+import type { Constants, PilotSkills } from '@helm/formulas';
 import type { Clock } from './clock';
 import type { Rng } from './rng';
-import type { PowerMode } from './enums/power-mode';
 import type { Loadout } from './types/loadout';
 import { createInternalState } from './state';
 import { Ship } from './ship';
@@ -9,14 +8,14 @@ import { Ship } from './ship';
 export interface ShipConfig {
 	id?: string;
 	nodeId?: number | null;
-	powerMode?: PowerMode;
-	tuning?: Partial<ActionTuning>;
+	shieldPriority?: number;
 	cargo?: Record<string, number>;
 	ammo?: Record<string, number>;
 	hullIntegrity?: number;
 	coreLife?: number;
 	powerFullAt?: number | null;
 	shieldsFullAt?: number | null;
+	pilot?: Partial<PilotSkills>;
 }
 
 export function createShip(

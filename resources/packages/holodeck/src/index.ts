@@ -1,6 +1,4 @@
 // Enums
-export { PowerMode, POWER_MODE_PROFILES } from './enums/power-mode';
-export type { PowerModeProfile } from './enums/power-mode';
 export { ActionType, actionRequiresTime, actionLabel } from './enums/action-type';
 export { ActionStatus, isActionComplete, isActionSuccess } from './enums/action-status';
 export { ShipFittingSlot, REQUIRED_SLOTS, EQUIPMENT_SLOTS, isRequiredSlot } from './enums/fitting-slot';

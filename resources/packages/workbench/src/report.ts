@@ -1,4 +1,4 @@
-import type { ActionTuning, Constants } from '@helm/formulas';
+import type { ActionTuning, Constants, PilotSkills } from '@helm/formulas';
 import {
 	coreOutput, regenRate, perfRatio, capacitor,
 	scanComfortRange, scanPowerCost, scanDuration, scanSuccessChance,
@@ -7,6 +7,7 @@ import {
 	discoveryProbability,
 	transitShieldRegenRate, transitShieldRecovered,
 	coreResonanceCost, sensorShieldCouplingMultiplier,
+	DEFAULT_PILOT_SKILLS,
 } from '@helm/formulas';
 import type { ReportLoadout, ShipReport } from './types';
 
@@ -41,7 +42,13 @@ function formatPower(loadout: ReportLoadout): ShipReport['power'] {
 	};
 }
 
-function formatScan(loadout: ReportLoadout, output: number, effort: number, constants: Constants): ShipReport['scan'] {
+function formatScan(
+	loadout: ReportLoadout,
+	output: number,
+	effort: number,
+	constants: Constants,
+	pilotScanning = 1.0,
+): ShipReport['scan'] {
 	const scanMult = loadout.hull.scanComfortMultiplier ?? 1.0;
 	const comfort = scanComfortRange(loadout.sensor, output) * scanMult;
 	const durationPerLy = Math.ceil(constants.baseScanSecondsPerLy * (loadout.sensor.mult_a ?? 0) * effort);
@@ -61,7 +68,7 @@ function formatScan(loadout: ReportLoadout, output: number, effort: number, cons
 			cost: scanPowerCost(d, constants, comfort),
 			duration: scanDuration(d, loadout.sensor, effort, constants),
 			strain: strainFactor(d, comfort),
-			chance: scanSuccessChance(loadout.sensor, d, comfort, effort),
+			chance: scanSuccessChance(loadout.sensor, d, comfort, effort, pilotScanning),
 		})),
 	};
 }
@@ -109,7 +116,11 @@ function formatShield(loadout: ReportLoadout, priority: number): ShipReport['shi
 	return { capacity, regenRate: regen, draw, timeToFull: time };
 }
 
-function formatNav(loadout: ReportLoadout, constants: Constants): ShipReport['nav'] {
+function formatNav(
+	loadout: ReportLoadout,
+	constants: Constants,
+	pilotJumping = 1.0,
+): ShipReport['nav'] {
 	const skill = loadout.nav.mult_a ?? 0;
 	const efficiency = loadout.nav.mult_b ?? 0;
 	const depths = [0, 1, 2, 3, 4, 5];
@@ -118,7 +129,7 @@ function formatNav(loadout: ReportLoadout, constants: Constants): ShipReport['na
 		efficiency,
 		discoveryByDepth: depths.map((depth) => ({
 			depth,
-			probability: discoveryProbability(skill, efficiency, depth, constants.hopDecayFactor),
+			probability: discoveryProbability(skill, efficiency, depth, constants.hopDecayFactor, pilotJumping),
 		})),
 	};
 }
@@ -177,9 +188,11 @@ export function computeShipReport(
 	loadout: ReportLoadout,
 	tuning: ActionTuning,
 	constants: Constants,
+	pilot?: PilotSkills,
 ): ShipReport {
+	const p = pilot ?? DEFAULT_PILOT_SKILLS;
 	const power = formatPower(loadout);
-	const scan = formatScan(loadout, power.coreOutput, tuning.effort, constants);
+	const scan = formatScan(loadout, power.coreOutput, tuning.effort, constants, p.scanning);
 	const jump = formatJump(loadout, power.coreOutput, power.perfRatio, tuning.throttle, constants);
 	const shield = formatShield(loadout, tuning.priority);
 	return {
@@ -188,7 +201,7 @@ export function computeShipReport(
 		scan,
 		jump,
 		shield,
-		nav: formatNav(loadout, constants),
+		nav: formatNav(loadout, constants, p.jumping),
 		signature: formatSignature(loadout),
 		mechanics: formatMechanics(loadout, shield, jump, scan, power),
 	};

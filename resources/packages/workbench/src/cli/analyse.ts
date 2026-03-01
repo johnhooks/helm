@@ -1,8 +1,8 @@
 import { computeShipReport } from '../report';
 import { getProductsByType, getProduct, DEFAULT_LOADOUT_SLUGS } from '../data/products';
 import { HULLS } from '../data/hulls';
-import type { ActionTuning, ComponentType, Constants, ShipReport, ReportLoadout, Hull, CatalogProduct } from '../types';
-import { DEFAULT_CONSTANTS, DEFAULT_TUNING } from '../types';
+import type { ActionTuning, ComponentType, Constants, ShipReport, ReportLoadout, Hull, CatalogProduct, PilotSkills } from '../types';
+import { DEFAULT_CONSTANTS, DEFAULT_TUNING, DEFAULT_PILOT_SKILLS, PILOT_SKILL_RANGE } from '../types';
 
 interface Scenario {
 	name: string;
@@ -78,11 +78,12 @@ function run(
 	loadoutOverrides: Partial<Record<string, string>>,
 	tuning: ActionTuning = DEFAULT_TUNING,
 	constants: Constants = DEFAULT_CONSTANTS,
+	pilot?: PilotSkills,
 ): { slugs: Record<string, string>; report: ShipReport } {
 	const loadout = buildLoadout(loadoutOverrides);
 	return {
 		slugs: slugsOf(loadout),
-		report: computeShipReport(loadout, tuning, constants),
+		report: computeShipReport(loadout, tuning, constants, pilot),
 	};
 }
 
@@ -91,8 +92,9 @@ function scenario(
 	description: string,
 	loadoutOverrides: Partial<Record<string, string>>,
 	tuning: ActionTuning = DEFAULT_TUNING,
+	pilot?: PilotSkills,
 ): Scenario {
-	const { slugs, report } = run(loadoutOverrides, tuning);
+	const { slugs, report } = run(loadoutOverrides, tuning, DEFAULT_CONSTANTS, pilot);
 	return {
 		name,
 		description,
@@ -552,6 +554,24 @@ function crossoverProducts(): AnalysisCategory {
 	};
 }
 
+function pilotSkillSweep(): AnalysisCategory {
+	const values = [1.0, 1.05, 1.1, 1.15, 1.2, 1.25];
+	return {
+		category: 'Pilot Skill Sweep',
+		description: `Scan and nav metrics across pilot skill multipliers ${PILOT_SKILL_RANGE.min}→${PILOT_SKILL_RANGE.max}. Default loadout, default tuning.`,
+		scenarios: values.map((v) => {
+			const pilot: PilotSkills = { ...DEFAULT_PILOT_SKILLS, scanning: v, jumping: v };
+			return scenario(
+				`pilot=${v}`,
+				`All wired pilot skills at ${v}. Scanning boosts scan success, jumping boosts discovery.`,
+				{},
+				DEFAULT_TUNING,
+				pilot,
+			);
+		}),
+	};
+}
+
 // ── Main ───────────────────────────────────────────────────
 
 export function analyse(): void {
@@ -568,6 +588,7 @@ export function analyse(): void {
 			throttleSweep(),
 			effortSweep(),
 			prioritySweep(),
+			pilotSkillSweep(),
 			powerBudget(),
 			coreDriveMatrix(),
 			sensorMatrix(),

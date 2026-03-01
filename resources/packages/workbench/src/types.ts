@@ -1,8 +1,8 @@
-import type { ActionTuning, Constants } from '@helm/formulas';
+import type { ActionTuning, Constants, PilotSkills } from '@helm/formulas';
 import type { Hull, CatalogProduct } from '@helm/holodeck';
-export { DEFAULT_CONSTANTS, DEFAULT_TUNING } from '@helm/formulas';
+export { DEFAULT_CONSTANTS, DEFAULT_TUNING, DEFAULT_PILOT_SKILLS, PILOT_SKILL_RANGE } from '@helm/formulas';
 
-export type { ActionTuning, Constants };
+export type { ActionTuning, Constants, PilotSkills };
 
 export type { Hull };
 

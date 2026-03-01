@@ -2,7 +2,6 @@ import { describe, it, expect } from 'vitest';
 import { PowerSystem } from '../systems/power';
 import { createInternalState } from '../state';
 import { makeLoadout, makeComponent, makeCore } from './helpers';
-import { PowerMode } from '../enums/power-mode';
 
 function createPowerSystem(
 	overrides: Parameters<typeof createInternalState>[1] = {},
@@ -30,7 +29,7 @@ describe('PowerSystem', () => {
 		});
 
 		it('returns partial power based on timestamp', () => {
-			// Core: rate=10/hr, normal regen mult=1.0, capacity=100
+			// Core: rate=10/hr, capacity=100
 			// powerFullAt = 3600 (1 hour from now=0)
 			// deficit = 1 hour * 10/hr = 10
 			// current = 100 - 10 = 90
@@ -46,54 +45,16 @@ describe('PowerSystem', () => {
 	});
 
 	describe('getRegenRate', () => {
-		it('normal mode: base rate * 1.0', () => {
+		it('returns base rate from core product', () => {
 			const sys = createPowerSystem();
 			expect(sys.getRegenRate()).toBe(10);
-		});
-
-		it('efficiency mode: base rate * 0.5', () => {
-			const sys = createPowerSystem({ powerMode: PowerMode.Efficiency });
-			expect(sys.getRegenRate()).toBe(5);
-		});
-
-		it('overdrive mode: base rate * 1.3', () => {
-			const sys = createPowerSystem({ powerMode: PowerMode.Overdrive });
-			expect(sys.getRegenRate()).toBe(13);
 		});
 	});
 
 	describe('getOutputMultiplier', () => {
-		it('normal mode: core output * 1.0', () => {
+		it('returns core output', () => {
 			const sys = createPowerSystem();
 			expect(sys.getOutputMultiplier()).toBe(1.0);
-		});
-
-		it('overdrive: core output * 1.3', () => {
-			const sys = createPowerSystem({ powerMode: PowerMode.Overdrive });
-			expect(sys.getOutputMultiplier()).toBeCloseTo(1.3);
-		});
-
-		it('efficiency: core output * 0.7', () => {
-			const sys = createPowerSystem({ powerMode: PowerMode.Efficiency });
-			expect(sys.getOutputMultiplier()).toBeCloseTo(0.7);
-		});
-	});
-
-	describe('getDecayMultiplier', () => {
-		it('normal mode: 1.0', () => {
-			expect(createPowerSystem().getDecayMultiplier()).toBe(1.0);
-		});
-
-		it('efficiency mode: 0.0', () => {
-			expect(
-				createPowerSystem({ powerMode: PowerMode.Efficiency }).getDecayMultiplier(),
-			).toBe(0.0);
-		});
-
-		it('overdrive mode: 2.5', () => {
-			expect(
-				createPowerSystem({ powerMode: PowerMode.Overdrive }).getDecayMultiplier(),
-			).toBe(2.5);
 		});
 	});
 

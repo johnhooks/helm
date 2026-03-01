@@ -28,6 +28,7 @@ Runs ~460 scenarios across 14 categories (baseline, tuning sweeps, power budget,
 | What are available components/hulls? | `bun run wb list products [--type=core]` / `bun run wb list hulls` |
 | What does a holodeck ship look like? | `bun run wb ship --hull=pioneer --core=epoch_s` |
 | How does power regen after consumption? | `bun run wb timeline --steps='[{"t":0,"action":"consumePower","amount":50},{"t":3600,"action":"resolve"}]'` |
+| How does shield priority affect regen? | `bun run wb timeline --steps='[{"t":0,"action":"setShieldPriority","priority":2.0},{"t":3600,"action":"resolve"}]'` |
 
 ## Tuning Flags
 
@@ -38,6 +39,8 @@ Work on `report`, `compare`, `matrix`:
 | `--throttle=1.0` | Jump speed/cost (0.5=limp/free, 2.0=fast/expensive) |
 | `--effort=1.0` | Scan duration/chance |
 | `--priority=1.0` | Shield regen/draw |
+| `--pilot.scanning=1.0` | Pilot scan skill multiplier (1.0→1.25) |
+| `--pilot.jumping=1.0` | Pilot jump skill multiplier (1.0→1.25) |
 
 ## Key Metrics
 
