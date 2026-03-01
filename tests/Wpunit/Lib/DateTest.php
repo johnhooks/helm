@@ -383,4 +383,155 @@ final class DateTest extends \Codeception\TestCase\WPTestCase
         $this->assertEquals($dt1, $dt2);
         $this->assertTrue($dt1 == $dt2);
     }
+
+    // ──────────────────────────────────────────────
+    // Test time (Carbon-inspired)
+    // ──────────────────────────────────────────────
+
+    public function tear_down(): void
+    {
+        Date::setTestNow(null);
+        parent::tear_down();
+    }
+
+    public function test_set_test_now_freezes_time(): void
+    {
+        Date::setTestNow('2025-01-15 10:00:00');
+
+        $this->assertSame('2025-01-15 10:00:00', Date::now()->format('Y-m-d H:i:s'));
+        $this->assertSame('2025-01-15 10:00:00', Date::now()->format('Y-m-d H:i:s'));
+    }
+
+    public function test_set_test_now_accepts_datetime_immutable(): void
+    {
+        $time = new DateTimeImmutable('2025-03-01 08:30:00', new DateTimeZone('UTC'));
+        Date::setTestNow($time);
+
+        $this->assertSame('2025-03-01 08:30:00', Date::now()->format('Y-m-d H:i:s'));
+    }
+
+    public function test_set_test_now_null_clears(): void
+    {
+        Date::setTestNow('2025-01-15 10:00:00');
+        Date::setTestNow(null);
+
+        $before = time();
+        $result = Date::now();
+        $after = time();
+
+        $this->assertGreaterThanOrEqual($before, $result->getTimestamp());
+        $this->assertLessThanOrEqual($after, $result->getTimestamp());
+    }
+
+    public function test_set_test_now_no_args_clears(): void
+    {
+        Date::setTestNow('2025-01-15 10:00:00');
+        Date::setTestNow();
+
+        $this->assertFalse(Date::hasTestNow());
+    }
+
+    public function test_has_test_now_false_by_default(): void
+    {
+        $this->assertFalse(Date::hasTestNow());
+    }
+
+    public function test_has_test_now_true_when_set(): void
+    {
+        Date::setTestNow('2025-01-15 10:00:00');
+
+        $this->assertTrue(Date::hasTestNow());
+    }
+
+    public function test_get_test_now_null_by_default(): void
+    {
+        $this->assertNull(Date::getTestNow());
+    }
+
+    public function test_get_test_now_returns_frozen_time(): void
+    {
+        Date::setTestNow('2025-01-15 10:00:00');
+
+        $this->assertSame('2025-01-15 10:00:00', Date::getTestNow()->format('Y-m-d H:i:s'));
+    }
+
+    public function test_advance_test_now_moves_forward(): void
+    {
+        Date::setTestNow('2025-01-15 10:00:00');
+
+        $result = Date::advanceTestNow(3600);
+
+        $this->assertSame('2025-01-15 11:00:00', $result->format('Y-m-d H:i:s'));
+        $this->assertSame('2025-01-15 11:00:00', Date::now()->format('Y-m-d H:i:s'));
+    }
+
+    public function test_advance_test_now_accumulates(): void
+    {
+        Date::setTestNow('2025-01-15 10:00:00');
+
+        Date::advanceTestNow(1800);
+        Date::advanceTestNow(1800);
+
+        $this->assertSame('2025-01-15 11:00:00', Date::now()->format('Y-m-d H:i:s'));
+    }
+
+    public function test_advance_test_now_throws_without_test_time(): void
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('no test time is set');
+
+        Date::advanceTestNow(60);
+    }
+
+    public function test_now_string_uses_test_time(): void
+    {
+        Date::setTestNow('2025-01-15 10:00:00');
+
+        $this->assertSame('2025-01-15 10:00:00', Date::nowString());
+    }
+
+    public function test_with_test_now_scoped(): void
+    {
+        $result = Date::withTestNow('2025-06-01 12:00:00', function () {
+            return Date::nowString();
+        });
+
+        $this->assertSame('2025-06-01 12:00:00', $result);
+        $this->assertFalse(Date::hasTestNow());
+    }
+
+    public function test_with_test_now_restores_previous(): void
+    {
+        Date::setTestNow('2025-01-01 00:00:00');
+
+        Date::withTestNow('2025-06-01 12:00:00', function () {
+            $this->assertSame('2025-06-01 12:00:00', Date::nowString());
+        });
+
+        $this->assertSame('2025-01-01 00:00:00', Date::nowString());
+    }
+
+    public function test_with_test_now_restores_on_exception(): void
+    {
+        Date::setTestNow('2025-01-01 00:00:00');
+
+        try {
+            Date::withTestNow('2025-06-01 12:00:00', function () {
+                throw new \RuntimeException('boom');
+            });
+        } catch (\RuntimeException) {
+            // expected
+        }
+
+        $this->assertSame('2025-01-01 00:00:00', Date::nowString());
+    }
+
+    public function test_with_test_now_returns_callback_value(): void
+    {
+        $result = Date::withTestNow('2025-06-01 12:00:00', function () {
+            return 42;
+        });
+
+        $this->assertSame(42, $result);
+    }
 }
