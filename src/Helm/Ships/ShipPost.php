@@ -13,7 +13,7 @@ use WP_Post;
  * Wraps a WordPress post of type helm_ship and provides
  * access to ship metadata.
  */
-final class ShipPost
+final class ShipPost implements ShipIdentity
 {
     public function __construct(
         private readonly WP_Post $post,

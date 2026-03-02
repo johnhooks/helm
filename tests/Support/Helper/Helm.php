@@ -21,7 +21,7 @@ use Helm\Planets\PlanetRepository;
 use Helm\PostTypes\PostTypeRegistry;
 use Helm\Products\Models\Product;
 use Helm\Products\Contracts\ProductRepository;
-use Helm\ShipLink\LoadoutFactory;
+use Helm\ShipLink\Contracts\LoadoutFactory;
 use Helm\ShipLink\ShipFittingSlot;
 use Helm\ShipLink\Contracts\ShipStateRepository;
 use Helm\Ships\ShipPost;

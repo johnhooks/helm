@@ -17,7 +17,7 @@ use Helm\ShipLink\ActionType;
 use Helm\ShipLink\Contracts\ActionRepository;
 use Helm\ShipLink\Contracts\ShipLink;
 use Helm\ShipLink\Contracts\ShipStateRepository;
-use Helm\ShipLink\LoadoutFactory;
+use Helm\ShipLink\Contracts\LoadoutFactory;
 use Helm\ShipLink\ShipFactory;
 use Helm\Ships\ShipPost;
 use Helm\Stars\StarPost;

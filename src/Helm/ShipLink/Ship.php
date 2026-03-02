@@ -14,7 +14,7 @@ use Helm\ShipLink\Contracts\Shields;
 use Helm\ShipLink\Contracts\ShipLink;
 use Helm\ShipLink\Models\Action;
 use Helm\ShipLink\Models\ShipState;
-use Helm\Ships\ShipPost;
+use Helm\Ships\ShipIdentity;
 
 /**
  * Ship implementation of ShipLink.
@@ -29,7 +29,7 @@ use Helm\Ships\ShipPost;
 final class Ship implements ShipLink
 {
     public function __construct(
-        private ShipPost $post,
+        private ShipIdentity $identity,
         private ShipState $state,
         private Loadout $loadout,
         private PowerSystem $powerSystem,
@@ -54,17 +54,17 @@ final class Ship implements ShipLink
 
     public function getId(): int
     {
-        return $this->post->postId();
+        return $this->identity->postId();
     }
 
     public function getName(): string
     {
-        return $this->post->name();
+        return $this->identity->name();
     }
 
     public function getOwnerId(): int
     {
-        return $this->post->ownerId();
+        return $this->identity->ownerId();
     }
 
     public function process(Action $action): ActionResult

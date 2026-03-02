@@ -20,7 +20,7 @@ final class Provider extends ServiceProvider
     {
         $this->container->singleton(ShipStateRepository::class, WpdbShipStateRepository::class);
         $this->container->singleton(ActionRepository::class, WpdbActionRepository::class);
-        $this->container->singleton(LoadoutFactory::class);
+        $this->container->singleton(Contracts\LoadoutFactory::class, WpdbLoadoutFactory::class);
         $this->container->singleton(ShipFactory::class);
         $this->container->singleton(MethodInvoker::class);
         $this->container->singleton(ActionFactory::class);

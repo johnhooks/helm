@@ -10,15 +10,16 @@ use Helm\Inventory\LocationType;
 use Helm\Inventory\Models\Item;
 use Helm\Products\Contracts\ProductRepository;
 use Helm\Products\Models\Product;
+use Helm\ShipLink\Contracts\LoadoutFactory;
 use Helm\StellarWP\Models\Model;
 
 /**
  * Builds Loadout instances from database data.
  *
- * Replaces ShipSystemsRepository::findOrCreate() as the way to
- * get component data for a ship.
+ * Uses a single JOIN query for performance. The in-memory
+ * implementation composes from repository contracts instead.
  */
-final class LoadoutFactory
+final class WpdbLoadoutFactory implements LoadoutFactory
 {
     public function __construct(
         private readonly ProductRepository $productRepository,

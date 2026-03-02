@@ -6,7 +6,7 @@ namespace Tests\Wpunit\ShipLink;
 
 use Helm\ShipLink\Contracts\ShipLink;
 use Helm\ShipLink\Loadout;
-use Helm\ShipLink\LoadoutFactory;
+use Helm\ShipLink\Contracts\LoadoutFactory;
 use Helm\ShipLink\Ship;
 use Helm\ShipLink\ShipFactory;
 use Helm\ShipLink\Models\ShipState;

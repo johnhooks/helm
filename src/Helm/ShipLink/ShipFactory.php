@@ -16,6 +16,7 @@ use Helm\ShipLink\System\Power;
 use Helm\ShipLink\System\Propulsion;
 use Helm\ShipLink\System\Sensors;
 use Helm\ShipLink\System\Shields;
+use Helm\Ships\ShipIdentity;
 use Helm\Ships\ShipPost;
 
 /**
@@ -28,13 +29,29 @@ use Helm\Ships\ShipPost;
  */
 final class ShipFactory
 {
+    /** @var (callable(int): ?ShipIdentity)|null */
+    private $identityResolver;
+
     public function __construct(
         private readonly ShipStateRepository $stateRepository,
-        private readonly LoadoutFactory $loadoutFactory,
+        private readonly Contracts\LoadoutFactory $loadoutFactory,
         private readonly NavigationService $navigationService,
         private readonly InventoryRepository $inventoryRepository,
         private readonly ProductRepository $productRepository,
     ) {
+    }
+
+    /**
+     * Set a custom identity resolver.
+     *
+     * When set, build() uses this instead of ShipPost::fromId().
+     * Used by the simulation to resolve ship identities from memory.
+     *
+     * @param (callable(int): ?ShipIdentity)|null $resolver
+     */
+    public function setIdentityResolver(?callable $resolver): void
+    {
+        $this->identityResolver = $resolver;
     }
 
     /**
@@ -44,32 +61,34 @@ final class ShipFactory
      */
     public function build(int $shipPostId): Ship
     {
-        $shipPost = ShipPost::fromId($shipPostId);
+        $identity = $this->identityResolver !== null
+            ? ($this->identityResolver)($shipPostId)
+            : ShipPost::fromId($shipPostId);
 
-        if ($shipPost === null) {
-            throw new \InvalidArgumentException("Ship post not found: {$shipPostId}");
+        if ($identity === null) {
+            throw new \InvalidArgumentException("Ship not found: {$shipPostId}");
         }
 
-        return $this->buildFromPost($shipPost);
+        return $this->buildFromPost($identity);
     }
 
     /**
-     * Build a Ship from a ShipPost.
+     * Build a Ship from a ShipIdentity.
      */
-    public function buildFromPost(ShipPost $shipPost): Ship
+    public function buildFromPost(ShipIdentity $ship): Ship
     {
-        $state = $this->stateRepository->findOrCreate($shipPost->postId());
-        $loadout = $this->loadoutFactory->build($shipPost->postId());
+        $state = $this->stateRepository->findOrCreate($ship->postId());
+        $loadout = $this->loadoutFactory->build($ship->postId());
 
-        return $this->buildFromParts($shipPost, $state, $loadout);
+        return $this->buildFromParts($ship, $state, $loadout);
     }
 
     /**
      * Build a Ship from existing parts.
      *
-     * Useful when you already have loaded the post, state, and loadout.
+     * Useful when you already have loaded the identity, state, and loadout.
      */
-    public function buildFromParts(ShipPost $shipPost, ShipState $state, Loadout $loadout): Ship
+    public function buildFromParts(ShipIdentity $ship, ShipState $state, Loadout $loadout): Ship
     {
         // Build power system first - needs state (power_full_at etc.) + loadout (core stats)
         $power = new Power($state, $loadout);
@@ -85,12 +104,12 @@ final class ShipFactory
         $cargo = new Cargo(
             $this->inventoryRepository,
             $this->productRepository,
-            $shipPost->postId(),
-            $shipPost->ownerId(),
+            $ship->postId(),
+            $ship->ownerId(),
         );
 
         return new Ship(
-            post: $shipPost,
+            identity: $ship,
             state: $state,
             loadout: $loadout,
             powerSystem: $power,

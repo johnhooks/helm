@@ -8,7 +8,7 @@ use Helm\Inventory\Models\Item;
 use Helm\Products\Models\Product;
 use Helm\ShipLink\FittedComponent;
 use Helm\ShipLink\Loadout;
-use Helm\ShipLink\LoadoutFactory;
+use Helm\ShipLink\Contracts\LoadoutFactory;
 use Helm\ShipLink\ShipFittingSlot;
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use Tests\Support\WpunitTester;
@@ -16,7 +16,7 @@ use Tests\Support\WpunitTester;
 /**
  * @covers \Helm\ShipLink\Loadout
  * @covers \Helm\ShipLink\FittedComponent
- * @covers \Helm\ShipLink\LoadoutFactory
+ * @covers \Helm\ShipLink\WpdbLoadoutFactory
  *
  * @property WpunitTester $tester
  */
