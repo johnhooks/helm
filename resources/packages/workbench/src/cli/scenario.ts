@@ -20,6 +20,7 @@ import {
 	firePhaserHandler,
 	fireTorpedoHandler,
 	buildLoadout,
+	createNavGraph,
 } from '@helm/holodeck';
 import type { Ship, ShipState, Action } from '@helm/holodeck';
 import type { ParsedFlags } from './parse';
@@ -47,6 +48,7 @@ interface ScenarioAction {
 export interface ScenarioFile {
 	name: string;
 	description: string;
+	masterSeed?: string;
 	ships: Record<string, ScenarioShipSpec>;
 	actions: ScenarioAction[];
 }
@@ -105,7 +107,8 @@ export function runScenario(scenario: ScenarioFile): { timeline: TimelineEntry[]
 	registerAllHandlers();
 
 	const clock = createClock(0);
-	const engine = createEngine(clock);
+	const graph = createNavGraph(scenario.masterSeed ?? 'helm');
+	const engine = createEngine(clock, graph);
 	const ships: Record<string, Ship> = {};
 
 	// Build ships

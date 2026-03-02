@@ -16,6 +16,7 @@ import {
 	scanRouteHandler,
 	firePhaserHandler,
 	fireTorpedoHandler,
+	createNavGraph,
 } from '@helm/holodeck';
 import type { ParsedFlags } from './parse';
 import { hydrateLoadout, loadoutSlugs, resolvePilot } from './parse';
@@ -64,7 +65,8 @@ export function action({ flags }: ParsedFlags): void {
 	const clock = createClock(0);
 	const rng = createRng(42);
 	const ship = createShip(loadout, clock, rng, { nodeId, pilot });
-	const engine = createEngine(clock);
+	const graph = createNavGraph();
+	const engine = createEngine(clock, graph);
 
 	// Build action params
 	const params: Record<string, unknown> = {};

@@ -46,10 +46,10 @@ describe('NavigationSystem', () => {
 		expect(p5).toBeLessThan(p1);
 	});
 
-	it('discovery probability is capped at 1.0', () => {
+	it('discovery probability is capped at 0.95', () => {
 		// High skill and efficiency
 		const sys = createNavSystem({}, { mult_a: 2.0, mult_b: 2.0 });
-		expect(sys.getDiscoveryProbability(0)).toBe(1.0);
+		expect(sys.getDiscoveryProbability(0)).toBe(0.95);
 	});
 
 	it('pilot jumping skill boosts discovery probability', () => {

@@ -8,6 +8,7 @@ import type { ActionContext } from './types';
 import { jumpHandler } from './jump';
 import { registerHandler } from './registry';
 import { makeLoadout } from '../test-helpers';
+import { createEmptyNavGraph } from '../nav-graph';
 
 const ctx: ActionContext = { getShip: () => undefined };
 
@@ -184,6 +185,88 @@ describe('Jump Handler', () => {
 			expect(stateAfter.coreLife).toBeLessThan(stateBefore.coreLife);
 			expect(stateAfter.power).toBeLessThan(stateBefore.power);
 			expect(outcome.result.remaining_core_life).toBe(stateAfter.coreLife);
+		});
+	});
+
+	describe('with NavGraph', () => {
+		function setupWithGraph() {
+			const graph = createEmptyNavGraph('test-seed');
+			graph.addNode({ type: 'system', x: 0, y: 0, z: 0 }); // id 1
+			graph.addNode({ type: 'system', x: 3, y: 0, z: 0 }); // id 2
+			graph.addEdge(1, 2, 3.0);
+
+			const graphCtx: ActionContext = {
+				getShip: () => undefined,
+				getGraph: () => graph,
+			};
+
+			const loadout = makeLoadout();
+			const clock = createClock();
+			const rng = createRng(42);
+			const ship = createShip(loadout, clock, rng, { nodeId: 1 });
+			return { ship, clock, loadout, graph, ctx: graphCtx };
+		}
+
+		it('rejects jump with no discovered edge', () => {
+			const { ship, ctx: graphCtx, graph } = setupWithGraph();
+			graph.addNode({ type: 'system', x: 10, y: 0, z: 0 }); // id 3, no edge to 1
+
+			expect(() =>
+				jumpHandler.validate(ship, { target_node_id: 3 }, graphCtx),
+			).toThrow(ActionError);
+
+			try {
+				jumpHandler.validate(ship, { target_node_id: 3 }, graphCtx);
+			} catch (e) {
+				expect((e as ActionError).code).toBe(ActionErrorCode.NavigationNoRoute);
+			}
+		});
+
+		it('allows jump along discovered edge', () => {
+			const { ship, ctx: graphCtx } = setupWithGraph();
+
+			expect(() =>
+				jumpHandler.validate(ship, { target_node_id: 2 }, graphCtx),
+			).not.toThrow();
+		});
+
+		it('uses edge distance from graph', () => {
+			const { ship, ctx: graphCtx } = setupWithGraph();
+
+			const intent = jumpHandler.handle(
+				ship,
+				{ target_node_id: 2 },
+				0,
+				graphCtx,
+			);
+
+			expect(intent.result.distance).toBe(3.0);
+		});
+
+		it('increments traversal count on resolve', () => {
+			const { ship, graph, ctx: graphCtx } = setupWithGraph();
+
+			const intent = jumpHandler.handle(
+				ship,
+				{ target_node_id: 2 },
+				0,
+				graphCtx,
+			);
+
+			const action = {
+				id: 1,
+				shipId: ship.resolve().id,
+				type: ActionType.Jump,
+				params: { target_node_id: 2 },
+				status: 'pending' as const,
+				createdAt: 0,
+				deferredUntil: intent.deferredUntil,
+				result: { ...intent.result },
+			};
+
+			expect(graph.getEdge(1, 2)!.traversals).toBe(0);
+			jumpHandler.resolve(ship, action, graphCtx);
+			expect(graph.getEdge(1, 2)!.traversals).toBe(1);
 		});
 	});
 });

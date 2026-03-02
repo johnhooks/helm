@@ -24,7 +24,7 @@ export { scanComfortRange, scanPowerCost, scanDuration, scanSuccessChance } from
 export { shieldRegenRate, shieldDraw, shieldTimeToFull } from './shield';
 
 // Nav
-export { discoveryProbability } from './nav';
+export { NAV_CONSTANTS, firstHopChance, discoveryProbability } from './nav';
 
 // Experience
 export { buffFactor, skillMultiplier } from './experience';

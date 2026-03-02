@@ -10,6 +10,7 @@ import { scanRouteHandler } from './scan-route';
 import { registerHandler } from './registry';
 import { createEngine } from './engine';
 import { makeLoadout } from '../test-helpers';
+import { createEmptyNavGraph } from '../nav-graph';
 
 beforeEach(() => {
 	registerHandler(ActionType.Jump, jumpHandler);
@@ -312,5 +313,71 @@ describe('Engine — Action Lifecycle', () => {
 		} catch (e) {
 			expect((e as ActionError).code).toBe(ActionErrorCode.ActionNoHandler);
 		}
+	});
+
+	describe('with NavGraph — scan then jump', () => {
+		it('full exploration loop: scan discovers edge, then jump along it', () => {
+			// Build a graph with two close nodes (< 1ly = direct jump possible)
+			const graph = createEmptyNavGraph('integration-seed');
+			graph.addNode({ type: 'system', x: 0, y: 0, z: 0 }); // id 1 (Sol)
+			graph.addNode({ type: 'system', x: 0.5, y: 0.3, z: 0 }); // id 2 (close neighbor)
+
+			const clock = createClock();
+			const engine = createEngine(clock, graph);
+			const loadout = makeLoadout();
+			const rng = createRng(42);
+			const ship = createShip(loadout, clock, rng, { nodeId: 1 });
+
+			// No edge initially
+			expect(graph.hasEdge(1, 2)).toBe(false);
+
+			// Scan toward node 2 (close enough for direct jump → always succeeds)
+			const scanAction = engine.submitAction(ship, ActionType.ScanRoute, {
+				target_node_id: 2,
+			});
+			engine.advanceUntilIdle();
+
+			expect(scanAction.result.success).toBe(true);
+			expect(scanAction.result.complete).toBe(true);
+			// Edge should now exist
+			expect(graph.hasEdge(1, 2)).toBe(true);
+
+			// Ship is still at node 1 (scan doesn't move)
+			expect(ship.resolve().nodeId).toBe(1);
+
+			// Now jump along the discovered edge
+			const jumpAction = engine.submitAction(ship, ActionType.Jump, {
+				target_node_id: 2,
+			});
+			engine.advanceUntilIdle();
+
+			expect(jumpAction.status).toBe(ActionStatus.Fulfilled);
+			expect(ship.resolve().nodeId).toBe(2);
+
+			// Traversal count incremented
+			expect(graph.getEdge(1, 2)!.traversals).toBe(1);
+		});
+
+		it('jump is rejected when no edge exists', () => {
+			const graph = createEmptyNavGraph('test');
+			graph.addNode({ type: 'system', x: 0, y: 0, z: 0 }); // id 1
+			graph.addNode({ type: 'system', x: 5, y: 0, z: 0 }); // id 2, no edge
+
+			const clock = createClock();
+			const engine = createEngine(clock, graph);
+			const loadout = makeLoadout();
+			const rng = createRng(42);
+			const ship = createShip(loadout, clock, rng, { nodeId: 1 });
+
+			expect(() =>
+				engine.submitAction(ship, ActionType.Jump, { target_node_id: 2 }),
+			).toThrow(ActionError);
+
+			try {
+				engine.submitAction(ship, ActionType.Jump, { target_node_id: 2 });
+			} catch (e) {
+				expect((e as ActionError).code).toBe(ActionErrorCode.NavigationNoRoute);
+			}
+		});
 	});
 });

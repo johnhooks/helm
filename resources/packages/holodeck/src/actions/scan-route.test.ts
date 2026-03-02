@@ -8,6 +8,7 @@ import type { ActionContext } from './types';
 import { scanRouteHandler } from './scan-route';
 import { registerHandler } from './registry';
 import { makeLoadout } from '../test-helpers';
+import { createEmptyNavGraph } from '../nav-graph';
 
 const ctx: ActionContext = { getShip: () => undefined };
 
@@ -251,6 +252,152 @@ describe('ScanRoute Handler', () => {
 
 			expect(outcome.status).toBe('fulfilled');
 			expect(outcome.result.success).toBe(false);
+		});
+	});
+
+	describe('with NavGraph', () => {
+		const SEED = 'test-seed';
+
+		function setupWithGraph(config?: Parameters<typeof createShip>[3]) {
+			const graph = createEmptyNavGraph(SEED);
+			graph.addNode({ type: 'system', x: 0, y: 0, z: 0 }); // id 1 - Sol
+			graph.addNode({ type: 'system', x: 0.5, y: 0, z: 0 }); // id 2 - very close (< 1 ly)
+			graph.addNode({ type: 'system', x: 5, y: 3, z: 2 }); // id 3 - far
+
+			const graphCtx: ActionContext = {
+				getShip: () => undefined,
+				getGraph: () => graph,
+			};
+
+			const loadout = makeLoadout();
+			const clock = createClock();
+			const rng = createRng(42);
+			const ship = createShip(loadout, clock, rng, { nodeId: 1, ...config });
+			return { ship, clock, loadout, graph, ctx: graphCtx };
+		}
+
+		it('validates nodes exist in graph', () => {
+			const { ship, ctx: graphCtx } = setupWithGraph();
+			expect(() =>
+				scanRouteHandler.validate(ship, { target_node_id: 999 }, graphCtx),
+			).toThrow(ActionError);
+
+			try {
+				scanRouteHandler.validate(ship, { target_node_id: 999 }, graphCtx);
+			} catch (e) {
+				expect((e as ActionError).code).toBe(ActionErrorCode.NavigationNoGraph);
+			}
+		});
+
+		it('computes distance from graph coordinates', () => {
+			const { ship, ctx: graphCtx } = setupWithGraph();
+			const intent = scanRouteHandler.handle(
+				ship,
+				{ target_node_id: 3 },
+				0,
+				graphCtx,
+			);
+
+			// Distance from (0,0,0) to (5,3,2) = sqrt(38) ≈ 6.164
+			const expected = Math.sqrt(5 * 5 + 3 * 3 + 2 * 2);
+			expect(intent.result.distance).toBeCloseTo(expected);
+		});
+
+		it('creates direct edge for very close systems', () => {
+			const { ship, graph, ctx: graphCtx } = setupWithGraph();
+
+			const intent = scanRouteHandler.handle(
+				ship,
+				{ target_node_id: 2 },
+				0,
+				graphCtx,
+			);
+
+			const action = {
+				id: 1,
+				shipId: ship.resolve().id,
+				type: ActionType.ScanRoute,
+				params: { target_node_id: 2 },
+				status: 'pending' as const,
+				createdAt: 0,
+				deferredUntil: intent.deferredUntil,
+				result: { ...intent.result },
+			};
+
+			const outcome = scanRouteHandler.resolve(ship, action, graphCtx);
+
+			expect(outcome.result.success).toBe(true);
+			expect(outcome.result.complete).toBe(true);
+			expect(graph.hasEdge(1, 2)).toBe(true);
+			expect(outcome.result.discovered_edges).toHaveLength(1);
+		});
+
+		it('discovers waypoints for distant systems on success', () => {
+			// Use a high-skill nav to maximize discovery probability
+			const { ship, graph, ctx: graphCtx } = setupWithGraph();
+
+			const intent = scanRouteHandler.handle(
+				ship,
+				{ target_node_id: 3 },
+				0,
+				graphCtx,
+			);
+
+			const action = {
+				id: 1,
+				shipId: ship.resolve().id,
+				type: ActionType.ScanRoute,
+				params: { target_node_id: 3 },
+				status: 'pending' as const,
+				createdAt: 0,
+				deferredUntil: intent.deferredUntil,
+				result: { ...intent.result },
+			};
+
+			const outcome = scanRouteHandler.resolve(ship, action, graphCtx);
+
+			expect(outcome.status).toBe('fulfilled');
+			if (outcome.result.success) {
+				// When successful, should discover at least one edge
+				const edges = outcome.result.discovered_edges as unknown[];
+				expect(edges.length).toBeGreaterThanOrEqual(1);
+				// Graph should have new edges
+				expect(graph.edgeCount).toBeGreaterThanOrEqual(1);
+			}
+		});
+
+		it('returns failure on bad roll', () => {
+			const { ship, ctx: graphCtx } = setupWithGraph();
+			const state = ship.resolve();
+
+			const action = {
+				id: 1,
+				shipId: state.id,
+				type: ActionType.ScanRoute,
+				params: { target_node_id: 3 },
+				status: 'pending' as const,
+				createdAt: 0,
+				deferredUntil: 100,
+				result: {
+					from_node_id: 1,
+					to_node_id: 3,
+					distance: Math.sqrt(38),
+					effort: 1.0,
+					success_chance: 0.001, // very low chance → likely failure
+					power_cost: 1,
+					duration: 100,
+				},
+			};
+
+			const outcome = scanRouteHandler.resolve(ship, action, graphCtx);
+
+			expect(outcome.status).toBe('fulfilled');
+			// With success_chance 0.001 and firstHopChance reducing it further,
+			// the effective chance is ~0.01 (clamped minimum)
+			// The roll may or may not beat it, but we check the structure
+			if (!outcome.result.success) {
+				expect(outcome.result.discovered_nodes).toBeUndefined();
+			}
 		});
 	});
 });

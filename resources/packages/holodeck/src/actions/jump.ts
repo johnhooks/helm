@@ -4,7 +4,7 @@ import { ActionError, ActionErrorCode } from './types';
 import { ActionStatus } from '../enums/action-status';
 
 export const jumpHandler: ActionHandler = {
-	validate(ship: Ship, params: Record<string, unknown>, _context: ActionContext): void {
+	validate(ship: Ship, params: Record<string, unknown>, context: ActionContext): void {
 		const state = ship.resolve();
 
 		if (state.nodeId === null) {
@@ -28,7 +28,27 @@ export const jumpHandler: ActionHandler = {
 			);
 		}
 
-		const distance = (params.distance as number) ?? 1;
+		const graph = context.getGraph?.();
+
+		// When graph present, validate edge exists
+		if (graph && params.target_node_id !== undefined) {
+			if (!graph.hasEdge(state.nodeId, params.target_node_id as number)) {
+				throw new ActionError(
+					ActionErrorCode.NavigationNoRoute,
+					'No discovered route to target node',
+				);
+			}
+		}
+
+		// Determine distance for core cost check
+		let distance: number;
+		if (graph && params.target_node_id !== undefined) {
+			const edge = graph.getEdge(state.nodeId, params.target_node_id as number);
+			distance = edge?.distance ?? (params.distance as number) ?? 1;
+		} else {
+			distance = (params.distance as number) ?? 1;
+		}
+
 		const throttle = (params.throttle as number) ?? 1.0;
 		const coreCost = ship.propulsion.getJumpCoreCost(distance, throttle);
 
@@ -44,12 +64,21 @@ export const jumpHandler: ActionHandler = {
 		ship: Ship,
 		params: Record<string, unknown>,
 		now: number,
-		_context: ActionContext,
+		context: ActionContext,
 	): ActionIntent {
 		const state = ship.resolve();
-		const distance = (params.distance as number) ?? 1;
 		const throttle = (params.throttle as number) ?? 1.0;
 		const targetNodeId = (params.target_node_id as number) ?? 0;
+
+		const graph = context.getGraph?.();
+		let distance: number;
+
+		if (graph && targetNodeId) {
+			const edge = graph.getEdge(state.nodeId!, targetNodeId);
+			distance = edge?.distance ?? (params.distance as number) ?? 1;
+		} else {
+			distance = (params.distance as number) ?? 1;
+		}
 
 		const coreCost = ship.propulsion.getJumpCoreCost(distance, throttle);
 		const powerCost = ship.propulsion.getJumpPowerCost(distance);
@@ -69,14 +98,20 @@ export const jumpHandler: ActionHandler = {
 		};
 	},
 
-	resolve(ship: Ship, action: Action, _context: ActionContext): ActionOutcome {
+	resolve(ship: Ship, action: Action, context: ActionContext): ActionOutcome {
 		const coreCost = action.result.core_cost as number;
 		const powerCost = action.result.power_cost as number;
 		const targetNodeId = action.result.to_node_id as number;
+		const fromNodeId = action.result.from_node_id as number;
 
 		ship.degradeCore(coreCost);
 		ship.consumePower(powerCost);
 		ship.moveToNode(targetNodeId);
+
+		const graph = context.getGraph?.();
+		if (graph && fromNodeId && targetNodeId) {
+			graph.incrementTraversal(fromNodeId, targetNodeId);
+		}
 
 		return {
 			status: ActionStatus.Fulfilled,

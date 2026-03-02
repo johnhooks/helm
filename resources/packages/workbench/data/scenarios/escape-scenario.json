@@ -1,31 +1,33 @@
 {
-  "name": "Escape Scenario",
-  "description": "Target detects wolf, activates ECM, then jumps to escape. Tests reaction and escape window.",
-  "ships": {
-    "wolf": {
-      "hull": "striker",
-      "core": "epoch_s",
-      "drive": "dr_505",
-      "sensor": "vrs_mk1",
-      "shield": "aegis_delta",
-      "nav": "nav_tier_3",
-      "equipment": ["phaser_array"],
-      "node": 1
-    },
-    "prey": {
-      "hull": "pioneer",
-      "core": "epoch_s",
-      "drive": "dr_505",
-      "sensor": "vrs_mk1",
-      "shield": "aegis_delta",
-      "nav": "nav_tier_3",
-      "equipment": ["ecm_mk1", "mining_laser"],
-      "node": 1
-    }
-  },
-  "actions": [
-    { "ship": "prey", "type": "activate_equipment", "params": { "equipment_slug": "ecm_mk1" } },
-    { "ship": "wolf", "type": "fire_phaser", "params": { "target_ship_id": "prey", "duration": 600 } },
-    { "ship": "prey", "type": "jump", "params": { "target_node_id": 99, "distance": 2 } }
-  ]
+	"name": "Escape Scenario",
+	"description": "Target detects wolf, activates ECM, takes fire, then scans and jumps to escape. Tests reaction and escape window.",
+	"masterSeed": "helm",
+	"ships": {
+		"wolf": {
+			"hull": "striker",
+			"core": "epoch_s",
+			"drive": "dr_505",
+			"sensor": "vrs_mk1",
+			"shield": "aegis_delta",
+			"nav": "nav_tier_3",
+			"equipment": ["phaser_array"],
+			"node": 1
+		},
+		"prey": {
+			"hull": "pioneer",
+			"core": "epoch_s",
+			"drive": "dr_505",
+			"sensor": "vrs_mk1",
+			"shield": "aegis_delta",
+			"nav": "nav_tier_3",
+			"equipment": ["ecm_mk1", "mining_laser"],
+			"node": 1
+		}
+	},
+	"actions": [
+		{ "ship": "prey", "type": "activate_equipment", "params": { "equipment_slug": "ecm_mk1" } },
+		{ "ship": "wolf", "type": "fire_phaser", "params": { "target_ship_id": "prey", "duration": 600 } },
+		{ "ship": "prey", "type": "scan_route", "params": { "target_node_id": 2 } },
+		{ "ship": "prey", "type": "jump", "params": { "target_node_id": 2 } }
+	]
 }

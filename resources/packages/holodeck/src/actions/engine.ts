@@ -4,20 +4,23 @@ import { createRng } from '../rng';
 import { ActionStatus } from '../enums/action-status';
 import type { ActionType } from '../enums/action-type';
 import type { Ship } from '../ship';
+import type { NavGraph } from '../nav-graph';
 import type { Action, ActionContext, ActionPreview } from './types';
 import { ActionError, ActionErrorCode } from './types';
 import { getHandler } from './registry';
 
 export class Engine implements ActionContext {
 	readonly clock: Clock;
+	private readonly graph?: NavGraph;
 	private readonly actions: Action[] = [];
 	private readonly currentActionByShip = new Map<string, number>();
 	private readonly shipsByAction = new Map<number, Ship>();
 	private readonly shipRegistry = new Map<string, Ship>();
 	private nextActionId = 1;
 
-	constructor(clock: Clock) {
+	constructor(clock: Clock, graph?: NavGraph) {
 		this.clock = clock;
+		this.graph = graph;
 	}
 
 	registerShip(id: string, ship: Ship): void {
@@ -26,6 +29,10 @@ export class Engine implements ActionContext {
 
 	getShip(id: string): Ship | undefined {
 		return this.shipRegistry.get(id);
+	}
+
+	getGraph(): NavGraph | undefined {
+		return this.graph;
 	}
 
 	submitAction(
@@ -221,6 +228,6 @@ export class Engine implements ActionContext {
 	}
 }
 
-export function createEngine(clock: Clock): Engine {
-	return new Engine(clock);
+export function createEngine(clock: Clock, graph?: NavGraph): Engine {
+	return new Engine(clock, graph);
 }

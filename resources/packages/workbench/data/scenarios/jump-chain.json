@@ -1,22 +1,28 @@
 {
-  "name": "Jump Chain",
-  "description": "5 sequential jumps, real durations from loadout.",
-  "ships": {
-    "explorer": {
-      "hull": "pioneer",
-      "core": "epoch_s",
-      "drive": "dr_505",
-      "sensor": "vrs_mk1",
-      "shield": "aegis_delta",
-      "nav": "nav_tier_3",
-      "node": 1
-    }
-  },
-  "actions": [
-    { "ship": "explorer", "type": "jump", "params": { "target_node_id": 10, "distance": 3 } },
-    { "ship": "explorer", "type": "jump", "params": { "target_node_id": 20, "distance": 3 } },
-    { "ship": "explorer", "type": "jump", "params": { "target_node_id": 30, "distance": 3 } },
-    { "ship": "explorer", "type": "jump", "params": { "target_node_id": 40, "distance": 3 } },
-    { "ship": "explorer", "type": "jump", "params": { "target_node_id": 50, "distance": 3 } }
-  ]
+	"name": "Jump Chain",
+	"description": "Scan and jump through 5 nearby systems from Sol: Proxima Centauri, Toliman, Barnard's Star, Ross 154, Lacaille 8760. All direct-jumpable hops, exercises core degradation over multiple jumps.",
+	"masterSeed": "helm",
+	"ships": {
+		"explorer": {
+			"hull": "pioneer",
+			"core": "epoch_s",
+			"drive": "dr_505",
+			"sensor": "vrs_mk1",
+			"shield": "aegis_delta",
+			"nav": "nav_tier_3",
+			"node": 1
+		}
+	},
+	"actions": [
+		{ "ship": "explorer", "type": "scan_route", "params": { "target_node_id": 2 } },
+		{ "ship": "explorer", "type": "jump", "params": { "target_node_id": 2 } },
+		{ "ship": "explorer", "type": "scan_route", "params": { "target_node_id": 3 } },
+		{ "ship": "explorer", "type": "jump", "params": { "target_node_id": 3 } },
+		{ "ship": "explorer", "type": "scan_route", "params": { "target_node_id": 4 } },
+		{ "ship": "explorer", "type": "jump", "params": { "target_node_id": 4 } },
+		{ "ship": "explorer", "type": "scan_route", "params": { "target_node_id": 9 } },
+		{ "ship": "explorer", "type": "jump", "params": { "target_node_id": 9 } },
+		{ "ship": "explorer", "type": "scan_route", "params": { "target_node_id": 26 } },
+		{ "ship": "explorer", "type": "jump", "params": { "target_node_id": 26 } }
+	]
 }

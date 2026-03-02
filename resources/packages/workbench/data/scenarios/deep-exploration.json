@@ -1,0 +1,22 @@
+{
+	"name": "Deep Exploration",
+	"description": "Ship at Sol attempts long-range scans toward distant systems (5-7 ly). Exercises waypoint discovery, corridor difficulty, and the firstHopChance formula. Node 111 (6.8 ly, difficulty 0.92) is near-impossible; node 95 (6.2 ly, direct) should succeed.",
+	"masterSeed": "helm",
+	"ships": {
+		"explorer": {
+			"hull": "surveyor",
+			"core": "epoch_s",
+			"drive": "dr_505",
+			"sensor": "vrs_mk1",
+			"shield": "aegis_delta",
+			"nav": "nav_tier_3",
+			"node": 1
+		}
+	},
+	"actions": [
+		{ "ship": "explorer", "type": "scan_route", "params": { "target_node_id": 69 } },
+		{ "ship": "explorer", "type": "scan_route", "params": { "target_node_id": 95 } },
+		{ "ship": "explorer", "type": "scan_route", "params": { "target_node_id": 111 } },
+		{ "ship": "explorer", "type": "scan_route", "params": { "target_node_id": 115 } }
+	]
+}

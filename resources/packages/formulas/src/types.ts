@@ -23,7 +23,7 @@ export const DEFAULT_CONSTANTS: Constants = {
 	baseScanSecondsPerLy: 30,
 	baseJumpSecondsPerLy: 3600,
 	baseJumpPowerPerLy: 8.0,
-	hopDecayFactor: 0.9,
+	hopDecayFactor: 0.85,
 };
 
 // ---------------------------------------------------------------------------

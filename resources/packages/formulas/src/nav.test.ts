@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { discoveryProbability } from './nav';
+import { discoveryProbability, firstHopChance, NAV_CONSTANTS } from './nav';
 
 describe('discoveryProbability', () => {
 	it('returns skill * efficiency at depth 0', () => {
@@ -18,16 +18,16 @@ describe('discoveryProbability', () => {
 		expect(depth1).toBeCloseTo(0.378);
 	});
 
-	it('caps at 1.0 for high skill and efficiency', () => {
-		expect(discoveryProbability(1.0, 1.5, 0, 0.9)).toBe(1.0);
+	it('caps at 0.95 for high skill and efficiency', () => {
+		expect(discoveryProbability(1.0, 1.5, 0, 0.9)).toBe(0.95);
 	});
 
-	it('returns 0 when skill is 0', () => {
-		expect(discoveryProbability(0, 0.7, 0, 0.9)).toBe(0);
+	it('returns 0.01 when skill is 0', () => {
+		expect(discoveryProbability(0, 0.7, 0, 0.9)).toBe(0.01);
 	});
 
-	it('returns 0 when efficiency is 0', () => {
-		expect(discoveryProbability(0.6, 0, 0, 0.9)).toBe(0);
+	it('returns 0.01 when efficiency is 0', () => {
+		expect(discoveryProbability(0.6, 0, 0, 0.9)).toBe(0.01);
 	});
 
 	it('approaches 0 at high depth', () => {
@@ -46,8 +46,8 @@ describe('discoveryProbability', () => {
 		expect(discoveryProbability(0.6, 0.7, 0, 0.9, 1.25)).toBeCloseTo(0.525);
 	});
 
-	it('pilotSkill boost is still capped at 1.0', () => {
-		expect(discoveryProbability(1.0, 1.0, 0, 0.9, 1.25)).toBe(1.0);
+	it('pilotSkill boost is still capped at 0.95', () => {
+		expect(discoveryProbability(1.0, 1.0, 0, 0.9, 1.25)).toBe(0.95);
 	});
 
 	it('pilotSkill boost compounds with depth decay', () => {
@@ -55,5 +55,52 @@ describe('discoveryProbability', () => {
 		const base = discoveryProbability(0.6, 0.7, 2, 0.9);
 		const boosted = discoveryProbability(0.6, 0.7, 2, 0.9, 1.25);
 		expect(boosted).toBeCloseTo(base * 1.25);
+	});
+});
+
+describe('NAV_CONSTANTS', () => {
+	it('has expected values', () => {
+		expect(NAV_CONSTANTS.MAX_RANGE).toBe(7.0);
+		expect(NAV_CONSTANTS.DISTANCE_SCALE).toBe(10.0);
+		expect(NAV_CONSTANTS.MAX_SCATTER).toBe(0.1);
+		expect(NAV_CONSTANTS.ALGORITHM_VERSION).toBe(1);
+	});
+});
+
+describe('firstHopChance', () => {
+	it('returns high chance for close, easy corridors', () => {
+		const chance = firstHopChance(0.85, 1.0, 0.0);
+		// 0.85 * exp(-1/10) * (1 - 0*0.3) = 0.85 * 0.9048 = 0.7691
+		expect(chance).toBeCloseTo(0.7691, 3);
+	});
+
+	it('decreases with distance', () => {
+		const close = firstHopChance(0.85, 1.0, 0.0);
+		const far = firstHopChance(0.85, 5.0, 0.0);
+		expect(far).toBeLessThan(close);
+	});
+
+	it('decreases with difficulty', () => {
+		const easy = firstHopChance(0.85, 3.0, 0.0);
+		const hard = firstHopChance(0.85, 3.0, 1.0);
+		expect(hard).toBeLessThan(easy);
+	});
+
+	it('is clamped to minimum 0.01', () => {
+		const chance = firstHopChance(0.01, 100, 1.0);
+		expect(chance).toBe(0.01);
+	});
+
+	it('is clamped to maximum 0.99', () => {
+		const chance = firstHopChance(1.0, 0.0, 0.0);
+		// 1.0 * exp(0) * 1.0 = 1.0 → clamped to 0.99
+		expect(chance).toBe(0.99);
+	});
+
+	it('difficulty reduces chance by up to 30%', () => {
+		const noDifficulty = firstHopChance(0.85, 3.0, 0.0);
+		const maxDifficulty = firstHopChance(0.85, 3.0, 1.0);
+		// With difficulty 1.0: factor is (1.0 - 1.0 * 0.3) = 0.7
+		expect(maxDifficulty).toBeCloseTo(noDifficulty * 0.7, 3);
 	});
 });

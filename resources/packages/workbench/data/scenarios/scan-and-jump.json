@@ -1,0 +1,32 @@
+{
+	"name": "Scan and Jump",
+	"description": "Ship at Sol scans toward Proxima Centauri, then jumps along the discovered edge. Exercises the full exploration loop with a real star catalog.",
+	"masterSeed": "helm",
+	"ships": {
+		"explorer": {
+			"hull": "pioneer",
+			"core": "epoch_s",
+			"drive": "dr_505",
+			"sensor": "vrs_mk1",
+			"shield": "aegis_delta",
+			"nav": "nav_tier_3",
+			"node": 1
+		}
+	},
+	"actions": [
+		{
+			"ship": "explorer",
+			"type": "scan_route",
+			"params": {
+				"target_node_id": 2
+			}
+		},
+		{
+			"ship": "explorer",
+			"type": "jump",
+			"params": {
+				"target_node_id": 2
+			}
+		}
+	]
+}

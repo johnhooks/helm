@@ -1,22 +1,23 @@
 {
-  "name": "Scan Sweep",
-  "description": "Ship scans at varying distances, real durations from loadout.",
-  "ships": {
-    "scanner": {
-      "hull": "surveyor",
-      "core": "epoch_s",
-      "drive": "dr_505",
-      "sensor": "vrs_mk1",
-      "shield": "aegis_delta",
-      "nav": "nav_tier_3",
-      "node": 1
-    }
-  },
-  "actions": [
-    { "ship": "scanner", "type": "scan_route", "params": { "target_node_id": 10, "distance": 1 } },
-    { "ship": "scanner", "type": "scan_route", "params": { "target_node_id": 20, "distance": 2 } },
-    { "ship": "scanner", "type": "scan_route", "params": { "target_node_id": 30, "distance": 3 } },
-    { "ship": "scanner", "type": "scan_route", "params": { "target_node_id": 40, "distance": 5 } },
-    { "ship": "scanner", "type": "scan_route", "params": { "target_node_id": 50, "distance": 7 } }
-  ]
+	"name": "Scan Sweep",
+	"description": "Ship at Sol scans toward stars at varying distances. Mix of direct-jump (Proxima 1.3ly, Barnard's 1.8ly, Ross 248 3.2ly) and waypoint-generating corridors (Ran 3.2ly, Lacaille 9352 3.3ly) to exercise full discovery system.",
+	"masterSeed": "helm",
+	"ships": {
+		"scanner": {
+			"hull": "surveyor",
+			"core": "epoch_s",
+			"drive": "dr_505",
+			"sensor": "vrs_mk1",
+			"shield": "aegis_delta",
+			"nav": "nav_tier_3",
+			"node": 1
+		}
+	},
+	"actions": [
+		{ "ship": "scanner", "type": "scan_route", "params": { "target_node_id": 2 } },
+		{ "ship": "scanner", "type": "scan_route", "params": { "target_node_id": 4 } },
+		{ "ship": "scanner", "type": "scan_route", "params": { "target_node_id": 10 } },
+		{ "ship": "scanner", "type": "scan_route", "params": { "target_node_id": 11 } },
+		{ "ship": "scanner", "type": "scan_route", "params": { "target_node_id": 12 } }
+	]
 }

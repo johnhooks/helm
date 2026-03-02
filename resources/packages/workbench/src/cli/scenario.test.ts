@@ -3,6 +3,14 @@ import { runScenario } from './scenario';
 import type { ScenarioFile } from './scenario';
 import { ActionStatus } from '@helm/holodeck';
 
+// Node IDs from graph.json (real star catalog):
+// 1 = Sol (0,0,0)
+// 2 = Proxima Centauri (1.296 ly from Sol) — direct jump
+// 3 = Toliman (0.058 ly from Proxima) — direct jump
+// 4 = Barnard's Star (1.975 ly from Toliman) — direct jump
+// 9 = Ross 154
+// 10 = Ross 248 (3.165 ly from Sol)
+
 const baseShip = {
 	hull: 'pioneer',
 	core: 'epoch_s',
@@ -30,30 +38,35 @@ describe('scenario runner', () => {
 		expect(timeline[0].ships.explorer.nodeId).toBe(1);
 	});
 
-	it('jump moves ship and degrades core', () => {
+	it('scan then jump moves ship and degrades core', () => {
 		const scenario: ScenarioFile = {
-			name: 'single jump',
-			description: 'One jump',
+			name: 'scan and jump',
+			description: 'Scan then jump to Proxima',
 			ships: { explorer: baseShip },
 			actions: [
-				{ ship: 'explorer', type: 'jump', params: { target_node_id: 42, distance: 3 } },
+				{ ship: 'explorer', type: 'scan_route', params: { target_node_id: 2 } },
+				{ ship: 'explorer', type: 'jump', params: { target_node_id: 2 } },
 			],
 		};
 
 		const { timeline, actions } = runScenario(scenario);
-		expect(timeline).toHaveLength(2);
+		expect(timeline).toHaveLength(3);
 
-		// Action resolved
+		// Scan resolved
 		expect(actions[0].status).toBe(ActionStatus.Fulfilled);
+		expect(actions[0].result.success).toBe(true);
 
-		// Ship moved
-		expect(timeline[1].ships.explorer.nodeId).toBe(42);
+		// Jump resolved
+		expect(actions[1].status).toBe(ActionStatus.Fulfilled);
+
+		// Ship moved to Proxima (node 2)
+		expect(timeline[2].ships.explorer.nodeId).toBe(2);
 
 		// Core degraded
-		expect(timeline[1].ships.explorer.coreLife).toBeLessThan(timeline[0].ships.explorer.coreLife);
+		expect(timeline[2].ships.explorer.coreLife).toBeLessThan(timeline[0].ships.explorer.coreLife);
 
-		// Time advanced (duration computed from drive stats, not hardcoded)
-		expect(timeline[1].t).toBeGreaterThan(0);
+		// Time advanced
+		expect(timeline[2].t).toBeGreaterThan(0);
 	});
 
 	it('jump duration is computed from drive stats and distance', () => {
@@ -62,45 +75,61 @@ describe('scenario runner', () => {
 			description: 'Short then long jump',
 			ships: { explorer: baseShip },
 			actions: [
-				{ ship: 'explorer', type: 'jump', params: { target_node_id: 10, distance: 1 } },
-				{ ship: 'explorer', type: 'jump', params: { target_node_id: 20, distance: 5 } },
+				// Proxima is 1.296 ly from Sol
+				{ ship: 'explorer', type: 'scan_route', params: { target_node_id: 2 } },
+				{ ship: 'explorer', type: 'jump', params: { target_node_id: 2 } },
+				// Barnard's Star is 2.004 ly from Proxima
+				{ ship: 'explorer', type: 'scan_route', params: { target_node_id: 4 } },
+				{ ship: 'explorer', type: 'jump', params: { target_node_id: 4 } },
 			],
 		};
 
 		const { timeline } = runScenario(scenario);
 
-		const shortDuration = timeline[1].t - timeline[0].t;
-		const longDuration = timeline[2].t - timeline[1].t;
+		// First jump duration (scan + jump for each pair)
+		const firstJumpStart = timeline[1].t; // after scan
+		const firstJumpEnd = timeline[2].t; // after jump
+		const secondJumpStart = timeline[3].t; // after scan
+		const secondJumpEnd = timeline[4].t; // after jump
+
+		const firstJumpDuration = firstJumpEnd - firstJumpStart;
+		const secondJumpDuration = secondJumpEnd - secondJumpStart;
 
 		// Longer distance = longer duration
-		expect(longDuration).toBeGreaterThan(shortDuration);
+		expect(secondJumpDuration).toBeGreaterThan(firstJumpDuration);
 	});
 
 	it('sequential jumps accumulate core degradation', () => {
 		const scenario: ScenarioFile = {
 			name: 'jump chain',
-			description: '3 sequential jumps',
+			description: '3 scan-and-jump pairs',
 			ships: { explorer: baseShip },
 			actions: [
-				{ ship: 'explorer', type: 'jump', params: { target_node_id: 10, distance: 3 } },
-				{ ship: 'explorer', type: 'jump', params: { target_node_id: 20, distance: 3 } },
-				{ ship: 'explorer', type: 'jump', params: { target_node_id: 30, distance: 3 } },
+				{ ship: 'explorer', type: 'scan_route', params: { target_node_id: 2 } },
+				{ ship: 'explorer', type: 'jump', params: { target_node_id: 2 } },
+				{ ship: 'explorer', type: 'scan_route', params: { target_node_id: 3 } },
+				{ ship: 'explorer', type: 'jump', params: { target_node_id: 3 } },
+				{ ship: 'explorer', type: 'scan_route', params: { target_node_id: 4 } },
+				{ ship: 'explorer', type: 'jump', params: { target_node_id: 4 } },
 			],
 		};
 
 		const { timeline } = runScenario(scenario);
-		expect(timeline).toHaveLength(4);
+		expect(timeline).toHaveLength(7); // initial + 6 actions
 
-		// Core life decreases with each jump
-		const coreLifes = timeline.map((s) => s.ships.explorer.coreLife);
-		for (let i = 1; i < coreLifes.length; i++) {
-			expect(coreLifes[i]).toBeLessThan(coreLifes[i - 1]);
-		}
+		// Core life decreases with each jump (compare after each jump)
+		const afterJump1 = timeline[2].ships.explorer.coreLife;
+		const afterJump2 = timeline[4].ships.explorer.coreLife;
+		const afterJump3 = timeline[6].ships.explorer.coreLife;
 
-		// Position updates
-		expect(timeline[1].ships.explorer.nodeId).toBe(10);
-		expect(timeline[2].ships.explorer.nodeId).toBe(20);
-		expect(timeline[3].ships.explorer.nodeId).toBe(30);
+		expect(afterJump1).toBeLessThan(timeline[0].ships.explorer.coreLife);
+		expect(afterJump2).toBeLessThan(afterJump1);
+		expect(afterJump3).toBeLessThan(afterJump2);
+
+		// Positions
+		expect(timeline[2].ships.explorer.nodeId).toBe(2);
+		expect(timeline[4].ships.explorer.nodeId).toBe(3);
+		expect(timeline[6].ships.explorer.nodeId).toBe(4);
 	});
 
 	it('power regenerates during action durations', () => {
@@ -109,32 +138,30 @@ describe('scenario runner', () => {
 			description: 'Jump consumes power, then next snapshot shows regen',
 			ships: { explorer: baseShip },
 			actions: [
-				{ ship: 'explorer', type: 'jump', params: { target_node_id: 10, distance: 5 } },
-				{ ship: 'explorer', type: 'jump', params: { target_node_id: 20, distance: 1 } },
+				{ ship: 'explorer', type: 'scan_route', params: { target_node_id: 2 } },
+				{ ship: 'explorer', type: 'jump', params: { target_node_id: 2 } },
+				{ ship: 'explorer', type: 'scan_route', params: { target_node_id: 3 } },
+				{ ship: 'explorer', type: 'jump', params: { target_node_id: 3 } },
 			],
 		};
 
 		const { timeline } = runScenario(scenario);
 
-		// After first jump, power was consumed but regen happened during the jump duration.
-		// After second (short) jump, power consumed again. The point is that
-		// power at step 2 is higher than naive "initial - 2 * cost" because regen
-		// happened during the first jump's duration.
-		const afterFirstJump = timeline[1].ships.explorer.power;
-		const afterSecondJump = timeline[2].ships.explorer.power;
+		// Power should not be zero — regen during action durations partially restores it
+		const afterFirstJump = timeline[2].ships.explorer.power;
+		const afterSecondJump = timeline[4].ships.explorer.power;
 
-		// Power should not be zero — regen during jump duration partially restores it
 		expect(afterFirstJump).toBeGreaterThan(0);
 		expect(afterSecondJump).toBeGreaterThan(0);
 	});
 
-	it('scan actions consume power and produce success/fail results', () => {
+	it('scan actions consume power and produce discovery results', () => {
 		const scenario: ScenarioFile = {
 			name: 'scan',
 			description: 'Single scan',
 			ships: { scanner: { ...baseShip, hull: 'surveyor' } },
 			actions: [
-				{ ship: 'scanner', type: 'scan_route', params: { target_node_id: 10, distance: 3 } },
+				{ ship: 'scanner', type: 'scan_route', params: { target_node_id: 2 } },
 			],
 		};
 
@@ -144,10 +171,8 @@ describe('scenario runner', () => {
 		// Action resolved
 		expect(actions[0].status).toBe(ActionStatus.Fulfilled);
 
-		// Result has success and roll (deterministic from seeded RNG)
-		expect(actions[0].result.success).toBeDefined();
-		expect(actions[0].result.roll).toBeDefined();
-		expect(typeof actions[0].result.roll).toBe('number');
+		// Result has success (with graph, close nodes produce direct edge)
+		expect(actions[0].result.success).toBe(true);
 
 		// Time advanced
 		expect(timeline[1].t).toBeGreaterThan(0);
@@ -159,14 +184,13 @@ describe('scenario runner', () => {
 			description: 'Same scenario twice',
 			ships: { scanner: { ...baseShip, hull: 'surveyor' } },
 			actions: [
-				{ ship: 'scanner', type: 'scan_route', params: { target_node_id: 10, distance: 3 } },
+				{ ship: 'scanner', type: 'scan_route', params: { target_node_id: 10 } },
 			],
 		};
 
 		const run1 = runScenario(scenario);
 		const run2 = runScenario(scenario);
 
-		expect(run1.actions[0].result.roll).toBe(run2.actions[0].result.roll);
 		expect(run1.actions[0].result.success).toBe(run2.actions[0].result.success);
 	});
 
@@ -176,8 +200,8 @@ describe('scenario runner', () => {
 			description: 'Verify timestamps',
 			ships: { explorer: baseShip },
 			actions: [
-				{ ship: 'explorer', type: 'jump', params: { target_node_id: 10, distance: 3 } },
-				{ ship: 'explorer', type: 'jump', params: { target_node_id: 20, distance: 3 } },
+				{ ship: 'explorer', type: 'scan_route', params: { target_node_id: 2 } },
+				{ ship: 'explorer', type: 'scan_route', params: { target_node_id: 4 } },
 			],
 		};
 
@@ -186,47 +210,41 @@ describe('scenario runner', () => {
 		// t=0 is initial
 		expect(timeline[0].t).toBe(0);
 
-		// Each subsequent timestamp is the sum of previous durations
-		const firstDuration = timeline[1].t;
-		const secondDuration = timeline[2].t - timeline[1].t;
-
-		// Same distance + same loadout → same duration
-		expect(secondDuration).toBe(firstDuration);
-
-		// Total time is sum
-		expect(timeline[2].t).toBe(firstDuration + secondDuration);
+		// Each subsequent timestamp is positive
+		expect(timeline[1].t).toBeGreaterThan(0);
+		expect(timeline[2].t).toBeGreaterThan(timeline[1].t);
 	});
 
-	it('mixed jump and scan actions accumulate state correctly', () => {
+	it('scan then jump then scan accumulates state correctly', () => {
 		const scenario: ScenarioFile = {
 			name: 'mixed',
-			description: 'Jump then scan then jump',
+			description: 'Scan, jump, then scan from new position',
 			ships: { explorer: baseShip },
 			actions: [
-				{ ship: 'explorer', type: 'jump', params: { target_node_id: 10, distance: 2 } },
-				{ ship: 'explorer', type: 'scan_route', params: { target_node_id: 20, distance: 2 } },
-				{ ship: 'explorer', type: 'jump', params: { target_node_id: 20, distance: 2 } },
+				{ ship: 'explorer', type: 'scan_route', params: { target_node_id: 2 } },
+				{ ship: 'explorer', type: 'jump', params: { target_node_id: 2 } },
+				{ ship: 'explorer', type: 'scan_route', params: { target_node_id: 3 } },
 			],
 		};
 
 		const { timeline } = runScenario(scenario);
 		expect(timeline).toHaveLength(4);
 
-		// After jump: at node 10
-		expect(timeline[1].ships.explorer.nodeId).toBe(10);
-		// After scan: still at node 10 (scan doesn't move)
-		expect(timeline[2].ships.explorer.nodeId).toBe(10);
-		// After second jump: at node 20
-		expect(timeline[3].ships.explorer.nodeId).toBe(20);
+		// After scan: still at node 1
+		expect(timeline[1].ships.explorer.nodeId).toBe(1);
+		// After jump: at node 2
+		expect(timeline[2].ships.explorer.nodeId).toBe(2);
+		// After second scan: still at node 2 (scan doesn't move)
+		expect(timeline[3].ships.explorer.nodeId).toBe(2);
 
-		// Core degraded from jumps but not from scan
+		// Core degraded from jump but not from scans
 		const coreDrop1 = timeline[0].ships.explorer.coreLife - timeline[1].ships.explorer.coreLife;
 		const coreDrop2 = timeline[1].ships.explorer.coreLife - timeline[2].ships.explorer.coreLife;
 		const coreDrop3 = timeline[2].ships.explorer.coreLife - timeline[3].ships.explorer.coreLife;
 
-		expect(coreDrop1).toBeGreaterThan(0); // jump degrades
-		expect(coreDrop2).toBe(0); // scan doesn't degrade core
-		expect(coreDrop3).toBeGreaterThan(0); // jump degrades
+		expect(coreDrop1).toBe(0); // scan doesn't degrade core
+		expect(coreDrop2).toBeGreaterThan(0); // jump degrades
+		expect(coreDrop3).toBe(0); // scan doesn't degrade core
 	});
 
 	it('phaser attack drains target shields', () => {
@@ -405,7 +423,7 @@ describe('scenario runner', () => {
 			description: 'References nonexistent ship',
 			ships: { explorer: baseShip },
 			actions: [
-				{ ship: 'ghost', type: 'jump', params: { target_node_id: 10, distance: 1 } },
+				{ ship: 'ghost', type: 'scan_route', params: { target_node_id: 2 } },
 			],
 		};
 

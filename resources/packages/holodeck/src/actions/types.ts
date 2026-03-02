@@ -2,6 +2,7 @@ import type { ActionType } from '../enums/action-type';
 import type { ActionStatus } from '../enums/action-status';
 import type { Ship } from '../ship';
 import type { ShipState } from '../types/ship-state';
+import type { NavGraph } from '../nav-graph';
 
 export interface Action {
 	id: number;
@@ -33,6 +34,7 @@ export interface ActionPreview {
 
 export interface ActionContext {
 	getShip: (id: string) => Ship | undefined;
+	getGraph?: () => NavGraph | undefined;
 }
 
 export interface ActionHandler {
@@ -59,6 +61,8 @@ export const ActionErrorCode = {
 	TargetDestroyed: 'target.destroyed',
 	ShipMissingEquipment: 'ship.missing_equipment',
 	ShipInsufficientAmmo: 'ship.insufficient_ammo',
+	NavigationNoGraph: 'navigation.no_graph',
+	NavigationNoRoute: 'navigation.no_route',
 } as const;
 
 export type ActionErrorCode =

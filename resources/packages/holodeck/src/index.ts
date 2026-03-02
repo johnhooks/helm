@@ -57,3 +57,15 @@ export { fireTorpedoHandler } from './actions/fire-torpedo';
 
 // Engine
 export { Engine, createEngine } from './actions/engine';
+
+// NavGraph
+export { NavGraph, createNavGraph, createEmptyNavGraph } from './nav-graph';
+export type { GraphNode, GraphEdge, GraphStar } from './data/graph';
+export { GRAPH_NODES, GRAPH_EDGES, GRAPH_META, getGraphNode } from './data/graph';
+
+// Nav Generator
+export {
+	sha256, corridorSeed, seededFloat, waypointHash,
+	computeWaypoint, canDirectJump, corridorDifficulty,
+} from './nav-generator';
+export type { WaypointData } from './nav-generator';
