@@ -139,19 +139,29 @@ The workbench currently has three loosely connected layers:
 
 3. **Discrete-event sim** (`src/sim/engine.ts`) — A toy simulator that steps through scripted actions. No timestamp-based state, no action validation, no real duration modeling, non-deterministic RNG, no spatial awareness. It's a prototype that answered early questions but can't validate real gameplay.
 
-### What's Been Built (Stages 1–3)
+### What's Been Built (Stages 1–4)
 
 - **Shared catalog data.** Products and hulls moved from workbench to `tests/_data/catalog/`. Holodeck, workbench, and PHP tests all consume the same JSON.
 - **Holodeck engine.** `@helm/holodeck` with Clock, seeded RNG, `InternalShipState`, 7 system classes (Power, Propulsion, Sensors, Shields, Hull, Navigation, Cargo), Ship orchestrator with mutations and `resolve()`. Timestamp-based state (`powerFullAt`/`shieldsFullAt`), PowerMode multipliers, deterministic RNG.
 - **Pilot skills.** Experience curve (`buffFactor`/`skillMultiplier`) in `@helm/formulas`, `PilotSkills` type with 7 skill categories. Wired through holodeck: `pilot.scanning` boosts scan success chance, `pilot.jumping` boosts discovery probability. Workbench CLI exposes `--pilot-scanning`, `--pilot-jumping` flags.
 - **Date test time.** Carbon-inspired `Date::setTestNow()`/`advanceTestNow()`/`withTestNow()` on the PHP Date class for simulation time control.
-- **Action lifecycle.** Validate → handle → defer → resolve pipeline. Jump and ScanRoute handlers. Engine class owns the lifecycle across ships; Ship is the state + mutation layer. Action preview via ship cloning. Handler registry for extensibility.
+- **Action lifecycle.** Validate → handle → defer → resolve pipeline. Jump, ScanRoute, FirePhaser, and FireTorpedo handlers. Engine class owns the lifecycle across ships; Ship is the state + mutation layer. Action preview via ship cloning. Handler registry for extensibility.
+- **Action CLI.** `bun run wb action` for single action submission, `bun run wb scenario` for JSON scenario sequences. Old `src/sim/` engine removed. `compare` and `matrix` commands for side-by-side analysis and component sweeps.
+- **Navigation graph.** `createNavGraph()` loads 275 real systems from `graph.json` (3D coordinates, star metadata, edges with distances). Ships exist at nodes, distance is Euclidean 3D.
+- **Multi-ship engine.** `registerShip()`, `getShipsAtNode()`, cross-ship combat (phaser drain, torpedo hit/intercept, PDS, ECM effectiveness reduction).
+- **Emissions pipeline.** Actions declare `EmissionDeclaration[]`, engine tracks `EmissionRecord[]` with time-varying `DriveEnvelope` power curves. Equipment emissions (ECM, shield regen) computed from live ship state. `computeEMSnapshot()` aggregates all emissions at a node with stellar baseline and noise floor.
+- **Passive detection.** Ships with sensor affinity auto-scan at configurable intervals. `queryPassiveDetection()` produces confidence scores and information tiers (anomaly → class → type → analysis). Self-emissions excluded from detections but contribute to noise floor. `advanceUntilIdle()` interleaves passive scans between action deferrals so mid-flight emissions are detectable.
+- **Drive envelope.** Multi-phase jump: spool at origin → cooldown at destination. Each phase produces distinct emissions with time-varying power curves. DSC sensors detect continuous emissions (drive envelopes), ACU sensors detect pulse emissions (weapons fire, scan pings).
+- **Verdict system.** `dsp-progress` command with 40+ gameplay checks producing PASS/WARN/FAIL verdicts across submarine warfare, miner safety, sensor tiers, drive envelopes, and multi-ship detection scenarios.
+- **Scenario library.** 13 scenario files covering exploration, combat, passive detection, drive envelope detection, ECM impact, fleet engagement, and PDS defense.
 
 ### Remaining Gaps
 
-- **No spatial model.** Ships have `nodeId: number` but no navigation graph. No edges, no distance between ships. Detection assumes proximity. Escape has no meaning.
+- **Baseline persistence.** No explicit `save_baseline`/`load_baseline` commands. Regression detection requires manually comparing JSON outputs from consecutive runs.
 
-- **Analysis output is unusable.** The `analyse` command produces ~84,000 lines of raw JSON. An agent can't read it without writing custom jq pipelines. There's no summary, no verdicts, no flagging of problems.
+- **Diff engine.** No automated comparison between two analysis runs. The verdict system flags current-state problems but doesn't track drift over time.
+
+- **Report generation.** No markdown report generator. Analysis output is structured JSON consumed by agents or piped through jq. Human-readable reports are Stage 6.
 
 ## Stages
 
@@ -220,37 +230,27 @@ Ship owns state and mutations (`resolve()`, `consumePower()`, `moveToNode()`, et
 - Action preview via ship cloning (doesn't mutate real state or consume real RNG)
 - Action history inspection (getCurrentAction, getActions with optional ship filter)
 
-### Stage 3.5: Workbench — Action CLI Integration
+### Stage 3.5: Workbench — Action CLI Integration ✓
 
-**What:** Wire the holodeck's action lifecycle into workbench CLI commands.
+**Status:** Complete.
 
-**Why:** Same rationale as Stage 2.5 — the action pipeline needs a feedback loop before building multi-ship in Stage 4. "What happens when a Pioneer tries to jump 15 ly in efficiency mode?" should be answerable with a CLI command, not just a unit test.
+- **`bun run wb action`** — Single action submission with preview, before/after state, and result. Supports all tuning flags (throttle, effort, pilot skills).
+- **`bun run wb scenario <file.json>`** — JSON scenario runner through the holodeck engine. Multi-ship support with sequential action execution. Generates timeline with state snapshots at each step. Handles passive scans triggered during action resolution.
+- **Action comparison** — `bun run wb compare` for side-by-side loadout comparison. `bun run wb matrix --vary=core,drive` for Cartesian product sweeps.
+- **Old sim engine removed** — `src/sim/` deleted. All simulation runs through holodeck's action lifecycle.
 
-**Scope:**
-- **`bun run wb action`** — Submit an action to a holodeck Ship and show the result. `--hull=pioneer --action=jump --distance=10` → validates, shows duration/costs, resolves, shows final state. Covers the full validate → handle → resolve pipeline in one command.
-- **`bun run wb scenario <file.json>`** — Run a sequence of actions from a JSON file through the holodeck. This replaces/evolves the existing `simulate` command to use the holodeck engine instead of the workbench's toy sim. Actions are validated and resolved through the action lifecycle, not just applied as raw mutations.
-- **Action comparison** — "What's the difference between jumping 10 ly in normal vs efficiency mode?" Side-by-side output showing costs, duration, and projected state for each.
-- **Migrate existing sim tests** — Move tests from `src/sim/engine.test.ts` to use the holodeck-backed scenario runner where applicable. Tests that cover action lifecycle behaviors (jump costs power, scan has success chance, phaser drains shields) should validate against the holodeck, not the toy sim.
+### Stage 4: Holodeck — Multi-Ship and Environment ✓
 
-**Not in scope:**
-- Multi-ship (Stage 4)
-- Full analysis framework rebuild (Stage 5)
+**Status:** Complete.
 
-### Stage 4: Holodeck — Multi-Ship and Environment
-
-**What:** Add spatial awareness, multi-ship systems, and environmental context.
-
-**Why:** Helm's most interesting mechanics are emergent from multi-ship interaction. Detection, combat, interdiction, and the economy all depend on ships coexisting in systems and affecting each other. The holodeck can't validate any of these without a spatial model.
-
-**Scope:**
-- Load navigation graph from `tests/_data/catalog/graph.json` (exported from live game via `wp helm export graph`)
-- System/node model (ships exist at nodes, nodes have 3D coordinates and star metadata)
-- Stellar environment from real star data (spectral class → noise floor, belt density, traffic)
-- Multi-ship awareness (which ships share a node)
-- Emission tracking (actions produce emissions, engine tracks them)
-- Detection integration (passive detection between ships at the same node)
-- Drive envelope integration (spool/sustain/cooldown phases produce emissions over time)
-- Environmental modifiers from real stellar data that affect formula inputs
+- **Navigation graph.** `createNavGraph(masterSeed)` loads from `tests/_data/catalog/graph.json` — 275 systems within 10 ly of Sol with 3D coordinates, star metadata (spectral class, luminosity, temperature), edges with distances. `getNode()`, `getNeighbors()`, `distanceBetween()`, `addEdge()`, `incrementTraversal()`.
+- **System/node model.** Ships exist at nodes (`nodeId`). `getShipsAtNode()` for co-location queries. Detection and combat are node-scoped.
+- **Stellar environment.** Spectral class → `stellarNoise()` → noise floor baseline. Belt masking modeled in detection analysis.
+- **Multi-ship awareness.** Engine registry (`registerShip`), auto-registration on `submitAction`. Cross-ship combat: phaser drain, torpedo hit/miss/intercept, PDS defense, ECM effectiveness reduction.
+- **Emission tracking.** Actions declare `EmissionDeclaration[]` in `ActionIntent`/`ActionOutcome`. Engine tracks `EmissionRecord[]` with start/end times, time-varying `DriveEnvelope` power curves. `getActiveEmissions(nodeId, atTime)`. Equipment emissions (ECM, shield regen) computed from live ship state via `computeEquipmentEmissions()`.
+- **Detection integration.** `queryPassiveDetection(shipId, integrationSeconds)` → EM snapshot → confidence → information tier. `processPassiveScans()` batch-processes all ships ready to scan. `advanceUntilIdle()` interleaves passive scans between action deferrals for mid-flight detection.
+- **Drive envelope.** Multi-phase jump: spool at origin (front-loaded power curve) → cooldown at destination (decaying curve). `emissionPowerAtTime()` applies envelope to get instantaneous power. DSC sensors excel at detecting continuous emissions (drive envelopes), ACU sensors excel at pulse emissions (weapons, scans).
+- **Environmental modifiers.** Noise floor from `noiseFloor(stellarBaseline, shipEmissions, jitter, ecmNoise, saturation)`. ECM raises noise floor for all ships at the node. Self-interference: own emissions raise noise floor but are excluded from detections.
 
 ### Stage 5: Analysis Framework
 
@@ -291,7 +291,7 @@ The existing workbench code doesn't get thrown away — it gets reorganized:
 - **`computeShipReport()`** — Stays in the workbench as a convenience function for quick static analysis.
 - **Product/hull data** — Moves from `workbench/data/` to `tests/_data/catalog/` in Stage 1. Workbench loaders repoint to the shared location. Holodeck and PHP tests consume the same files.
 - **DSP analysis commands** — Migrate into the analysis framework as scenario categories (Stage 5). The formula-level DSP analysis is still valuable.
-- **Sim engine** — Incrementally replaced by the holodeck. Stage 2.5 adds holodeck-backed CLI commands alongside the existing sim. Stage 3.5 migrates the scenario runner to use the holodeck's action lifecycle. The old sim engine stays until the holodeck can handle everything it does.
+- **Sim engine** — Removed. Fully replaced by the holodeck engine in Stage 3.5.
 - **CLI commands** — Collapse from 12 commands to a focused set.
 
 ## What Carries to Frontend

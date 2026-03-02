@@ -17,6 +17,7 @@ export interface ShipConfig {
 	shieldsFullAt?: number | null;
 	activeEquipment?: string[];
 	pilot?: Partial<PilotSkills>;
+	passiveScanInterval?: number;
 }
 
 export function createShip(

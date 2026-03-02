@@ -186,7 +186,8 @@ describe('Combat — Multi-Ship Integration', () => {
 				target_ship_id: 'miner',
 			});
 			const resolved = engine.advanceUntilIdle();
-			const result = resolved[0].result;
+			const torpedo = resolved.find((a) => a.type === ActionType.FireTorpedo)!;
+			const result = torpedo.result;
 
 			if (result.hit) {
 				// If hit, target should have taken damage
@@ -195,7 +196,7 @@ describe('Combat — Multi-Ship Integration', () => {
 				expect(result.damage).toBeGreaterThan(0);
 			}
 			// Either hit or miss, status is fulfilled
-			expect(resolved[0].status).toBe(ActionStatus.Fulfilled);
+			expect(torpedo.status).toBe(ActionStatus.Fulfilled);
 		});
 
 		it('PDS intercepts torpedoes', () => {
@@ -214,7 +215,8 @@ describe('Combat — Multi-Ship Integration', () => {
 					target_ship_id: 'miner',
 				});
 				const resolved = engine.advanceUntilIdle();
-				results.push(resolved[0].result);
+				const torpedo = resolved.find((a) => a.type === ActionType.FireTorpedo)!;
+				results.push(torpedo.result);
 			}
 
 			// With PDS active (mult_a=0.45, single torpedo), some should be intercepted

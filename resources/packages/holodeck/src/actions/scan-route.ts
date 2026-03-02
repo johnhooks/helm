@@ -1,9 +1,12 @@
+import {
+	emissionPower, tunedEmission, DEFAULT_EMISSION_PROFILES,
+	firstHopChance,
+} from '@helm/formulas';
 import type { Ship } from '../ship';
 import type { GraphNode, GraphEdge } from '../data/graph';
 import type { Action, ActionContext, ActionHandler, ActionIntent, ActionOutcome } from './types';
 import { ActionError, ActionErrorCode } from './types';
 import { ActionStatus } from '../enums/action-status';
-import { firstHopChance } from '@helm/formulas';
 import {
 	canDirectJump,
 	corridorDifficulty,
@@ -89,6 +92,11 @@ export const scanRouteHandler: ActionHandler = {
 				power_cost: powerCost,
 				duration,
 			},
+			emissions: [{
+				emissionType: 'pnp_scan',
+				spectralType: DEFAULT_EMISSION_PROFILES.pnp_scan.spectralType,
+				basePower: tunedEmission(emissionPower('pnp_scan'), effort),
+			}],
 		};
 	},
 

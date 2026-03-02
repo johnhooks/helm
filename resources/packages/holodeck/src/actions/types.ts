@@ -3,6 +3,30 @@ import type { ActionStatus } from '../enums/action-status';
 import type { Ship } from '../ship';
 import type { ShipState } from '../types/ship-state';
 import type { NavGraph } from '../nav-graph';
+import type { EmissionType, SpectralType, DriveEnvelope } from '@helm/formulas';
+
+export interface EmissionDeclaration {
+	emissionType: EmissionType;
+	spectralType: SpectralType;
+	basePower: number;
+	nodeId?: number;
+	envelope?: DriveEnvelope;
+	label?: string;
+}
+
+export interface EmissionRecord {
+	id: number;
+	shipId: string;
+	actionId: number;
+	nodeId: number;
+	emissionType: EmissionType;
+	spectralType: SpectralType;
+	basePower: number;
+	startedAt: number;
+	endedAt: number | null;
+	envelope?: DriveEnvelope;
+	label?: string;
+}
 
 export interface Action {
 	id: number;
@@ -18,11 +42,14 @@ export interface Action {
 export interface ActionIntent {
 	deferredUntil: number | null;
 	result: Record<string, unknown>;
+	emissions?: EmissionDeclaration[];
 }
 
 export interface ActionOutcome {
 	status: ActionStatus;
 	result: Record<string, unknown>;
+	deferredUntil?: number | null;
+	emissions?: EmissionDeclaration[];
 }
 
 export interface ActionPreview {
@@ -35,6 +62,7 @@ export interface ActionPreview {
 export interface ActionContext {
 	getShip: (id: string) => Ship | undefined;
 	getGraph?: () => NavGraph | undefined;
+	getActiveEmissions?: (nodeId: number, atTime?: number) => EmissionRecord[];
 }
 
 export interface ActionHandler {

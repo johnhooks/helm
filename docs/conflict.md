@@ -413,13 +413,113 @@ Step 6 is rarer because the cost is enormous.
 
 ---
 
+## Stealth Is Emergent
+
+There is no stealth toggle. No cloak equipment. No visibility flag. A ship's detectability is the sum of its emissions, and emissions come from what the ship is doing.
+
+**A ship doing nothing emits nothing.** No shields, no active equipment, no actions in progress — the ship is electromagnetically invisible. Passive scanning (listening) produces zero emissions. An idle ship cannot be found by any sensor at any range.
+
+This is the foundation of the async safety model: a player who logs off is safe because their ship is dark. It also creates the ambush predator archetype — a Spectre sitting dark in a system is invisible until it chooses to act.
+
+Each system a ship powers up adds to its emission profile:
+
+| Step | What happens | Emission | Detectable? |
+|------|-------------|----------|-------------|
+| Idle / passive scan | Listening only | 0 | No |
+| Engage shields | Shield power-up ramp | 0.2 (faint) | Barely — DSC with long integration might |
+| Arm weapons / active scan | Targeting lock | 5.0+ (loud) | Yes — this is the commitment point |
+| Fire | Weapons discharge | 6.0 | Very |
+
+The reveal is gradual and player-driven. Each step up the ladder trades stealth for capability. The ambush predator must sacrifice information asymmetry to engage.
+
+---
+
+## Actions vs State
+
+Ship behavior falls into two categories, distinguished by whether it occupies the action slot.
+
+### Actions (async, one-at-a-time)
+
+Actions block the ship's action slot. A ship can only perform one at a time. They go through the handler lifecycle: validate, handle, defer, resolve. They produce results the player sees.
+
+- **jump** — multi-phase travel (spool / cooldown), emits drive envelopes
+- **scan_route** — discover navigation routes, emits pnp_scan
+- **passive_scan** — listen for emissions over integration period, emits nothing
+- **pvp_scan** — targeting lock on a detected contact, emits loudly
+- **fire_phaser / fire_torpedo** — combat, emits weapons_fire
+- **Mining / Salvaging** — resource extraction, emits faintly
+
+### State (timestamp-based, runs in parallel)
+
+State transitions are instant mutations that start a timestamp clock. Formulas compute current values on demand. These do NOT occupy the action slot — a ship can engage shields while running a passive scan.
+
+- **Shield engagement** — `shields_engaged_at`, power-up curve formula gives current strength
+- **Shield regen** — `shields_full_at`, regen rate fills shields after damage
+- **Weapon arming** — `weapons_armed_at`, readiness ramp
+- **ECM activation** — `ecm_activated_at`, warm-up period
+- **Power regen** — `power_full_at`, capacitor refill
+
+The pattern is always: `current_value = formula(now - timestamp, max, rate)`.
+
+This distinction matters for engagement: the Spectre can toggle shields and arm weapons (state, parallel, instant) while its action slot is occupied by a passive scan (action, blocking). The moment it switches from passive scan to targeting lock, it loses listening capability AND starts emitting loudly.
+
+---
+
+## The Engagement Chain
+
+Detection feeds targeting. Targeting gates firing. Firing creates impact events on the target. Each step is connected through confidence values and action relationships.
+
+```
+passive_scan → detection result (confidence 0.0–1.0)
+    → confidence >= lock_threshold?
+        → fire action (multi-phase):
+            phase 1: targeting lock (uses detection confidence + weapon system + pilot skill)
+            phase 2: lock acquired → fire
+            phase 3: engagement result → child action on target ship
+```
+
+### Sensor Role Ends at Detection
+
+The sensor determines detection quality — how well you see things, how early, what confidence. Once a detection exceeds the lock threshold, the sensor's job is done.
+
+**Targeting lock speed comes from the weapon system and pilot skill, not the sensor.** A DSC and ACU that both produce a 0.7 confidence detection feed into the same lock mechanics. The sensor choice is purely about detection quality:
+
+- **DSC:** Better passive ears. Sees faint continuous emissions earlier. The scout sensor, the miner's early warning.
+- **ACU:** Better pulse matching. Catches transient events (drive spools, scan sweeps). The combat awareness sensor.
+
+### Parent-Child Actions
+
+When an attacker's action produces an effect on a target, the system creates a child action on the target's ship. The parent-child link exists for system analysis; it is never exposed to the other player.
+
+- `actor = self` — you initiated this (scan, jump, fire)
+- `actor = <ship_id>` — another player caused this (damage, interdiction)
+- `actor = system` — the game caused this (environmental, tick event)
+
+The target's client sees their own action records — some self-initiated, some caused by others. Whether they know *who* caused it depends on their passive scan detection tier, not the action record.
+
+For gameplay, a ship only needs its current action and its parent. Full chain walking is an analysis concern, never a runtime query.
+
+---
+
+## Scenario Walkthroughs
+
+Detailed mechanical walkthroughs of engagement scenarios live in `docs/dev/scenarios/`:
+
+- `spectre-vs-striker.md` — Ambush predator vs combat patrol. Covers solo and pair tactics, timing windows, detection chains.
+
+---
+
 ## Summary
 
 1. **Finding players is the hard part.** Detection depends on active scanning, which is detectable. Idle ships are invisible. Space is huge.
-2. **Interdiction is the default.** Wolves catch prey, drain shields, take cargo. Both ships survive. The attack stops when shields drop.
-3. **Destruction is deliberate and taboo.** A second, separate action on an already-looted ship. Triggers escalating bounties, station exile, and creates bounty hunters.
-4. **PvE (Others) is the primary combat.** Necessary, rewarding, socially valued.
-5. **Combat is mutual.** Both sides take damage. No clean wins.
-6. **The math favors building.** Piracy is a lifestyle, not an optimization.
-7. **Automation helps both sides.** Flee scripts and hunt scripts — but the asymmetry is in event frequency, not code.
-8. **Security zones protect new players.** The core is safe, the frontier is your choice.
+2. **Stealth is emergent.** No cloak needed. Doing nothing = invisible. Each system powered up adds emissions.
+3. **Actions occupy the slot, state runs in parallel.** Shield engagement and weapon arming are timestamp-based. Scanning and firing are actions.
+4. **Detection confidence gates targeting.** Passive scan produces confidence. Lock speed comes from weapons and pilot skill, not the sensor.
+5. **Parent-child actions link attacker and target.** Same table, same lifecycle. The relationship is for analysis, not client exposure.
+6. **Interdiction is the default.** Wolves catch prey, drain shields, take cargo. Both ships survive.
+7. **Destruction is deliberate and taboo.** Triggers escalating bounties, station exile, and creates bounty hunters.
+8. **PvE (Others) is the primary combat.** Necessary, rewarding, socially valued.
+9. **Combat is mutual.** Both sides take damage. No clean wins.
+10. **The math favors building.** Piracy is a lifestyle, not an optimization.
+11. **Automation helps both sides.** Flee scripts and hunt scripts — the asymmetry is in event frequency, not code.
+12. **Security zones protect new players.** The core is safe, the frontier is your choice.

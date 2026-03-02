@@ -17,4 +17,6 @@ export interface ShipState {
 	ammo: Record<string, number>;
 	activeEquipment: string[];
 	pilot: PilotSkills;
+	passiveScanInterval: number;
+	nextPassiveScanAt: number;
 }

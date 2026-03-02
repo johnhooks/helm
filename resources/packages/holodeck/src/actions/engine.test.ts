@@ -11,6 +11,7 @@ import { registerHandler } from './registry';
 import { createEngine } from './engine';
 import { makeLoadout } from '../test-helpers';
 import { createEmptyNavGraph } from '../nav-graph';
+import { buildLoadout } from '../loadout-builder';
 
 beforeEach(() => {
 	registerHandler(ActionType.Jump, jumpHandler);
@@ -27,8 +28,8 @@ function setup(config?: Parameters<typeof createShip>[3]) {
 }
 
 describe('Engine — Action Lifecycle', () => {
-	it('submit returns pending, advance resolves to fulfilled', () => {
-		const { engine, ship, clock } = setup();
+	it('submit returns pending, advanceUntilIdle resolves through all phases', () => {
+		const { engine, ship } = setup();
 
 		const action = engine.submitAction(ship, ActionType.Jump, {
 			target_node_id: 42,
@@ -39,11 +40,13 @@ describe('Engine — Action Lifecycle', () => {
 		expect(action.deferredUntil).toBeGreaterThan(0);
 		expect(action.result.from_node_id).toBe(1);
 		expect(action.result.to_node_id).toBe(42);
+		expect(action.result.phase).toBe('spool');
 
-		// Advance past deferred time
-		const resolved = engine.advance(action.deferredUntil! - clock.now());
+		// Resolve through spool + cooldown
+		const resolved = engine.advanceUntilIdle();
 		expect(resolved).toHaveLength(1);
 		expect(resolved[0].status).toBe(ActionStatus.Fulfilled);
+		expect(resolved[0].result.phase).toBe('complete');
 
 		const state = ship.resolve();
 		expect(state.nodeId).toBe(42);
@@ -74,15 +77,15 @@ describe('Engine — Action Lifecycle', () => {
 		}
 	});
 
-	it('slot clears on completion: submit jump, advance, submit scan succeeds', () => {
+	it('slot clears on completion: submit jump, advanceUntilIdle, submit scan succeeds', () => {
 		const { engine, ship } = setup();
 
-		const jump = engine.submitAction(ship, ActionType.Jump, {
+		engine.submitAction(ship, ActionType.Jump, {
 			target_node_id: 42,
 			distance: 1,
 		});
 
-		engine.advance(jump.deferredUntil!);
+		engine.advanceUntilIdle();
 
 		// Ship is now at node 42, slot is clear
 		expect(engine.getCurrentAction(ship)).toBeNull();
@@ -96,7 +99,7 @@ describe('Engine — Action Lifecycle', () => {
 		expect(scan.type).toBe(ActionType.ScanRoute);
 	});
 
-	it('partial advance: submit 2-step, advance partway, then finish', () => {
+	it('partial advance: spool phase then cooldown phase', () => {
 		const { engine, ship, clock } = setup();
 
 		const action = engine.submitAction(ship, ActionType.Jump, {
@@ -104,20 +107,27 @@ describe('Engine — Action Lifecycle', () => {
 			distance: 2,
 		});
 
-		const totalTime = action.deferredUntil!;
-		const halfTime = totalTime / 2;
+		const spoolEnd = action.deferredUntil!;
+		const halfSpool = spoolEnd / 2;
 
-		// Advance halfway — should not resolve
-		const firstAdvance = engine.advance(halfTime);
+		// Advance halfway through spool — should not resolve
+		const firstAdvance = engine.advance(halfSpool);
 		expect(firstAdvance).toHaveLength(0);
 		expect(engine.getCurrentAction(ship)!.status).toBe(ActionStatus.Pending);
 		expect(ship.resolve().nodeId).toBe(1); // still at origin
 
-		// Advance the rest — should resolve
-		const secondAdvance = engine.advance(totalTime - clock.now());
-		expect(secondAdvance).toHaveLength(1);
-		expect(secondAdvance[0].status).toBe(ActionStatus.Fulfilled);
-		expect(ship.resolve().nodeId).toBe(42);
+		// Advance to spool end — ship moves, cooldown begins
+		const spoolResolve = engine.advance(spoolEnd - clock.now());
+		expect(spoolResolve).toHaveLength(0); // not terminal yet
+		expect(ship.resolve().nodeId).toBe(42); // ship has moved
+		expect(engine.getCurrentAction(ship)).not.toBeNull(); // still in cooldown
+
+		// Advance through cooldown
+		const resolved = engine.advanceUntilIdle();
+		expect(resolved).toHaveLength(1);
+		expect(resolved[0].status).toBe(ActionStatus.Fulfilled);
+		expect(resolved[0].result.phase).toBe('complete');
+		expect(engine.getCurrentAction(ship)).toBeNull();
 	});
 
 	it('advanceUntilIdle: jumps to exact deferredUntil', () => {
@@ -378,6 +388,72 @@ describe('Engine — Action Lifecycle', () => {
 			} catch (e) {
 				expect((e as ActionError).code).toBe(ActionErrorCode.NavigationNoRoute);
 			}
+		});
+	});
+
+	describe('advanceUntilIdle — passive scan interleaving', () => {
+		it('fires passive scans between deferrals', () => {
+			const graph = createEmptyNavGraph('interleave-test');
+			graph.addNode({ type: 'system', x: 0, y: 0, z: 0 }); // id 1
+			graph.addNode({ type: 'system', x: 0.5, y: 0.3, z: 0 }); // id 2
+
+			const clock = createClock();
+			const engine = createEngine(clock, graph);
+
+			// Jumper: will create drive_spool emission at node 1
+			const jumperLoadout = buildLoadout('pioneer');
+			const jumper = createShip(jumperLoadout, clock, createRng(1), {
+				id: 'jumper',
+				nodeId: 1,
+			});
+			engine.registerShip('jumper', jumper);
+
+			// DSC listener at same node, short interval to fire during spool
+			const listenerLoadout = buildLoadout('surveyor', { sensor: 'dsc_mk1' });
+			const listener = createShip(listenerLoadout, clock, createRng(2), {
+				id: 'listener',
+				nodeId: 1,
+				passiveScanInterval: 30,
+			});
+			engine.registerShip('listener', listener);
+
+			// Scan to discover edge, then jump
+			engine.submitAction(jumper, ActionType.ScanRoute, { target_node_id: 2 });
+			engine.advanceUntilIdle();
+
+			engine.submitAction(jumper, ActionType.Jump, { target_node_id: 2 });
+			const resolved = engine.advanceUntilIdle();
+
+			// Should contain passive scan actions from the listener
+			const passiveScans = resolved.filter(
+				(a) => a.type === ActionType.ScanPassive,
+			);
+			expect(passiveScans.length).toBeGreaterThan(0);
+			expect(passiveScans.every((a) => a.shipId === 'listener')).toBe(true);
+
+			// Should also contain the resolved jump action
+			const jumpActions = resolved.filter(
+				(a) => a.type === ActionType.Jump,
+			);
+			expect(jumpActions).toHaveLength(1);
+			expect(jumpActions[0].status).toBe(ActionStatus.Fulfilled);
+		});
+
+		it('no passive scans when ship has no sensor affinity', () => {
+			const { engine, ship } = setup();
+
+			engine.submitAction(ship, ActionType.Jump, {
+				target_node_id: 42,
+				distance: 2,
+			});
+
+			const resolved = engine.advanceUntilIdle();
+
+			// makeLoadout() has no sensorDsp → getSensorAffinity() returns null
+			// So no passive scans fire, only the jump resolves
+			expect(resolved).toHaveLength(1);
+			expect(resolved[0].type).toBe(ActionType.Jump);
+			expect(resolved[0].status).toBe(ActionStatus.Fulfilled);
 		});
 	});
 });

@@ -13,8 +13,8 @@ import {
 } from '../index';
 
 describe('ActionType', () => {
-	it('has 13 types', () => {
-		expect(Object.values(ActionType)).toHaveLength(13);
+	it('has 14 types', () => {
+		expect(Object.values(ActionType)).toHaveLength(14);
 	});
 
 	it('values match PHP string backing', () => {
@@ -46,6 +46,7 @@ describe('ActionType', () => {
 		expect(actionRequiresTime(ActionType.Buy)).toBe(false);
 		expect(actionRequiresTime(ActionType.Sell)).toBe(false);
 		expect(actionRequiresTime(ActionType.Transfer)).toBe(false);
+		expect(actionRequiresTime(ActionType.ScanPassive)).toBe(false);
 	});
 
 	it('actionLabel returns human-readable labels', () => {

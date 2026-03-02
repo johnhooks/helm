@@ -5,7 +5,8 @@ import {
 	scanSuccessChance,
 	DEFAULT_CONSTANTS,
 } from '@helm/formulas';
-import type { Constants } from '@helm/formulas';
+import type { Constants, SensorAffinity } from '@helm/formulas';
+import type { CatalogProduct } from '../types/catalog';
 import type { PowerSystem } from './power';
 import type { InternalShipState } from '../state';
 import type { Loadout } from '../types/loadout';
@@ -66,5 +67,9 @@ export class SensorSystem {
 			effort,
 			this.state.pilot.scanning,
 		);
+	}
+
+	getSensorAffinity(): SensorAffinity | null {
+		return (this.loadout.sensor.product as CatalogProduct).sensorDsp ?? null;
 	}
 }

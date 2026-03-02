@@ -1,7 +1,11 @@
+import { emissionPower, DEFAULT_EMISSION_PROFILES } from '@helm/formulas';
+import type { DriveEnvelope } from '@helm/formulas';
 import type { Ship } from '../ship';
 import type { Action, ActionContext, ActionHandler, ActionIntent, ActionOutcome } from './types';
 import { ActionError, ActionErrorCode } from './types';
 import { ActionStatus } from '../enums/action-status';
+
+const DEFAULT_COOLDOWN_SECONDS = 120;
 
 export const jumpHandler: ActionHandler = {
 	validate(ship: Ship, params: Record<string, unknown>, context: ActionContext): void {
@@ -82,40 +86,99 @@ export const jumpHandler: ActionHandler = {
 
 		const coreCost = ship.propulsion.getJumpCoreCost(distance, throttle);
 		const powerCost = ship.propulsion.getJumpPowerCost(distance);
-		const duration = ship.propulsion.getJumpDuration(distance, throttle);
+		const spoolDuration = ship.propulsion.getJumpDuration(distance, throttle);
+
+		// Read drive envelope from catalog — derive phase durations
+		const envelope = ship.propulsion.getDriveEnvelope();
+		const cooldownDuration = envelope?.cooldown.duration ?? DEFAULT_COOLDOWN_SECONDS;
+
+		// Build spool envelope (spool-only — no sustain/cooldown phases)
+		const spoolEnvelope: DriveEnvelope | undefined = envelope
+			? {
+				label: envelope.label,
+				spool: envelope.spool,
+				sustain: { duration: 0, peakPower: 0, curve: 1.0 },
+				cooldown: { duration: 0, peakPower: 0, curve: 1.0 },
+			}
+			: undefined;
 
 		return {
-			deferredUntil: now + duration,
+			deferredUntil: now + spoolDuration,
 			result: {
+				phase: 'spool',
 				from_node_id: state.nodeId,
 				to_node_id: targetNodeId,
 				distance,
 				throttle,
 				core_cost: coreCost,
 				power_cost: powerCost,
-				duration,
+				spool_duration: spoolDuration,
+				cooldown_duration: cooldownDuration,
+				spool_started_at: now,
 			},
+			emissions: [{
+				emissionType: 'drive_spool',
+				spectralType: DEFAULT_EMISSION_PROFILES.drive_spool.spectralType,
+				basePower: emissionPower('drive_spool'),
+				envelope: spoolEnvelope,
+			}],
 		};
 	},
 
 	resolve(ship: Ship, action: Action, context: ActionContext): ActionOutcome {
-		const coreCost = action.result.core_cost as number;
-		const powerCost = action.result.power_cost as number;
-		const targetNodeId = action.result.to_node_id as number;
-		const fromNodeId = action.result.from_node_id as number;
+		const phase = action.result.phase as string;
 
-		ship.degradeCore(coreCost);
-		ship.consumePower(powerCost);
-		ship.moveToNode(targetNodeId);
+		if (phase === 'spool') {
+			// Spool complete — ship jumps to destination
+			const coreCost = action.result.core_cost as number;
+			const powerCost = action.result.power_cost as number;
+			const targetNodeId = action.result.to_node_id as number;
+			const fromNodeId = action.result.from_node_id as number;
+			const cooldownDuration = action.result.cooldown_duration as number;
 
-		const graph = context.getGraph?.();
-		if (graph && fromNodeId && targetNodeId) {
-			graph.incrementTraversal(fromNodeId, targetNodeId);
+			ship.degradeCore(coreCost);
+			ship.consumePower(powerCost);
+			ship.moveToNode(targetNodeId);
+
+			const graph = context.getGraph?.();
+			if (graph && fromNodeId && targetNodeId) {
+				graph.incrementTraversal(fromNodeId, targetNodeId);
+			}
+
+			// Build cooldown-only envelope (no spool/sustain phases)
+			const envelope = ship.propulsion.getDriveEnvelope();
+			const cooldownEnvelope: DriveEnvelope | undefined = envelope
+				? {
+					label: envelope.label,
+					spool: { duration: 0, peakPower: 0, curve: 1.0 },
+					sustain: { duration: 0, peakPower: 0, curve: 1.0 },
+					cooldown: envelope.cooldown,
+				}
+				: undefined;
+
+			return {
+				status: ActionStatus.Pending,
+				deferredUntil: action.deferredUntil! + cooldownDuration,
+				result: {
+					phase: 'cooldown',
+					spool_ended_at: action.deferredUntil,
+					cooldown_started_at: action.deferredUntil,
+				},
+				emissions: [{
+					emissionType: 'drive_cooldown',
+					spectralType: DEFAULT_EMISSION_PROFILES.drive_cooldown.spectralType,
+					basePower: emissionPower('drive_cooldown'),
+					envelope: cooldownEnvelope,
+				}],
+			};
 		}
 
+		// phase === 'cooldown' — cooldown complete
 		return {
 			status: ActionStatus.Fulfilled,
 			result: {
+				phase: 'complete',
+				cooldown_ended_at: action.deferredUntil,
 				remaining_core_life: ship.resolve().coreLife,
 			},
 		};

@@ -3,6 +3,7 @@ import {
 	pdsInterception, ecmLockDegradation,
 	shieldAbsorption,
 	DEFAULT_DSP_CONSTANTS,
+	emissionPower, DEFAULT_EMISSION_PROFILES,
 } from '@helm/formulas';
 import type { Ship } from '../ship';
 import type { Action, ActionContext, ActionHandler, ActionIntent, ActionOutcome } from './types';
@@ -110,6 +111,11 @@ export const fireTorpedoHandler: ActionHandler = {
 				payload,
 				launcher_slug: launcher.product.slug,
 			},
+			emissions: [{
+				emissionType: 'weapons_fire',
+				spectralType: DEFAULT_EMISSION_PROFILES.weapons_fire.spectralType,
+				basePower: emissionPower('weapons_fire'),
+			}],
 		};
 	},
 

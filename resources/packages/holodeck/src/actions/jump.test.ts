@@ -85,7 +85,7 @@ describe('Jump Handler', () => {
 	});
 
 	describe('handle', () => {
-		it('computes correct duration from propulsion system', () => {
+		it('computes correct spool duration from propulsion system', () => {
 			const { ship } = setup();
 			const intent = jumpHandler.handle(
 				ship,
@@ -96,7 +96,9 @@ describe('Jump Handler', () => {
 
 			const expectedDuration = ship.propulsion.getJumpDuration(3, 1.0);
 			expect(intent.deferredUntil).toBe(expectedDuration);
-			expect(intent.result.duration).toBe(expectedDuration);
+			expect(intent.result.spool_duration).toBe(expectedDuration);
+			expect(intent.result.phase).toBe('spool');
+			expect(intent.result.spool_started_at).toBe(0);
 		});
 
 		it('computes correct core cost and power cost', () => {
@@ -144,18 +146,32 @@ describe('Jump Handler', () => {
 				ctx,
 			);
 
-			// Lower throttle → longer duration, lower core cost
-			expect(intentHalf.result.duration).toBeGreaterThan(
-				intentFull.result.duration as number,
+			// Lower throttle → longer spool duration, lower core cost
+			expect(intentHalf.result.spool_duration).toBeGreaterThan(
+				intentFull.result.spool_duration as number,
 			);
 			expect(intentHalf.result.core_cost).toBeLessThan(
 				intentFull.result.core_cost as number,
 			);
 		});
+
+		it('declares drive_spool emission', () => {
+			const { ship } = setup();
+			const intent = jumpHandler.handle(
+				ship,
+				{ target_node_id: 2, distance: 3 },
+				0,
+				ctx,
+			);
+
+			expect(intent.emissions).toHaveLength(1);
+			expect(intent.emissions![0].emissionType).toBe('drive_spool');
+			expect(intent.emissions![0].basePower).toBeGreaterThan(0);
+		});
 	});
 
 	describe('resolve', () => {
-		it('moves ship, degrades core, consumes power', () => {
+		it('spool phase: moves ship, degrades core, returns cooldown', () => {
 			const { ship } = setup();
 			const stateBefore = ship.resolve();
 
@@ -177,14 +193,95 @@ describe('Jump Handler', () => {
 				result: { ...intent.result },
 			};
 
-			const outcome = jumpHandler.resolve(ship, action, ctx);
+			// First resolve: spool → cooldown
+			const spoolOutcome = jumpHandler.resolve(ship, action, ctx);
+			expect(spoolOutcome.status).toBe('pending');
+			expect(spoolOutcome.deferredUntil).toBeGreaterThan(action.deferredUntil!);
+			expect(spoolOutcome.result.phase).toBe('cooldown');
+			expect(spoolOutcome.result.spool_ended_at).toBe(action.deferredUntil);
+			expect(spoolOutcome.result.cooldown_started_at).toBe(action.deferredUntil);
 
-			expect(outcome.status).toBe('fulfilled');
-			const stateAfter = ship.resolve();
-			expect(stateAfter.nodeId).toBe(42);
-			expect(stateAfter.coreLife).toBeLessThan(stateBefore.coreLife);
-			expect(stateAfter.power).toBeLessThan(stateBefore.power);
-			expect(outcome.result.remaining_core_life).toBe(stateAfter.coreLife);
+			// Ship has moved and consumed resources
+			const stateAfterSpool = ship.resolve();
+			expect(stateAfterSpool.nodeId).toBe(42);
+			expect(stateAfterSpool.coreLife).toBeLessThan(stateBefore.coreLife);
+			expect(stateAfterSpool.power).toBeLessThan(stateBefore.power);
+
+			// Declares cooldown emission
+			expect(spoolOutcome.emissions).toHaveLength(1);
+			expect(spoolOutcome.emissions![0].emissionType).toBe('drive_cooldown');
+		});
+
+		it('cooldown phase: fulfills action', () => {
+			const { ship } = setup();
+
+			const intent = jumpHandler.handle(
+				ship,
+				{ target_node_id: 42, distance: 2 },
+				0,
+				ctx,
+			);
+
+			const action = {
+				id: 1,
+				shipId: ship.resolve().id,
+				type: ActionType.Jump,
+				params: { target_node_id: 42, distance: 2 },
+				status: 'pending' as const,
+				createdAt: 0,
+				deferredUntil: intent.deferredUntil,
+				result: { ...intent.result },
+			};
+
+			// Resolve spool first
+			const spoolOutcome = jumpHandler.resolve(ship, action, ctx);
+			Object.assign(action.result, spoolOutcome.result);
+			action.deferredUntil = spoolOutcome.deferredUntil!;
+
+			// Resolve cooldown
+			const cooldownOutcome = jumpHandler.resolve(ship, action, ctx);
+			expect(cooldownOutcome.status).toBe('fulfilled');
+			expect(cooldownOutcome.result.phase).toBe('complete');
+			expect(cooldownOutcome.result.cooldown_ended_at).toBe(action.deferredUntil);
+			expect(cooldownOutcome.result.remaining_core_life).toBeDefined();
+		});
+
+		it('result accumulates phase timestamps across resolves', () => {
+			const { ship } = setup();
+
+			const intent = jumpHandler.handle(
+				ship,
+				{ target_node_id: 42, distance: 2 },
+				0,
+				ctx,
+			);
+
+			const action = {
+				id: 1,
+				shipId: ship.resolve().id,
+				type: ActionType.Jump,
+				params: { target_node_id: 42, distance: 2 },
+				status: 'pending' as const,
+				createdAt: 0,
+				deferredUntil: intent.deferredUntil,
+				result: { ...intent.result },
+			};
+
+			// Spool resolve
+			const spoolOutcome = jumpHandler.resolve(ship, action, ctx);
+			Object.assign(action.result, spoolOutcome.result);
+			action.deferredUntil = spoolOutcome.deferredUntil!;
+
+			// Cooldown resolve
+			const cooldownOutcome = jumpHandler.resolve(ship, action, ctx);
+			Object.assign(action.result, cooldownOutcome.result);
+
+			// Full timeline present
+			expect(action.result.spool_started_at).toBe(0);
+			expect(action.result.spool_ended_at).toBeDefined();
+			expect(action.result.cooldown_started_at).toBeDefined();
+			expect(action.result.cooldown_ended_at).toBeDefined();
+			expect(action.result.phase).toBe('complete');
 		});
 	});
 
@@ -243,7 +340,7 @@ describe('Jump Handler', () => {
 			expect(intent.result.distance).toBe(3.0);
 		});
 
-		it('increments traversal count on resolve', () => {
+		it('increments traversal count on spool resolve', () => {
 			const { ship, graph, ctx: graphCtx } = setupWithGraph();
 
 			const intent = jumpHandler.handle(
@@ -265,7 +362,7 @@ describe('Jump Handler', () => {
 			};
 
 			expect(graph.getEdge(1, 2)!.traversals).toBe(0);
-			jumpHandler.resolve(ship, action, graphCtx);
+			jumpHandler.resolve(ship, action, graphCtx); // spool phase
 			expect(graph.getEdge(1, 2)!.traversals).toBe(1);
 		});
 	});

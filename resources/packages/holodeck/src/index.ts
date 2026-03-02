@@ -48,7 +48,13 @@ export { CargoSystem } from './systems/cargo';
 
 // Actions
 export { ActionError, ActionErrorCode } from './actions/types';
-export type { Action, ActionContext, ActionHandler, ActionIntent, ActionOutcome, ActionPreview } from './actions/types';
+export type {
+	Action, ActionContext, ActionHandler, ActionIntent, ActionOutcome, ActionPreview,
+	EmissionDeclaration, EmissionRecord,
+} from './actions/types';
+
+// Emissions
+export { computeEquipmentEmissions, emissionPowerAtTime } from './emissions';
 export { registerHandler, getHandler } from './actions/registry';
 export { jumpHandler } from './actions/jump';
 export { scanRouteHandler } from './actions/scan-route';
@@ -57,6 +63,11 @@ export { fireTorpedoHandler } from './actions/fire-torpedo';
 
 // Engine
 export { Engine, createEngine } from './actions/engine';
+export type { EnrichedDetection, PassiveDetectionResult } from './actions/engine';
+
+// EM Snapshot
+export { computeEMSnapshot } from './em-snapshot';
+export type { EMSnapshot, EMSnapshotSource } from './em-snapshot';
 
 // NavGraph
 export { NavGraph, createNavGraph, createEmptyNavGraph } from './nav-graph';

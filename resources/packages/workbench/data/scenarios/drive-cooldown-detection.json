@@ -1,0 +1,37 @@
+{
+	"name": "Drive Cooldown Detection",
+	"description": "Detect drive cooldown at destination. Listener at node 2 with 30s passive scan interval catches cooldown emission after jumper arrives.",
+	"ships": {
+		"jumper": {
+			"hull": "pioneer",
+			"core": "epoch_s",
+			"drive": "dr_705",
+			"sensor": "vrs_mk1",
+			"shield": "aegis_delta",
+			"nav": "nav_tier_3",
+			"node": 1
+		},
+		"listener": {
+			"hull": "surveyor",
+			"core": "epoch_s",
+			"drive": "dr_305",
+			"sensor": "dsc_mk1",
+			"shield": "aegis_delta",
+			"nav": "nav_tier_3",
+			"node": 2,
+			"passive_scan_interval": 30
+		}
+	},
+	"actions": [
+		{
+			"ship": "jumper",
+			"type": "scan_route",
+			"params": { "target_node_id": 2, "distance": 2 }
+		},
+		{
+			"ship": "jumper",
+			"type": "jump",
+			"params": { "target_node_id": 2 }
+		}
+	]
+}

@@ -1,0 +1,55 @@
+{
+	"name": "ECM Detection Impact",
+	"description": "ECM raises noise floor and reduces detection confidence. Listener scans before and after ECM activation.",
+	"ships": {
+		"target": {
+			"hull": "pioneer",
+			"core": "epoch_s",
+			"drive": "dr_505",
+			"sensor": "vrs_mk1",
+			"shield": "aegis_delta",
+			"nav": "nav_tier_3",
+			"node": 1
+		},
+		"jammer": {
+			"hull": "pioneer",
+			"core": "epoch_s",
+			"drive": "dr_305",
+			"sensor": "vrs_mk1",
+			"shield": "aegis_delta",
+			"nav": "nav_tier_3",
+			"equipment": ["ecm_mk1"],
+			"node": 1
+		},
+		"listener": {
+			"hull": "surveyor",
+			"core": "epoch_s",
+			"drive": "dr_305",
+			"sensor": "dsc_mk1",
+			"shield": "aegis_delta",
+			"nav": "nav_tier_3",
+			"node": 1,
+			"passive_scan_interval": 7200
+		}
+	},
+	"actions": [
+		{
+			"ship": "target",
+			"type": "absorb_damage",
+			"params": { "amount": 30 }
+		},
+		{
+			"ship": "listener",
+			"type": "scan_passive"
+		},
+		{
+			"ship": "jammer",
+			"type": "activate_equipment",
+			"params": { "equipment_slug": "ecm_mk1" }
+		},
+		{
+			"ship": "listener",
+			"type": "scan_passive"
+		}
+	]
+}

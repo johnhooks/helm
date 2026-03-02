@@ -1,0 +1,36 @@
+{
+	"name": "Passive Detection Basic",
+	"description": "DSC listener detects shield regen from damaged ship at same node.",
+	"ships": {
+		"target": {
+			"hull": "pioneer",
+			"core": "epoch_s",
+			"drive": "dr_505",
+			"sensor": "acu_mk1",
+			"shield": "aegis_delta",
+			"nav": "nav_tier_3",
+			"node": 1
+		},
+		"listener": {
+			"hull": "surveyor",
+			"core": "epoch_s",
+			"drive": "dr_305",
+			"sensor": "dsc_mk1",
+			"shield": "aegis_delta",
+			"nav": "nav_tier_3",
+			"node": 1,
+			"passive_scan_interval": 7200
+		}
+	},
+	"actions": [
+		{
+			"ship": "target",
+			"type": "absorb_damage",
+			"params": { "amount": 30 }
+		},
+		{
+			"ship": "listener",
+			"type": "scan_passive"
+		}
+	]
+}

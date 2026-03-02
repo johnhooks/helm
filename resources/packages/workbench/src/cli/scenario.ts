@@ -37,6 +37,7 @@ interface ScenarioShipSpec {
 	equipment?: string[];
 	ammo?: Record<string, number>;
 	pilot?: Record<string, number>;
+	passive_scan_interval?: number;
 }
 
 interface ScenarioAction {
@@ -139,6 +140,7 @@ export function runScenario(scenario: ScenarioFile): { timeline: TimelineEntry[]
 			nodeId: spec.node ?? 1,
 			ammo: spec.ammo ?? defaultAmmo,
 			pilot: spec.pilot,
+			passiveScanInterval: spec.passive_scan_interval,
 		});
 
 		// Register ship with engine by scenario name
@@ -188,14 +190,60 @@ export function runScenario(scenario: ScenarioFile): { timeline: TimelineEntry[]
 			continue;
 		}
 
+		if (actionSpec.type === 'absorb_damage') {
+			const amount = (actionSpec.params?.amount as number) ?? 0;
+			const dmg = ship.absorbDamage(amount);
+			timeline.push({
+				t: clock.now(),
+				action: { ship: actionSpec.ship, type: actionSpec.type, params: actionSpec.params },
+				result: { shieldAbsorbed: dmg.shieldAbsorbed, hullDamage: dmg.hullDamage },
+				ships: snapshotAllShips(ships),
+			});
+			continue;
+		}
+
+		if (actionSpec.type === 'scan_passive') {
+			// Advance clock to ship's nextPassiveScanAt if needed
+			// Use clock.advance directly to avoid triggering engine.processPassiveScans
+			const scanShip = ships[actionSpec.ship];
+			const nextScanAt = scanShip.getNextPassiveScanAt();
+			if (nextScanAt > clock.now()) {
+				clock.advance(nextScanAt - clock.now());
+			}
+
+			const action = engine.processPassiveScan(actionSpec.ship);
+			const detectionResult: Record<string, unknown> = action
+				? { ...action.result }
+				: { detections: [], noise_floor: 0, source_count: 0, integration_seconds: 0 };
+			timeline.push({
+				t: clock.now(),
+				action: { ship: actionSpec.ship, type: actionSpec.type, params: actionSpec.params },
+				result: detectionResult,
+				ships: snapshotAllShips(ships),
+			});
+			continue;
+		}
+
 		const action = engine.submitAction(
 			ship,
 			actionSpec.type as ActionType,
 			actionSpec.params ?? {},
 		);
-		const resolved = engine.advanceUntilIdle();
+		const allResolved = engine.advanceUntilIdle();
 
-		const finalAction = resolved[0] ?? action;
+		// Passive scans that fired during this action's resolution
+		for (const resolved of allResolved) {
+			if (resolved.type === ActionType.ScanPassive) {
+				timeline.push({
+					t: resolved.createdAt,
+					action: { ship: resolved.shipId, type: 'scan_passive' },
+					result: { ...resolved.result },
+					ships: snapshotAllShips(ships),
+				});
+			}
+		}
+
+		const finalAction = allResolved.find((a) => a.type !== ActionType.ScanPassive) ?? action;
 		resolvedActions.push(finalAction);
 
 		timeline.push({

@@ -70,6 +70,8 @@ export class Ship {
 			ammo: { ...this.state.ammo },
 			activeEquipment: [...this.state.activeEquipment],
 			pilot: { ...this.state.pilot },
+			passiveScanInterval: this.state.passiveScanInterval,
+			nextPassiveScanAt: this.state.nextPassiveScanAt,
 		};
 	}
 
@@ -108,8 +110,18 @@ export class Ship {
 			shieldsFullAt: this.state.shieldsFullAt,
 			activeEquipment: [...this.state.activeEquipment],
 			pilot: { ...this.state.pilot },
+			passiveScanInterval: this.state.passiveScanInterval,
+			nextPassiveScanAt: this.state.nextPassiveScanAt,
 		});
 		return new Ship(clonedState, clock, rng, this.constants);
+	}
+
+	scheduleNextPassiveScan(completedAt: number): void {
+		this.state.nextPassiveScanAt = completedAt + this.state.passiveScanInterval;
+	}
+
+	getNextPassiveScanAt(): number {
+		return this.state.nextPassiveScanAt;
 	}
 
 	consumePower(amount: number): void {

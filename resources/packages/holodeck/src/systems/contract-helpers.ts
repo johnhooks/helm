@@ -40,7 +40,7 @@ export interface FixtureCase {
 	now?: number;
 	distance?: number;
 	skip_ts?: boolean;
-	expected: Record<string, number>;
+	expected: Record<string, number | undefined>;
 }
 
 export function loadoutFromFixture(fixture: FixtureCase): Loadout {
@@ -73,6 +73,8 @@ export function stateFromFixture(fixture: FixtureCase): InternalShipState {
 		ammo: {},
 		activeEquipment: new Set(),
 		pilot: { ...DEFAULT_PILOT_SKILLS },
+		passiveScanInterval: 300,
+		nextPassiveScanAt: 300,
 	};
 }
 

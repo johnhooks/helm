@@ -413,7 +413,7 @@ describe('scenario runner', () => {
 		expect(actions).toHaveLength(4);
 
 		// All 4 torpedoes fired, ammo should be 0
-		const finalAmmo = timeline[4].ships.wolf.ammo.torpedo_launcher ?? 0;
+		const finalAmmo = timeline.at(-1)!.ships.wolf.ammo.torpedo_launcher ?? 0;
 		expect(finalAmmo).toBe(0);
 	});
 
@@ -428,5 +428,97 @@ describe('scenario runner', () => {
 		};
 
 		expect(() => runScenario(scenario)).toThrow('Unknown ship: ghost');
+	});
+
+	describe('passive scan actions', () => {
+		it('scan_passive returns detections in timeline', () => {
+			const scenario: ScenarioFile = {
+				name: 'detection query',
+				description: 'Damaged target emits shield_regen, listener detects',
+				ships: {
+					target: { ...baseShip },
+					listener: { ...baseShip, hull: 'surveyor', sensor: 'dsc_mk1', passive_scan_interval: 7200 },
+				},
+				actions: [
+					{ ship: 'target', type: 'absorb_damage', params: { amount: 30 } },
+					{ ship: 'listener', type: 'scan_passive' },
+				],
+			};
+
+			const { timeline } = runScenario(scenario);
+			// Initial + absorb_damage + passive scan = 3 entries
+			expect(timeline).toHaveLength(3);
+
+			const queryResult = timeline[2].result!;
+			expect(queryResult.detections).toBeDefined();
+			expect(queryResult.integration_seconds).toBe(7200);
+			expect(queryResult.noise_floor).toBeDefined();
+		});
+
+		it('scan_passive advances clock to nextPassiveScanAt when needed', () => {
+			const scenario: ScenarioFile = {
+				name: 'clock advance',
+				description: 'Passive scan waits for scheduled time',
+				ships: {
+					target: { ...baseShip },
+					listener: { ...baseShip, hull: 'surveyor', sensor: 'dsc_mk1' },
+				},
+				actions: [
+					{ ship: 'target', type: 'absorb_damage', params: { amount: 30 } },
+					{ ship: 'listener', type: 'scan_passive' },
+				],
+			};
+
+			const { timeline } = runScenario(scenario);
+			// absorb_damage is instant (t=0), so clock advances to nextPassiveScanAt (300)
+			expect(timeline[2].t).toBeGreaterThanOrEqual(300);
+		});
+
+		it('ECM prevents passive detection in scenario', () => {
+			const scenario: ScenarioFile = {
+				name: 'ecm impact',
+				description: 'ECM drowns out faint signals',
+				ships: {
+					target: { ...baseShip },
+					jammer: { ...baseShip, equipment: ['ecm_mk1'] },
+					listener: { ...baseShip, hull: 'surveyor', sensor: 'dsc_mk1', passive_scan_interval: 7200 },
+				},
+				actions: [
+					{ ship: 'target', type: 'absorb_damage', params: { amount: 30 } },
+					{ ship: 'listener', type: 'scan_passive' },
+					{ ship: 'jammer', type: 'activate_equipment', params: { equipment_slug: 'ecm_mk1' } },
+					{ ship: 'listener', type: 'scan_passive' },
+				],
+			};
+
+			const { timeline } = runScenario(scenario);
+			const beforeEcm = timeline[2].result!;
+			const afterEcm = timeline[4].result!;
+
+			// Before ECM: shield_regen detected
+			expect((beforeEcm.detections as unknown[]).length).toBeGreaterThan(0);
+
+			// After ECM: signal drowned out, no detections
+			expect((afterEcm.detections as unknown[]).length).toBe(0);
+		});
+
+		it('absorb_damage creates shield regen emission detectable by listener', () => {
+			const scenario: ScenarioFile = {
+				name: 'shield regen detection',
+				description: 'Damaged ship emits shield_regen, listener detects',
+				ships: {
+					target: { ...baseShip },
+					listener: { ...baseShip, hull: 'surveyor', sensor: 'dsc_mk1', passive_scan_interval: 7200 },
+				},
+				actions: [
+					{ ship: 'target', type: 'absorb_damage', params: { amount: 30 } },
+					{ ship: 'listener', type: 'scan_passive' },
+				],
+			};
+
+			const { timeline } = runScenario(scenario);
+			const queryResult = timeline[2].result!;
+			expect((queryResult.source_count as number)).toBeGreaterThan(0);
+		});
 	});
 });

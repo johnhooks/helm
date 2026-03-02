@@ -12,6 +12,7 @@ export const ActionType = {
 	Upgrade: 'upgrade',
 	FirePhaser: 'fire_phaser',
 	FireTorpedo: 'fire_torpedo',
+	ScanPassive: 'scan_passive',
 } as const;
 
 export type ActionType = (typeof ActionType)[keyof typeof ActionType];
@@ -47,6 +48,7 @@ const ACTION_LABELS: Record<ActionType, string> = {
 	upgrade: 'Upgrade',
 	fire_phaser: 'Fire Phaser',
 	fire_torpedo: 'Fire Torpedo',
+	scan_passive: 'Passive Scan',
 };
 
 export function actionLabel(type: ActionType): string {

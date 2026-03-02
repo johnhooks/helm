@@ -18,6 +18,8 @@ export interface InternalShipState {
 	ammo: Record<string, number>;
 	activeEquipment: Set<string>;
 	pilot: PilotSkills;
+	passiveScanInterval: number;
+	nextPassiveScanAt: number;
 }
 
 export interface InternalStateConfig {
@@ -32,6 +34,8 @@ export interface InternalStateConfig {
 	shieldsFullAt?: number | null;
 	activeEquipment?: string[];
 	pilot?: Partial<PilotSkills>;
+	passiveScanInterval?: number;
+	nextPassiveScanAt?: number;
 }
 
 export function createInternalState(
@@ -62,5 +66,7 @@ export function createInternalState(
 		ammo: config?.ammo ? { ...config.ammo } : {},
 		activeEquipment: new Set(config?.activeEquipment ?? []),
 		pilot: { ...DEFAULT_PILOT_SKILLS, ...config?.pilot },
+		passiveScanInterval: config?.passiveScanInterval ?? 300,
+		nextPassiveScanAt: config?.nextPassiveScanAt ?? (config?.passiveScanInterval ?? 300),
 	};
 }

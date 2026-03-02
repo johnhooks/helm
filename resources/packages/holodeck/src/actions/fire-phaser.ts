@@ -2,6 +2,7 @@ import {
 	phaserDraw, phaserShieldDrain, phaserHullDamage,
 	ecmLockDegradation,
 	DEFAULT_DSP_CONSTANTS,
+	emissionPower, DEFAULT_EMISSION_PROFILES,
 } from '@helm/formulas';
 import type { Ship } from '../ship';
 import type { CatalogProduct } from '../types/catalog';
@@ -92,6 +93,11 @@ export const firePhaserHandler: ActionHandler = {
 				duration,
 				ecm_degradation: ecmDegradation,
 			},
+			emissions: [{
+				emissionType: 'weapons_fire',
+				spectralType: DEFAULT_EMISSION_PROFILES.weapons_fire.spectralType,
+				basePower: emissionPower('weapons_fire'),
+			}],
 		};
 	},
 

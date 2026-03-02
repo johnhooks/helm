@@ -1,0 +1,37 @@
+{
+	"name": "Drive Spool Detection",
+	"description": "Detect drive spool during jump. Listener at origin with 30s passive scan interval catches spool emission as jumper departs.",
+	"ships": {
+		"jumper": {
+			"hull": "pioneer",
+			"core": "epoch_s",
+			"drive": "dr_705",
+			"sensor": "vrs_mk1",
+			"shield": "aegis_delta",
+			"nav": "nav_tier_3",
+			"node": 1
+		},
+		"listener": {
+			"hull": "surveyor",
+			"core": "epoch_s",
+			"drive": "dr_305",
+			"sensor": "dsc_mk1",
+			"shield": "aegis_delta",
+			"nav": "nav_tier_3",
+			"node": 1,
+			"passive_scan_interval": 30
+		}
+	},
+	"actions": [
+		{
+			"ship": "jumper",
+			"type": "scan_route",
+			"params": { "target_node_id": 2, "distance": 2 }
+		},
+		{
+			"ship": "jumper",
+			"type": "jump",
+			"params": { "target_node_id": 2 }
+		}
+	]
+}
