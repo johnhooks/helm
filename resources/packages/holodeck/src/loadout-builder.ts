@@ -28,6 +28,19 @@ function resolve(type: ComponentType, slug: string): CatalogProduct {
 	return product;
 }
 
+const EQUIPMENT_TYPES = new Set(['equipment', 'weapon', 'cloak']);
+
+function resolveEquipment(slug: string): CatalogProduct {
+	const product = getProduct(slug);
+	if (!product) {
+		throw new Error(`Unknown equipment "${slug}"`);
+	}
+	if (!EQUIPMENT_TYPES.has(product.type)) {
+		throw new Error(`Product "${slug}" is type "${product.type}", expected equipment/weapon/cloak`);
+	}
+	return product;
+}
+
 /**
  * Build a holodeck Loadout from catalog slugs.
  *
@@ -53,6 +66,6 @@ export function buildLoadout(
 		sensor: toComponent(resolve('sensor', slugs.sensor), 'sensor'),
 		shield: toComponent(resolve('shield', slugs.shield), 'shield'),
 		nav: toComponent(resolve('nav', slugs.nav), 'nav'),
-		equipment: (equipmentSlugs ?? []).map((slug, i) => toComponent(resolve('equipment', slug), `equip_${i + 1}`)),
+		equipment: (equipmentSlugs ?? []).map((slug, i) => toComponent(resolveEquipment(slug), `equip_${i + 1}`)),
 	};
 }

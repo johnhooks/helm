@@ -15,6 +15,7 @@ export interface ShipConfig {
 	coreLife?: number;
 	powerFullAt?: number | null;
 	shieldsFullAt?: number | null;
+	activeEquipment?: string[];
 	pilot?: Partial<PilotSkills>;
 }
 

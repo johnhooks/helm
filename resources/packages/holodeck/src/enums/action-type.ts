@@ -10,6 +10,8 @@ export const ActionType = {
 	Transfer: 'transfer',
 	Repair: 'repair',
 	Upgrade: 'upgrade',
+	FirePhaser: 'fire_phaser',
+	FireTorpedo: 'fire_torpedo',
 } as const;
 
 export type ActionType = (typeof ActionType)[keyof typeof ActionType];
@@ -23,6 +25,8 @@ const TIME_ACTIONS: ReadonlySet<ActionType> = new Set([
 	ActionType.Refine,
 	ActionType.Repair,
 	ActionType.Upgrade,
+	ActionType.FirePhaser,
+	ActionType.FireTorpedo,
 ]);
 
 export function actionRequiresTime(type: ActionType): boolean {
@@ -41,6 +45,8 @@ const ACTION_LABELS: Record<ActionType, string> = {
 	transfer: 'Transfer',
 	repair: 'Repair',
 	upgrade: 'Upgrade',
+	fire_phaser: 'Fire Phaser',
+	fire_torpedo: 'Fire Torpedo',
 };
 
 export function actionLabel(type: ActionType): string {

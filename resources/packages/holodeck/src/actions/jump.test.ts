@@ -4,9 +4,12 @@ import { createClock } from '../clock';
 import { createRng } from '../rng';
 import { ActionType } from '../enums/action-type';
 import { ActionError, ActionErrorCode } from './types';
+import type { ActionContext } from './types';
 import { jumpHandler } from './jump';
 import { registerHandler } from './registry';
 import { makeLoadout } from '../test-helpers';
+
+const ctx: ActionContext = { getShip: () => undefined };
 
 beforeEach(() => {
 	registerHandler(ActionType.Jump, jumpHandler);
@@ -24,11 +27,11 @@ describe('Jump Handler', () => {
 	describe('validate', () => {
 		it('rejects when ship has no position', () => {
 			const { ship } = setup({ nodeId: null });
-			expect(() => jumpHandler.validate(ship, { target_node_id: 2, distance: 1 }))
+			expect(() => jumpHandler.validate(ship, { target_node_id: 2, distance: 1 }, ctx))
 				.toThrow(ActionError);
 
 			try {
-				jumpHandler.validate(ship, { target_node_id: 2, distance: 1 });
+				jumpHandler.validate(ship, { target_node_id: 2, distance: 1 }, ctx);
 			} catch (e) {
 				expect(e).toBeInstanceOf(ActionError);
 				expect((e as ActionError).code).toBe(ActionErrorCode.ShipNoPosition);
@@ -37,11 +40,11 @@ describe('Jump Handler', () => {
 
 		it('rejects when already at target', () => {
 			const { ship } = setup();
-			expect(() => jumpHandler.validate(ship, { target_node_id: 1, distance: 1 }))
+			expect(() => jumpHandler.validate(ship, { target_node_id: 1, distance: 1 }, ctx))
 				.toThrow(ActionError);
 
 			try {
-				jumpHandler.validate(ship, { target_node_id: 1, distance: 1 });
+				jumpHandler.validate(ship, { target_node_id: 1, distance: 1 }, ctx);
 			} catch (e) {
 				expect((e as ActionError).code).toBe(ActionErrorCode.NavigationAlreadyAtTarget);
 			}
@@ -49,11 +52,11 @@ describe('Jump Handler', () => {
 
 		it('rejects when missing target and distance', () => {
 			const { ship } = setup();
-			expect(() => jumpHandler.validate(ship, {}))
+			expect(() => jumpHandler.validate(ship, {}, ctx))
 				.toThrow(ActionError);
 
 			try {
-				jumpHandler.validate(ship, {});
+				jumpHandler.validate(ship, {}, ctx);
 			} catch (e) {
 				expect((e as ActionError).code).toBe(ActionErrorCode.NavigationMissingTarget);
 			}
@@ -62,11 +65,11 @@ describe('Jump Handler', () => {
 		it('rejects when insufficient core life', () => {
 			const { ship } = setup({ coreLife: 0.001 });
 			expect(() =>
-				jumpHandler.validate(ship, { target_node_id: 2, distance: 10 }),
+				jumpHandler.validate(ship, { target_node_id: 2, distance: 10 }, ctx),
 			).toThrow(ActionError);
 
 			try {
-				jumpHandler.validate(ship, { target_node_id: 2, distance: 10 });
+				jumpHandler.validate(ship, { target_node_id: 2, distance: 10 }, ctx);
 			} catch (e) {
 				expect((e as ActionError).code).toBe(ActionErrorCode.ShipInsufficientCore);
 			}
@@ -75,7 +78,7 @@ describe('Jump Handler', () => {
 		it('passes with valid params', () => {
 			const { ship } = setup();
 			expect(() =>
-				jumpHandler.validate(ship, { target_node_id: 2, distance: 1 }),
+				jumpHandler.validate(ship, { target_node_id: 2, distance: 1 }, ctx),
 			).not.toThrow();
 		});
 	});
@@ -87,6 +90,7 @@ describe('Jump Handler', () => {
 				ship,
 				{ target_node_id: 2, distance: 3 },
 				0,
+				ctx,
 			);
 
 			const expectedDuration = ship.propulsion.getJumpDuration(3, 1.0);
@@ -100,6 +104,7 @@ describe('Jump Handler', () => {
 				ship,
 				{ target_node_id: 2, distance: 3, throttle: 0.8 },
 				0,
+				ctx,
 			);
 
 			const expectedCoreCost = ship.propulsion.getJumpCoreCost(3, 0.8);
@@ -115,6 +120,7 @@ describe('Jump Handler', () => {
 				ship,
 				{ target_node_id: 42, distance: 2 },
 				100,
+				ctx,
 			);
 
 			expect(intent.result.from_node_id).toBe(1);
@@ -128,11 +134,13 @@ describe('Jump Handler', () => {
 				ship,
 				{ target_node_id: 2, distance: 3, throttle: 1.0 },
 				0,
+				ctx,
 			);
 			const intentHalf = jumpHandler.handle(
 				ship,
 				{ target_node_id: 2, distance: 3, throttle: 0.5 },
 				0,
+				ctx,
 			);
 
 			// Lower throttle → longer duration, lower core cost
@@ -154,6 +162,7 @@ describe('Jump Handler', () => {
 				ship,
 				{ target_node_id: 42, distance: 2 },
 				0,
+				ctx,
 			);
 
 			const action = {
@@ -167,7 +176,7 @@ describe('Jump Handler', () => {
 				result: { ...intent.result },
 			};
 
-			const outcome = jumpHandler.resolve(ship, action);
+			const outcome = jumpHandler.resolve(ship, action, ctx);
 
 			expect(outcome.status).toBe('fulfilled');
 			const stateAfter = ship.resolve();

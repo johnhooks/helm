@@ -68,8 +68,31 @@ export class Ship {
 			nodeId: this.navigation.getCurrentPosition(),
 			cargo: { ...this.state.cargo },
 			ammo: { ...this.state.ammo },
+			activeEquipment: [...this.state.activeEquipment],
 			pilot: { ...this.state.pilot },
 		};
+	}
+
+	activateEquipment(slug: string): void {
+		const hasInLoadout = this.state.loadout.equipment.some(
+			(eq) => eq.product.slug === slug,
+		);
+		if (!hasInLoadout) {
+			throw new Error(`Equipment "${slug}" not in loadout`);
+		}
+		this.state.activeEquipment.add(slug);
+	}
+
+	deactivateEquipment(slug: string): void {
+		this.state.activeEquipment.delete(slug);
+	}
+
+	isEquipmentActive(slug: string): boolean {
+		return this.state.activeEquipment.has(slug);
+	}
+
+	getActiveEquipment(): readonly string[] {
+		return [...this.state.activeEquipment];
 	}
 
 	createClone(clock: Clock, rng: Rng): Ship {
@@ -83,6 +106,7 @@ export class Ship {
 			coreLife: this.state.coreLife,
 			powerFullAt: this.state.powerFullAt,
 			shieldsFullAt: this.state.shieldsFullAt,
+			activeEquipment: [...this.state.activeEquipment],
 			pilot: { ...this.state.pilot },
 		});
 		return new Ship(clonedState, clock, rng, this.constants);

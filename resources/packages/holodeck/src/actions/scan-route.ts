@@ -1,10 +1,10 @@
 import type { Ship } from '../ship';
-import type { Action, ActionHandler, ActionIntent, ActionOutcome } from './types';
+import type { Action, ActionContext, ActionHandler, ActionIntent, ActionOutcome } from './types';
 import { ActionError, ActionErrorCode } from './types';
 import { ActionStatus } from '../enums/action-status';
 
 export const scanRouteHandler: ActionHandler = {
-	validate(ship: Ship, params: Record<string, unknown>): void {
+	validate(ship: Ship, params: Record<string, unknown>, _context: ActionContext): void {
 		const state = ship.resolve();
 
 		if (state.nodeId === null) {
@@ -33,6 +33,7 @@ export const scanRouteHandler: ActionHandler = {
 		ship: Ship,
 		params: Record<string, unknown>,
 		now: number,
+		_context: ActionContext,
 	): ActionIntent {
 		const state = ship.resolve();
 		const distance = (params.distance as number) ?? 1;
@@ -56,7 +57,7 @@ export const scanRouteHandler: ActionHandler = {
 		};
 	},
 
-	resolve(ship: Ship, action: Action): ActionOutcome {
+	resolve(ship: Ship, action: Action, _context: ActionContext): ActionOutcome {
 		const powerCost = action.result.power_cost as number;
 		const successChance = action.result.success_chance as number;
 

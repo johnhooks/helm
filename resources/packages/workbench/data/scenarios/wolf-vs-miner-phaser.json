@@ -9,7 +9,8 @@
       "sensor": "vrs_mk1",
       "shield": "aegis_delta",
       "nav": "nav_tier_3",
-      "equipment": ["phaser_array"]
+      "equipment": ["phaser_array"],
+      "node": 1
     },
     "miner": {
       "hull": "pioneer",
@@ -18,13 +19,14 @@
       "sensor": "vrs_mk1",
       "shield": "aegis_delta",
       "nav": "nav_tier_3",
-      "equipment": ["mining_laser"]
+      "equipment": ["mining_laser"],
+      "node": 1
     }
   },
   "actions": [
-    { "t": 0, "ship": "wolf", "type": "fire_phaser", "params": { "target": "miner", "duration": 3600 } },
-    { "t": 3600, "ship": "wolf", "type": "fire_phaser", "params": { "target": "miner", "duration": 3600 } },
-    { "t": 7200, "ship": "wolf", "type": "fire_phaser", "params": { "target": "miner", "duration": 3600 } },
-    { "t": 10800, "ship": "wolf", "type": "fire_phaser", "params": { "target": "miner", "duration": 3600 } }
+    { "ship": "wolf", "type": "fire_phaser", "params": { "target_ship_id": "miner", "duration": 3600 } },
+    { "ship": "wolf", "type": "fire_phaser", "params": { "target_ship_id": "miner", "duration": 3600 } },
+    { "ship": "wolf", "type": "fire_phaser", "params": { "target_ship_id": "miner", "duration": 3600 } },
+    { "ship": "wolf", "type": "fire_phaser", "params": { "target_ship_id": "miner", "duration": 3600 } }
   ]
 }

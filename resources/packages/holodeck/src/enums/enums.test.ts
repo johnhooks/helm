@@ -13,8 +13,8 @@ import {
 } from '../index';
 
 describe('ActionType', () => {
-	it('has 11 types', () => {
-		expect(Object.values(ActionType)).toHaveLength(11);
+	it('has 13 types', () => {
+		expect(Object.values(ActionType)).toHaveLength(13);
 	});
 
 	it('values match PHP string backing', () => {

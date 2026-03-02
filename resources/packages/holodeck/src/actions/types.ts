@@ -31,14 +31,19 @@ export interface ActionPreview {
 	projectedState?: ShipState;
 }
 
+export interface ActionContext {
+	getShip: (id: string) => Ship | undefined;
+}
+
 export interface ActionHandler {
-	validate: (ship: Ship, params: Record<string, unknown>) => void;
+	validate: (ship: Ship, params: Record<string, unknown>, context: ActionContext) => void;
 	handle: (
 		ship: Ship,
 		params: Record<string, unknown>,
 		now: number,
+		context: ActionContext,
 	) => ActionIntent;
-	resolve: (ship: Ship, action: Action) => ActionOutcome;
+	resolve: (ship: Ship, action: Action, context: ActionContext) => ActionOutcome;
 }
 
 export const ActionErrorCode = {
@@ -50,6 +55,10 @@ export const ActionErrorCode = {
 	ActionInProgress: 'action.in_progress',
 	ActionMissingParam: 'action.missing_param',
 	ActionNoHandler: 'action.no_handler',
+	TargetNotFound: 'target.not_found',
+	TargetDestroyed: 'target.destroyed',
+	ShipMissingEquipment: 'ship.missing_equipment',
+	ShipInsufficientAmmo: 'ship.insufficient_ammo',
 } as const;
 
 export type ActionErrorCode =

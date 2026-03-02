@@ -9,7 +9,8 @@
       "sensor": "vrs_mk1",
       "shield": "aegis_delta",
       "nav": "nav_tier_3",
-      "equipment": ["phaser_array"]
+      "equipment": ["phaser_array"],
+      "node": 1
     },
     "specter": {
       "hull": "specter",
@@ -18,7 +19,8 @@
       "sensor": "vrs_mk1",
       "shield": "aegis_delta",
       "nav": "nav_tier_3",
-      "equipment": ["torpedo_launcher", "veil_array"]
+      "equipment": ["torpedo_launcher"],
+      "node": 1
     },
     "pioneer": {
       "hull": "pioneer",
@@ -27,7 +29,8 @@
       "sensor": "vrs_mk1",
       "shield": "aegis_delta",
       "nav": "nav_tier_3",
-      "equipment": ["mining_laser", "pds_mk1"]
+      "equipment": ["mining_laser", "pds_mk1"],
+      "node": 1
     },
     "bulwark": {
       "hull": "bulwark",
@@ -36,17 +39,18 @@
       "sensor": "vrs_mk1",
       "shield": "aegis_delta",
       "nav": "nav_tier_3",
-      "equipment": ["ecm_mk1"]
+      "equipment": ["ecm_mk1"],
+      "node": 1
     }
   },
   "actions": [
-    { "t": 0, "ship": "pioneer", "type": "activate_pds" },
-    { "t": 0, "ship": "bulwark", "type": "activate_ecm" },
-    { "t": 60, "ship": "striker", "type": "fire_phaser", "params": { "target": "pioneer", "duration": 3600 } },
-    { "t": 120, "ship": "specter", "type": "fire_torpedo", "params": { "target": "pioneer" } },
-    { "t": 420, "ship": "specter", "type": "fire_torpedo", "params": { "target": "pioneer" } },
-    { "t": 3600, "ship": "striker", "type": "fire_phaser", "params": { "target": "bulwark", "duration": 3600 } },
-    { "t": 3660, "ship": "specter", "type": "fire_torpedo", "params": { "target": "bulwark" } },
-    { "t": 3960, "ship": "specter", "type": "fire_torpedo", "params": { "target": "bulwark" } }
+    { "ship": "pioneer", "type": "activate_equipment", "params": { "equipment_slug": "pds_mk1" } },
+    { "ship": "bulwark", "type": "activate_equipment", "params": { "equipment_slug": "ecm_mk1" } },
+    { "ship": "striker", "type": "fire_phaser", "params": { "target_ship_id": "pioneer", "duration": 3600 } },
+    { "ship": "specter", "type": "fire_torpedo", "params": { "target_ship_id": "pioneer" } },
+    { "ship": "specter", "type": "fire_torpedo", "params": { "target_ship_id": "pioneer" } },
+    { "ship": "striker", "type": "fire_phaser", "params": { "target_ship_id": "bulwark", "duration": 3600 } },
+    { "ship": "specter", "type": "fire_torpedo", "params": { "target_ship_id": "bulwark" } },
+    { "ship": "specter", "type": "fire_torpedo", "params": { "target_ship_id": "bulwark" } }
   ]
 }

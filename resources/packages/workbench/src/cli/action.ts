@@ -14,6 +14,8 @@ import {
 	ActionType,
 	jumpHandler,
 	scanRouteHandler,
+	firePhaserHandler,
+	fireTorpedoHandler,
 } from '@helm/holodeck';
 import type { ParsedFlags } from './parse';
 import { hydrateLoadout, loadoutSlugs, resolvePilot } from './parse';
@@ -51,6 +53,8 @@ export function action({ flags }: ParsedFlags): void {
 	// Register handlers
 	registerHandler(ActionType.Jump, jumpHandler);
 	registerHandler(ActionType.ScanRoute, scanRouteHandler);
+	registerHandler(ActionType.FirePhaser, firePhaserHandler);
+	registerHandler(ActionType.FireTorpedo, fireTorpedoHandler);
 
 	// Build ship
 	const loadout = hydrateLoadout(flags);

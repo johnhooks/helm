@@ -2,10 +2,25 @@ import { describe, it, expect } from 'vitest';
 import { createShip } from './factory';
 import { createClock } from './clock';
 import { createRng } from './rng';
-import { makeLoadout } from './test-helpers';
+import { makeLoadout, makeProduct, makeComponent } from './test-helpers';
 
 function setup(config?: Parameters<typeof createShip>[3]) {
 	const loadout = makeLoadout();
+	const clock = createClock();
+	const rng = createRng(42);
+	const ship = createShip(loadout, clock, rng, config);
+	return { ship, clock, loadout };
+}
+
+function setupWithEquipment(config?: Parameters<typeof createShip>[3]) {
+	const pds = makeProduct({ slug: 'pds_mk1', type: 'equipment', mult_a: 0.45 });
+	const ecm = makeProduct({ slug: 'ecm_mk1', type: 'equipment', mult_a: 0.3 });
+	const loadout = makeLoadout({
+		equipment: [
+			makeComponent(pds, 'equip_1'),
+			makeComponent(ecm, 'equip_2'),
+		],
+	});
 	const clock = createClock();
 	const rng = createRng(42);
 	const ship = createShip(loadout, clock, rng, config);
@@ -30,6 +45,7 @@ describe('Ship', () => {
 			expect(state.shieldPriority).toBe(1.0);
 			expect(state.cargo).toEqual({});
 			expect(state.ammo).toEqual({});
+			expect(state.activeEquipment).toEqual([]);
 			expect(state.pilot).toEqual({
 				scanning: 1.0,
 				jumping: 1.0,
@@ -209,6 +225,61 @@ describe('Ship', () => {
 			const { ship } = setup({ ammo: { torpedo: 1 } });
 			ship.consumeAmmo('torpedo');
 			expect(ship.resolve().ammo).toEqual({});
+		});
+	});
+
+	describe('equipment activation', () => {
+		it('activateEquipment adds to active set', () => {
+			const { ship } = setupWithEquipment();
+			ship.activateEquipment('pds_mk1');
+			expect(ship.isEquipmentActive('pds_mk1')).toBe(true);
+			expect(ship.isEquipmentActive('ecm_mk1')).toBe(false);
+			expect(ship.resolve().activeEquipment).toEqual(['pds_mk1']);
+		});
+
+		it('deactivateEquipment removes from active set', () => {
+			const { ship } = setupWithEquipment();
+			ship.activateEquipment('pds_mk1');
+			ship.activateEquipment('ecm_mk1');
+			ship.deactivateEquipment('pds_mk1');
+			expect(ship.isEquipmentActive('pds_mk1')).toBe(false);
+			expect(ship.isEquipmentActive('ecm_mk1')).toBe(true);
+			expect(ship.resolve().activeEquipment).toEqual(['ecm_mk1']);
+		});
+
+		it('activateEquipment throws for unknown slug', () => {
+			const { ship } = setupWithEquipment();
+			expect(() => ship.activateEquipment('nonexistent')).toThrow('Equipment "nonexistent" not in loadout');
+		});
+
+		it('getActiveEquipment returns current active list', () => {
+			const { ship } = setupWithEquipment();
+			expect(ship.getActiveEquipment()).toEqual([]);
+			ship.activateEquipment('pds_mk1');
+			ship.activateEquipment('ecm_mk1');
+			expect(ship.getActiveEquipment()).toEqual(['pds_mk1', 'ecm_mk1']);
+		});
+
+		it('resolve includes activeEquipment', () => {
+			const { ship } = setupWithEquipment();
+			expect(ship.resolve().activeEquipment).toEqual([]);
+			ship.activateEquipment('ecm_mk1');
+			expect(ship.resolve().activeEquipment).toEqual(['ecm_mk1']);
+		});
+
+		it('createClone preserves active equipment', () => {
+			const { ship } = setupWithEquipment();
+			ship.activateEquipment('pds_mk1');
+			const clone = ship.createClone(createClock(), createRng(0));
+			expect(clone.isEquipmentActive('pds_mk1')).toBe(true);
+			expect(clone.resolve().activeEquipment).toEqual(['pds_mk1']);
+		});
+
+		it('config activeEquipment initializes active set', () => {
+			const { ship } = setupWithEquipment({ activeEquipment: ['pds_mk1', 'ecm_mk1'] });
+			expect(ship.isEquipmentActive('pds_mk1')).toBe(true);
+			expect(ship.isEquipmentActive('ecm_mk1')).toBe(true);
+			expect(ship.resolve().activeEquipment).toEqual(['pds_mk1', 'ecm_mk1']);
 		});
 	});
 });

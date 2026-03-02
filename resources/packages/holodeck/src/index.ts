@@ -48,10 +48,12 @@ export { CargoSystem } from './systems/cargo';
 
 // Actions
 export { ActionError, ActionErrorCode } from './actions/types';
-export type { Action, ActionHandler, ActionIntent, ActionOutcome, ActionPreview } from './actions/types';
+export type { Action, ActionContext, ActionHandler, ActionIntent, ActionOutcome, ActionPreview } from './actions/types';
 export { registerHandler, getHandler } from './actions/registry';
 export { jumpHandler } from './actions/jump';
 export { scanRouteHandler } from './actions/scan-route';
+export { firePhaserHandler } from './actions/fire-phaser';
+export { fireTorpedoHandler } from './actions/fire-torpedo';
 
 // Engine
 export { Engine, createEngine } from './actions/engine';

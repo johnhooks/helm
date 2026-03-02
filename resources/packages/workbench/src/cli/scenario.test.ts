@@ -229,6 +229,176 @@ describe('scenario runner', () => {
 		expect(coreDrop3).toBeGreaterThan(0); // jump degrades
 	});
 
+	it('phaser attack drains target shields', () => {
+		const scenario: ScenarioFile = {
+			name: 'phaser test',
+			description: 'Phaser drains shields',
+			ships: {
+				wolf: {
+					hull: 'striker',
+					core: 'epoch_s',
+					drive: 'dr_505',
+					sensor: 'vrs_mk1',
+					shield: 'aegis_delta',
+					nav: 'nav_tier_3',
+					equipment: ['phaser_array'],
+					node: 1,
+				},
+				miner: { ...baseShip, node: 1 },
+			},
+			actions: [
+				{ ship: 'wolf', type: 'fire_phaser', params: { target_ship_id: 'miner', duration: 600 } },
+			],
+		};
+
+		const { timeline, actions } = runScenario(scenario);
+		expect(actions[0].status).toBe(ActionStatus.Fulfilled);
+
+		// Target shields should be drained
+		expect(timeline[1].ships.miner.shield).toBeLessThan(timeline[0].ships.miner.shield);
+	});
+
+	it('torpedo attack consumes ammo', () => {
+		const scenario: ScenarioFile = {
+			name: 'torpedo test',
+			description: 'Torpedo consumes ammo',
+			ships: {
+				wolf: {
+					hull: 'specter',
+					core: 'epoch_s',
+					drive: 'dr_505',
+					sensor: 'vrs_mk1',
+					shield: 'aegis_delta',
+					nav: 'nav_tier_3',
+					equipment: ['torpedo_launcher'],
+					node: 1,
+				},
+				miner: { ...baseShip, node: 1 },
+			},
+			actions: [
+				{ ship: 'wolf', type: 'fire_torpedo', params: { target_ship_id: 'miner' } },
+			],
+		};
+
+		const { timeline, actions } = runScenario(scenario);
+		expect(actions[0].status).toBe(ActionStatus.Fulfilled);
+
+		// Ammo consumed (torpedo_launcher capacity is 4, so should be 3 after firing)
+		const startAmmo = timeline[0].ships.wolf.ammo.torpedo_launcher ?? 0;
+		const endAmmo = timeline[1].ships.wolf.ammo.torpedo_launcher ?? 0;
+		expect(endAmmo).toBe(startAmmo - 1);
+	});
+
+	it('equipment activation shows in snapshot', () => {
+		const scenario: ScenarioFile = {
+			name: 'equipment test',
+			description: 'PDS activation appears in snapshot',
+			ships: {
+				miner: {
+					hull: 'pioneer',
+					core: 'epoch_s',
+					drive: 'dr_505',
+					sensor: 'vrs_mk1',
+					shield: 'aegis_delta',
+					nav: 'nav_tier_3',
+					equipment: ['mining_laser', 'pds_mk1'],
+					node: 1,
+				},
+			},
+			actions: [
+				{ ship: 'miner', type: 'activate_equipment', params: { equipment_slug: 'pds_mk1' } },
+			],
+		};
+
+		const { timeline } = runScenario(scenario);
+		expect(timeline).toHaveLength(2);
+
+		// No active equipment initially
+		expect(timeline[0].ships.miner.activeEquipment).toEqual([]);
+
+		// PDS active after activation
+		expect(timeline[1].ships.miner.activeEquipment).toContain('pds_mk1');
+	});
+
+	it('multi-ship combat scenario with equipment', () => {
+		const scenario: ScenarioFile = {
+			name: 'combat sequence',
+			description: 'ECM activation then phaser attack',
+			ships: {
+				wolf: {
+					hull: 'striker',
+					core: 'epoch_s',
+					drive: 'dr_505',
+					sensor: 'vrs_mk1',
+					shield: 'aegis_delta',
+					nav: 'nav_tier_3',
+					equipment: ['phaser_array'],
+					node: 1,
+				},
+				prey: {
+					hull: 'pioneer',
+					core: 'epoch_s',
+					drive: 'dr_505',
+					sensor: 'vrs_mk1',
+					shield: 'aegis_delta',
+					nav: 'nav_tier_3',
+					equipment: ['ecm_mk1', 'mining_laser'],
+					node: 1,
+				},
+			},
+			actions: [
+				{ ship: 'prey', type: 'activate_equipment', params: { equipment_slug: 'ecm_mk1' } },
+				{ ship: 'wolf', type: 'fire_phaser', params: { target_ship_id: 'prey', duration: 600 } },
+			],
+		};
+
+		const { timeline, actions } = runScenario(scenario);
+
+		// ECM activation is a mutation, not an engine action
+		// Only the phaser fire is in the actions array
+		expect(actions).toHaveLength(1);
+		expect(actions[0].status).toBe(ActionStatus.Fulfilled);
+
+		// ECM should reduce phaser drain (shields should be higher than without ECM)
+		expect(timeline[2].ships.prey.shield).toBeLessThan(timeline[0].ships.prey.shield);
+
+		// ECM is active
+		expect(timeline[1].ships.prey.activeEquipment).toContain('ecm_mk1');
+	});
+
+	it('sequential torpedo attacks deplete ammo', () => {
+		const scenario: ScenarioFile = {
+			name: 'ammo depletion',
+			description: 'Fire all torpedoes',
+			ships: {
+				wolf: {
+					hull: 'specter',
+					core: 'epoch_s',
+					drive: 'dr_505',
+					sensor: 'vrs_mk1',
+					shield: 'aegis_delta',
+					nav: 'nav_tier_3',
+					equipment: ['torpedo_launcher'],
+					node: 1,
+				},
+				miner: { ...baseShip, node: 1 },
+			},
+			actions: [
+				{ ship: 'wolf', type: 'fire_torpedo', params: { target_ship_id: 'miner' } },
+				{ ship: 'wolf', type: 'fire_torpedo', params: { target_ship_id: 'miner' } },
+				{ ship: 'wolf', type: 'fire_torpedo', params: { target_ship_id: 'miner' } },
+				{ ship: 'wolf', type: 'fire_torpedo', params: { target_ship_id: 'miner' } },
+			],
+		};
+
+		const { timeline, actions } = runScenario(scenario);
+		expect(actions).toHaveLength(4);
+
+		// All 4 torpedoes fired, ammo should be 0
+		const finalAmmo = timeline[4].ships.wolf.ammo.torpedo_launcher ?? 0;
+		expect(finalAmmo).toBe(0);
+	});
+
 	it('throws for unknown ship reference', () => {
 		const scenario: ScenarioFile = {
 			name: 'bad ref',

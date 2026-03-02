@@ -15,5 +15,6 @@ export interface ShipState {
 	nodeId: number | null;
 	cargo: Record<string, number>;
 	ammo: Record<string, number>;
+	activeEquipment: string[];
 	pilot: PilotSkills;
 }

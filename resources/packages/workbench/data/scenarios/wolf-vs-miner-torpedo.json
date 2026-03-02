@@ -9,7 +9,8 @@
       "sensor": "vrs_mk1",
       "shield": "aegis_delta",
       "nav": "nav_tier_3",
-      "equipment": ["torpedo_launcher"]
+      "equipment": ["torpedo_launcher"],
+      "node": 1
     },
     "miner": {
       "hull": "pioneer",
@@ -18,13 +19,14 @@
       "sensor": "vrs_mk1",
       "shield": "aegis_delta",
       "nav": "nav_tier_3",
-      "equipment": ["mining_laser"]
+      "equipment": ["mining_laser"],
+      "node": 1
     }
   },
   "actions": [
-    { "t": 0, "ship": "wolf", "type": "fire_torpedo", "params": { "target": "miner" } },
-    { "t": 300, "ship": "wolf", "type": "fire_torpedo", "params": { "target": "miner" } },
-    { "t": 600, "ship": "wolf", "type": "fire_torpedo", "params": { "target": "miner" } },
-    { "t": 900, "ship": "wolf", "type": "fire_torpedo", "params": { "target": "miner" } }
+    { "ship": "wolf", "type": "fire_torpedo", "params": { "target_ship_id": "miner" } },
+    { "ship": "wolf", "type": "fire_torpedo", "params": { "target_ship_id": "miner" } },
+    { "ship": "wolf", "type": "fire_torpedo", "params": { "target_ship_id": "miner" } },
+    { "ship": "wolf", "type": "fire_torpedo", "params": { "target_ship_id": "miner" } }
   ]
 }

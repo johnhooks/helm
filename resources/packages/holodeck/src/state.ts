@@ -16,6 +16,7 @@ export interface InternalShipState {
 	nodeId: number | null;
 	cargo: Record<string, number>;
 	ammo: Record<string, number>;
+	activeEquipment: Set<string>;
 	pilot: PilotSkills;
 }
 
@@ -29,6 +30,7 @@ export interface InternalStateConfig {
 	coreLife?: number;
 	powerFullAt?: number | null;
 	shieldsFullAt?: number | null;
+	activeEquipment?: string[];
 	pilot?: Partial<PilotSkills>;
 }
 
@@ -58,6 +60,7 @@ export function createInternalState(
 		nodeId: config?.nodeId ?? null,
 		cargo: config?.cargo ? { ...config.cargo } : {},
 		ammo: config?.ammo ? { ...config.ammo } : {},
+		activeEquipment: new Set(config?.activeEquipment ?? []),
 		pilot: { ...DEFAULT_PILOT_SKILLS, ...config?.pilot },
 	};
 }

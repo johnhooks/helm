@@ -8,8 +8,6 @@ import { dsp } from './cli/dsp';
 import { dspProgress } from './cli/dsp-progress';
 import { dspTiers } from './cli/dsp-tiers';
 import { balance } from './cli/balance';
-import { simulateCommand } from './cli/simulate';
-import { combat } from './cli/combat';
 import { detection } from './cli/detection';
 import { ship } from './cli/ship';
 import { timeline } from './cli/timeline';
@@ -56,14 +54,6 @@ switch (command) {
 		balance(parsed);
 		break;
 
-	case 'simulate':
-		simulateCommand(parsed);
-		break;
-
-	case 'combat':
-		combat(parsed);
-		break;
-
 	case 'detection':
 		detection();
 		break;
@@ -98,8 +88,6 @@ switch (command) {
 		console.error('  dsp-progress                  DSP gameplay progress assessment'); // eslint-disable-line no-console
 		console.error('  dsp-tiers                     Information tier exploration'); // eslint-disable-line no-console
 		console.error('  balance [--vary=core,drive]   All hulls × loadout matrix'); // eslint-disable-line no-console
-		console.error('  simulate <scenario.json>      Run simulation scenario'); // eslint-disable-line no-console
-		console.error('  combat [--attacker=X ...]     Quick combat scenario'); // eslint-disable-line no-console
 		console.error('  detection                     Wolf × target detection matrix'); // eslint-disable-line no-console
 		console.error('  ship [--hull=X --core=Y ...]  Holodeck ship state snapshot'); // eslint-disable-line no-console
 		console.error('  timeline [--file=X]           Ship mutation timeline'); // eslint-disable-line no-console

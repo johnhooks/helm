@@ -4,19 +4,28 @@ import { createRng } from '../rng';
 import { ActionStatus } from '../enums/action-status';
 import type { ActionType } from '../enums/action-type';
 import type { Ship } from '../ship';
-import type { Action, ActionPreview } from './types';
+import type { Action, ActionContext, ActionPreview } from './types';
 import { ActionError, ActionErrorCode } from './types';
 import { getHandler } from './registry';
 
-export class Engine {
+export class Engine implements ActionContext {
 	readonly clock: Clock;
 	private readonly actions: Action[] = [];
 	private readonly currentActionByShip = new Map<string, number>();
 	private readonly shipsByAction = new Map<number, Ship>();
+	private readonly shipRegistry = new Map<string, Ship>();
 	private nextActionId = 1;
 
 	constructor(clock: Clock) {
 		this.clock = clock;
+	}
+
+	registerShip(id: string, ship: Ship): void {
+		this.shipRegistry.set(id, ship);
+	}
+
+	getShip(id: string): Ship | undefined {
+		return this.shipRegistry.get(id);
 	}
 
 	submitAction(
@@ -25,6 +34,11 @@ export class Engine {
 		params: Record<string, unknown> = {},
 	): Action {
 		const shipId = ship.resolve().id;
+
+		// Auto-register ship if not already registered
+		if (!this.shipRegistry.has(shipId)) {
+			this.shipRegistry.set(shipId, ship);
+		}
 
 		if (this.currentActionByShip.has(shipId)) {
 			throw new ActionError(
@@ -41,10 +55,10 @@ export class Engine {
 			);
 		}
 
-		handler.validate(ship, params);
+		handler.validate(ship, params, this);
 
 		const now = this.clock.now();
-		const intent = handler.handle(ship, params, now);
+		const intent = handler.handle(ship, params, now, this);
 
 		const action: Action = {
 			id: this.nextActionId++,
@@ -61,7 +75,7 @@ export class Engine {
 		this.shipsByAction.set(action.id, ship);
 
 		if (intent.deferredUntil === null) {
-			const outcome = handler.resolve(ship, action);
+			const outcome = handler.resolve(ship, action, this);
 			action.status = outcome.status;
 			Object.assign(action.result, outcome.result);
 		} else {
@@ -119,7 +133,7 @@ export class Engine {
 		const clone = ship.createClone(clonedClock, clonedRng);
 
 		try {
-			handler.validate(clone, params);
+			handler.validate(clone, params, this);
 		} catch (e) {
 			if (e instanceof ActionError) {
 				return { valid: false, error: e.message };
@@ -128,7 +142,7 @@ export class Engine {
 		}
 
 		const now = clonedClock.now();
-		const intent = handler.handle(clone, params, now);
+		const intent = handler.handle(clone, params, now, this);
 
 		const tempAction: Action = {
 			id: 0,
@@ -145,7 +159,7 @@ export class Engine {
 			clonedClock.advanceTo(intent.deferredUntil);
 		}
 
-		handler.resolve(clone, tempAction);
+		handler.resolve(clone, tempAction, this);
 
 		return {
 			valid: true,
@@ -195,7 +209,7 @@ export class Engine {
 				continue;
 			}
 
-			const outcome = handler.resolve(ship, action);
+			const outcome = handler.resolve(ship, action, this);
 			action.status = outcome.status;
 			Object.assign(action.result, outcome.result);
 

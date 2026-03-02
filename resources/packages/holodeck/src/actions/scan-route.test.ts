@@ -4,9 +4,12 @@ import { createClock } from '../clock';
 import { createRng } from '../rng';
 import { ActionType } from '../enums/action-type';
 import { ActionError, ActionErrorCode } from './types';
+import type { ActionContext } from './types';
 import { scanRouteHandler } from './scan-route';
 import { registerHandler } from './registry';
 import { makeLoadout } from '../test-helpers';
+
+const ctx: ActionContext = { getShip: () => undefined };
 
 beforeEach(() => {
 	registerHandler(ActionType.ScanRoute, scanRouteHandler);
@@ -25,11 +28,11 @@ describe('ScanRoute Handler', () => {
 		it('rejects when ship has no position', () => {
 			const { ship } = setup({ nodeId: null });
 			expect(() =>
-				scanRouteHandler.validate(ship, { target_node_id: 2 }),
+				scanRouteHandler.validate(ship, { target_node_id: 2 }, ctx),
 			).toThrow(ActionError);
 
 			try {
-				scanRouteHandler.validate(ship, { target_node_id: 2 });
+				scanRouteHandler.validate(ship, { target_node_id: 2 }, ctx);
 			} catch (e) {
 				expect((e as ActionError).code).toBe(ActionErrorCode.ShipNoPosition);
 			}
@@ -38,11 +41,11 @@ describe('ScanRoute Handler', () => {
 		it('rejects when already at target', () => {
 			const { ship } = setup();
 			expect(() =>
-				scanRouteHandler.validate(ship, { target_node_id: 1 }),
+				scanRouteHandler.validate(ship, { target_node_id: 1 }, ctx),
 			).toThrow(ActionError);
 
 			try {
-				scanRouteHandler.validate(ship, { target_node_id: 1 });
+				scanRouteHandler.validate(ship, { target_node_id: 1 }, ctx);
 			} catch (e) {
 				expect((e as ActionError).code).toBe(
 					ActionErrorCode.NavigationAlreadyAtTarget,
@@ -52,10 +55,10 @@ describe('ScanRoute Handler', () => {
 
 		it('rejects when missing target_node_id', () => {
 			const { ship } = setup();
-			expect(() => scanRouteHandler.validate(ship, {})).toThrow(ActionError);
+			expect(() => scanRouteHandler.validate(ship, {}, ctx)).toThrow(ActionError);
 
 			try {
-				scanRouteHandler.validate(ship, {});
+				scanRouteHandler.validate(ship, {}, ctx);
 			} catch (e) {
 				expect((e as ActionError).code).toBe(
 					ActionErrorCode.NavigationMissingTarget,
@@ -66,7 +69,7 @@ describe('ScanRoute Handler', () => {
 		it('passes with valid params', () => {
 			const { ship } = setup();
 			expect(() =>
-				scanRouteHandler.validate(ship, { target_node_id: 2, distance: 1 }),
+				scanRouteHandler.validate(ship, { target_node_id: 2, distance: 1 }, ctx),
 			).not.toThrow();
 		});
 	});
@@ -78,6 +81,7 @@ describe('ScanRoute Handler', () => {
 				ship,
 				{ target_node_id: 2, distance: 3 },
 				0,
+				ctx,
 			);
 
 			const expectedDuration = ship.sensors.getScanDuration(3, 1.0);
@@ -92,6 +96,7 @@ describe('ScanRoute Handler', () => {
 				ship,
 				{ target_node_id: 2, distance: 3 },
 				0,
+				ctx,
 			);
 
 			const expectedChance = ship.sensors.getScanSuccessChance(3, 1.0);
@@ -104,6 +109,7 @@ describe('ScanRoute Handler', () => {
 				ship,
 				{ target_node_id: 2, distance: 3 },
 				0,
+				ctx,
 			);
 
 			const expectedPowerCost = ship.sensors.getScanPowerCost(3);
@@ -116,6 +122,7 @@ describe('ScanRoute Handler', () => {
 				ship,
 				{ target_node_id: 42, distance: 2 },
 				100,
+				ctx,
 			);
 
 			expect(intent.result.from_node_id).toBe(1);
@@ -128,11 +135,13 @@ describe('ScanRoute Handler', () => {
 				ship,
 				{ target_node_id: 2, distance: 3 },
 				0,
+				ctx,
 			);
 			const intentLowEffort = scanRouteHandler.handle(
 				ship,
 				{ target_node_id: 2, distance: 3, effort: 0.5 },
 				0,
+				ctx,
 			);
 
 			// Lower effort → shorter duration, lower success chance
@@ -154,6 +163,7 @@ describe('ScanRoute Handler', () => {
 				ship,
 				{ target_node_id: 2, distance: 1 },
 				0,
+				ctx,
 			);
 
 			const action = {
@@ -167,7 +177,7 @@ describe('ScanRoute Handler', () => {
 				result: { ...intent.result },
 			};
 
-			const outcome = scanRouteHandler.resolve(ship, action);
+			const outcome = scanRouteHandler.resolve(ship, action, ctx);
 
 			expect(outcome.status).toBe('fulfilled');
 			expect(typeof outcome.result.roll).toBe('number');
@@ -188,6 +198,7 @@ describe('ScanRoute Handler', () => {
 					ship,
 					{ target_node_id: 2, distance: 1 },
 					0,
+					ctx,
 				);
 
 				const action = {
@@ -201,7 +212,7 @@ describe('ScanRoute Handler', () => {
 					result: { ...intent.result },
 				};
 
-				return scanRouteHandler.resolve(ship, action);
+				return scanRouteHandler.resolve(ship, action, ctx);
 			}
 
 			const outcome1 = runScan();
@@ -236,7 +247,7 @@ describe('ScanRoute Handler', () => {
 				},
 			};
 
-			const outcome = scanRouteHandler.resolve(ship, action);
+			const outcome = scanRouteHandler.resolve(ship, action, ctx);
 
 			expect(outcome.status).toBe('fulfilled');
 			expect(outcome.result.success).toBe(false);

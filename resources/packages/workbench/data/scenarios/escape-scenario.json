@@ -1,6 +1,6 @@
 {
   "name": "Escape Scenario",
-  "description": "Target detects wolf, activates ECM, spools drive and escapes. Tests detection → reaction → escape window.",
+  "description": "Target detects wolf, activates ECM, then jumps to escape. Tests reaction and escape window.",
   "ships": {
     "wolf": {
       "hull": "striker",
@@ -9,7 +9,8 @@
       "sensor": "vrs_mk1",
       "shield": "aegis_delta",
       "nav": "nav_tier_3",
-      "equipment": ["phaser_array"]
+      "equipment": ["phaser_array"],
+      "node": 1
     },
     "prey": {
       "hull": "pioneer",
@@ -18,13 +19,13 @@
       "sensor": "vrs_mk1",
       "shield": "aegis_delta",
       "nav": "nav_tier_3",
-      "equipment": ["ecm_mk1", "mining_laser"]
+      "equipment": ["ecm_mk1", "mining_laser"],
+      "node": 1
     }
   },
   "actions": [
-    { "t": 0, "ship": "wolf", "type": "fire_phaser", "params": { "target": "prey", "duration": 600 } },
-    { "t": 120, "ship": "prey", "type": "activate_ecm" },
-    { "t": 300, "ship": "prey", "type": "jump", "params": { "distance": 2 } },
-    { "t": 600, "ship": "wolf", "type": "wait" }
+    { "ship": "prey", "type": "activate_equipment", "params": { "equipment_slug": "ecm_mk1" } },
+    { "ship": "wolf", "type": "fire_phaser", "params": { "target_ship_id": "prey", "duration": 600 } },
+    { "ship": "prey", "type": "jump", "params": { "target_node_id": 99, "distance": 2 } }
   ]
 }
