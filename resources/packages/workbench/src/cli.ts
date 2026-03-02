@@ -13,6 +13,7 @@ import { ship } from './cli/ship';
 import { timeline } from './cli/timeline';
 import { action } from './cli/action';
 import { scenarioCommand } from './cli/scenario';
+import { baseline } from './cli/baseline';
 
 const parsed = parseArgs();
 const command = parsed.positional[0];
@@ -74,6 +75,10 @@ switch (command) {
 		scenarioCommand(parsed);
 		break;
 
+	case 'baseline':
+		baseline(parsed.positional.slice(1), parsed.flags);
+		break;
+
 	default:
 		console.error('Usage: bun wb <command> [options]'); // eslint-disable-line no-console
 		console.error(''); // eslint-disable-line no-console
@@ -93,6 +98,7 @@ switch (command) {
 		console.error('  timeline [--file=X]           Ship mutation timeline'); // eslint-disable-line no-console
 		console.error('  action --action=jump [...]    Submit action via holodeck Engine'); // eslint-disable-line no-console
 		console.error('  scenario <scenario.json>      Run sequential actions via Engine'); // eslint-disable-line no-console
+		console.error('  baseline save|show|diff       Baseline persistence and diff'); // eslint-disable-line no-console
 		console.error(''); // eslint-disable-line no-console
 		console.error('Tuning flags: --throttle=1.0 --effort=1.0 --priority=1.0'); // eslint-disable-line no-console
 		process.exit(1);

@@ -574,8 +574,10 @@ function pilotSkillSweep(): AnalysisCategory {
 
 // ── Main ───────────────────────────────────────────────────
 
-export function analyse(): void {
-	const analysis: Analysis = {
+export type { Analysis, AnalysisCategory, Scenario };
+
+export function runAnalyse(): Analysis {
+	return {
 		generated: new Date().toISOString(),
 		defaults: {
 			loadout: defaultSlugs,
@@ -600,6 +602,8 @@ export function analyse(): void {
 			edgeCases(),
 		],
 	};
+}
 
-	console.log(JSON.stringify(analysis, null, 2)); // eslint-disable-line no-console
+export function analyse(): void {
+	console.log(JSON.stringify(runAnalyse(), null, 2)); // eslint-disable-line no-console
 }

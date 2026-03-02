@@ -1,0 +1,99 @@
+{
+  "generated": "2026-03-02T23:17:50.834Z",
+  "vary": "hull",
+  "tuning": {
+    "effort": 1,
+    "throttle": 1,
+    "priority": 1
+  },
+  "rows": [
+    {
+      "hull": "pioneer",
+      "hullIntegrity": 100,
+      "capacitor": 100,
+      "coreLife": 750,
+      "regenRate": 10,
+      "perfRatio": 1,
+      "jumpComfort": 7,
+      "scanComfort": 5,
+      "shieldCapacity": 100,
+      "shieldRegen": 10,
+      "cargo": 200,
+      "equipmentSlots": 3
+    },
+    {
+      "hull": "scout",
+      "hullIntegrity": 75,
+      "capacitor": 100,
+      "coreLife": 750,
+      "regenRate": 10,
+      "perfRatio": 1,
+      "jumpComfort": 10,
+      "scanComfort": 5,
+      "shieldCapacity": 75,
+      "shieldRegen": 10,
+      "cargo": 150,
+      "equipmentSlots": 2
+    },
+    {
+      "hull": "surveyor",
+      "hullIntegrity": 100,
+      "capacitor": 100,
+      "coreLife": 750,
+      "regenRate": 10,
+      "perfRatio": 1,
+      "jumpComfort": 6.4,
+      "scanComfort": 5.8,
+      "shieldCapacity": 100,
+      "shieldRegen": 10,
+      "cargo": 225,
+      "equipmentSlots": 4
+    },
+    {
+      "hull": "bulwark",
+      "hullIntegrity": 150,
+      "capacitor": 100,
+      "coreLife": 750,
+      "regenRate": 10,
+      "perfRatio": 1,
+      "jumpComfort": 5,
+      "scanComfort": 5,
+      "shieldCapacity": 150,
+      "shieldRegen": 10,
+      "cargo": 500,
+      "equipmentSlots": 1
+    },
+    {
+      "hull": "striker",
+      "hullIntegrity": 75,
+      "capacitor": 100,
+      "coreLife": 750,
+      "regenRate": 10,
+      "perfRatio": 1,
+      "jumpComfort": 7.8,
+      "scanComfort": 5,
+      "shieldCapacity": 100,
+      "shieldRegen": 10,
+      "cargo": 100,
+      "equipmentSlots": 2
+    },
+    {
+      "hull": "specter",
+      "hullIntegrity": 60,
+      "capacitor": 100,
+      "coreLife": 750,
+      "regenRate": 10,
+      "perfRatio": 1,
+      "jumpComfort": 8.8,
+      "scanComfort": 5,
+      "shieldCapacity": 75,
+      "shieldRegen": 10,
+      "cargo": 100,
+      "equipmentSlots": 2
+    }
+  ],
+  "outliers": [
+    "OUTLIER: surveyor — scanComfort=5.8 (2.2σ from mean 5.1)",
+    "OUTLIER: bulwark — cargo=500 (2.1σ from mean 212.5)"
+  ]
+}

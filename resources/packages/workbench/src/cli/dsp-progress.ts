@@ -976,7 +976,17 @@ function gameplayScenarios(): Section {
 
 // ── Main ─────────────────────────────────────────────────────
 
-export function dspProgress(): void {
+export type { Check, Section, Verdict };
+
+interface DspProgressOutput {
+	generated: string;
+	summary: { pass: number; warn: number; fail: number; info: number; total: number };
+	sections: Section[];
+}
+
+export type { DspProgressOutput };
+
+export function runDspProgress(): DspProgressOutput {
 	const sections = [
 		submarineWarfare(),
 		sensorDifferentiation(),
@@ -1004,7 +1014,7 @@ export function dspProgress(): void {
 		}
 	}
 
-	const output = {
+	return {
 		generated: new Date().toISOString(),
 		summary: { pass, warn, fail, info, total: pass + warn + fail + info },
 		sections: sections.map(s => ({
@@ -1013,6 +1023,8 @@ export function dspProgress(): void {
 			checks: s.checks,
 		})),
 	};
+}
 
-	console.log(JSON.stringify(output, null, 2)); // eslint-disable-line no-console
+export function dspProgress(): void {
+	console.log(JSON.stringify(runDspProgress(), null, 2)); // eslint-disable-line no-console
 }

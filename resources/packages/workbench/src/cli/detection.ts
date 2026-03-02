@@ -1058,7 +1058,30 @@ function combatProjections(): CombatProjection[] {
 
 // ── Main ─────────────────────────────────────────────────────
 
-export function detection(): void {
+export type { DetectionResult, SummaryRow, PvpEncounterResult, CombatProjection };
+
+export interface DetectionOutput {
+	generated: string;
+	config: unknown;
+	wolves: WolfConfig[];
+	targets: TargetConfig[];
+	environments: Environment[];
+	detectionMatrix: DetectionResult[];
+	summary: SummaryRow[];
+	pvpScanEncounters: PvpEncounterResult[];
+	combatProjections: CombatProjection[];
+	stats: {
+		totalCombinations: number;
+		wolvesCount: number;
+		targetsCount: number;
+		environmentsCount: number;
+		verdictCounts: Record<string, number>;
+		pvpEncounterCount: number;
+		pvpVerdicts: Record<string, number>;
+	};
+}
+
+export function runDetection(): DetectionOutput {
 	const wolves = buildWolves();
 	const targets = buildTargets();
 	const environments = buildEnvironments();
@@ -1081,7 +1104,7 @@ export function detection(): void {
 	const defaultEnv = environments.find((e) => e.id === 'normal')!;
 	const pvpResults = pvpEncounters.map((enc) => computePvpEncounter(enc, defaultEnv));
 
-	const output = {
+	return {
 		generated: new Date().toISOString(),
 		config: {
 			constants: {
@@ -1125,8 +1148,10 @@ export function detection(): void {
 			pvpVerdicts: countBy(pvpResults, (e) => e.race.verdict),
 		},
 	};
+}
 
-	console.log(JSON.stringify(output, null, 2)); // eslint-disable-line no-console
+export function detection(): void {
+	console.log(JSON.stringify(runDetection(), null, 2)); // eslint-disable-line no-console
 }
 
 function countBy<T>(arr: T[], fn: (item: T) => string): Record<string, number> {

@@ -97,7 +97,19 @@ function flagOutliers(rows: BalanceRow[]): string[] {
 	return warnings;
 }
 
-export function balance({ flags }: ParsedFlags): void {
+export type { BalanceRow };
+
+interface BalanceOutput {
+	generated: string;
+	vary: string;
+	tuning: ReturnType<typeof resolveTuning>;
+	rows: BalanceRow[];
+	outliers: string[];
+}
+
+export type { BalanceOutput };
+
+export function runBalance({ flags }: ParsedFlags): BalanceOutput {
 	const tuning = resolveTuning(flags);
 	const constants = resolveConstants(flags);
 	const varyRaw = flags.vary;
@@ -142,15 +154,17 @@ export function balance({ flags }: ParsedFlags): void {
 
 	const warnings = flagOutliers(rows);
 
-	const output = {
+	return {
 		generated: new Date().toISOString(),
 		vary: varyRaw ?? 'hull',
 		tuning,
 		rows,
 		outliers: warnings,
 	};
+}
 
-	console.log(JSON.stringify(output, null, 2)); // eslint-disable-line no-console
+export function balance(parsed: ParsedFlags): void {
+	console.log(JSON.stringify(runBalance(parsed), null, 2)); // eslint-disable-line no-console
 }
 
 function cartesian(arrays: CatalogProduct[][]): CatalogProduct[][] {
