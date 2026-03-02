@@ -11,7 +11,7 @@ use Helm\ShipLink\Models\ShipState;
 /**
  * In-memory ship state repository for simulation.
  */
-final class InMemoryShipStateRepository implements ShipStateRepository
+final class MemoryShipStateRepository implements ShipStateRepository
 {
     /** @var array<int, ShipState> Indexed by ship_post_id */
     private array $states = [];
@@ -23,7 +23,7 @@ final class InMemoryShipStateRepository implements ShipStateRepository
 
     public function findForUser(int $userId): ?ShipState
     {
-        throw new \BadMethodCallException('InMemoryShipStateRepository::findForUser() is not implemented.');
+        throw new \BadMethodCallException('MemoryShipStateRepository::findForUser() is not implemented.');
     }
 
     public function findOrCreate(int $shipPostId): ShipState
@@ -92,12 +92,12 @@ final class InMemoryShipStateRepository implements ShipStateRepository
 
     public function findAtNode(int $nodeId): array
     {
-        throw new \BadMethodCallException('InMemoryShipStateRepository::findAtNode() is not implemented.');
+        throw new \BadMethodCallException('MemoryShipStateRepository::findAtNode() is not implemented.');
     }
 
     public function findWithCurrentAction(): array
     {
-        throw new \BadMethodCallException('InMemoryShipStateRepository::findWithCurrentAction() is not implemented.');
+        throw new \BadMethodCallException('MemoryShipStateRepository::findWithCurrentAction() is not implemented.');
     }
 
     public function updateNodeId(int $shipPostId, ?int $nodeId): bool

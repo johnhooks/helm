@@ -11,12 +11,12 @@ use Helm\Ships\ShipIdentity;
  *
  * No WordPress post needed — just the three values the game loop uses.
  */
-final readonly class SimShipIdentity implements ShipIdentity
+final class MemoryShipIdentity implements ShipIdentity
 {
     public function __construct(
-        private int $postId,
-        private string $name,
-        private int $ownerId,
+        private readonly int $postId,
+        private readonly string $name,
+        private readonly int $ownerId,
     ) {
     }
 

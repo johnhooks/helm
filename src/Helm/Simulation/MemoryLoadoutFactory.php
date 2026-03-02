@@ -19,7 +19,7 @@ use Helm\ShipLink\ShipFittingSlot;
  * Replaces the raw $wpdb JOIN query in WpdbLoadoutFactory
  * by composing from InventoryRepository + ProductRepository.
  */
-final class InMemoryLoadoutFactory implements LoadoutFactory
+final class MemoryLoadoutFactory implements LoadoutFactory
 {
     public function __construct(
         private readonly ProductRepository $productRepository,
@@ -107,17 +107,17 @@ final class InMemoryLoadoutFactory implements LoadoutFactory
      *
      * The contract's findAtLocation() requires userId, but build() only
      * knows shipPostId (matching WpdbLoadoutFactory's raw SQL). We use
-     * the concrete InMemoryInventoryRepository which provides a
+     * the concrete MemoryInventoryRepository which provides a
      * simulation-only findFittedAtShip() method.
      *
      * @return array<Item>
      */
     private function allFittedAtShip(int $shipPostId): array
     {
-        if ($this->inventoryRepository instanceof InMemoryInventoryRepository) {
+        if ($this->inventoryRepository instanceof MemoryInventoryRepository) {
             return $this->inventoryRepository->findFittedAtShip($shipPostId);
         }
 
-        throw new \RuntimeException('InMemoryLoadoutFactory requires InMemoryInventoryRepository');
+        throw new \RuntimeException('MemoryLoadoutFactory requires MemoryInventoryRepository');
     }
 }

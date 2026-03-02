@@ -50,7 +50,7 @@ class ShipFactoryTest extends WPTestCase
     public function test_build_throws_for_invalid_post_id(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Ship post not found');
+        $this->expectExceptionMessage('Ship not found');
 
         $this->factory->build(99999);
     }

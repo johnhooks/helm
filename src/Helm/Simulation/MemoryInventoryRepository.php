@@ -12,7 +12,7 @@ use Helm\Lib\Date;
 /**
  * In-memory inventory repository for simulation.
  */
-final class InMemoryInventoryRepository implements InventoryRepository
+final class MemoryInventoryRepository implements InventoryRepository
 {
     /** @var array<int, Item> Indexed by item ID */
     private array $items = [];
@@ -26,7 +26,7 @@ final class InMemoryInventoryRepository implements InventoryRepository
 
     public function findForUser(int $userId): array
     {
-        throw new \BadMethodCallException('InMemoryInventoryRepository::findForUser() is not implemented.');
+        throw new \BadMethodCallException('MemoryInventoryRepository::findForUser() is not implemented.');
     }
 
     public function findAtLocation(int $userId, LocationType $locationType, ?int $locationId = null): array
@@ -53,7 +53,7 @@ final class InMemoryInventoryRepository implements InventoryRepository
 
     public function findFittedByLocation(LocationType $locationType, int $locationId): array
     {
-        throw new \BadMethodCallException('InMemoryInventoryRepository::findFittedByLocation() is not implemented.');
+        throw new \BadMethodCallException('MemoryInventoryRepository::findFittedByLocation() is not implemented.');
     }
 
     public function findCargoAtLocation(
@@ -151,7 +151,7 @@ final class InMemoryInventoryRepository implements InventoryRepository
     /**
      * Find fitted items (non-null slot) at a ship, regardless of user.
      *
-     * Used by InMemoryLoadoutFactory::build() which needs to query by
+     * Used by MemoryLoadoutFactory::build() which needs to query by
      * location only, matching the raw SQL in WpdbLoadoutFactory.
      *
      * @return array<Item>

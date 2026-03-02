@@ -8,9 +8,15 @@ use Helm\Inventory\Contracts\InventoryRepository;
 use Helm\Navigation\Contracts\EdgeRepository;
 use Helm\Navigation\Contracts\NodeRepository;
 use Helm\Products\Contracts\ProductRepository;
+use Helm\Navigation\NavComputer;
+use Helm\Navigation\NavigationService;
+use Helm\ShipLink\ActionFactory;
+use Helm\ShipLink\ActionProcessor;
+use Helm\ShipLink\ActionResolver;
 use Helm\ShipLink\Contracts\ActionRepository;
 use Helm\ShipLink\Contracts\LoadoutFactory;
 use Helm\ShipLink\Contracts\ShipStateRepository;
+use Helm\ShipLink\ShipFactory;
 use Helm\lucatume\DI52\ServiceProvider;
 
 /**
@@ -26,15 +32,24 @@ final class Provider extends ServiceProvider
     public function register(): void
     {
         // Repositories
-        $this->container->singleton(ShipStateRepository::class, InMemoryShipStateRepository::class);
-        $this->container->singleton(ActionRepository::class, InMemoryActionRepository::class);
-        $this->container->singleton(InventoryRepository::class, InMemoryInventoryRepository::class);
-        $this->container->singleton(ProductRepository::class, InMemoryProductRepository::class);
-        $this->container->singleton(NodeRepository::class, InMemoryNodeRepository::class);
-        $this->container->singleton(EdgeRepository::class, InMemoryEdgeRepository::class);
+        $this->container->singleton(ShipStateRepository::class, MemoryShipStateRepository::class);
+        $this->container->singleton(ActionRepository::class, MemoryActionRepository::class);
+        $this->container->singleton(InventoryRepository::class, MemoryInventoryRepository::class);
+        $this->container->singleton(ProductRepository::class, MemoryProductRepository::class);
+        $this->container->singleton(NodeRepository::class, MemoryNodeRepository::class);
+        $this->container->singleton(EdgeRepository::class, MemoryEdgeRepository::class);
 
         // LoadoutFactory
-        $this->container->singleton(LoadoutFactory::class, InMemoryLoadoutFactory::class);
+        $this->container->singleton(LoadoutFactory::class, MemoryLoadoutFactory::class);
+
+        // Re-register dependent singletons so they pick up the
+        // in-memory bindings instead of cached Wpdb* instances.
+        $this->container->singleton(NavComputer::class);
+        $this->container->singleton(NavigationService::class);
+        $this->container->singleton(ShipFactory::class);
+        $this->container->singleton(ActionFactory::class);
+        $this->container->singleton(ActionResolver::class);
+        $this->container->singleton(ActionProcessor::class);
 
         // Simulation orchestrator
         $this->container->singleton(Simulation::class);
@@ -42,8 +57,12 @@ final class Provider extends ServiceProvider
 
     public function boot(): void
     {
-        // Seed products into in-memory store
-        $seeder = $this->container->get(\Helm\Products\ProductSeeder::class);
+        // Seed products into in-memory store.
+        // Create the seeder directly to ensure it uses the rebound
+        // MemoryProductRepository, not a cached singleton with Wpdb*.
+        $seeder = new \Helm\Products\ProductSeeder(
+            $this->container->get(ProductRepository::class)
+        );
         $seeder->seed();
     }
 }

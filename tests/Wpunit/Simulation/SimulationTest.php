@@ -34,7 +34,7 @@ class SimulationTest extends WPTestCase
         parent::set_up();
 
         // Register the simulation provider — overrides all Wpdb* bindings
-        $provider = new \Helm\Simulation\Provider(helm());
+        $provider = new \Helm\Simulation\Provider(helm()->getContainer());
         $provider->register();
         $provider->boot();
 
@@ -86,7 +86,7 @@ class SimulationTest extends WPTestCase
     {
         $ship = $this->sim->createShip('Power Ship', 1);
 
-        $this->assertGreaterThan(0.0, $ship->power()->getOutput());
+        $this->assertGreaterThan(0.0, $ship->power()->getCurrentPower());
     }
 
     public function test_rebuild_ship_from_state(): void

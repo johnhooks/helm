@@ -13,7 +13,7 @@ use Helm\ShipLink\Models\Action;
 /**
  * In-memory action repository for simulation.
  */
-final class InMemoryActionRepository implements ActionRepository
+final class MemoryActionRepository implements ActionRepository
 {
     /** @var array<int, Action> Indexed by action ID */
     private array $actions = [];
@@ -27,17 +27,17 @@ final class InMemoryActionRepository implements ActionRepository
 
     public function findForShipPaginated(int $shipPostId, int $perPage = 20, ?int $before = null): array
     {
-        throw new \BadMethodCallException('InMemoryActionRepository::findForShipPaginated() is not implemented.');
+        throw new \BadMethodCallException('MemoryActionRepository::findForShipPaginated() is not implemented.');
     }
 
     public function findForShip(int $shipPostId, ?int $limit = null): array
     {
-        throw new \BadMethodCallException('InMemoryActionRepository::findForShip() is not implemented.');
+        throw new \BadMethodCallException('MemoryActionRepository::findForShip() is not implemented.');
     }
 
     public function findCurrentForShip(int $shipPostId): ?Action
     {
-        throw new \BadMethodCallException('InMemoryActionRepository::findCurrentForShip() is not implemented.');
+        throw new \BadMethodCallException('MemoryActionRepository::findCurrentForShip() is not implemented.');
     }
 
     public function findPending(): array
@@ -50,7 +50,7 @@ final class InMemoryActionRepository implements ActionRepository
 
     public function findRunning(): array
     {
-        throw new \BadMethodCallException('InMemoryActionRepository::findRunning() is not implemented.');
+        throw new \BadMethodCallException('MemoryActionRepository::findRunning() is not implemented.');
     }
 
     public function findDeferredUntil(DateTimeImmutable $until): array
@@ -65,7 +65,7 @@ final class InMemoryActionRepository implements ActionRepository
 
     public function findByStatus(ActionStatus $status, ?int $limit = null): array
     {
-        throw new \BadMethodCallException('InMemoryActionRepository::findByStatus() is not implemented.');
+        throw new \BadMethodCallException('MemoryActionRepository::findByStatus() is not implemented.');
     }
 
     public function insert(Action $action): bool
@@ -116,17 +116,17 @@ final class InMemoryActionRepository implements ActionRepository
 
     public function deleteForShip(int $shipPostId): int
     {
-        throw new \BadMethodCallException('InMemoryActionRepository::deleteForShip() is not implemented.');
+        throw new \BadMethodCallException('MemoryActionRepository::deleteForShip() is not implemented.');
     }
 
     public function deleteOldCompleted(DateTimeImmutable $olderThan): int
     {
-        throw new \BadMethodCallException('InMemoryActionRepository::deleteOldCompleted() is not implemented.');
+        throw new \BadMethodCallException('MemoryActionRepository::deleteOldCompleted() is not implemented.');
     }
 
     public function countByStatus(): array
     {
-        throw new \BadMethodCallException('InMemoryActionRepository::countByStatus() is not implemented.');
+        throw new \BadMethodCallException('MemoryActionRepository::countByStatus() is not implemented.');
     }
 
     public function count(): int
@@ -166,7 +166,7 @@ final class InMemoryActionRepository implements ActionRepository
 
     public function findBroadcastsSince(DateTimeImmutable $since, int $userId): array
     {
-        throw new \BadMethodCallException('InMemoryActionRepository::findBroadcastsSince() is not implemented.');
+        throw new \BadMethodCallException('MemoryActionRepository::findBroadcastsSince() is not implemented.');
     }
 
     /**

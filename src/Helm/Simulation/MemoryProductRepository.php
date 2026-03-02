@@ -11,7 +11,7 @@ use Helm\Products\Models\Product;
 /**
  * In-memory product repository for simulation.
  */
-final class InMemoryProductRepository implements ProductRepository
+final class MemoryProductRepository implements ProductRepository
 {
     /** @var array<int, Product> Indexed by product ID */
     private array $products = [];

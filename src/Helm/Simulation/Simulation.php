@@ -29,7 +29,7 @@ final class Simulation
 {
     private int $nextShipId = 1;
 
-    /** @var array<int, SimShipIdentity> */
+    /** @var array<int, MemoryShipIdentity> */
     private array $identities = [];
 
     public function __construct(
@@ -52,7 +52,7 @@ final class Simulation
     public function createShip(string $name, int $ownerId): Ship
     {
         $postId = $this->nextShipId++;
-        $identity = new SimShipIdentity($postId, $name, $ownerId);
+        $identity = new MemoryShipIdentity($postId, $name, $ownerId);
         $this->identities[$postId] = $identity;
 
         $state = ShipState::defaults($postId);

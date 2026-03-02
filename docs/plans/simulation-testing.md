@@ -162,7 +162,7 @@ The fix: `Transaction` checks whether the database is available. If repositories
 
 `Origin` reads from `wp_options`. The simulation needs an Origin with a known seed for deterministic generation.
 
-The fix: bind an `InMemoryOrigin` that returns a fixed `OriginConfig` with a predetermined master seed. No database needed.
+The fix: bind an `MemoryOrigin` that returns a fixed `OriginConfig` with a predetermined master seed. No database needed.
 
 ### Locking
 
@@ -214,10 +214,10 @@ In-memory repositories are seeded from `tests/_data/catalog/`:
 
 | Data | Source | Repository |
 |---|---|---|
-| Products | `tests/_data/catalog/products/*.json` | `InMemoryProductRepository` |
+| Products | `tests/_data/catalog/products/*.json` | `MemoryProductRepository` |
 | Hulls | `tests/_data/catalog/hulls.json` | Used by `LoadoutFactory` |
-| Nav graph | `tests/_data/catalog/graph.json` | `InMemoryNodeRepository` + `InMemoryEdgeRepository` |
-| Ships | Created programmatically via `Simulation::createShip()` | `InMemoryShipStateRepository` + `InMemoryInventoryRepository` |
+| Nav graph | `tests/_data/catalog/graph.json` | `MemoryNodeRepository` + `MemoryEdgeRepository` |
+| Ships | Created programmatically via `Simulation::createShip()` | `MemoryShipStateRepository` + `MemoryInventoryRepository` |
 
 This is the same data the holodeck and workbench consume. One source of truth.
 
@@ -234,15 +234,15 @@ final class SimulationProvider extends ServiceProvider
         Date::setTestNow($this->startTime);
 
         // Repositories — in-memory, seeded from tests/_data/catalog/
-        $this->container->singleton(ShipStateRepositoryContract::class, InMemoryShipStateRepository::class);
-        $this->container->singleton(ActionRepositoryContract::class, InMemoryActionRepository::class);
-        $this->container->singleton(InventoryRepositoryContract::class, InMemoryInventoryRepository::class);
-        $this->container->singleton(ProductRepositoryContract::class, InMemoryProductRepository::class);
-        $this->container->singleton(NodeRepositoryContract::class, InMemoryNodeRepository::class);
-        $this->container->singleton(EdgeRepositoryContract::class, InMemoryEdgeRepository::class);
+        $this->container->singleton(ShipStateRepositoryContract::class, MemoryShipStateRepository::class);
+        $this->container->singleton(ActionRepositoryContract::class, MemoryActionRepository::class);
+        $this->container->singleton(InventoryRepositoryContract::class, MemoryInventoryRepository::class);
+        $this->container->singleton(ProductRepositoryContract::class, MemoryProductRepository::class);
+        $this->container->singleton(NodeRepositoryContract::class, MemoryNodeRepository::class);
+        $this->container->singleton(EdgeRepositoryContract::class, MemoryEdgeRepository::class);
 
         // Origin — fixed seed for deterministic generation
-        $this->container->singleton(Origin::class, fn () => new InMemoryOrigin($seed));
+        $this->container->singleton(Origin::class, fn () => new MemoryOrigin($seed));
 
         // Transaction no-op
         $this->container->singleton(TransactionManager::class, NullTransactionManager::class);

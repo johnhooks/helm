@@ -29,7 +29,7 @@ class ContractTest extends WPTestCase
     {
         parent::set_up();
 
-        $provider = new \Helm\Simulation\Provider(helm());
+        $provider = new \Helm\Simulation\Provider(helm()->getContainer());
         $provider->register();
         $provider->boot();
 

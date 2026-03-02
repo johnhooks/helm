@@ -12,7 +12,7 @@ use Helm\Navigation\NodeType;
 /**
  * In-memory node repository for simulation.
  */
-final class InMemoryNodeRepository implements NodeRepository
+final class MemoryNodeRepository implements NodeRepository
 {
     /** @var array<int, Node> Indexed by node ID */
     private array $nodes = [];
@@ -39,7 +39,7 @@ final class InMemoryNodeRepository implements NodeRepository
 
     public function paginate(?NodeType $type = null, int $page = 1, int $perPage = 100): array
     {
-        throw new \BadMethodCallException('InMemoryNodeRepository::paginate() is not implemented.');
+        throw new \BadMethodCallException('MemoryNodeRepository::paginate() is not implemented.');
     }
 
     public function getByHash(string $hash): ?Node
@@ -55,7 +55,7 @@ final class InMemoryNodeRepository implements NodeRepository
 
     public function allSystems(): array
     {
-        throw new \BadMethodCallException('InMemoryNodeRepository::allSystems() is not implemented.');
+        throw new \BadMethodCallException('MemoryNodeRepository::allSystems() is not implemented.');
     }
 
     public function withinDistance(float $x, float $y, float $z, float $maxDistance): array
@@ -138,11 +138,11 @@ final class InMemoryNodeRepository implements NodeRepository
 
     public function countSystems(): int
     {
-        throw new \BadMethodCallException('InMemoryNodeRepository::countSystems() is not implemented.');
+        throw new \BadMethodCallException('MemoryNodeRepository::countSystems() is not implemented.');
     }
 
     public function countWaypoints(): int
     {
-        throw new \BadMethodCallException('InMemoryNodeRepository::countWaypoints() is not implemented.');
+        throw new \BadMethodCallException('MemoryNodeRepository::countWaypoints() is not implemented.');
     }
 }

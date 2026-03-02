@@ -11,7 +11,7 @@ use Helm\Navigation\Edge;
 /**
  * In-memory edge repository for simulation.
  */
-final class InMemoryEdgeRepository implements EdgeRepository
+final class MemoryEdgeRepository implements EdgeRepository
 {
     /** @var array<int, Edge> Indexed by edge ID */
     private array $edges = [];
@@ -47,12 +47,12 @@ final class InMemoryEdgeRepository implements EdgeRepository
 
     public function publicEdges(): array
     {
-        throw new \BadMethodCallException('InMemoryEdgeRepository::publicEdges() is not implemented.');
+        throw new \BadMethodCallException('MemoryEdgeRepository::publicEdges() is not implemented.');
     }
 
     public function discoveredBy(string $shipId): array
     {
-        throw new \BadMethodCallException('InMemoryEdgeRepository::discoveredBy() is not implemented.');
+        throw new \BadMethodCallException('MemoryEdgeRepository::discoveredBy() is not implemented.');
     }
 
     public function save(Edge $edge): Edge
