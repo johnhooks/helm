@@ -152,7 +152,7 @@ export const firePhaserHandler: ActionHandler = {
 		return {
 			status: ActionStatus.Fulfilled,
 			result: {
-				shield_drained: shieldDrained > 0 ? shieldDrained : totalDrain,
+				shield_drained: shieldDrained,
 				hull_damage: hullDamage,
 				target_destroyed: target.resolve().hull <= 0,
 			},

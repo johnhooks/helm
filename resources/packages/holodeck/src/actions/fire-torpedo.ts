@@ -2,13 +2,12 @@ import {
 	torpedoHitChance, torpedoDamage,
 	pdsInterception, ecmLockDegradation,
 	shieldAbsorption,
+	DEFAULT_DSP_CONSTANTS,
 } from '@helm/formulas';
 import type { Ship } from '../ship';
 import type { Action, ActionContext, ActionHandler, ActionIntent, ActionOutcome } from './types';
 import { ActionError, ActionErrorCode } from './types';
 import { ActionStatus } from '../enums/action-status';
-
-const TORPEDO_FLIGHT_SECONDS = 120;
 
 export const fireTorpedoHandler: ActionHandler = {
 	validate(ship: Ship, params: Record<string, unknown>, context: ActionContext): void {
@@ -103,7 +102,7 @@ export const fireTorpedoHandler: ActionHandler = {
 		const payload = torpedoDamage(launcher.product.mult_a ?? 0);
 
 		return {
-			deferredUntil: now + TORPEDO_FLIGHT_SECONDS,
+			deferredUntil: now + DEFAULT_DSP_CONSTANTS.torpedoFlightSeconds,
 			result: {
 				target_ship_id: targetId,
 				hit_chance: hitChance,
