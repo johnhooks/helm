@@ -10,7 +10,6 @@ use Helm\Navigation\Contracts\NodeRepository;
 use Helm\Navigation\NodeType;
 use Helm\ShipLink\ActionStatus;
 use Helm\ShipLink\ActionType;
-use Helm\ShipLink\Contracts\ActionRepository;
 use Helm\ShipLink\Contracts\ShipStateRepository;
 use Helm\ShipLink\Ship;
 use Helm\Simulation\Simulation;
@@ -140,7 +139,7 @@ class SimulationTest extends WPTestCase
         $this->assertSame(0, $result->failed);
 
         // Reload action — should be fulfilled
-        $resolved = helm(ActionRepository::class)->find($action->id);
+        $resolved = $this->sim->findAction($action->id);
         $this->assertSame(ActionStatus::Fulfilled, $resolved->status);
 
         // Result should contain scan data
@@ -162,6 +161,62 @@ class SimulationTest extends WPTestCase
         $this->assertSame(2, $ship2->getId());
         $this->assertSame('Alpha', $ship1->getName());
         $this->assertSame('Beta', $ship2->getName());
+    }
+
+    public function test_create_ship_at_node(): void
+    {
+        $ship = $this->sim->createShipAtNode('Explorer', 1, 2);
+
+        $this->assertSame(2, $ship->navigation()->getCurrentPosition());
+        $this->assertSame('Explorer', $ship->getName());
+    }
+
+    public function test_advance_until_idle_resolves_action(): void
+    {
+        $ship = $this->sim->createShip('Idle Scanner', 1);
+
+        $action = $this->sim->dispatch($ship->getId(), ActionType::ScanRoute, [
+            'target_node_id' => 2,
+        ]);
+
+        $this->assertSame(ActionStatus::Pending, $action->status);
+
+        // advanceUntilIdle should jump clock and process without manual calculation
+        $result = $this->sim->advanceUntilIdle();
+
+        $this->assertSame(1, $result->processed);
+        $this->assertSame(0, $result->failed);
+
+        $resolved = $this->sim->findAction($action->id);
+        $this->assertSame(ActionStatus::Fulfilled, $resolved->status);
+    }
+
+    public function test_advance_until_idle_scan_then_jump(): void
+    {
+        $ship = $this->sim->createShip('Full Loop', 1);
+
+        // Scan for route to node 2
+        $scan = $this->sim->dispatch($ship->getId(), ActionType::ScanRoute, [
+            'target_node_id' => 2,
+        ]);
+        $this->sim->advanceUntilIdle();
+
+        $resolvedScan = $this->sim->findAction($scan->id);
+        $this->assertSame(ActionStatus::Fulfilled, $resolvedScan->status);
+        $this->assertTrue($resolvedScan->result['success']);
+
+        // Now jump to node 2
+        $jump = $this->sim->dispatch($ship->getId(), ActionType::Jump, [
+            'target_node_id' => 2,
+        ]);
+        $this->sim->advanceUntilIdle();
+
+        $resolvedJump = $this->sim->findAction($jump->id);
+        $this->assertSame(ActionStatus::Fulfilled, $resolvedJump->status);
+
+        // Ship should now be at node 2
+        $rebuilt = $this->sim->getShip($ship->getId());
+        $this->assertSame(2, $rebuilt->navigation()->getCurrentPosition());
     }
 
     public function test_seed_graph(): void

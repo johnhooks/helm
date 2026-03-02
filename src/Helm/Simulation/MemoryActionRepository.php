@@ -170,6 +170,32 @@ final class MemoryActionRepository implements ActionRepository
     }
 
     /**
+     * Get the earliest deferred_until timestamp among pending actions.
+     *
+     * Used by Simulation::advanceUntilIdle() to jump the clock forward.
+     */
+    public function nextDeferredUntil(): ?DateTimeImmutable
+    {
+        $earliest = null;
+
+        foreach ($this->actions as $action) {
+            if ($action->status !== ActionStatus::Pending) {
+                continue;
+            }
+
+            if ($action->deferred_until === null) {
+                continue;
+            }
+
+            if ($earliest === null || $action->deferred_until < $earliest) {
+                $earliest = $action->deferred_until;
+            }
+        }
+
+        return $earliest;
+    }
+
+    /**
      * Claim a single action — transition from Pending to Running.
      */
     public function claim(int $actionId): bool

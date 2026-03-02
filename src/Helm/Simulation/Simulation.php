@@ -11,6 +11,7 @@ use Helm\Navigation\NodeType;
 use Helm\ShipLink\ActionFactory;
 use Helm\ShipLink\ActionProcessor;
 use Helm\ShipLink\ActionType;
+use Helm\ShipLink\Contracts\ActionRepository;
 use Helm\ShipLink\Contracts\LoadoutFactory;
 use Helm\ShipLink\Contracts\ShipStateRepository;
 use Helm\ShipLink\Models\Action;
@@ -40,6 +41,7 @@ final class Simulation
         private readonly ActionProcessor $processor,
         private readonly NodeRepository $nodeRepository,
         private readonly EdgeRepository $edgeRepository,
+        private readonly ActionRepository $actionRepository,
     ) {
         $this->shipFactory->setIdentityResolver(
             fn (int $id) => $this->identities[$id] ?? null
@@ -51,11 +53,20 @@ final class Simulation
      */
     public function createShip(string $name, int $ownerId): Ship
     {
+        return $this->createShipAtNode($name, $ownerId, 1);
+    }
+
+    /**
+     * Create a ship with default loadout at a specific node.
+     */
+    public function createShipAtNode(string $name, int $ownerId, int $nodeId): Ship
+    {
         $postId = $this->nextShipId++;
         $identity = new MemoryShipIdentity($postId, $name, $ownerId);
         $this->identities[$postId] = $identity;
 
         $state = ShipState::defaults($postId);
+        $state->node_id = $nodeId;
         $this->stateRepository->insert($state);
         $loadout = $this->loadoutFactory->buildDefaults($postId, $ownerId);
 
@@ -88,6 +99,54 @@ final class Simulation
     public function processReady(): ProcessingResult
     {
         return $this->processor->processReady();
+    }
+
+    /**
+     * Advance clock until all pending actions have resolved.
+     *
+     * Loops: find next deferred timestamp, jump clock to it,
+     * process ready actions, repeat until no pending actions remain.
+     */
+    public function advanceUntilIdle(): ProcessingResult
+    {
+        $totalProcessed = 0;
+        $totalFailed = 0;
+
+        $memoryRepo = $this->actionRepository;
+        assert($memoryRepo instanceof MemoryActionRepository);
+
+        while (true) {
+            $next = $memoryRepo->nextDeferredUntil();
+            if ($next === null) {
+                break;
+            }
+
+            // Advance clock to the deferred timestamp
+            $now = Date::now();
+            $delta = $next->getTimestamp() - $now->getTimestamp();
+            if ($delta > 0) {
+                Date::advanceTestNow($delta);
+            }
+
+            $result = $this->processor->processReady();
+            $totalProcessed += $result->processed;
+            $totalFailed += $result->failed;
+
+            // Safety: if nothing was processed, break to avoid infinite loop
+            if ($result->total() === 0) {
+                break;
+            }
+        }
+
+        return new ProcessingResult($totalProcessed, $totalFailed);
+    }
+
+    /**
+     * Find an action by ID.
+     */
+    public function findAction(int $id): ?Action
+    {
+        return $this->actionRepository->find($id);
     }
 
     /**
