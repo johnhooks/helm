@@ -6,7 +6,7 @@ namespace Tests\Wpunit\ShipLink;
 
 use Helm\Lib\Date;
 use Helm\ShipLink\ActionHeartbeat;
-use Helm\ShipLink\ActionRepository;
+use Helm\ShipLink\WpdbActionRepository;
 use Helm\ShipLink\ActionStatus;
 use Helm\ShipLink\ActionType;
 use Helm\ShipLink\Models\Action;
@@ -19,7 +19,7 @@ use Tests\Support\WpunitTester;
  */
 class ActionHeartbeatTest extends \Codeception\TestCase\WPTestCase
 {
-    private ActionRepository $repository;
+    private WpdbActionRepository $repository;
     private ActionHeartbeat $heartbeat;
 
     private int $ownerId;
@@ -31,7 +31,7 @@ class ActionHeartbeatTest extends \Codeception\TestCase\WPTestCase
 
         $this->tester->haveOrigin();
 
-        $this->repository = new ActionRepository();
+        $this->repository = new WpdbActionRepository();
         $this->heartbeat  = new ActionHeartbeat($this->repository);
 
         $this->ownerId = self::factory()->user->create(['role' => 'subscriber']);

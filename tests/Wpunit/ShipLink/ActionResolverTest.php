@@ -6,15 +6,15 @@ namespace Tests\Wpunit\ShipLink;
 
 use DateTimeImmutable;
 use Helm\Core\ErrorCode;
-use Helm\Navigation\EdgeRepository;
-use Helm\Navigation\NodeRepository;
+use Helm\Navigation\Contracts\EdgeRepository;
+use Helm\Navigation\Contracts\NodeRepository;
 use Helm\ShipLink\ActionException;
-use Helm\ShipLink\ActionRepository;
+use Helm\ShipLink\Contracts\ActionRepository;
 use Helm\ShipLink\ActionResolver;
 use Helm\ShipLink\ActionStatus;
 use Helm\ShipLink\ActionType;
 use Helm\ShipLink\Models\Action;
-use Helm\ShipLink\ShipStateRepository;
+use Helm\ShipLink\Contracts\ShipStateRepository;
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use Tests\Support\WpunitTester;
 

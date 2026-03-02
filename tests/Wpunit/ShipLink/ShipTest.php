@@ -5,15 +5,15 @@ declare(strict_types=1);
 namespace Tests\Wpunit\ShipLink;
 
 use DateTimeImmutable;
-use Helm\Navigation\EdgeRepository;
-use Helm\Navigation\NodeRepository;
+use Helm\Navigation\Contracts\EdgeRepository;
+use Helm\Navigation\Contracts\NodeRepository;
 use Helm\ShipLink\Models\Action;
 use Helm\ShipLink\ActionType;
 use Helm\ShipLink\Contracts\ShipLink;
 use Helm\ShipLink\Loadout;
 use Helm\ShipLink\Models\ShipState;
 use Helm\ShipLink\ShipFactory;
-use Helm\ShipLink\ShipStateRepository;
+use Helm\ShipLink\Contracts\ShipStateRepository;
 use Helm\Ships\ShipPost;
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use Tests\Support\WpunitTester;

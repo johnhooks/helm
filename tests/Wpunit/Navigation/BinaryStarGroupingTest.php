@@ -6,7 +6,7 @@ namespace Tests\Wpunit\Navigation;
 
 use Helm\Celestials\CelestialRepository;
 use Helm\Celestials\CelestialType;
-use Helm\Navigation\NodeRepository;
+use Helm\Navigation\Contracts\NodeRepository;
 use Helm\Navigation\Provider as NavigationProvider;
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use Tests\Support\WpunitTester;

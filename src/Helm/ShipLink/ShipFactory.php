@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Helm\ShipLink;
 
-use Helm\Inventory\InventoryRepository;
+use Helm\Inventory\Contracts\InventoryRepository;
 use Helm\Navigation\NavigationService;
-use Helm\Products\ProductRepository;
+use Helm\Products\Contracts\ProductRepository;
+use Helm\ShipLink\Contracts\ShipStateRepository;
 use Helm\ShipLink\Models\ShipState;
 use Helm\ShipLink\System\Cargo;
 use Helm\ShipLink\System\Hull;

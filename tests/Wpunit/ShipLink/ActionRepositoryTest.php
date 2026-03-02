@@ -5,27 +5,27 @@ declare(strict_types=1);
 namespace Tests\Wpunit\ShipLink;
 
 use DateTimeImmutable;
-use Helm\ShipLink\ActionRepository;
+use Helm\ShipLink\WpdbActionRepository;
 use Helm\ShipLink\ActionStatus;
 use Helm\ShipLink\ActionType;
 use Helm\ShipLink\Models\Action;
 use Tests\Support\WpunitTester;
 
 /**
- * @covers \Helm\ShipLink\ActionRepository
+ * @covers \Helm\ShipLink\WpdbActionRepository
  *
  * @property WpunitTester $tester
  */
 class ActionRepositoryTest extends \Codeception\TestCase\WPTestCase
 {
-    private ActionRepository $repository;
+    private WpdbActionRepository $repository;
 
     public function _before(): void
     {
         parent::_before();
         $this->tester->haveOrigin();
 
-        $this->repository = new ActionRepository();
+        $this->repository = new WpdbActionRepository();
     }
 
     public function test_insert_sets_id(): void

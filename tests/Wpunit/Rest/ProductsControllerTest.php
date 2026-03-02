@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Wpunit\Rest;
 
-use Helm\Products\ProductRepository;
+use Helm\Products\Contracts\ProductRepository;
 use lucatume\WPBrowser\TestCase\WPRestApiTestCase;
 use Tests\Support\WpunitTester;
 use WP_REST_Request;

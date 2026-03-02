@@ -5,23 +5,23 @@ declare(strict_types=1);
 namespace Tests\Wpunit\ShipLink;
 
 use Helm\ShipLink\Models\ShipState;
-use Helm\ShipLink\ShipStateRepository;
+use Helm\ShipLink\WpdbShipStateRepository;
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use Tests\Support\WpunitTester;
 
 /**
- * @covers \Helm\ShipLink\ShipStateRepository
+ * @covers \Helm\ShipLink\WpdbShipStateRepository
  *
  * @property WpunitTester $tester
  */
 class ShipStateRepositoryTest extends WPTestCase
 {
-    private ShipStateRepository $repository;
+    private WpdbShipStateRepository $repository;
 
     public function _before(): void
     {
         parent::_before();
-        $this->repository = new ShipStateRepository();
+        $this->repository = new WpdbShipStateRepository();
     }
 
     public function test_find_returns_null_for_nonexistent(): void

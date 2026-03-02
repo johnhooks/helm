@@ -7,6 +7,8 @@ namespace Helm\Navigation;
 use Helm\Celestials\CelestialRepository;
 use Helm\Celestials\CelestialType;
 use Helm\lucatume\DI52\ServiceProvider;
+use Helm\Navigation\Contracts\EdgeRepository;
+use Helm\Navigation\Contracts\NodeRepository;
 use Helm\Stars\Star;
 use Helm\Stars\StarPost;
 use Helm\Stars\StarRepository;
@@ -27,8 +29,8 @@ final class Provider extends ServiceProvider
 
     public function register(): void
     {
-        $this->container->singleton(NodeRepository::class);
-        $this->container->singleton(EdgeRepository::class);
+        $this->container->singleton(NodeRepository::class, WpdbNodeRepository::class);
+        $this->container->singleton(EdgeRepository::class, WpdbEdgeRepository::class);
         $this->container->singleton(RouteRepository::class);
         $this->container->singleton(NodeGenerator::class);
         $this->container->singleton(NavComputer::class);

@@ -38,8 +38,8 @@ final class NavComputer
 
     public function __construct(
         private readonly NodeGenerator $generator,
-        private readonly NodeRepository $nodeRepository,
-        private readonly EdgeRepository $edgeRepository,
+        private readonly Contracts\NodeRepository $nodeRepository,
+        private readonly Contracts\EdgeRepository $edgeRepository,
     ) {
     }
 

@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Helm\ShipLink;
 
 use Helm\Database\Schema;
-use Helm\Inventory\InventoryRepository;
+use Helm\Inventory\Contracts\InventoryRepository;
 use Helm\Inventory\LocationType;
 use Helm\Inventory\Models\Item;
+use Helm\Products\Contracts\ProductRepository;
 use Helm\Products\Models\Product;
-use Helm\Products\ProductRepository;
 use Helm\StellarWP\Models\Model;
 
 /**

@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace Helm\ShipLink;
 
 use Helm\Core\ErrorCode;
-use Helm\Lib\Date;
 use Helm\Database\Transaction;
-use Helm\Inventory\InventoryRepository;
+use Helm\Inventory\Contracts\InventoryRepository;
 use Helm\ShipLink\Contracts\ActionHandler;
+use Helm\ShipLink\Contracts\ActionRepository;
+use Helm\ShipLink\Contracts\ShipStateRepository;
 use Helm\ShipLink\Models\Action;
 use Helm\lucatume\DI52\Container;
 
@@ -54,7 +55,7 @@ final class ActionResolver
             }
 
             // Atomically claim
-            if (! $this->claim($actionId)) {
+            if (! $this->actionRepository->claim($actionId)) {
                 throw new ActionException(ErrorCode::ActionClaimFailed, __('Action is already being processed', 'helm'));
             }
 
@@ -116,33 +117,6 @@ final class ActionResolver
             $this->stateRepository->updateCurrentAction($action->ship_post_id, null);
             throw $error;
         }
-    }
-
-    /**
-     * Atomically claim an action for processing.
-     */
-    private function claim(int $actionId): bool
-    {
-        global $wpdb;
-
-        $table = $wpdb->prefix . 'helm_ship_actions';
-
-        $nowString = Date::nowString();
-        $updated = $wpdb->query(
-            $wpdb->prepare(
-                "UPDATE {$table}
-                 SET status = %s, processing_at = %s, broadcast_at = %s, updated_at = %s
-                 WHERE id = %d AND status = %s",
-                ActionStatus::Running->value,
-                $nowString,
-                $nowString,
-                $nowString,
-                $actionId,
-                ActionStatus::Pending->value
-            )
-        );
-
-        return $updated === 1;
     }
 
     /**

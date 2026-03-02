@@ -6,9 +6,11 @@ namespace Helm\ShipLink;
 
 use Helm\Core\ErrorCode;
 use Helm\Database\Transaction;
-use Helm\Inventory\InventoryRepository;
+use Helm\Inventory\Contracts\InventoryRepository;
 use Helm\ShipLink\Contracts\ActionHandler;
+use Helm\ShipLink\Contracts\ActionRepository;
 use Helm\ShipLink\Contracts\ActionValidator;
+use Helm\ShipLink\Contracts\ShipStateRepository;
 use Helm\ShipLink\Models\Action;
 use Helm\lucatume\DI52\Container;
 

@@ -7,6 +7,8 @@ namespace Helm\Navigation;
 use Helm\Celestials\CelestialRepository;
 use Helm\Celestials\CelestialType;
 use Helm\Core\ErrorCode;
+use Helm\Navigation\Contracts\EdgeRepository;
+use Helm\Navigation\Contracts\NodeRepository;
 use Helm\Stars\StarRepository;
 
 /**

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Wpunit\Products;
 
-use Helm\Products\ProductRepository;
+use Helm\Products\Contracts\ProductRepository;
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use Tests\Support\WpunitTester;
 

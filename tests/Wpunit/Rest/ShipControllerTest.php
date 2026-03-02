@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Wpunit\Rest;
 
-use Helm\ShipLink\ShipStateRepository;
+use Helm\ShipLink\Contracts\ShipStateRepository;
 use Helm\Ships\ShipPost;
 use lucatume\WPBrowser\TestCase\WPRestApiTestCase;
 use Tests\Support\WpunitTester;

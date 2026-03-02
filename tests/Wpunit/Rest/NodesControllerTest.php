@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests\Wpunit\Rest;
 
 use Helm\Navigation\Node;
-use Helm\Navigation\NodeRepository;
+use Helm\Navigation\Contracts\NodeRepository;
 use Helm\Navigation\NodeType;
 use Helm\Stars\StarPost;
 use lucatume\WPBrowser\TestCase\WPRestApiTestCase;

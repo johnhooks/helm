@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace Helm\Navigation;
 
 use Helm\Database\Schema;
+use Helm\Navigation\Contracts\NodeRepository;
 
 /**
  * Repository for navigation nodes.
  */
-final class NodeRepository
+final class WpdbNodeRepository implements NodeRepository
 {
     /**
      * Find a node by ID.

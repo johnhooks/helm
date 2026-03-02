@@ -6,11 +6,11 @@ namespace Tests\Wpunit\Navigation;
 
 use Helm\Core\ErrorCode;
 use Helm\Navigation\EdgeInfo;
-use Helm\Navigation\EdgeRepository;
+use Helm\Navigation\Contracts\EdgeRepository;
 use Helm\Navigation\NavigationService;
 use Helm\Navigation\NearbyStar;
 use Helm\Navigation\Node;
-use Helm\Navigation\NodeRepository;
+use Helm\Navigation\Contracts\NodeRepository;
 use Helm\PostTypes\PostTypeRegistry;
 use Helm\Stars\Star;
 use Helm\Stars\StarRepository;

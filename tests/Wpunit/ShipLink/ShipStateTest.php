@@ -7,7 +7,7 @@ namespace Tests\Wpunit\ShipLink;
 use DateTimeImmutable;
 use Helm\ShipLink\Components\PowerMode;
 use Helm\ShipLink\Models\ShipState;
-use Helm\ShipLink\ShipStateRepository;
+use Helm\ShipLink\Contracts\ShipStateRepository;
 use Helm\StellarWP\Models\Model;
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use Tests\Support\WpunitTester;

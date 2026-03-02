@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Helm\ShipLink\System;
 
-use Helm\Inventory\InventoryRepository;
+use Helm\Inventory\Contracts\InventoryRepository;
 use Helm\Inventory\LocationType;
 use Helm\Inventory\Models\Item;
-use Helm\Products\ProductRepository;
+use Helm\Products\Contracts\ProductRepository;
 use Helm\ShipLink\Contracts\Cargo as CargoContract;
 
 /**

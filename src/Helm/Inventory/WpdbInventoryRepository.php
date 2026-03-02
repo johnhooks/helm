@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Helm\Inventory;
 
 use Helm\Database\Schema;
+use Helm\Inventory\Contracts\InventoryRepository;
 use Helm\Inventory\Models\Item;
 use Helm\Lib\Date;
 use Helm\Lib\HydratesModels;
@@ -13,7 +14,7 @@ use Helm\StellarWP\Models\Model;
 /**
  * Repository for inventory operations.
  */
-final class InventoryRepository
+final class WpdbInventoryRepository implements InventoryRepository
 {
     use HydratesModels;
 

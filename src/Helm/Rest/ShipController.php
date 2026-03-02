@@ -6,9 +6,9 @@ namespace Helm\Rest;
 
 use Helm\Core\ErrorCode;
 use Helm\ShipLink\Components\PowerMode;
+use Helm\ShipLink\Contracts\ShipStateRepository;
 use Helm\ShipLink\Ship;
 use Helm\ShipLink\ShipFactory;
-use Helm\ShipLink\ShipStateRepository;
 use Helm\Ships\ShipPost;
 use WP_Error;
 use WP_REST_Request;

@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Helm\Rest;
 
 use Helm\Core\ErrorCode;
-use Helm\Inventory\InventoryRepository;
+use Helm\Inventory\Contracts\InventoryRepository;
 use Helm\Inventory\LocationType;
-use Helm\Products\ProductRepository;
+use Helm\Products\Contracts\ProductRepository;
 use Helm\Ships\ShipPost;
 use WP_Error;
 use WP_REST_Request;

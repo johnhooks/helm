@@ -5,15 +5,15 @@ declare(strict_types=1);
 namespace Tests\Wpunit\ShipLink;
 
 use DateTimeImmutable;
-use Helm\Navigation\EdgeRepository;
-use Helm\Navigation\NodeRepository;
+use Helm\Navigation\Contracts\EdgeRepository;
+use Helm\Navigation\Contracts\NodeRepository;
 use Helm\ShipLink\ActionProcessor;
-use Helm\ShipLink\ActionRepository;
+use Helm\ShipLink\WpdbActionRepository;
 use Helm\ShipLink\ActionStatus;
 use Helm\ShipLink\ActionType;
 use Helm\ShipLink\Models\Action;
 use Helm\ShipLink\ProcessingResult;
-use Helm\ShipLink\ShipStateRepository;
+use Helm\ShipLink\WpdbShipStateRepository;
 use Tests\Support\WpunitTester;
 
 /**
@@ -23,9 +23,9 @@ use Tests\Support\WpunitTester;
  */
 class ActionProcessorTest extends \Codeception\TestCase\WPTestCase
 {
-    private ActionRepository $repository;
+    private WpdbActionRepository $repository;
     private ActionProcessor $processor;
-    private ShipStateRepository $stateRepository;
+    private WpdbShipStateRepository $stateRepository;
     private NodeRepository $nodeRepository;
     private EdgeRepository $edgeRepository;
 
@@ -35,8 +35,8 @@ class ActionProcessorTest extends \Codeception\TestCase\WPTestCase
 
         $this->tester->haveOrigin();
 
-        $this->repository = new ActionRepository();
-        $this->stateRepository = new ShipStateRepository();
+        $this->repository = new WpdbActionRepository();
+        $this->stateRepository = new WpdbShipStateRepository();
         $this->nodeRepository = helm(NodeRepository::class);
         $this->edgeRepository = helm(EdgeRepository::class);
 

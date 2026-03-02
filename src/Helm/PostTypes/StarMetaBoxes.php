@@ -7,7 +7,7 @@ namespace Helm\PostTypes;
 use Helm\Celestials\CelestialRepository;
 use Helm\Celestials\CelestialType;
 use Helm\Discovery\DiscoveryService;
-use Helm\Navigation\NodeRepository;
+use Helm\Navigation\Contracts\NodeRepository;
 use Helm\Origin\Origin;
 use Helm\Planets\PlanetRepository;
 use Helm\Stars\StarRepository;

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests\Wpunit\ShipLink\Actions\ScanRoute;
 
 use Helm\Navigation\NavigationService;
-use Helm\Navigation\NodeRepository;
+use Helm\Navigation\Contracts\NodeRepository;
 use Helm\ShipLink\Actions\ScanRoute\Resolver;
 use Helm\ShipLink\ActionType;
 use Helm\ShipLink\Models\Action;

@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Helm\CLI;
 
 use Helm\ShipLink\ActionProcessor;
-use Helm\ShipLink\ActionRepository;
 use Helm\ShipLink\ActionStatus;
+use Helm\ShipLink\Contracts\ActionRepository;
 use WP_CLI;
 
 /**

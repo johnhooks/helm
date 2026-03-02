@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Tests\Wpunit\ShipLink\Actions\Jump;
 
 use DateTimeImmutable;
-use Helm\Navigation\EdgeRepository;
-use Helm\Navigation\NodeRepository;
+use Helm\Navigation\Contracts\EdgeRepository;
+use Helm\Navigation\Contracts\NodeRepository;
 use Helm\ShipLink\Actions\Jump\Handler;
 use Helm\ShipLink\ActionStatus;
 use Helm\ShipLink\ActionType;

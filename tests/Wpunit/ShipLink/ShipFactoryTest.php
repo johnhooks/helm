@@ -10,7 +10,7 @@ use Helm\ShipLink\LoadoutFactory;
 use Helm\ShipLink\Ship;
 use Helm\ShipLink\ShipFactory;
 use Helm\ShipLink\Models\ShipState;
-use Helm\ShipLink\ShipStateRepository;
+use Helm\ShipLink\Contracts\ShipStateRepository;
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use Tests\Support\WpunitTester;
 

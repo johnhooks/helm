@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Helm\ShipLink;
 
 use Helm\Lib\Date;
-use Helm\ShipLink\ActionRepository;
+use Helm\ShipLink\Contracts\ActionRepository;
 
 /**
  * Delivers action state updates via the WordPress Heartbeat API.

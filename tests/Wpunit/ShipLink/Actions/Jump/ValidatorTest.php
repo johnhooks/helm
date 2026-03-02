@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Tests\Wpunit\ShipLink\Actions\Jump;
 
 use Helm\Core\ErrorCode;
-use Helm\Navigation\EdgeRepository;
-use Helm\Navigation\NodeRepository;
+use Helm\Navigation\Contracts\EdgeRepository;
+use Helm\Navigation\Contracts\NodeRepository;
 use Helm\ShipLink\ActionException;
 use Helm\ShipLink\Actions\Jump\Validator;
 use Helm\ShipLink\ActionType;

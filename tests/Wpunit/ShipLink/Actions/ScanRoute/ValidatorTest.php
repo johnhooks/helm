@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests\Wpunit\ShipLink\Actions\ScanRoute;
 
 use Helm\Core\ErrorCode;
-use Helm\Navigation\NodeRepository;
+use Helm\Navigation\Contracts\NodeRepository;
 use Helm\ShipLink\ActionException;
 use Helm\ShipLink\Actions\ScanRoute\Validator;
 use Helm\ShipLink\ActionType;

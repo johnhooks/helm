@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Helm\Products;
 
+use Helm\Products\Contracts\ProductRepository;
 use Helm\lucatume\DI52\ServiceProvider;
 
 /**
@@ -16,7 +17,7 @@ final class Provider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->container->singleton(ProductRepository::class);
+        $this->container->singleton(ProductRepository::class, WpdbProductRepository::class);
         $this->container->singleton(ProductSeeder::class);
     }
 

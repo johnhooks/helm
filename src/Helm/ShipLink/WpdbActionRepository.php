@@ -9,6 +9,7 @@ use Helm\Database\Schema;
 use Helm\Database\Transaction;
 use Helm\Lib\Date;
 use Helm\Lib\HydratesModels;
+use Helm\ShipLink\Contracts\ActionRepository;
 use Helm\ShipLink\Models\Action;
 use Helm\StellarWP\Models\Model;
 
@@ -17,7 +18,7 @@ use Helm\StellarWP\Models\Model;
  *
  * Handles CRUD operations for the helm_ship_actions custom table.
  */
-final class ActionRepository
+final class WpdbActionRepository implements ActionRepository
 {
     use HydratesModels;
 
@@ -536,6 +537,35 @@ final class ActionRepository
             fn(array $row) => $this->hydrate($row),
             $rows
         );
+    }
+
+    /**
+     * Atomically claim a single action for processing.
+     *
+     * Transitions the action from Pending to Running status.
+     */
+    public function claim(int $actionId): bool
+    {
+        global $wpdb;
+
+        $table = $wpdb->prefix . Schema::TABLE_SHIP_ACTIONS;
+
+        $nowString = Date::nowString();
+        $updated = $wpdb->query(
+            $wpdb->prepare(
+                "UPDATE {$table}
+                 SET status = %s, processing_at = %s, broadcast_at = %s, updated_at = %s
+                 WHERE id = %d AND status = %s",
+                ActionStatus::Running->value,
+                $nowString,
+                $nowString,
+                $nowString,
+                $actionId,
+                ActionStatus::Pending->value
+            )
+        );
+
+        return $updated === 1;
     }
 
     /**

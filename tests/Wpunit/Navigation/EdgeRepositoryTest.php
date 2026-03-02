@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Tests\Wpunit\Navigation;
 
 use Helm\Navigation\Edge;
-use Helm\Navigation\EdgeRepository;
-use Helm\Navigation\NodeRepository;
+use Helm\Navigation\Contracts\EdgeRepository;
+use Helm\Navigation\Contracts\NodeRepository;
 use Helm\Navigation\NodeType;
 use lucatume\WPBrowser\TestCase\WPTestCase;
 

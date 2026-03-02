@@ -29,6 +29,6 @@ foreach (\Helm\Database\Schema::TABLES as $table) {
 // Re-seed products so they're available for all tests.
 // Must run after cleanup since DELETE removes seeded rows.
 $seeder = new \Helm\Products\ProductSeeder(
-    new \Helm\Products\ProductRepository()
+    new \Helm\Products\WpdbProductRepository()
 );
 $seeder->seed();

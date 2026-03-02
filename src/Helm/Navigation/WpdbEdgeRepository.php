@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace Helm\Navigation;
 
 use Helm\Database\Schema;
+use Helm\Navigation\Contracts\EdgeRepository;
 
 /**
  * Repository for navigation edges.
  */
-final class EdgeRepository
+final class WpdbEdgeRepository implements EdgeRepository
 {
     /**
      * Find an edge by ID.

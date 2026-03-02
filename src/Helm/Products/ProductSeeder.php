@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Helm\Products;
 
+use Helm\Products\Contracts\ProductRepository;
+
 /**
  * Seeds the products table from JSON data files.
  *

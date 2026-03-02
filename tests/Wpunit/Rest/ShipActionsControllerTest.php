@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Wpunit\Rest;
 
-use Helm\Navigation\EdgeRepository;
-use Helm\Navigation\NodeRepository;
-use Helm\ShipLink\ActionRepository;
+use Helm\Navigation\Contracts\EdgeRepository;
+use Helm\Navigation\Contracts\NodeRepository;
+use Helm\ShipLink\Contracts\ActionRepository;
 use Helm\ShipLink\ActionStatus;
 use Helm\ShipLink\Models\Action;
 use Helm\Ships\ShipPost;

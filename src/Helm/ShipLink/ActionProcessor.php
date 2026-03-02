@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Helm\ShipLink;
 
+use Helm\ShipLink\Contracts\ActionRepository;
+
 /**
  * Processes ready actions from the queue.
  *

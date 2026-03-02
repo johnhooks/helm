@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Helm\ShipLink;
 
 use Helm\Lib\MethodInvoker;
+use Helm\ShipLink\Contracts\ActionRepository;
+use Helm\ShipLink\Contracts\ShipStateRepository;
 use Helm\lucatume\DI52\ServiceProvider;
 
 /**
@@ -16,8 +18,8 @@ final class Provider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->container->singleton(ShipStateRepository::class);
-        $this->container->singleton(ActionRepository::class);
+        $this->container->singleton(ShipStateRepository::class, WpdbShipStateRepository::class);
+        $this->container->singleton(ActionRepository::class, WpdbActionRepository::class);
         $this->container->singleton(LoadoutFactory::class);
         $this->container->singleton(ShipFactory::class);
         $this->container->singleton(MethodInvoker::class);

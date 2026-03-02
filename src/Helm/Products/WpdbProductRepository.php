@@ -7,13 +7,14 @@ namespace Helm\Products;
 use Helm\Database\Schema;
 use Helm\Lib\Date;
 use Helm\Lib\HydratesModels;
+use Helm\Products\Contracts\ProductRepository;
 use Helm\Products\Models\Product;
 use Helm\StellarWP\Models\Model;
 
 /**
  * Repository for product catalog table operations.
  */
-final class ProductRepository
+final class WpdbProductRepository implements ProductRepository
 {
     use HydratesModels;
 

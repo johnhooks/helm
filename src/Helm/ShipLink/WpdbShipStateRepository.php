@@ -8,6 +8,7 @@ use Helm\Database\Schema;
 use Helm\Lib\Date;
 use Helm\Lib\HydratesModels;
 use Helm\ShipLink\Models\ShipState;
+use Helm\ShipLink\Contracts\ShipStateRepository;
 use Helm\Ships\ShipPost;
 
 /**
@@ -15,7 +16,7 @@ use Helm\Ships\ShipPost;
  *
  * Handles CRUD operations for the helm_ship_state custom table.
  */
-final class ShipStateRepository
+final class WpdbShipStateRepository implements ShipStateRepository
 {
     use HydratesModels;
 

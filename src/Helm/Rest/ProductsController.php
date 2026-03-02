@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Helm\Rest;
 
 use Helm\Core\ErrorCode;
+use Helm\Products\Contracts\ProductRepository;
 use Helm\Products\Models\Product;
-use Helm\Products\ProductRepository;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;

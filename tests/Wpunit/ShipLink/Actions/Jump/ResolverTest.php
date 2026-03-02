@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Wpunit\ShipLink\Actions\Jump;
 
-use Helm\Navigation\EdgeRepository;
-use Helm\Navigation\NodeRepository;
+use Helm\Navigation\Contracts\EdgeRepository;
+use Helm\Navigation\Contracts\NodeRepository;
 use Helm\ShipLink\Actions\Jump\Resolver;
 use Helm\ShipLink\ActionType;
 use Helm\ShipLink\Models\Action;

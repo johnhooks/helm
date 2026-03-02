@@ -6,7 +6,7 @@ namespace Tests\Wpunit\Navigation;
 
 use Helm\Navigation\Route;
 use Helm\Navigation\RouteRepository;
-use Helm\Navigation\NodeRepository;
+use Helm\Navigation\Contracts\NodeRepository;
 use Helm\Navigation\NodeType;
 use lucatume\WPBrowser\TestCase\WPTestCase;
 
