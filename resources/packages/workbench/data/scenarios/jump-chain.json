@@ -1,6 +1,6 @@
 {
   "name": "Jump Chain",
-  "description": "Ship jumps 5 times, tracks core life and power recovery between jumps.",
+  "description": "5 sequential jumps, real durations from loadout.",
   "ships": {
     "explorer": {
       "hull": "pioneer",
@@ -8,14 +8,15 @@
       "drive": "dr_505",
       "sensor": "vrs_mk1",
       "shield": "aegis_delta",
-      "nav": "nav_tier_3"
+      "nav": "nav_tier_3",
+      "node": 1
     }
   },
   "actions": [
-    { "t": 0, "ship": "explorer", "type": "jump", "params": { "distance": 3 } },
-    { "t": 3600, "ship": "explorer", "type": "jump", "params": { "distance": 3 } },
-    { "t": 7200, "ship": "explorer", "type": "jump", "params": { "distance": 3 } },
-    { "t": 10800, "ship": "explorer", "type": "jump", "params": { "distance": 3 } },
-    { "t": 14400, "ship": "explorer", "type": "jump", "params": { "distance": 3 } }
+    { "ship": "explorer", "type": "jump", "params": { "target_node_id": 10, "distance": 3 } },
+    { "ship": "explorer", "type": "jump", "params": { "target_node_id": 20, "distance": 3 } },
+    { "ship": "explorer", "type": "jump", "params": { "target_node_id": 30, "distance": 3 } },
+    { "ship": "explorer", "type": "jump", "params": { "target_node_id": 40, "distance": 3 } },
+    { "ship": "explorer", "type": "jump", "params": { "target_node_id": 50, "distance": 3 } }
   ]
 }

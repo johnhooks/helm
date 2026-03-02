@@ -13,6 +13,8 @@ import { combat } from './cli/combat';
 import { detection } from './cli/detection';
 import { ship } from './cli/ship';
 import { timeline } from './cli/timeline';
+import { action } from './cli/action';
+import { scenarioCommand } from './cli/scenario';
 
 const parsed = parseArgs();
 const command = parsed.positional[0];
@@ -74,6 +76,14 @@ switch (command) {
 		timeline(parsed);
 		break;
 
+	case 'action':
+		action(parsed);
+		break;
+
+	case 'scenario':
+		scenarioCommand(parsed);
+		break;
+
 	default:
 		console.error('Usage: bun wb <command> [options]'); // eslint-disable-line no-console
 		console.error(''); // eslint-disable-line no-console
@@ -93,6 +103,8 @@ switch (command) {
 		console.error('  detection                     Wolf × target detection matrix'); // eslint-disable-line no-console
 		console.error('  ship [--hull=X --core=Y ...]  Holodeck ship state snapshot'); // eslint-disable-line no-console
 		console.error('  timeline [--file=X]           Ship mutation timeline'); // eslint-disable-line no-console
+		console.error('  action --action=jump [...]    Submit action via holodeck Engine'); // eslint-disable-line no-console
+		console.error('  scenario <scenario.json>      Run sequential actions via Engine'); // eslint-disable-line no-console
 		console.error(''); // eslint-disable-line no-console
 		console.error('Tuning flags: --throttle=1.0 --effort=1.0 --priority=1.0'); // eslint-disable-line no-console
 		process.exit(1);
