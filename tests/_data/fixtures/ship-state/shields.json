@@ -1,0 +1,30 @@
+[
+	{
+		"label": "full shields (null full_at)",
+		"state": { "shields_max": 100, "shields_full_at": null },
+		"loadout": { "core": "epoch_s", "drive": "dr_505", "sensor": "vrs_mk1", "shield": "aegis_delta" },
+		"now": 0,
+		"expected": { "currentStrength": 100.0, "regenRate": 10.0 }
+	},
+	{
+		"label": "full shields (past full_at)",
+		"state": { "shields_max": 100, "shields_full_at": -3600 },
+		"loadout": { "core": "epoch_s", "drive": "dr_505", "sensor": "vrs_mk1", "shield": "aegis_delta" },
+		"now": 0,
+		"expected": { "currentStrength": 100.0 }
+	},
+	{
+		"label": "partial shields (2 hours until full)",
+		"state": { "shields_max": 100, "shields_full_at": 7200 },
+		"loadout": { "core": "epoch_s", "drive": "dr_505", "sensor": "vrs_mk1", "shield": "aegis_delta" },
+		"now": 0,
+		"expected": { "currentStrength": 80.0, "regenRate": 10.0 }
+	},
+	{
+		"label": "zero shields (deficit exceeds max)",
+		"state": { "shields_max": 100, "shields_full_at": 72000 },
+		"loadout": { "core": "epoch_s", "drive": "dr_505", "sensor": "vrs_mk1", "shield": "aegis_delta" },
+		"now": 0,
+		"expected": { "currentStrength": 0.0 }
+	}
+]

@@ -1,0 +1,35 @@
+[
+	{
+		"label": "default loadout effective range",
+		"state": { "power_max": 100, "power_full_at": null, "power_mode": "normal" },
+		"loadout": { "core": "epoch_s", "drive": "dr_505", "sensor": "vrs_mk1", "shield": "aegis_delta" },
+		"now": 0,
+		"distance": 5,
+		"expected": { "range": 5.0 }
+	},
+	{
+		"label": "scan duration for 5 ly",
+		"state": { "power_max": 100, "power_full_at": null, "power_mode": "normal" },
+		"loadout": { "core": "epoch_s", "drive": "dr_505", "sensor": "vrs_mk1", "shield": "aegis_delta" },
+		"now": 0,
+		"distance": 5,
+		"expected": { "scanDuration": 150 }
+	},
+	{
+		"label": "scan cost for 5 ly",
+		"state": { "power_max": 100, "power_full_at": null, "power_mode": "normal" },
+		"loadout": { "core": "epoch_s", "drive": "dr_505", "sensor": "vrs_mk1", "shield": "aegis_delta" },
+		"now": 0,
+		"distance": 5,
+		"expected": { "scanCost": 10.0 }
+	},
+	{
+		"label": "efficiency mode reduces range",
+		"state": { "power_max": 100, "power_full_at": null, "power_mode": "efficiency" },
+		"loadout": { "core": "epoch_s", "drive": "dr_505", "sensor": "vrs_mk1", "shield": "aegis_delta" },
+		"now": 0,
+		"distance": 3,
+		"skip_ts": true,
+		"expected": { "range": 3.5 }
+	}
+]

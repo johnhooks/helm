@@ -41,7 +41,9 @@ export default defineConfig({
             '@helm/admin-settings': path.resolve(__dirname, 'resources/packages/admin-settings/src'),
             '@helm/actions': path.resolve(__dirname, 'resources/packages/actions/src'),
             '@helm/router': path.resolve(__dirname, 'resources/packages/router/src'),
+            '@helm/formulas': path.resolve(__dirname, 'resources/packages/formulas/src'),
             '@helm/holodeck': path.resolve(__dirname, 'resources/packages/holodeck/src'),
+            '@helm/workbench': path.resolve(__dirname, 'resources/packages/workbench/src'),
         },
     },
 });

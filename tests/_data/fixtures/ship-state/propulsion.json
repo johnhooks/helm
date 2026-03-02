@@ -1,0 +1,36 @@
+[
+	{
+		"label": "default loadout, 5 ly jump",
+		"state": { "power_max": 100, "power_full_at": null, "power_mode": "normal" },
+		"loadout": { "core": "epoch_s", "drive": "dr_505", "sensor": "vrs_mk1", "shield": "aegis_delta" },
+		"now": 0,
+		"distance": 5,
+		"expected": { "jumpDuration": 18000, "coreCost": 5.0, "performanceRatio": 1.0, "maxRange": 7.0 }
+	},
+	{
+		"label": "efficiency mode underpowers drive",
+		"state": { "power_max": 100, "power_full_at": null, "power_mode": "efficiency" },
+		"loadout": { "core": "epoch_s", "drive": "dr_505", "sensor": "vrs_mk1", "shield": "aegis_delta" },
+		"now": 0,
+		"distance": 5,
+		"skip_ts": true,
+		"expected": { "jumpDuration": 36735, "coreCost": 5.0, "performanceRatio": 0.7, "maxRange": 3.43 }
+	},
+	{
+		"label": "overdrive boosts amplitude",
+		"state": { "power_max": 100, "power_full_at": null, "power_mode": "overdrive" },
+		"loadout": { "core": "epoch_s", "drive": "dr_505", "sensor": "vrs_mk1", "shield": "aegis_delta" },
+		"now": 0,
+		"distance": 5,
+		"skip_ts": true,
+		"expected": { "jumpDuration": 13847, "coreCost": 5.0, "performanceRatio": 1.0, "maxRange": 9.1 }
+	},
+	{
+		"label": "max range at default loadout",
+		"state": { "power_max": 100, "power_full_at": null, "power_mode": "normal" },
+		"loadout": { "core": "epoch_s", "drive": "dr_505", "sensor": "vrs_mk1", "shield": "aegis_delta" },
+		"now": 0,
+		"distance": 7,
+		"expected": { "maxRange": 7.0 }
+	}
+]

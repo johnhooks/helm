@@ -1,0 +1,41 @@
+[
+	{
+		"label": "after-jump snapshot: power regenning, shields regenning",
+		"state": {
+			"power_max": 100,
+			"power_full_at": 1800,
+			"shields_max": 100,
+			"shields_full_at": 3600,
+			"power_mode": "normal"
+		},
+		"loadout": { "core": "epoch_s", "drive": "dr_505", "sensor": "vrs_mk1", "shield": "aegis_delta" },
+		"now": 0,
+		"distance": 5,
+		"expected": {
+			"currentPower": 95.0,
+			"currentStrength": 90.0,
+			"jumpDuration": 18000,
+			"range": 5.0
+		}
+	},
+	{
+		"label": "overdrive mode affects all systems",
+		"state": {
+			"power_max": 100,
+			"power_full_at": null,
+			"power_mode": "overdrive"
+		},
+		"loadout": { "core": "epoch_s", "drive": "dr_505", "sensor": "vrs_mk1", "shield": "aegis_delta" },
+		"now": 0,
+		"distance": 5,
+		"skip_ts": true,
+		"expected": {
+			"currentPower": 100.0,
+			"outputMultiplier": 1.3,
+			"regenRate": 13.0,
+			"jumpDuration": 13847,
+			"range": 6.5,
+			"maxRange": 9.1
+		}
+	}
+]

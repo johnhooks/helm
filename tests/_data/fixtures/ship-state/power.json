@@ -1,0 +1,46 @@
+[
+	{
+		"label": "full power (null full_at)",
+		"state": { "power_max": 100, "power_full_at": null, "power_mode": "normal" },
+		"loadout": { "core": "epoch_s", "drive": "dr_505", "sensor": "vrs_mk1", "shield": "aegis_delta" },
+		"now": 0,
+		"expected": { "currentPower": 100.0, "regenRate": 10.0, "outputMultiplier": 1.0 }
+	},
+	{
+		"label": "full power (past full_at)",
+		"state": { "power_max": 100, "power_full_at": -3600, "power_mode": "normal" },
+		"loadout": { "core": "epoch_s", "drive": "dr_505", "sensor": "vrs_mk1", "shield": "aegis_delta" },
+		"now": 0,
+		"expected": { "currentPower": 100.0 }
+	},
+	{
+		"label": "partial power (1 hour until full)",
+		"state": { "power_max": 100, "power_full_at": 3600, "power_mode": "normal" },
+		"loadout": { "core": "epoch_s", "drive": "dr_505", "sensor": "vrs_mk1", "shield": "aegis_delta" },
+		"now": 0,
+		"expected": { "currentPower": 90.0 }
+	},
+	{
+		"label": "zero power (deficit exceeds max)",
+		"state": { "power_max": 100, "power_full_at": 72000, "power_mode": "normal" },
+		"loadout": { "core": "epoch_s", "drive": "dr_505", "sensor": "vrs_mk1", "shield": "aegis_delta" },
+		"now": 0,
+		"expected": { "currentPower": 0.0 }
+	},
+	{
+		"label": "efficiency mode halves regen rate",
+		"state": { "power_max": 100, "power_full_at": 7200, "power_mode": "efficiency" },
+		"loadout": { "core": "epoch_s", "drive": "dr_505", "sensor": "vrs_mk1", "shield": "aegis_delta" },
+		"now": 0,
+		"skip_ts": true,
+		"expected": { "currentPower": 90.0, "regenRate": 5.0 }
+	},
+	{
+		"label": "overdrive boosts output multiplier",
+		"state": { "power_max": 100, "power_full_at": null, "power_mode": "overdrive" },
+		"loadout": { "core": "epoch_s", "drive": "dr_505", "sensor": "vrs_mk1", "shield": "aegis_delta" },
+		"now": 0,
+		"skip_ts": true,
+		"expected": { "currentPower": 100.0, "outputMultiplier": 1.3, "regenRate": 13.0 }
+	}
+]
