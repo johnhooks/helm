@@ -93,7 +93,7 @@ describe('matchedFilterGain', () => {
 	});
 
 	it('DSC excels at continuous detection', () => {
-		expect(matchedFilterGain(dsc, 'continuous')).toBe(1.5);
+		expect(matchedFilterGain(dsc, 'continuous')).toBe(1.25);
 		expect(matchedFilterGain(dsc, 'continuous')).toBeGreaterThan(matchedFilterGain(vrs, 'continuous'));
 	});
 
@@ -106,8 +106,8 @@ describe('matchedFilterGain', () => {
 	it('sweep gain is average of pulse and continuous', () => {
 		// ACU sweep: (1.5 + 0.7) / 2 = 1.1
 		expect(matchedFilterGain(acu, 'sweep')).toBeCloseTo(1.1);
-		// DSC sweep: (0.7 + 1.5) / 2 = 1.1
-		expect(matchedFilterGain(dsc, 'sweep')).toBeCloseTo(1.1);
+		// DSC sweep: (0.7 + 1.25) / 2 = 0.975
+		expect(matchedFilterGain(dsc, 'sweep')).toBeCloseTo(0.975);
 	});
 
 	it('ACU is poor at continuous signals', () => {

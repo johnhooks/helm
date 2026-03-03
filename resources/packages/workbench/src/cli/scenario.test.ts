@@ -437,7 +437,7 @@ describe('scenario runner', () => {
 				description: 'Damaged target emits shield_regen, listener detects',
 				ships: {
 					target: { ...baseShip },
-					listener: { ...baseShip, hull: 'surveyor', sensor: 'dsc_mk1', passive_scan_interval: 7200 },
+					listener: { ...baseShip, hull: 'surveyor', sensor: 'dsc_mk3', passive_scan_interval: 7200 },
 				},
 				actions: [
 					{ ship: 'target', type: 'absorb_damage', params: { amount: 30 } },
@@ -481,7 +481,7 @@ describe('scenario runner', () => {
 				ships: {
 					target: { ...baseShip },
 					jammer: { ...baseShip, equipment: ['ecm_mk1'] },
-					listener: { ...baseShip, hull: 'surveyor', sensor: 'dsc_mk1', passive_scan_interval: 7200 },
+					listener: { ...baseShip, hull: 'surveyor', sensor: 'dsc_mk3', passive_scan_interval: 7200 },
 				},
 				actions: [
 					{ ship: 'target', type: 'absorb_damage', params: { amount: 30 } },
@@ -508,7 +508,7 @@ describe('scenario runner', () => {
 				description: 'Damaged ship emits shield_regen, listener detects',
 				ships: {
 					target: { ...baseShip },
-					listener: { ...baseShip, hull: 'surveyor', sensor: 'dsc_mk1', passive_scan_interval: 7200 },
+					listener: { ...baseShip, hull: 'surveyor', sensor: 'dsc_mk3', passive_scan_interval: 7200 },
 				},
 				actions: [
 					{ ship: 'target', type: 'absorb_damage', params: { amount: 30 } },

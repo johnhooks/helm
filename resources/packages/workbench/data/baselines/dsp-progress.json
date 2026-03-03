@@ -1,8 +1,8 @@
 {
-  "generated": "2026-03-03T03:06:43.063Z",
+  "generated": "2026-03-03T04:30:25.730Z",
   "summary": {
-    "pass": 35,
-    "warn": 9,
+    "pass": 39,
+    "warn": 5,
     "fail": 0,
     "info": 23,
     "total": 67
@@ -23,11 +23,11 @@
         },
         {
           "goal": "Belt miner is safe for ~6hr even vs DSC (masking=3.0)",
-          "verdict": "WARN",
-          "detail": "Belt miner (masking=3): 6hr=31.6%, 24hr=81.1%.",
+          "verdict": "PASS",
+          "detail": "Belt miner (masking=3): 6hr=21.8%, 24hr=61%.",
           "values": {
-            "conf6hr": 0.3159,
-            "conf24hr": 0.8107
+            "conf6hr": 0.2182,
+            "conf24hr": 0.61
           }
         },
         {
@@ -50,9 +50,9 @@
         {
           "goal": "Shield regen barely detectable (even DSC, 12hr, open space)",
           "verdict": "WARN",
-          "detail": "Shield regen emission=0.2, DSC 12hr = 38.2%.",
+          "detail": "Shield regen emission=0.2, DSC 12hr = 25.9%.",
           "values": {
-            "confidence": 0.3823
+            "confidence": 0.2592
           }
         }
       ]
@@ -64,11 +64,11 @@
         {
           "goal": "DSC > VRS > ACU for passive detection of continuous signals",
           "verdict": "PASS",
-          "detail": "2hr mining passive: DSC=89.5%, VRS=36.6%, ACU=12.2%.",
+          "detail": "2hr mining passive: DSC=72.7%, VRS=36.6%, ACU=12.2%.",
           "values": {
             "acu": 0.12225851797782741,
             "vrs": 0.3657460335195043,
-            "dsc": 0.8951000498935047
+            "dsc": 0.7271917106318523
           }
         },
         {
@@ -82,12 +82,12 @@
         {
           "goal": "Matched filter specialization: ACU→pulse, DSC→continuous",
           "verdict": "PASS",
-          "detail": "ACU pulse=1.5 cont=0.7. DSC pulse=0.7 cont=1.5.",
+          "detail": "ACU pulse=1.5 cont=0.7. DSC pulse=0.7 cont=1.25.",
           "values": {
             "acuPulse": 1.5,
             "acuCont": 0.7,
             "dscPulse": 0.7,
-            "dscCont": 1.5
+            "dscCont": 1.25
           }
         },
         {
@@ -118,20 +118,20 @@
         {
           "goal": "Military spool at peak detectable within a few samples (DSC)",
           "verdict": "PASS",
-          "detail": "DR-705 peak: power=10, DSC 1-sample=87%, 3-samples (15min)=95%.",
+          "detail": "DR-705 peak: power=10, DSC 1-sample=82.5%, 3-samples (15min)=95%.",
           "values": {
             "power": 10,
-            "conf1": 0.8699,
+            "conf1": 0.8249,
             "conf3": 0.95
           }
         },
         {
           "goal": "Civilian drive still stealthy at 50% spool",
-          "verdict": "WARN",
-          "detail": "DR-305 at 50% spool (90s): power=1.6971, confidence=10.3%.",
+          "verdict": "PASS",
+          "detail": "DR-305 at 50% spool (90s): power=1.6971, confidence=9.7%.",
           "values": {
             "power": 1.6971,
-            "confidence": 0.1026
+            "confidence": 0.0973
           }
         },
         {
@@ -179,25 +179,25 @@
         {
           "goal": "Round-trip: PNP scan (power=5)",
           "verdict": "INFO",
-          "detail": "At passive cap (95%). Estimated=3.5021 (underestimates true power=5). Use active scan for precise readings.",
+          "detail": "At passive cap (95%). Estimated=3.7715 (underestimates true power=5). Use active scan for precise readings.",
           "values": {
             "truePower": 5,
             "confidence": 0.95,
-            "estimated": 3.5021,
-            "error": 1.4979,
-            "topMatch": "ecm",
+            "estimated": 3.7715,
+            "error": 1.2285,
+            "topMatch": "drive_spool",
             "atCap": true
           }
         },
         {
           "goal": "Round-trip: Mining (power=1)",
           "verdict": "INFO",
-          "detail": "At passive cap (95%). Estimated=0.6672 (underestimates true power=1). Use active scan for precise readings.",
+          "detail": "At passive cap (95%). Estimated=0.8622 (underestimates true power=1). Use active scan for precise readings.",
           "values": {
             "truePower": 1,
             "confidence": 0.95,
-            "estimated": 0.6672,
-            "error": 0.3328,
+            "estimated": 0.8622,
+            "error": 0.1378,
             "topMatch": "planet_scan",
             "atCap": true
           }
@@ -205,10 +205,10 @@
         {
           "goal": "Round-trip: Belt miner (power=1)",
           "verdict": "PASS",
-          "detail": "Confidence=76.9%, estimated=1, error=0, top_match=mining.",
+          "detail": "Confidence=56.2%, estimated=1, error=0, top_match=mining.",
           "values": {
             "truePower": 1,
-            "confidence": 0.7685,
+            "confidence": 0.5622,
             "estimated": 1,
             "error": 0,
             "topMatch": "mining",
@@ -218,20 +218,20 @@
         {
           "goal": "Round-trip: Drive spool (power=4)",
           "verdict": "INFO",
-          "detail": "At passive cap (95%). Estimated=2.4763 (underestimates true power=4). Use active scan for precise readings.",
+          "detail": "At passive cap (95%). Estimated=2.6668 (underestimates true power=4). Use active scan for precise readings.",
           "values": {
             "truePower": 4,
             "confidence": 0.95,
-            "estimated": 2.4763,
-            "error": 1.5237,
-            "topMatch": "drive_sustain",
+            "estimated": 2.6668,
+            "error": 1.3332,
+            "topMatch": "belt_scan",
             "atCap": true
           }
         },
         {
           "goal": "All 3 drive classes identifiable by peak spool signature",
           "verdict": "PASS",
-          "detail": "DR-305 (civilian): peak=4.8, conf=34.3%, identified=YES. DR-505 (industrial): peak=6, conf=48.5%, identified=YES. DR-705 (military): peak=10, conf=87%, identified=YES"
+          "detail": "DR-305 (civilian): peak=4.8, conf=30.7%, identified=YES. DR-505 (industrial): peak=6, conf=43.3%, identified=YES. DR-705 (military): peak=10, conf=82.5%, identified=YES"
         }
       ]
     },
@@ -241,11 +241,11 @@
       "checks": [
         {
           "goal": "Progressive revelation: 30m → anomaly, 2hr → type, 4hr → cap (95%)",
-          "verdict": "WARN",
-          "detail": "Open miner vs DSC: 30m=39.5%, 2hr=89.5%, 6hr=95%, 12hr=95%. Passive cap=95%.",
+          "verdict": "PASS",
+          "detail": "Open miner vs DSC: 30m=26.7%, 2hr=72.7%, 6hr=95%, 12hr=95%. Passive cap=95%.",
           "values": {
-            "conf30m": 0.3946,
-            "conf2hr": 0.8951,
+            "conf30m": 0.267,
+            "conf2hr": 0.7272,
             "conf6hr": 0.95,
             "conf12hr": 0.95
           }
@@ -253,10 +253,10 @@
         {
           "goal": "Classification improves with integration time",
           "verdict": "PASS",
-          "detail": "2hr: top=mining (sep=0). 6hr: top=planet_scan (sep=0.2). Wider separation = more confident classification.",
+          "detail": "2hr: top=mining (sep=0). 6hr: top=planet_scan (sep=0.0755). Wider separation = more confident classification.",
           "values": {
             "sep2hr": 0,
-            "sep6hr": 0.2,
+            "sep6hr": 0.0755,
             "top2hr": "mining",
             "top6hr": "planet_scan"
           }
@@ -290,19 +290,19 @@
         },
         {
           "goal": "Miner detection progresses through tiers over hours (DSC)",
-          "verdict": "WARN",
-          "detail": "1hr=65.4%[type], 2hr=89.5%[analysis], 4hr=95%[analysis], 6hr=95%[analysis], 8hr=95%[analysis], 12hr=95%[analysis]",
+          "verdict": "PASS",
+          "detail": "1hr=45.4%[class], 2hr=72.7%[type], 4hr=93.3%[analysis], 6hr=95%[analysis], 8hr=95%[analysis], 12hr=95%[analysis]",
           "values": {
             "1hr": {
-              "conf": 0.6541,
-              "tier": "type"
+              "conf": 0.4538,
+              "tier": "class"
             },
             "2hr": {
-              "conf": 0.8951,
-              "tier": "analysis"
+              "conf": 0.7272,
+              "tier": "type"
             },
             "4hr": {
-              "conf": 0.95,
+              "conf": 0.9327,
               "tier": "analysis"
             },
             "6hr": {
@@ -322,10 +322,10 @@
         {
           "goal": "Military drive spool at peak reaches type tier (DSC, 1 sample)",
           "verdict": "PASS",
-          "detail": "DR-705 peak DSC 1-sample: confidence=87%, tier=analysis.",
+          "detail": "DR-705 peak DSC 1-sample: confidence=82.5%, tier=type.",
           "values": {
-            "confidence": 0.8699,
-            "tier": "analysis"
+            "confidence": 0.8249,
+            "tier": "type"
           }
         },
         {
@@ -360,52 +360,52 @@
         {
           "goal": "DR-305 (civilian): peak vs time-averaged detection",
           "verdict": "INFO",
-          "detail": "Envelope avg power=1.8707, duty cycle=100.3%, diluted power=1.8769. Peak conf=34.3%, time-avg conf=11.1%.",
+          "detail": "Envelope avg power=1.8707, duty cycle=100.3%, diluted power=1.8769. Peak conf=30.7%, time-avg conf=10.5%.",
           "values": {
             "avgPower": 1.8707,
             "dutyCycle": 1.0033,
             "dilutedPower": 1.8769,
-            "peakConf": 0.3434,
-            "avgConf": 0.111
+            "peakConf": 0.3066,
+            "avgConf": 0.1047
           }
         },
         {
           "goal": "DR-505 (industrial): peak vs time-averaged detection",
           "verdict": "INFO",
-          "detail": "Envelope avg power=2.5019, duty cycle=140.3%, diluted power=3.511. Peak conf=48.5%, time-avg conf=21.8%.",
+          "detail": "Envelope avg power=2.5019, duty cycle=140.3%, diluted power=3.511. Peak conf=43.3%, time-avg conf=19.7%.",
           "values": {
             "avgPower": 2.5019,
             "dutyCycle": 1.4033,
             "dilutedPower": 3.511,
-            "peakConf": 0.485,
-            "avgConf": 0.2176
+            "peakConf": 0.4329,
+            "avgConf": 0.1974
           }
         },
         {
           "goal": "DR-705 (military): peak vs time-averaged detection",
           "verdict": "INFO",
-          "detail": "Envelope avg power=5.447, duty cycle=90.3%, diluted power=4.9205. Peak conf=87%, time-avg conf=35.7%.",
+          "detail": "Envelope avg power=5.447, duty cycle=90.3%, diluted power=4.9205. Peak conf=82.5%, time-avg conf=31.8%.",
           "values": {
             "avgPower": 5.447,
             "dutyCycle": 0.9033,
             "dilutedPower": 4.9205,
-            "peakConf": 0.8699,
-            "avgConf": 0.3569
+            "peakConf": 0.8249,
+            "avgConf": 0.3184
           }
         },
         {
           "goal": "What sample period catches a military spool at peak?",
           "verdict": "INFO",
-          "detail": "5s=87%, 10s=87%, 15s=87%, 30s=87%, 60s=87%, 300s=87%, 600s=87%, 1800s=87%",
+          "detail": "5s=82.5%, 10s=82.5%, 15s=82.5%, 30s=82.5%, 60s=82.5%, 300s=82.5%, 600s=82.5%, 1800s=82.5%",
           "values": {
-            "5s": 0.8699,
-            "10s": 0.8699,
-            "15s": 0.8699,
-            "30s": 0.8699,
-            "60s": 0.8699,
-            "300s": 0.8699,
-            "600s": 0.8699,
-            "1800s": 0.8699
+            "5s": 0.8249,
+            "10s": 0.8249,
+            "15s": 0.8249,
+            "30s": 0.8249,
+            "60s": 0.8249,
+            "300s": 0.8249,
+            "600s": 0.8249,
+            "1800s": 0.8249
           }
         },
         {
@@ -426,32 +426,32 @@
           "values": {
             "0%": {
               "selfPower": 1.5,
-              "cleanConf": 0.6541,
-              "dirtyConf": 0.3795,
-              "degradation": "42%"
+              "cleanConf": 0.4538,
+              "dirtyConf": 0.2575,
+              "degradation": "43.3%"
             },
             "25%": {
               "selfPower": 0.9533,
-              "cleanConf": 0.6541,
-              "dirtyConf": 0.4572,
-              "degradation": "30.1%"
+              "cleanConf": 0.4538,
+              "dirtyConf": 0.3076,
+              "degradation": "32.2%"
             },
             "50%": {
               "selfPower": 0.6892,
-              "cleanConf": 0.6541,
-              "dirtyConf": 0.5035,
-              "degradation": "23%"
+              "cleanConf": 0.4538,
+              "dirtyConf": 0.339,
+              "degradation": "25.3%"
             },
             "75%": {
               "selfPower": 0.3959,
-              "cleanConf": 0.6541,
-              "dirtyConf": 0.5625,
-              "degradation": "14%"
+              "cleanConf": 0.4538,
+              "dirtyConf": 0.3813,
+              "degradation": "16%"
             },
             "100%": {
               "selfPower": 0,
-              "cleanConf": 0.6541,
-              "dirtyConf": 0.6541,
+              "cleanConf": 0.4538,
+              "dirtyConf": 0.4538,
               "degradation": "0%"
             }
           }
@@ -463,32 +463,32 @@
           "values": {
             "0%": {
               "selfPower": 1.8,
-              "cleanConf": 0.6541,
-              "dirtyConf": 0.3457,
-              "degradation": "47.2%"
+              "cleanConf": 0.4538,
+              "dirtyConf": 0.2364,
+              "degradation": "47.9%"
             },
             "25%": {
               "selfPower": 1.0621,
-              "cleanConf": 0.6541,
-              "dirtyConf": 0.4399,
-              "degradation": "32.8%"
+              "cleanConf": 0.4538,
+              "dirtyConf": 0.2962,
+              "degradation": "34.7%"
             },
             "50%": {
               "selfPower": 0.6529,
-              "cleanConf": 0.6541,
-              "dirtyConf": 0.5104,
-              "degradation": "22%"
+              "cleanConf": 0.4538,
+              "dirtyConf": 0.3438,
+              "degradation": "24.2%"
             },
             "75%": {
               "selfPower": 0.2842,
-              "cleanConf": 0.6541,
-              "dirtyConf": 0.587,
-              "degradation": "10.3%"
+              "cleanConf": 0.4538,
+              "dirtyConf": 0.3997,
+              "degradation": "11.9%"
             },
             "100%": {
               "selfPower": 0,
-              "cleanConf": 0.6541,
-              "dirtyConf": 0.6541,
+              "cleanConf": 0.4538,
+              "dirtyConf": 0.4538,
               "degradation": "0%"
             }
           }
@@ -500,32 +500,32 @@
           "values": {
             "0%": {
               "selfPower": 1.2,
-              "cleanConf": 0.6541,
-              "dirtyConf": 0.4193,
-              "degradation": "35.9%"
+              "cleanConf": 0.4538,
+              "dirtyConf": 0.2828,
+              "degradation": "37.7%"
             },
             "25%": {
               "selfPower": 2.272,
-              "cleanConf": 0.6541,
-              "dirtyConf": 0.3022,
+              "cleanConf": 0.4538,
+              "dirtyConf": 0.2098,
               "degradation": "53.8%"
             },
             "50%": {
               "selfPower": 1.7813,
-              "cleanConf": 0.6541,
-              "dirtyConf": 0.3476,
-              "degradation": "46.9%"
+              "cleanConf": 0.4538,
+              "dirtyConf": 0.2376,
+              "degradation": "47.6%"
             },
             "75%": {
               "selfPower": 1.1752,
-              "cleanConf": 0.6541,
-              "dirtyConf": 0.4229,
-              "degradation": "35.3%"
+              "cleanConf": 0.4538,
+              "dirtyConf": 0.2851,
+              "degradation": "37.2%"
             },
             "100%": {
               "selfPower": 0,
-              "cleanConf": 0.6541,
-              "dirtyConf": 0.6541,
+              "cleanConf": 0.4538,
+              "dirtyConf": 0.4538,
               "degradation": "0%"
             }
           }
@@ -533,21 +533,21 @@
         {
           "goal": "Military cooldown meaningfully degrades scanning (wait vs scan now)",
           "verdict": "PASS",
-          "detail": "DSC detecting miner 2hr: clean=89.5%, during DR-705 cooldown peak=46.1%. Self-emission=2.7.",
+          "detail": "DSC detecting miner 2hr: clean=72.7%, during DR-705 cooldown peak=31%. Self-emission=2.7.",
           "values": {
-            "clean": 0.8951,
-            "hot": 0.4606,
+            "clean": 0.7272,
+            "hot": 0.3098,
             "selfEmission": 2.7
           }
         },
         {
           "goal": "Civilian cooldown has less scan impact than military",
           "verdict": "PASS",
-          "detail": "DSC detecting miner 2hr: clean=89.5%, DR-305 cooldown=68.6%, DR-705 cooldown=46.1%. Civilian degrades less than military.",
+          "detail": "DSC detecting miner 2hr: clean=72.7%, DR-305 cooldown=48.2%, DR-705 cooldown=31%. Civilian degrades less than military.",
           "values": {
-            "clean": 0.8951,
-            "civHot": 0.6862,
-            "milHot": 0.4606
+            "clean": 0.7272,
+            "civHot": 0.4817,
+            "milHot": 0.3098
           }
         }
       ]
@@ -571,11 +571,11 @@
         {
           "goal": "Wolf pack PNP raises noise floor, partially masking other signals",
           "verdict": "PASS",
-          "detail": "DSC finding miner (6hr): clean=95%, 1 wolf PNP=63.7%, 3 wolf PNP=37.2%. Wolf pack noise helps hide the miner.",
+          "detail": "DSC finding miner (6hr): clean=95%, 1 wolf PNP=44%, 3 wolf PNP=25.3%. Wolf pack noise helps hide the miner.",
           "values": {
             "clean": 0.95,
-            "wolf1": 0.6373,
-            "wolf3": 0.372
+            "wolf1": 0.4397,
+            "wolf3": 0.2528
           }
         },
         {
@@ -622,10 +622,10 @@
         {
           "goal": "Busy system (10 miners + 2 wolves + ECM): detection is degraded but works",
           "verdict": "WARN",
-          "detail": "Noise floor=6.8238 (baseline=1). Miner detection (DSC 6hr): 15.5%. Wolf PNP (VRS 1 sample): 6%, 30min: 8.5%.",
+          "detail": "Noise floor=6.8238 (baseline=1). Miner detection (DSC 6hr): 12%. Wolf PNP (VRS 1 sample): 6%, 30min: 8.5%.",
           "values": {
             "noiseFloor": 6.8238,
-            "minerConf": 0.1552,
+            "minerConf": 0.1203,
             "wolfConf1": 0.0605,
             "wolfConf30m": 0.0853
           }

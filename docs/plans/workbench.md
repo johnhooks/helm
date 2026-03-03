@@ -158,7 +158,7 @@ The workbench currently has three loosely connected layers:
 
 ### Remaining Gaps
 
-- **Report generation.** No markdown report generator. Analysis output is structured JSON consumed by agents or piped through jq. Human-readable reports are Stage 6.
+All planned stages (1–6) are complete.
 
 ## Stages
 
@@ -260,19 +260,15 @@ Ship owns state and mutations (`resolve()`, `consumePower()`, `moveToNode()`, et
 - **Diff engine** (`c31e9c4`): Per-command differs with verdict regression detection (dsp-progress), numeric leaf comparison (analyse), composite key matching (balance, detection), outlier tracking (balance). 23 unit tests
 - **Static report preserved**: `computeShipReport` used by `analyse`, `balance`, `matrix` for formula-level sweeps. Matrix commands consume holodeck data structures (shared catalog, hull/product types) but compute statically — the engine is for behavioral validation (scenarios), not numeric sweeps
 
-### Stage 6: Report Generation
+### Stage 6: Report Generation ✓
 
-**What:** Build the report layer that turns analysis data into readable markdown documents.
+**Status:** Complete.
 
-**Why:** The workbench's output needs to be useful without post-processing. A generated report should tell you the state of game balance, what changed since last run, and what needs attention. It should be readable by both humans reviewing game design and agents doing balance work.
-
-**Scope:**
-- Report generator that reads analysis results and writes markdown files
-- Summary report (top-level findings, flags, key metrics)
-- Per-category deep-dive reports (combat balance, detection/stealth, economy, progression)
-- Regression report (what changed since the last baseline)
-- Reports written to `reports/` directory, gitignored or committed as design artifacts
-- CLI command: `bun run wb report` generates the full report suite
+- **`report` → `loadout` rename**: Existing single-loadout JSON snapshot renamed to `bun run wb loadout`. `report` reclaimed for the report suite.
+- **`bun run wb report`**: Generates markdown report suite to `reports/` directory (gitignored). Runs all 4 analysis commands fresh, diffs against baselines if available.
+- **4 deep-dive reports**: `index.md` (summary with at-a-glance metrics, attention items, hull overview), `dsp-health.md` (67 DSP checks with verdict badges), `hull-balance.md` (balance matrix, core×drive compatibility, power budget, crossover products, core lifecycle), `detection-stealth.md` (verdict distribution, per-wolf summaries, environment impact, PVP encounters, combat projections).
+- **Regression report**: `regression.md` generated when baselines exist. Summary table, regressions, improvements, other changes grouped by command.
+- **Agent-friendly patterns**: Consistent heading hierarchy, verdict badges in headings, `**FLAG:**` prefix for attention items, metadata blocks, tables for all matrix data.
 
 ## Migration
 

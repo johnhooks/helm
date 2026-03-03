@@ -1,6 +1,6 @@
 # Workbench
 
-Design-time CLI for game balance analysis. Consumes `@helm/holodeck` for product catalog and ship simulation, `@helm/formulas` for calculations. All output is JSON to stdout.
+Design-time CLI for game balance analysis. Consumes `@helm/holodeck` for product catalog and ship simulation, `@helm/formulas` for calculations. Analysis commands output JSON to stdout. The `report` command generates markdown reports to `reports/`.
 
 ```bash
 bun run wb <command> [flags]
@@ -18,7 +18,8 @@ Runs ~460 scenarios across 14 categories (baseline, tuning sweeps, power budget,
 
 | Question | Command |
 |----------|---------|
-| How does one specific loadout perform? | `bun run wb report --hull=specter --core=epoch_r` |
+| How does one specific loadout perform? | `bun run wb loadout --hull=specter --core=epoch_r` |
+| Generate readable report suite? | `bun run wb report` (writes markdown to `reports/`) |
 | What's the difference between two builds? | `bun run wb compare --a.core=epoch_s --b.core=epoch_r` |
 | Which component is best in a slot? | `bun run wb matrix --vary=core` (or `--vary=core,drive`) |
 | Are any hull/component combos broken? | `bun run wb balance` (flags outliers >2σ) |
@@ -36,7 +37,7 @@ Runs ~460 scenarios across 14 categories (baseline, tuning sweeps, power budget,
 
 ## Tuning Flags
 
-Work on `report`, `compare`, `matrix`:
+Work on `loadout`, `compare`, `matrix`:
 
 | Flag | Affects |
 |------|---------|

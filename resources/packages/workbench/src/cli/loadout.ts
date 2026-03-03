@@ -2,14 +2,14 @@ import { computeShipReport } from '../report';
 import type { ParsedFlags } from './parse';
 import { hydrateLoadout, toReportLoadout, resolveTuning, resolveConstants, loadoutSlugs } from './parse';
 
-export function report({ flags }: ParsedFlags): void {
-	const loadout = hydrateLoadout(flags);
+export function loadout({ flags }: ParsedFlags): void {
+	const lo = hydrateLoadout(flags);
 	const tuning = resolveTuning(flags);
 	const constants = resolveConstants(flags);
-	const shipReport = computeShipReport(toReportLoadout(loadout), tuning, constants);
+	const shipReport = computeShipReport(toReportLoadout(lo), tuning, constants);
 
 	const out = {
-		loadout: loadoutSlugs(loadout),
+		loadout: loadoutSlugs(lo),
 		tuning,
 		report: shipReport,
 	};

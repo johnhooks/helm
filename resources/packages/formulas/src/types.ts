@@ -284,7 +284,7 @@ export const DEFAULT_DRIVE_ENVELOPES: Record<string, DriveEnvelope> = {
 export const SENSOR_AFFINITIES: Record<string, SensorAffinity> = {
 	acu: { active: 1.4, passive: 0.6, pulseGain: 1.5, continuousGain: 0.7, pvpGain: 1.5 },
 	vrs: { active: 1.0, passive: 1.0, pulseGain: 1.0, continuousGain: 1.0, pvpGain: 0.8 },
-	dsc: { active: 0.7, passive: 1.4, pulseGain: 0.7, continuousGain: 1.5, pvpGain: 0.4 },
+	dsc: { active: 0.7, passive: 1.3, pulseGain: 0.7, continuousGain: 1.25, pvpGain: 0.4 },
 };
 
 // ---------------------------------------------------------------------------

@@ -31,5 +31,8 @@ bin/strauss.phar
 .DS_Store
 Thumbs.db
 
+# Workbench reports (ephemeral, regenerated on demand)
+resources/packages/workbench/reports/
+
 # Working drafts
 docs/plans/.wip/

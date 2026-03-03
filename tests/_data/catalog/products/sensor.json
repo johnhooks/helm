@@ -12,7 +12,7 @@
       "mult_a": 2.0,
       "draw": 3.0,
       "tuning": { "param": "effort", "min": 0.5, "max": 3.0 },
-      "dsp": { "active": 0.70, "passive": 1.40, "pulseGain": 0.70, "continuousGain": 1.50, "pvpGain": 0.40 }
+      "dsp": { "active": 0.70, "passive": 1.30, "pulseGain": 0.70, "continuousGain": 1.25, "pvpGain": 0.40 }
     },
     {
       "slug": "vrs_mk1",
@@ -51,7 +51,7 @@
       "mult_a": 1.4,
       "draw": 3.0,
       "tuning": { "param": "effort", "min": 0.5, "max": 3.0 },
-      "dsp": { "active": 0.80, "passive": 1.50, "pulseGain": 0.80, "continuousGain": 1.60, "pvpGain": 0.45 }
+      "dsp": { "active": 0.80, "passive": 1.40, "pulseGain": 0.80, "continuousGain": 1.35, "pvpGain": 0.45 }
     },
     {
       "slug": "vrs_mk2",
@@ -117,7 +117,7 @@
       "mult_a": 1.0,
       "draw": 3.0,
       "tuning": { "param": "effort", "min": 0.5, "max": 3.0 },
-      "dsp": { "active": 0.85, "passive": 1.60, "pulseGain": 0.85, "continuousGain": 1.70, "pvpGain": 0.50 }
+      "dsp": { "active": 0.85, "passive": 1.50, "pulseGain": 0.85, "continuousGain": 1.45, "pvpGain": 0.50 }
     },
     {
       "slug": "vrs_mk3",

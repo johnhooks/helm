@@ -1,6 +1,7 @@
 import { parseArgs } from './cli/parse';
 import { list } from './cli/list';
-import { report } from './cli/report';
+import { loadout } from './cli/loadout';
+import { reports } from './cli/reports';
 import { compare } from './cli/compare';
 import { matrix } from './cli/matrix';
 import { analyse } from './cli/analyse';
@@ -23,8 +24,12 @@ switch (command) {
 		list(parsed);
 		break;
 
+	case 'loadout':
+		loadout(parsed);
+		break;
+
 	case 'report':
-		report(parsed);
+		reports();
 		break;
 
 	case 'compare':
@@ -85,7 +90,8 @@ switch (command) {
 		console.error('Commands:'); // eslint-disable-line no-console
 		console.error('  list products [--type=core]   List available products'); // eslint-disable-line no-console
 		console.error('  list hulls                    List available hulls'); // eslint-disable-line no-console
-		console.error('  report [--core=X ...]         Single loadout report'); // eslint-disable-line no-console
+		console.error('  loadout [--core=X ...]         Single loadout report (JSON)'); // eslint-disable-line no-console
+		console.error('  report                        Generate markdown report suite'); // eslint-disable-line no-console
 		console.error('  compare [--a.core=X --b.core=Y]  Compare two loadouts'); // eslint-disable-line no-console
 		console.error('  matrix --vary=slot[,slot]     Sweep combinations'); // eslint-disable-line no-console
 		console.error('  analyse                       Run full analysis battery'); // eslint-disable-line no-console
