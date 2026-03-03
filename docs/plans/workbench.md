@@ -154,12 +154,9 @@ The workbench currently has three loosely connected layers:
 - **Drive envelope.** Multi-phase jump: spool at origin → cooldown at destination. Each phase produces distinct emissions with time-varying power curves. DSC sensors detect continuous emissions (drive envelopes), ACU sensors detect pulse emissions (weapons fire, scan pings).
 - **Verdict system.** `dsp-progress` command with 40+ gameplay checks producing PASS/WARN/FAIL verdicts across submarine warfare, miner safety, sensor tiers, drive envelopes, and multi-ship detection scenarios.
 - **Scenario library.** 13 scenario files covering exploration, combat, passive detection, drive envelope detection, ECM impact, fleet engagement, and PDS defense.
+- **Baseline persistence.** `bun run wb baseline save/show/diff` with per-command save, show, and diff. Baselines stored as JSON in `data/baselines/`, committed to git. Diff engine with per-command differs: verdict regression detection (dsp-progress), numeric deltas (analyse), composite key matching (balance, detection), outlier tracking (balance).
 
 ### Remaining Gaps
-
-- **Baseline persistence.** No explicit `save_baseline`/`load_baseline` commands. Regression detection requires manually comparing JSON outputs from consecutive runs.
-
-- **Diff engine.** No automated comparison between two analysis runs. The verdict system flags current-state problems but doesn't track drift over time.
 
 - **Report generation.** No markdown report generator. Analysis output is structured JSON consumed by agents or piped through jq. Human-readable reports are Stage 6.
 
@@ -252,21 +249,16 @@ Ship owns state and mutations (`resolve()`, `consumePower()`, `moveToNode()`, et
 - **Drive envelope.** Multi-phase jump: spool at origin (front-loaded power curve) → cooldown at destination (decaying curve). `emissionPowerAtTime()` applies envelope to get instantaneous power. DSC sensors excel at detecting continuous emissions (drive envelopes), ACU sensors excel at pulse emissions (weapons, scans).
 - **Environmental modifiers.** Noise floor from `noiseFloor(stellarBaseline, shipEmissions, jitter, ecmNoise, saturation)`. ECM raises noise floor for all ships at the node. Self-interference: own emissions raise noise floor but are excluded from detections.
 
-### Stage 5: Analysis Framework
+### Stage 5: Analysis Framework ✓
 
-**What:** Rebuild the workbench analysis layer to consume the holodeck engine instead of raw formulas.
+**Status:** Complete. Delivered across Stages 3.5–4 and `c31e9c4`.
 
-**Why:** The current analysis commands produce raw data that requires manual interpretation. The new analysis layer should run scenarios through the holodeck, compare results against design goals, and produce structured verdicts. "Is the game balanced?" should be answerable by running one command and reading the output.
-
-**Scope:**
-- Scenario definition format (ships, loadouts, action sequences, assertions)
-- Scenario runner that feeds scenarios through the holodeck
-- Verdict logic (PASS/WARN/FAIL against named design goals)
-- Matrix runner (hull × component × tuning sweeps through the engine, not just static reports)
-- Baseline save/load for regression detection
-- Diff engine for comparing two analysis runs
-- Pre-built scenario library covering the design questions from simulation-testing.md
-- Static report (`computeShipReport`) preserved as a convenience for quick loadout checks
+- **Scenario format + runner** (Stage 3.5): `ScenarioFile` JSON format, `bun run wb scenario` runs multi-ship action sequences through the holodeck engine
+- **Verdict system** (Stage 4): `dsp-progress` with 67 gameplay checks (PASS/WARN/FAIL/INFO) across 11 sections
+- **Pre-built scenario library** (Stage 4): 13 scenario files covering exploration, combat, passive detection, ECM, fleet engagement
+- **Baseline persistence** (`c31e9c4`): `bun run wb baseline save/show/diff` with per-command save, show, diff. JSON baselines in `data/baselines/`, committed to git
+- **Diff engine** (`c31e9c4`): Per-command differs with verdict regression detection (dsp-progress), numeric leaf comparison (analyse), composite key matching (balance, detection), outlier tracking (balance). 23 unit tests
+- **Static report preserved**: `computeShipReport` used by `analyse`, `balance`, `matrix` for formula-level sweeps. Matrix commands consume holodeck data structures (shared catalog, hull/product types) but compute statically — the engine is for behavioral validation (scenarios), not numeric sweeps
 
 ### Stage 6: Report Generation
 
