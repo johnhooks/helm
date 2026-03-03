@@ -9,7 +9,6 @@ import {
 	DEFAULT_DSP_CONSTANTS,
 	DEFAULT_DRIVE_ENVELOPES,
 	DEFAULT_TIER_THRESHOLDS,
-	SENSOR_AFFINITIES,
 	emissionPower,
 	tunedEmission,
 	stellarNoise,
@@ -30,6 +29,14 @@ import {
 	informationTier,
 	adjustedThresholds,
 } from '@helm/formulas';
+import { getSensorAffinity } from './holodeck-setup';
+
+// Sensor affinities sourced from catalog (not formula constants)
+const SENSOR_AFFINITIES: Record<string, SensorAffinity> = {
+	acu: getSensorAffinity('acu_mk1'),
+	vrs: getSensorAffinity('vrs_mk1'),
+	dsc: getSensorAffinity('dsc_mk1'),
+};
 
 // ── Output types ─────────────────────────────────────────────
 

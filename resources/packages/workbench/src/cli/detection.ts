@@ -9,7 +9,6 @@
  */
 
 import {
-	SENSOR_AFFINITIES,
 	DEFAULT_DSP_CONSTANTS,
 	DEFAULT_EMISSION_PROFILES,
 	emissionPower,
@@ -24,13 +23,30 @@ import {
 	phaserHullDamage,
 } from '@helm/formulas';
 import type { SensorAffinity, EmissionType, SpectralType } from '@helm/formulas';
-import { HULLS } from '../data/hulls';
-import { getProduct } from '../data/products';
+import {
+	getSensorAffinity, getWeaponStats, getShieldStats, getCoreStats, getHullData,
+	HULLS, getProduct,
+} from './holodeck-setup';
 import { r } from '../format';
+
+// ── Catalog-sourced constants ─────────────────────────────────
+
+// Sensor affinities from product catalog
+const SENSOR_AFFINITIES: Record<string, SensorAffinity> = {
+	acu: getSensorAffinity('acu_mk1'),
+	vrs: getSensorAffinity('vrs_mk1'),
+	dsc: getSensorAffinity('dsc_mk1'),
+};
 
 // Read Veil Array emission reduction from product catalog
 const veilArray = getProduct('veil_array');
 const VEIL_ARRAY_REDUCTION = veilArray?.mult_a ?? 0.7;
+
+// Weapon and shield stats from catalog
+const PHASER = getWeaponStats('phaser_array');
+const TORPEDO = getWeaponStats('torpedo_launcher');
+const AEGIS_DELTA = getShieldStats('aegis_delta');
+const EPOCH_S = getCoreStats('epoch_s');
 
 // ── Configuration (all input data as structured JSON) ───────
 
@@ -70,58 +86,35 @@ interface Environment {
 }
 
 function buildWolves(): WolfConfig[] {
-	const strikerHull = HULLS.find((h) => h.slug === 'striker')!;
-	const specterHull = HULLS.find((h) => h.slug === 'specter')!;
-	const pioneerHull = HULLS.find((h) => h.slug === 'pioneer')!;
-	const surveyorHull = HULLS.find((h) => h.slug === 'surveyor')!;
+	const wolf = (
+		id: string, label: string, hullSlug: string,
+		sensorSlug: string, affinityKey: string, role: WolfConfig['role'],
+	): WolfConfig => {
+		const hd = getHullData(hullSlug);
+		return {
+			id, label, hull: hullSlug,
+			hullSignature: hd.hullSignature,
+			sensor: sensorSlug,
+			affinity: SENSOR_AFFINITIES[affinityKey],
+			role,
+		};
+	};
 
 	return [
-		{
-			id: 'striker_acu',
-			label: 'Striker + ACU (active hunter)',
-			hull: 'striker',
-			hullSignature: strikerHull.hullSignature,
-			sensor: 'acu_mk1',
-			affinity: SENSOR_AFFINITIES.acu,
-			role: 'active',
-		},
-		{
-			id: 'specter_dsc',
-			label: 'Specter + DSC (passive listener)',
-			hull: 'specter',
-			hullSignature: specterHull.hullSignature,
-			sensor: 'dsc_mk1',
-			affinity: SENSOR_AFFINITIES.dsc,
-			role: 'passive',
-		},
-		{
-			id: 'pioneer_vrs',
-			label: 'Pioneer + VRS (generalist)',
-			hull: 'pioneer',
-			hullSignature: pioneerHull.hullSignature,
-			sensor: 'vrs_mk1',
-			affinity: SENSOR_AFFINITIES.vrs,
-			role: 'both',
-		},
-		{
-			id: 'surveyor_dsc',
-			label: 'Surveyor + DSC (science vessel)',
-			hull: 'surveyor',
-			hullSignature: surveyorHull.hullSignature,
-			sensor: 'dsc_mk1',
-			affinity: SENSOR_AFFINITIES.dsc,
-			role: 'passive',
-		},
+		wolf('striker_acu', 'Striker + ACU (active hunter)', 'striker', 'acu_mk1', 'acu', 'active'),
+		wolf('specter_dsc', 'Specter + DSC (passive listener)', 'specter', 'dsc_mk1', 'dsc', 'passive'),
+		wolf('pioneer_vrs', 'Pioneer + VRS (generalist)', 'pioneer', 'vrs_mk1', 'vrs', 'both'),
+		wolf('surveyor_dsc', 'Surveyor + DSC (science vessel)', 'surveyor', 'dsc_mk1', 'dsc', 'passive'),
 	];
 }
 
 function buildTargets(): TargetConfig[] {
 	const h = (slug: string) => {
-		const hull = HULLS.find((x) => x.slug === slug)!;
+		const hd = getHullData(slug);
 		return {
-			hullSignature: hull.hullSignature,
-			hullIntegrity: hull.hullIntegrity,
-			shieldMult: hull.shieldCapacityMultiplier ?? 1.0,
+			hullSignature: hd.hullSignature,
+			hullIntegrity: hd.hullIntegrity,
+			shieldMult: hd.shieldCapacityMultiplier,
 		};
 	};
 
@@ -134,14 +127,13 @@ function buildTargets(): TargetConfig[] {
 		activity: string, masking: number, cloak: boolean = false,
 	): TargetConfig => {
 		const hd = h(hull);
-		const aegisDeltaCap = 100;
 		const base = emissionPower(emission);
 		const cf = cloak ? (1 - VEIL_ARRAY_REDUCTION) : 1.0;
 		return {
 			id, label, hull,
 			hullSignature: hd.hullSignature,
 			hullIntegrity: hd.hullIntegrity,
-			shieldCapacity: aegisDeltaCap * hd.shieldMult,
+			shieldCapacity: AEGIS_DELTA.capacity * hd.shieldMult,
 			activity, emission,
 			baseEmission: base,
 			cloakFactor: cf,
@@ -520,17 +512,16 @@ interface PvpEncounterResult {
 }
 
 function buildPvpEncounters(): PvpEncounterConfig[] {
-	const aegisDeltaCap = 100;
 	const h = (slug: string) => {
-		const hd = HULLS.find((x) => x.slug === slug)!;
+		const hd = getHullData(slug);
 		return {
 			hullSignature: hd.hullSignature,
 			hullIntegrity: hd.hullIntegrity,
-			shieldCapacity: aegisDeltaCap * (hd.shieldCapacityMultiplier ?? 1.0),
-			weaponDrawMult: hd.weaponDrawMultiplier ?? 1.0,
+			shieldCapacity: AEGIS_DELTA.capacity * hd.shieldCapacityMultiplier,
+			weaponDrawMult: hd.weaponDrawMultiplier,
 		};
 	};
-	const cap = 100; // epoch_s standard capacitor
+	const cap = EPOCH_S.capacity;
 
 	const eff = (base: number, sig: number, cloak: number) => base * sig * cloak;
 
@@ -853,8 +844,8 @@ function computeCombatResolution(
 	// ── Wolf's phaser kill timeline ──
 	// Wolf fires phasers: drain shields, then overflow to hull damage
 	// Cloaked targets have shields DOWN — phasers go straight to hull
-	const phaserDrainRate = 35.0; // phaser_array mult_a
-	const shieldRegenRate = 10.0; // aegis_delta rate at priority 1.0
+	const phaserDrainRate = PHASER.damage; // phaser_array mult_a
+	const shieldRegenRate = AEGIS_DELTA.rate; // aegis_delta rate at priority 1.0
 	const targetCloaked = target.cloakFactor < 1.0;
 	const targetShieldCap = targetCloaked ? 0 : target.shieldCapacity;
 	const targetHullHP = target.hullIntegrity;
@@ -874,9 +865,9 @@ function computeCombatResolution(
 	const wolfKillsAt = wolfFiresAt !== null ? wolfFiresAt + wolfKillTime : null;
 
 	// ── Target's torpedo kill timeline ──
-	const torpCount = 4; // torpedo_launcher capacity
-	const torpAccuracy = 0.70; // torpedo_launcher mult_b
-	const torpDamage = 75.0; // torpedo_launcher mult_a
+	const torpCount = TORPEDO.capacity;
+	const torpAccuracy = TORPEDO.accuracy;
+	const torpDamage = TORPEDO.damage;
 	const torpFlightTime = C.torpedoFlightSeconds;
 
 	// Wolf's effective HP (shields + hull)
@@ -1008,11 +999,11 @@ function combatProjections(): CombatProjection[] {
 		arr.findIndex((x) => x.hull === t.hull) === i,
 	); // unique hulls
 
-	const phaserDrainRate = 35.0; // phaser mult_a
-	const shieldRegenPerHour = 10.0; // aegis_delta rate at priority 1.0
-	const torpMagazine = 4;
-	const torpAccuracy = 0.70;
-	const torpDamage = 75.0;
+	const phaserDrainRate = PHASER.damage;
+	const shieldRegenPerHour = AEGIS_DELTA.rate;
+	const torpMagazine = TORPEDO.capacity;
+	const torpAccuracy = TORPEDO.accuracy;
+	const torpDamage = TORPEDO.damage;
 
 	const results: CombatProjection[] = [];
 
