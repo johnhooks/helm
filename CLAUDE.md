@@ -63,7 +63,7 @@ State is always accurate on-demand. Background ticks handle complex interactions
 
 ### PHP
 - PHP 8.1+
-- WordPress 6.4+
+- WordPress 6.9
 - DI52 container (lucatume/di52)
 - Action Scheduler for background jobs
 - WP-CLI for ship operations

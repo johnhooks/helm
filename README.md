@@ -40,7 +40,7 @@ This is a WordPress plugin. It currently has:
 
 ## The Tech
 
-- PHP 8.1+ / WordPress 6.4+
+- PHP 8.1+ / WordPress 6.9
 - TypeScript / React
 - Bun workspaces
 - Action Scheduler for background jobs
@@ -58,7 +58,8 @@ If this sounds interesting to you — if the phrase "space economy MMO on WordPr
 
 ## Getting Started
 
-See [docs/dev/getting-started.md](docs/dev/getting-started.md) for installation, setup, and initializing a game world.
+- [docs/getting-started.md](docs/getting-started.md) — installing Helm on a WordPress host and initializing a game world.
+- [docs/dev/getting-started.md](docs/dev/getting-started.md) — setting up a local development environment (including the Lando setup we use).
 
 ## License
 
