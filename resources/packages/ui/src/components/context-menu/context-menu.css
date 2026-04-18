@@ -22,6 +22,10 @@
   gap: 8px;
 }
 
+.helm-context-menu__header--standalone {
+  border-bottom: none;
+}
+
 .helm-context-menu__name {
   font-size: var(--helm-ui-font-size-label-lg);
   font-weight: 700;

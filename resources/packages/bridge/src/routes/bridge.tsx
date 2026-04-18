@@ -15,6 +15,7 @@ import { store as actionsStore } from '@helm/actions';
 import type { StarSelectEvent, Position3D, Route } from '@helm/astrometric';
 import { ViewportConfig } from '../components/viewport-config';
 import { StarContextMenu } from '../components/star-context-menu';
+import { getStarContextMenuActions } from '../components/star-context-menu-actions';
 import { ShipSystemsCard } from '../components/ship-systems-card';
 import { ShipLog } from '@helm/shell';
 
@@ -177,6 +178,25 @@ export function BridgePage() {
 		setStarSelectEvent(null);
 	}, []);
 
+	const contextMenuActions = useMemo(
+		() => getStarContextMenuActions( {
+			selectedStar,
+			currentNodeId,
+			selectedDistance,
+			hasActiveAction,
+			onScanRoute: handleContextMenuScanRoute,
+			onClose: handleContextMenuClose,
+		} ),
+		[
+			selectedStar,
+			currentNodeId,
+			selectedDistance,
+			hasActiveAction,
+			handleContextMenuScanRoute,
+			handleContextMenuClose,
+		],
+	);
+
 	return (
 		<SideDrawer
 			open={drawerOpen}
@@ -205,14 +225,12 @@ export function BridgePage() {
 							style={viewportStyle}
 							selectedStarOverlay={
 								starSelectEvent ? (
-									<StarContextMenu
-										star={ starSelectEvent.star }
-										distance={ selectedDistance ?? starSelectEvent.distance }
-										hasActiveAction={ hasActiveAction }
-										onScanRoute={ handleContextMenuScanRoute }
-										onClose={ handleContextMenuClose }
-									/>
-								) : undefined
+								<StarContextMenu
+									star={ starSelectEvent.star }
+									actions={ contextMenuActions }
+									onClose={ handleContextMenuClose }
+								/>
+							) : undefined
 							}
 						/>
 					</Suspense>

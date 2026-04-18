@@ -33,6 +33,7 @@ export function ContextMenu({
 }: ContextMenuProps) {
   const menuRef = useRef<HTMLDivElement>(null);
   const actionRefs = useRef<Map<number, HTMLButtonElement>>(new Map());
+  const hasActions = actions.length > 0;
 
   const getEnabledIndices = useCallback(
     () => actions.reduce<number[]>((acc, action, i) => {
@@ -111,46 +112,55 @@ export function ContextMenu({
       onKeyDown={handleKeyDown}
       data-testid={testId}
     >
-      <div className={`helm-context-menu__header helm-tone--${tone}`}>
+      <div
+        className={[
+          `helm-context-menu__header helm-tone--${tone}`,
+          !hasActions && "helm-context-menu__header--standalone",
+        ]
+          .filter(Boolean)
+          .join(" ")}
+      >
         <span className="helm-context-menu__name">{name}</span>
         {subtitle && (
           <span className="helm-context-menu__subtitle">{subtitle}</span>
         )}
       </div>
-      <div className="helm-context-menu__actions">
-        {actions.map((action, i) => (
-          <button
-            key={action.label}
-            ref={(el) => {
-              if (el) {
-                actionRefs.current.set(i, el);
-              } else {
-                actionRefs.current.delete(i);
-              }
-            }}
-            className={[
-              "helm-context-menu__action",
-              action.tone && `helm-tone--${action.tone}`,
-            ]
-              .filter(Boolean)
-              .join(" ")}
-            role="menuitem"
-            type="button"
-            disabled={action.disabled}
-            tabIndex={action.disabled ? -1 : 0}
-            onClick={action.onClick}
-          >
-            <span className="helm-context-menu__action-label">
-              {action.label}
-            </span>
-            {action.detail && (
-              <span className="helm-context-menu__action-detail">
-                {action.detail}
+      {hasActions && (
+        <div className="helm-context-menu__actions">
+          {actions.map((action, i) => (
+            <button
+              key={action.label}
+              ref={(el) => {
+                if (el) {
+                  actionRefs.current.set(i, el);
+                } else {
+                  actionRefs.current.delete(i);
+                }
+              }}
+              className={[
+                "helm-context-menu__action",
+                action.tone && `helm-tone--${action.tone}`,
+              ]
+                .filter(Boolean)
+                .join(" ")}
+              role="menuitem"
+              type="button"
+              disabled={action.disabled}
+              tabIndex={action.disabled ? -1 : 0}
+              onClick={action.onClick}
+            >
+              <span className="helm-context-menu__action-label">
+                {action.label}
               </span>
-            )}
-          </button>
-        ))}
-      </div>
+              {action.detail && (
+                <span className="helm-context-menu__action-detail">
+                  {action.detail}
+                </span>
+              )}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
