@@ -75,6 +75,16 @@ export function StarField({
     return star ? { x: star.x, y: star.y, z: star.z } : null;
   }, [selectedStarId, stars]);
 
+  // Camera orbits the current ship node. Falls back to origin when the node
+  // isn't in the loaded stars (e.g. ship is at a waypoint).
+  const cameraTarget: Position3D = useMemo(() => {
+    if (currentNodeId === null || currentNodeId === undefined) {
+      return { x: 0, y: 0, z: 0 };
+    }
+    const star = starsByNodeId.get(currentNodeId);
+    return star ? { x: star.x, y: star.y, z: star.z } : { x: 0, y: 0, z: 0 };
+  }, [currentNodeId, starsByNodeId]);
+
   // Track which node IDs have routes connected
   const connectedNodeIds = useMemo(() => {
     const ids = new Set<number>();
@@ -193,6 +203,7 @@ export function StarField({
           maxDistance={maxDistance}
           onCameraChange={handleCameraChange}
           isOrthographic={isOrthographic}
+          target={cameraTarget}
         />
 
         {/* Galactic plane glow (distant galaxy disk) - hidden when examining a star */}

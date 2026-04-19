@@ -2,6 +2,7 @@ import { OrbitControls } from "@react-three/drei";
 import { useThree } from "@react-three/fiber";
 import { useCallback, useEffect, useRef } from "react";
 import type { ComponentRef } from "react";
+import { Vector3 } from "three";
 import {
   DEFAULT_CAMERA_DISTANCE,
   DEFAULT_MAX_DISTANCE,
@@ -10,7 +11,7 @@ import {
   POLAR_ANGLE_MAX,
   POLAR_ANGLE_MIN,
 } from "../../constants";
-import type { CameraInfo } from "../../types";
+import type { CameraInfo, Position3D } from "../../types";
 
 export interface CameraControlsProps {
   /**
@@ -37,7 +38,15 @@ export interface CameraControlsProps {
    * Whether using orthographic camera
    */
   isOrthographic?: boolean;
+  /**
+   * World-space point the camera orbits around. Defaults to origin.
+   * Changing this after mount translates the camera by the same delta so
+   * the orbital distance and angle are preserved.
+   */
+  target?: Position3D;
 }
+
+const ORIGIN: Position3D = { x: 0, y: 0, z: 0 };
 
 export function CameraControls({
   enabled = true,
@@ -46,15 +55,35 @@ export function CameraControls({
   maxDistance = DEFAULT_MAX_DISTANCE,
   onCameraChange,
   isOrthographic = false,
+  target = ORIGIN,
 }: CameraControlsProps) {
   const controlsRef = useRef<ComponentRef<typeof OrbitControls>>(null);
   const { camera } = useThree();
+  const prevTargetRef = useRef<Vector3>(new Vector3(target.x, target.y, target.z));
 
-  // Set initial camera position
+  // Initial camera placement relative to the target.
   useEffect(() => {
-    camera.position.set(0, initialDistance * 0.5, initialDistance * 0.866);
-    camera.lookAt(0, 0, 0);
+    camera.position.set(
+      prevTargetRef.current.x,
+      prevTargetRef.current.y + initialDistance * 0.5,
+      prevTargetRef.current.z + initialDistance * 0.866,
+    );
+    camera.lookAt(prevTargetRef.current);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [camera, initialDistance]);
+
+  // When the target moves, translate the camera by the same delta so the
+  // user-chosen orbit angle and zoom are preserved across target changes.
+  useEffect(() => {
+    const next = new Vector3(target.x, target.y, target.z);
+    const delta = next.clone().sub(prevTargetRef.current);
+    if (delta.lengthSq() === 0) {
+      return;
+    }
+    camera.position.add(delta);
+    prevTargetRef.current.copy(next);
+    controlsRef.current?.update();
+  }, [target.x, target.y, target.z, camera]);
 
   // For orthographic cameras, zoom is roughly pixels-per-unit
   // minZoom = zoomed out (see more), maxZoom = zoomed in (see less but bigger)
@@ -91,7 +120,7 @@ export function CameraControls({
       maxZoom={maxZoom}
       minPolarAngle={POLAR_ANGLE_MIN}
       maxPolarAngle={POLAR_ANGLE_MAX}
-      target={[0, 0, 0]}
+      target={[target.x, target.y, target.z]}
       onChange={handleChange}
     />
   );
