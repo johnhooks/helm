@@ -1,99 +1,70 @@
-# Running Tests
+# Running Tests and Checks
 
-Helm uses Codeception with slic (Docker-based WordPress testing environment).
+Helm has parallel PHP and JS toolchains. PHP runs under WordPress via slic (Docker). JS runs directly via Vitest and Playwright.
 
-## Running Tests
+## PHP
 
-Tests must be run from the parent directory (`~/Projects`) using slic:
+PHP tests use Codeception through wp-browser, executed with [slic](https://github.com/developer-toolbelt/slic). `slic run` is a thin wrapper around `codecept run`, so any `codecept run` syntax works.
+
+### Codeception run syntax
+
+```
+codecept run [options] [--] [<suite> [<test>]]
+```
+
+The `<test>` argument is a path relative to the suite directory (`tests/Wpunit/`), optionally followed by `:methodName`.
 
 ```bash
-# Point slic at the plugins directory (if not already done)
-slic here
-
-# Select this plugin
-slic use helm
-
-# Run all tests
-slic run Wpunit
-
-# Run tests in a directory
-slic run Wpunit "ShipLink/"
-
-# Run a specific test file
-slic run Wpunit "ShipLink/HexCoordinateTest.php"
-
-# Run a specific test method
-slic run Wpunit "ShipLink/HexCoordinateTest.php:testDistanceCalculation"
+composer test:unit                                              # all Wpunit tests
+slic run Wpunit                                                 # same thing, direct
+slic run Wpunit ShipLink                                        # a directory
+slic run Wpunit ShipLink/HexCoordinateTest.php                  # a single file
+slic run Wpunit ShipLink/HexCoordinateTest.php:testDistanceCalculation # a single method
+slic run Wpunit --filter=testDistance                           # filter by name pattern
+slic run Wpunit --group=slow                                    # run a Codeception group
+slic run Wpunit --debug                                         # verbose scenario output
+slic cc build                                                   # rebuild Codeception actors after changing test helpers
 ```
 
-## Debugging Tests
+One-time slic setup from `~/Projects`: `slic here && slic use helm`. After that, `slic run` works from the project directory.
 
-To debug tests, use `codecept_debug()` in your test code and run with the `--debug` flag:
-
-```php
-// In your test file
-codecept_debug($variable);
-codecept_debug($coordinate->toArray());
-```
+### PHP static analysis and linting
 
 ```bash
-# Run with debug output
-slic run Wpunit:TestName -- --debug
+composer analyse   # PHPStan
+composer lint      # PHPCS
+composer lint:fix  # PHPCBF (auto-fix)
+composer test      # analyse + lint + unit tests
 ```
 
-## Interactive Debugging
-
-For more complex debugging, drop into the slic shell:
+## JavaScript and TypeScript
 
 ```bash
-slic shell
-cd /var/www/html/wp-content/plugins/helm
-vendor/bin/codecept run Wpunit --debug
+npm test              # Vitest unit tests
+npm run test:watch    # Vitest watch mode
+npm run check-types   # tsc --noEmit
+npm run lint:js       # ESLint
+npm run lint:fix      # ESLint auto-fix
 ```
 
-## Test Organization
+## End-to-End
 
-Tests are organized by domain:
-
-```
-tests/Wpunit/
-├── ShipLink/           # ShipLink contract and simulation tests
-│   ├── HexCoordinateTest.php
-│   └── PositionTest.php
-├── Systems/            # Ship systems tests
-│   ├── ShieldsTest.php
-│   └── PowerTest.php
-└── Rest/               # REST API endpoint tests
-```
-
-## Writing Tests
-
-Extend `WPTestCase` for WordPress integration tests:
-
-```php
-<?php
-
-namespace Tests\Wpunit\ShipLink;
-
-use lucatume\WPBrowser\TestCase\WPTestCase;
-use Helm\ShipLink\Contracts\HexCoordinate;
-
-class HexCoordinateTest extends WPTestCase
-{
-    public function testDistanceCalculation(): void
-    {
-        $a = new HexCoordinate(0, 0, 0);
-        $b = new HexCoordinate(3, -2, -1);
-
-        $this->assertEquals(3, $a->distanceTo($b));
-    }
-}
-```
-
-## Coverage
-
-Run tests with coverage:
+Playwright runs against a Vite dev server. It does not need a running WordPress instance.
 
 ```bash
-XDEBUG_MODE=coverage slic run Wpunit -- --coverage-html coverage/html
+npm run test:e2e         # headless
+npm run test:e2e:ui      # interactive UI
+npm run test:e2e:headed  # headed browser
+npm run test:e2e:debug   # Playwright inspector
+npm run test:e2e:report  # open last report
 ```
+
+## Full Check Before Commit
+
+Run PHP checks, JS checks, and both unit suites:
+
+```bash
+composer test && npm run check-types && npm run lint:js && npm test
+```
+
+Run Playwright separately when UI behavior changed.
