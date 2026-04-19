@@ -15,8 +15,7 @@ codecept run [options] [--] [<suite> [<test>]]
 The `<test>` argument is a path relative to the suite directory (`tests/Wpunit/`), optionally followed by `:methodName`.
 
 ```bash
-composer test:unit                                              # all Wpunit tests
-slic run Wpunit                                                 # same thing, direct
+slic run Wpunit                                                 # all Wpunit tests
 slic run Wpunit ShipLink                                        # a directory
 slic run Wpunit ShipLink/HexCoordinateTest.php                  # a single file
 slic run Wpunit ShipLink/HexCoordinateTest.php:testDistanceCalculation # a single method
@@ -34,8 +33,9 @@ One-time slic setup from `~/Projects`: `slic here && slic use helm`. After that,
 composer analyse   # PHPStan
 composer lint      # PHPCS
 composer lint:fix  # PHPCBF (auto-fix)
-composer test      # analyse + lint + unit tests
 ```
+
+These run PHP binaries directly with no Docker dependency, so they work anywhere Composer is installed.
 
 ## JavaScript and TypeScript
 
@@ -61,10 +61,10 @@ npm run test:e2e:report  # open last report
 
 ## Full Check Before Commit
 
-Run PHP checks, JS checks, and both unit suites:
+Run PHP static checks, PHP unit tests, then JS checks and unit tests:
 
 ```bash
-composer test && npm run check-types && npm run lint:js && npm test
+composer analyse && composer lint && slic run Wpunit && npm run check-types && npm run lint:js && npm test
 ```
 
 Run Playwright separately when UI behavior changed.
