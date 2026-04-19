@@ -27,6 +27,10 @@ export interface ReadoutProps {
    */
   size?: "sm" | "md" | "lg";
   /**
+   * Maximum decimal places when value is a number. Trailing zeros are trimmed.
+   */
+  precision?: number;
+  /**
    * Text alignment
    */
   align?: "left" | "center" | "right";
@@ -52,10 +56,13 @@ export function Readout({
   tone = "neutral",
   size = "md",
   align = "left",
+  precision = 2,
   className = "",
   style,
   "data-testid": testId,
 }: ReadoutProps) {
+  const displayValue = formatValue(value, precision);
+  const displayMax = formatValue(max, precision);
   const classNames = [
     "helm-readout",
     `helm-readout--${size}`,
@@ -73,11 +80,18 @@ export function Readout({
         {unit && <span className="helm-readout__unit">{unit}</span>}
       </dt>
       <dd className="helm-readout__value-row">
-        <span className="helm-readout__value">{value}</span>
+        <span className="helm-readout__value">{displayValue}</span>
         {max !== undefined && (
-          <span className="helm-readout__max">/{max}</span>
+          <span className="helm-readout__max">/{displayMax}</span>
         )}
       </dd>
     </dl>
   );
+}
+
+function formatValue(value: ReactNode, precision: number): ReactNode {
+  if (typeof value !== "number" || !Number.isFinite(value)) {
+    return value;
+  }
+  return Number(value.toFixed(precision));
 }
