@@ -11,10 +11,9 @@ Helm has three test layers, each targeting a different boundary.
 ## Commands
 
 ```bash
-# PHP
-composer test              # PHPStan + PHPCS + Wpunit
-composer test:unit         # Wpunit only
-composer test:coverage     # Wpunit with HTML coverage
+# PHP unit tests (require slic + Docker)
+slic run Wpunit            # Wpunit suite
+XDEBUG_MODE=coverage slic run Wpunit -- --coverage-html coverage/html
 
 # JavaScript
 bun run test               # Vitest

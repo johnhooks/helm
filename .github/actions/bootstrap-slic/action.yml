@@ -1,0 +1,50 @@
+name: Bootstrap slic
+description: Check out slic, configure it for CI, and bring the helm stack up to a testable state.
+
+runs:
+  using: composite
+  steps:
+    - name: Checkout slic
+      uses: actions/checkout@v6
+      with:
+        repository: stellarwp/slic
+        ref: main
+        path: slic
+        fetch-depth: 1
+
+    - name: Export slic env vars
+      shell: bash
+      run: |
+        echo "SLIC_BIN=${GITHUB_WORKSPACE}/slic/slic" >> $GITHUB_ENV
+        echo "SLIC_WP_DIR=${GITHUB_WORKSPACE}/slic/_wordpress" >> $GITHUB_ENV
+        echo "SLIC_WORDPRESS_DOCKERFILE=Dockerfile.base" >> $GITHUB_ENV
+        echo "SLIC=1" >> $GITHUB_ENV
+        echo "CI=1" >> $GITHUB_ENV
+
+    - name: Start ssh-agent
+      shell: bash
+      run: |
+        mkdir -p "${HOME}/.ssh"
+        ssh-agent -a /tmp/ssh_agent.sock
+        echo "SSH_AUTH_SOCK=/tmp/ssh_agent.sock" >> $GITHUB_ENV
+
+    - name: Configure slic
+      shell: bash
+      run: |
+        cd ${GITHUB_WORKSPACE}/..
+        ${SLIC_BIN} here
+        ${SLIC_BIN} interactive off
+        ${SLIC_BIN} build-prompt off
+        ${SLIC_BIN} build-subdir off
+        ${SLIC_BIN} xdebug off
+        ${SLIC_BIN} debug on
+        ${SLIC_BIN} info
+        ${SLIC_BIN} config
+
+    - name: Run helm slic setup
+      shell: bash
+      run: ./bin/setup-slic.sh
+
+    - name: Enable airplane mode
+      shell: bash
+      run: ${SLIC_BIN} airplane-mode on

@@ -41,6 +41,9 @@
             "dealerdirect/phpcodesniffer-composer-installer": true,
             "phpstan/extension-installer": true
         },
+        "platform": {
+            "php": "8.1"
+        },
         "sort-packages": true,
         "optimize-autoloader": true
     },
@@ -60,14 +63,7 @@
         ],
         "analyse": "@php vendor/bin/phpstan analyse --memory-limit=4G --no-progress",
         "lint": "@php vendor/bin/phpcs -n --colors",
-        "lint:fix": "@php vendor/bin/phpcbf",
-        "test": [
-            "@analyse",
-            "@lint",
-            "slic run Wpunit"
-        ],
-        "test:unit": "slic run Wpunit",
-        "test:coverage": "XDEBUG_MODE=coverage slic run Wpunit -- --coverage-html coverage/html"
+        "lint:fix": "@php vendor/bin/phpcbf"
     },
     "extra": {
         "strauss": {
