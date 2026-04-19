@@ -1,7 +1,9 @@
 import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
 import { assert, ErrorCode, HelmError } from '@helm/errors';
+import { store as shipsStore } from '@helm/ships';
 import type { Thunk } from '@helm/types';
+import { isFulfilled, isJump } from '../guards';
 import type { Action, DraftAction, ShipAction, ShipActionType } from './types';
 import type { store } from './index';
 import { createIndexQueryId } from './utils';
@@ -32,9 +34,23 @@ export function receiveAction( action: ShipAction ): Action {
 	return { type: 'RECEIVE_ACTION', action };
 }
 
-export function receiveHeartbeat( actions: ShipAction[], cursor: string ): Action {
-	return { type: 'RECEIVE_HEARTBEAT', actions, cursor };
-}
+export const receiveHeartbeat =
+	( actions: ShipAction[], cursor: string ): Thunk< Action, typeof store > =>
+	async ( { dispatch, registry } ) => {
+		dispatch( { type: 'RECEIVE_HEARTBEAT', actions, cursor } );
+
+		// A fulfilled jump has moved ship.node_id and burned core life on the
+		// server. Invalidate the ship resolver so the next read refetches.
+		const refreshedShipIds = new Set< number >();
+		for ( const action of actions ) {
+			if ( isJump( action ) && isFulfilled( action ) ) {
+				refreshedShipIds.add( action.ship_post_id );
+			}
+		}
+		for ( const shipId of refreshedShipIds ) {
+			registry.dispatch( shipsStore ).invalidateResolution( 'getShip', [ shipId ] );
+		}
+	};
 
 export function draftCreate( action: DraftAction ): Action {
 	return { type: 'CREATE_DRAFT', action };

@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import { dispatch } from '@wordpress/data';
+import { dispatch, select } from '@wordpress/data';
 import { describe, expect, it, vi } from 'vitest';
 import type { StarNode } from '@helm/types';
 import { store as actionsStore, type ShipAction } from '@helm/actions';
@@ -35,10 +35,10 @@ function seedScan( id: number, targetNodeId: number ): void {
 }
 
 describe( 'StarContextMenu', () => {
-	// Tests run sequentially in declaration order; the "no scan known" case
-	// is asserted before any seedScan() call so the module-singleton wp-data
+	// Tests run sequentially in declaration order; the "no scan known" cases
+	// are asserted before any seedScan() call so the module-singleton wp-data
 	// registry is still clean at that point.
-	it( 'renders the selected star header with no visible actions for the current star', () => {
+	it( 'renders the selected star header and a disabled Jump for the current star', () => {
 		render(
 			<StarContextMenu
 				star={ star }
@@ -51,10 +51,13 @@ describe( 'StarContextMenu', () => {
 
 		expect( screen.getByText( 'Sol' ) ).toBeInTheDocument();
 		expect( screen.getByText( 'G2V' ) ).toBeInTheDocument();
-		expect( screen.queryAllByRole( 'menuitem' ) ).toHaveLength( 0 );
+		expect( screen.queryByRole( 'menuitem', { name: /^Scan Route/ } ) ).not.toBeInTheDocument();
+		const jump = screen.getByRole( 'menuitem', { name: /^Jump/ } );
+		expect( jump ).toBeDisabled();
+		expect( jump ).toHaveTextContent( 'already here' );
 	} );
 
-	it( 'shows Scan Route and hides Jump when no route to this star is known', () => {
+	it( 'shows Scan Route and a disabled Jump when no route to this star is known', () => {
 		render(
 			<StarContextMenu
 				star={ star }
@@ -66,10 +69,12 @@ describe( 'StarContextMenu', () => {
 		);
 
 		expect( screen.getByRole( 'menuitem', { name: /^Scan Route/ } ) ).toBeInTheDocument();
-		expect( screen.queryByRole( 'menuitem', { name: /^Jump/ } ) ).not.toBeInTheDocument();
+		const jump = screen.getByRole( 'menuitem', { name: /^Jump/ } );
+		expect( jump ).toBeDisabled();
+		expect( jump ).toHaveTextContent( 'route unknown' );
 	} );
 
-	it( 'hides Scan Route and shows Jump when a route to this star is already known', () => {
+	it( 'hides Scan Route and enables Jump when a route to this star is already known', () => {
 		seedScan( 100, star.node_id );
 
 		render(
@@ -83,7 +88,53 @@ describe( 'StarContextMenu', () => {
 		);
 
 		expect( screen.queryByRole( 'menuitem', { name: /^Scan Route/ } ) ).not.toBeInTheDocument();
-		expect( screen.getByRole( 'menuitem', { name: /^Jump/ } ) ).toBeDisabled();
+		const jump = screen.getByRole( 'menuitem', { name: /^Jump/ } );
+		expect( jump ).toBeEnabled();
+		expect( jump ).toHaveTextContent( '11.9 ly' );
+	} );
+
+	it( 'disables Jump with an in-progress detail when another action is active', () => {
+		render(
+			<StarContextMenu
+				star={ star }
+				currentNodeId={ 1 }
+				selectedDistance={ 11.9 }
+				hasActiveAction={ true }
+				onClose={ vi.fn() }
+			/>
+		);
+
+		const jump = screen.getByRole( 'menuitem', { name: /^Jump/ } );
+		expect( jump ).toBeDisabled();
+		expect( jump ).toHaveTextContent( 'action in progress' );
+	} );
+
+	it( 'drafts a jump action and closes the menu when Jump is clicked', () => {
+		dispatch( actionsStore ).clearDraft();
+		const onClose = vi.fn();
+
+		render(
+			<StarContextMenu
+				star={ star }
+				currentNodeId={ 1 }
+				selectedDistance={ 11.9 }
+				hasActiveAction={ false }
+				onClose={ onClose }
+			/>
+		);
+
+		fireEvent.click( screen.getByRole( 'menuitem', { name: /^Jump/ } ) );
+
+		const draft = select( actionsStore ).getDraft();
+		expect( draft ).toEqual( {
+			type: 'jump',
+			params: {
+				target_node_id: star.node_id,
+				source_node_id: 1,
+				distance_ly: 11.9,
+			},
+		} );
+		expect( onClose ).toHaveBeenCalledTimes( 1 );
 	} );
 
 	it( 'closes on escape', () => {

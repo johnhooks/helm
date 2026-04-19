@@ -11,7 +11,7 @@ import { store as navStore } from '@helm/nav';
 import { log } from '@helm/logger';
 import { Panel, SideDrawer } from '@helm/ui';
 import { useShip } from '@helm/ships';
-import { store as actionsStore } from '@helm/actions';
+import { isJump, isScanRoute, store as actionsStore } from '@helm/actions';
 import type { StarSelectEvent, Position3D, Route } from '@helm/astrometric';
 import { ViewportConfig } from '../components/viewport-config';
 import { StarContextMenu } from '../components/star-context-menu';
@@ -118,35 +118,50 @@ export function BridgePage() {
 		return distance3D(currentStar, selectedStar);
 	}, [currentStar, selectedStar]);
 
-	// Derive routes and waypoint positions from the current action's scan result.
+	// TODO(nav-06): replace with a datacore edge query. Today this reads
+	// edges and waypoints off whichever action was latest, which means only
+	// the most recent scan's discoveries render and nothing persists across
+	// the next action or a page reload.
 	const action = useSelect(
 		(select) => select(actionsStore).getLatestAction(),
 		[],
 	);
 
-	const { scanRoutes, scanNodePositions } = useMemo(() => {
-		const result = action?.result as Record<string, unknown> | null;
-		if (!result || !result.edges || !result.nodes) {
-			return { scanRoutes: [] as Route[], scanNodePositions: undefined };
+	const { actionRoutes, actionNodePositions } = useMemo(() => {
+		if (!action?.result) {
+			return { actionRoutes: [] as Route[], actionNodePositions: undefined };
 		}
 
-		const nodes = result.nodes as Array<{ id: number; x: number; y: number; z: number }>;
-		const edges = result.edges as Array<{ id: number; node_a_id: number; node_b_id: number }>;
+		if (isScanRoute(action) && action.result.edges && action.result.nodes) {
+			const positions = new Map<number, Position3D>();
+			for (const node of action.result.nodes) {
+				positions.set(node.id, { x: node.x, y: node.y, z: node.z });
+			}
 
-		const positions = new Map<number, Position3D>();
-		for (const node of nodes) {
-			positions.set(node.id, { x: node.x, y: node.y, z: node.z });
+			const routes: Route[] = action.result.edges.map((edge) => ({
+				id: `scan-${edge.id}`,
+				from: edge.node_a_id,
+				to: edge.node_b_id,
+				status: 'discovered' as const,
+			}));
+
+			return { actionRoutes: routes, actionNodePositions: positions };
 		}
 
-		const routes: Route[] = edges.map((edge) => ({
-			id: `scan-${edge.id}`,
-			from: edge.node_a_id,
-			to: edge.node_b_id,
-			status: 'discovered' as const,
-		}));
+		if (isJump(action)) {
+			const routes: Route[] = [
+				{
+					id: `jump-${action.id}`,
+					from: action.result.from_node_id,
+					to: action.result.to_node_id,
+					status: 'discovered' as const,
+				},
+			];
+			return { actionRoutes: routes, actionNodePositions: undefined };
+		}
 
-		return { scanRoutes: routes, scanNodePositions: positions };
-	}, [action?.result]);
+		return { actionRoutes: [] as Route[], actionNodePositions: undefined };
+	}, [action]);
 
 	const sizeMultiplier = STAR_SIZE_MULTIPLIER[starSize] ?? 1;
 	const viewportStyle = useMemo(() => ({ width: '100%', height: '100%' }), []);
@@ -179,8 +194,8 @@ export function BridgePage() {
 					<Suspense fallback={null}>
 						<StarField
 							stars={stars}
-							routes={scanRoutes}
-							nodePositions={scanNodePositions}
+							routes={actionRoutes}
+							nodePositions={actionNodePositions}
 							currentNodeId={currentNodeId}
 							selectedStarId={selectedStar?.id ?? null}
 							onStarSelect={handleStarSelect}

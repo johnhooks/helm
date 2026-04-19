@@ -130,29 +130,84 @@ describe( 'receiveAction', () => {
 } );
 
 describe( 'receiveHeartbeat', () => {
-	it( 'returns a RECEIVE_HEARTBEAT action', () => {
+	let dispatch: ReturnType< typeof vi.fn >;
+	let invalidateResolution: ReturnType< typeof vi.fn >;
+	let registry: { dispatch: ReturnType< typeof vi.fn > };
+
+	beforeEach( () => {
+		dispatch = vi.fn();
+		invalidateResolution = vi.fn();
+		registry = { dispatch: vi.fn().mockReturnValue( { invalidateResolution } ) };
+	} );
+
+	it( 'dispatches a RECEIVE_HEARTBEAT action', async () => {
 		const actions = [
 			createShipAction( { id: 1, ship_post_id: 1 } ),
 			createShipAction( { id: 2, ship_post_id: 2 } ),
 		];
 
-		const result = receiveHeartbeat( actions, '2025-06-01T00:00:00Z' );
+		await receiveHeartbeat( actions, '2025-06-01T00:00:00Z' )(
+			{ dispatch, registry } as never,
+		);
 
-		expect( result ).toEqual( {
+		expect( dispatch ).toHaveBeenCalledWith( {
 			type: 'RECEIVE_HEARTBEAT',
 			actions,
 			cursor: '2025-06-01T00:00:00Z',
 		} );
 	} );
 
-	it( 'returns a RECEIVE_HEARTBEAT action for empty array', () => {
-		const result = receiveHeartbeat( [], '2025-06-01T00:00:00Z' );
+	it( 'dispatches a RECEIVE_HEARTBEAT action for empty array', async () => {
+		await receiveHeartbeat( [], '2025-06-01T00:00:00Z' )(
+			{ dispatch, registry } as never,
+		);
 
-		expect( result ).toEqual( {
+		expect( dispatch ).toHaveBeenCalledWith( {
 			type: 'RECEIVE_HEARTBEAT',
 			actions: [],
 			cursor: '2025-06-01T00:00:00Z',
 		} );
+	} );
+
+	it( 'invalidates the ship resolver for each fulfilled jump', async () => {
+		const actions = [
+			createShipAction( { id: 10, ship_post_id: 1, type: 'jump', status: 'fulfilled' } ),
+			createShipAction( { id: 11, ship_post_id: 2, type: 'jump', status: 'fulfilled' } ),
+		];
+
+		await receiveHeartbeat( actions, '2025-06-01T00:00:00Z' )(
+			{ dispatch, registry } as never,
+		);
+
+		expect( invalidateResolution ).toHaveBeenCalledWith( 'getShip', [ 1 ] );
+		expect( invalidateResolution ).toHaveBeenCalledWith( 'getShip', [ 2 ] );
+	} );
+
+	it( 'invalidates once per ship when multiple fulfilled jumps land together', async () => {
+		const actions = [
+			createShipAction( { id: 10, ship_post_id: 1, type: 'jump', status: 'fulfilled' } ),
+			createShipAction( { id: 11, ship_post_id: 1, type: 'jump', status: 'fulfilled' } ),
+		];
+
+		await receiveHeartbeat( actions, '2025-06-01T00:00:00Z' )(
+			{ dispatch, registry } as never,
+		);
+
+		expect( invalidateResolution ).toHaveBeenCalledTimes( 1 );
+		expect( invalidateResolution ).toHaveBeenCalledWith( 'getShip', [ 1 ] );
+	} );
+
+	it( 'does not invalidate for non-jump or non-fulfilled actions', async () => {
+		const actions = [
+			createShipAction( { id: 10, ship_post_id: 1, type: 'jump', status: 'running' } ),
+			createShipAction( { id: 11, ship_post_id: 1, type: 'scan_route', status: 'fulfilled' } ),
+		];
+
+		await receiveHeartbeat( actions, '2025-06-01T00:00:00Z' )(
+			{ dispatch, registry } as never,
+		);
+
+		expect( invalidateResolution ).not.toHaveBeenCalled();
 	} );
 } );
 
