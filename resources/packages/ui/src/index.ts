@@ -68,7 +68,8 @@ export { LogCard } from "./components/log-card";
 export type { LogCardProps } from "./components/log-card";
 
 export { ContextMenu } from "./components/context-menu";
-export type { ContextMenuProps, ContextMenuAction } from "./components/context-menu";
+export { ContextMenuActionItem } from "./components/context-menu";
+export type { ContextMenuProps, ContextMenuAction, ContextMenuActionItemProps } from "./components/context-menu";
 
 export { Dropdown } from "./components/dropdown";
 export type {

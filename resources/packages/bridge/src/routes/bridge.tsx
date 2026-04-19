@@ -6,7 +6,7 @@
  * the star map is ready, then renders.
  */
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from '@wordpress/element';
-import { useDispatch, useSelect, useSuspenseSelect } from '@wordpress/data';
+import { useSelect, useSuspenseSelect } from '@wordpress/data';
 import { store as navStore } from '@helm/nav';
 import { log } from '@helm/logger';
 import { Panel, SideDrawer } from '@helm/ui';
@@ -15,7 +15,6 @@ import { store as actionsStore } from '@helm/actions';
 import type { StarSelectEvent, Position3D, Route } from '@helm/astrometric';
 import { ViewportConfig } from '../components/viewport-config';
 import { StarContextMenu } from '../components/star-context-menu';
-import { getStarContextMenuActions } from '../components/star-context-menu-actions';
 import { ShipSystemsCard } from '../components/ship-systems-card';
 import { ShipLog } from '@helm/shell';
 
@@ -156,46 +155,11 @@ export function BridgePage() {
 		setDrawerOpen((v) => !v);
 	}, []);
 
-	const { draftCreate } = useDispatch(actionsStore);
-
 	const hasActiveAction = !! action && ( action.status === 'pending' || action.status === 'running' );
-
-	const handleContextMenuScanRoute = useCallback(() => {
-		if ( ! selectedStar ) {
-			return;
-		}
-		draftCreate( {
-			type: 'scan_route',
-			params: {
-				target_node_id: selectedStar.node_id,
-				source_node_id: currentNodeId,
-				distance_ly: selectedDistance,
-			},
-		} );
-	}, [ selectedStar, currentNodeId, selectedDistance, draftCreate ]);
 
 	const handleContextMenuClose = useCallback(() => {
 		setStarSelectEvent(null);
 	}, []);
-
-	const contextMenuActions = useMemo(
-		() => getStarContextMenuActions( {
-			selectedStar,
-			currentNodeId,
-			selectedDistance,
-			hasActiveAction,
-			onScanRoute: handleContextMenuScanRoute,
-			onClose: handleContextMenuClose,
-		} ),
-		[
-			selectedStar,
-			currentNodeId,
-			selectedDistance,
-			hasActiveAction,
-			handleContextMenuScanRoute,
-			handleContextMenuClose,
-		],
-	);
 
 	return (
 		<SideDrawer
@@ -225,12 +189,14 @@ export function BridgePage() {
 							style={viewportStyle}
 							selectedStarOverlay={
 								starSelectEvent ? (
-								<StarContextMenu
-									star={ starSelectEvent.star }
-									actions={ contextMenuActions }
-									onClose={ handleContextMenuClose }
-								/>
-							) : undefined
+									<StarContextMenu
+										star={ starSelectEvent.star }
+										currentNodeId={ currentNodeId }
+										selectedDistance={ selectedDistance ?? starSelectEvent.distance }
+										hasActiveAction={ hasActiveAction }
+										onClose={ handleContextMenuClose }
+									/>
+								) : undefined
 							}
 						/>
 					</Suspense>

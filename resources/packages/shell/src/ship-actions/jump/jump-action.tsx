@@ -3,13 +3,10 @@ import type { DraftAction, ShipAction } from '@helm/actions';
 import { isJump, store as actionsStore } from '@helm/actions';
 import { store as navStore } from '@helm/nav';
 import { useShip } from '@helm/ships';
-import { ShipActionFill } from '../ship-action-slot';
 import type { ShipActionRenderProps } from '../types';
 import { DraftJumpCard } from './draft-jump-card';
 import { ActiveJumpCard } from './active-jump-card';
 import { CompleteJumpCard } from './complete-jump-card';
-
-const JUMP_TYPES = [ 'jump' ] as const;
 
 function DraftJump( { draft }: { draft: DraftAction< 'jump' > } ) {
 	const { shipId } = useShip();
@@ -43,28 +40,15 @@ function CompleteJump( { action }: { action: ShipAction< 'jump' > } ) {
 	return <CompleteJumpCard action={ action } targetName={ targetName } />;
 }
 
-function renderJumpAction( { action, draft }: ShipActionRenderProps ) {
+export function renderJumpAction( { action, draft }: ShipActionRenderProps ) {
 	if ( draft && isJump( draft ) ) {
 		return <DraftJump draft={ draft } />;
 	}
-	if ( ! action ) {
-		return <></>;
-	}
-	if ( ! isJump( action ) ) {
-		return <></>;
+	if ( ! action || ! isJump( action ) ) {
+		return null;
 	}
 	if ( action.status === 'pending' || action.status === 'running' ) {
 		return <ActiveJump action={ action } />;
 	}
 	return <CompleteJump action={ action } />;
-}
-
-export function JumpActionFill() {
-	return (
-		<>
-			{ JUMP_TYPES.map( ( type ) => (
-				<ShipActionFill key={ type } type={ type } render={ renderJumpAction } />
-			) ) }
-		</>
-	);
 }

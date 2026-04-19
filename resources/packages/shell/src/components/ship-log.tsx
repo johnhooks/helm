@@ -1,8 +1,9 @@
 /**
  * Ship Log — reverse-chronological feed of ship actions.
  *
- * Connects to the actions store and renders each action via the renderer registry.
- * Supports cursor-based pagination via "Load more" button.
+ * Reads the actions store and renders each action through ShipActionCard,
+ * which dispatches to a per-type renderer via its internal switch.
+ * Supports cursor-based pagination via the "Load more" button.
  */
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
@@ -10,7 +11,7 @@ import { store as actionsStore } from '@helm/actions';
 import type { DraftAction, ShipAction } from '@helm/actions';
 import { Button } from '@helm/ui';
 import { ErrorBoundary } from 'react-error-boundary';
-import { ShipActionSlot } from '../ship-actions/ship-action-slot';
+import { ShipActionCard } from '../ship-actions/ship-action-card';
 import { ShipActionErrorFallback } from '../ship-actions/ship-action-error-fallback';
 import './ship-log.css';
 
@@ -21,7 +22,7 @@ interface ShipLogProps {
 function DraftLogCard( { draft }: { draft: DraftAction } ) {
 	return (
 		<ErrorBoundary FallbackComponent={ ShipActionErrorFallback }>
-			<ShipActionSlot
+			<ShipActionCard
 				type={ draft.type }
 				draft={ draft }
 			/>
@@ -32,7 +33,7 @@ function DraftLogCard( { draft }: { draft: DraftAction } ) {
 function ShipLogCard( { action }: { action: ShipAction } ) {
 	return (
 		<ErrorBoundary FallbackComponent={ ShipActionErrorFallback }>
-			<ShipActionSlot
+			<ShipActionCard
 				type={ action.type }
 				action={ action }
 			/>

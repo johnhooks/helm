@@ -2,8 +2,11 @@ export { HelmErrorFallback, HelmErrorPageFallback, HelmErrorCompactFallback } fr
 export { ShipLog } from './components/ship-log';
 export { ActionStatusBadge } from './ship-actions/action-status';
 export { ShipActionErrorFallback } from './ship-actions/ship-action-error-fallback';
-export { JumpActionFill } from './ship-actions/jump/jump-action-fill';
-export { ScanActionFill } from './ship-actions/scan/scan-action-fill';
-export { ShipActionFill, ShipActionSlot } from './ship-actions/ship-action-slot';
+export { ShipActionCard } from './ship-actions/ship-action-card';
 export type { ShipActionRenderProps } from './ship-actions/types';
+
+export { ScanRouteContextAction } from './star-context-actions/scan-route';
+export { JumpContextAction } from './star-context-actions/jump';
+export type { StarContextActionProps } from './star-context-actions/types';
+
 export { useErrorModal } from './hooks/use-error-modal';

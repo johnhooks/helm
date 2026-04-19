@@ -1,5 +1,6 @@
 import { createSelector } from '@wordpress/data';
 import type { HelmError } from '@helm/errors';
+import { isFulfilled, isScanRoute } from '../guards';
 import type { DraftAction, QueryMeta, ShipAction, ShipActionType, State } from './types';
 import { createIndexQueryId } from './utils';
 
@@ -34,6 +35,33 @@ export const getLatestAction = createSelector(
 			}
 		}
 		return latest;
+	},
+	( state: State ) => [ state.actions.byId ]
+);
+
+/**
+ * Returns true if any loaded scan_route action with a fulfilled or partial
+ * status targets the given node_id. Used to gate UI that requires a known
+ * route (e.g. hiding "Scan Route" once it's been run, enabling "Jump").
+ *
+ * TEMPORARY. This is an interim source of truth — it only considers scan
+ * actions currently in state, so pagination or a fresh session loses
+ * history. The real question is graph-shaped: "is there an edge, or a
+ * chain of edges, from our current node that reaches the target?" Once
+ * discovered edges are persisted in the datacore (see nav-06), this
+ * selector should be replaced by a datacore query against the edge graph.
+ */
+export const hasFulfilledScanRouteTo = createSelector(
+	( state: State, nodeId: number ): boolean => {
+		for ( const action of Object.values( state.actions.byId ) ) {
+			if ( ! isScanRoute( action ) || ! isFulfilled( action ) ) {
+				continue;
+			}
+			if ( action.params.target_node_id === nodeId ) {
+				return true;
+			}
+		}
+		return false;
 	},
 	( state: State ) => [ state.actions.byId ]
 );

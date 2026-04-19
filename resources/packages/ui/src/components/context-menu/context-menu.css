@@ -15,15 +15,10 @@
 /* Header */
 .helm-context-menu__header {
   padding: 6px 10px;
-  border-bottom: 1px solid var(--helm-ui-color-border);
   display: flex;
   align-items: baseline;
   justify-content: space-between;
   gap: 8px;
-}
-
-.helm-context-menu__header--standalone {
-  border-bottom: none;
 }
 
 .helm-context-menu__name {
@@ -46,6 +41,13 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
+  border-top: 1px solid var(--helm-ui-color-border);
+}
+
+/* Hide the wrapper (and its divider) when every action component returned
+   null — keeps the header flush. */
+.helm-context-menu__actions:empty {
+  display: none;
 }
 
 .helm-context-menu__action {

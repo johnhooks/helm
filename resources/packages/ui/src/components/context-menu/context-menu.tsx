@@ -1,4 +1,15 @@
-import { useCallback, useRef, type CSSProperties, type KeyboardEvent } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  type CSSProperties,
+  type KeyboardEvent,
+  type ReactNode,
+} from "react";
 import type { LcarsTone } from "../../tones";
 import "./context-menu.css";
 
@@ -14,97 +25,187 @@ export interface ContextMenuProps {
   name: string;
   subtitle?: string;
   tone?: LcarsTone;
-  actions: ContextMenuAction[];
+  actions?: ContextMenuAction[];
+  children?: ReactNode;
   width?: number;
   className?: string;
   style?: CSSProperties;
   "data-testid"?: string;
 }
 
-export function ContextMenu({
-  name,
-  subtitle,
-  tone = "sky",
-  actions,
-  width = 180,
-  className,
-  style,
-  "data-testid": testId,
-}: ContextMenuProps) {
-  const menuRef = useRef<HTMLDivElement>(null);
-  const actionRefs = useRef<Map<number, HTMLButtonElement>>(new Map());
-  const hasActions = actions.length > 0;
+type ActionRegistration = {
+  id: string;
+  ref: HTMLButtonElement | null;
+  disabled: boolean;
+};
 
-  const getEnabledIndices = useCallback(
-    () => actions.reduce<number[]>((acc, action, i) => {
-      if (!action.disabled) {
-        acc.push(i);
-      }
-      return acc;
-    }, []),
-    [actions]
+type ActionRegistry = {
+  registerAction: (registration: ActionRegistration) => void;
+  unregisterAction: (id: string) => void;
+};
+
+const ContextMenuActionsContext = createContext<ActionRegistry | null>(null);
+
+interface ContextMenuActionListProps {
+  children: ReactNode;
+}
+
+function ContextMenuActionList({ children }: ContextMenuActionListProps) {
+  return (
+    <div className="helm-context-menu__actions">
+      {children}
+    </div>
+  );
+}
+
+function useActionRegistry() {
+  const actionRefs = useRef<Map<string, ActionRegistration>>(new Map());
+
+  const registry = useMemo<ActionRegistry>(
+    () => ({
+      registerAction: (registration) => {
+        actionRefs.current.set(registration.id, registration);
+      },
+      unregisterAction: (id) => {
+        actionRefs.current.delete(id);
+      },
+    }),
+    []
+  );
+
+  const getEnabledButtons = useCallback(
+    () =>
+      Array.from(actionRefs.current.values())
+        .filter((registration) => !registration.disabled && registration.ref)
+        .map((registration) => registration.ref as HTMLButtonElement),
+    []
   );
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent<HTMLDivElement>) => {
-      const enabled = getEnabledIndices();
-      if (enabled.length === 0) {
+      const enabledButtons = getEnabledButtons();
+      if (enabledButtons.length === 0) {
         return;
       }
 
-      const focused = menuRef.current?.ownerDocument.activeElement;
-      const currentIndex = [...actionRefs.current.entries()].find(
-        ([, el]) => el === focused
-      )?.[0];
-
-      const currentEnabledPos = currentIndex !== undefined
-        ? enabled.indexOf(currentIndex)
+      const focused = event.currentTarget.ownerDocument.activeElement;
+      const currentIndex = focused instanceof HTMLButtonElement
+        ? enabledButtons.indexOf(focused)
         : -1;
 
-      let nextPos: number | undefined;
+      let nextIndex: number | undefined;
 
       switch (event.key) {
         case "ArrowDown":
           event.preventDefault();
-          nextPos = currentEnabledPos < enabled.length - 1
-            ? currentEnabledPos + 1
+          nextIndex = currentIndex < enabledButtons.length - 1
+            ? currentIndex + 1
             : 0;
           break;
         case "ArrowUp":
           event.preventDefault();
-          nextPos = currentEnabledPos > 0
-            ? currentEnabledPos - 1
-            : enabled.length - 1;
+          nextIndex = currentIndex > 0
+            ? currentIndex - 1
+            : enabledButtons.length - 1;
           break;
         case "Home":
           event.preventDefault();
-          nextPos = 0;
+          nextIndex = 0;
           break;
         case "End":
           event.preventDefault();
-          nextPos = enabled.length - 1;
+          nextIndex = enabledButtons.length - 1;
           break;
         default:
           return;
       }
 
-      if (nextPos !== undefined) {
-        actionRefs.current.get(enabled[nextPos])?.focus();
-      }
+      enabledButtons[nextIndex]?.focus();
     },
-    [getEnabledIndices]
+    [getEnabledButtons]
   );
 
-  const classNames = [
-    "helm-context-menu",
-    className,
-  ]
-    .filter(Boolean)
-    .join(" ");
+  return { registry, handleKeyDown };
+}
+
+export interface ContextMenuActionItemProps extends ContextMenuAction {}
+
+export function ContextMenuActionItem({
+  label,
+  detail,
+  disabled,
+  tone,
+  onClick,
+}: ContextMenuActionItemProps) {
+  const registry = useContext(ContextMenuActionsContext);
+  const id = useId();
+  const buttonRef = useRef<HTMLButtonElement | null>(null);
+
+  useEffect(() => {
+    if (!registry) {
+      return;
+    }
+
+    registry.registerAction({
+      id,
+      ref: buttonRef.current,
+      disabled: Boolean(disabled),
+    });
+
+    return () => {
+      registry.unregisterAction(id);
+    };
+  }, [disabled, id, registry]);
+
+  return (
+    <button
+      ref={buttonRef}
+      className={[
+        "helm-context-menu__action",
+        tone && `helm-tone--${tone}`,
+      ]
+        .filter(Boolean)
+        .join(" ")}
+      role="menuitem"
+      type="button"
+      disabled={disabled}
+      tabIndex={disabled ? -1 : 0}
+      onClick={onClick}
+    >
+      <span className="helm-context-menu__action-label">
+        {label}
+      </span>
+      {detail && (
+        <span className="helm-context-menu__action-detail">
+          {detail}
+        </span>
+      )}
+    </button>
+  );
+}
+
+export function ContextMenu({
+  name,
+  subtitle,
+  tone = "sky",
+  actions = [],
+  children,
+  width = 180,
+  className,
+  style,
+  "data-testid": testId,
+}: ContextMenuProps) {
+  // Render the actions wrapper unconditionally when any children or `actions`
+  // are passed. Individual items may still render null at runtime based on
+  // their own applicability — CSS `.helm-context-menu__actions:empty` hides
+  // the wrapper so the header stays flush when nothing applies.
+  const hasAnyContribution = actions.length > 0 || children !== undefined;
+  const { registry, handleKeyDown } = useActionRegistry();
+
+  const classNames = ["helm-context-menu", className].filter(Boolean).join(" ");
 
   return (
     <div
-      ref={menuRef}
       className={classNames}
       role="menu"
       tabIndex={-1}
@@ -112,54 +213,29 @@ export function ContextMenu({
       onKeyDown={handleKeyDown}
       data-testid={testId}
     >
-      <div
-        className={[
-          `helm-context-menu__header helm-tone--${tone}`,
-          !hasActions && "helm-context-menu__header--standalone",
-        ]
-          .filter(Boolean)
-          .join(" ")}
-      >
+      <div className={`helm-context-menu__header helm-tone--${tone}`}>
         <span className="helm-context-menu__name">{name}</span>
         {subtitle && (
           <span className="helm-context-menu__subtitle">{subtitle}</span>
         )}
       </div>
-      {hasActions && (
-        <div className="helm-context-menu__actions">
-          {actions.map((action, i) => (
-            <button
-              key={action.label}
-              ref={(el) => {
-                if (el) {
-                  actionRefs.current.set(i, el);
-                } else {
-                  actionRefs.current.delete(i);
-                }
-              }}
-              className={[
-                "helm-context-menu__action",
-                action.tone && `helm-tone--${action.tone}`,
-              ]
-                .filter(Boolean)
-                .join(" ")}
-              role="menuitem"
-              type="button"
-              disabled={action.disabled}
-              tabIndex={action.disabled ? -1 : 0}
-              onClick={action.onClick}
-            >
-              <span className="helm-context-menu__action-label">
-                {action.label}
-              </span>
-              {action.detail && (
-                <span className="helm-context-menu__action-detail">
-                  {action.detail}
-                </span>
-              )}
-            </button>
-          ))}
-        </div>
+      {hasAnyContribution && (
+        <ContextMenuActionsContext.Provider value={registry}>
+          <ContextMenuActionList>
+            {actions.map((action, i) => (
+              <div key={`${action.label}-${i}`}>
+                <ContextMenuActionItem
+                  label={action.label}
+                  detail={action.detail}
+                  disabled={action.disabled}
+                  tone={action.tone}
+                  onClick={action.onClick}
+                />
+              </div>
+            ))}
+            {children}
+          </ContextMenuActionList>
+        </ContextMenuActionsContext.Provider>
       )}
     </div>
   );

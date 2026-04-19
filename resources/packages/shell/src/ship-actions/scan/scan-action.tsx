@@ -3,13 +3,10 @@ import type { DraftAction, ShipAction } from '@helm/actions';
 import { isScanRoute, store as actionsStore } from '@helm/actions';
 import { store as navStore } from '@helm/nav';
 import { useShip } from '@helm/ships';
-import { ShipActionFill } from '../ship-action-slot';
 import type { ShipActionRenderProps } from '../types';
 import { DraftScanCard } from './draft-scan-card';
 import { ActiveScanCard } from './active-scan-card';
 import { CompleteScanCard } from './complete-scan-card';
-
-const SCAN_TYPES = [ 'scan_route' ] as const;
 
 function DraftScan( { draft }: { draft: DraftAction< 'scan_route' > } ) {
 	const { shipId } = useShip();
@@ -43,28 +40,15 @@ function CompleteScan( { action }: { action: ShipAction< 'scan_route' > } ) {
 	return <CompleteScanCard action={ action } targetName={ targetName } />;
 }
 
-function renderScanAction( { action, draft }: ShipActionRenderProps ) {
+export function renderScanAction( { action, draft }: ShipActionRenderProps ) {
 	if ( draft && isScanRoute( draft ) ) {
 		return <DraftScan draft={ draft } />;
 	}
-	if ( ! action ) {
-		return <></>;
-	}
-	if ( ! isScanRoute( action ) ) {
-		return <></>;
+	if ( ! action || ! isScanRoute( action ) ) {
+		return null;
 	}
 	if ( action.status === 'pending' || action.status === 'running' ) {
 		return <ActiveScan action={ action } />;
 	}
 	return <CompleteScan action={ action } />;
-}
-
-export function ScanActionFill() {
-	return (
-		<>
-			{ SCAN_TYPES.map( ( type ) => (
-				<ShipActionFill key={ type } type={ type } render={ renderScanAction } />
-			) ) }
-		</>
-	);
 }
