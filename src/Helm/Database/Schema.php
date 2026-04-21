@@ -24,6 +24,7 @@ final class Schema
     public const TABLE_INVENTORY = 'helm_inventory';
     public const TABLE_SHIP_STATE = 'helm_ship_state';
     public const TABLE_SHIP_ACTIONS = 'helm_ship_actions';
+    public const TABLE_USER_EDGE = 'helm_user_edge';
 
     /**
      * All custom tables (without prefix).
@@ -38,13 +39,14 @@ final class Schema
         self::TABLE_INVENTORY,
         self::TABLE_SHIP_STATE,
         self::TABLE_SHIP_ACTIONS,
+        self::TABLE_USER_EDGE,
     ];
 
     /**
      * Current schema version.
      * Increment when making schema changes.
      */
-    public const VERSION = 3;
+    public const VERSION = 4;
 
     /**
      * Option key for stored schema version.
@@ -72,7 +74,8 @@ final class Schema
              . self::getProductsTableSql($prefix, $charsetCollate)
              . self::getInventoryTableSql($prefix, $charsetCollate)
              . self::getShipStateTableSql($prefix, $charsetCollate)
-             . self::getShipActionsTableSql($prefix, $charsetCollate);
+             . self::getShipActionsTableSql($prefix, $charsetCollate)
+             . self::getUserEdgeTableSql($prefix, $charsetCollate);
 
         // Run dbDelta with error handling
         $wpError = self::dbDeltaWithErrorHandling($sql);
@@ -469,6 +472,33 @@ CREATE TABLE {$prefix}helm_ship_actions (
     KEY ship_status (ship_post_id,status),
     KEY idx_ready (status,deferred_until,processing_at),
     KEY idx_broadcast (broadcast_at)
+) {$charsetCollate};
+";
+    }
+
+    /**
+     * User edge discoveries table SQL.
+     *
+     * Per-player record of which edges a WordPress user knows about.
+     * Edges themselves are global in helm_nav_edges; this join captures
+     * the fog-of-war layer. Populated by the scan resolver whenever a
+     * player's ship resolves edges in a scan result.
+     *
+     * INSERT IGNORE semantics preserve the original discovered_at on
+     * re-scans so freshness signals to the client only change when the
+     * user genuinely learned something new.
+     */
+    private static function getUserEdgeTableSql(string $prefix, string $charsetCollate): string
+    {
+        return "
+CREATE TABLE {$prefix}helm_user_edge (
+    id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+    user_id bigint(20) unsigned NOT NULL,
+    edge_id bigint(20) unsigned NOT NULL,
+    discovered_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY  (id),
+    UNIQUE KEY user_edge (user_id,edge_id),
+    KEY edge_id (edge_id)
 ) {$charsetCollate};
 ";
     }

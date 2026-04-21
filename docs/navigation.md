@@ -80,32 +80,28 @@ Players can look out and see the stars. They're the backdrop — public, known, 
 | Data | Default Visibility | Becomes Public |
 |------|-------------------|----------------|
 | Stars / system nodes | Public | Always visible |
-| Waypoints | Hidden | When the player discovers them |
-| Edges | Hidden | When the player discovers them; public after enough traversals |
+| Waypoints | Global in storage, surfaced only through scans | A player sees a waypoint id once a scan of theirs references it |
+| Edges | Hidden per-player | Public after enough traversals |
 | Routes | Private | After enough traversals (threshold) |
 
 ### Player Knowledge
 
-Each player maintains their own navigation chart — the waypoints and edges they've discovered. This is tracked server-side with two relationships:
+Edge knowledge is the per-player state. Waypoint nodes live in the global `helm_nav_nodes` table and are fetched by id on demand — a player only ever learns of a waypoint through a scan result that references it, so the global node table does not leak the shape of the corridor network on its own.
 
-- **`helm_user_node`** — which waypoint nodes the player has charted
-- **`helm_user_edge`** — which edges the player knows about
-
-Knowing a waypoint doesn't mean knowing its edges. You might discover W1 from one scan and W2 from another without knowing there's a connection between them. Nodes and edges are independently tracked.
+- **`helm_user_edge`** — the single per-player join table. Every row is one `(user_id, edge_id)` discovery with a `discovered_at` timestamp. Writes happen in the scan resolver the moment an edge appears in a scan result, so chart state is captured at discovery time and never depends on the action payload surviving.
 
 Discoveries belong to the player, not the ship:
 
-- Switching browsers or devices preserves your discoveries
-- Losing a ship doesn't erase your star charts
-- The server can enforce visibility (don't leak waypoint coordinates)
-- Public things (stations, anomalies) can be attached to waypoint nodes independently of who discovered them
-- Team/faction sharing is future work
+- Switching browsers or devices preserves your edge chart — the server is the source of truth and the client rebuilds its cache from `/helm/v1/edges` on cold load.
+- Losing a ship doesn't erase your star charts.
+- Public things (stations, anomalies) can be attached to waypoint nodes independently of who discovered them.
+- Team/faction sharing is future work.
 
-The client caches known waypoints and edges locally for fast rendering, but the server is the source of truth.
+The client caches the discovered edge graph locally in its datacore for fast rendering, and waypoint coordinates are fetched by id from the global node endpoints as needed. The server remains the source of truth.
 
 ### What's Not Exposed
 
-Waypoint coordinates are never served through a public API. Stars are public (you can see the sky), but waypoints only enter the client through scan results. There is no endpoint for browsing all waypoints or edges — that data flows exclusively through gameplay actions.
+Waypoint coordinates are fetchable by id, but a player only ever learns of a waypoint id through a scan of their own, so the data flows exclusively through gameplay actions. Edges are gated per-player; a cold client rebuilds the graph from `/helm/v1/edges`, which returns only the authenticated user's discoveries.
 
 ## Scanning
 

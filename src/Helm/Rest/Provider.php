@@ -18,6 +18,7 @@ final class Provider extends ServiceProvider
         $this->container->singleton(ShipController::class);
         $this->container->singleton(ShipSystemsController::class);
         $this->container->singleton(NodesController::class);
+        $this->container->singleton(EdgesController::class);
     }
 
     public function boot(): void
@@ -27,5 +28,6 @@ final class Provider extends ServiceProvider
         add_action('rest_api_init', $this->container->callback(ShipController::class, 'register'));
         add_action('rest_api_init', $this->container->callback(ShipSystemsController::class, 'register'));
         add_action('rest_api_init', $this->container->callback(NodesController::class, 'register'));
+        add_action('rest_api_init', $this->container->callback(EdgesController::class, 'register'));
     }
 }

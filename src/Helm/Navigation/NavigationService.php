@@ -17,7 +17,7 @@ use Helm\Stars\StarRepository;
  * Pure infrastructure - no knowledge of ships, power, or core life.
  * Takes primitives, returns results.
  */
-final class NavigationService
+class NavigationService
 {
     public function __construct(
         private readonly NavComputer $navComputer,

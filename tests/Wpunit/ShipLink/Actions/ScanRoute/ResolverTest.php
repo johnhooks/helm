@@ -6,6 +6,7 @@ namespace Tests\Wpunit\ShipLink\Actions\ScanRoute;
 
 use Helm\Navigation\NavigationService;
 use Helm\Navigation\Contracts\NodeRepository;
+use Helm\Navigation\Contracts\UserEdgeRepository;
 use Helm\ShipLink\Actions\ScanRoute\Resolver;
 use Helm\ShipLink\ActionType;
 use Helm\ShipLink\Models\Action;
@@ -29,7 +30,10 @@ class ResolverTest extends WPTestCase
         parent::_before();
         $this->tester->haveOrigin();
 
-        $this->resolver = new Resolver(helm(NavigationService::class));
+        $this->resolver = new Resolver(
+            helm(NavigationService::class),
+            helm(UserEdgeRepository::class),
+        );
         $this->shipFactory = helm(ShipFactory::class);
         $this->nodeRepository = helm(NodeRepository::class);
     }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Helm\ShipLink\Actions\ScanRoute;
 
+use Helm\Navigation\Contracts\UserEdgeRepository;
 use Helm\Navigation\Edge;
 use Helm\Navigation\NavigationService;
 use Helm\Navigation\Node;
@@ -21,6 +22,7 @@ final class Resolver implements ActionHandler
 {
     public function __construct(
         private readonly NavigationService $navigationService,
+        private readonly UserEdgeRepository $userEdgeRepository,
     ) {
     }
 
@@ -51,6 +53,11 @@ final class Resolver implements ActionHandler
             $result['nodes'] = [];
             $result['edges'] = [];
         } else {
+            $userId = $ship->getOwnerId();
+            foreach ($scanResult->edges as $edge) {
+                $this->userEdgeRepository->upsert($userId, $edge->id);
+            }
+
             $waypointCount = 0;
             foreach ($scanResult->nodes as $node) {
                 if ($node->isWaypoint()) {

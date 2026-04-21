@@ -47,9 +47,9 @@ becomes interesting.
 ### Bridge hydrate sync
 
 On bridge hydrate the client compares its cached view against the server
-using the headers nav-08 puts on every `/me/edges` response. The datacore
-keeps `X-Helm-Edge-Count` and `X-Helm-Edge-Last-Discovered` in its meta
-table from the previous sync. A single `HEAD` on the edge endpoint returns
+using the headers nav-08 puts on every `/edges` response. The datacore
+keeps `X-WP-Total` and `X-Helm-Edge-Last-Discovered` in its meta table
+from the previous sync. A single `HEAD` on the edge endpoint returns
 the current pair. If both values match what the datacore has, hydrate is
 a no-op. If either differs, the client issues a `GET`, replaces the edge
 table inside a single datacore transaction, fetches any unknown referenced
