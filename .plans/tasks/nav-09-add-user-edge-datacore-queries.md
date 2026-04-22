@@ -1,5 +1,4 @@
----
-status: draft
+status: done
 ---
 
 # Add user edge datacore queries
@@ -30,8 +29,33 @@ repository pattern.
 Expose query APIs that let client code work from a node id without reaching
 back into action payloads. At minimum, callers should be able to fetch the
 known user edges touching a node and derive the connected node ids for that
-node from datacore alone. These operations must be idempotent, work with the
-existing hydrate and reconcile flows from nav-06, and preserve the server as
-the source of truth. This task adds the datacore type and query surface only.
-It does not change the server REST shape or introduce new independent write
-paths outside the existing sync and reconcile flows.
+node from datacore alone. In practice the route-known check also needs a
+direct boolean probe, so the datacore query surface includes:
+
+- `getUserEdgesAtNode(nodeId)`
+- `hasUserEdgesAtNode(nodeId)`
+- `getConnectedNodeIds(nodeId)`
+
+These operations are idempotent, work with the existing hydrate and reconcile
+flows from nav-06, and preserve the server as the source of truth. This task
+adds the datacore type and query surface only. It does not change the server
+REST shape or introduce new independent write paths outside the existing sync
+and reconcile flows.
+
+## Implemented
+
+The shipped datacore work added a dedicated `user_edges` SQLite table keyed by
+`(user_id, id)` with endpoint-node indexes so node-oriented lookups stay local
+and cheap. The public datacore API now exposes:
+
+- Insert helpers for one edge or many edges.
+- `clearUserEdges()` for hydrate clear-and-replace flows.
+- `getUserEdgesAtNode(nodeId)` for callers that need the full local edge rows.
+- `hasUserEdgesAtNode(nodeId)` for route-known checks without materializing the
+  matching edges.
+- `getConnectedNodeIds(nodeId)` for deriving adjacent known nodes from the
+  local graph.
+
+The implementation remains scoped to datacore storage and query behavior. It
+does not add a new server write path, and it keeps hydrate/reconcile as the
+callers responsible for deciding when local edge state should change.

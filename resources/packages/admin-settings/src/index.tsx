@@ -2,7 +2,7 @@
  * Helm Settings — admin settings entry point.
  *
  * Uses the nav store for datacore sync and status display.
- * Provides a "Sync Nodes" button for manual cache sync,
+ * Provides a manual datacore sync button,
  * and shows the current ship via the ShipProvider context.
  */
 import {createRoot, Suspense, useState} from '@wordpress/element';
@@ -178,6 +178,16 @@ function Settings() {
                                 tone="neutral"
                             />
                             <Readout
+                                label={__('Waypoints', 'helm')}
+                                value={syncResult?.waypoints ?? '\u2014'}
+                                tone="neutral"
+                            />
+                            <Readout
+                                label={__('Edges', 'helm')}
+                                value={syncResult?.edges ?? '\u2014'}
+                                tone="neutral"
+                            />
+                            <Readout
                                 label={__('Last Synced', 'helm')}
                                 value={syncResult?.syncedAt ?? '\u2014'}
                                 tone="neutral"
@@ -189,7 +199,7 @@ function Settings() {
                                 onClick={handleSync}
                                 disabled={syncing}
                             >
-                                {__('Sync Nodes', 'helm')}
+                                {__('Sync Datacore', 'helm')}
                             </Button>
                         </div>
                     </div>

@@ -5,7 +5,14 @@ import type { Datacore } from '@helm/datacore';
 import type { Thunk } from '@helm/types';
 import type { Action } from './types';
 import type { store } from './index';
-import { syncNodes as syncNodesToDatacore, META_SYNCED_AT, META_NODE_COUNT, META_STAR_COUNT } from '../sync';
+import {
+	syncNodes as syncNodesToDatacore,
+	META_SYNCED_AT,
+	META_NODE_COUNT,
+	META_STAR_COUNT,
+	META_WAYPOINT_COUNT,
+	META_EDGE_COUNT,
+} from '../sync';
 
 /**
  * Module-level datacore singleton — not stored in Redux state.
@@ -67,6 +74,8 @@ export const hydrate =
 
 		const nodeCount = await dc.getMeta( META_NODE_COUNT );
 		const starCount = await dc.getMeta( META_STAR_COUNT );
+		const waypointCount = await dc.getMeta( META_WAYPOINT_COUNT );
+		const edgeCount = await dc.getMeta( META_EDGE_COUNT );
 		const nodes = await dc.getStarMap();
 
 		dispatch( {
@@ -75,13 +84,15 @@ export const hydrate =
 			syncResult: {
 				nodes: Number( nodeCount ?? 0 ),
 				stars: Number( starCount ?? 0 ),
+				waypoints: Number( waypointCount ?? 0 ),
+				edges: Number( edgeCount ?? 0 ),
 				syncedAt,
 			},
 		} );
 	};
 
 /**
- * Fetch all nodes from REST, write to datacore, load star map into state.
+ * Fetch all nav data from REST, write to datacore, load star map into state.
  */
 export const syncNodes =
 	(): Thunk< Action, typeof store > =>

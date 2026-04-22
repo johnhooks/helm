@@ -3,6 +3,7 @@ import { makeApiNode, makeStar } from './factories';
 import type { Route } from '@playwright/test';
 
 const NODES_PATH = '**/helm/v1/nodes*';
+const EDGES_PATH = '**/helm/v1/edges*';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -24,6 +25,20 @@ async function getNodeCount(page: import('@playwright/test').Page): Promise<numb
 async function getStarCount(page: import('@playwright/test').Page): Promise<number> {
 	return page.evaluate(async () => {
 		const count = await window.helm.dc.getMeta('cache.star_count');
+		return count ? Number(count) : 0;
+	});
+}
+
+async function getWaypointCount(page: import('@playwright/test').Page): Promise<number> {
+	return page.evaluate(async () => {
+		const count = await window.helm.dc.getMeta('cache.waypoint_count');
+		return count ? Number(count) : 0;
+	});
+}
+
+async function getEdgeCount(page: import('@playwright/test').Page): Promise<number> {
+	return page.evaluate(async () => {
+		const count = await window.helm.dc.getMeta('cache.edge_count');
 		return count ? Number(count) : 0;
 	});
 }
@@ -50,6 +65,23 @@ function paginatedRoute(pages: Record<string, unknown>[][]) {
 	};
 }
 
+function makeEdge(id: number, nodeAId: number, nodeBId: number) {
+	return {
+		id,
+		node_a_id: nodeAId,
+		node_b_id: nodeBId,
+		distance: 1.5,
+		discovered_at: '2026-01-01T00:00:00Z',
+	};
+}
+
+async function mockEdges(
+	page: import('@playwright/test').Page,
+	pages: Record<string, unknown>[][] = [[]],
+) {
+	await page.route(EDGES_PATH, paginatedRoute(pages));
+}
+
 // ---------------------------------------------------------------------------
 // Tests
 // ---------------------------------------------------------------------------
@@ -67,12 +99,16 @@ test.describe('Cache E2E', () => {
 			});
 
 			await page.route(NODES_PATH, paginatedRoute([nodes]));
+			await mockEdges(page, [[makeEdge(1, 1, 2), makeEdge(2, 2, 3)]]);
 			const result = await runSync(page);
 
 			expect(result.nodes).toBe(10);
 			expect(result.stars).toBe(10);
+			expect(result.edges).toBe(2);
 			expect(await getNodeCount(page)).toBe(10);
 			expect(await getStarCount(page)).toBe(10);
+			expect(await getWaypointCount(page)).toBe(0);
+			expect(await getEdgeCount(page)).toBe(2);
 
 			const syncedAt = await page.evaluate(async () => {
 				return window.helm.dc.getMeta('cache.synced_at');
@@ -95,11 +131,13 @@ test.describe('Cache E2E', () => {
 				requestCount++;
 				paginatedRoute([page1, page2])(route);
 			});
+			await mockEdges(page, [[makeEdge(1, 1, 2)]]);
 
 			const result = await runSync(page);
 
 			expect(result.nodes).toBe(12);
 			expect(result.stars).toBe(12);
+			expect(result.edges).toBe(1);
 			expect(requestCount).toBe(2);
 		});
 
@@ -122,11 +160,13 @@ test.describe('Cache E2E', () => {
 				requestCount++;
 				paginatedRoute([page1, page2, page3])(route);
 			});
+			await mockEdges(page, [[makeEdge(1, 1, 2), makeEdge(2, 2, 3), makeEdge(3, 3, 4)]]);
 
 			const result = await runSync(page);
 
 			expect(result.nodes).toBe(20);
 			expect(result.stars).toBe(20);
+			expect(result.edges).toBe(3);
 			expect(requestCount).toBe(3);
 		});
 
@@ -142,10 +182,12 @@ test.describe('Cache E2E', () => {
 			];
 
 			await page.route(NODES_PATH, paginatedRoute([nodes]));
+			await mockEdges(page, [[makeEdge(1, 1, 2)]]);
 			const result = await runSync(page);
 
 			expect(result.nodes).toBe(3);
 			expect(result.stars).toBe(4);
+			expect(result.edges).toBe(1);
 
 			const starsAtNode1 = await page.evaluate(async () => {
 				return window.helm.dc.getStarsAtNode(1);
@@ -161,16 +203,21 @@ test.describe('Cache E2E', () => {
 		test('empty response — clears existing data', async ({ page }) => {
 			const seed = [makeApiNode(1, [makeStar({ id: 10, node_id: 1 })])];
 			await page.route(NODES_PATH, paginatedRoute([seed]));
+			await mockEdges(page, [[makeEdge(1, 1, 2)]]);
 			await runSync(page);
 			expect(await getNodeCount(page)).toBe(1);
+			expect(await getEdgeCount(page)).toBe(1);
 
 			await page.unrouteAll();
 			await page.route(NODES_PATH, paginatedRoute([[]]));
+			await mockEdges(page, [[]]);
 			const result = await runSync(page);
 
 			expect(result.nodes).toBe(0);
 			expect(result.stars).toBe(0);
+			expect(result.edges).toBe(0);
 			expect(await getNodeCount(page)).toBe(0);
+			expect(await getEdgeCount(page)).toBe(0);
 		});
 	});
 
@@ -186,6 +233,7 @@ test.describe('Cache E2E', () => {
 			];
 
 			await page.route(NODES_PATH, paginatedRoute([nodes]));
+			await mockEdges(page, [[makeEdge(1, 1, 2)]]);
 			await runSync(page);
 
 			const node1 = await page.evaluate(async () => {
@@ -208,14 +256,18 @@ test.describe('Cache E2E', () => {
 
 		test('sync replaces previous data', async ({ page }) => {
 			await page.route(NODES_PATH, paginatedRoute([[makeApiNode(1)]]));
+			await mockEdges(page, [[makeEdge(1, 1, 2)]]);
 			await runSync(page);
 			expect(await getNodeCount(page)).toBe(1);
+			expect(await getEdgeCount(page)).toBe(1);
 
 			await page.unrouteAll();
 			await page.route(NODES_PATH, paginatedRoute([[makeApiNode(50), makeApiNode(51)]]));
+			await mockEdges(page, [[makeEdge(50, 50, 51), makeEdge(51, 51, 52)]]);
 			await runSync(page);
 
 			expect(await getNodeCount(page)).toBe(2);
+			expect(await getEdgeCount(page)).toBe(2);
 
 			const oldNode = await page.evaluate(async () => {
 				return window.helm.dc.getNode(1);
@@ -238,6 +290,7 @@ test.describe('Cache E2E', () => {
 
 		test('synced_at meta is set after sync', async ({ page }) => {
 			await page.route(NODES_PATH, paginatedRoute([[makeApiNode(1)]]));
+			await mockEdges(page, [[makeEdge(1, 1, 2)]]);
 			await runSync(page);
 
 			const syncedAt = await page.evaluate(async () => {
@@ -256,8 +309,10 @@ test.describe('Cache E2E', () => {
 	test.describe('Error responses', () => {
 		test('server 500 — throws CacheFetchFailed, cache untouched', async ({ page }) => {
 			await page.route(NODES_PATH, paginatedRoute([[makeApiNode(1)]]));
+			await mockEdges(page, [[makeEdge(1, 1, 2)]]);
 			await runSync(page);
 			expect(await getNodeCount(page)).toBe(1);
+			expect(await getEdgeCount(page)).toBe(1);
 
 			await page.unrouteAll();
 			await page.route(NODES_PATH, (route) => {
@@ -271,6 +326,7 @@ test.describe('Cache E2E', () => {
 					}),
 				});
 			});
+			await mockEdges(page, [[makeEdge(1, 1, 2)]]);
 
 			const error = await page.evaluate(async () => {
 				try {
@@ -286,6 +342,7 @@ test.describe('Cache E2E', () => {
 			expect(error!.isSafe).toBe(true);
 
 			expect(await getNodeCount(page)).toBe(1);
+			expect(await getEdgeCount(page)).toBe(1);
 		});
 
 		test('server 403 — throws CacheFetchFailed', async ({ page }) => {
@@ -300,6 +357,7 @@ test.describe('Cache E2E', () => {
 					}),
 				});
 			});
+			await mockEdges(page, [[makeEdge(1, 1, 2)]]);
 
 			const error = await page.evaluate(async () => {
 				try {
@@ -318,6 +376,7 @@ test.describe('Cache E2E', () => {
 			await page.route(NODES_PATH, (route) => {
 				route.abort('connectionrefused');
 			});
+			await mockEdges(page, [[makeEdge(1, 1, 2)]]);
 
 			const error = await page.evaluate(async () => {
 				try {
@@ -335,8 +394,10 @@ test.describe('Cache E2E', () => {
 
 		test('error mid-pagination — throws CacheFetchFailed, cache untouched', async ({ page }) => {
 			await page.route(NODES_PATH, paginatedRoute([[makeApiNode(1)]]));
+			await mockEdges(page, [[makeEdge(1, 1, 2)]]);
 			await runSync(page);
 			expect(await getNodeCount(page)).toBe(1);
+			expect(await getEdgeCount(page)).toBe(1);
 
 			await page.unrouteAll();
 			let requestNum = 0;
@@ -363,6 +424,7 @@ test.describe('Cache E2E', () => {
 					});
 				}
 			});
+			await mockEdges(page, [[makeEdge(1, 1, 2)]]);
 
 			const error = await page.evaluate(async () => {
 				try {
@@ -377,6 +439,7 @@ test.describe('Cache E2E', () => {
 			expect(error!.message).toBe('helm.cache.fetch_failed');
 
 			expect(await getNodeCount(page)).toBe(1);
+			expect(await getEdgeCount(page)).toBe(1);
 		});
 	});
 });

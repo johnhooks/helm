@@ -9,6 +9,8 @@ export type Action =
 export interface SyncResult {
 	nodes: number;
 	stars: number;
+	waypoints: number;
+	edges: number;
 	syncedAt: string;
 }
 
