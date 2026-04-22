@@ -36,6 +36,7 @@ export const initialize =
 
 		initPromise = createDatacore( {
 			workerUrl: window.helm.settings.workerUrl,
+			userId: window.helm.settings.userId,
 		} );
 
 		try {

@@ -152,6 +152,7 @@ final class Provider extends ServiceProvider
                 . 'window.helm.settings = ' . wp_json_encode([
                     'workerUrl' => HELM_URL . 'build/datacore-worker.js',
                     'debug'    => defined('WP_DEBUG') && WP_DEBUG,
+                    'userId'   => get_current_user_id(),
                     'shipId'   => $shipPostId,
                 ]) . ';',
                 'before',

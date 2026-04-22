@@ -2,6 +2,7 @@ import { __ } from '@wordpress/i18n';
 import { META_SCHEMA, createMetaRepository } from './meta';
 import { NODES_SCHEMA, createNodesRepository } from './nodes';
 import { STARS_SCHEMA, createStarsRepository } from './stars';
+import { USER_EDGES_SCHEMA, createUserEdgesRepository } from './user-edges';
 import { ErrorCode, HelmError } from '@helm/errors';
 import type {
 	Connection,
@@ -32,7 +33,7 @@ function nextId(): string {
  * @param  options
  * @throws {HelmError} with code `helm.datacore.unsupported` if the browser lacks required APIs.
  */
-export async function createDatacore(options: DatacoreOptions = {}): Promise<Datacore> {
+export async function createDatacore(options: DatacoreOptions): Promise<Datacore> {
 	if (typeof Worker === 'undefined') {
 		throw HelmError.safe(
 			ErrorCode.DatacoreUnsupported,
@@ -151,6 +152,7 @@ export async function createDatacore(options: DatacoreOptions = {}): Promise<Dat
 
 	// Create schema (nodes first — stars has FK).
 	await sendExec(NODES_SCHEMA);
+	await sendExec(USER_EDGES_SCHEMA);
 	await sendExec(STARS_SCHEMA);
 	await sendExec(META_SCHEMA);
 
@@ -164,6 +166,7 @@ export async function createDatacore(options: DatacoreOptions = {}): Promise<Dat
 	return {
 		...createStarsRepository(conn),
 		...createNodesRepository(conn),
+		...createUserEdgesRepository(conn, options.userId),
 		...createMetaRepository(conn),
 		transaction: sendTransaction,
 

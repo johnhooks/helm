@@ -28,7 +28,7 @@ export const test = base.extend({
 
 		// Boot Datacore.
 		await page.evaluate(async () => {
-			window.helm.dc = await window.helm.datacore.createDatacore();
+			window.helm.dc = await window.helm.datacore.createDatacore({ userId: 1 });
 		});
 
 		await use(page); // eslint-disable-line react-hooks/rules-of-hooks

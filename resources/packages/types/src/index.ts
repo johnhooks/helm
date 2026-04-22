@@ -2,6 +2,7 @@ export type { SystemPlanet, SystemContents } from './planet';
 export type { Star } from './star';
 export type { StarNode } from './star-node';
 export type { NavNode, ApiNodeResponse } from './node';
+export type { UserEdge } from './user-edge';
 export type { Product, ProductEmbed } from './product';
 export { LinkRel } from './rest';
 export type {

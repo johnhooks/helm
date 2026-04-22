@@ -1,4 +1,4 @@
-import type { NavNode, Star, StarNode } from '@helm/types';
+import type { NavNode, Star, StarNode, UserEdge } from '@helm/types';
 
 /**
  * SQLite-compatible parameter types for binding.
@@ -102,21 +102,36 @@ export type StarRow = Omit<Star, 'is_primary'> & { is_primary: number };
 
 export interface DatacoreOptions {
 	workerUrl?: string | URL;
+	userId: number;
 }
 
 export interface Datacore {
+	// Nodes
 	insertNode: (node: NavNode) => Promise<void>;
 	insertNodes: (nodes: NavNode[]) => Promise<void>;
+	clearNodes: () => Promise<void>;
+	getNode: (id: number) => Promise<NavNode | null>;
+
+	// Stars
 	insertStar: (star: Star) => Promise<void>;
 	insertStars: (stars: Star[]) => Promise<void>;
-	clearNodes: () => Promise<void>;
 	clearStars: () => Promise<void>;
 	getStarMap: () => Promise<StarNode[]>;
-
 	getStarsAtNode: (nodeId: number) => Promise<Star[]>;
-	getNode: (id: number) => Promise<NavNode | null>;
+
+	// User edges
+	insertUserEdge: (edge: UserEdge) => Promise<void>;
+	insertUserEdges: (edges: UserEdge[]) => Promise<void>;
+	clearUserEdges: () => Promise<void>;
+	getUserEdgesAtNode: (nodeId: number) => Promise<UserEdge[]>;
+	hasUserEdgesAtNode: (nodeId: number) => Promise<boolean>;
+	getConnectedNodeIds: (nodeId: number) => Promise<number[]>;
+
+	// Meta
 	getMeta: (key: string) => Promise<string | null>;
 	setMeta: (key: string, value: string) => Promise<void>;
+
+	// Lifecycle
 	transaction: <T>(fn: () => Promise<T>) => Promise<T>;
 	close: () => Promise<void>;
 }

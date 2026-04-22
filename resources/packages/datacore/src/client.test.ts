@@ -57,7 +57,7 @@ vi.stubGlobal('navigator', { storage: { getDirectory: vi.fn() } });
  * Helper: create a Datacore instance with auto-responding init + schema exec.
  */
 async function createTestDatacore() {
-	const dcPromise = createDatacore();
+	const dcPromise = createDatacore({ userId: 42 });
 
 	// Auto-respond to init (ready) and exec (schema init) messages.
 	MockWorker.instance.onPosted((msg: unknown) => {
@@ -89,8 +89,14 @@ describe('createDatacore', () => {
 		expect(dc.insertStar).toBeInstanceOf(Function);
 		expect(dc.clearNodes).toBeInstanceOf(Function);
 		expect(dc.clearStars).toBeInstanceOf(Function);
+		expect(dc.insertUserEdge).toBeInstanceOf(Function);
+		expect(dc.insertUserEdges).toBeInstanceOf(Function);
+		expect(dc.clearUserEdges).toBeInstanceOf(Function);
 		expect(dc.getStarMap).toBeInstanceOf(Function);
 		expect(dc.getStarsAtNode).toBeInstanceOf(Function);
+		expect(dc.getUserEdgesAtNode).toBeInstanceOf(Function);
+		expect(dc.hasUserEdgesAtNode).toBeInstanceOf(Function);
+		expect(dc.getConnectedNodeIds).toBeInstanceOf(Function);
 		expect(dc.getNode).toBeInstanceOf(Function);
 		expect(dc.getMeta).toBeInstanceOf(Function);
 		expect(dc.setMeta).toBeInstanceOf(Function);
@@ -200,6 +206,59 @@ describe('createDatacore', () => {
 
 		expect(captured).not.toBeNull();
 		expect(captured!.sql).toBe('DELETE FROM stars');
+	});
+
+	it('insertUserEdge sends upsert with scoped user id', async () => {
+		const dc = await createTestDatacore();
+
+		let captured: { sql: string; params?: unknown[] } | null = null;
+		MockWorker.instance.onPosted((msg: unknown) => {
+			const m = msg as { id: string; type: string; payload?: { sql: string; params?: unknown[] } };
+			if (m.type === 'run') {
+				captured = m.payload!;
+				MockWorker.instance.receive({
+					id: m.id,
+					type: 'result',
+					payload: { rows: [], columns: [] },
+				});
+			}
+		});
+
+		await dc.insertUserEdge({
+			id: 7,
+			node_a_id: 10,
+			node_b_id: 11,
+			distance: 1.25,
+			discovered_at: '2026-04-20T00:00:00+00:00',
+		});
+
+		expect(captured).not.toBeNull();
+		expect(captured!.sql).toContain('INSERT INTO user_edges');
+		expect(captured!.sql).toContain('ON CONFLICT(user_id, id) DO UPDATE');
+		expect(captured!.params).toEqual([42, 7, 10, 11, 1.25, '2026-04-20T00:00:00+00:00']);
+	});
+
+	it('clearUserEdges deletes only the current user rows', async () => {
+		const dc = await createTestDatacore();
+
+		let captured: { sql: string; params?: unknown[] } | null = null;
+		MockWorker.instance.onPosted((msg: unknown) => {
+			const m = msg as { id: string; type: string; payload?: { sql: string; params?: unknown[] } };
+			if (m.type === 'run') {
+				captured = m.payload!;
+				MockWorker.instance.receive({
+					id: m.id,
+					type: 'result',
+					payload: { rows: [], columns: [] },
+				});
+			}
+		});
+
+		await dc.clearUserEdges();
+
+		expect(captured).not.toBeNull();
+		expect(captured!.sql).toBe('DELETE FROM user_edges WHERE user_id = ?');
+		expect(captured!.params).toEqual([42]);
 	});
 
 	it('transaction sends SAVEPOINT and RELEASE on success', async () => {
@@ -344,6 +403,105 @@ describe('createDatacore', () => {
 		expect(stars[1].is_primary).toBe(false);
 		expect(stars[0].node_id).toBe(10);
 		expect(stars[0].title).toBe('Alpha');
+	});
+
+	it('getUserEdgesAtNode returns typed UserEdge[]', async () => {
+		const dc = await createTestDatacore();
+
+		MockWorker.instance.onPosted((msg: unknown) => {
+			const m = msg as { id: string; type: string };
+			if (m.type === 'query') {
+				MockWorker.instance.receive({
+					id: m.id,
+					type: 'result',
+					payload: {
+						rows: [
+							[7, 10, 11, 1.25, '2026-04-20T00:00:00+00:00'],
+							[8, 10, 12, 2.5, '2026-04-21T00:00:00+00:00'],
+						],
+						columns: ['id', 'node_a_id', 'node_b_id', 'distance', 'discovered_at'],
+					},
+				});
+			}
+		});
+
+		const edges = await dc.getUserEdgesAtNode(10);
+		expect(edges).toEqual([
+			{
+				id: 7,
+				node_a_id: 10,
+				node_b_id: 11,
+				distance: 1.25,
+				discovered_at: '2026-04-20T00:00:00+00:00',
+			},
+			{
+				id: 8,
+				node_a_id: 10,
+				node_b_id: 12,
+				distance: 2.5,
+				discovered_at: '2026-04-21T00:00:00+00:00',
+			},
+		]);
+	});
+
+	it('hasUserEdgesAtNode returns true when a matching row exists', async () => {
+		const dc = await createTestDatacore();
+
+		MockWorker.instance.onPosted((msg: unknown) => {
+			const m = msg as { id: string; type: string };
+			if (m.type === 'query') {
+				MockWorker.instance.receive({
+					id: m.id,
+					type: 'result',
+					payload: {
+						rows: [[1]],
+						columns: ['edge_exists'],
+					},
+				});
+			}
+		});
+
+		await expect(dc.hasUserEdgesAtNode(10)).resolves.toBe(true);
+	});
+
+	it('hasUserEdgesAtNode returns false when no matching row exists', async () => {
+		const dc = await createTestDatacore();
+
+		MockWorker.instance.onPosted((msg: unknown) => {
+			const m = msg as { id: string; type: string };
+			if (m.type === 'query') {
+				MockWorker.instance.receive({
+					id: m.id,
+					type: 'result',
+					payload: {
+						rows: [],
+						columns: ['edge_exists'],
+					},
+				});
+			}
+		});
+
+		await expect(dc.hasUserEdgesAtNode(10)).resolves.toBe(false);
+	});
+
+	it('getConnectedNodeIds returns the opposite endpoints only', async () => {
+		const dc = await createTestDatacore();
+
+		MockWorker.instance.onPosted((msg: unknown) => {
+			const m = msg as { id: string; type: string };
+			if (m.type === 'query') {
+				MockWorker.instance.receive({
+					id: m.id,
+					type: 'result',
+					payload: {
+						rows: [[11], [12], [15]],
+						columns: ['connected_node_id'],
+					},
+				});
+			}
+		});
+
+		await expect(dc.getConnectedNodeIds(10)).resolves.toEqual([11, 12, 15]);
 	});
 
 	it('getNode returns NavNode or null', async () => {
@@ -506,22 +664,22 @@ describe('unsupported browser errors', () => {
 	it('throws HelmError when Worker is unavailable', async () => {
 		vi.stubGlobal('Worker', undefined);
 
-		await expect(createDatacore()).rejects.toThrow(HelmError);
-		await expect(createDatacore()).rejects.toThrow(ErrorCode.DatacoreUnsupported);
+		await expect(createDatacore({ userId: 42 })).rejects.toThrow(HelmError);
+		await expect(createDatacore({ userId: 42 })).rejects.toThrow(ErrorCode.DatacoreUnsupported);
 	});
 
 	it('throws HelmError when OPFS is unavailable', async () => {
 		vi.stubGlobal('navigator', { storage: {} });
 
-		await expect(createDatacore()).rejects.toThrow(HelmError);
-		await expect(createDatacore()).rejects.toThrow(ErrorCode.DatacoreUnsupported);
+		await expect(createDatacore({ userId: 42 })).rejects.toThrow(HelmError);
+		await expect(createDatacore({ userId: 42 })).rejects.toThrow(ErrorCode.DatacoreUnsupported);
 	});
 
 	it('error detail names the missing API', async () => {
 		vi.stubGlobal('navigator', { storage: {} });
 
 		try {
-			await createDatacore();
+			await createDatacore({ userId: 42 });
 		} catch (e) {
 			expect(HelmError.is(e)).toBe(true);
 			expect((e as HelmError).detail).toContain('Origin Private File System');
