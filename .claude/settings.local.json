@@ -1,0 +1,41 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep:*)",
+      "Bash(bun run typecheck:*)",
+      "Bash(bun run check-types:*)",
+      "Bash(vendor/bin/phpcbf:*)",
+      "Bash(vendor/bin/phpcs:*)",
+      "Bash(slic run:*)",
+      "Bash(slic php:*)",
+      "Bash(slic composer dump-autoload:*)",
+      "Bash(slic composer strauss:*)",
+      "Bash(vendor/bin/codecept build:*)",
+      "Bash(composer test:*)",
+      "Bash(vendor/bin/phpstan analyse:*)",
+      "Bash(composer search:*)",
+      "Bash(composer lint:*)",
+      "Bash(composer analyse:*)",
+      "Bash(composer lint:fix:*)",
+      "Bash(composer test:unit:*)",
+      "Bash(./vendor/bin/phpstan:*)",
+      "Bash(ls:*)",
+      "Bash(find:*)",
+      "Bash(bun run format:*)",
+      "Bash(bun run:*)",
+      "Bash(bunx playwright test:*)",
+      "WebSearch",
+      "WebFetch(domain:developer.wordpress.org)",
+      "Bash(xargs:*)",
+      "WebFetch(domain:r3f.docs.pmnd.rs)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(npx tsc:*)",
+      "Bash(bun wb:*)",
+      "Bash(tree:*)",
+      "Bash(bun:*)",
+      "Bash(npx vitest:*)",
+      "Read(//home/hooks/.claude/**)",
+      "Read(//home/hooks/**)"
+    ]
+  }
+}
