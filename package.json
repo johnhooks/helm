@@ -8,6 +8,8 @@
     ],
     "scripts": {
         "build": "wp-scripts build",
+        "release": "bin/build-release.sh",
+        "release:prerelease": "bin/build-release.sh --with-commit-hash",
         "dev": "wp-scripts start",
         "lint:js": "wp-scripts lint-js resources/packages",
         "lint:fix": "wp-scripts lint-js resources/packages --fix",

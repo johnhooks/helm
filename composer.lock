@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "05768dc7ddd3fc56b6a30950fa2562e6",
+    "content-hash": "106ccfb3ee13cde0693982a5040b21b9",
     "packages": [
         {
             "name": "lucatume/di52",
@@ -10054,5 +10054,8 @@
         "php": ">=8.1"
     },
     "platform-dev": {},
+    "platform-overrides": {
+        "php": "8.1"
+    },
     "plugin-api-version": "2.9.0"
 }

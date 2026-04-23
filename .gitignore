@@ -5,6 +5,7 @@ node_modules/
 
 # Build artifacts
 /build/
+/release/
 /tmp/
 artifacts
 bin/strauss.phar
