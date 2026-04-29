@@ -76,6 +76,8 @@ class ResolverTest extends WPTestCase
         $this->assertArrayHasKey('edges_discovered', $action->result);
         $this->assertArrayHasKey('waypoints_created', $action->result);
         $this->assertArrayHasKey('path', $action->result);
+        $this->assertArrayHasKey('discovered_edge_ids', $action->result);
+        $this->assertArrayHasKey('discovered_node_ids', $action->result);
         $this->assertArrayHasKey('nodes', $action->result);
         $this->assertArrayHasKey('edges', $action->result);
 
@@ -84,6 +86,8 @@ class ResolverTest extends WPTestCase
         $this->assertIsInt($action->result['edges_discovered']);
         $this->assertIsInt($action->result['waypoints_created']);
         $this->assertIsArray($action->result['path']);
+        $this->assertIsArray($action->result['discovered_edge_ids']);
+        $this->assertIsArray($action->result['discovered_node_ids']);
         $this->assertIsArray($action->result['nodes']);
         $this->assertIsArray($action->result['edges']);
     }
@@ -134,12 +138,21 @@ class ResolverTest extends WPTestCase
         $this->assertArrayHasKey('id', $firstEdge);
         $this->assertArrayHasKey('node_a_id', $firstEdge);
         $this->assertArrayHasKey('node_b_id', $firstEdge);
-        $this->assertArrayHasKey('distance', $firstEdge);
+        $this->assertArrayNotHasKey('distance', $firstEdge);
+        $this->assertArrayNotHasKey('discovered_at', $firstEdge);
 
         // Path should match node IDs
         $this->assertCount(count($action->result['nodes']), $action->result['path']);
         // edges_discovered should match edges array length
         $this->assertSame($action->result['edges_discovered'], count($action->result['edges']));
+        $this->assertSame(
+            array_column($action->result['edges'], 'id'),
+            $action->result['discovered_edge_ids']
+        );
+        $this->assertSame(
+            array_column($action->result['nodes'], 'id'),
+            $action->result['discovered_node_ids']
+        );
     }
 
     public function test_failed_scan_still_completes(): void
@@ -174,6 +187,8 @@ class ResolverTest extends WPTestCase
         $this->assertIsInt($action->result['edges_discovered']);
         $this->assertIsInt($action->result['waypoints_created']);
         $this->assertIsArray($action->result['path']);
+        $this->assertIsArray($action->result['discovered_edge_ids']);
+        $this->assertIsArray($action->result['discovered_node_ids']);
         $this->assertIsArray($action->result['nodes']);
         $this->assertIsArray($action->result['edges']);
     }

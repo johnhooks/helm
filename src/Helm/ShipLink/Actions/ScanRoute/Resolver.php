@@ -50,6 +50,8 @@ final class Resolver implements ActionHandler
             $result['edges_discovered'] = 0;
             $result['waypoints_created'] = 0;
             $result['path'] = [];
+            $result['discovered_edge_ids'] = [];
+            $result['discovered_node_ids'] = [];
             $result['nodes'] = [];
             $result['edges'] = [];
         } else {
@@ -70,6 +72,14 @@ final class Resolver implements ActionHandler
             $result['edges_discovered'] = count($scanResult->edges);
             $result['waypoints_created'] = $waypointCount;
             $result['path'] = $scanResult->pathIds();
+            $result['discovered_edge_ids'] = array_map(
+                static fn(Edge $e) => $e->id,
+                $scanResult->edges
+            );
+            $result['discovered_node_ids'] = array_map(
+                static fn(Node $n) => $n->id,
+                $scanResult->nodes
+            );
             $result['nodes'] = array_map(static fn(Node $n) => [
                 'id' => $n->id,
                 'type' => $n->isSystem() ? 'system' : 'waypoint',
@@ -81,7 +91,6 @@ final class Resolver implements ActionHandler
                 'id' => $e->id,
                 'node_a_id' => $e->nodeAId,
                 'node_b_id' => $e->nodeBId,
-                'distance' => $e->distance,
             ], $scanResult->edges);
         }
 
