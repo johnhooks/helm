@@ -1,4 +1,9 @@
+---
 status: done
+area: navigation
+priority: p1
+depends_on:
+  - nav-08-track-edge-discoveries-per-player
 ---
 
 # Add user edge datacore queries

@@ -1,3 +1,13 @@
+---
+status: ready
+area: navigation
+priority: p1
+depends_on:
+  - nav-08-track-edge-discoveries-per-player
+  - nav-09-add-user-edge-datacore-queries
+  - nav-10-sync-user-edges-on-load
+---
+
 # Persist scan discoveries in the datacore
 
 ## Description

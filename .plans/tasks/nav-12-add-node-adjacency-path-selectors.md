@@ -1,5 +1,9 @@
 ---
-status: draft
+status: ready
+area: navigation
+priority: p2
+depends_on:
+  - nav-09-add-user-edge-datacore-queries
 ---
 
 # Add node adjacency path selectors

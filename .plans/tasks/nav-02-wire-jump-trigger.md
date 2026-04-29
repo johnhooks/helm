@@ -1,3 +1,11 @@
+---
+status: done
+area: navigation
+priority: p1
+depends_on:
+  - nav-01-hide-current-star-actions
+---
+
 # Wire Jump Trigger in Bridge UI
 
 ## Description

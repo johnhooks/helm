@@ -1,5 +1,7 @@
 ---
 status: done
+area: navigation
+priority: p1
 ---
 
 # Track edge discoveries per player

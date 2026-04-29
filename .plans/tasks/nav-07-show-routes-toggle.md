@@ -1,5 +1,10 @@
 ---
-status: draft
+status: blocked
+area: navigation
+priority: p2
+depends_on:
+  - nav-06-persist-scan-discoveries
+blocked_by: nav-06 must make discovered edges available from datacore.
 ---
 
 # Add a "Show routes" toggle to the viewport

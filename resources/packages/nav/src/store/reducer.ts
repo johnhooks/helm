@@ -30,6 +30,20 @@ export function reducer( state: State, action: Action ): State {
 					error: null,
 				},
 			};
+		case 'EDGE_SYNC_FINISHED':
+			return {
+				...state,
+				stars: {
+					...state.stars,
+					syncResult: state.stars.syncResult
+						? {
+							...state.stars.syncResult,
+							edges: action.edges,
+						}
+						: null,
+					error: null,
+				},
+			};
 		case 'SYNC_FAILED':
 			return {
 				...state,

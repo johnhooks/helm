@@ -4,6 +4,7 @@ import type { StarNode } from '@helm/types';
 export type Action =
 	| { type: 'SYNC_START' }
 	| { type: 'SYNC_FINISHED'; nodes: StarNode[]; syncResult: SyncResult }
+	| { type: 'EDGE_SYNC_FINISHED'; edges: number }
 	| { type: 'SYNC_FAILED'; error: HelmError };
 
 export interface SyncResult {

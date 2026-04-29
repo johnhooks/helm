@@ -1,5 +1,10 @@
 ---
-status: draft
+status: blocked
+area: testing
+priority: p3
+depends_on:
+  - test-01-refactor-scan-resolver-test
+blocked_by: test-01 should land first so this research can evaluate the established stub pattern.
 ---
 
 # Research stub mocking for NavigationService and ActionProcessor tests

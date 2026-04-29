@@ -1,5 +1,10 @@
 ---
-status: draft
+status: done
+area: navigation
+priority: p1
+depends_on:
+  - nav-08-track-edge-discoveries-per-player
+  - nav-09-add-user-edge-datacore-queries
 ---
 
 # Sync user edges on load
@@ -60,3 +65,20 @@ reconcile for newly fulfilled scan actions, and it does not change the REST
 shape exposed by `/helm/v1/edges`. Tightening waypoint visibility so the
 backend, not the client, enforces which waypoint nodes a player may load is a
 follow-up task.
+
+## Implemented
+
+The nav sync path now stores local edge freshness metadata alongside the
+cached user edges. Full datacore sync writes both `cache.edge_count` and
+`cache.edge_last_discovered`, using the latest `discovered_at` value from the
+fetched edge rows.
+
+Cached hydrate no longer treats a persisted star map as sufficient by itself.
+When hydrate succeeds, the nav resolver checks `/helm/v1/edges` with a HEAD
+request, compares `X-WP-Total` and `X-Helm-Edge-Last-Discovered` against the
+local metadata, and only fetches all edge pages when the server differs. A
+stale edge cache is replaced transactionally by clearing and reinserting
+`user_edges`, then updating the freshness metadata.
+
+Manual Sync continues to use the existing full `syncNodes()` flow, so it
+still force-refreshes nodes, stars, waypoints, and user edges together.

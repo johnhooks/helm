@@ -1,5 +1,7 @@
 ---
-status: draft
+status: ready
+area: rest
+priority: p2
 ---
 
 # Add response schemas to REST controllers

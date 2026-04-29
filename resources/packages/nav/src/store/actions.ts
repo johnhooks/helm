@@ -7,6 +7,7 @@ import type { Action } from './types';
 import type { store } from './index';
 import {
 	syncNodes as syncNodesToDatacore,
+	syncUserEdgesIfStale as syncUserEdgesIfStaleInDatacore,
 	META_SYNCED_AT,
 	META_NODE_COUNT,
 	META_STAR_COUNT,
@@ -89,6 +90,36 @@ export const hydrate =
 				syncedAt,
 			},
 		} );
+	};
+
+/**
+ * Refresh user edge data after cached hydrate when server freshness changed.
+ */
+export const syncUserEdgesIfStale =
+	(): Thunk< Action, typeof store > =>
+	async ( { dispatch } ) => {
+		try {
+			const dc = await dispatch.initialize();
+			const result = await syncUserEdgesIfStaleInDatacore( dc );
+
+			if ( result.refreshed ) {
+				dispatch( {
+					type: 'EDGE_SYNC_FINISHED',
+					edges: result.edges,
+				} );
+			}
+		} catch ( error ) {
+			const helmError = error instanceof HelmError
+				? error
+				: HelmError.safe(
+					ErrorCode.CacheSyncFailed,
+					__( 'Failed to sync edge data.', 'helm' ),
+					error,
+				);
+
+			dispatch( { type: 'SYNC_FAILED', error: helmError } );
+			throw helmError;
+		}
 	};
 
 /**

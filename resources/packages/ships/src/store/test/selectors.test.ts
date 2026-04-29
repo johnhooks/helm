@@ -378,6 +378,15 @@ describe( 'getSystemStats', () => {
 		} );
 	} );
 
+	it( 'memoizes stats when state and products are unchanged', () => {
+		const state = createLoadedState();
+
+		const first = getSystemStats( state, 1 );
+		const second = getSystemStats( state, 1 );
+
+		expect( second ).toBe( first );
+	} );
+
 	it( 'defaults nullable product fields to zero', () => {
 		mockRegistry( getSystemStats, {
 			[ CORE_PRODUCT_ID ]: createProductEmbed( { id: CORE_PRODUCT_ID, rate: null, mult_a: null } ),

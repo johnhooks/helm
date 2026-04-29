@@ -1,3 +1,13 @@
+---
+status: blocked
+area: navigation
+priority: p2
+depends_on:
+  - nav-02-wire-jump-trigger
+  - nav-06-persist-scan-discoveries
+blocked_by: nav-06 must provide a stable datacore route graph for jumpable targets.
+---
+
 # Visual Jump Indicator on Starfield
 
 ## Description

@@ -1,8 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Datacore } from '@helm/datacore';
-import { syncNodes } from './sync';
+import {
+	META_EDGE_LAST_DISCOVERED,
+	syncNodes,
+	syncUserEdgesIfStale,
+} from './sync';
 import { fetchAllNodes } from './fetch-nodes';
-import { fetchAllEdges } from './fetch-edges';
+import { fetchAllEdges, fetchEdgeFreshness } from './fetch-edges';
 
 vi.mock( './fetch-nodes', () => ( {
 	fetchAllNodes: vi.fn(),
@@ -10,6 +14,13 @@ vi.mock( './fetch-nodes', () => ( {
 
 vi.mock( './fetch-edges', () => ( {
 	fetchAllEdges: vi.fn(),
+	fetchEdgeFreshness: vi.fn(),
+	getLastDiscoveredFromEdges: vi.fn( ( edges: Array< { discovered_at: string } > ) =>
+		edges.reduce(
+			( latest, edge ) => edge.discovered_at > latest ? edge.discovered_at : latest,
+			'',
+		),
+	),
 } ) );
 
 function createDatacoreMock(): Datacore {
@@ -38,14 +49,15 @@ function createDatacoreMock(): Datacore {
 	};
 }
 
-describe( 'syncNodes', () => {
-	beforeEach( () => {
-		vi.mocked( fetchAllNodes ).mockReset();
-		vi.mocked( fetchAllEdges ).mockReset();
-		vi.useFakeTimers();
-		vi.setSystemTime( new Date( '2026-04-21T12:00:00Z' ) );
-	} );
+beforeEach( () => {
+	vi.mocked( fetchAllNodes ).mockReset();
+	vi.mocked( fetchAllEdges ).mockReset();
+	vi.mocked( fetchEdgeFreshness ).mockReset();
+	vi.useFakeTimers();
+	vi.setSystemTime( new Date( '2026-04-21T12:00:00Z' ) );
+} );
 
+describe( 'syncNodes', () => {
 	it( 'clears and reloads nodes, stars, and user edges inside one transaction', async () => {
 		const dc = createDatacoreMock();
 
@@ -124,6 +136,7 @@ describe( 'syncNodes', () => {
 		expect( dc.setMeta ).toHaveBeenCalledWith( 'cache.star_count', '1' );
 		expect( dc.setMeta ).toHaveBeenCalledWith( 'cache.waypoint_count', '0' );
 		expect( dc.setMeta ).toHaveBeenCalledWith( 'cache.edge_count', '1' );
+		expect( dc.setMeta ).toHaveBeenCalledWith( META_EDGE_LAST_DISCOVERED, '2026-04-21T00:00:00Z' );
 	} );
 
 	it( 'does not mutate datacore when edge fetch fails before the transaction', async () => {
@@ -138,5 +151,77 @@ describe( 'syncNodes', () => {
 		expect( dc.clearUserEdges ).not.toHaveBeenCalled();
 		expect( dc.clearStars ).not.toHaveBeenCalled();
 		expect( dc.clearNodes ).not.toHaveBeenCalled();
+	} );
+} );
+
+describe( 'syncUserEdgesIfStale', () => {
+	it( 'does not reload edges when local and server freshness match', async () => {
+		const dc = createDatacoreMock();
+		vi.mocked( dc.getMeta )
+			.mockResolvedValueOnce( '2' )
+			.mockResolvedValueOnce( '2026-04-22T00:00:00+00:00' );
+		vi.mocked( fetchEdgeFreshness ).mockResolvedValue( {
+			count: 2,
+			lastDiscovered: '2026-04-22T00:00:00+00:00',
+		} );
+
+		await expect( syncUserEdgesIfStale( dc ) ).resolves.toEqual( {
+			refreshed: false,
+			edges: 2,
+			lastDiscovered: '2026-04-22T00:00:00+00:00',
+		} );
+
+		expect( fetchAllEdges ).not.toHaveBeenCalled();
+		expect( dc.transaction ).not.toHaveBeenCalled();
+	} );
+
+	it( 'full-replaces user edges when count differs', async () => {
+		const dc = createDatacoreMock();
+		vi.mocked( dc.getMeta )
+			.mockResolvedValueOnce( '1' )
+			.mockResolvedValueOnce( '2026-04-21T00:00:00+00:00' );
+		vi.mocked( fetchEdgeFreshness ).mockResolvedValue( {
+			count: 2,
+			lastDiscovered: '2026-04-21T00:00:00+00:00',
+		} );
+		vi.mocked( fetchAllEdges ).mockResolvedValue( [
+			{ id: 1, node_a_id: 10, node_b_id: 20, distance: 1.5, discovered_at: '2026-04-20T00:00:00+00:00' },
+			{ id: 2, node_a_id: 20, node_b_id: 30, distance: 2.5, discovered_at: '2026-04-21T00:00:00+00:00' },
+		] );
+
+		await expect( syncUserEdgesIfStale( dc ) ).resolves.toEqual( {
+			refreshed: true,
+			edges: 2,
+			lastDiscovered: '2026-04-21T00:00:00+00:00',
+		} );
+
+		expect( dc.clearUserEdges ).toHaveBeenCalledTimes( 1 );
+		expect( dc.insertUserEdges ).toHaveBeenCalledTimes( 1 );
+		expect( dc.setMeta ).toHaveBeenCalledWith( 'cache.edge_count', '2' );
+		expect( dc.setMeta ).toHaveBeenCalledWith( META_EDGE_LAST_DISCOVERED, '2026-04-21T00:00:00+00:00' );
+	} );
+
+	it( 'full-replaces user edges when last discovery differs', async () => {
+		const dc = createDatacoreMock();
+		vi.mocked( dc.getMeta )
+			.mockResolvedValueOnce( '1' )
+			.mockResolvedValueOnce( '2026-04-20T00:00:00+00:00' );
+		vi.mocked( fetchEdgeFreshness ).mockResolvedValue( {
+			count: 1,
+			lastDiscovered: '2026-04-21T00:00:00+00:00',
+		} );
+		vi.mocked( fetchAllEdges ).mockResolvedValue( [
+			{ id: 1, node_a_id: 10, node_b_id: 20, distance: 1.5, discovered_at: '2026-04-21T00:00:00+00:00' },
+		] );
+
+		await expect( syncUserEdgesIfStale( dc ) ).resolves.toMatchObject( {
+			refreshed: true,
+			edges: 1,
+		} );
+
+		expect( dc.clearUserEdges ).toHaveBeenCalledTimes( 1 );
+		expect( dc.insertUserEdges ).toHaveBeenCalledWith( [
+			{ id: 1, node_a_id: 10, node_b_id: 20, distance: 1.5, discovered_at: '2026-04-21T00:00:00+00:00' },
+		] );
 	} );
 } );

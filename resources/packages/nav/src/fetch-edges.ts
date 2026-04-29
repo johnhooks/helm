@@ -5,6 +5,37 @@ import type { UserEdge } from '@helm/types';
 
 const PER_PAGE = 500;
 
+export interface EdgeFreshness {
+	count: number;
+	lastDiscovered: string;
+}
+
+/**
+ * Fetch freshness metadata for the authenticated user's discovered edges.
+ *
+ * @internal
+ */
+export async function fetchEdgeFreshness(): Promise< EdgeFreshness > {
+	try {
+		const response = await apiFetch( {
+			path: '/helm/v1/edges?per_page=1&page=1',
+			method: 'HEAD',
+			parse: false,
+		} );
+
+		return {
+			count: Number( response.headers.get( 'X-WP-Total' ) ?? 0 ),
+			lastDiscovered: response.headers.get( 'X-Helm-Edge-Last-Discovered' ) ?? '',
+		};
+	} catch ( error ) {
+		throw HelmError.safe(
+			ErrorCode.CacheFetchFailed,
+			__( 'Failed to fetch edge freshness from the server.', 'helm' ),
+			error,
+		);
+	}
+}
+
 /**
  * Fetch all discovered user edges from the REST API.
  *
@@ -41,4 +72,11 @@ export async function fetchAllEdges(): Promise< UserEdge[] > {
 	}
 
 	return allEdges;
+}
+
+export function getLastDiscoveredFromEdges( edges: UserEdge[] ): string {
+	return edges.reduce(
+		( latest, edge ) => edge.discovered_at > latest ? edge.discovered_at : latest,
+		'',
+	);
 }

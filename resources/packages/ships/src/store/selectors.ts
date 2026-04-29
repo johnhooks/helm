@@ -1,8 +1,9 @@
-import { createRegistrySelector } from '@wordpress/data';
+import { createRegistrySelector, createSelector } from '@wordpress/data';
 import type { HelmError } from '@helm/errors';
+import { store as productsStore } from '@helm/products';
 import type { ShipLoadout, ShipState, SystemComponentResponse, SystemStats, WithRestLinks } from '@helm/types';
 import type { State } from './types';
-import { expectLoadout } from './utils';
+import { expectLoadout, getSystemSlots } from './utils';
 
 export const getShip = (
 	state: State,
@@ -47,28 +48,56 @@ export const getShipWithLoadout = createRegistrySelector(
  * @throws {HelmError} When ship, systems, a required slot, or its preloaded product is missing.
  */
 export const getSystemStats = createRegistrySelector(
-	( select ) => ( state: State, _shipId: number ): SystemStats => {
-		const { slots, products } = expectLoadout( state, select );
+	( select ) =>
+		createSelector(
+			( state: State, _shipId: number ): SystemStats => {
+				const { slots, products } = expectLoadout( state, select );
 
-		return {
-			engineering: {
-				rechargeRate: products.core.rate ?? 0,
-				coreLife: slots.core.life ?? 0,
-				outputMult: products.core.mult_a ?? 1,
-				condition: slots.core.condition * 100,
+				return {
+					engineering: {
+						rechargeRate: products.core.rate ?? 0,
+						coreLife: slots.core.life ?? 0,
+						outputMult: products.core.mult_a ?? 1,
+						condition: slots.core.condition * 100,
+					},
+					navigation: {
+						range: products.drive.sustain ?? 0,
+						speed: products.drive.mult_a ?? 0,
+						draw: products.drive.mult_b ?? 0,
+						condition: slots.drive.condition * 100,
+					},
+					sensors: {
+						range: products.sensor.sustain ?? 0,
+						scanDuration: products.sensor.mult_a ?? 0,
+						discovery: ( products.sensor.chance ?? 0 ) * 100,
+						condition: slots.sensor.condition * 100,
+					},
+				};
 			},
-			navigation: {
-				range: products.drive.sustain ?? 0,
-				speed: products.drive.mult_a ?? 0,
-				draw: products.drive.mult_b ?? 0,
-				condition: slots.drive.condition * 100,
-			},
-			sensors: {
-				range: products.sensor.sustain ?? 0,
-				scanDuration: products.sensor.mult_a ?? 0,
-				discovery: ( products.sensor.chance ?? 0 ) * 100,
-				condition: slots.sensor.condition * 100,
-			},
-		};
-	}
+			( state: State ) => {
+				const { ship } = state.ship;
+				const { systems } = state.systems;
+
+				if ( ! systems ) {
+					return [ ship, systems ];
+				}
+
+				try {
+					const slots = getSystemSlots( systems );
+					const products = select( productsStore );
+
+					return [
+						ship,
+						systems,
+						products.getProduct( slots.core.product_id ),
+						products.getProduct( slots.drive.product_id ),
+						products.getProduct( slots.sensor.product_id ),
+						products.getProduct( slots.shield.product_id ),
+						products.getProduct( slots.nav.product_id ),
+					];
+				} catch {
+					return [ ship, systems ];
+				}
+			}
+		)
 );

@@ -1,5 +1,9 @@
 ---
-status: draft
+status: ready
+area: navigation
+priority: p1
+depends_on:
+  - nav-10-sync-user-edges-on-load
 ---
 
 # Enforce waypoint visibility on the backend

@@ -1,5 +1,9 @@
 ---
-status: draft
+status: ready
+area: testing
+priority: p2
+depends_on:
+  - nav-08-track-edge-discoveries-per-player
 ---
 
 # Refactor scan resolver test to stub navigation service

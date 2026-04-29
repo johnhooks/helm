@@ -1,3 +1,11 @@
+---
+status: done
+area: navigation
+priority: p2
+depends_on:
+  - nav-01-hide-current-star-actions
+---
+
 # Refactor Star Context Menu Actions to Slot Fill
 
 ## Description

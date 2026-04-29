@@ -1,3 +1,9 @@
+---
+status: done
+area: navigation
+priority: p1
+---
+
 # Suppress Navigation Actions on the Current Star's Context Menu
 
 ## Description

@@ -1,3 +1,13 @@
+---
+status: blocked
+area: navigation
+priority: p2
+depends_on:
+  - nav-03-visual-jump-indicator
+  - nav-06-persist-scan-discoveries
+blocked_by: nav-03 and nav-06 must define the ring layer and route graph source first.
+---
+
 # Visual Scan Indicator on Starfield
 
 ## Description
