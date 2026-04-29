@@ -25,6 +25,10 @@
 	gap: 6px;
 }
 
+.helm-ship-log__list > * {
+	flex-shrink: 0;
+}
+
 .helm-ship-log__load-more {
 	flex-shrink: 0;
 	padding-top: 4px;
