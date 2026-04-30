@@ -43,3 +43,27 @@ export async function fetchAllNodes(): Promise< ApiNodeResponse[] > {
 
 	return allNodes;
 }
+
+/**
+ * Fetch a specific set of nodes from the REST API in a single request.
+ *
+ * @internal
+ */
+export async function fetchNodesByIds( ids: number[] ): Promise< ApiNodeResponse[] > {
+	const uniqueIds = [ ...new Set( ids ) ];
+	if ( uniqueIds.length === 0 ) {
+		return [];
+	}
+
+	try {
+		return await apiFetch< ApiNodeResponse[] >( {
+			path: `/helm/v1/nodes?include=${ uniqueIds.join( ',' ) }`,
+		} );
+	} catch ( error ) {
+		throw HelmError.safe(
+			ErrorCode.CacheFetchFailed,
+			__( 'Failed to fetch node data from the server.', 'helm' ),
+			error,
+		);
+	}
+}

@@ -1,7 +1,7 @@
 ---
 status: ready
 area: navigation
-priority: p1
+priority: p3
 depends_on:
   - nav-10-sync-user-edges-on-load
 ---
@@ -55,3 +55,8 @@ authorized waypoint load path should be explicit:
 It does not need to solve team sharing or public-route promotion. It only
 needs to make private waypoint visibility a backend concern and provide a
 datacore-safe load path for authorized waypoint rows.
+
+This is a low-priority hardening task while route discovery is still local to
+the origin and scan reconciliation only requests nodes referenced by authorized
+user edges. It becomes more important before wider deployment, shared clients,
+or any feature that lets users request arbitrary waypoint ids directly.

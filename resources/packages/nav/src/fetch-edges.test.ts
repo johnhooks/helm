@@ -3,6 +3,7 @@ import apiFetch from '@wordpress/api-fetch';
 import { ErrorCode, HelmError } from '@helm/errors';
 import {
 	fetchAllEdges,
+	fetchEdgesByIds,
 	fetchEdgeFreshness,
 	getLastDiscoveredFromEdges,
 } from './fetch-edges';
@@ -104,6 +105,26 @@ describe( 'fetchAllEdges', () => {
 		await expect( fetchAllEdges() ).rejects.toMatchObject( {
 			message: ErrorCode.CacheFetchFailed,
 		} satisfies Partial< HelmError > );
+	} );
+
+	it( 'fetches unique edge ids in one request', async () => {
+		const edges = [
+			{ id: 7, node_a_id: 10, node_b_id: 20, distance: 1.5, discovered_at: '2026-04-21T00:00:00Z' },
+			{ id: 8, node_a_id: 20, node_b_id: 30, distance: 2.5, discovered_at: '2026-04-22T00:00:00Z' },
+		];
+		vi.mocked( apiFetch ).mockResolvedValueOnce( edges as never );
+
+		await expect( fetchEdgesByIds( [ 7, 8, 7 ] ) ).resolves.toEqual( edges );
+
+		expect( vi.mocked( apiFetch ) ).toHaveBeenCalledWith( {
+			path: '/helm/v1/edges?include=7,8',
+		} );
+	} );
+
+	it( 'returns empty targeted edges without a request when no ids are provided', async () => {
+		await expect( fetchEdgesByIds( [] ) ).resolves.toEqual( [] );
+
+		expect( vi.mocked( apiFetch ) ).not.toHaveBeenCalled();
 	} );
 
 	it( 'returns the latest discovered timestamp from edge rows', () => {

@@ -7,6 +7,7 @@ import type { Action } from './types';
 import type { store } from './index';
 import {
 	syncNodes as syncNodesToDatacore,
+	syncUserEdgesByIds as syncUserEdgesByIdsInDatacore,
 	syncUserEdgesIfStale as syncUserEdgesIfStaleInDatacore,
 	META_SYNCED_AT,
 	META_NODE_COUNT,
@@ -108,6 +109,29 @@ export const syncUserEdgesIfStale =
 					edges: result.edges,
 				} );
 			}
+		} catch ( error ) {
+			const helmError = error instanceof HelmError
+				? error
+				: HelmError.safe(
+					ErrorCode.CacheSyncFailed,
+					__( 'Failed to sync edge data.', 'helm' ),
+					error,
+				);
+
+			dispatch( { type: 'SYNC_FAILED', error: helmError } );
+			throw helmError;
+		}
+	};
+
+/**
+ * Reconcile specific discovered user edges after a scan result lands.
+ */
+export const syncUserEdgesByIds =
+	( edgeIds: number[] ): Thunk< Action, typeof store > =>
+	async ( { dispatch } ) => {
+		try {
+			const dc = await dispatch.initialize();
+			await syncUserEdgesByIdsInDatacore( dc, edgeIds );
 		} catch ( error ) {
 			const helmError = error instanceof HelmError
 				? error

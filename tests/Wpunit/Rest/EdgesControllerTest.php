@@ -135,6 +135,47 @@ class EdgesControllerTest extends WPRestApiTestCase
         $this->assertSame('3', $response->get_headers()['X-WP-TotalPages']);
     }
 
+    public function test_filters_by_included_edge_ids_for_current_user(): void
+    {
+        $edgeA = $this->createEdge();
+        $edgeB = $this->createEdge();
+
+        $this->userEdgeRepository->upsert($this->userId, $edgeA);
+        $this->userEdgeRepository->upsert($this->userId, $edgeB);
+
+        $request = new WP_REST_Request('GET', '/helm/v1/edges');
+        $request->set_param('include', "{$edgeB},{$edgeA}");
+        $response = rest_do_request($request);
+
+        $this->assertSame(200, $response->get_status());
+
+        $data = $response->get_data();
+        $ids = array_column($data, 'id');
+
+        $this->assertCount(2, $data);
+        $this->assertContains($edgeA, $ids);
+        $this->assertContains($edgeB, $ids);
+        $this->assertSame('2', $response->get_headers()['X-WP-Total']);
+        $this->assertSame('1', $response->get_headers()['X-WP-TotalPages']);
+    }
+
+    public function test_include_returns_403_when_any_requested_edge_is_not_discovered_by_current_user(): void
+    {
+        $edgeA = $this->createEdge();
+        $edgeB = $this->createEdge();
+
+        $this->userEdgeRepository->upsert($this->userId, $edgeA);
+
+        $otherUser = self::factory()->user->create(['role' => 'subscriber']);
+        $this->userEdgeRepository->upsert($otherUser, $edgeB);
+
+        $request = new WP_REST_Request('GET', '/helm/v1/edges');
+        $request->set_param('include', "{$edgeA},{$edgeB}");
+        $response = rest_do_request($request);
+
+        $this->assertErrorResponse('rest_forbidden', $response, 403);
+    }
+
     public function test_head_returns_same_headers_as_get(): void
     {
         $edge = $this->createEdge();

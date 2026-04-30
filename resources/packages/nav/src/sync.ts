@@ -5,10 +5,11 @@ import { LinkRel } from '@helm/types';
 import type { ApiNodeResponse, NavNode, Star } from '@helm/types';
 import {
 	fetchAllEdges,
+	fetchEdgesByIds,
 	fetchEdgeFreshness,
 	getLastDiscoveredFromEdges,
 } from './fetch-edges';
-import { fetchAllNodes } from './fetch-nodes';
+import { fetchAllNodes, fetchNodesByIds } from './fetch-nodes';
 import type { SyncResult } from './store/types';
 
 export const META_SYNCED_AT = 'cache.synced_at';
@@ -128,10 +129,12 @@ export async function syncUserEdgesIfStale( datacore: Datacore ): Promise< EdgeS
 
 	const userEdges = await fetchAllEdges();
 	const edgeLastDiscovered = getLastDiscoveredFromEdges( userEdges );
+	const missingNodes = await fetchMissingEdgeNodes( datacore, userEdges );
 
 	try {
 		await datacore.transaction( async () => {
 			await datacore.clearUserEdges();
+			await datacore.insertNodes( missingNodes.map( toNavNode ) );
 			await datacore.insertUserEdges( userEdges );
 			await datacore.setMeta( META_EDGE_COUNT, String( userEdges.length ) );
 			await datacore.setMeta( META_EDGE_LAST_DISCOVERED, edgeLastDiscovered );
@@ -153,6 +156,64 @@ export async function syncUserEdgesIfStale( datacore: Datacore ): Promise< EdgeS
 		edges: userEdges.length,
 		lastDiscovered: edgeLastDiscovered,
 	};
+}
+
+/**
+ * Reconcile specific discovered user edges into datacore.
+ *
+ * This is the targeted scan-discovery path. The server endpoint remains
+ * canonical and user-scoped, so undiscovered or unauthorized edge IDs simply
+ * do not come back.
+ *
+ * @internal
+ */
+export async function syncUserEdgesByIds(
+	datacore: Datacore,
+	edgeIds: number[],
+): Promise< EdgeSyncResult > {
+	const userEdges = await fetchEdgesByIds( edgeIds );
+	const missingNodes = await fetchMissingEdgeNodes( datacore, userEdges );
+
+	try {
+		await datacore.transaction( async () => {
+			await datacore.insertNodes( missingNodes.map( toNavNode ) );
+			await datacore.insertUserEdges( userEdges );
+		} );
+	} catch ( error ) {
+		if ( HelmError.is( error ) ) {
+			throw error;
+		}
+
+		throw HelmError.safe(
+			ErrorCode.CacheSyncFailed,
+			__( 'Failed to write edge data to the local cache.', 'helm' ),
+			error,
+		);
+	}
+
+	return {
+		refreshed: userEdges.length > 0,
+		edges: userEdges.length,
+		lastDiscovered: getLastDiscoveredFromEdges( userEdges ),
+	};
+}
+
+async function fetchMissingEdgeNodes(
+	datacore: Datacore,
+	userEdges: Array< { node_a_id: number; node_b_id: number } >,
+): Promise< ApiNodeResponse[] > {
+	const referencedNodeIds = [
+		...new Set( userEdges.flatMap( ( edge ) => [ edge.node_a_id, edge.node_b_id ] ) ),
+	];
+
+	const missingNodeIds: number[] = [];
+	for ( const nodeId of referencedNodeIds ) {
+		if ( ! await datacore.getNode( nodeId ) ) {
+			missingNodeIds.push( nodeId );
+		}
+	}
+
+	return fetchNodesByIds( missingNodeIds );
 }
 
 function toNavNode( apiNode: ApiNodeResponse ): NavNode {

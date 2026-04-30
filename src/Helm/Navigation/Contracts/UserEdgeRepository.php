@@ -27,6 +27,14 @@ interface UserEdgeRepository
     public function paginate(int $userId, int $page, int $perPage): array;
 
     /**
+     * Specific edges the user has discovered, oldest first.
+     *
+     * @param int[] $edgeIds
+     * @return UserEdge[]
+     */
+    public function getMany(int $userId, array $edgeIds): array;
+
+    /**
      * Total number of edges the user has discovered.
      */
     public function count(int $userId): int;

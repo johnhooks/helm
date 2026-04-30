@@ -44,6 +44,13 @@ final class EdgesController
                 'callback'            => [$this, 'index'],
                 'permission_callback' => [$this, 'permissions'],
                 'args'                => [
+                    'include' => [
+                        'description' => __('Limit results to specific edge IDs.', 'helm'),
+                        'type'        => ['array', 'string'],
+                        'items'       => [
+                            'type' => 'integer',
+                        ],
+                    ],
                     'page' => [
                         'description' => __('Current page of the collection.', 'helm'),
                         'type'        => 'integer',
@@ -81,18 +88,34 @@ final class EdgesController
     /**
      * @param WP_REST_Request<array<string, mixed>> $request
      */
-    public function index(WP_REST_Request $request): WP_REST_Response
+    public function index(WP_REST_Request $request): WP_REST_Response|WP_Error
     {
         $userId = get_current_user_id();
+        $include = $this->resolveInclude($request->get_param('include'));
         $page = (int) $request->get_param('page');
         $perPage = (int) $request->get_param('per_page');
 
-        $result = $this->userEdgeRepository->paginate($userId, $page, $perPage);
-        $total = $result['total'];
-        $totalPages = (int) ceil($total / $perPage);
+        if ($include !== []) {
+            $edges = $this->userEdgeRepository->getMany($userId, $include);
+            if (count($edges) !== count($include)) {
+                return new WP_Error(
+                    'rest_forbidden',
+                    __('You are not authorized to access one or more requested edges.', 'helm'),
+                    ['status' => 403]
+                );
+            }
+            $total = count($edges);
+            $totalPages = 1;
+        } else {
+            $result = $this->userEdgeRepository->paginate($userId, $page, $perPage);
+            $edges = $result['edges'];
+            $total = $result['total'];
+            $totalPages = (int) ceil($total / $perPage);
+        }
+
         $lastDiscovered = $this->userEdgeRepository->lastDiscovered($userId);
 
-        $data = array_map(fn (UserEdge $ue) => $this->serialize($ue), $result['edges']);
+        $data = array_map(fn (UserEdge $ue) => $this->serialize($ue), $edges);
 
         $response = new WP_REST_Response($data);
         $response->header('X-WP-Total', (string) $total);
@@ -114,5 +137,36 @@ final class EdgesController
             'distance'      => $userEdge->distance,
             'discovered_at' => $userEdge->discoveredAt,
         ];
+    }
+
+    /**
+     * Resolve include parameter values to unique positive edge IDs.
+     *
+     * @param mixed $include
+     * @return int[]
+     */
+    private function resolveInclude(mixed $include): array
+    {
+        if ($include === null || $include === '') {
+            return [];
+        }
+
+        if (is_string($include)) {
+            $include = explode(',', $include);
+        }
+
+        if (! is_array($include)) {
+            return [];
+        }
+
+        $ids = [];
+        foreach ($include as $id) {
+            $id = (int) $id;
+            if ($id > 0) {
+                $ids[$id] = $id;
+            }
+        }
+
+        return array_values($ids);
     }
 }

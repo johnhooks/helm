@@ -49,6 +49,13 @@ final class NodesController
                         'type'        => 'string',
                         'enum'        => ['system', 'waypoint'],
                     ],
+                    'include' => [
+                        'description' => __('Limit results to specific node IDs.', 'helm'),
+                        'type'        => ['array', 'string'],
+                        'items'       => [
+                            'type' => 'integer',
+                        ],
+                    ],
                     'page' => [
                         'description' => __('Current page of the collection.', 'helm'),
                         'type'        => 'integer',
@@ -127,24 +134,32 @@ final class NodesController
      */
     public function index(WP_REST_Request $request): WP_REST_Response
     {
+        $include = $this->resolveInclude($request->get_param('include'));
         $typeParam = $request->get_param('type');
         $page = (int) $request->get_param('page');
         $perPage = (int) $request->get_param('per_page');
 
-        $type = $this->resolveType($typeParam);
-
-        $result = $this->nodeRepository->paginate($type, $page, $perPage);
-        $total = $result['total'];
-        $totalPages = (int) ceil($total / $perPage);
+        if ($include !== []) {
+            $nodesById = $this->nodeRepository->getMany($include);
+            $nodes = array_values($nodesById);
+            $total = count($nodes);
+            $totalPages = $total > 0 ? 1 : 0;
+        } else {
+            $type = $this->resolveType($typeParam);
+            $result = $this->nodeRepository->paginate($type, $page, $perPage);
+            $nodes = $result['nodes'];
+            $total = $result['total'];
+            $totalPages = (int) ceil($total / $perPage);
+        }
 
         $embedStars = $this->shouldEmbedStars($request);
         $starsByNode = $embedStars
-            ? $this->celestialService->serializeStarsForNodes(array_map(fn (Node $n) => $n->id, $result['nodes']))
+            ? $this->celestialService->serializeStarsForNodes(array_map(fn (Node $n) => $n->id, $nodes))
             : [];
 
         $data = array_map(
             fn (Node $node) => $this->serializeNode($node, $starsByNode[$node->id] ?? null),
-            $result['nodes']
+            $nodes
         );
 
         $response = new WP_REST_Response($data);
@@ -275,6 +290,37 @@ final class NodesController
             'waypoint' => NodeType::Waypoint,
             default    => null,
         };
+    }
+
+    /**
+     * Resolve include parameter values to unique positive node IDs.
+     *
+     * @param mixed $include
+     * @return int[]
+     */
+    private function resolveInclude(mixed $include): array
+    {
+        if ($include === null || $include === '') {
+            return [];
+        }
+
+        if (is_string($include)) {
+            $include = explode(',', $include);
+        }
+
+        if (! is_array($include)) {
+            return [];
+        }
+
+        $ids = [];
+        foreach ($include as $id) {
+            $id = (int) $id;
+            if ($id > 0) {
+                $ids[$id] = $id;
+            }
+        }
+
+        return array_values($ids);
     }
 
     /**

@@ -1,5 +1,5 @@
 ---
-status: ready
+status: done
 area: navigation
 priority: p1
 depends_on:
@@ -107,6 +107,12 @@ it in — so the future backfill task is pure orchestration.
 
 ## Implementation notes
 
+The reusable scan-result reconciliation entry point originally described here
+has been split into `nav-13-add-scan-result-reconciler`. This task completes
+the concrete hydrate and heartbeat reconciliation paths. `nav-13` will make
+that reconciliation reusable for ship action REST responses and historical
+backfill.
+
 Keep the action-result and user-edge contracts separate:
 
 - `action.result.edges` may contain only the edge id and endpoint node ids
@@ -116,13 +122,14 @@ Keep the action-result and user-edge contracts separate:
 - datacore `user_edges` must be written from canonical `UserEdge` rows
   returned by `/helm/v1/edges`, including `distance` and `discovered_at`.
 
-The first implementation can reuse the existing edge freshness path from
-nav-10. When a fulfilled scan action arrives, call the edge sync path and let
-it fetch all pages if the server freshness headers differ from local metadata.
-That is intentionally blunt but correct. If this becomes too much traffic,
-add a follow-up endpoint or query parameter for fetching specific user-edge
-ids, then have the reconcile entry point request only the ids present in the
-scan result.
+Hydrate can reuse the existing edge freshness path from nav-10 and fetch all
+pages if the server freshness headers differ from local metadata. In-session
+scan reconciliation should use targeted edge fetches:
+`GET /helm/v1/edges?include=1,2,3`. That returns canonical `UserEdge` rows for
+the authenticated user's matching discovered edge ids, so the reconcile entry
+point can request only the ids present in the scan result. If any requested
+edge id is not visible to the authenticated user, the endpoint returns
+`rest_forbidden` instead of silently omitting it.
 
 Node reconciliation should prefer the nodes embedded in the scan action
 result when they are present and complete enough for datacore. If an edge

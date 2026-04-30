@@ -34,7 +34,7 @@ describe( 'CompleteScanCard', () => {
 				duration: 3600,
 				success: true,
 				complete: true,
-				nodes: [ { id: 1, x: 0, y: 0, z: 0 }, { id: 2, x: 1, y: 1, z: 1 }, { id: 3, x: 2, y: 2, z: 2 } ],
+				nodes: [ { id: 1, type: 'system', x: 0, y: 0, z: 0 }, { id: 2, type: 'waypoint', x: 1, y: 1, z: 1 }, { id: 3, type: 'system', x: 2, y: 2, z: 2 } ],
 				edges: [ { id: 1, node_a_id: 1, node_b_id: 2 } ],
 				discovered_edge_ids: [ 1 ],
 				discovered_node_ids: [ 1, 2, 3 ],

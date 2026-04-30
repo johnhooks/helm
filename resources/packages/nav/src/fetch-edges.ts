@@ -74,6 +74,30 @@ export async function fetchAllEdges(): Promise< UserEdge[] > {
 	return allEdges;
 }
 
+/**
+ * Fetch a specific set of discovered user edges from the REST API.
+ *
+ * @internal
+ */
+export async function fetchEdgesByIds( ids: number[] ): Promise< UserEdge[] > {
+	const uniqueIds = [ ...new Set( ids ) ];
+	if ( uniqueIds.length === 0 ) {
+		return [];
+	}
+
+	try {
+		return await apiFetch< UserEdge[] >( {
+			path: `/helm/v1/edges?include=${ uniqueIds.join( ',' ) }`,
+		} );
+	} catch ( error ) {
+		throw HelmError.safe(
+			ErrorCode.CacheFetchFailed,
+			__( 'Failed to fetch edge data from the server.', 'helm' ),
+			error,
+		);
+	}
+}
+
 export function getLastDiscoveredFromEdges( edges: UserEdge[] ): string {
 	return edges.reduce(
 		( latest, edge ) => edge.discovered_at > latest ? edge.discovered_at : latest,

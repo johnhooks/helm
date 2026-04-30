@@ -38,7 +38,7 @@ describe( 'ActiveScanCard', () => {
 				duration: 3600,
 				success: true,
 				complete: false,
-				nodes: [ { id: 1, x: 0, y: 0, z: 0 }, { id: 2, x: 1, y: 1, z: 1 } ],
+				nodes: [ { id: 1, type: 'system', x: 0, y: 0, z: 0 }, { id: 2, type: 'waypoint', x: 1, y: 1, z: 1 } ],
 				edges: [],
 				discovered_edge_ids: [],
 				discovered_node_ids: [ 1, 2 ],

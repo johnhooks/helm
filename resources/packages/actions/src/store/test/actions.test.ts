@@ -5,6 +5,12 @@ import { createAction, loadMore, receiveAction, receiveHeartbeat, draftCreate, c
 import { createShipAction } from './fixtures';
 
 vi.mock( '@wordpress/api-fetch' );
+vi.mock( '@helm/nav', () => ( {
+	store: { name: 'helm/nav' },
+} ) );
+vi.mock( '@helm/ships', () => ( {
+	store: { name: 'helm/ships' },
+} ) );
 
 const mockedApiFetch = vi.mocked( apiFetch );
 
@@ -132,12 +138,20 @@ describe( 'receiveAction', () => {
 describe( 'receiveHeartbeat', () => {
 	let dispatch: ReturnType< typeof vi.fn >;
 	let invalidateResolution: ReturnType< typeof vi.fn >;
+	let syncUserEdgesIfStale: ReturnType< typeof vi.fn >;
+	let syncUserEdgesByIds: ReturnType< typeof vi.fn >;
 	let registry: { dispatch: ReturnType< typeof vi.fn > };
 
 	beforeEach( () => {
 		dispatch = vi.fn();
 		invalidateResolution = vi.fn();
-		registry = { dispatch: vi.fn().mockReturnValue( { invalidateResolution } ) };
+		syncUserEdgesIfStale = vi.fn().mockResolvedValue( undefined );
+		syncUserEdgesByIds = vi.fn().mockResolvedValue( undefined );
+		registry = {
+			dispatch: vi.fn( ( store ) => store.name === 'helm/nav'
+				? { syncUserEdgesIfStale, syncUserEdgesByIds }
+				: { invalidateResolution } ),
+		};
 	} );
 
 	it( 'dispatches a RECEIVE_HEARTBEAT action', async () => {
@@ -208,6 +222,95 @@ describe( 'receiveHeartbeat', () => {
 		);
 
 		expect( invalidateResolution ).not.toHaveBeenCalled();
+	} );
+
+	it( 'syncs discovered scan edges once when heartbeat receives scan discoveries', async () => {
+		const actions = [
+			createShipAction( {
+				id: 11,
+				ship_post_id: 1,
+				type: 'scan_route',
+				status: 'fulfilled',
+				result: {
+					from_node_id: 1,
+					to_node_id: 3,
+					skill: 1,
+					efficiency: 1,
+					duration: 3600,
+					success: true,
+					complete: true,
+					nodes: [ { id: 2, type: 'waypoint', x: 1, y: 1, z: 1 } ],
+					edges: [ { id: 7, node_a_id: 1, node_b_id: 2 } ],
+					discovered_edge_ids: [ 7 ],
+					discovered_node_ids: [ 2 ],
+					edges_discovered: 1,
+					waypoints_created: 1,
+					path: [ 1, 2, 3 ],
+				},
+			} ),
+			createShipAction( {
+				id: 12,
+				ship_post_id: 1,
+				type: 'scan_route',
+				status: 'partial',
+				result: {
+					from_node_id: 1,
+					to_node_id: 4,
+					skill: 1,
+					efficiency: 1,
+					duration: 3600,
+					success: true,
+					complete: false,
+					nodes: [ { id: 3, type: 'waypoint', x: 2, y: 2, z: 2 } ],
+					edges: [ { id: 8, node_a_id: 2, node_b_id: 3 } ],
+					discovered_edge_ids: [ 8 ],
+					discovered_node_ids: [ 3 ],
+					edges_discovered: 1,
+					waypoints_created: 1,
+					path: [ 1, 2, 3 ],
+				},
+			} ),
+		];
+
+		await receiveHeartbeat( actions, '2025-06-01T00:00:00Z' )(
+			{ dispatch, registry } as never,
+		);
+
+		expect( syncUserEdgesByIds ).toHaveBeenCalledTimes( 1 );
+		expect( syncUserEdgesByIds ).toHaveBeenCalledWith( [ 7, 8 ] );
+	} );
+
+	it( 'does not sync scan edges when terminal scan has no discovered ids', async () => {
+		const actions = [
+			createShipAction( {
+				id: 11,
+				ship_post_id: 1,
+				type: 'scan_route',
+				status: 'fulfilled',
+				result: {
+					from_node_id: 1,
+					to_node_id: 3,
+					skill: 1,
+					efficiency: 1,
+					duration: 3600,
+					success: false,
+					complete: false,
+					nodes: [],
+					edges: [],
+					discovered_edge_ids: [],
+					discovered_node_ids: [],
+					edges_discovered: 0,
+					waypoints_created: 0,
+					path: [],
+				},
+			} ),
+		];
+
+		await receiveHeartbeat( actions, '2025-06-01T00:00:00Z' )(
+			{ dispatch, registry } as never,
+		);
+
+		expect( syncUserEdgesByIds ).not.toHaveBeenCalled();
 	} );
 } );
 

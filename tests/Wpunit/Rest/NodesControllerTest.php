@@ -180,6 +180,28 @@ class NodesControllerTest extends WPRestApiTestCase
         $this->assertSame('0', $response->get_headers()['X-WP-TotalPages']);
     }
 
+    public function test_filters_by_included_node_ids(): void
+    {
+        $first = $this->nodeRepository->create(1.0, 0.0, 0.0, NodeType::System);
+        $second = $this->nodeRepository->create(2.0, 0.0, 0.0, NodeType::Waypoint, hash: 'include_test_2');
+        $this->nodeRepository->create(3.0, 0.0, 0.0, NodeType::System);
+
+        $request = new WP_REST_Request('GET', '/helm/v1/nodes');
+        $request->set_param('include', "{$second->id},{$first->id}");
+        $response = rest_do_request($request);
+
+        $this->assertSame(200, $response->get_status());
+
+        $data = $response->get_data();
+        $ids = array_column($data, 'id');
+
+        $this->assertCount(2, $data);
+        $this->assertContains($first->id, $ids);
+        $this->assertContains($second->id, $ids);
+        $this->assertSame('2', $response->get_headers()['X-WP-Total']);
+        $this->assertSame('1', $response->get_headers()['X-WP-TotalPages']);
+    }
+
     public function test_node_type_serialized_as_string(): void
     {
         $this->nodeRepository->create(1.0, 0.0, 0.0, NodeType::System);

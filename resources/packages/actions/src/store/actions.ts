@@ -1,9 +1,10 @@
 import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
 import { assert, ErrorCode, HelmError } from '@helm/errors';
+import { store as navStore } from '@helm/nav';
 import { store as shipsStore } from '@helm/ships';
 import type { Thunk } from '@helm/types';
-import { isFulfilled, isJump } from '../guards';
+import { isFulfilled, isJump, isScanRoute } from '../guards';
 import type { Action, DraftAction, ShipAction, ShipActionType } from './types';
 import type { store } from './index';
 import { createIndexQueryId } from './utils';
@@ -42,13 +43,22 @@ export const receiveHeartbeat =
 		// A fulfilled jump has moved ship.node_id and burned core life on the
 		// server. Invalidate the ship resolver so the next read refetches.
 		const refreshedShipIds = new Set< number >();
+		const discoveredEdgeIds = new Set< number >();
 		for ( const action of actions ) {
 			if ( isJump( action ) && isFulfilled( action ) ) {
 				refreshedShipIds.add( action.ship_post_id );
 			}
+			if ( isScanRoute( action ) && isFulfilled( action ) && action.result ) {
+				for ( const edgeId of action.result.discovered_edge_ids ?? [] ) {
+					discoveredEdgeIds.add( edgeId );
+				}
+			}
 		}
 		for ( const shipId of refreshedShipIds ) {
 			registry.dispatch( shipsStore ).invalidateResolution( 'getShip', [ shipId ] );
+		}
+		if ( discoveredEdgeIds.size > 0 ) {
+			await registry.dispatch( navStore ).syncUserEdgesByIds( [ ...discoveredEdgeIds ] );
 		}
 	};
 

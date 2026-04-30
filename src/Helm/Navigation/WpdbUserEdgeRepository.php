@@ -81,6 +81,45 @@ final class WpdbUserEdgeRepository implements UserEdgeRepository
         ];
     }
 
+    /**
+     * @param int[] $edgeIds
+     * @return UserEdge[]
+     */
+    public function getMany(int $userId, array $edgeIds): array
+    {
+        global $wpdb;
+
+        $edgeIds = array_values(array_unique(array_filter(
+            array_map('intval', $edgeIds),
+            fn (int $edgeId) => $edgeId > 0
+        )));
+
+        if ($edgeIds === []) {
+            return [];
+        }
+
+        $userEdgeTable = $wpdb->prefix . Schema::TABLE_USER_EDGE;
+        $edgesTable = $wpdb->prefix . Schema::TABLE_NAV_EDGES;
+        $placeholders = implode(',', array_fill(0, count($edgeIds), '%d'));
+
+        $rows = $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT ue.user_id, ue.edge_id, ue.discovered_at,
+                        e.node_a_id, e.node_b_id, e.distance
+                FROM {$userEdgeTable} ue
+                INNER JOIN {$edgesTable} e ON e.id = ue.edge_id
+                WHERE ue.user_id = %d
+                  AND ue.edge_id IN ({$placeholders})
+                ORDER BY ue.discovered_at ASC, ue.id ASC",
+                $userId,
+                ...$edgeIds
+            ),
+            ARRAY_A
+        );
+
+        return array_map(fn ($row) => UserEdge::fromRow($row), $rows ?? []);
+    }
+
     public function count(int $userId): int
     {
         global $wpdb;

@@ -17,21 +17,21 @@ No active task is recorded.
 ## Ready
 
 - [dev-01-time-scale-constant](tasks/dev-01-time-scale-constant.md) - Add a time-scale constant for manual testing. `dev` `p2`
-- [nav-06-persist-scan-discoveries](tasks/nav-06-persist-scan-discoveries.md) - Persist scan discoveries in the datacore. `navigation` `p1`
-- [nav-11-enforce-waypoint-visibility](tasks/nav-11-enforce-waypoint-visibility.md) - Enforce waypoint visibility on the backend. `navigation` `p1`
+- [nav-11-enforce-waypoint-visibility](tasks/nav-11-enforce-waypoint-visibility.md) - Enforce waypoint visibility on the backend. `navigation` `p3`
 - [nav-12-add-node-adjacency-path-selectors](tasks/nav-12-add-node-adjacency-path-selectors.md) - Add node adjacency path selectors. `navigation` `p2`
 - [rest-01-add-response-schemas](tasks/rest-01-add-response-schemas.md) - Add response schemas to REST controllers. `rest` `p2`
 - [test-01-refactor-scan-resolver-test](tasks/test-01-refactor-scan-resolver-test.md) - Refactor scan resolver test to stub navigation service. `testing` `p2`
 
 ## Draft
 
-No draft task is recorded.
+- [nav-13-add-scan-result-reconciler](tasks/nav-13-add-scan-result-reconciler.md) - Add a scan result reconciler. `navigation` `p2`
 
 ## Done
 
 - [nav-01-hide-current-star-actions](tasks/nav-01-hide-current-star-actions.md) - Suppress Navigation Actions on the Current Star's Context Menu. `navigation` `p1`
 - [nav-02-wire-jump-trigger](tasks/nav-02-wire-jump-trigger.md) - Wire Jump Trigger in Bridge UI. `navigation` `p1`
 - [nav-05-slot-fill-context-menu-actions](tasks/nav-05-slot-fill-context-menu-actions.md) - Refactor Star Context Menu Actions to Slot Fill. `navigation` `p2`
+- [nav-06-persist-scan-discoveries](tasks/nav-06-persist-scan-discoveries.md) - Persist scan discoveries in the datacore. `navigation` `p1`
 - [nav-08-track-edge-discoveries-per-player](tasks/nav-08-track-edge-discoveries-per-player.md) - Track edge discoveries per player. `navigation` `p1`
 - [nav-09-add-user-edge-datacore-queries](tasks/nav-09-add-user-edge-datacore-queries.md) - Add user edge datacore queries. `navigation` `p1`
 - [nav-10-sync-user-edges-on-load](tasks/nav-10-sync-user-edges-on-load.md) - Sync user edges on load. `navigation` `p1`

@@ -139,6 +139,22 @@ class UserEdgeRepositoryTest extends WPTestCase
         $this->assertCount(1, $pageThree['edges']);
     }
 
+    public function test_get_many_returns_only_requested_edges_for_user(): void
+    {
+        $edgeA = $this->createEdge();
+        $edgeB = $this->createEdge();
+        $edgeC = $this->createEdge();
+
+        $this->userEdgeRepository->upsert(1, $edgeA);
+        $this->userEdgeRepository->upsert(1, $edgeB);
+        $this->userEdgeRepository->upsert(2, $edgeC);
+
+        $edges = $this->userEdgeRepository->getMany(1, [$edgeA, $edgeC, $edgeA]);
+        $edgeIds = array_map(fn ($edge) => $edge->edgeId, $edges);
+
+        $this->assertSame([$edgeA], $edgeIds);
+    }
+
     public function test_last_discovered_is_null_for_user_with_no_rows(): void
     {
         $this->assertNull($this->userEdgeRepository->lastDiscovered(99));

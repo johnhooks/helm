@@ -3,17 +3,20 @@ import type { Datacore } from '@helm/datacore';
 import {
 	META_EDGE_LAST_DISCOVERED,
 	syncNodes,
+	syncUserEdgesByIds,
 	syncUserEdgesIfStale,
 } from './sync';
-import { fetchAllNodes } from './fetch-nodes';
-import { fetchAllEdges, fetchEdgeFreshness } from './fetch-edges';
+import { fetchAllNodes, fetchNodesByIds } from './fetch-nodes';
+import { fetchAllEdges, fetchEdgesByIds, fetchEdgeFreshness } from './fetch-edges';
 
 vi.mock( './fetch-nodes', () => ( {
 	fetchAllNodes: vi.fn(),
+	fetchNodesByIds: vi.fn(),
 } ) );
 
 vi.mock( './fetch-edges', () => ( {
 	fetchAllEdges: vi.fn(),
+	fetchEdgesByIds: vi.fn(),
 	fetchEdgeFreshness: vi.fn(),
 	getLastDiscoveredFromEdges: vi.fn( ( edges: Array< { discovered_at: string } > ) =>
 		edges.reduce(
@@ -51,10 +54,44 @@ function createDatacoreMock(): Datacore {
 
 beforeEach( () => {
 	vi.mocked( fetchAllNodes ).mockReset();
+	vi.mocked( fetchNodesByIds ).mockReset();
 	vi.mocked( fetchAllEdges ).mockReset();
+	vi.mocked( fetchEdgesByIds ).mockReset();
 	vi.mocked( fetchEdgeFreshness ).mockReset();
 	vi.useFakeTimers();
 	vi.setSystemTime( new Date( '2026-04-21T12:00:00Z' ) );
+} );
+
+describe( 'syncUserEdgesByIds', () => {
+	it( 'fetches targeted canonical edges and inserts missing nodes first', async () => {
+		const dc = createDatacoreMock();
+		vi.mocked( fetchEdgesByIds ).mockResolvedValue( [
+			{ id: 7, node_a_id: 10, node_b_id: 20, distance: 1.5, discovered_at: '2026-04-21T00:00:00+00:00' },
+		] );
+		vi.mocked( dc.getNode )
+			.mockResolvedValueOnce( { id: 10, type: 'system', x: 0, y: 0, z: 0, created_at: null } )
+			.mockResolvedValueOnce( null );
+		vi.mocked( fetchNodesByIds ).mockResolvedValue( [
+			{ id: 20, type: 'waypoint', x: 1, y: 1, z: 1, created_at: '2026-04-20T00:00:00+00:00' },
+		] );
+
+		await expect( syncUserEdgesByIds( dc, [ 7 ] ) ).resolves.toEqual( {
+			refreshed: true,
+			edges: 1,
+			lastDiscovered: '2026-04-21T00:00:00+00:00',
+		} );
+
+		expect( fetchEdgesByIds ).toHaveBeenCalledWith( [ 7 ] );
+		expect( fetchNodesByIds ).toHaveBeenCalledWith( [ 20 ] );
+		expect( dc.clearUserEdges ).not.toHaveBeenCalled();
+		expect( dc.insertNodes ).toHaveBeenCalledWith( [
+			{ id: 20, type: 'waypoint', x: 1, y: 1, z: 1, created_at: '2026-04-20T00:00:00+00:00' },
+		] );
+		expect( dc.insertUserEdges ).toHaveBeenCalledWith( [
+			{ id: 7, node_a_id: 10, node_b_id: 20, distance: 1.5, discovered_at: '2026-04-21T00:00:00+00:00' },
+		] );
+		expect( dc.setMeta ).not.toHaveBeenCalled();
+	} );
 } );
 
 describe( 'syncNodes', () => {
@@ -172,6 +209,7 @@ describe( 'syncUserEdgesIfStale', () => {
 		} );
 
 		expect( fetchAllEdges ).not.toHaveBeenCalled();
+		expect( fetchNodesByIds ).not.toHaveBeenCalled();
 		expect( dc.transaction ).not.toHaveBeenCalled();
 	} );
 
@@ -188,6 +226,14 @@ describe( 'syncUserEdgesIfStale', () => {
 			{ id: 1, node_a_id: 10, node_b_id: 20, distance: 1.5, discovered_at: '2026-04-20T00:00:00+00:00' },
 			{ id: 2, node_a_id: 20, node_b_id: 30, distance: 2.5, discovered_at: '2026-04-21T00:00:00+00:00' },
 		] );
+		vi.mocked( dc.getNode )
+			.mockResolvedValueOnce( { id: 10, type: 'system', x: 0, y: 0, z: 0, created_at: null } )
+			.mockResolvedValueOnce( null )
+			.mockResolvedValueOnce( null );
+		vi.mocked( fetchNodesByIds ).mockResolvedValue( [
+			{ id: 20, type: 'waypoint', x: 1, y: 1, z: 1, created_at: '2026-04-20T00:00:00+00:00' },
+			{ id: 30, type: 'system', x: 2, y: 2, z: 2, created_at: '2026-04-20T00:00:00+00:00' },
+		] );
 
 		await expect( syncUserEdgesIfStale( dc ) ).resolves.toEqual( {
 			refreshed: true,
@@ -196,6 +242,11 @@ describe( 'syncUserEdgesIfStale', () => {
 		} );
 
 		expect( dc.clearUserEdges ).toHaveBeenCalledTimes( 1 );
+		expect( fetchNodesByIds ).toHaveBeenCalledWith( [ 20, 30 ] );
+		expect( dc.insertNodes ).toHaveBeenCalledWith( [
+			{ id: 20, type: 'waypoint', x: 1, y: 1, z: 1, created_at: '2026-04-20T00:00:00+00:00' },
+			{ id: 30, type: 'system', x: 2, y: 2, z: 2, created_at: '2026-04-20T00:00:00+00:00' },
+		] );
 		expect( dc.insertUserEdges ).toHaveBeenCalledTimes( 1 );
 		expect( dc.setMeta ).toHaveBeenCalledWith( 'cache.edge_count', '2' );
 		expect( dc.setMeta ).toHaveBeenCalledWith( META_EDGE_LAST_DISCOVERED, '2026-04-21T00:00:00+00:00' );
@@ -213,6 +264,10 @@ describe( 'syncUserEdgesIfStale', () => {
 		vi.mocked( fetchAllEdges ).mockResolvedValue( [
 			{ id: 1, node_a_id: 10, node_b_id: 20, distance: 1.5, discovered_at: '2026-04-21T00:00:00+00:00' },
 		] );
+		vi.mocked( dc.getNode )
+			.mockResolvedValueOnce( { id: 10, type: 'system', x: 0, y: 0, z: 0, created_at: null } )
+			.mockResolvedValueOnce( { id: 20, type: 'system', x: 1, y: 1, z: 1, created_at: null } );
+		vi.mocked( fetchNodesByIds ).mockResolvedValue( [] );
 
 		await expect( syncUserEdgesIfStale( dc ) ).resolves.toMatchObject( {
 			refreshed: true,
@@ -220,6 +275,7 @@ describe( 'syncUserEdgesIfStale', () => {
 		} );
 
 		expect( dc.clearUserEdges ).toHaveBeenCalledTimes( 1 );
+		expect( fetchNodesByIds ).toHaveBeenCalledWith( [] );
 		expect( dc.insertUserEdges ).toHaveBeenCalledWith( [
 			{ id: 1, node_a_id: 10, node_b_id: 20, distance: 1.5, discovered_at: '2026-04-21T00:00:00+00:00' },
 		] );
