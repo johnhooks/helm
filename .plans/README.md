@@ -18,7 +18,6 @@ No active task is recorded.
 
 - [dev-01-time-scale-constant](tasks/dev-01-time-scale-constant.md) - Add a time-scale constant for manual testing. `dev` `p2`
 - [nav-11-enforce-waypoint-visibility](tasks/nav-11-enforce-waypoint-visibility.md) - Enforce waypoint visibility on the backend. `navigation` `p3`
-- [nav-12-add-node-adjacency-path-selectors](tasks/nav-12-add-node-adjacency-path-selectors.md) - Add node adjacency path selectors. `navigation` `p2`
 - [rest-01-add-response-schemas](tasks/rest-01-add-response-schemas.md) - Add response schemas to REST controllers. `rest` `p2`
 - [test-01-refactor-scan-resolver-test](tasks/test-01-refactor-scan-resolver-test.md) - Refactor scan resolver test to stub navigation service. `testing` `p2`
 
@@ -35,3 +34,4 @@ No active task is recorded.
 - [nav-08-track-edge-discoveries-per-player](tasks/nav-08-track-edge-discoveries-per-player.md) - Track edge discoveries per player. `navigation` `p1`
 - [nav-09-add-user-edge-datacore-queries](tasks/nav-09-add-user-edge-datacore-queries.md) - Add user edge datacore queries. `navigation` `p1`
 - [nav-10-sync-user-edges-on-load](tasks/nav-10-sync-user-edges-on-load.md) - Sync user edges on load. `navigation` `p1`
+- [nav-12-add-node-adjacency-path-selectors](tasks/nav-12-add-node-adjacency-path-selectors.md) - Add known path selectors. `navigation` `p2`

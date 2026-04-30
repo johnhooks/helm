@@ -1,10 +1,13 @@
 import type { HelmError } from '@helm/errors';
+import type { KnownPathResult } from '@helm/datacore';
 import type { StarNode } from '@helm/types';
 
 export type Action =
 	| { type: 'SYNC_START' }
 	| { type: 'SYNC_FINISHED'; nodes: StarNode[]; syncResult: SyncResult }
 	| { type: 'EDGE_SYNC_FINISHED'; edges: number }
+	| { type: 'DIRECT_EDGE_READ_FINISHED'; key: string; hasDirectEdge: boolean }
+	| { type: 'KNOWN_PATH_READ_FINISHED'; key: string; path: KnownPathResult }
 	| { type: 'SYNC_FAILED'; error: HelmError };
 
 export interface SyncResult {
@@ -24,4 +27,10 @@ export interface StarsState {
 
 export interface State {
 	stars: StarsState;
+	graph: GraphState;
+}
+
+export interface GraphState {
+	directEdges: Record< string, boolean >;
+	knownPaths: Record< string, KnownPathResult >;
 }

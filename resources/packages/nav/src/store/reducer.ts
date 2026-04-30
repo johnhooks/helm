@@ -44,6 +44,28 @@ export function reducer( state: State, action: Action ): State {
 					error: null,
 				},
 			};
+		case 'DIRECT_EDGE_READ_FINISHED':
+			return {
+				...state,
+				graph: {
+					...state.graph,
+					directEdges: {
+						...state.graph.directEdges,
+						[action.key]: action.hasDirectEdge,
+					},
+				},
+			};
+		case 'KNOWN_PATH_READ_FINISHED':
+			return {
+				...state,
+				graph: {
+					...state.graph,
+					knownPaths: {
+						...state.graph.knownPaths,
+						[action.key]: action.path,
+					},
+				},
+			};
 		case 'SYNC_FAILED':
 			return {
 				...state,
@@ -65,6 +87,10 @@ export function initializeDefaultState(): State {
 			syncStatus: 'idle',
 			syncResult: null,
 			error: null,
+		},
+		graph: {
+			directEdges: {},
+			knownPaths: {},
 		},
 	};
 }

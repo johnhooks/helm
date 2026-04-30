@@ -1,6 +1,7 @@
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as actionsStore } from '@helm/actions';
+import { store as navStore } from '@helm/nav';
 import { ContextMenuActionItem } from '@helm/ui';
 import type { StarContextActionProps } from './types';
 
@@ -11,13 +12,13 @@ export function ScanRouteContextAction( {
 	hasActiveAction,
 	onClose,
 }: StarContextActionProps ) {
-	const alreadyScanned = useSelect(
-		( select ) => select( actionsStore ).hasFulfilledScanRouteTo( star.node_id ),
-		[ star.node_id ]
+	const hasDirectEdge = useSelect(
+		( select ) => select( navStore ).hasDirectEdgeBetween( currentNodeId, star.node_id ),
+		[ currentNodeId, star.node_id ]
 	);
 	const { draftCreate } = useDispatch( actionsStore );
 
-	if ( star.node_id === currentNodeId || alreadyScanned ) {
+	if ( star.node_id === currentNodeId || hasDirectEdge === true ) {
 		return null;
 	}
 

@@ -1,5 +1,5 @@
 ---
-status: ready
+status: done
 area: navigation
 priority: p2
 depends_on:
