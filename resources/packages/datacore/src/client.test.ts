@@ -97,6 +97,8 @@ describe('createDatacore', () => {
 		expect(dc.getUserEdgesAtNode).toBeInstanceOf(Function);
 		expect(dc.hasUserEdgesAtNode).toBeInstanceOf(Function);
 		expect(dc.getConnectedNodeIds).toBeInstanceOf(Function);
+		expect(dc.hasDirectEdgeBetween).toBeInstanceOf(Function);
+		expect(dc.findKnownPath).toBeInstanceOf(Function);
 		expect(dc.getNode).toBeInstanceOf(Function);
 		expect(dc.getMeta).toBeInstanceOf(Function);
 		expect(dc.setMeta).toBeInstanceOf(Function);
@@ -502,6 +504,56 @@ describe('createDatacore', () => {
 		});
 
 		await expect(dc.getConnectedNodeIds(10)).resolves.toEqual([11, 12, 15]);
+	});
+
+	it('hasDirectEdgeBetween returns true when a direct edge exists', async () => {
+		const dc = await createTestDatacore();
+
+		MockWorker.instance.onPosted((msg: unknown) => {
+			const m = msg as { id: string; type: string };
+			if (m.type === 'query') {
+				MockWorker.instance.receive({
+					id: m.id,
+					type: 'result',
+					payload: {
+						rows: [[1]],
+						columns: ['edge_exists'],
+					},
+				});
+			}
+		});
+
+		await expect(dc.hasDirectEdgeBetween(10, 11)).resolves.toBe(true);
+	});
+
+	it('findKnownPath returns a structured route result', async () => {
+		const dc = await createTestDatacore();
+
+		MockWorker.instance.onPosted((msg: unknown) => {
+			const m = msg as { id: string; type: string };
+			if (m.type === 'query') {
+				MockWorker.instance.receive({
+					id: m.id,
+					type: 'result',
+					payload: {
+						rows: [
+							[7, 10, 11, 1.25, '2026-04-20T00:00:00+00:00'],
+							[8, 11, 12, 2.5, '2026-04-21T00:00:00+00:00'],
+						],
+						columns: ['id', 'node_a_id', 'node_b_id', 'distance', 'discovered_at'],
+					},
+				});
+			}
+		});
+
+		await expect(dc.findKnownPath(10, 12)).resolves.toEqual({
+			reachable: true,
+			direct: false,
+			nodeIds: [10, 11, 12],
+			edgeIds: [7, 8],
+			totalDistance: 3.75,
+			nextNodeId: 11,
+		});
 	});
 
 	it('getNode returns NavNode or null', async () => {

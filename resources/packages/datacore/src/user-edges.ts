@@ -1,5 +1,5 @@
 import type { UserEdge } from '@helm/types';
-import type { Connection } from './types';
+import type { Connection, KnownPathResult } from './types';
 
 export const USER_EDGES_SCHEMA = `
 CREATE TABLE IF NOT EXISTS user_edges (
@@ -31,6 +31,17 @@ const USER_EDGE_EXISTS_AT_NODE = `
 SELECT 1 AS edge_exists
 FROM user_edges
 WHERE user_id = ? AND (node_a_id = ? OR node_b_id = ?)
+LIMIT 1
+`;
+
+const DIRECT_USER_EDGE_EXISTS = `
+SELECT 1 AS edge_exists
+FROM user_edges
+WHERE user_id = ?
+  AND (
+    (node_a_id = ? AND node_b_id = ?)
+    OR (node_a_id = ? AND node_b_id = ?)
+  )
 LIMIT 1
 `;
 
@@ -110,5 +121,186 @@ export function createUserEdgesRepository(conn: Connection, userId: number) {
 
 			return rows.map((row) => row.connected_node_id);
 		},
+
+		async hasDirectEdgeBetween(fromNodeId: number, targetNodeId: number): Promise<boolean> {
+			const rows = await conn.query<{ edge_exists: number }>(DIRECT_USER_EDGE_EXISTS, [
+				userId,
+				fromNodeId,
+				targetNodeId,
+				targetNodeId,
+				fromNodeId,
+			]);
+
+			return rows.length > 0;
+		},
+
+		async findKnownPath(fromNodeId: number, targetNodeId: number): Promise<KnownPathResult> {
+			if (fromNodeId === targetNodeId) {
+				return {
+					reachable: true,
+					direct: false,
+					nodeIds: [fromNodeId],
+					edgeIds: [],
+					totalDistance: 0,
+					nextNodeId: null,
+				};
+			}
+
+			return findShortestPath(
+				fromNodeId,
+				targetNodeId,
+				(nodeId) => conn.query<UserEdge>(USER_EDGES_AT_NODE, [userId, nodeId, nodeId]),
+			);
+		},
+	};
+}
+
+type Neighbor = {
+	nodeId: number;
+	edgeId: number;
+	distance: number;
+};
+
+type PreviousStep = {
+	nodeId: number;
+	edgeId: number;
+};
+
+async function findShortestPath(
+	fromNodeId: number,
+	targetNodeId: number,
+	loadEdgesAtNode: (nodeId: number) => Promise<UserEdge[]>,
+): Promise<KnownPathResult> {
+	const adjacency = new Map<number, Neighbor[]>();
+	const distances = new Map<number, number>([[fromNodeId, 0]]);
+	const previous = new Map<number, PreviousStep>();
+	const visited = new Set<number>();
+	const loadedNodes = new Set<number>();
+	const queue = new Set<number>([fromNodeId]);
+
+	while (queue.size > 0) {
+		const currentNodeId = closestQueuedNode(queue, distances);
+		if (currentNodeId === null) {
+			break;
+		}
+
+		queue.delete(currentNodeId);
+		if (visited.has(currentNodeId)) {
+			continue;
+		}
+
+		if (currentNodeId === targetNodeId) {
+			break;
+		}
+
+		visited.add(currentNodeId);
+		const currentDistance = distances.get(currentNodeId) ?? Infinity;
+		const neighbors = await getNeighbors(adjacency, loadedNodes, currentNodeId, loadEdgesAtNode);
+
+		for (const neighbor of neighbors) {
+			if (visited.has(neighbor.nodeId)) {
+				continue;
+			}
+
+			const nextDistance = currentDistance + neighbor.distance;
+			if (nextDistance < (distances.get(neighbor.nodeId) ?? Infinity)) {
+				distances.set(neighbor.nodeId, nextDistance);
+				previous.set(neighbor.nodeId, {
+					nodeId: currentNodeId,
+					edgeId: neighbor.edgeId,
+				});
+				queue.add(neighbor.nodeId);
+			}
+		}
+	}
+
+	const totalDistance = distances.get(targetNodeId);
+	if (totalDistance === undefined) {
+		return noPath();
+	}
+
+	const nodeIds = [targetNodeId];
+	const edgeIds: number[] = [];
+	let currentNodeId = targetNodeId;
+
+	while (currentNodeId !== fromNodeId) {
+		const step = previous.get(currentNodeId);
+		if (!step) {
+			return noPath();
+		}
+
+		nodeIds.unshift(step.nodeId);
+		edgeIds.unshift(step.edgeId);
+		currentNodeId = step.nodeId;
+	}
+
+	return {
+		reachable: true,
+		direct: edgeIds.length === 1,
+		nodeIds,
+		edgeIds,
+		totalDistance,
+		nextNodeId: nodeIds[1] ?? null,
+	};
+}
+
+async function getNeighbors(
+	adjacency: Map<number, Neighbor[]>,
+	loadedNodes: Set<number>,
+	nodeId: number,
+	loadEdgesAtNode: (nodeId: number) => Promise<UserEdge[]>,
+): Promise<Neighbor[]> {
+	if (!loadedNodes.has(nodeId)) {
+		const edges = await loadEdgesAtNode(nodeId);
+		for (const edge of edges) {
+			addNeighbor(adjacency, edge.node_a_id, {
+				nodeId: edge.node_b_id,
+				edgeId: edge.id,
+				distance: edge.distance,
+			});
+			addNeighbor(adjacency, edge.node_b_id, {
+				nodeId: edge.node_a_id,
+				edgeId: edge.id,
+				distance: edge.distance,
+			});
+		}
+		loadedNodes.add(nodeId);
+	}
+
+	return adjacency.get(nodeId) ?? [];
+}
+
+function addNeighbor(adjacency: Map<number, Neighbor[]>, nodeId: number, neighbor: Neighbor): void {
+	const neighbors = adjacency.get(nodeId) ?? [];
+	if (neighbors.some((existing) => existing.edgeId === neighbor.edgeId && existing.nodeId === neighbor.nodeId)) {
+		return;
+	}
+	neighbors.push(neighbor);
+	adjacency.set(nodeId, neighbors);
+}
+
+function closestQueuedNode(queue: Set<number>, distances: Map<number, number>): number | null {
+	let closestNodeId: number | null = null;
+	let closestDistance = Infinity;
+
+	for (const nodeId of queue) {
+		const distance = distances.get(nodeId) ?? Infinity;
+		if (distance < closestDistance) {
+			closestNodeId = nodeId;
+			closestDistance = distance;
+		}
+	}
+
+	return closestNodeId;
+}
+
+function noPath(): KnownPathResult {
+	return {
+		reachable: false,
+		direct: false,
+		nodeIds: [],
+		edgeIds: [],
+		totalDistance: 0,
+		nextNodeId: null,
 	};
 }

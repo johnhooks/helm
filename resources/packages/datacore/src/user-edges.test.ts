@@ -8,9 +8,10 @@ import { USER_EDGES_SCHEMA, createUserEdgesRepository } from './user-edges';
 
 let database: Database;
 
-function createConnection(): Connection {
+function createConnection(onQuery?: (sql: string, params?: SQLiteParam[]) => void): Connection {
 	return {
 		query: async <Row>(sql: string, params?: SQLiteParam[]) => {
+			onQuery?.(sql, params);
 			const result = await query<Row & Record<string, SQLiteValue>>(database, sql, params);
 			return result.rows as Row[];
 		},
@@ -22,6 +23,14 @@ function createConnection(): Connection {
 		},
 		transaction: async <T>(fn: () => Promise<T>) => fn(),
 	};
+}
+
+async function insertNode(id: number, type: 'system' | 'waypoint' = 'waypoint'): Promise<void> {
+	await database.sqlite3.run(
+		database.db,
+		'INSERT INTO nodes (id, type, x, y, z, created_at) VALUES (?, ?, ?, ?, ?, ?)',
+		[id, type, id, 0, 0, null],
+	);
 }
 
 beforeEach(async () => {
@@ -220,5 +229,275 @@ describe('createUserEdgesRepository', () => {
 		]);
 
 		await expect(repo.getConnectedNodeIds(1)).resolves.toEqual([2, 3]);
+	});
+
+	it('hasDirectEdgeBetween matches either edge direction for the current user', async () => {
+		const userA = createUserEdgesRepository(createConnection(), 7);
+		const userB = createUserEdgesRepository(createConnection(), 8);
+
+		await userA.insertUserEdge({
+			id: 99,
+			node_a_id: 1,
+			node_b_id: 2,
+			distance: 1.5,
+			discovered_at: '2026-04-20T00:00:00+00:00',
+		});
+		await userB.insertUserEdge({
+			id: 100,
+			node_a_id: 3,
+			node_b_id: 4,
+			distance: 1.5,
+			discovered_at: '2026-04-20T00:00:00+00:00',
+		});
+
+		await expect(userA.hasDirectEdgeBetween(1, 2)).resolves.toBe(true);
+		await expect(userA.hasDirectEdgeBetween(2, 1)).resolves.toBe(true);
+		await expect(userA.hasDirectEdgeBetween(3, 4)).resolves.toBe(false);
+	});
+
+	it('findKnownPath returns origin-only result when origin equals target', async () => {
+		const repo = createUserEdgesRepository(createConnection(), 7);
+
+		await expect(repo.findKnownPath(1, 1)).resolves.toEqual({
+			reachable: true,
+			direct: false,
+			nodeIds: [1],
+			edgeIds: [],
+			totalDistance: 0,
+			nextNodeId: null,
+		});
+	});
+
+	it('findKnownPath returns a direct path for adjacent nodes', async () => {
+		const repo = createUserEdgesRepository(createConnection(), 7);
+
+		await repo.insertUserEdge({
+			id: 99,
+			node_a_id: 1,
+			node_b_id: 2,
+			distance: 1.5,
+			discovered_at: '2026-04-20T00:00:00+00:00',
+		});
+
+		await expect(repo.findKnownPath(1, 2)).resolves.toEqual({
+			reachable: true,
+			direct: true,
+			nodeIds: [1, 2],
+			edgeIds: [99],
+			totalDistance: 1.5,
+			nextNodeId: 2,
+		});
+	});
+
+	it('findKnownPath returns an indirect path through waypoint and system nodes', async () => {
+		const repo = createUserEdgesRepository(createConnection(), 7);
+
+		await repo.insertUserEdges([
+			{
+				id: 99,
+				node_a_id: 1,
+				node_b_id: 4,
+				distance: 1.5,
+				discovered_at: '2026-04-20T00:00:00+00:00',
+			},
+			{
+				id: 100,
+				node_a_id: 4,
+				node_b_id: 2,
+				distance: 2.5,
+				discovered_at: '2026-04-21T00:00:00+00:00',
+			},
+			{
+				id: 101,
+				node_a_id: 2,
+				node_b_id: 3,
+				distance: 3.5,
+				discovered_at: '2026-04-22T00:00:00+00:00',
+			},
+		]);
+
+		await expect(repo.findKnownPath(1, 3)).resolves.toEqual({
+			reachable: true,
+			direct: false,
+			nodeIds: [1, 4, 2, 3],
+			edgeIds: [99, 100, 101],
+			totalDistance: 7.5,
+			nextNodeId: 4,
+		});
+	});
+
+	it('findKnownPath returns no-path result when the target is unreachable', async () => {
+		const repo = createUserEdgesRepository(createConnection(), 7);
+
+		await repo.insertUserEdge({
+			id: 99,
+			node_a_id: 1,
+			node_b_id: 2,
+			distance: 1.5,
+			discovered_at: '2026-04-20T00:00:00+00:00',
+		});
+
+		await expect(repo.findKnownPath(1, 4)).resolves.toEqual({
+			reachable: false,
+			direct: false,
+			nodeIds: [],
+			edgeIds: [],
+			totalDistance: 0,
+			nextNodeId: null,
+		});
+	});
+
+	it('findKnownPath handles cycles without revisiting forever', async () => {
+		const repo = createUserEdgesRepository(createConnection(), 7);
+
+		await repo.insertUserEdges([
+			{
+				id: 99,
+				node_a_id: 1,
+				node_b_id: 2,
+				distance: 1,
+				discovered_at: '2026-04-20T00:00:00+00:00',
+			},
+			{
+				id: 100,
+				node_a_id: 2,
+				node_b_id: 3,
+				distance: 1,
+				discovered_at: '2026-04-21T00:00:00+00:00',
+			},
+			{
+				id: 101,
+				node_a_id: 3,
+				node_b_id: 1,
+				distance: 1,
+				discovered_at: '2026-04-22T00:00:00+00:00',
+			},
+			{
+				id: 102,
+				node_a_id: 3,
+				node_b_id: 4,
+				distance: 1,
+				discovered_at: '2026-04-23T00:00:00+00:00',
+			},
+		]);
+
+		await expect(repo.findKnownPath(1, 4)).resolves.toEqual({
+			reachable: true,
+			direct: false,
+			nodeIds: [1, 3, 4],
+			edgeIds: [101, 102],
+			totalDistance: 2,
+			nextNodeId: 3,
+		});
+	});
+
+	it('findKnownPath chooses the shortest path by distance instead of hop count', async () => {
+		const repo = createUserEdgesRepository(createConnection(), 7);
+		await insertNode(5);
+
+		await repo.insertUserEdges([
+			{
+				id: 99,
+				node_a_id: 1,
+				node_b_id: 3,
+				distance: 10,
+				discovered_at: '2026-04-20T00:00:00+00:00',
+			},
+			{
+				id: 100,
+				node_a_id: 1,
+				node_b_id: 2,
+				distance: 2,
+				discovered_at: '2026-04-21T00:00:00+00:00',
+			},
+			{
+				id: 101,
+				node_a_id: 2,
+				node_b_id: 5,
+				distance: 2,
+				discovered_at: '2026-04-22T00:00:00+00:00',
+			},
+			{
+				id: 102,
+				node_a_id: 5,
+				node_b_id: 3,
+				distance: 2,
+				discovered_at: '2026-04-23T00:00:00+00:00',
+			},
+		]);
+
+		await expect(repo.findKnownPath(1, 3)).resolves.toEqual({
+			reachable: true,
+			direct: false,
+			nodeIds: [1, 2, 5, 3],
+			edgeIds: [100, 101, 102],
+			totalDistance: 6,
+			nextNodeId: 2,
+		});
+	});
+
+	it('findKnownPath only uses edges for the current user', async () => {
+		const userA = createUserEdgesRepository(createConnection(), 7);
+		const userB = createUserEdgesRepository(createConnection(), 8);
+
+		await userA.insertUserEdge({
+			id: 99,
+			node_a_id: 1,
+			node_b_id: 2,
+			distance: 1,
+			discovered_at: '2026-04-20T00:00:00+00:00',
+		});
+		await userB.insertUserEdge({
+			id: 100,
+			node_a_id: 2,
+			node_b_id: 3,
+			distance: 1,
+			discovered_at: '2026-04-21T00:00:00+00:00',
+		});
+
+		await expect(userA.findKnownPath(1, 3)).resolves.toEqual({
+			reachable: false,
+			direct: false,
+			nodeIds: [],
+			edgeIds: [],
+			totalDistance: 0,
+			nextNodeId: null,
+		});
+	});
+
+	it('findKnownPath expands adjacent edges lazily and does not load unrelated chart components', async () => {
+		const adjacencyQueries: number[] = [];
+		const repo = createUserEdgesRepository(
+			createConnection((sql, params) => {
+				if (sql.includes('FROM user_edges') && sql.includes('node_a_id = ? OR node_b_id = ?')) {
+					adjacencyQueries.push(params?.[1] as number);
+				}
+			}),
+			7,
+		);
+
+		await repo.insertUserEdges([
+			{
+				id: 99,
+				node_a_id: 1,
+				node_b_id: 2,
+				distance: 1,
+				discovered_at: '2026-04-20T00:00:00+00:00',
+			},
+			{
+				id: 100,
+				node_a_id: 3,
+				node_b_id: 4,
+				distance: 1,
+				discovered_at: '2026-04-21T00:00:00+00:00',
+			},
+		]);
+
+		await expect(repo.findKnownPath(1, 2)).resolves.toMatchObject({
+			reachable: true,
+			nodeIds: [1, 2],
+			edgeIds: [99],
+		});
+		expect(adjacencyQueries).toEqual([1]);
 	});
 });

@@ -105,6 +105,15 @@ export interface DatacoreOptions {
 	userId: number;
 }
 
+export interface KnownPathResult {
+	reachable: boolean;
+	direct: boolean;
+	nodeIds: number[];
+	edgeIds: number[];
+	totalDistance: number;
+	nextNodeId: number | null;
+}
+
 export interface Datacore {
 	// Nodes
 	insertNode: (node: NavNode) => Promise<void>;
@@ -126,6 +135,8 @@ export interface Datacore {
 	getUserEdgesAtNode: (nodeId: number) => Promise<UserEdge[]>;
 	hasUserEdgesAtNode: (nodeId: number) => Promise<boolean>;
 	getConnectedNodeIds: (nodeId: number) => Promise<number[]>;
+	hasDirectEdgeBetween: (fromNodeId: number, targetNodeId: number) => Promise<boolean>;
+	findKnownPath: (fromNodeId: number, targetNodeId: number) => Promise<KnownPathResult>;
 
 	// Meta
 	getMeta: (key: string) => Promise<string | null>;

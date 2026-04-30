@@ -45,6 +45,8 @@ function createDatacoreMock(): Datacore {
 		getUserEdgesAtNode: vi.fn(),
 		hasUserEdgesAtNode: vi.fn(),
 		getConnectedNodeIds: vi.fn(),
+		hasDirectEdgeBetween: vi.fn(),
+		findKnownPath: vi.fn(),
 		getMeta: vi.fn(),
 		setMeta: vi.fn(),
 		transaction: vi.fn( transaction ) as Datacore['transaction'],

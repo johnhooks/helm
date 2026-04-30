@@ -6,7 +6,7 @@ depends_on:
   - nav-09-add-user-edge-datacore-queries
 ---
 
-# Add node adjacency path selectors
+# Add known path selectors
 
 ## Problem
 
@@ -24,42 +24,73 @@ waypoint instead of a star.
 
 This matters because the navigation design depends on partial knowledge. A
 player may know only part of a corridor, may branch from a waypoint toward
-multiple stars, and may have discovered shapes that do not terminate cleanly
-at a system node yet. The store needs a first-class way to surface that known
-graph from any node so route planning and star-context UI can build on
-persisted discoveries instead of one-off scan payloads.
+multiple stars, and may have discovered shapes that pass through intermediate
+systems before reaching a selected destination. The store needs a first-class
+way to surface useful facts about the known graph from any node so route
+planning and star-context UI can build on persisted discoveries instead of
+one-off scan payloads.
+
+There are also two different questions hiding behind today's "route known"
+language:
+
+- Is the target directly adjacent to the current node through one known edge?
+- Is the target reachable through any known edge path?
+
+Those answers drive different UI and action behavior. A scan route action is
+eligible when there is not already a direct edge between the current node and
+the selected target. A selected target may still be reachable through an
+indirect known path, but that does not make another scan useless because a
+direct corridor may still be valuable. Jump and route-planning UI need the
+reachable-path answer, but direct one-edge jumping remains a separate concept
+unless a later task adds an explicit multi-hop route-following action.
 
 ## Proposed solution
 
-Extend the nav store with selector-level graph reads that start from a node id
-and return the discovered navigation state that is locally available from that
-origin. At minimum, callers should be able to ask for the directly available
-edges and connected nodes at a node, and to ask for the known paths that can
-be followed outward through discovered edges until they terminate at a star or
-at the furthest known waypoint in that branch.
+Extend the nav package with graph reads that start from a node id and inspect
+the locally cached discovered edge graph. The first implementation should be
+target-specific and bounded by what current UI needs. It should answer direct
+adjacency and find a known path from an origin node to a selected target node.
+It should not eagerly compute the whole reachable frontier unless a caller
+explicitly asks for that broader shape in a later task.
 
-The selector contract should treat waypoints and systems as first-class graph
-nodes. A branch should continue through waypoints recursively while protecting
-against cycles and duplicated work, and it should stop when there is no
-further discovered edge to follow or when it reaches a system node that
-represents a star destination. The result should preserve enough structure for
-the caller to distinguish direct adjacency from the recursively followed path,
-rather than flattening everything into an unordered node list.
+The graph contract should treat waypoints and systems as first-class nodes. A
+known-path search must not stop at intermediate system nodes. Systems can be
+waypoints in a larger route, so traversal should continue until the requested
+target is found or the known graph is exhausted. The path result should
+preserve ordered structure, including node ids, edge ids, total distance, and
+the next node to jump to when the target is reachable indirectly.
 
-This work should build on the existing datacore edge queries instead of adding
-new server endpoints. Multiple local queries are acceptable if needed, but the
-selector surface should hide that complexity from callers and avoid pushing
-N-plus-1 traversal logic into components. If the current store shape makes
-that awkward, extend the nav package with a small graph-read abstraction that
-keeps traversal and caching behavior in one place.
+Use shortest known path by edge distance for the first route plan. Dijkstra is
+the expected algorithm because edge weights are already available as
+`distance`, and later tasks can swap or extend the weighting model for travel
+time, core cost, hazard, public/private preference, or route safety.
 
-The outcome is a reusable nav-store contract for node-oriented graph reads:
+This work should build on the existing datacore edge data instead of adding new
+server endpoints. The implementation can add one or more datacore graph-read
+methods if that keeps traversal in the worker and prevents React components
+from making chains of async neighbor calls. Components should consume a small
+nav-level contract rather than reimplementing traversal or directly walking
+datacore edge queries.
 
-- direct adjacency from a node id
-- reachable waypoint branches from that node
-- terminating stars when a known branch reaches a system node
-- partial branch termination when the known graph ends at a waypoint
+This task is about local known-chart pathfinding only. It does not change scan
+generation, edge discovery rules, waypoint visibility on the backend, jump
+action validation, or saved public/private route records.
 
-This task is about selector and local graph-read behavior only. It does not
-change scan generation, edge discovery rules, or waypoint visibility on the
-backend.
+## Requirements
+
+- Provide reusable nav/datacore reads for direct adjacency and target-specific
+  known-path lookup.
+- Direct adjacency means one discovered user edge connects the two requested
+  nodes in either direction.
+- Known-path lookup searches discovered user edges from origin to target,
+  including through waypoint and system nodes.
+- Traversal must not stop at intermediate systems, must handle cycles, and must
+  return the shortest path by total edge distance.
+- Path results must include reachability, directness, ordered node ids, ordered
+  edge ids, total distance, and the next node id when reachable.
+- No-path and origin-equals-target results must be distinguishable.
+- UI callers must not perform their own N-plus-1 graph traversal.
+- Do not add REST endpoints or change scan, action result, or jump server
+  behavior.
+- Tests must cover direct edge, indirect path, no path, cycle handling,
+  bidirectional edges, origin equals target, and shortest-path selection.
