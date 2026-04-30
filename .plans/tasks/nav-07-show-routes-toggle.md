@@ -1,10 +1,9 @@
 ---
-status: blocked
+status: active
 area: navigation
 priority: p2
 depends_on:
   - nav-06-persist-scan-discoveries
-blocked_by: nav-06 must make discovered edges available from datacore.
 ---
 
 # Add a "Show routes" toggle to the viewport
@@ -22,6 +21,12 @@ The context menu hints at the data (Jump enables once a route exists), and
 nav-03 will add per-star rings for jumpable targets, but neither surfaces
 the edges themselves. The player's mental model of the sector stays stuck
 inside the action history.
+
+The bridge route also still has a temporary route-rendering path that reads the
+latest ship action and turns `action.result.edges` and `action.result.nodes`
+into starfield routes. That path only renders the most recent scan result, does
+not survive unrelated actions or reloads, and keeps the map coupled to the
+transitional scan result payload.
 
 ## Proposed solution
 
@@ -42,7 +47,8 @@ family.
   on selection in this task.
 - Toggle state persists using the same mechanism as the existing viewport
   config values (`starSize`, `jumpRangeOnly`, `showLabels`).
+- The bridge route must remove the temporary latest-action route layer that
+  reads `action.result.edges` and `action.result.nodes`.
 
-Depends on nav-06. Until edges live in the datacore there is no stable
-source for this layer, and this task should read the datacore edge graph
-only — no fallback reads from `action.result` on the actions store.
+This task should read the datacore edge graph only. Do not fall back to
+`action.result` on the actions store.

@@ -5,18 +5,17 @@ Each entry points to the full task file in `.plans/tasks/`.
 
 ## Active
 
-No active task is recorded.
+- [nav-07-show-routes-toggle](tasks/nav-07-show-routes-toggle.md) - Add a "Show routes" toggle to the viewport. `navigation` `p2`
 
 ## Blocked
 
-- [nav-03-visual-jump-indicator](tasks/nav-03-visual-jump-indicator.md) - Visual Jump Indicator on Starfield. `navigation` `p2` Blocked by: nav-06 must provide a stable datacore route graph for jumpable targets.
-- [nav-04-visual-scan-indicator](tasks/nav-04-visual-scan-indicator.md) - Visual Scan Indicator on Starfield. `navigation` `p2` Blocked by: nav-03 and nav-06 must define the ring layer and route graph source first.
-- [nav-07-show-routes-toggle](tasks/nav-07-show-routes-toggle.md) - Add a "Show routes" toggle to the viewport. `navigation` `p2` Blocked by: nav-06 must make discovered edges available from datacore.
+- [nav-04-visual-scan-indicator](tasks/nav-04-visual-scan-indicator.md) - Visual Scan Indicator on Starfield. `navigation` `p2` Blocked by: nav-03 must define the shared ring layer and direct-jump precedence.
 - [test-02-research-stub-candidates](tasks/test-02-research-stub-candidates.md) - Research stub mocking for NavigationService and ActionProcessor tests. `testing` `p3` Blocked by: test-01 should land first so this research can evaluate the established stub pattern.
 
 ## Ready
 
 - [dev-01-time-scale-constant](tasks/dev-01-time-scale-constant.md) - Add a time-scale constant for manual testing. `dev` `p2`
+- [nav-03-visual-jump-indicator](tasks/nav-03-visual-jump-indicator.md) - Visual Jump Indicator on Starfield. `navigation` `p2`
 - [nav-11-enforce-waypoint-visibility](tasks/nav-11-enforce-waypoint-visibility.md) - Enforce waypoint visibility on the backend. `navigation` `p3`
 - [rest-01-add-response-schemas](tasks/rest-01-add-response-schemas.md) - Add response schemas to REST controllers. `rest` `p2`
 - [test-01-refactor-scan-resolver-test](tasks/test-01-refactor-scan-resolver-test.md) - Refactor scan resolver test to stub navigation service. `testing` `p2`
@@ -24,6 +23,8 @@ No active task is recorded.
 ## Draft
 
 - [nav-13-add-scan-result-reconciler](tasks/nav-13-add-scan-result-reconciler.md) - Add a scan result reconciler. `navigation` `p2`
+- [nav-14-route-aware-jump-draft](tasks/nav-14-route-aware-jump-draft.md) - Add route-aware jump drafts. `navigation` `p2`
+- [nav-15-clean-up-scan-results](tasks/nav-15-clean-up-scan-results.md) - Clean up scan results. `navigation` `p2`
 
 ## Done
 
