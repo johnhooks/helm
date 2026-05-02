@@ -1,16 +1,26 @@
 import type { StarNode } from '@helm/types';
 import type { Action, State } from './types';
 
-function toById( nodes: StarNode[] ): Record< number, StarNode > {
-	const byId: Record< number, StarNode > = {};
-	for ( const node of nodes ) {
-		byId[ node.node_id ] = node;
+function toById(nodes: StarNode[]): Record<number, StarNode> {
+	const byId: Record<number, StarNode> = {};
+	for (const node of nodes) {
+		byId[node.node_id] = node;
 	}
 	return byId;
 }
 
-export function reducer( state: State, action: Action ): State {
-	switch ( action.type ) {
+function toNodeById<Node extends { id: number }>(
+	nodes: Node[]
+): Record<number, Node> {
+	const byId: Record<number, Node> = {};
+	for (const node of nodes) {
+		byId[node.id] = node;
+	}
+	return byId;
+}
+
+export function reducer(state: State, action: Action): State {
+	switch (action.type) {
 		case 'SYNC_START':
 			return {
 				...state,
@@ -24,10 +34,15 @@ export function reducer( state: State, action: Action ): State {
 			return {
 				...state,
 				stars: {
-					byId: toById( action.nodes ),
+					byId: toById(action.nodes),
 					syncStatus: 'synced',
 					syncResult: action.syncResult,
 					error: null,
+				},
+				graph: {
+					...state.graph,
+					userEdges: null,
+					edgeNodes: {},
 				},
 			};
 		case 'EDGE_SYNC_FINISHED':
@@ -37,21 +52,35 @@ export function reducer( state: State, action: Action ): State {
 					...state.stars,
 					syncResult: state.stars.syncResult
 						? {
-							...state.stars.syncResult,
-							edges: action.edges,
-						}
+								...state.stars.syncResult,
+								edges: action.edges,
+						  }
 						: null,
 					error: null,
 				},
+				graph: {
+					...state.graph,
+					userEdges: null,
+					edgeNodes: {},
+				},
 			};
-		case 'DIRECT_EDGE_READ_FINISHED':
+		case 'USER_EDGE_GRAPH_SYNC_FINISHED':
 			return {
 				...state,
 				graph: {
 					...state.graph,
-					directEdges: {
-						...state.graph.directEdges,
-						[action.key]: action.hasDirectEdge,
+					userEdges: action.userEdges,
+					edgeNodes: toNodeById(action.edgeNodes),
+				},
+			};
+		case 'RECEIVE_ADJACENCY':
+			return {
+				...state,
+				graph: {
+					...state.graph,
+					adjacency: {
+						...state.graph.adjacency,
+						[action.key]: action.adjacent,
 					},
 				},
 			};
@@ -60,8 +89,8 @@ export function reducer( state: State, action: Action ): State {
 				...state,
 				graph: {
 					...state.graph,
-					knownPaths: {
-						...state.graph.knownPaths,
+					paths: {
+						...state.graph.paths,
 						[action.key]: action.path,
 					},
 				},
@@ -89,8 +118,10 @@ export function initializeDefaultState(): State {
 			error: null,
 		},
 		graph: {
-			directEdges: {},
-			knownPaths: {},
+			userEdges: null,
+			edgeNodes: {},
+			adjacency: {},
+			paths: {},
 		},
 	};
 }

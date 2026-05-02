@@ -8,11 +8,17 @@ import { USER_EDGES_SCHEMA, createUserEdgesRepository } from './user-edges';
 
 let database: Database;
 
-function createConnection(onQuery?: (sql: string, params?: SQLiteParam[]) => void): Connection {
+function createConnection(
+	onQuery?: (sql: string, params?: SQLiteParam[]) => void
+): Connection {
 	return {
 		query: async <Row>(sql: string, params?: SQLiteParam[]) => {
 			onQuery?.(sql, params);
-			const result = await query<Row & Record<string, SQLiteValue>>(database, sql, params);
+			const result = await query<Row & Record<string, SQLiteValue>>(
+				database,
+				sql,
+				params
+			);
 			return result.rows as Row[];
 		},
 		run: async (sql: string, params?: SQLiteParam[]) => {
@@ -25,11 +31,14 @@ function createConnection(onQuery?: (sql: string, params?: SQLiteParam[]) => voi
 	};
 }
 
-async function insertNode(id: number, type: 'system' | 'waypoint' = 'waypoint'): Promise<void> {
+async function insertNode(
+	id: number,
+	type: 'system' | 'waypoint' = 'waypoint'
+): Promise<void> {
 	await database.sqlite3.run(
 		database.db,
 		'INSERT INTO nodes (id, type, x, y, z, created_at) VALUES (?, ?, ?, ?, ?, ?)',
-		[id, type, id, 0, 0, null],
+		[id, type, id, 0, 0, null]
 	);
 }
 
@@ -41,11 +50,31 @@ beforeEach(async () => {
 		database.db,
 		'INSERT INTO nodes (id, type, x, y, z, created_at) VALUES (?, ?, ?, ?, ?, ?), (?, ?, ?, ?, ?, ?), (?, ?, ?, ?, ?, ?), (?, ?, ?, ?, ?, ?)',
 		[
-			1, 'system', 0, 0, 0, null,
-			2, 'system', 1, 0, 0, null,
-			3, 'system', 2, 0, 0, null,
-			4, 'waypoint', 3, 0, 0, null,
-		],
+			1,
+			'system',
+			0,
+			0,
+			0,
+			null,
+			2,
+			'system',
+			1,
+			0,
+			0,
+			null,
+			3,
+			'system',
+			2,
+			0,
+			0,
+			null,
+			4,
+			'waypoint',
+			3,
+			0,
+			0,
+			null,
+		]
 	);
 });
 
@@ -57,7 +86,7 @@ describe('createUserEdgesRepository', () => {
 	it('creates the schema with nodes present', async () => {
 		const result = await query<{ name: string }>(
 			database,
-			"SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'user_edges'",
+			"SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'user_edges'"
 		);
 		expect(result.rows).toEqual([{ name: 'user_edges' }]);
 	});
@@ -80,10 +109,14 @@ describe('createUserEdgesRepository', () => {
 			discovered_at: '2026-04-21T00:00:00+00:00',
 		});
 
-		const result = await query<{ count: number; distance: number; discovered_at: string }>(
+		const result = await query<{
+			count: number;
+			distance: number;
+			discovered_at: string;
+		}>(
 			database,
 			'SELECT COUNT(*) AS count, MAX(distance) AS distance, MAX(discovered_at) AS discovered_at FROM user_edges WHERE user_id = ? AND id = ?',
-			[7, 99],
+			[7, 99]
 		);
 
 		expect(result.rows[0]).toEqual({
@@ -112,10 +145,14 @@ describe('createUserEdgesRepository', () => {
 			discovered_at: '2026-04-21T00:00:00+00:00',
 		});
 
-		const result = await query<{ user_id: number; node_a_id: number; node_b_id: number }>(
+		const result = await query<{
+			user_id: number;
+			node_a_id: number;
+			node_b_id: number;
+		}>(
 			database,
 			'SELECT user_id, node_a_id, node_b_id FROM user_edges WHERE id = ? ORDER BY user_id ASC',
-			[99],
+			[99]
 		);
 
 		expect(result.rows).toEqual([
@@ -147,7 +184,7 @@ describe('createUserEdgesRepository', () => {
 
 		const result = await query<{ user_id: number; id: number }>(
 			database,
-			'SELECT user_id, id FROM user_edges ORDER BY user_id ASC, id ASC',
+			'SELECT user_id, id FROM user_edges ORDER BY user_id ASC, id ASC'
 		);
 
 		expect(result.rows).toEqual([{ user_id: 8, id: 100 }]);
@@ -199,6 +236,52 @@ describe('createUserEdgesRepository', () => {
 		]);
 		await expect(userA.hasUserEdgesAtNode(4)).resolves.toBe(false);
 		await expect(userB.hasUserEdgesAtNode(4)).resolves.toBe(true);
+	});
+
+	it('getUserEdges returns every edge for the current user in discovery order', async () => {
+		const userA = createUserEdgesRepository(createConnection(), 7);
+		const userB = createUserEdgesRepository(createConnection(), 8);
+
+		await userA.insertUserEdges([
+			{
+				id: 100,
+				node_a_id: 2,
+				node_b_id: 3,
+				distance: 2,
+				discovered_at: '2026-04-21T00:00:00+00:00',
+			},
+			{
+				id: 99,
+				node_a_id: 1,
+				node_b_id: 2,
+				distance: 1,
+				discovered_at: '2026-04-20T00:00:00+00:00',
+			},
+		]);
+		await userB.insertUserEdge({
+			id: 101,
+			node_a_id: 3,
+			node_b_id: 4,
+			distance: 3,
+			discovered_at: '2026-04-19T00:00:00+00:00',
+		});
+
+		await expect(userA.getUserEdges()).resolves.toEqual([
+			{
+				id: 99,
+				node_a_id: 1,
+				node_b_id: 2,
+				distance: 1,
+				discovered_at: '2026-04-20T00:00:00+00:00',
+			},
+			{
+				id: 100,
+				node_a_id: 2,
+				node_b_id: 3,
+				distance: 2,
+				discovered_at: '2026-04-21T00:00:00+00:00',
+			},
+		]);
 	});
 
 	it('getConnectedNodeIds de-duplicates and orders results', async () => {
@@ -469,11 +552,14 @@ describe('createUserEdgesRepository', () => {
 		const adjacencyQueries: number[] = [];
 		const repo = createUserEdgesRepository(
 			createConnection((sql, params) => {
-				if (sql.includes('FROM user_edges') && sql.includes('node_a_id = ? OR node_b_id = ?')) {
+				if (
+					sql.includes('FROM user_edges') &&
+					sql.includes('node_a_id = ? OR node_b_id = ?')
+				) {
 					adjacencyQueries.push(params?.[1] as number);
 				}
 			}),
-			7,
+			7
 		);
 
 		await repo.insertUserEdges([

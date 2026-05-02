@@ -14,10 +14,30 @@
 		}
 	},
 	"actions": [
-		{ "ship": "scanner", "type": "scan_route", "params": { "target_node_id": 2 } },
-		{ "ship": "scanner", "type": "scan_route", "params": { "target_node_id": 4 } },
-		{ "ship": "scanner", "type": "scan_route", "params": { "target_node_id": 10 } },
-		{ "ship": "scanner", "type": "scan_route", "params": { "target_node_id": 11 } },
-		{ "ship": "scanner", "type": "scan_route", "params": { "target_node_id": 12 } }
+		{
+			"ship": "scanner",
+			"type": "scan_route",
+			"params": { "target_node_id": 2 }
+		},
+		{
+			"ship": "scanner",
+			"type": "scan_route",
+			"params": { "target_node_id": 4 }
+		},
+		{
+			"ship": "scanner",
+			"type": "scan_route",
+			"params": { "target_node_id": 10 }
+		},
+		{
+			"ship": "scanner",
+			"type": "scan_route",
+			"params": { "target_node_id": 11 }
+		},
+		{
+			"ship": "scanner",
+			"type": "scan_route",
+			"params": { "target_node_id": 12 }
+		}
 	]
 }

@@ -5,7 +5,14 @@
  * sync, and queries behind its resolver. The bridge suspends until
  * the star map is ready, then renders.
  */
-import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from '@wordpress/element';
+import {
+	lazy,
+	Suspense,
+	useCallback,
+	useEffect,
+	useMemo,
+	useState,
+} from '@wordpress/element';
 import { useSelect, useSuspenseSelect } from '@wordpress/data';
 import { store as navStore } from '@helm/nav';
 import { log } from '@helm/logger';
@@ -17,6 +24,7 @@ import { ViewportConfig } from '../components/viewport-config';
 import { StarContextMenu } from '../components/star-context-menu';
 import { ShipSystemsCard } from '../components/ship-systems-card';
 import { ShipLog } from '@helm/shell';
+import { useBridgeViewportPreferences } from '../hooks/use-bridge-viewport-preferences';
 
 const StarField = lazy(() =>
 	import('@helm/astrometric').then((m) => ({ default: m.StarField }))
@@ -29,7 +37,10 @@ const STAR_SIZE_MULTIPLIER: Record<string, number> = {
 	lg: 1.5,
 };
 
-function distance3D(a: { x: number; y: number; z: number }, b: { x: number; y: number; z: number }): number {
+function distance3D(
+	a: { x: number; y: number; z: number },
+	b: { x: number; y: number; z: number }
+): number {
 	const dx = a.x - b.x;
 	const dy = a.y - b.y;
 	const dz = a.z - b.z;
@@ -43,17 +54,34 @@ export function BridgePage() {
 
 	const allStars = useSuspenseSelect(
 		(select) => select(navStore).getStarNodes(),
-		[],
+		[]
 	);
 
 	const [stars, setStars] = useState(allStars);
-	const [starSize, setStarSize] = useState('md');
-	const [jumpRangeOnly, setJumpRangeOnly] = useState(false);
-	const [showLabels, setShowLabels] = useState(false);
-	const [starSelectEvent, setStarSelectEvent] = useState<StarSelectEvent | null>(null);
+	const [starSelectEvent, setStarSelectEvent] =
+		useState<StarSelectEvent | null>(null);
 	const [drawerOpen, setDrawerOpen] = useState(true);
+	const {
+		preferences: viewportPreferences,
+		setStarSize,
+		setJumpRangeOnly,
+		setShowRoutes,
+		setShowLabels,
+	} = useBridgeViewportPreferences();
+	const { starSize, jumpRangeOnly, showRoutes, showLabels } =
+		viewportPreferences;
 
 	const selectedStar = starSelectEvent?.star ?? null;
+
+	const userEdges = useSuspenseSelect(
+		(select) => select(navStore).getUserEdges(),
+		[]
+	);
+
+	const edgeNodes = useSelect(
+		(select) => select(navStore).getEdgeNodes(),
+		[]
+	);
 
 	const handleStarSelect = useCallback((event: StarSelectEvent | null) => {
 		setStarSelectEvent(event);
@@ -71,7 +99,7 @@ export function BridgePage() {
 		if (!jumpRangeOnly) {
 			setShowLabels(false);
 		}
-	}, [jumpRangeOnly]);
+	}, [jumpRangeOnly, setShowLabels]);
 
 	// Filter stars to jump range client-side — all stars are already in memory.
 	useEffect(() => {
@@ -107,7 +135,7 @@ export function BridgePage() {
 
 	const currentStar = useMemo(
 		() => allStars.find((s) => s.node_id === currentNodeId) ?? null,
-		[allStars, currentNodeId],
+		[allStars, currentNodeId]
 	);
 
 	// Compute distance from current star to selected star.
@@ -118,59 +146,92 @@ export function BridgePage() {
 		return distance3D(currentStar, selectedStar);
 	}, [currentStar, selectedStar]);
 
-	// TODO(nav-06): replace with a datacore edge query. Today this reads
-	// edges and waypoints off whichever action was latest, which means only
-	// the most recent scan's discoveries render and nothing persists across
-	// the next action or a page reload.
 	const action = useSelect(
 		(select) => select(actionsStore).getLatestAction(),
-		[],
+		[]
 	);
 
-	const { actionRoutes, actionNodePositions } = useMemo(() => {
-		if (!action?.result) {
-			return { actionRoutes: [] as Route[], actionNodePositions: undefined };
+	const knownRoutes: Route[] = useMemo(() => {
+		if (!showRoutes) {
+			return [];
 		}
 
-		if (isScanRoute(action) && action.result.edges && action.result.nodes) {
-			const positions = new Map<number, Position3D>();
-			for (const node of action.result.nodes) {
-				positions.set(node.id, { x: node.x, y: node.y, z: node.z });
-			}
+		return (userEdges ?? []).map((edge) => ({
+			id: `user-edge-${edge.id}`,
+			from: edge.node_a_id,
+			to: edge.node_b_id,
+			status: 'discovered' as const,
+		}));
+	}, [showRoutes, userEdges]);
 
-			const routes: Route[] = action.result.edges.map((edge) => ({
-				id: `scan-${edge.id}`,
+	const actionRoutes: Route[] = useMemo(() => {
+		if (!showRoutes || !action?.result) {
+			return [];
+		}
+
+		if (isScanRoute(action) && action.result.edges) {
+			return action.result.edges.map((edge) => ({
+				id: `scan-${action.id}-${edge.id}`,
 				from: edge.node_a_id,
 				to: edge.node_b_id,
-				status: 'discovered' as const,
+				status: 'plotted' as const,
+				active: true,
 			}));
-
-			return { actionRoutes: routes, actionNodePositions: positions };
 		}
 
 		if (isJump(action)) {
-			const routes: Route[] = [
+			return [
 				{
 					id: `jump-${action.id}`,
 					from: action.result.from_node_id,
 					to: action.result.to_node_id,
-					status: 'discovered' as const,
+					status: 'traveled' as const,
+					active: true,
 				},
 			];
-			return { actionRoutes: routes, actionNodePositions: undefined };
 		}
 
-		return { actionRoutes: [] as Route[], actionNodePositions: undefined };
-	}, [action]);
+		return [];
+	}, [action, showRoutes]);
+
+	const routes: Route[] = useMemo(
+		() => [...knownRoutes, ...actionRoutes],
+		[actionRoutes, knownRoutes]
+	);
+
+	const routeNodePositions = useMemo(() => {
+		if (!showRoutes) {
+			return undefined;
+		}
+
+		const positions = new Map<number, Position3D>();
+		for (const star of allStars) {
+			positions.set(star.node_id, { x: star.x, y: star.y, z: star.z });
+		}
+		for (const node of edgeNodes) {
+			positions.set(node.id, { x: node.x, y: node.y, z: node.z });
+		}
+		if (action && isScanRoute(action) && action.result?.nodes) {
+			for (const node of action.result.nodes) {
+				positions.set(node.id, { x: node.x, y: node.y, z: node.z });
+			}
+		}
+		return positions;
+	}, [action, allStars, edgeNodes, showRoutes]);
 
 	const sizeMultiplier = STAR_SIZE_MULTIPLIER[starSize] ?? 1;
-	const viewportStyle = useMemo(() => ({ width: '100%', height: '100%' }), []);
+	const viewportStyle = useMemo(
+		() => ({ width: '100%', height: '100%' }),
+		[]
+	);
 
 	const handleDrawerToggle = useCallback(() => {
 		setDrawerOpen((v) => !v);
 	}, []);
 
-	const hasActiveAction = !! action && ( action.status === 'pending' || action.status === 'running' );
+	const hasActiveAction =
+		!!action &&
+		(action.status === 'pending' || action.status === 'running');
 
 	const handleContextMenuClose = useCallback(() => {
 		setStarSelectEvent(null);
@@ -182,20 +243,26 @@ export function BridgePage() {
 			onToggle={handleDrawerToggle}
 			className="helm-bridge"
 			viewport={
-				<Panel variant="inset" padding="none" className="helm-bridge__viewport">
+				<Panel
+					variant="inset"
+					padding="none"
+					className="helm-bridge__viewport"
+				>
 					<ViewportConfig
 						starSize={starSize}
 						onStarSizeChange={setStarSize}
 						jumpRangeOnly={jumpRangeOnly}
 						onJumpRangeOnlyChange={setJumpRangeOnly}
+						showRoutes={showRoutes}
+						onShowRoutesChange={setShowRoutes}
 						showLabels={showLabels}
 						onShowLabelsChange={setShowLabels}
 					/>
 					<Suspense fallback={null}>
 						<StarField
 							stars={stars}
-							routes={actionRoutes}
-							nodePositions={actionNodePositions}
+							routes={routes}
+							nodePositions={routeNodePositions}
 							currentNodeId={currentNodeId}
 							selectedStarId={selectedStar?.id ?? null}
 							onStarSelect={handleStarSelect}
@@ -205,11 +272,14 @@ export function BridgePage() {
 							selectedStarOverlay={
 								starSelectEvent ? (
 									<StarContextMenu
-										star={ starSelectEvent.star }
-										currentNodeId={ currentNodeId }
-										selectedDistance={ selectedDistance ?? starSelectEvent.distance }
-										hasActiveAction={ hasActiveAction }
-										onClose={ handleContextMenuClose }
+										star={starSelectEvent.star}
+										currentNodeId={currentNodeId}
+										selectedDistance={
+											selectedDistance ??
+											starSelectEvent.distance
+										}
+										hasActiveAction={hasActiveAction}
+										onClose={handleContextMenuClose}
 									/>
 								) : undefined
 							}

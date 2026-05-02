@@ -10,28 +10,34 @@ export interface EdgeFreshness {
 	lastDiscovered: string;
 }
 
+export interface FetchedEdgesByIdsResult {
+	edges: UserEdge[];
+	freshness: EdgeFreshness;
+}
+
 /**
  * Fetch freshness metadata for the authenticated user's discovered edges.
  *
  * @internal
  */
-export async function fetchEdgeFreshness(): Promise< EdgeFreshness > {
+export async function fetchEdgeFreshness(): Promise<EdgeFreshness> {
 	try {
-		const response = await apiFetch( {
+		const response = await apiFetch({
 			path: '/helm/v1/edges?per_page=1&page=1',
 			method: 'HEAD',
 			parse: false,
-		} );
+		});
 
 		return {
-			count: Number( response.headers.get( 'X-WP-Total' ) ?? 0 ),
-			lastDiscovered: response.headers.get( 'X-Helm-Edge-Last-Discovered' ) ?? '',
+			count: Number(response.headers.get('X-WP-Total') ?? 0),
+			lastDiscovered:
+				response.headers.get('X-Helm-Edge-Last-Discovered') ?? '',
 		};
-	} catch ( error ) {
+	} catch (error) {
 		throw HelmError.safe(
 			ErrorCode.CacheFetchFailed,
-			__( 'Failed to fetch edge freshness from the server.', 'helm' ),
-			error,
+			__('Failed to fetch edge freshness from the server.', 'helm'),
+			error
 		);
 	}
 }
@@ -44,30 +50,30 @@ export async function fetchEdgeFreshness(): Promise< EdgeFreshness > {
  *
  * @internal
  */
-export async function fetchAllEdges(): Promise< UserEdge[] > {
+export async function fetchAllEdges(): Promise<UserEdge[]> {
 	const allEdges: UserEdge[] = [];
 	let page = 1;
 	let totalPages = 1;
 
 	try {
 		do {
-			const response = await apiFetch( {
-				path: `/helm/v1/edges?per_page=${ PER_PAGE }&page=${ page }`,
+			const response = await apiFetch({
+				path: `/helm/v1/edges?per_page=${PER_PAGE}&page=${page}`,
 				parse: false as const,
-			} );
+			});
 
-			totalPages = Number( response.headers.get( 'X-WP-TotalPages' ) ) || 1;
+			totalPages = Number(response.headers.get('X-WP-TotalPages')) || 1;
 
 			const edges: UserEdge[] = await response.json();
-			allEdges.push( ...edges );
+			allEdges.push(...edges);
 
 			page++;
-		} while ( page <= totalPages );
-	} catch ( error ) {
+		} while (page <= totalPages);
+	} catch (error) {
 		throw HelmError.safe(
 			ErrorCode.CacheFetchFailed,
-			__( 'Failed to fetch edge data from the server.', 'helm' ),
-			error,
+			__('Failed to fetch edge data from the server.', 'helm'),
+			error
 		);
 	}
 
@@ -79,28 +85,47 @@ export async function fetchAllEdges(): Promise< UserEdge[] > {
  *
  * @internal
  */
-export async function fetchEdgesByIds( ids: number[] ): Promise< UserEdge[] > {
-	const uniqueIds = [ ...new Set( ids ) ];
-	if ( uniqueIds.length === 0 ) {
-		return [];
+export async function fetchEdgesByIds(
+	ids: number[]
+): Promise<FetchedEdgesByIdsResult> {
+	const uniqueIds = [...new Set(ids)];
+	if (uniqueIds.length === 0) {
+		return {
+			edges: [],
+			freshness: {
+				count: 0,
+				lastDiscovered: '',
+			},
+		};
 	}
 
 	try {
-		return await apiFetch< UserEdge[] >( {
-			path: `/helm/v1/edges?include=${ uniqueIds.join( ',' ) }`,
-		} );
-	} catch ( error ) {
+		const response = await apiFetch({
+			path: `/helm/v1/edges?include=${uniqueIds.join(',')}`,
+			parse: false as const,
+		});
+
+		return {
+			edges: (await response.json()) as UserEdge[],
+			freshness: {
+				count: Number(response.headers.get('X-WP-Total') ?? 0),
+				lastDiscovered:
+					response.headers.get('X-Helm-Edge-Last-Discovered') ?? '',
+			},
+		};
+	} catch (error) {
 		throw HelmError.safe(
 			ErrorCode.CacheFetchFailed,
-			__( 'Failed to fetch edge data from the server.', 'helm' ),
-			error,
+			__('Failed to fetch edge data from the server.', 'helm'),
+			error
 		);
 	}
 }
 
-export function getLastDiscoveredFromEdges( edges: UserEdge[] ): string {
+export function getLastDiscoveredFromEdges(edges: UserEdge[]): string {
 	return edges.reduce(
-		( latest, edge ) => edge.discovered_at > latest ? edge.discovered_at : latest,
-		'',
+		(latest, edge) =>
+			edge.discovered_at > latest ? edge.discovered_at : latest,
+		''
 	);
 }

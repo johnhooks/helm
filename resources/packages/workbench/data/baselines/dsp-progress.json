@@ -1,781 +1,781 @@
 {
-  "generated": "2026-03-03T04:30:25.730Z",
-  "summary": {
-    "pass": 39,
-    "warn": 5,
-    "fail": 0,
-    "info": 23,
-    "total": 67
-  },
-  "sections": [
-    {
-      "title": "Submarine Warfare — Can You Hide?",
-      "description": "The core promise: idle ships invisible, belt miners safe, loud actions obvious.",
-      "checks": [
-        {
-          "goal": "Idle ships are undetectable (even after 48hr DSC observation)",
-          "verdict": "PASS",
-          "detail": "Idle emission = 0. DSC 48hr confidence = 4.7%.",
-          "values": {
-            "idleEmission": 0,
-            "confidence48hr": 0.0474
-          }
-        },
-        {
-          "goal": "Belt miner is safe for ~6hr even vs DSC (masking=3.0)",
-          "verdict": "PASS",
-          "detail": "Belt miner (masking=3): 6hr=21.8%, 24hr=61%.",
-          "values": {
-            "conf6hr": 0.2182,
-            "conf24hr": 0.61
-          }
-        },
-        {
-          "goal": "Open-space miner detectable by DSC after ~6hr integration",
-          "verdict": "PASS",
-          "detail": "Open miner, DSC 6hr = 95%.",
-          "values": {
-            "confidence": 0.95
-          }
-        },
-        {
-          "goal": "PNP scan detectable within ~30 min (VRS passive)",
-          "verdict": "PASS",
-          "detail": "PNP emission=5, VRS: 1-sample=37.8%, 30min=95%. Cap=95%.",
-          "values": {
-            "conf1": 0.3775,
-            "conf30m": 0.95
-          }
-        },
-        {
-          "goal": "Shield regen barely detectable (even DSC, 12hr, open space)",
-          "verdict": "WARN",
-          "detail": "Shield regen emission=0.2, DSC 12hr = 25.9%.",
-          "values": {
-            "confidence": 0.2592
-          }
-        }
-      ]
-    },
-    {
-      "title": "Sensor Differentiation — Do They Feel Different?",
-      "description": "ACU = loud hunter, DSC = patient listener, VRS = generalist. Each should create a distinct playstyle.",
-      "checks": [
-        {
-          "goal": "DSC > VRS > ACU for passive detection of continuous signals",
-          "verdict": "PASS",
-          "detail": "2hr mining passive: DSC=72.7%, VRS=36.6%, ACU=12.2%.",
-          "values": {
-            "acu": 0.12225851797782741,
-            "vrs": 0.3657460335195043,
-            "dsc": 0.7271917106318523
-          }
-        },
-        {
-          "goal": "ACU is genuinely poor at passive detection (< 20% for miner at 6hr)",
-          "verdict": "WARN",
-          "detail": "ACU 6hr passive miner = 22.8%. ACU should need active scanning.",
-          "values": {
-            "acuPassive": 0.2283
-          }
-        },
-        {
-          "goal": "Matched filter specialization: ACU→pulse, DSC→continuous",
-          "verdict": "PASS",
-          "detail": "ACU pulse=1.5 cont=0.7. DSC pulse=0.7 cont=1.25.",
-          "values": {
-            "acuPulse": 1.5,
-            "acuCont": 0.7,
-            "dscPulse": 0.7,
-            "dscCont": 1.25
-          }
-        },
-        {
-          "goal": "VRS is generalist: moderate gains, never best or worst",
-          "verdict": "PASS",
-          "detail": "VRS pulse=1, continuous=1. Should be 1.0 (neutral).",
-          "values": {
-            "vrsPulse": 1,
-            "vrsCont": 1
-          }
-        }
-      ]
-    },
-    {
-      "title": "Drive Envelope Personalities",
-      "description": "Each drive class should have a distinctive EM signature. Military = brutal/fast, civilian = gentle/slow, industrial = hot/heavy.",
-      "checks": [
-        {
-          "goal": "Peak power ranking: military > industrial > civilian",
-          "verdict": "PASS",
-          "detail": "DR-705 (military): peak=2.5. DR-505 (industrial): peak=1.5. DR-305 (civilian): peak=1.2",
-          "values": {
-            "dr-705": 2.5,
-            "dr-505": 1.5,
-            "dr-305": 1.2
-          }
-        },
-        {
-          "goal": "Military spool at peak detectable within a few samples (DSC)",
-          "verdict": "PASS",
-          "detail": "DR-705 peak: power=10, DSC 1-sample=82.5%, 3-samples (15min)=95%.",
-          "values": {
-            "power": 10,
-            "conf1": 0.8249,
-            "conf3": 0.95
-          }
-        },
-        {
-          "goal": "Civilian drive still stealthy at 50% spool",
-          "verdict": "PASS",
-          "detail": "DR-305 at 50% spool (90s): power=1.6971, confidence=9.7%.",
-          "values": {
-            "power": 1.6971,
-            "confidence": 0.0973
-          }
-        },
-        {
-          "goal": "Military sustain is quieter than civilian (stealthy at cruise)",
-          "verdict": "PASS",
-          "detail": "DR-705 sustain=0.8, DR-305 sustain=1.",
-          "values": {
-            "military": 0.8,
-            "civilian": 1
-          }
-        },
-        {
-          "goal": "DR-305 (civilian): spool and cooldown durations are gameplay-meaningful",
-          "verdict": "PASS",
-          "detail": "Spool=180s (3min), cooldown=120s (2min). Should be 1-5 min for catchable detection windows.",
-          "values": {
-            "spool": 180,
-            "cooldown": 120
-          }
-        },
-        {
-          "goal": "DR-505 (industrial): spool and cooldown durations are gameplay-meaningful",
-          "verdict": "PASS",
-          "detail": "Spool=240s (4min), cooldown=180s (3min). Should be 1-5 min for catchable detection windows.",
-          "values": {
-            "spool": 240,
-            "cooldown": 180
-          }
-        },
-        {
-          "goal": "DR-705 (military): spool and cooldown durations are gameplay-meaningful",
-          "verdict": "PASS",
-          "detail": "Spool=120s (2min), cooldown=150s (2.5min). Should be 1-5 min for catchable detection windows.",
-          "values": {
-            "spool": 120,
-            "cooldown": 150
-          }
-        }
-      ]
-    },
-    {
-      "title": "Signature Analysis — What Can You Learn?",
-      "description": "Passive observation should reveal information: emission power estimation, activity classification, drive identification.",
-      "checks": [
-        {
-          "goal": "Round-trip: PNP scan (power=5)",
-          "verdict": "INFO",
-          "detail": "At passive cap (95%). Estimated=3.7715 (underestimates true power=5). Use active scan for precise readings.",
-          "values": {
-            "truePower": 5,
-            "confidence": 0.95,
-            "estimated": 3.7715,
-            "error": 1.2285,
-            "topMatch": "drive_spool",
-            "atCap": true
-          }
-        },
-        {
-          "goal": "Round-trip: Mining (power=1)",
-          "verdict": "INFO",
-          "detail": "At passive cap (95%). Estimated=0.8622 (underestimates true power=1). Use active scan for precise readings.",
-          "values": {
-            "truePower": 1,
-            "confidence": 0.95,
-            "estimated": 0.8622,
-            "error": 0.1378,
-            "topMatch": "planet_scan",
-            "atCap": true
-          }
-        },
-        {
-          "goal": "Round-trip: Belt miner (power=1)",
-          "verdict": "PASS",
-          "detail": "Confidence=56.2%, estimated=1, error=0, top_match=mining.",
-          "values": {
-            "truePower": 1,
-            "confidence": 0.5622,
-            "estimated": 1,
-            "error": 0,
-            "topMatch": "mining",
-            "atCap": false
-          }
-        },
-        {
-          "goal": "Round-trip: Drive spool (power=4)",
-          "verdict": "INFO",
-          "detail": "At passive cap (95%). Estimated=2.6668 (underestimates true power=4). Use active scan for precise readings.",
-          "values": {
-            "truePower": 4,
-            "confidence": 0.95,
-            "estimated": 2.6668,
-            "error": 1.3332,
-            "topMatch": "belt_scan",
-            "atCap": true
-          }
-        },
-        {
-          "goal": "All 3 drive classes identifiable by peak spool signature",
-          "verdict": "PASS",
-          "detail": "DR-305 (civilian): peak=4.8, conf=30.7%, identified=YES. DR-505 (industrial): peak=6, conf=43.3%, identified=YES. DR-705 (military): peak=10, conf=82.5%, identified=YES"
-        }
-      ]
-    },
-    {
-      "title": "Information Hierarchy — Escalating Detail at Escalating Cost",
-      "description": "From docs/dev/dsp.md: \"Integration refines classification over time.\" Patient observation → awareness → identification.",
-      "checks": [
-        {
-          "goal": "Progressive revelation: 30m → anomaly, 2hr → type, 4hr → cap (95%)",
-          "verdict": "PASS",
-          "detail": "Open miner vs DSC: 30m=26.7%, 2hr=72.7%, 6hr=95%, 12hr=95%. Passive cap=95%.",
-          "values": {
-            "conf30m": 0.267,
-            "conf2hr": 0.7272,
-            "conf6hr": 0.95,
-            "conf12hr": 0.95
-          }
-        },
-        {
-          "goal": "Classification improves with integration time",
-          "verdict": "PASS",
-          "detail": "2hr: top=mining (sep=0). 6hr: top=planet_scan (sep=0.0755). Wider separation = more confident classification.",
-          "values": {
-            "sep2hr": 0,
-            "sep6hr": 0.0755,
-            "top2hr": "mining",
-            "top6hr": "planet_scan"
-          }
-        },
-        {
-          "goal": "Information cost hierarchy: passive=0, survey=moderate, PNP=loud",
-          "verdict": "PASS",
-          "detail": "Passive emission=0. Survey emission=2. PNP emission=5. Each level reveals more but costs more signal.",
-          "values": {
-            "passive": 0,
-            "survey": 2,
-            "pnp": 5
-          }
-        }
-      ]
-    },
-    {
-      "title": "Information Tiers — What Do You Learn?",
-      "description": "Confidence maps to information quality: anomaly → class → type → analysis. Equipment and experience shift thresholds.",
-      "checks": [
-        {
-          "goal": "PNP scan progresses: anomaly immediately, analysis within 30min (VRS)",
-          "verdict": "PASS",
-          "detail": "PNP VRS: 1-sample=37.8% [anomaly], 30min=95% [analysis].",
-          "values": {
-            "conf1": 0.3775,
-            "tier1": "anomaly",
-            "conf30m": 0.95,
-            "tier30m": "analysis"
-          }
-        },
-        {
-          "goal": "Miner detection progresses through tiers over hours (DSC)",
-          "verdict": "PASS",
-          "detail": "1hr=45.4%[class], 2hr=72.7%[type], 4hr=93.3%[analysis], 6hr=95%[analysis], 8hr=95%[analysis], 12hr=95%[analysis]",
-          "values": {
-            "1hr": {
-              "conf": 0.4538,
-              "tier": "class"
-            },
-            "2hr": {
-              "conf": 0.7272,
-              "tier": "type"
-            },
-            "4hr": {
-              "conf": 0.9327,
-              "tier": "analysis"
-            },
-            "6hr": {
-              "conf": 0.95,
-              "tier": "analysis"
-            },
-            "8hr": {
-              "conf": 0.95,
-              "tier": "analysis"
-            },
-            "12hr": {
-              "conf": 0.95,
-              "tier": "analysis"
-            }
-          }
-        },
-        {
-          "goal": "Military drive spool at peak reaches type tier (DSC, 1 sample)",
-          "verdict": "PASS",
-          "detail": "DR-705 peak DSC 1-sample: confidence=82.5%, tier=type.",
-          "values": {
-            "confidence": 0.8249,
-            "tier": "type"
-          }
-        },
-        {
-          "goal": "Correlator module (bonus=0.05) shifts a marginal reading up one tier",
-          "verdict": "PASS",
-          "detail": "Confidence=62%: default=class, with correlator=type. Thresholds shifted by 0.05.",
-          "values": {
-            "confidence": 0.62,
-            "defaultTier": "class",
-            "boostedTier": "type"
-          }
-        }
-      ]
-    },
-    {
-      "title": "Envelope vs Sample Period — Scan Frequency Tradeoffs",
-      "description": "Spool durations are minutes. Passive samples every 1-10 minutes. Faster scanning catches more transients.",
-      "checks": [
-        {
-          "goal": "Spool-to-sample ratio: are spools catchable?",
-          "verdict": "INFO",
-          "detail": "Sample period=300s (5min). Spool durations: DR-305 (civilian)=180s (3min), DR-505 (industrial)=240s (4min), DR-705 (military)=120s (2min). Spool/sample ratio: 40%-80%.",
-          "values": {
-            "samplePeriodS": 300,
-            "spoolDurations": {
-              "dr-305": 180,
-              "dr-505": 240,
-              "dr-705": 120
-            }
-          }
-        },
-        {
-          "goal": "DR-305 (civilian): peak vs time-averaged detection",
-          "verdict": "INFO",
-          "detail": "Envelope avg power=1.8707, duty cycle=100.3%, diluted power=1.8769. Peak conf=30.7%, time-avg conf=10.5%.",
-          "values": {
-            "avgPower": 1.8707,
-            "dutyCycle": 1.0033,
-            "dilutedPower": 1.8769,
-            "peakConf": 0.3066,
-            "avgConf": 0.1047
-          }
-        },
-        {
-          "goal": "DR-505 (industrial): peak vs time-averaged detection",
-          "verdict": "INFO",
-          "detail": "Envelope avg power=2.5019, duty cycle=140.3%, diluted power=3.511. Peak conf=43.3%, time-avg conf=19.7%.",
-          "values": {
-            "avgPower": 2.5019,
-            "dutyCycle": 1.4033,
-            "dilutedPower": 3.511,
-            "peakConf": 0.4329,
-            "avgConf": 0.1974
-          }
-        },
-        {
-          "goal": "DR-705 (military): peak vs time-averaged detection",
-          "verdict": "INFO",
-          "detail": "Envelope avg power=5.447, duty cycle=90.3%, diluted power=4.9205. Peak conf=82.5%, time-avg conf=31.8%.",
-          "values": {
-            "avgPower": 5.447,
-            "dutyCycle": 0.9033,
-            "dilutedPower": 4.9205,
-            "peakConf": 0.8249,
-            "avgConf": 0.3184
-          }
-        },
-        {
-          "goal": "What sample period catches a military spool at peak?",
-          "verdict": "INFO",
-          "detail": "5s=82.5%, 10s=82.5%, 15s=82.5%, 30s=82.5%, 60s=82.5%, 300s=82.5%, 600s=82.5%, 1800s=82.5%",
-          "values": {
-            "5s": 0.8249,
-            "10s": 0.8249,
-            "15s": 0.8249,
-            "30s": 0.8249,
-            "60s": 0.8249,
-            "300s": 0.8249,
-            "600s": 0.8249,
-            "1800s": 0.8249
-          }
-        },
-        {
-          "goal": "Design question: how does the engine observe transient spool events?",
-          "verdict": "INFO",
-          "detail": "Spools are now 2-4 minutes. With 5-min default sampling, a military spool occupies 40% of a sample window. A 1-min scanner catches every spool. A 10-min scanner has a 20% chance. Scan frequency is now a meaningful tactical choice."
-        }
-      ]
-    },
-    {
-      "title": "Self-Interference — Cooldown Degrades Scanning",
-      "description": "From dsp.md: own-ship emissions add to the noise the sensor must filter. Military drives arrive hot.",
-      "checks": [
-        {
-          "goal": "DR-305 (civilian): cooldown self-interference on scanning",
-          "verdict": "INFO",
-          "detail": "Self-emission during cooldown degrades own sensor. DR-305 (civilian) cooldown peak=1.2000000000000002.",
-          "values": {
-            "0%": {
-              "selfPower": 1.5,
-              "cleanConf": 0.4538,
-              "dirtyConf": 0.2575,
-              "degradation": "43.3%"
-            },
-            "25%": {
-              "selfPower": 0.9533,
-              "cleanConf": 0.4538,
-              "dirtyConf": 0.3076,
-              "degradation": "32.2%"
-            },
-            "50%": {
-              "selfPower": 0.6892,
-              "cleanConf": 0.4538,
-              "dirtyConf": 0.339,
-              "degradation": "25.3%"
-            },
-            "75%": {
-              "selfPower": 0.3959,
-              "cleanConf": 0.4538,
-              "dirtyConf": 0.3813,
-              "degradation": "16%"
-            },
-            "100%": {
-              "selfPower": 0,
-              "cleanConf": 0.4538,
-              "dirtyConf": 0.4538,
-              "degradation": "0%"
-            }
-          }
-        },
-        {
-          "goal": "DR-505 (industrial): cooldown self-interference on scanning",
-          "verdict": "INFO",
-          "detail": "Self-emission during cooldown degrades own sensor. DR-505 (industrial) cooldown peak=1.5.",
-          "values": {
-            "0%": {
-              "selfPower": 1.8,
-              "cleanConf": 0.4538,
-              "dirtyConf": 0.2364,
-              "degradation": "47.9%"
-            },
-            "25%": {
-              "selfPower": 1.0621,
-              "cleanConf": 0.4538,
-              "dirtyConf": 0.2962,
-              "degradation": "34.7%"
-            },
-            "50%": {
-              "selfPower": 0.6529,
-              "cleanConf": 0.4538,
-              "dirtyConf": 0.3438,
-              "degradation": "24.2%"
-            },
-            "75%": {
-              "selfPower": 0.2842,
-              "cleanConf": 0.4538,
-              "dirtyConf": 0.3997,
-              "degradation": "11.9%"
-            },
-            "100%": {
-              "selfPower": 0,
-              "cleanConf": 0.4538,
-              "dirtyConf": 0.4538,
-              "degradation": "0%"
-            }
-          }
-        },
-        {
-          "goal": "DR-705 (military): cooldown self-interference on scanning",
-          "verdict": "INFO",
-          "detail": "Self-emission during cooldown degrades own sensor. DR-705 (military) cooldown peak=2.7.",
-          "values": {
-            "0%": {
-              "selfPower": 1.2,
-              "cleanConf": 0.4538,
-              "dirtyConf": 0.2828,
-              "degradation": "37.7%"
-            },
-            "25%": {
-              "selfPower": 2.272,
-              "cleanConf": 0.4538,
-              "dirtyConf": 0.2098,
-              "degradation": "53.8%"
-            },
-            "50%": {
-              "selfPower": 1.7813,
-              "cleanConf": 0.4538,
-              "dirtyConf": 0.2376,
-              "degradation": "47.6%"
-            },
-            "75%": {
-              "selfPower": 1.1752,
-              "cleanConf": 0.4538,
-              "dirtyConf": 0.2851,
-              "degradation": "37.2%"
-            },
-            "100%": {
-              "selfPower": 0,
-              "cleanConf": 0.4538,
-              "dirtyConf": 0.4538,
-              "degradation": "0%"
-            }
-          }
-        },
-        {
-          "goal": "Military cooldown meaningfully degrades scanning (wait vs scan now)",
-          "verdict": "PASS",
-          "detail": "DSC detecting miner 2hr: clean=72.7%, during DR-705 cooldown peak=31%. Self-emission=2.7.",
-          "values": {
-            "clean": 0.7272,
-            "hot": 0.3098,
-            "selfEmission": 2.7
-          }
-        },
-        {
-          "goal": "Civilian cooldown has less scan impact than military",
-          "verdict": "PASS",
-          "detail": "DSC detecting miner 2hr: clean=72.7%, DR-305 cooldown=48.2%, DR-705 cooldown=31%. Civilian degrades less than military.",
-          "values": {
-            "clean": 0.7272,
-            "civHot": 0.4817,
-            "milHot": 0.3098
-          }
-        }
-      ]
-    },
-    {
-      "title": "Gameplay Scenarios — Does the Timing Work?",
-      "description": "Real gameplay situations stress-tested against the timestamp model. Wolves, miners, wolf packs, busy systems.",
-      "checks": [
-        {
-          "goal": "Miner detects wolf PNP scan (builds confidence over samples)",
-          "verdict": "PASS",
-          "detail": "Wolf PNP (power=5). VRS: 1 sample=37.8%, 3 samples (15min)=79.1%, 6 samples (30min)=95%. Awareness builds, not instant.",
-          "values": {
-            "pnpPower": 5,
-            "conf1": 0.3775,
-            "conf3": 0.7909,
-            "conf6": 0.95,
-            "sampleMinutes": 5
-          }
-        },
-        {
-          "goal": "Wolf pack PNP raises noise floor, partially masking other signals",
-          "verdict": "PASS",
-          "detail": "DSC finding miner (6hr): clean=95%, 1 wolf PNP=44%, 3 wolf PNP=25.3%. Wolf pack noise helps hide the miner.",
-          "values": {
-            "clean": 0.95,
-            "wolf1": 0.4397,
-            "wolf3": 0.2528
-          }
-        },
-        {
-          "goal": "Wolf pack is LOUDER than solo wolf (RMS scaling)",
-          "verdict": "PASS",
-          "detail": "3-wolf PNP signal (RMS)=8.6603 vs solo=5. 1 sample=79.1%, 15min=95%. Pack can't sneak for long.",
-          "values": {
-            "soloPower": 5,
-            "packPower": 8.6603,
-            "conf1": 0.7909,
-            "conf15m": 0.95
-          }
-        },
-        {
-          "goal": "DR-305 (civilian): spool warning window for flee decision",
-          "verdict": "PASS",
-          "detail": "Spool lasts 180s (3min). Sample period=300s (5min). Catch probability: 60%.",
-          "values": {
-            "warningWindowS": 180,
-            "samplePeriodS": 300,
-            "catchProbability": 0.6
-          }
-        },
-        {
-          "goal": "DR-505 (industrial): spool warning window for flee decision",
-          "verdict": "PASS",
-          "detail": "Spool lasts 240s (4min). Sample period=300s (5min). Catch probability: 80%.",
-          "values": {
-            "warningWindowS": 240,
-            "samplePeriodS": 300,
-            "catchProbability": 0.8
-          }
-        },
-        {
-          "goal": "DR-705 (military): spool warning window for flee decision",
-          "verdict": "WARN",
-          "detail": "Spool lasts 120s (2min). Sample period=300s (5min). Catch probability: 40%.",
-          "values": {
-            "warningWindowS": 120,
-            "samplePeriodS": 300,
-            "catchProbability": 0.4
-          }
-        },
-        {
-          "goal": "Busy system (10 miners + 2 wolves + ECM): detection is degraded but works",
-          "verdict": "WARN",
-          "detail": "Noise floor=6.8238 (baseline=1). Miner detection (DSC 6hr): 12%. Wolf PNP (VRS 1 sample): 6%, 30min: 8.5%.",
-          "values": {
-            "noiseFloor": 6.8238,
-            "minerConf": 0.1203,
-            "wolfConf1": 0.0605,
-            "wolfConf30m": 0.0853
-          }
-        },
-        {
-          "goal": "Two ships, independent envelope phases — noise floor computed at shared timestamp",
-          "verdict": "INFO",
-          "detail": "DR-705 at 5s (spool): emission=2.0412. DR-305 at 40s (spool): emission=0.5028. Combined noise floor=1.6307.",
-          "values": {
-            "shipA": {
-              "elapsed": 5,
-              "phase": "spool",
-              "emission": 2.0412
-            },
-            "shipB": {
-              "elapsed": 40,
-              "phase": "spool",
-              "emission": 0.5028
-            },
-            "combinedNoise": 1.6307
-          }
-        }
-      ]
-    },
-    {
-      "title": "Implementation Coverage — Formula Layer vs Design Docs",
-      "description": "What's built, what's designed but not yet implemented.",
-      "checks": [
-        {
-          "goal": "emission.ts — Source signal power",
-          "verdict": "PASS",
-          "detail": "Implemented and tested."
-        },
-        {
-          "goal": "noise.ts — Noise floor (stellar + ships + belt + ECM + shipNoiseFactor)",
-          "verdict": "PASS",
-          "detail": "Implemented and tested."
-        },
-        {
-          "goal": "snr.ts — SNR, masked SNR, integration gain",
-          "verdict": "PASS",
-          "detail": "Implemented and tested."
-        },
-        {
-          "goal": "detection.ts — Detection sigmoid, cumulative detection, matched filter",
-          "verdict": "PASS",
-          "detail": "Implemented and tested."
-        },
-        {
-          "goal": "passive.ts — Full passive pipeline, multi-source report",
-          "verdict": "PASS",
-          "detail": "Implemented and tested."
-        },
-        {
-          "goal": "envelope.ts — Drive ADSR envelope (spool/sustain/cooldown)",
-          "verdict": "PASS",
-          "detail": "Implemented and tested."
-        },
-        {
-          "goal": "signature.ts — Inverse sigmoid, power estimation, classification",
-          "verdict": "PASS",
-          "detail": "Implemented and tested."
-        },
-        {
-          "goal": "classification.ts — Information tiers, adjusted thresholds (equipment/experience)",
-          "verdict": "PASS",
-          "detail": "Implemented and tested."
-        },
-        {
-          "goal": "Active scan sweep model (envelopes.md)",
-          "verdict": "INFO",
-          "detail": "Sensor LFO sweep pattern, checkpoint-based detection with cumulative probability per sweep"
-        },
-        {
-          "goal": "Self-interference (dsp.md)",
-          "verdict": "INFO",
-          "detail": "Own-ship emissions degrade own sensor SNR (drive cooldown degrades scanning)"
-        },
-        {
-          "goal": "ECM/ECCM (scanning.md)",
-          "verdict": "INFO",
-          "detail": "Intentional noise injection and counter-measures"
-        },
-        {
-          "goal": "Signal processor addon (scanning.md)",
-          "verdict": "INFO",
-          "detail": "Correlator/amplifier/filter equipment modifying the signal chain"
-        },
-        {
-          "goal": "Filter tuning (dsp.md)",
-          "verdict": "INFO",
-          "detail": "Bandwidth, noise rejection, spectral focus as tunable parameters"
-        },
-        {
-          "goal": "Component drift (envelopes.md)",
-          "verdict": "INFO",
-          "detail": "Usage-based template sharpening (veteran sensors detect familiar signals better)"
-        },
-        {
-          "goal": "Chirp pattern fingerprinting (dsp.md)",
-          "verdict": "INFO",
-          "detail": "Drive frequency sweep rate as a unique identifier per drive model"
-        },
-        {
-          "goal": "Distance/range within system (scanning.md)",
-          "verdict": "INFO",
-          "detail": "Optional: spatial attenuation within a system abstraction"
-        },
-        {
-          "goal": "Information decay (scanning.md)",
-          "verdict": "INFO",
-          "detail": "Stale contacts lose confidence over time"
-        }
-      ]
-    },
-    {
-      "title": "Tuning Health — Are the Numbers Right?",
-      "description": "Validates that the constants produce reasonable gameplay characteristics.",
-      "checks": [
-        {
-          "goal": "Emission ranking: weapons > PNP > drive_spool (loudest = most aggressive actions)",
-          "verdict": "WARN",
-          "detail": "Top 3: pvp_scan=8, weapons_fire=6, pnp_scan=5. Bottom: planet_scan=0.8, shield_regen=0.2, idle=0."
-        },
-        {
-          "goal": "Integration gain shows diminishing returns (√N scaling)",
-          "verdict": "INFO",
-          "detail": "Raw SNR=1. Integrated: 1hr=3.4641, 2hr=4.899, 4hr=6.9282, 8hr=9.798, 12hr=12, 24hr=16.9706, 48hr=24.",
-          "values": {
-            "1hr": 3.4641,
-            "2hr": 4.899,
-            "4hr": 6.9282,
-            "8hr": 9.798,
-            "12hr": 12,
-            "24hr": 16.9706,
-            "48hr": 24
-          }
-        },
-        {
-          "goal": "Sigmoid transition zone is gradual (no brick walls)",
-          "verdict": "PASS",
-          "detail": "10%=1.6056, 50%=6, 90%=10.3944, width=8.7889. Steepness=0.5. Target: 4-12 width (very gradual).",
-          "values": {
-            "snr10": 1.6056,
-            "snr50": 6,
-            "snr90": 10.3944,
-            "width": 8.7889
-          }
-        }
-      ]
-    }
-  ]
+	"generated": "2026-03-03T04:30:25.730Z",
+	"summary": {
+		"pass": 39,
+		"warn": 5,
+		"fail": 0,
+		"info": 23,
+		"total": 67
+	},
+	"sections": [
+		{
+			"title": "Submarine Warfare — Can You Hide?",
+			"description": "The core promise: idle ships invisible, belt miners safe, loud actions obvious.",
+			"checks": [
+				{
+					"goal": "Idle ships are undetectable (even after 48hr DSC observation)",
+					"verdict": "PASS",
+					"detail": "Idle emission = 0. DSC 48hr confidence = 4.7%.",
+					"values": {
+						"idleEmission": 0,
+						"confidence48hr": 0.0474
+					}
+				},
+				{
+					"goal": "Belt miner is safe for ~6hr even vs DSC (masking=3.0)",
+					"verdict": "PASS",
+					"detail": "Belt miner (masking=3): 6hr=21.8%, 24hr=61%.",
+					"values": {
+						"conf6hr": 0.2182,
+						"conf24hr": 0.61
+					}
+				},
+				{
+					"goal": "Open-space miner detectable by DSC after ~6hr integration",
+					"verdict": "PASS",
+					"detail": "Open miner, DSC 6hr = 95%.",
+					"values": {
+						"confidence": 0.95
+					}
+				},
+				{
+					"goal": "PNP scan detectable within ~30 min (VRS passive)",
+					"verdict": "PASS",
+					"detail": "PNP emission=5, VRS: 1-sample=37.8%, 30min=95%. Cap=95%.",
+					"values": {
+						"conf1": 0.3775,
+						"conf30m": 0.95
+					}
+				},
+				{
+					"goal": "Shield regen barely detectable (even DSC, 12hr, open space)",
+					"verdict": "WARN",
+					"detail": "Shield regen emission=0.2, DSC 12hr = 25.9%.",
+					"values": {
+						"confidence": 0.2592
+					}
+				}
+			]
+		},
+		{
+			"title": "Sensor Differentiation — Do They Feel Different?",
+			"description": "ACU = loud hunter, DSC = patient listener, VRS = generalist. Each should create a distinct playstyle.",
+			"checks": [
+				{
+					"goal": "DSC > VRS > ACU for passive detection of continuous signals",
+					"verdict": "PASS",
+					"detail": "2hr mining passive: DSC=72.7%, VRS=36.6%, ACU=12.2%.",
+					"values": {
+						"acu": 0.12225851797782741,
+						"vrs": 0.3657460335195043,
+						"dsc": 0.7271917106318523
+					}
+				},
+				{
+					"goal": "ACU is genuinely poor at passive detection (< 20% for miner at 6hr)",
+					"verdict": "WARN",
+					"detail": "ACU 6hr passive miner = 22.8%. ACU should need active scanning.",
+					"values": {
+						"acuPassive": 0.2283
+					}
+				},
+				{
+					"goal": "Matched filter specialization: ACU→pulse, DSC→continuous",
+					"verdict": "PASS",
+					"detail": "ACU pulse=1.5 cont=0.7. DSC pulse=0.7 cont=1.25.",
+					"values": {
+						"acuPulse": 1.5,
+						"acuCont": 0.7,
+						"dscPulse": 0.7,
+						"dscCont": 1.25
+					}
+				},
+				{
+					"goal": "VRS is generalist: moderate gains, never best or worst",
+					"verdict": "PASS",
+					"detail": "VRS pulse=1, continuous=1. Should be 1.0 (neutral).",
+					"values": {
+						"vrsPulse": 1,
+						"vrsCont": 1
+					}
+				}
+			]
+		},
+		{
+			"title": "Drive Envelope Personalities",
+			"description": "Each drive class should have a distinctive EM signature. Military = brutal/fast, civilian = gentle/slow, industrial = hot/heavy.",
+			"checks": [
+				{
+					"goal": "Peak power ranking: military > industrial > civilian",
+					"verdict": "PASS",
+					"detail": "DR-705 (military): peak=2.5. DR-505 (industrial): peak=1.5. DR-305 (civilian): peak=1.2",
+					"values": {
+						"dr-705": 2.5,
+						"dr-505": 1.5,
+						"dr-305": 1.2
+					}
+				},
+				{
+					"goal": "Military spool at peak detectable within a few samples (DSC)",
+					"verdict": "PASS",
+					"detail": "DR-705 peak: power=10, DSC 1-sample=82.5%, 3-samples (15min)=95%.",
+					"values": {
+						"power": 10,
+						"conf1": 0.8249,
+						"conf3": 0.95
+					}
+				},
+				{
+					"goal": "Civilian drive still stealthy at 50% spool",
+					"verdict": "PASS",
+					"detail": "DR-305 at 50% spool (90s): power=1.6971, confidence=9.7%.",
+					"values": {
+						"power": 1.6971,
+						"confidence": 0.0973
+					}
+				},
+				{
+					"goal": "Military sustain is quieter than civilian (stealthy at cruise)",
+					"verdict": "PASS",
+					"detail": "DR-705 sustain=0.8, DR-305 sustain=1.",
+					"values": {
+						"military": 0.8,
+						"civilian": 1
+					}
+				},
+				{
+					"goal": "DR-305 (civilian): spool and cooldown durations are gameplay-meaningful",
+					"verdict": "PASS",
+					"detail": "Spool=180s (3min), cooldown=120s (2min). Should be 1-5 min for catchable detection windows.",
+					"values": {
+						"spool": 180,
+						"cooldown": 120
+					}
+				},
+				{
+					"goal": "DR-505 (industrial): spool and cooldown durations are gameplay-meaningful",
+					"verdict": "PASS",
+					"detail": "Spool=240s (4min), cooldown=180s (3min). Should be 1-5 min for catchable detection windows.",
+					"values": {
+						"spool": 240,
+						"cooldown": 180
+					}
+				},
+				{
+					"goal": "DR-705 (military): spool and cooldown durations are gameplay-meaningful",
+					"verdict": "PASS",
+					"detail": "Spool=120s (2min), cooldown=150s (2.5min). Should be 1-5 min for catchable detection windows.",
+					"values": {
+						"spool": 120,
+						"cooldown": 150
+					}
+				}
+			]
+		},
+		{
+			"title": "Signature Analysis — What Can You Learn?",
+			"description": "Passive observation should reveal information: emission power estimation, activity classification, drive identification.",
+			"checks": [
+				{
+					"goal": "Round-trip: PNP scan (power=5)",
+					"verdict": "INFO",
+					"detail": "At passive cap (95%). Estimated=3.7715 (underestimates true power=5). Use active scan for precise readings.",
+					"values": {
+						"truePower": 5,
+						"confidence": 0.95,
+						"estimated": 3.7715,
+						"error": 1.2285,
+						"topMatch": "drive_spool",
+						"atCap": true
+					}
+				},
+				{
+					"goal": "Round-trip: Mining (power=1)",
+					"verdict": "INFO",
+					"detail": "At passive cap (95%). Estimated=0.8622 (underestimates true power=1). Use active scan for precise readings.",
+					"values": {
+						"truePower": 1,
+						"confidence": 0.95,
+						"estimated": 0.8622,
+						"error": 0.1378,
+						"topMatch": "planet_scan",
+						"atCap": true
+					}
+				},
+				{
+					"goal": "Round-trip: Belt miner (power=1)",
+					"verdict": "PASS",
+					"detail": "Confidence=56.2%, estimated=1, error=0, top_match=mining.",
+					"values": {
+						"truePower": 1,
+						"confidence": 0.5622,
+						"estimated": 1,
+						"error": 0,
+						"topMatch": "mining",
+						"atCap": false
+					}
+				},
+				{
+					"goal": "Round-trip: Drive spool (power=4)",
+					"verdict": "INFO",
+					"detail": "At passive cap (95%). Estimated=2.6668 (underestimates true power=4). Use active scan for precise readings.",
+					"values": {
+						"truePower": 4,
+						"confidence": 0.95,
+						"estimated": 2.6668,
+						"error": 1.3332,
+						"topMatch": "belt_scan",
+						"atCap": true
+					}
+				},
+				{
+					"goal": "All 3 drive classes identifiable by peak spool signature",
+					"verdict": "PASS",
+					"detail": "DR-305 (civilian): peak=4.8, conf=30.7%, identified=YES. DR-505 (industrial): peak=6, conf=43.3%, identified=YES. DR-705 (military): peak=10, conf=82.5%, identified=YES"
+				}
+			]
+		},
+		{
+			"title": "Information Hierarchy — Escalating Detail at Escalating Cost",
+			"description": "From docs/dev/dsp.md: \"Integration refines classification over time.\" Patient observation → awareness → identification.",
+			"checks": [
+				{
+					"goal": "Progressive revelation: 30m → anomaly, 2hr → type, 4hr → cap (95%)",
+					"verdict": "PASS",
+					"detail": "Open miner vs DSC: 30m=26.7%, 2hr=72.7%, 6hr=95%, 12hr=95%. Passive cap=95%.",
+					"values": {
+						"conf30m": 0.267,
+						"conf2hr": 0.7272,
+						"conf6hr": 0.95,
+						"conf12hr": 0.95
+					}
+				},
+				{
+					"goal": "Classification improves with integration time",
+					"verdict": "PASS",
+					"detail": "2hr: top=mining (sep=0). 6hr: top=planet_scan (sep=0.0755). Wider separation = more confident classification.",
+					"values": {
+						"sep2hr": 0,
+						"sep6hr": 0.0755,
+						"top2hr": "mining",
+						"top6hr": "planet_scan"
+					}
+				},
+				{
+					"goal": "Information cost hierarchy: passive=0, survey=moderate, PNP=loud",
+					"verdict": "PASS",
+					"detail": "Passive emission=0. Survey emission=2. PNP emission=5. Each level reveals more but costs more signal.",
+					"values": {
+						"passive": 0,
+						"survey": 2,
+						"pnp": 5
+					}
+				}
+			]
+		},
+		{
+			"title": "Information Tiers — What Do You Learn?",
+			"description": "Confidence maps to information quality: anomaly → class → type → analysis. Equipment and experience shift thresholds.",
+			"checks": [
+				{
+					"goal": "PNP scan progresses: anomaly immediately, analysis within 30min (VRS)",
+					"verdict": "PASS",
+					"detail": "PNP VRS: 1-sample=37.8% [anomaly], 30min=95% [analysis].",
+					"values": {
+						"conf1": 0.3775,
+						"tier1": "anomaly",
+						"conf30m": 0.95,
+						"tier30m": "analysis"
+					}
+				},
+				{
+					"goal": "Miner detection progresses through tiers over hours (DSC)",
+					"verdict": "PASS",
+					"detail": "1hr=45.4%[class], 2hr=72.7%[type], 4hr=93.3%[analysis], 6hr=95%[analysis], 8hr=95%[analysis], 12hr=95%[analysis]",
+					"values": {
+						"1hr": {
+							"conf": 0.4538,
+							"tier": "class"
+						},
+						"2hr": {
+							"conf": 0.7272,
+							"tier": "type"
+						},
+						"4hr": {
+							"conf": 0.9327,
+							"tier": "analysis"
+						},
+						"6hr": {
+							"conf": 0.95,
+							"tier": "analysis"
+						},
+						"8hr": {
+							"conf": 0.95,
+							"tier": "analysis"
+						},
+						"12hr": {
+							"conf": 0.95,
+							"tier": "analysis"
+						}
+					}
+				},
+				{
+					"goal": "Military drive spool at peak reaches type tier (DSC, 1 sample)",
+					"verdict": "PASS",
+					"detail": "DR-705 peak DSC 1-sample: confidence=82.5%, tier=type.",
+					"values": {
+						"confidence": 0.8249,
+						"tier": "type"
+					}
+				},
+				{
+					"goal": "Correlator module (bonus=0.05) shifts a marginal reading up one tier",
+					"verdict": "PASS",
+					"detail": "Confidence=62%: default=class, with correlator=type. Thresholds shifted by 0.05.",
+					"values": {
+						"confidence": 0.62,
+						"defaultTier": "class",
+						"boostedTier": "type"
+					}
+				}
+			]
+		},
+		{
+			"title": "Envelope vs Sample Period — Scan Frequency Tradeoffs",
+			"description": "Spool durations are minutes. Passive samples every 1-10 minutes. Faster scanning catches more transients.",
+			"checks": [
+				{
+					"goal": "Spool-to-sample ratio: are spools catchable?",
+					"verdict": "INFO",
+					"detail": "Sample period=300s (5min). Spool durations: DR-305 (civilian)=180s (3min), DR-505 (industrial)=240s (4min), DR-705 (military)=120s (2min). Spool/sample ratio: 40%-80%.",
+					"values": {
+						"samplePeriodS": 300,
+						"spoolDurations": {
+							"dr-305": 180,
+							"dr-505": 240,
+							"dr-705": 120
+						}
+					}
+				},
+				{
+					"goal": "DR-305 (civilian): peak vs time-averaged detection",
+					"verdict": "INFO",
+					"detail": "Envelope avg power=1.8707, duty cycle=100.3%, diluted power=1.8769. Peak conf=30.7%, time-avg conf=10.5%.",
+					"values": {
+						"avgPower": 1.8707,
+						"dutyCycle": 1.0033,
+						"dilutedPower": 1.8769,
+						"peakConf": 0.3066,
+						"avgConf": 0.1047
+					}
+				},
+				{
+					"goal": "DR-505 (industrial): peak vs time-averaged detection",
+					"verdict": "INFO",
+					"detail": "Envelope avg power=2.5019, duty cycle=140.3%, diluted power=3.511. Peak conf=43.3%, time-avg conf=19.7%.",
+					"values": {
+						"avgPower": 2.5019,
+						"dutyCycle": 1.4033,
+						"dilutedPower": 3.511,
+						"peakConf": 0.4329,
+						"avgConf": 0.1974
+					}
+				},
+				{
+					"goal": "DR-705 (military): peak vs time-averaged detection",
+					"verdict": "INFO",
+					"detail": "Envelope avg power=5.447, duty cycle=90.3%, diluted power=4.9205. Peak conf=82.5%, time-avg conf=31.8%.",
+					"values": {
+						"avgPower": 5.447,
+						"dutyCycle": 0.9033,
+						"dilutedPower": 4.9205,
+						"peakConf": 0.8249,
+						"avgConf": 0.3184
+					}
+				},
+				{
+					"goal": "What sample period catches a military spool at peak?",
+					"verdict": "INFO",
+					"detail": "5s=82.5%, 10s=82.5%, 15s=82.5%, 30s=82.5%, 60s=82.5%, 300s=82.5%, 600s=82.5%, 1800s=82.5%",
+					"values": {
+						"5s": 0.8249,
+						"10s": 0.8249,
+						"15s": 0.8249,
+						"30s": 0.8249,
+						"60s": 0.8249,
+						"300s": 0.8249,
+						"600s": 0.8249,
+						"1800s": 0.8249
+					}
+				},
+				{
+					"goal": "Design question: how does the engine observe transient spool events?",
+					"verdict": "INFO",
+					"detail": "Spools are now 2-4 minutes. With 5-min default sampling, a military spool occupies 40% of a sample window. A 1-min scanner catches every spool. A 10-min scanner has a 20% chance. Scan frequency is now a meaningful tactical choice."
+				}
+			]
+		},
+		{
+			"title": "Self-Interference — Cooldown Degrades Scanning",
+			"description": "From dsp.md: own-ship emissions add to the noise the sensor must filter. Military drives arrive hot.",
+			"checks": [
+				{
+					"goal": "DR-305 (civilian): cooldown self-interference on scanning",
+					"verdict": "INFO",
+					"detail": "Self-emission during cooldown degrades own sensor. DR-305 (civilian) cooldown peak=1.2000000000000002.",
+					"values": {
+						"0%": {
+							"selfPower": 1.5,
+							"cleanConf": 0.4538,
+							"dirtyConf": 0.2575,
+							"degradation": "43.3%"
+						},
+						"25%": {
+							"selfPower": 0.9533,
+							"cleanConf": 0.4538,
+							"dirtyConf": 0.3076,
+							"degradation": "32.2%"
+						},
+						"50%": {
+							"selfPower": 0.6892,
+							"cleanConf": 0.4538,
+							"dirtyConf": 0.339,
+							"degradation": "25.3%"
+						},
+						"75%": {
+							"selfPower": 0.3959,
+							"cleanConf": 0.4538,
+							"dirtyConf": 0.3813,
+							"degradation": "16%"
+						},
+						"100%": {
+							"selfPower": 0,
+							"cleanConf": 0.4538,
+							"dirtyConf": 0.4538,
+							"degradation": "0%"
+						}
+					}
+				},
+				{
+					"goal": "DR-505 (industrial): cooldown self-interference on scanning",
+					"verdict": "INFO",
+					"detail": "Self-emission during cooldown degrades own sensor. DR-505 (industrial) cooldown peak=1.5.",
+					"values": {
+						"0%": {
+							"selfPower": 1.8,
+							"cleanConf": 0.4538,
+							"dirtyConf": 0.2364,
+							"degradation": "47.9%"
+						},
+						"25%": {
+							"selfPower": 1.0621,
+							"cleanConf": 0.4538,
+							"dirtyConf": 0.2962,
+							"degradation": "34.7%"
+						},
+						"50%": {
+							"selfPower": 0.6529,
+							"cleanConf": 0.4538,
+							"dirtyConf": 0.3438,
+							"degradation": "24.2%"
+						},
+						"75%": {
+							"selfPower": 0.2842,
+							"cleanConf": 0.4538,
+							"dirtyConf": 0.3997,
+							"degradation": "11.9%"
+						},
+						"100%": {
+							"selfPower": 0,
+							"cleanConf": 0.4538,
+							"dirtyConf": 0.4538,
+							"degradation": "0%"
+						}
+					}
+				},
+				{
+					"goal": "DR-705 (military): cooldown self-interference on scanning",
+					"verdict": "INFO",
+					"detail": "Self-emission during cooldown degrades own sensor. DR-705 (military) cooldown peak=2.7.",
+					"values": {
+						"0%": {
+							"selfPower": 1.2,
+							"cleanConf": 0.4538,
+							"dirtyConf": 0.2828,
+							"degradation": "37.7%"
+						},
+						"25%": {
+							"selfPower": 2.272,
+							"cleanConf": 0.4538,
+							"dirtyConf": 0.2098,
+							"degradation": "53.8%"
+						},
+						"50%": {
+							"selfPower": 1.7813,
+							"cleanConf": 0.4538,
+							"dirtyConf": 0.2376,
+							"degradation": "47.6%"
+						},
+						"75%": {
+							"selfPower": 1.1752,
+							"cleanConf": 0.4538,
+							"dirtyConf": 0.2851,
+							"degradation": "37.2%"
+						},
+						"100%": {
+							"selfPower": 0,
+							"cleanConf": 0.4538,
+							"dirtyConf": 0.4538,
+							"degradation": "0%"
+						}
+					}
+				},
+				{
+					"goal": "Military cooldown meaningfully degrades scanning (wait vs scan now)",
+					"verdict": "PASS",
+					"detail": "DSC detecting miner 2hr: clean=72.7%, during DR-705 cooldown peak=31%. Self-emission=2.7.",
+					"values": {
+						"clean": 0.7272,
+						"hot": 0.3098,
+						"selfEmission": 2.7
+					}
+				},
+				{
+					"goal": "Civilian cooldown has less scan impact than military",
+					"verdict": "PASS",
+					"detail": "DSC detecting miner 2hr: clean=72.7%, DR-305 cooldown=48.2%, DR-705 cooldown=31%. Civilian degrades less than military.",
+					"values": {
+						"clean": 0.7272,
+						"civHot": 0.4817,
+						"milHot": 0.3098
+					}
+				}
+			]
+		},
+		{
+			"title": "Gameplay Scenarios — Does the Timing Work?",
+			"description": "Real gameplay situations stress-tested against the timestamp model. Wolves, miners, wolf packs, busy systems.",
+			"checks": [
+				{
+					"goal": "Miner detects wolf PNP scan (builds confidence over samples)",
+					"verdict": "PASS",
+					"detail": "Wolf PNP (power=5). VRS: 1 sample=37.8%, 3 samples (15min)=79.1%, 6 samples (30min)=95%. Awareness builds, not instant.",
+					"values": {
+						"pnpPower": 5,
+						"conf1": 0.3775,
+						"conf3": 0.7909,
+						"conf6": 0.95,
+						"sampleMinutes": 5
+					}
+				},
+				{
+					"goal": "Wolf pack PNP raises noise floor, partially masking other signals",
+					"verdict": "PASS",
+					"detail": "DSC finding miner (6hr): clean=95%, 1 wolf PNP=44%, 3 wolf PNP=25.3%. Wolf pack noise helps hide the miner.",
+					"values": {
+						"clean": 0.95,
+						"wolf1": 0.4397,
+						"wolf3": 0.2528
+					}
+				},
+				{
+					"goal": "Wolf pack is LOUDER than solo wolf (RMS scaling)",
+					"verdict": "PASS",
+					"detail": "3-wolf PNP signal (RMS)=8.6603 vs solo=5. 1 sample=79.1%, 15min=95%. Pack can't sneak for long.",
+					"values": {
+						"soloPower": 5,
+						"packPower": 8.6603,
+						"conf1": 0.7909,
+						"conf15m": 0.95
+					}
+				},
+				{
+					"goal": "DR-305 (civilian): spool warning window for flee decision",
+					"verdict": "PASS",
+					"detail": "Spool lasts 180s (3min). Sample period=300s (5min). Catch probability: 60%.",
+					"values": {
+						"warningWindowS": 180,
+						"samplePeriodS": 300,
+						"catchProbability": 0.6
+					}
+				},
+				{
+					"goal": "DR-505 (industrial): spool warning window for flee decision",
+					"verdict": "PASS",
+					"detail": "Spool lasts 240s (4min). Sample period=300s (5min). Catch probability: 80%.",
+					"values": {
+						"warningWindowS": 240,
+						"samplePeriodS": 300,
+						"catchProbability": 0.8
+					}
+				},
+				{
+					"goal": "DR-705 (military): spool warning window for flee decision",
+					"verdict": "WARN",
+					"detail": "Spool lasts 120s (2min). Sample period=300s (5min). Catch probability: 40%.",
+					"values": {
+						"warningWindowS": 120,
+						"samplePeriodS": 300,
+						"catchProbability": 0.4
+					}
+				},
+				{
+					"goal": "Busy system (10 miners + 2 wolves + ECM): detection is degraded but works",
+					"verdict": "WARN",
+					"detail": "Noise floor=6.8238 (baseline=1). Miner detection (DSC 6hr): 12%. Wolf PNP (VRS 1 sample): 6%, 30min: 8.5%.",
+					"values": {
+						"noiseFloor": 6.8238,
+						"minerConf": 0.1203,
+						"wolfConf1": 0.0605,
+						"wolfConf30m": 0.0853
+					}
+				},
+				{
+					"goal": "Two ships, independent envelope phases — noise floor computed at shared timestamp",
+					"verdict": "INFO",
+					"detail": "DR-705 at 5s (spool): emission=2.0412. DR-305 at 40s (spool): emission=0.5028. Combined noise floor=1.6307.",
+					"values": {
+						"shipA": {
+							"elapsed": 5,
+							"phase": "spool",
+							"emission": 2.0412
+						},
+						"shipB": {
+							"elapsed": 40,
+							"phase": "spool",
+							"emission": 0.5028
+						},
+						"combinedNoise": 1.6307
+					}
+				}
+			]
+		},
+		{
+			"title": "Implementation Coverage — Formula Layer vs Design Docs",
+			"description": "What's built, what's designed but not yet implemented.",
+			"checks": [
+				{
+					"goal": "emission.ts — Source signal power",
+					"verdict": "PASS",
+					"detail": "Implemented and tested."
+				},
+				{
+					"goal": "noise.ts — Noise floor (stellar + ships + belt + ECM + shipNoiseFactor)",
+					"verdict": "PASS",
+					"detail": "Implemented and tested."
+				},
+				{
+					"goal": "snr.ts — SNR, masked SNR, integration gain",
+					"verdict": "PASS",
+					"detail": "Implemented and tested."
+				},
+				{
+					"goal": "detection.ts — Detection sigmoid, cumulative detection, matched filter",
+					"verdict": "PASS",
+					"detail": "Implemented and tested."
+				},
+				{
+					"goal": "passive.ts — Full passive pipeline, multi-source report",
+					"verdict": "PASS",
+					"detail": "Implemented and tested."
+				},
+				{
+					"goal": "envelope.ts — Drive ADSR envelope (spool/sustain/cooldown)",
+					"verdict": "PASS",
+					"detail": "Implemented and tested."
+				},
+				{
+					"goal": "signature.ts — Inverse sigmoid, power estimation, classification",
+					"verdict": "PASS",
+					"detail": "Implemented and tested."
+				},
+				{
+					"goal": "classification.ts — Information tiers, adjusted thresholds (equipment/experience)",
+					"verdict": "PASS",
+					"detail": "Implemented and tested."
+				},
+				{
+					"goal": "Active scan sweep model (envelopes.md)",
+					"verdict": "INFO",
+					"detail": "Sensor LFO sweep pattern, checkpoint-based detection with cumulative probability per sweep"
+				},
+				{
+					"goal": "Self-interference (dsp.md)",
+					"verdict": "INFO",
+					"detail": "Own-ship emissions degrade own sensor SNR (drive cooldown degrades scanning)"
+				},
+				{
+					"goal": "ECM/ECCM (scanning.md)",
+					"verdict": "INFO",
+					"detail": "Intentional noise injection and counter-measures"
+				},
+				{
+					"goal": "Signal processor addon (scanning.md)",
+					"verdict": "INFO",
+					"detail": "Correlator/amplifier/filter equipment modifying the signal chain"
+				},
+				{
+					"goal": "Filter tuning (dsp.md)",
+					"verdict": "INFO",
+					"detail": "Bandwidth, noise rejection, spectral focus as tunable parameters"
+				},
+				{
+					"goal": "Component drift (envelopes.md)",
+					"verdict": "INFO",
+					"detail": "Usage-based template sharpening (veteran sensors detect familiar signals better)"
+				},
+				{
+					"goal": "Chirp pattern fingerprinting (dsp.md)",
+					"verdict": "INFO",
+					"detail": "Drive frequency sweep rate as a unique identifier per drive model"
+				},
+				{
+					"goal": "Distance/range within system (scanning.md)",
+					"verdict": "INFO",
+					"detail": "Optional: spatial attenuation within a system abstraction"
+				},
+				{
+					"goal": "Information decay (scanning.md)",
+					"verdict": "INFO",
+					"detail": "Stale contacts lose confidence over time"
+				}
+			]
+		},
+		{
+			"title": "Tuning Health — Are the Numbers Right?",
+			"description": "Validates that the constants produce reasonable gameplay characteristics.",
+			"checks": [
+				{
+					"goal": "Emission ranking: weapons > PNP > drive_spool (loudest = most aggressive actions)",
+					"verdict": "WARN",
+					"detail": "Top 3: pvp_scan=8, weapons_fire=6, pnp_scan=5. Bottom: planet_scan=0.8, shield_regen=0.2, idle=0."
+				},
+				{
+					"goal": "Integration gain shows diminishing returns (√N scaling)",
+					"verdict": "INFO",
+					"detail": "Raw SNR=1. Integrated: 1hr=3.4641, 2hr=4.899, 4hr=6.9282, 8hr=9.798, 12hr=12, 24hr=16.9706, 48hr=24.",
+					"values": {
+						"1hr": 3.4641,
+						"2hr": 4.899,
+						"4hr": 6.9282,
+						"8hr": 9.798,
+						"12hr": 12,
+						"24hr": 16.9706,
+						"48hr": 24
+					}
+				},
+				{
+					"goal": "Sigmoid transition zone is gradual (no brick walls)",
+					"verdict": "PASS",
+					"detail": "10%=1.6056, 50%=6, 90%=10.3944, width=8.7889. Steepness=0.5. Target: 4-12 width (very gradual).",
+					"values": {
+						"snr10": 1.6056,
+						"snr50": 6,
+						"snr90": 10.3944,
+						"width": 8.7889
+					}
+				}
+			]
+		}
+	]
 }

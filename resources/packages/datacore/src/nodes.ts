@@ -23,6 +23,13 @@ FROM nodes
 WHERE id = ?
 `;
 
+const NODES_BY_IDS = `
+SELECT id, type, x, y, z, created_at
+FROM nodes
+WHERE id IN (__IDS__)
+ORDER BY id ASC
+`;
+
 export function createNodesRepository(conn: Connection) {
 	return {
 		async getNode(id: number): Promise<NavNode | null> {
@@ -30,11 +37,33 @@ export function createNodesRepository(conn: Connection) {
 			return rows[0] ?? null;
 		},
 
+		async getNodes(ids: number[]): Promise<NavNode[]> {
+			const uniqueIds = [...new Set(ids)];
+			if (uniqueIds.length === 0) {
+				return [];
+			}
+
+			const nodes: NavNode[] = [];
+			const chunkSize = 500;
+			for (let i = 0; i < uniqueIds.length; i += chunkSize) {
+				const chunk = uniqueIds.slice(i, i + chunkSize);
+				const placeholders = chunk.map(() => '?').join(', ');
+				nodes.push(
+					...(await conn.query<NavNode>(
+						NODES_BY_IDS.replace('__IDS__', placeholders),
+						chunk
+					))
+				);
+			}
+
+			return nodes;
+		},
+
 		async insertNode(node: NavNode): Promise<void> {
 			await conn.run(
 				`INSERT INTO nodes (id, type, x, y, z, created_at)
 				 VALUES (?, ?, ?, ?, ?, ?)`,
-				[node.id, node.type, node.x, node.y, node.z, node.created_at],
+				[node.id, node.type, node.x, node.y, node.z, node.created_at]
 			);
 		},
 
@@ -42,11 +71,20 @@ export function createNodesRepository(conn: Connection) {
 			const chunkSize = 166; // 6 columns × 166 = 996 params (SQLite limit: 999)
 			for (let i = 0; i < nodes.length; i += chunkSize) {
 				const chunk = nodes.slice(i, i + chunkSize);
-				const placeholders = chunk.map(() => '(?, ?, ?, ?, ?, ?)').join(', ');
-				const params = chunk.flatMap((n) => [n.id, n.type, n.x, n.y, n.z, n.created_at]);
+				const placeholders = chunk
+					.map(() => '(?, ?, ?, ?, ?, ?)')
+					.join(', ');
+				const params = chunk.flatMap((n) => [
+					n.id,
+					n.type,
+					n.x,
+					n.y,
+					n.z,
+					n.created_at,
+				]);
 				await conn.run(
 					`INSERT INTO nodes (id, type, x, y, z, created_at) VALUES ${placeholders}`,
-					params,
+					params
 				);
 			}
 		},

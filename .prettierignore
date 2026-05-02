@@ -1,7 +1,6 @@
-# Prettier only handles JSON and YAML — ESLint handles code formatting.
-*.ts
-*.tsx
-*.js
-*.jsx
-*.css
-*.scss
+node_modules
+vendor
+build
+artifacts
+release
+tmp

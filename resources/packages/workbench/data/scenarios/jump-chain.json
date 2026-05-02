@@ -14,15 +14,55 @@
 		}
 	},
 	"actions": [
-		{ "ship": "explorer", "type": "scan_route", "params": { "target_node_id": 2 } },
-		{ "ship": "explorer", "type": "jump", "params": { "target_node_id": 2 } },
-		{ "ship": "explorer", "type": "scan_route", "params": { "target_node_id": 3 } },
-		{ "ship": "explorer", "type": "jump", "params": { "target_node_id": 3 } },
-		{ "ship": "explorer", "type": "scan_route", "params": { "target_node_id": 4 } },
-		{ "ship": "explorer", "type": "jump", "params": { "target_node_id": 4 } },
-		{ "ship": "explorer", "type": "scan_route", "params": { "target_node_id": 9 } },
-		{ "ship": "explorer", "type": "jump", "params": { "target_node_id": 9 } },
-		{ "ship": "explorer", "type": "scan_route", "params": { "target_node_id": 26 } },
-		{ "ship": "explorer", "type": "jump", "params": { "target_node_id": 26 } }
+		{
+			"ship": "explorer",
+			"type": "scan_route",
+			"params": { "target_node_id": 2 }
+		},
+		{
+			"ship": "explorer",
+			"type": "jump",
+			"params": { "target_node_id": 2 }
+		},
+		{
+			"ship": "explorer",
+			"type": "scan_route",
+			"params": { "target_node_id": 3 }
+		},
+		{
+			"ship": "explorer",
+			"type": "jump",
+			"params": { "target_node_id": 3 }
+		},
+		{
+			"ship": "explorer",
+			"type": "scan_route",
+			"params": { "target_node_id": 4 }
+		},
+		{
+			"ship": "explorer",
+			"type": "jump",
+			"params": { "target_node_id": 4 }
+		},
+		{
+			"ship": "explorer",
+			"type": "scan_route",
+			"params": { "target_node_id": 9 }
+		},
+		{
+			"ship": "explorer",
+			"type": "jump",
+			"params": { "target_node_id": 9 }
+		},
+		{
+			"ship": "explorer",
+			"type": "scan_route",
+			"params": { "target_node_id": 26 }
+		},
+		{
+			"ship": "explorer",
+			"type": "jump",
+			"params": { "target_node_id": 26 }
+		}
 	]
 }

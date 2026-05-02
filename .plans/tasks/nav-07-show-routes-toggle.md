@@ -1,5 +1,5 @@
 ---
-status: active
+status: done
 area: navigation
 priority: p2
 depends_on:
@@ -52,3 +52,14 @@ family.
 
 This task should read the datacore edge graph only. Do not fall back to
 `action.result` on the actions store.
+
+## Implemented
+
+The bridge viewport config now includes a persisted `Show routes` toggle. When
+enabled, the starfield renders every locally cached user edge from datacore as a
+discovered route, with supplemental node positions loaded from the nav cache so
+waypoint-backed edges can draw without reading scan action payloads.
+
+The temporary bridge route layer that inspected the latest ship action's scan
+or jump result has been removed. The bridge still reads the latest action only
+to decide whether a context action should be disabled while work is active.

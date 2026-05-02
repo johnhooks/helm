@@ -1,32 +1,48 @@
 {
-  "name": "Wolf vs Miner — Torpedo Attack",
-  "description": "Specter ambushes a mining Pioneer with torpedoes. Tests burst alpha vs shields.",
-  "ships": {
-    "wolf": {
-      "hull": "specter",
-      "core": "epoch_s",
-      "drive": "dr_505",
-      "sensor": "vrs_mk1",
-      "shield": "aegis_delta",
-      "nav": "nav_tier_3",
-      "equipment": ["torpedo_launcher"],
-      "node": 1
-    },
-    "miner": {
-      "hull": "pioneer",
-      "core": "epoch_s",
-      "drive": "dr_505",
-      "sensor": "vrs_mk1",
-      "shield": "aegis_delta",
-      "nav": "nav_tier_3",
-      "equipment": ["mining_laser"],
-      "node": 1
-    }
-  },
-  "actions": [
-    { "ship": "wolf", "type": "fire_torpedo", "params": { "target_ship_id": "miner" } },
-    { "ship": "wolf", "type": "fire_torpedo", "params": { "target_ship_id": "miner" } },
-    { "ship": "wolf", "type": "fire_torpedo", "params": { "target_ship_id": "miner" } },
-    { "ship": "wolf", "type": "fire_torpedo", "params": { "target_ship_id": "miner" } }
-  ]
+	"name": "Wolf vs Miner — Torpedo Attack",
+	"description": "Specter ambushes a mining Pioneer with torpedoes. Tests burst alpha vs shields.",
+	"ships": {
+		"wolf": {
+			"hull": "specter",
+			"core": "epoch_s",
+			"drive": "dr_505",
+			"sensor": "vrs_mk1",
+			"shield": "aegis_delta",
+			"nav": "nav_tier_3",
+			"equipment": ["torpedo_launcher"],
+			"node": 1
+		},
+		"miner": {
+			"hull": "pioneer",
+			"core": "epoch_s",
+			"drive": "dr_505",
+			"sensor": "vrs_mk1",
+			"shield": "aegis_delta",
+			"nav": "nav_tier_3",
+			"equipment": ["mining_laser"],
+			"node": 1
+		}
+	},
+	"actions": [
+		{
+			"ship": "wolf",
+			"type": "fire_torpedo",
+			"params": { "target_ship_id": "miner" }
+		},
+		{
+			"ship": "wolf",
+			"type": "fire_torpedo",
+			"params": { "target_ship_id": "miner" }
+		},
+		{
+			"ship": "wolf",
+			"type": "fire_torpedo",
+			"params": { "target_ship_id": "miner" }
+		},
+		{
+			"ship": "wolf",
+			"type": "fire_torpedo",
+			"params": { "target_ship_id": "miner" }
+		}
+	]
 }

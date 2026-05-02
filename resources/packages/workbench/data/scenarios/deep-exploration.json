@@ -14,9 +14,25 @@
 		}
 	},
 	"actions": [
-		{ "ship": "explorer", "type": "scan_route", "params": { "target_node_id": 69 } },
-		{ "ship": "explorer", "type": "scan_route", "params": { "target_node_id": 95 } },
-		{ "ship": "explorer", "type": "scan_route", "params": { "target_node_id": 111 } },
-		{ "ship": "explorer", "type": "scan_route", "params": { "target_node_id": 115 } }
+		{
+			"ship": "explorer",
+			"type": "scan_route",
+			"params": { "target_node_id": 69 }
+		},
+		{
+			"ship": "explorer",
+			"type": "scan_route",
+			"params": { "target_node_id": 95 }
+		},
+		{
+			"ship": "explorer",
+			"type": "scan_route",
+			"params": { "target_node_id": 111 }
+		},
+		{
+			"ship": "explorer",
+			"type": "scan_route",
+			"params": { "target_node_id": 115 }
+		}
 	]
 }

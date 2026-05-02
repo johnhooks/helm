@@ -5,7 +5,7 @@ Each entry points to the full task file in `.plans/tasks/`.
 
 ## Active
 
-- [nav-07-show-routes-toggle](tasks/nav-07-show-routes-toggle.md) - Add a "Show routes" toggle to the viewport. `navigation` `p2`
+No active tasks.
 
 ## Blocked
 
@@ -25,6 +25,9 @@ Each entry points to the full task file in `.plans/tasks/`.
 - [nav-13-add-scan-result-reconciler](tasks/nav-13-add-scan-result-reconciler.md) - Add a scan result reconciler. `navigation` `p2`
 - [nav-14-route-aware-jump-draft](tasks/nav-14-route-aware-jump-draft.md) - Add route-aware jump drafts. `navigation` `p2`
 - [nav-15-clean-up-scan-results](tasks/nav-15-clean-up-scan-results.md) - Clean up scan results. `navigation` `p2`
+- [nav-16-show-active-scan-line](tasks/nav-16-show-active-scan-line.md) - Show active scan lines on the starfield. `navigation` `p2`
+- [nav-17-add-waypoint-nodes-to-starfield](tasks/nav-17-add-waypoint-nodes-to-starfield.md) - Add waypoint nodes to the starfield. `navigation` `p2`
+- [nav-18-fix-user-edge-total](tasks/nav-18-fix-user-edge-total.md) - Fix user edge totals. `navigation` `p1`
 
 ## Done
 
@@ -32,6 +35,7 @@ Each entry points to the full task file in `.plans/tasks/`.
 - [nav-02-wire-jump-trigger](tasks/nav-02-wire-jump-trigger.md) - Wire Jump Trigger in Bridge UI. `navigation` `p1`
 - [nav-05-slot-fill-context-menu-actions](tasks/nav-05-slot-fill-context-menu-actions.md) - Refactor Star Context Menu Actions to Slot Fill. `navigation` `p2`
 - [nav-06-persist-scan-discoveries](tasks/nav-06-persist-scan-discoveries.md) - Persist scan discoveries in the datacore. `navigation` `p1`
+- [nav-07-show-routes-toggle](tasks/nav-07-show-routes-toggle.md) - Add a "Show routes" toggle to the viewport. `navigation` `p2`
 - [nav-08-track-edge-discoveries-per-player](tasks/nav-08-track-edge-discoveries-per-player.md) - Track edge discoveries per player. `navigation` `p1`
 - [nav-09-add-user-edge-datacore-queries](tasks/nav-09-add-user-edge-datacore-queries.md) - Add user edge datacore queries. `navigation` `p1`
 - [nav-10-sync-user-edges-on-load](tasks/nav-10-sync-user-edges-on-load.md) - Sync user edges on load. `navigation` `p1`

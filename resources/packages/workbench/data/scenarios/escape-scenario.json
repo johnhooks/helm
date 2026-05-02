@@ -25,9 +25,21 @@
 		}
 	},
 	"actions": [
-		{ "ship": "prey", "type": "activate_equipment", "params": { "equipment_slug": "ecm_mk1" } },
-		{ "ship": "wolf", "type": "fire_phaser", "params": { "target_ship_id": "prey", "duration": 600 } },
-		{ "ship": "prey", "type": "scan_route", "params": { "target_node_id": 2 } },
+		{
+			"ship": "prey",
+			"type": "activate_equipment",
+			"params": { "equipment_slug": "ecm_mk1" }
+		},
+		{
+			"ship": "wolf",
+			"type": "fire_phaser",
+			"params": { "target_ship_id": "prey", "duration": 600 }
+		},
+		{
+			"ship": "prey",
+			"type": "scan_route",
+			"params": { "target_node_id": 2 }
+		},
 		{ "ship": "prey", "type": "jump", "params": { "target_node_id": 2 } }
 	]
 }

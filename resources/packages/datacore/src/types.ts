@@ -60,7 +60,12 @@ export interface CloseMessage {
 	type: 'close';
 }
 
-export type WorkerRequest = InitMessage | ExecMessage | QueryMessage | RunMessage | CloseMessage;
+export type WorkerRequest =
+	| InitMessage
+	| ExecMessage
+	| QueryMessage
+	| RunMessage
+	| CloseMessage;
 
 export interface ReadyResponse {
 	id: string;
@@ -84,15 +89,11 @@ export interface ErrorResponse {
 	};
 }
 
-export type WorkerResponse =
-	| ReadyResponse
-	| ResultResponse
-	| ErrorResponse;
+export type WorkerResponse = ReadyResponse | ResultResponse | ErrorResponse;
 
 // ---------------------------------------------------------------------------
 // Public API types
 // ---------------------------------------------------------------------------
-
 
 /**
  * What SQLite actually returns for star rows — `is_primary` is INTEGER (0|1),
@@ -120,6 +121,7 @@ export interface Datacore {
 	insertNodes: (nodes: NavNode[]) => Promise<void>;
 	clearNodes: () => Promise<void>;
 	getNode: (id: number) => Promise<NavNode | null>;
+	getNodes: (ids: number[]) => Promise<NavNode[]>;
 
 	// Stars
 	insertStar: (star: Star) => Promise<void>;
@@ -132,11 +134,18 @@ export interface Datacore {
 	insertUserEdge: (edge: UserEdge) => Promise<void>;
 	insertUserEdges: (edges: UserEdge[]) => Promise<void>;
 	clearUserEdges: () => Promise<void>;
+	getUserEdges: () => Promise<UserEdge[]>;
 	getUserEdgesAtNode: (nodeId: number) => Promise<UserEdge[]>;
 	hasUserEdgesAtNode: (nodeId: number) => Promise<boolean>;
 	getConnectedNodeIds: (nodeId: number) => Promise<number[]>;
-	hasDirectEdgeBetween: (fromNodeId: number, targetNodeId: number) => Promise<boolean>;
-	findKnownPath: (fromNodeId: number, targetNodeId: number) => Promise<KnownPathResult>;
+	hasDirectEdgeBetween: (
+		fromNodeId: number,
+		targetNodeId: number
+	) => Promise<boolean>;
+	findKnownPath: (
+		fromNodeId: number,
+		targetNodeId: number
+	) => Promise<KnownPathResult>;
 
 	// Meta
 	getMeta: (key: string) => Promise<string | null>;

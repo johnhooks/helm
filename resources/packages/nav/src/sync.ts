@@ -34,7 +34,7 @@ export interface EdgeSyncResult {
  *
  * @internal
  */
-export async function syncNodes( datacore: Datacore ): Promise< SyncResult > {
+export async function syncNodes(datacore: Datacore): Promise<SyncResult> {
 	// Fetch outside the transaction so no savepoint is held during network I/O.
 	const apiNodes = await fetchAllNodes();
 	const userEdges = await fetchAllEdges();
@@ -43,47 +43,50 @@ export async function syncNodes( datacore: Datacore ): Promise< SyncResult > {
 	const stars: Star[] = [];
 	let waypointCount = 0;
 
-	for ( const apiNode of apiNodes ) {
-		nodes.push( toNavNode( apiNode ) );
-		if ( apiNode.type === 'waypoint' ) {
+	for (const apiNode of apiNodes) {
+		nodes.push(toNavNode(apiNode));
+		if (apiNode.type === 'waypoint') {
 			waypointCount++;
 		}
 
-		const embedded = apiNode._embedded?.[ LinkRel.Stars ];
-		if ( embedded ) {
-			stars.push( ...embedded );
+		const embedded = apiNode._embedded?.[LinkRel.Stars];
+		if (embedded) {
+			stars.push(...embedded);
 		}
 	}
 
 	const syncedAt = new Date().toISOString();
-	const edgeLastDiscovered = getLastDiscoveredFromEdges( userEdges );
+	const edgeLastDiscovered = getLastDiscoveredFromEdges(userEdges);
 
 	try {
-		await datacore.transaction( async () => {
+		await datacore.transaction(async () => {
 			await datacore.clearUserEdges();
 			await datacore.clearStars();
 			await datacore.clearNodes();
 
-			await datacore.insertNodes( nodes );
-			await datacore.insertStars( stars );
-			await datacore.insertUserEdges( userEdges );
+			await datacore.insertNodes(nodes);
+			await datacore.insertStars(stars);
+			await datacore.insertUserEdges(userEdges);
 
-			await datacore.setMeta( META_SYNCED_AT, syncedAt );
-			await datacore.setMeta( META_NODE_COUNT, String( nodes.length ) );
-			await datacore.setMeta( META_STAR_COUNT, String( stars.length ) );
-			await datacore.setMeta( META_WAYPOINT_COUNT, String( waypointCount ) );
-			await datacore.setMeta( META_EDGE_COUNT, String( userEdges.length ) );
-			await datacore.setMeta( META_EDGE_LAST_DISCOVERED, edgeLastDiscovered );
-		} );
-	} catch ( error ) {
-		if ( HelmError.is( error ) ) {
+			await datacore.setMeta(META_SYNCED_AT, syncedAt);
+			await datacore.setMeta(META_NODE_COUNT, String(nodes.length));
+			await datacore.setMeta(META_STAR_COUNT, String(stars.length));
+			await datacore.setMeta(META_WAYPOINT_COUNT, String(waypointCount));
+			await datacore.setMeta(META_EDGE_COUNT, String(userEdges.length));
+			await datacore.setMeta(
+				META_EDGE_LAST_DISCOVERED,
+				edgeLastDiscovered
+			);
+		});
+	} catch (error) {
+		if (HelmError.is(error)) {
 			throw error;
 		}
 
 		throw HelmError.safe(
 			ErrorCode.CacheSyncFailed,
-			__( 'Failed to write navigation data to the local cache.', 'helm' ),
-			error,
+			__('Failed to write navigation data to the local cache.', 'helm'),
+			error
 		);
 	}
 
@@ -104,15 +107,17 @@ export async function syncNodes( datacore: Datacore ): Promise< SyncResult > {
  *
  * @internal
  */
-export async function syncUserEdgesIfStale( datacore: Datacore ): Promise< EdgeSyncResult > {
-	const [ server, localCount, localLastDiscovered ] = await Promise.all( [
+export async function syncUserEdgesIfStale(
+	datacore: Datacore
+): Promise<EdgeSyncResult> {
+	const [server, localCount, localLastDiscovered] = await Promise.all([
 		fetchEdgeFreshness(),
-		datacore.getMeta( META_EDGE_COUNT ),
-		datacore.getMeta( META_EDGE_LAST_DISCOVERED ),
-	] );
+		datacore.getMeta(META_EDGE_COUNT),
+		datacore.getMeta(META_EDGE_LAST_DISCOVERED),
+	]);
 
 	const local = {
-		count: Number( localCount ?? 0 ),
+		count: Number(localCount ?? 0),
 		lastDiscovered: localLastDiscovered ?? '',
 	};
 
@@ -128,26 +133,29 @@ export async function syncUserEdgesIfStale( datacore: Datacore ): Promise< EdgeS
 	}
 
 	const userEdges = await fetchAllEdges();
-	const edgeLastDiscovered = getLastDiscoveredFromEdges( userEdges );
-	const missingNodes = await fetchMissingEdgeNodes( datacore, userEdges );
+	const edgeLastDiscovered = getLastDiscoveredFromEdges(userEdges);
+	const missingNodes = await fetchMissingEdgeNodes(datacore, userEdges);
 
 	try {
-		await datacore.transaction( async () => {
+		await datacore.transaction(async () => {
 			await datacore.clearUserEdges();
-			await datacore.insertNodes( missingNodes.map( toNavNode ) );
-			await datacore.insertUserEdges( userEdges );
-			await datacore.setMeta( META_EDGE_COUNT, String( userEdges.length ) );
-			await datacore.setMeta( META_EDGE_LAST_DISCOVERED, edgeLastDiscovered );
-		} );
-	} catch ( error ) {
-		if ( HelmError.is( error ) ) {
+			await datacore.insertNodes(missingNodes.map(toNavNode));
+			await datacore.insertUserEdges(userEdges);
+			await datacore.setMeta(META_EDGE_COUNT, String(userEdges.length));
+			await datacore.setMeta(
+				META_EDGE_LAST_DISCOVERED,
+				edgeLastDiscovered
+			);
+		});
+	} catch (error) {
+		if (HelmError.is(error)) {
 			throw error;
 		}
 
 		throw HelmError.safe(
 			ErrorCode.CacheSyncFailed,
-			__( 'Failed to write edge data to the local cache.', 'helm' ),
-			error,
+			__('Failed to write edge data to the local cache.', 'helm'),
+			error
 		);
 	}
 
@@ -169,54 +177,61 @@ export async function syncUserEdgesIfStale( datacore: Datacore ): Promise< EdgeS
  */
 export async function syncUserEdgesByIds(
 	datacore: Datacore,
-	edgeIds: number[],
-): Promise< EdgeSyncResult > {
-	const userEdges = await fetchEdgesByIds( edgeIds );
-	const missingNodes = await fetchMissingEdgeNodes( datacore, userEdges );
+	edgeIds: number[]
+): Promise<EdgeSyncResult> {
+	const { edges: userEdges, freshness } = await fetchEdgesByIds(edgeIds);
+	const missingNodes = await fetchMissingEdgeNodes(datacore, userEdges);
 
 	try {
-		await datacore.transaction( async () => {
-			await datacore.insertNodes( missingNodes.map( toNavNode ) );
-			await datacore.insertUserEdges( userEdges );
-		} );
-	} catch ( error ) {
-		if ( HelmError.is( error ) ) {
+		await datacore.transaction(async () => {
+			await datacore.insertNodes(missingNodes.map(toNavNode));
+			await datacore.insertUserEdges(userEdges);
+			await datacore.setMeta(META_EDGE_COUNT, String(freshness.count));
+			await datacore.setMeta(
+				META_EDGE_LAST_DISCOVERED,
+				freshness.lastDiscovered
+			);
+		});
+	} catch (error) {
+		if (HelmError.is(error)) {
 			throw error;
 		}
 
 		throw HelmError.safe(
 			ErrorCode.CacheSyncFailed,
-			__( 'Failed to write edge data to the local cache.', 'helm' ),
-			error,
+			__('Failed to write edge data to the local cache.', 'helm'),
+			error
 		);
 	}
 
 	return {
 		refreshed: userEdges.length > 0,
-		edges: userEdges.length,
-		lastDiscovered: getLastDiscoveredFromEdges( userEdges ),
+		edges: freshness.count,
+		lastDiscovered: freshness.lastDiscovered,
 	};
 }
 
 async function fetchMissingEdgeNodes(
 	datacore: Datacore,
-	userEdges: Array< { node_a_id: number; node_b_id: number } >,
-): Promise< ApiNodeResponse[] > {
+	userEdges: Array<{ node_a_id: number; node_b_id: number }>
+): Promise<ApiNodeResponse[]> {
 	const referencedNodeIds = [
-		...new Set( userEdges.flatMap( ( edge ) => [ edge.node_a_id, edge.node_b_id ] ) ),
+		...new Set(
+			userEdges.flatMap((edge) => [edge.node_a_id, edge.node_b_id])
+		),
 	];
 
 	const missingNodeIds: number[] = [];
-	for ( const nodeId of referencedNodeIds ) {
-		if ( ! await datacore.getNode( nodeId ) ) {
-			missingNodeIds.push( nodeId );
+	for (const nodeId of referencedNodeIds) {
+		if (!(await datacore.getNode(nodeId))) {
+			missingNodeIds.push(nodeId);
 		}
 	}
 
-	return fetchNodesByIds( missingNodeIds );
+	return fetchNodesByIds(missingNodeIds);
 }
 
-function toNavNode( apiNode: ApiNodeResponse ): NavNode {
+function toNavNode(apiNode: ApiNodeResponse): NavNode {
 	return {
 		id: apiNode.id,
 		type: apiNode.type,

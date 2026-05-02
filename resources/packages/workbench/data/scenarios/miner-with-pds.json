@@ -1,33 +1,53 @@
 {
-  "name": "Miner with PDS vs Torpedo Attack",
-  "description": "Pioneer with PDS survives torpedo attack. Tests PDS interception mechanics.",
-  "ships": {
-    "wolf": {
-      "hull": "specter",
-      "core": "epoch_s",
-      "drive": "dr_505",
-      "sensor": "vrs_mk1",
-      "shield": "aegis_delta",
-      "nav": "nav_tier_3",
-      "equipment": ["torpedo_launcher"],
-      "node": 1
-    },
-    "miner": {
-      "hull": "pioneer",
-      "core": "epoch_s",
-      "drive": "dr_505",
-      "sensor": "vrs_mk1",
-      "shield": "aegis_delta",
-      "nav": "nav_tier_3",
-      "equipment": ["mining_laser", "pds_mk1"],
-      "node": 1
-    }
-  },
-  "actions": [
-    { "ship": "miner", "type": "activate_equipment", "params": { "equipment_slug": "pds_mk1" } },
-    { "ship": "wolf", "type": "fire_torpedo", "params": { "target_ship_id": "miner" } },
-    { "ship": "wolf", "type": "fire_torpedo", "params": { "target_ship_id": "miner" } },
-    { "ship": "wolf", "type": "fire_torpedo", "params": { "target_ship_id": "miner" } },
-    { "ship": "wolf", "type": "fire_torpedo", "params": { "target_ship_id": "miner" } }
-  ]
+	"name": "Miner with PDS vs Torpedo Attack",
+	"description": "Pioneer with PDS survives torpedo attack. Tests PDS interception mechanics.",
+	"ships": {
+		"wolf": {
+			"hull": "specter",
+			"core": "epoch_s",
+			"drive": "dr_505",
+			"sensor": "vrs_mk1",
+			"shield": "aegis_delta",
+			"nav": "nav_tier_3",
+			"equipment": ["torpedo_launcher"],
+			"node": 1
+		},
+		"miner": {
+			"hull": "pioneer",
+			"core": "epoch_s",
+			"drive": "dr_505",
+			"sensor": "vrs_mk1",
+			"shield": "aegis_delta",
+			"nav": "nav_tier_3",
+			"equipment": ["mining_laser", "pds_mk1"],
+			"node": 1
+		}
+	},
+	"actions": [
+		{
+			"ship": "miner",
+			"type": "activate_equipment",
+			"params": { "equipment_slug": "pds_mk1" }
+		},
+		{
+			"ship": "wolf",
+			"type": "fire_torpedo",
+			"params": { "target_ship_id": "miner" }
+		},
+		{
+			"ship": "wolf",
+			"type": "fire_torpedo",
+			"params": { "target_ship_id": "miner" }
+		},
+		{
+			"ship": "wolf",
+			"type": "fire_torpedo",
+			"params": { "target_ship_id": "miner" }
+		},
+		{
+			"ship": "wolf",
+			"type": "fire_torpedo",
+			"params": { "target_ship_id": "miner" }
+		}
+	]
 }

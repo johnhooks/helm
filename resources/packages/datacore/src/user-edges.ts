@@ -27,6 +27,13 @@ WHERE user_id = ? AND (node_a_id = ? OR node_b_id = ?)
 ORDER BY discovered_at ASC, id ASC
 `;
 
+const USER_EDGES = `
+SELECT id, node_a_id, node_b_id, distance, discovered_at
+FROM user_edges
+WHERE user_id = ?
+ORDER BY discovered_at ASC, id ASC
+`;
+
 const USER_EDGE_EXISTS_AT_NODE = `
 SELECT 1 AS edge_exists
 FROM user_edges
@@ -67,7 +74,14 @@ export function createUserEdgesRepository(conn: Connection, userId: number) {
 				   node_b_id = excluded.node_b_id,
 				   distance = excluded.distance,
 				   discovered_at = excluded.discovered_at`,
-				[userId, edge.id, edge.node_a_id, edge.node_b_id, edge.distance, edge.discovered_at],
+				[
+					userId,
+					edge.id,
+					edge.node_a_id,
+					edge.node_b_id,
+					edge.distance,
+					edge.discovered_at,
+				]
 			);
 		},
 
@@ -75,7 +89,9 @@ export function createUserEdgesRepository(conn: Connection, userId: number) {
 			const chunkSize = 166; // 6 columns × 166 = 996 params (SQLite limit: 999)
 			for (let i = 0; i < edges.length; i += chunkSize) {
 				const chunk = edges.slice(i, i + chunkSize);
-				const placeholders = chunk.map(() => '(?, ?, ?, ?, ?, ?)').join(', ');
+				const placeholders = chunk
+					.map(() => '(?, ?, ?, ?, ?, ?)')
+					.join(', ');
 				const params = chunk.flatMap((edge) => [
 					userId,
 					edge.id,
@@ -93,48 +109,62 @@ export function createUserEdgesRepository(conn: Connection, userId: number) {
 					   node_b_id = excluded.node_b_id,
 					   distance = excluded.distance,
 					   discovered_at = excluded.discovered_at`,
-					params,
+					params
 				);
 			}
 		},
 
 		async clearUserEdges(): Promise<void> {
-			await conn.run('DELETE FROM user_edges WHERE user_id = ?', [userId]);
+			await conn.run('DELETE FROM user_edges WHERE user_id = ?', [
+				userId,
+			]);
+		},
+
+		getUserEdges(): Promise<UserEdge[]> {
+			return conn.query<UserEdge>(USER_EDGES, [userId]);
 		},
 
 		getUserEdgesAtNode(nodeId: number): Promise<UserEdge[]> {
-			return conn.query<UserEdge>(USER_EDGES_AT_NODE, [userId, nodeId, nodeId]);
+			return conn.query<UserEdge>(USER_EDGES_AT_NODE, [
+				userId,
+				nodeId,
+				nodeId,
+			]);
 		},
 
 		async hasUserEdgesAtNode(nodeId: number): Promise<boolean> {
-			const rows = await conn.query<{ edge_exists: number }>(USER_EDGE_EXISTS_AT_NODE, [userId, nodeId, nodeId]);
+			const rows = await conn.query<{ edge_exists: number }>(
+				USER_EDGE_EXISTS_AT_NODE,
+				[userId, nodeId, nodeId]
+			);
 			return rows.length > 0;
 		},
 
 		async getConnectedNodeIds(nodeId: number): Promise<number[]> {
-			const rows = await conn.query<{ connected_node_id: number }>(CONNECTED_NODE_IDS, [
-				nodeId,
-				userId,
-				nodeId,
-				nodeId,
-			]);
+			const rows = await conn.query<{ connected_node_id: number }>(
+				CONNECTED_NODE_IDS,
+				[nodeId, userId, nodeId, nodeId]
+			);
 
 			return rows.map((row) => row.connected_node_id);
 		},
 
-		async hasDirectEdgeBetween(fromNodeId: number, targetNodeId: number): Promise<boolean> {
-			const rows = await conn.query<{ edge_exists: number }>(DIRECT_USER_EDGE_EXISTS, [
-				userId,
-				fromNodeId,
-				targetNodeId,
-				targetNodeId,
-				fromNodeId,
-			]);
+		async hasDirectEdgeBetween(
+			fromNodeId: number,
+			targetNodeId: number
+		): Promise<boolean> {
+			const rows = await conn.query<{ edge_exists: number }>(
+				DIRECT_USER_EDGE_EXISTS,
+				[userId, fromNodeId, targetNodeId, targetNodeId, fromNodeId]
+			);
 
 			return rows.length > 0;
 		},
 
-		async findKnownPath(fromNodeId: number, targetNodeId: number): Promise<KnownPathResult> {
+		async findKnownPath(
+			fromNodeId: number,
+			targetNodeId: number
+		): Promise<KnownPathResult> {
 			if (fromNodeId === targetNodeId) {
 				return {
 					reachable: true,
@@ -146,10 +176,12 @@ export function createUserEdgesRepository(conn: Connection, userId: number) {
 				};
 			}
 
-			return findShortestPath(
-				fromNodeId,
-				targetNodeId,
-				(nodeId) => conn.query<UserEdge>(USER_EDGES_AT_NODE, [userId, nodeId, nodeId]),
+			return findShortestPath(fromNodeId, targetNodeId, (nodeId) =>
+				conn.query<UserEdge>(USER_EDGES_AT_NODE, [
+					userId,
+					nodeId,
+					nodeId,
+				])
 			);
 		},
 	};
@@ -169,7 +201,7 @@ type PreviousStep = {
 async function findShortestPath(
 	fromNodeId: number,
 	targetNodeId: number,
-	loadEdgesAtNode: (nodeId: number) => Promise<UserEdge[]>,
+	loadEdgesAtNode: (nodeId: number) => Promise<UserEdge[]>
 ): Promise<KnownPathResult> {
 	const adjacency = new Map<number, Neighbor[]>();
 	const distances = new Map<number, number>([[fromNodeId, 0]]);
@@ -195,7 +227,12 @@ async function findShortestPath(
 
 		visited.add(currentNodeId);
 		const currentDistance = distances.get(currentNodeId) ?? Infinity;
-		const neighbors = await getNeighbors(adjacency, loadedNodes, currentNodeId, loadEdgesAtNode);
+		const neighbors = await getNeighbors(
+			adjacency,
+			loadedNodes,
+			currentNodeId,
+			loadEdgesAtNode
+		);
 
 		for (const neighbor of neighbors) {
 			if (visited.has(neighbor.nodeId)) {
@@ -248,7 +285,7 @@ async function getNeighbors(
 	adjacency: Map<number, Neighbor[]>,
 	loadedNodes: Set<number>,
 	nodeId: number,
-	loadEdgesAtNode: (nodeId: number) => Promise<UserEdge[]>,
+	loadEdgesAtNode: (nodeId: number) => Promise<UserEdge[]>
 ): Promise<Neighbor[]> {
 	if (!loadedNodes.has(nodeId)) {
 		const edges = await loadEdgesAtNode(nodeId);
@@ -270,16 +307,29 @@ async function getNeighbors(
 	return adjacency.get(nodeId) ?? [];
 }
 
-function addNeighbor(adjacency: Map<number, Neighbor[]>, nodeId: number, neighbor: Neighbor): void {
+function addNeighbor(
+	adjacency: Map<number, Neighbor[]>,
+	nodeId: number,
+	neighbor: Neighbor
+): void {
 	const neighbors = adjacency.get(nodeId) ?? [];
-	if (neighbors.some((existing) => existing.edgeId === neighbor.edgeId && existing.nodeId === neighbor.nodeId)) {
+	if (
+		neighbors.some(
+			(existing) =>
+				existing.edgeId === neighbor.edgeId &&
+				existing.nodeId === neighbor.nodeId
+		)
+	) {
 		return;
 	}
 	neighbors.push(neighbor);
 	adjacency.set(nodeId, neighbors);
 }
 
-function closestQueuedNode(queue: Set<number>, distances: Map<number, number>): number | null {
+function closestQueuedNode(
+	queue: Set<number>,
+	distances: Map<number, number>
+): number | null {
 	let closestNodeId: number | null = null;
 	let closestDistance = Infinity;
 

@@ -1,56 +1,88 @@
 {
-  "name": "Fleet Engagement",
-  "description": "Striker + Specter vs Pioneer + Bulwark. Mixed weapon engagement.",
-  "ships": {
-    "striker": {
-      "hull": "striker",
-      "core": "epoch_s",
-      "drive": "dr_505",
-      "sensor": "vrs_mk1",
-      "shield": "aegis_delta",
-      "nav": "nav_tier_3",
-      "equipment": ["phaser_array"],
-      "node": 1
-    },
-    "specter": {
-      "hull": "specter",
-      "core": "epoch_s",
-      "drive": "dr_505",
-      "sensor": "vrs_mk1",
-      "shield": "aegis_delta",
-      "nav": "nav_tier_3",
-      "equipment": ["torpedo_launcher"],
-      "node": 1
-    },
-    "pioneer": {
-      "hull": "pioneer",
-      "core": "epoch_s",
-      "drive": "dr_505",
-      "sensor": "vrs_mk1",
-      "shield": "aegis_delta",
-      "nav": "nav_tier_3",
-      "equipment": ["mining_laser", "pds_mk1"],
-      "node": 1
-    },
-    "bulwark": {
-      "hull": "bulwark",
-      "core": "epoch_e",
-      "drive": "dr_505",
-      "sensor": "vrs_mk1",
-      "shield": "aegis_delta",
-      "nav": "nav_tier_3",
-      "equipment": ["ecm_mk1"],
-      "node": 1
-    }
-  },
-  "actions": [
-    { "ship": "pioneer", "type": "activate_equipment", "params": { "equipment_slug": "pds_mk1" } },
-    { "ship": "bulwark", "type": "activate_equipment", "params": { "equipment_slug": "ecm_mk1" } },
-    { "ship": "striker", "type": "fire_phaser", "params": { "target_ship_id": "pioneer", "duration": 3600 } },
-    { "ship": "specter", "type": "fire_torpedo", "params": { "target_ship_id": "pioneer" } },
-    { "ship": "specter", "type": "fire_torpedo", "params": { "target_ship_id": "pioneer" } },
-    { "ship": "striker", "type": "fire_phaser", "params": { "target_ship_id": "bulwark", "duration": 3600 } },
-    { "ship": "specter", "type": "fire_torpedo", "params": { "target_ship_id": "bulwark" } },
-    { "ship": "specter", "type": "fire_torpedo", "params": { "target_ship_id": "bulwark" } }
-  ]
+	"name": "Fleet Engagement",
+	"description": "Striker + Specter vs Pioneer + Bulwark. Mixed weapon engagement.",
+	"ships": {
+		"striker": {
+			"hull": "striker",
+			"core": "epoch_s",
+			"drive": "dr_505",
+			"sensor": "vrs_mk1",
+			"shield": "aegis_delta",
+			"nav": "nav_tier_3",
+			"equipment": ["phaser_array"],
+			"node": 1
+		},
+		"specter": {
+			"hull": "specter",
+			"core": "epoch_s",
+			"drive": "dr_505",
+			"sensor": "vrs_mk1",
+			"shield": "aegis_delta",
+			"nav": "nav_tier_3",
+			"equipment": ["torpedo_launcher"],
+			"node": 1
+		},
+		"pioneer": {
+			"hull": "pioneer",
+			"core": "epoch_s",
+			"drive": "dr_505",
+			"sensor": "vrs_mk1",
+			"shield": "aegis_delta",
+			"nav": "nav_tier_3",
+			"equipment": ["mining_laser", "pds_mk1"],
+			"node": 1
+		},
+		"bulwark": {
+			"hull": "bulwark",
+			"core": "epoch_e",
+			"drive": "dr_505",
+			"sensor": "vrs_mk1",
+			"shield": "aegis_delta",
+			"nav": "nav_tier_3",
+			"equipment": ["ecm_mk1"],
+			"node": 1
+		}
+	},
+	"actions": [
+		{
+			"ship": "pioneer",
+			"type": "activate_equipment",
+			"params": { "equipment_slug": "pds_mk1" }
+		},
+		{
+			"ship": "bulwark",
+			"type": "activate_equipment",
+			"params": { "equipment_slug": "ecm_mk1" }
+		},
+		{
+			"ship": "striker",
+			"type": "fire_phaser",
+			"params": { "target_ship_id": "pioneer", "duration": 3600 }
+		},
+		{
+			"ship": "specter",
+			"type": "fire_torpedo",
+			"params": { "target_ship_id": "pioneer" }
+		},
+		{
+			"ship": "specter",
+			"type": "fire_torpedo",
+			"params": { "target_ship_id": "pioneer" }
+		},
+		{
+			"ship": "striker",
+			"type": "fire_phaser",
+			"params": { "target_ship_id": "bulwark", "duration": 3600 }
+		},
+		{
+			"ship": "specter",
+			"type": "fire_torpedo",
+			"params": { "target_ship_id": "bulwark" }
+		},
+		{
+			"ship": "specter",
+			"type": "fire_torpedo",
+			"params": { "target_ship_id": "bulwark" }
+		}
+	]
 }
