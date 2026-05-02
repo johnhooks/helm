@@ -5,7 +5,7 @@ Each entry points to the full task file in `.plans/tasks/`.
 
 ## Active
 
-No active tasks.
+- [nav-19-add-navigation-edge-states](tasks/nav-19-add-navigation-edge-states.md) - Add navigation edge states. `navigation` `p1`
 
 ## Blocked
 
