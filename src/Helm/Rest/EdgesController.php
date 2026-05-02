@@ -9,12 +9,13 @@ use Helm\Navigation\UserEdge;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
+use WP_REST_Server;
 
 /**
  * REST controller for navigation edges, scoped to the authenticated user.
  *
  * GET /helm/v1/edges  - List edges the authenticated user has discovered
- * HEAD /helm/v1/edges - Same response headers, no body (WP REST auto)
+ * HEAD /helm/v1/edges - Same response headers, no body
  *
  * The collection is naturally scoped per-user because edge knowledge is
  * a per-player fog-of-war layer. Admin-wide access (returning every
@@ -40,7 +41,7 @@ final class EdgesController
             self::NAMESPACE,
             '/edges',
             [
-                'methods'             => 'GET',
+                'methods'             => WP_REST_Server::READABLE,
                 'callback'            => [$this, 'index'],
                 'permission_callback' => [$this, 'permissions'],
                 'args'                => [
@@ -94,6 +95,8 @@ final class EdgesController
         $include = $this->resolveInclude($request->get_param('include'));
         $page = (int) $request->get_param('page');
         $perPage = (int) $request->get_param('per_page');
+        $total = $this->userEdgeRepository->count($userId);
+        $lastDiscovered = $this->userEdgeRepository->lastDiscovered($userId);
 
         if ($include !== []) {
             $edges = $this->userEdgeRepository->getMany($userId, $include);
@@ -104,19 +107,32 @@ final class EdgesController
                     ['status' => 403]
                 );
             }
-            $total = count($edges);
             $totalPages = 1;
         } else {
+            $totalPages = (int) ceil($total / $perPage);
+
+            if ($request->is_method('HEAD')) {
+                return $this->collectionResponse([], $total, $totalPages, $lastDiscovered);
+            }
+
             $result = $this->userEdgeRepository->paginate($userId, $page, $perPage);
             $edges = $result['edges'];
-            $total = $result['total'];
-            $totalPages = (int) ceil($total / $perPage);
         }
 
-        $lastDiscovered = $this->userEdgeRepository->lastDiscovered($userId);
+        if ($request->is_method('HEAD')) {
+            return $this->collectionResponse([], $total, $totalPages, $lastDiscovered);
+        }
 
         $data = array_map(fn (UserEdge $ue) => $this->serialize($ue), $edges);
 
+        return $this->collectionResponse($data, $total, $totalPages, $lastDiscovered);
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $data
+     */
+    private function collectionResponse(array $data, int $total, int $totalPages, ?string $lastDiscovered): WP_REST_Response
+    {
         $response = new WP_REST_Response($data);
         $response->header('X-WP-Total', (string) $total);
         $response->header('X-WP-TotalPages', (string) $totalPages);

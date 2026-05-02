@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Wpunit\Rest;
 
+use DateTimeImmutable;
+use DateTimeZone;
 use Helm\Lib\Date;
 use Helm\Navigation\Contracts\EdgeRepository;
 use Helm\Navigation\Contracts\NodeRepository;
@@ -74,10 +76,10 @@ class EdgesControllerTest extends WPRestApiTestCase
         $edgeA = $this->createEdge();
         $edgeB = $this->createEdge();
 
-        Date::setTestNow(new \DateTimeImmutable('2026-04-01 00:00:00', new \DateTimeZone('UTC')));
+        Date::setTestNow(new DateTimeImmutable('2026-04-01 00:00:00', new DateTimeZone('UTC')));
         $this->userEdgeRepository->upsert($this->userId, $edgeA);
 
-        Date::setTestNow(new \DateTimeImmutable('2026-04-19 12:34:56', new \DateTimeZone('UTC')));
+        Date::setTestNow(new DateTimeImmutable('2026-04-19 12:34:56', new DateTimeZone('UTC')));
         $this->userEdgeRepository->upsert($this->userId, $edgeB);
 
         $request = new WP_REST_Request('GET', '/helm/v1/edges');
@@ -118,6 +120,34 @@ class EdgesControllerTest extends WPRestApiTestCase
         $this->assertSame('0', $response->get_headers()['X-WP-Total']);
     }
 
+    public function test_freshness_headers_only_count_current_user_discoveries(): void
+    {
+        $currentUserEdge = $this->createEdge();
+        $otherUserEdgeA = $this->createEdge();
+        $otherUserEdgeB = $this->createEdge();
+
+        Date::setTestNow(new DateTimeImmutable('2026-04-01 00:00:00', new DateTimeZone('UTC')));
+        $this->userEdgeRepository->upsert($this->userId, $currentUserEdge);
+
+        $otherUser = self::factory()->user->create(['role' => 'subscriber']);
+
+        Date::setTestNow(new DateTimeImmutable('2026-04-02 00:00:00', new DateTimeZone('UTC')));
+        $this->userEdgeRepository->upsert($otherUser, $otherUserEdgeA);
+
+        Date::setTestNow(new DateTimeImmutable('2026-04-03 00:00:00', new DateTimeZone('UTC')));
+        $this->userEdgeRepository->upsert($otherUser, $otherUserEdgeB);
+
+        $request = new WP_REST_Request('GET', '/helm/v1/edges');
+        $response = rest_do_request($request);
+
+        $this->assertSame(200, $response->get_status());
+        $this->assertSame('1', $response->get_headers()['X-WP-Total']);
+        $this->assertSame(
+            '2026-04-01T00:00:00+00:00',
+            $response->get_headers()['X-Helm-Edge-Last-Discovered'],
+        );
+    }
+
     public function test_paginates_with_per_page_argument(): void
     {
         for ($i = 0; $i < 5; $i++) {
@@ -139,9 +169,16 @@ class EdgesControllerTest extends WPRestApiTestCase
     {
         $edgeA = $this->createEdge();
         $edgeB = $this->createEdge();
+        $edgeC = $this->createEdge();
 
+        Date::setTestNow(new DateTimeImmutable('2026-04-01 00:00:00', new DateTimeZone('UTC')));
         $this->userEdgeRepository->upsert($this->userId, $edgeA);
+
+        Date::setTestNow(new DateTimeImmutable('2026-04-02 00:00:00', new DateTimeZone('UTC')));
         $this->userEdgeRepository->upsert($this->userId, $edgeB);
+
+        Date::setTestNow(new DateTimeImmutable('2026-04-03 00:00:00', new DateTimeZone('UTC')));
+        $this->userEdgeRepository->upsert($this->userId, $edgeC);
 
         $request = new WP_REST_Request('GET', '/helm/v1/edges');
         $request->set_param('include', "{$edgeB},{$edgeA}");
@@ -155,8 +192,46 @@ class EdgesControllerTest extends WPRestApiTestCase
         $this->assertCount(2, $data);
         $this->assertContains($edgeA, $ids);
         $this->assertContains($edgeB, $ids);
-        $this->assertSame('2', $response->get_headers()['X-WP-Total']);
+        $this->assertNotContains($edgeC, $ids);
+        $this->assertSame('3', $response->get_headers()['X-WP-Total']);
         $this->assertSame('1', $response->get_headers()['X-WP-TotalPages']);
+        $this->assertSame(
+            '2026-04-03T00:00:00+00:00',
+            $response->get_headers()['X-Helm-Edge-Last-Discovered'],
+        );
+    }
+
+    public function test_include_freshness_headers_only_count_current_user_discoveries(): void
+    {
+        $edgeA = $this->createEdge();
+        $edgeB = $this->createEdge();
+        $otherUserEdge = $this->createEdge();
+
+        Date::setTestNow(new DateTimeImmutable('2026-04-01 00:00:00', new DateTimeZone('UTC')));
+        $this->userEdgeRepository->upsert($this->userId, $edgeA);
+
+        Date::setTestNow(new DateTimeImmutable('2026-04-02 00:00:00', new DateTimeZone('UTC')));
+        $this->userEdgeRepository->upsert($this->userId, $edgeB);
+
+        $otherUser = self::factory()->user->create(['role' => 'subscriber']);
+
+        Date::setTestNow(new DateTimeImmutable('2026-04-03 00:00:00', new DateTimeZone('UTC')));
+        $this->userEdgeRepository->upsert($otherUser, $otherUserEdge);
+
+        $request = new WP_REST_Request('GET', '/helm/v1/edges');
+        $request->set_param('include', (string) $edgeA);
+        $response = rest_do_request($request);
+
+        $this->assertSame(200, $response->get_status());
+
+        $data = $response->get_data();
+        $this->assertCount(1, $data);
+        $this->assertSame($edgeA, $data[0]['id']);
+        $this->assertSame('2', $response->get_headers()['X-WP-Total']);
+        $this->assertSame(
+            '2026-04-02T00:00:00+00:00',
+            $response->get_headers()['X-Helm-Edge-Last-Discovered'],
+        );
     }
 
     public function test_include_returns_403_when_any_requested_edge_is_not_discovered_by_current_user(): void
@@ -180,13 +255,14 @@ class EdgesControllerTest extends WPRestApiTestCase
     {
         $edge = $this->createEdge();
 
-        Date::setTestNow(new \DateTimeImmutable('2026-04-19 12:34:56', new \DateTimeZone('UTC')));
+        Date::setTestNow(new DateTimeImmutable('2026-04-19 12:34:56', new DateTimeZone('UTC')));
         $this->userEdgeRepository->upsert($this->userId, $edge);
 
         $headRequest = new WP_REST_Request('HEAD', '/helm/v1/edges');
         $headResponse = rest_do_request($headRequest);
 
         $this->assertSame(200, $headResponse->get_status());
+        $this->assertSame([], $headResponse->get_data());
         $this->assertSame('1', $headResponse->get_headers()['X-WP-Total']);
         $this->assertSame(
             '2026-04-19T12:34:56+00:00',
