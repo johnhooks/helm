@@ -31,7 +31,7 @@ export interface Database {
 export async function query<T extends Record<string, SQLiteValue>>(
 	database: Database,
 	sql: string,
-	params?: SQLiteParam[],
+	params?: SQLiteParam[]
 ): Promise<{ rows: T[]; columns: string[] }> {
 	const result: { rows: SQLiteValue[][]; columns: string[] } =
 		await database.sqlite3.execWithParams(database.db, sql, params);
@@ -51,7 +51,7 @@ export async function query<T extends Record<string, SQLiteValue>>(
 export async function run(
 	database: Database,
 	sql: string,
-	params?: SQLiteParam[],
+	params?: SQLiteParam[]
 ): Promise<void> {
 	await database.sqlite3.run(database.db, sql, params);
 }

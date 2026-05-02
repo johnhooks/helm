@@ -1,12 +1,19 @@
 import { describe, it, expect } from 'vitest';
 import { SENSOR_AFFINITIES, DEFAULT_DSP_CONSTANTS } from './types';
-import { detectionProbability, cumulativeDetection, matchedFilterGain } from './detection';
+import {
+	detectionProbability,
+	cumulativeDetection,
+	matchedFilterGain,
+} from './detection';
 
-const { detectionThreshold: threshold, detectionSteepness: steepness } = DEFAULT_DSP_CONSTANTS;
+const { detectionThreshold: threshold, detectionSteepness: steepness } =
+	DEFAULT_DSP_CONSTANTS;
 
 describe('detectionProbability', () => {
 	it('returns 50% at the threshold SNR', () => {
-		expect(detectionProbability(threshold, threshold, steepness)).toBeCloseTo(0.5);
+		expect(
+			detectionProbability(threshold, threshold, steepness)
+		).toBeCloseTo(0.5);
 	});
 
 	it('approaches 1.0 well above threshold', () => {
@@ -89,12 +96,16 @@ describe('matchedFilterGain', () => {
 
 	it('ACU excels at pulse detection', () => {
 		expect(matchedFilterGain(acu, 'pulse')).toBe(1.5);
-		expect(matchedFilterGain(acu, 'pulse')).toBeGreaterThan(matchedFilterGain(vrs, 'pulse'));
+		expect(matchedFilterGain(acu, 'pulse')).toBeGreaterThan(
+			matchedFilterGain(vrs, 'pulse')
+		);
 	});
 
 	it('DSC excels at continuous detection', () => {
 		expect(matchedFilterGain(dsc, 'continuous')).toBe(1.25);
-		expect(matchedFilterGain(dsc, 'continuous')).toBeGreaterThan(matchedFilterGain(vrs, 'continuous'));
+		expect(matchedFilterGain(dsc, 'continuous')).toBeGreaterThan(
+			matchedFilterGain(vrs, 'continuous')
+		);
 	});
 
 	it('VRS is neutral across all types', () => {

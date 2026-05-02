@@ -33,7 +33,7 @@ import { DEFAULT_EMISSION_PROFILES } from './types';
 export function emissionPower(
 	emissionType: EmissionType,
 	componentStat: number = 1.0,
-	profiles: Record<EmissionType, EmissionProfile> = DEFAULT_EMISSION_PROFILES,
+	profiles: Record<EmissionType, EmissionProfile> = DEFAULT_EMISSION_PROFILES
 ): number {
 	const profile = profiles[emissionType];
 	return profile.base * componentStat;
@@ -54,6 +54,9 @@ export function emissionPower(
  * @param baseEmission - Result of emissionPower()
  * @param tuningValue - Effort, throttle, or priority (default 1.0)
  */
-export function tunedEmission(baseEmission: number, tuningValue: number = 1.0): number {
+export function tunedEmission(
+	baseEmission: number,
+	tuningValue: number = 1.0
+): number {
 	return baseEmission * tuningValue;
 }

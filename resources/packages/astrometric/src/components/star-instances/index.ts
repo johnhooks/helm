@@ -1,2 +1,2 @@
-export { StarInstances } from "./star-instances";
-export type { StarInstancesProps } from "./star-instances";
+export { StarInstances } from './star-instances';
+export type { StarInstancesProps } from './star-instances';

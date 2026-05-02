@@ -44,8 +44,16 @@ describe('scenario runner', () => {
 			description: 'Scan then jump to Proxima',
 			ships: { explorer: baseShip },
 			actions: [
-				{ ship: 'explorer', type: 'scan_route', params: { target_node_id: 2 } },
-				{ ship: 'explorer', type: 'jump', params: { target_node_id: 2 } },
+				{
+					ship: 'explorer',
+					type: 'scan_route',
+					params: { target_node_id: 2 },
+				},
+				{
+					ship: 'explorer',
+					type: 'jump',
+					params: { target_node_id: 2 },
+				},
 			],
 		};
 
@@ -63,7 +71,9 @@ describe('scenario runner', () => {
 		expect(timeline[2].ships.explorer.nodeId).toBe(2);
 
 		// Core degraded
-		expect(timeline[2].ships.explorer.coreLife).toBeLessThan(timeline[0].ships.explorer.coreLife);
+		expect(timeline[2].ships.explorer.coreLife).toBeLessThan(
+			timeline[0].ships.explorer.coreLife
+		);
 
 		// Time advanced
 		expect(timeline[2].t).toBeGreaterThan(0);
@@ -76,11 +86,27 @@ describe('scenario runner', () => {
 			ships: { explorer: baseShip },
 			actions: [
 				// Proxima is 1.296 ly from Sol
-				{ ship: 'explorer', type: 'scan_route', params: { target_node_id: 2 } },
-				{ ship: 'explorer', type: 'jump', params: { target_node_id: 2 } },
+				{
+					ship: 'explorer',
+					type: 'scan_route',
+					params: { target_node_id: 2 },
+				},
+				{
+					ship: 'explorer',
+					type: 'jump',
+					params: { target_node_id: 2 },
+				},
 				// Barnard's Star is 2.004 ly from Proxima
-				{ ship: 'explorer', type: 'scan_route', params: { target_node_id: 4 } },
-				{ ship: 'explorer', type: 'jump', params: { target_node_id: 4 } },
+				{
+					ship: 'explorer',
+					type: 'scan_route',
+					params: { target_node_id: 4 },
+				},
+				{
+					ship: 'explorer',
+					type: 'jump',
+					params: { target_node_id: 4 },
+				},
 			],
 		};
 
@@ -105,12 +131,36 @@ describe('scenario runner', () => {
 			description: '3 scan-and-jump pairs',
 			ships: { explorer: baseShip },
 			actions: [
-				{ ship: 'explorer', type: 'scan_route', params: { target_node_id: 2 } },
-				{ ship: 'explorer', type: 'jump', params: { target_node_id: 2 } },
-				{ ship: 'explorer', type: 'scan_route', params: { target_node_id: 3 } },
-				{ ship: 'explorer', type: 'jump', params: { target_node_id: 3 } },
-				{ ship: 'explorer', type: 'scan_route', params: { target_node_id: 4 } },
-				{ ship: 'explorer', type: 'jump', params: { target_node_id: 4 } },
+				{
+					ship: 'explorer',
+					type: 'scan_route',
+					params: { target_node_id: 2 },
+				},
+				{
+					ship: 'explorer',
+					type: 'jump',
+					params: { target_node_id: 2 },
+				},
+				{
+					ship: 'explorer',
+					type: 'scan_route',
+					params: { target_node_id: 3 },
+				},
+				{
+					ship: 'explorer',
+					type: 'jump',
+					params: { target_node_id: 3 },
+				},
+				{
+					ship: 'explorer',
+					type: 'scan_route',
+					params: { target_node_id: 4 },
+				},
+				{
+					ship: 'explorer',
+					type: 'jump',
+					params: { target_node_id: 4 },
+				},
 			],
 		};
 
@@ -138,10 +188,26 @@ describe('scenario runner', () => {
 			description: 'Jump consumes power, then next snapshot shows regen',
 			ships: { explorer: baseShip },
 			actions: [
-				{ ship: 'explorer', type: 'scan_route', params: { target_node_id: 2 } },
-				{ ship: 'explorer', type: 'jump', params: { target_node_id: 2 } },
-				{ ship: 'explorer', type: 'scan_route', params: { target_node_id: 3 } },
-				{ ship: 'explorer', type: 'jump', params: { target_node_id: 3 } },
+				{
+					ship: 'explorer',
+					type: 'scan_route',
+					params: { target_node_id: 2 },
+				},
+				{
+					ship: 'explorer',
+					type: 'jump',
+					params: { target_node_id: 2 },
+				},
+				{
+					ship: 'explorer',
+					type: 'scan_route',
+					params: { target_node_id: 3 },
+				},
+				{
+					ship: 'explorer',
+					type: 'jump',
+					params: { target_node_id: 3 },
+				},
 			],
 		};
 
@@ -161,7 +227,11 @@ describe('scenario runner', () => {
 			description: 'Single scan',
 			ships: { scanner: { ...baseShip, hull: 'surveyor' } },
 			actions: [
-				{ ship: 'scanner', type: 'scan_route', params: { target_node_id: 2 } },
+				{
+					ship: 'scanner',
+					type: 'scan_route',
+					params: { target_node_id: 2 },
+				},
 			],
 		};
 
@@ -184,14 +254,20 @@ describe('scenario runner', () => {
 			description: 'Same scenario twice',
 			ships: { scanner: { ...baseShip, hull: 'surveyor' } },
 			actions: [
-				{ ship: 'scanner', type: 'scan_route', params: { target_node_id: 10 } },
+				{
+					ship: 'scanner',
+					type: 'scan_route',
+					params: { target_node_id: 10 },
+				},
 			],
 		};
 
 		const run1 = runScenario(scenario);
 		const run2 = runScenario(scenario);
 
-		expect(run1.actions[0].result.success).toBe(run2.actions[0].result.success);
+		expect(run1.actions[0].result.success).toBe(
+			run2.actions[0].result.success
+		);
 	});
 
 	it('timestamps reflect real computed durations', () => {
@@ -200,8 +276,16 @@ describe('scenario runner', () => {
 			description: 'Verify timestamps',
 			ships: { explorer: baseShip },
 			actions: [
-				{ ship: 'explorer', type: 'scan_route', params: { target_node_id: 2 } },
-				{ ship: 'explorer', type: 'scan_route', params: { target_node_id: 4 } },
+				{
+					ship: 'explorer',
+					type: 'scan_route',
+					params: { target_node_id: 2 },
+				},
+				{
+					ship: 'explorer',
+					type: 'scan_route',
+					params: { target_node_id: 4 },
+				},
 			],
 		};
 
@@ -221,9 +305,21 @@ describe('scenario runner', () => {
 			description: 'Scan, jump, then scan from new position',
 			ships: { explorer: baseShip },
 			actions: [
-				{ ship: 'explorer', type: 'scan_route', params: { target_node_id: 2 } },
-				{ ship: 'explorer', type: 'jump', params: { target_node_id: 2 } },
-				{ ship: 'explorer', type: 'scan_route', params: { target_node_id: 3 } },
+				{
+					ship: 'explorer',
+					type: 'scan_route',
+					params: { target_node_id: 2 },
+				},
+				{
+					ship: 'explorer',
+					type: 'jump',
+					params: { target_node_id: 2 },
+				},
+				{
+					ship: 'explorer',
+					type: 'scan_route',
+					params: { target_node_id: 3 },
+				},
 			],
 		};
 
@@ -238,9 +334,15 @@ describe('scenario runner', () => {
 		expect(timeline[3].ships.explorer.nodeId).toBe(2);
 
 		// Core degraded from jump but not from scans
-		const coreDrop1 = timeline[0].ships.explorer.coreLife - timeline[1].ships.explorer.coreLife;
-		const coreDrop2 = timeline[1].ships.explorer.coreLife - timeline[2].ships.explorer.coreLife;
-		const coreDrop3 = timeline[2].ships.explorer.coreLife - timeline[3].ships.explorer.coreLife;
+		const coreDrop1 =
+			timeline[0].ships.explorer.coreLife -
+			timeline[1].ships.explorer.coreLife;
+		const coreDrop2 =
+			timeline[1].ships.explorer.coreLife -
+			timeline[2].ships.explorer.coreLife;
+		const coreDrop3 =
+			timeline[2].ships.explorer.coreLife -
+			timeline[3].ships.explorer.coreLife;
 
 		expect(coreDrop1).toBe(0); // scan doesn't degrade core
 		expect(coreDrop2).toBeGreaterThan(0); // jump degrades
@@ -265,7 +367,11 @@ describe('scenario runner', () => {
 				miner: { ...baseShip, node: 1 },
 			},
 			actions: [
-				{ ship: 'wolf', type: 'fire_phaser', params: { target_ship_id: 'miner', duration: 600 } },
+				{
+					ship: 'wolf',
+					type: 'fire_phaser',
+					params: { target_ship_id: 'miner', duration: 600 },
+				},
 			],
 		};
 
@@ -273,7 +379,9 @@ describe('scenario runner', () => {
 		expect(actions[0].status).toBe(ActionStatus.Fulfilled);
 
 		// Target shields should be drained
-		expect(timeline[1].ships.miner.shield).toBeLessThan(timeline[0].ships.miner.shield);
+		expect(timeline[1].ships.miner.shield).toBeLessThan(
+			timeline[0].ships.miner.shield
+		);
 	});
 
 	it('torpedo attack consumes ammo', () => {
@@ -294,7 +402,11 @@ describe('scenario runner', () => {
 				miner: { ...baseShip, node: 1 },
 			},
 			actions: [
-				{ ship: 'wolf', type: 'fire_torpedo', params: { target_ship_id: 'miner' } },
+				{
+					ship: 'wolf',
+					type: 'fire_torpedo',
+					params: { target_ship_id: 'miner' },
+				},
 			],
 		};
 
@@ -324,7 +436,11 @@ describe('scenario runner', () => {
 				},
 			},
 			actions: [
-				{ ship: 'miner', type: 'activate_equipment', params: { equipment_slug: 'pds_mk1' } },
+				{
+					ship: 'miner',
+					type: 'activate_equipment',
+					params: { equipment_slug: 'pds_mk1' },
+				},
 			],
 		};
 
@@ -365,8 +481,16 @@ describe('scenario runner', () => {
 				},
 			},
 			actions: [
-				{ ship: 'prey', type: 'activate_equipment', params: { equipment_slug: 'ecm_mk1' } },
-				{ ship: 'wolf', type: 'fire_phaser', params: { target_ship_id: 'prey', duration: 600 } },
+				{
+					ship: 'prey',
+					type: 'activate_equipment',
+					params: { equipment_slug: 'ecm_mk1' },
+				},
+				{
+					ship: 'wolf',
+					type: 'fire_phaser',
+					params: { target_ship_id: 'prey', duration: 600 },
+				},
 			],
 		};
 
@@ -378,7 +502,9 @@ describe('scenario runner', () => {
 		expect(actions[0].status).toBe(ActionStatus.Fulfilled);
 
 		// ECM should reduce phaser drain (shields should be higher than without ECM)
-		expect(timeline[2].ships.prey.shield).toBeLessThan(timeline[0].ships.prey.shield);
+		expect(timeline[2].ships.prey.shield).toBeLessThan(
+			timeline[0].ships.prey.shield
+		);
 
 		// ECM is active
 		expect(timeline[1].ships.prey.activeEquipment).toContain('ecm_mk1');
@@ -402,10 +528,26 @@ describe('scenario runner', () => {
 				miner: { ...baseShip, node: 1 },
 			},
 			actions: [
-				{ ship: 'wolf', type: 'fire_torpedo', params: { target_ship_id: 'miner' } },
-				{ ship: 'wolf', type: 'fire_torpedo', params: { target_ship_id: 'miner' } },
-				{ ship: 'wolf', type: 'fire_torpedo', params: { target_ship_id: 'miner' } },
-				{ ship: 'wolf', type: 'fire_torpedo', params: { target_ship_id: 'miner' } },
+				{
+					ship: 'wolf',
+					type: 'fire_torpedo',
+					params: { target_ship_id: 'miner' },
+				},
+				{
+					ship: 'wolf',
+					type: 'fire_torpedo',
+					params: { target_ship_id: 'miner' },
+				},
+				{
+					ship: 'wolf',
+					type: 'fire_torpedo',
+					params: { target_ship_id: 'miner' },
+				},
+				{
+					ship: 'wolf',
+					type: 'fire_torpedo',
+					params: { target_ship_id: 'miner' },
+				},
 			],
 		};
 
@@ -413,7 +555,8 @@ describe('scenario runner', () => {
 		expect(actions).toHaveLength(4);
 
 		// All 4 torpedoes fired, ammo should be 0
-		const finalAmmo = timeline.at(-1)!.ships.wolf.ammo.torpedo_launcher ?? 0;
+		const finalAmmo =
+			timeline.at(-1)!.ships.wolf.ammo.torpedo_launcher ?? 0;
 		expect(finalAmmo).toBe(0);
 	});
 
@@ -423,7 +566,11 @@ describe('scenario runner', () => {
 			description: 'References nonexistent ship',
 			ships: { explorer: baseShip },
 			actions: [
-				{ ship: 'ghost', type: 'scan_route', params: { target_node_id: 2 } },
+				{
+					ship: 'ghost',
+					type: 'scan_route',
+					params: { target_node_id: 2 },
+				},
 			],
 		};
 
@@ -434,13 +581,23 @@ describe('scenario runner', () => {
 		it('scan_passive returns detections in timeline', () => {
 			const scenario: ScenarioFile = {
 				name: 'detection query',
-				description: 'Damaged target emits shield_regen, listener detects',
+				description:
+					'Damaged target emits shield_regen, listener detects',
 				ships: {
 					target: { ...baseShip },
-					listener: { ...baseShip, hull: 'surveyor', sensor: 'dsc_mk3', passive_scan_interval: 7200 },
+					listener: {
+						...baseShip,
+						hull: 'surveyor',
+						sensor: 'dsc_mk3',
+						passive_scan_interval: 7200,
+					},
 				},
 				actions: [
-					{ ship: 'target', type: 'absorb_damage', params: { amount: 30 } },
+					{
+						ship: 'target',
+						type: 'absorb_damage',
+						params: { amount: 30 },
+					},
 					{ ship: 'listener', type: 'scan_passive' },
 				],
 			};
@@ -461,10 +618,18 @@ describe('scenario runner', () => {
 				description: 'Passive scan waits for scheduled time',
 				ships: {
 					target: { ...baseShip },
-					listener: { ...baseShip, hull: 'surveyor', sensor: 'dsc_mk1' },
+					listener: {
+						...baseShip,
+						hull: 'surveyor',
+						sensor: 'dsc_mk1',
+					},
 				},
 				actions: [
-					{ ship: 'target', type: 'absorb_damage', params: { amount: 30 } },
+					{
+						ship: 'target',
+						type: 'absorb_damage',
+						params: { amount: 30 },
+					},
 					{ ship: 'listener', type: 'scan_passive' },
 				],
 			};
@@ -481,12 +646,25 @@ describe('scenario runner', () => {
 				ships: {
 					target: { ...baseShip },
 					jammer: { ...baseShip, equipment: ['ecm_mk1'] },
-					listener: { ...baseShip, hull: 'surveyor', sensor: 'dsc_mk3', passive_scan_interval: 7200 },
+					listener: {
+						...baseShip,
+						hull: 'surveyor',
+						sensor: 'dsc_mk3',
+						passive_scan_interval: 7200,
+					},
 				},
 				actions: [
-					{ ship: 'target', type: 'absorb_damage', params: { amount: 30 } },
+					{
+						ship: 'target',
+						type: 'absorb_damage',
+						params: { amount: 30 },
+					},
 					{ ship: 'listener', type: 'scan_passive' },
-					{ ship: 'jammer', type: 'activate_equipment', params: { equipment_slug: 'ecm_mk1' } },
+					{
+						ship: 'jammer',
+						type: 'activate_equipment',
+						params: { equipment_slug: 'ecm_mk1' },
+					},
 					{ ship: 'listener', type: 'scan_passive' },
 				],
 			};
@@ -496,7 +674,9 @@ describe('scenario runner', () => {
 			const afterEcm = timeline[4].result!;
 
 			// Before ECM: shield_regen detected
-			expect((beforeEcm.detections as unknown[]).length).toBeGreaterThan(0);
+			expect((beforeEcm.detections as unknown[]).length).toBeGreaterThan(
+				0
+			);
 
 			// After ECM: signal drowned out, no detections
 			expect((afterEcm.detections as unknown[]).length).toBe(0);
@@ -505,20 +685,30 @@ describe('scenario runner', () => {
 		it('absorb_damage creates shield regen emission detectable by listener', () => {
 			const scenario: ScenarioFile = {
 				name: 'shield regen detection',
-				description: 'Damaged ship emits shield_regen, listener detects',
+				description:
+					'Damaged ship emits shield_regen, listener detects',
 				ships: {
 					target: { ...baseShip },
-					listener: { ...baseShip, hull: 'surveyor', sensor: 'dsc_mk3', passive_scan_interval: 7200 },
+					listener: {
+						...baseShip,
+						hull: 'surveyor',
+						sensor: 'dsc_mk3',
+						passive_scan_interval: 7200,
+					},
 				},
 				actions: [
-					{ ship: 'target', type: 'absorb_damage', params: { amount: 30 } },
+					{
+						ship: 'target',
+						type: 'absorb_damage',
+						params: { amount: 30 },
+					},
 					{ ship: 'listener', type: 'scan_passive' },
 				],
 			};
 
 			const { timeline } = runScenario(scenario);
 			const queryResult = timeline[2].result!;
-			expect((queryResult.source_count as number)).toBeGreaterThan(0);
+			expect(queryResult.source_count as number).toBeGreaterThan(0);
 		});
 	});
 });

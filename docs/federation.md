@@ -160,10 +160,11 @@ COULD FEDERATE:
 See `federation-trade.md` for detailed trade deal mechanics.
 
 Summary:
-- Origins negotiate bilateral agreements
-- Deals specify: tariffs, quotas, limits, requirements
-- Transfers happen within deal bounds
-- No deal = no transfers
+
+-   Origins negotiate bilateral agreements
+-   Deals specify: tariffs, quotas, limits, requirements
+-   Transfers happen within deal bounds
+-   No deal = no transfers
 
 ## Deterministic Generation
 
@@ -224,15 +225,17 @@ POST /federation/deals       - Negotiate trade deals
 Federation is a future capability, not current scope.
 
 **Now:**
-- Single Origin holds all truth
-- Ships are clients
-- APIs designed for future federation
-- Deterministic generation maintained
+
+-   Single Origin holds all truth
+-   Ships are clients
+-   APIs designed for future federation
+-   Deterministic generation maintained
 
 **Later:**
-- Multiple Origins with trade deals
-- Shared discovery data
-- Ship/item transfers with tariffs
-- Political/economic gameplay between Origins
+
+-   Multiple Origins with trade deals
+-   Shared discovery data
+-   Ship/item transfers with tariffs
+-   Political/economic gameplay between Origins
 
 The architecture supports it. We just don't build it yet.

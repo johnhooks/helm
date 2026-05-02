@@ -10,13 +10,13 @@ A star system isn't silent. It has a baseline noise floor from stellar radiation
 
 Every ship action adds signal to this environment:
 
-- **Mining** produces extraction emissions (moderate)
-- **System scanning** produces sweep emissions (moderate)
-- **Jumping** produces drive spool/sustain/cooldown signatures (high during spool, moderate during sustain, tapering during cooldown)
-- **PNP scanning** produces active search pulses (very high)
-- **Salvaging** produces extraction emissions (moderate)
-- **Weapons fire** produces combat signatures (very high)
-- **Idle** produces nothing. The ship is indistinguishable from background noise.
+-   **Mining** produces extraction emissions (moderate)
+-   **System scanning** produces sweep emissions (moderate)
+-   **Jumping** produces drive spool/sustain/cooldown signatures (high during spool, moderate during sustain, tapering during cooldown)
+-   **PNP scanning** produces active search pulses (very high)
+-   **Salvaging** produces extraction emissions (moderate)
+-   **Weapons fire** produces combat signatures (very high)
+-   **Idle** produces nothing. The ship is indistinguishable from background noise.
 
 The total electromagnetic activity in a system at any moment is the sum of all these sources plus the baseline. This is the environment every sensor operates within.
 
@@ -44,10 +44,10 @@ PNP scanning is the **loudest** thing a ship can do. Every sweep peak is a beaco
 
 To find a ship in a belt, the wolf needs a **belt scan** — a focused, targeted scan of a specific belt. This changes the hunting math:
 
-- A system with 4 belts means 4 possible hiding spots. The wolf has to pick one.
-- Each belt scan takes time and produces emissions. The miner might detect the wolf's scan and flee before the wolf finishes.
-- The miner might be in belt 3, but the wolf started with belt 1. By the time they scan belt 3, the miner has moved.
-- Or the miner isn't in any belt — they're at a waypoint, or already gone.
+-   A system with 4 belts means 4 possible hiding spots. The wolf has to pick one.
+-   Each belt scan takes time and produces emissions. The miner might detect the wolf's scan and flee before the wolf finishes.
+-   The miner might be in belt 3, but the wolf started with belt 1. By the time they scan belt 3, the miner has moved.
+-   Or the miner isn't in any belt — they're at a waypoint, or already gone.
 
 This makes hunting miners dramatically harder than hunting ships in open space. The wolf can't just sweep the system. They have to commit to specific locations, one at a time, each attempt burning time and producing detectable emissions. The belt is the miner's fortress.
 
@@ -58,23 +58,26 @@ See `docs/plans/envelopes.md` for sweep mechanics (cumulative probability, sweep
 Not a scan the pilot initiates — it's always on. The ship's sensors continuously monitor the system's electromagnetic environment for anomalous signals. Passive detection picks up emissions from other ships' activities.
 
 What passive detection can find:
-- PNP scan emissions (high chance — they're loud)
-- Drive spool signatures (moderate chance — distinctive pattern)
-- Weapons fire (high chance — very energetic)
-- Mining emissions (low chance — similar to natural background)
-- System scan emissions (low chance — moderate energy, common pattern)
-- Salvage emissions (low chance — similar to mining)
+
+-   PNP scan emissions (high chance — they're loud)
+-   Drive spool signatures (moderate chance — distinctive pattern)
+-   Weapons fire (high chance — very energetic)
+-   Mining emissions (low chance — similar to natural background)
+-   System scan emissions (low chance — moderate energy, common pattern)
+-   Salvage emissions (low chance — similar to mining)
 
 What passive detection cannot find:
-- Idle ships (no emissions)
-- Ships running passive detection only (no emissions)
+
+-   Idle ships (no emissions)
+-   Ships running passive detection only (no emissions)
 
 Passive detection chance is affected by:
-- The target's emission strength (louder = easier to detect)
-- The system's noise floor (noisier = harder to distinguish signal from background)
-- The detecting ship's sensor quality and passive affinity
-- Stellar effects (ion storms increase noise, nebulae reduce detection range)
-- Signal processor addon (if equipped — see below)
+
+-   The target's emission strength (louder = easier to detect)
+-   The system's noise floor (noisier = harder to distinguish signal from background)
+-   The detecting ship's sensor quality and passive affinity
+-   Stellar effects (ion storms increase noise, nebulae reduce detection range)
+-   Signal processor addon (if equipped — see below)
 
 ### Passive Belt Scan
 
@@ -84,9 +87,9 @@ Passive belt scanning isn't a separate action. It's passive detection applied to
 
 How long this takes depends on the sensor:
 
-- **DSC** — naturally suited to passive belt scanning. Long integration time pulls weak signals out of noise. Can distinguish a miner from belt noise in hours.
-- **VRS** — moderate passive capability. Takes longer, but workable.
-- **ACU** — poor at passive scanning. Rapid sweep style doesn't integrate well. Could take much longer or simply fail against a dense belt's noise floor.
+-   **DSC** — naturally suited to passive belt scanning. Long integration time pulls weak signals out of noise. Can distinguish a miner from belt noise in hours.
+-   **VRS** — moderate passive capability. Takes longer, but workable.
+-   **ACU** — poor at passive scanning. Rapid sweep style doesn't integrate well. Could take much longer or simply fail against a dense belt's noise floor.
 
 The wolf running a passive belt scan produces **no emissions**. They're just listening. The miner has no way to know they're being watched. This is the patient predator's tool — sit outside a belt for hours, listening, invisible, until the signal resolves.
 
@@ -98,11 +101,11 @@ But it's slow. And the wolf has to choose a belt — they can't passively monito
 
 Each sensor has a natural affinity — a balance between active scanning (emitting energy and reading the returns) and passive detection (listening for emissions from other sources).
 
-| Sensor | Active Affinity | Passive Affinity | Character |
-|--------|----------------|-----------------|-----------|
-| ACU | High | Low | Loud hunter. Finds targets fast, broadcasts its presence. |
-| VRS | Moderate | Moderate | Balanced. Adequate at both, optimal at neither. |
-| DSC | Low | High | Patient listener. Quiet operation, slow but deep detection. |
+| Sensor | Active Affinity | Passive Affinity | Character                                                   |
+| ------ | --------------- | ---------------- | ----------------------------------------------------------- |
+| ACU    | High            | Low              | Loud hunter. Finds targets fast, broadcasts its presence.   |
+| VRS    | Moderate        | Moderate         | Balanced. Adequate at both, optimal at neither.             |
+| DSC    | Low             | High             | Patient listener. Quiet operation, slow but deep detection. |
 
 Active affinity affects: PNP scan effectiveness, system survey speed, belt scan speed (active mode).
 
@@ -116,13 +119,13 @@ The signal processor is an equipment slot module that modifies a sensor's detect
 
 **What it does.** Each signal processor variant adjusts the sensor's active/passive balance:
 
-- **Correlator.** Boosts passive affinity. Better signal integration, faster passive belt scans, higher passive detection probability. Reduces active scan effectiveness slightly. The bounty hunter's tool.
-- **Amplifier.** Boosts active affinity. Louder, more effective PNP scans and active belt scans. Reduces passive sensitivity. The aggressive hunter's tool.
-- **Filter.** Reduces the ship's own emission signature across all actions. Doesn't improve scanning — improves hiding. The prey's tool. A miner with a filter is harder to find even outside a belt.
+-   **Correlator.** Boosts passive affinity. Better signal integration, faster passive belt scans, higher passive detection probability. Reduces active scan effectiveness slightly. The bounty hunter's tool.
+-   **Amplifier.** Boosts active affinity. Louder, more effective PNP scans and active belt scans. Reduces passive sensitivity. The aggressive hunter's tool.
+-   **Filter.** Reduces the ship's own emission signature across all actions. Doesn't improve scanning — improves hiding. The prey's tool. A miner with a filter is harder to find even outside a belt.
 
 **Who equips it.** PVP players — hunters, bounty hunters, pirates, and the experienced frontier miners who've been ganked before and decided awareness is worth more than yield. The explorer surveying systems doesn't need it. The hauler on a trade route doesn't need it. The miner in hisec doesn't need it.
 
-The signal processor in your equipment slot *is* the tell. A ship carrying one has committed to a playstyle where detection matters. Their loadout says what they're here for before they do anything.
+The signal processor in your equipment slot _is_ the tell. A ship carrying one has committed to a playstyle where detection matters. Their loadout says what they're here for before they do anything.
 
 ### Wreck Scan
 
@@ -152,29 +155,31 @@ Each action produces a characteristic emission pattern. The pattern matters beca
 
 The drive envelope (see `docs/plans/envelopes.md`) produces a distinctive three-phase signature:
 
-- **Spool:** Sharp spike. Highly detectable. A drive spooling up is an unmistakable signal — something is about to jump.
-- **Sustain:** Steady emission during transit. Detectable but less distinctive than the spool spike.
-- **Cooldown:** Tapering emission. A ship that just arrived is still electromagnetically "hot." This is why scanning during drive cooldown is degraded — the ship's own residual drive emissions interfere with its sensors.
+-   **Spool:** Sharp spike. Highly detectable. A drive spooling up is an unmistakable signal — something is about to jump.
+-   **Sustain:** Steady emission during transit. Detectable but less distinctive than the spool spike.
+-   **Cooldown:** Tapering emission. A ship that just arrived is still electromagnetically "hot." This is why scanning during drive cooldown is degraded — the ship's own residual drive emissions interfere with its sensors.
 
 Drive emissions matter for detection because:
-- A spool spike tells everyone "a ship is about to leave"
-- A cooldown signature tells everyone "a ship just arrived"
-- Both are involuntary — the pilot can't suppress them
+
+-   A spool spike tells everyone "a ship is about to leave"
+-   A cooldown signature tells everyone "a ship just arrived"
+-   Both are involuntary — the pilot can't suppress them
 
 ### Scan Emissions
 
 Each sweep peak is an emission event (see `docs/plans/envelopes.md`). The emission strength scales with scan type and effort:
 
-| Scan Type | Emission per Sweep | Effort Scaling |
-|-----------|-------------------|----------------|
-| System survey | Moderate | More effort = more sweeps = more emissions |
-| Planet scan | Low | Focused, directional |
-| PNP scan | Very high | More effort = significantly louder |
+| Scan Type     | Emission per Sweep | Effort Scaling                             |
+| ------------- | ------------------ | ------------------------------------------ |
+| System survey | Moderate           | More effort = more sweeps = more emissions |
+| Planet scan   | Low                | Focused, directional                       |
+| PNP scan      | Very high          | More effort = significantly louder         |
 
 Sensor character affects emission pattern:
-- **ACU (rapid sweeps):** Frequent, short emission bursts. Easy to detect because of repetition.
-- **VRS (moderate sweeps):** Balanced emission cadence.
-- **DSC (long dwell):** Infrequent, longer emission events. Harder to distinguish from background because they're spaced further apart.
+
+-   **ACU (rapid sweeps):** Frequent, short emission bursts. Easy to detect because of repetition.
+-   **VRS (moderate sweeps):** Balanced emission cadence.
+-   **DSC (long dwell):** Infrequent, longer emission events. Harder to distinguish from background because they're spaced further apart.
 
 This means the DSC is the quietest hunter. Fewer emissions per hour, harder to detect. But slower to find anything.
 
@@ -198,17 +203,17 @@ Active disruption of the electromagnetic environment. This is the intentional co
 
 A ship or station can run ECM to degrade scanning in its vicinity:
 
-- **Noise generation.** Flood the local EM environment with false signals, raising the noise floor artificially. Every scan in the system becomes less effective — including the ECM operator's own scans.
-- **Signature spoofing.** Generate false ship signatures. PNP scans return ghost contacts that aren't real. The scanner wastes time investigating phantoms.
-- **Scan disruption.** Targeted interference with a specific ship's sensor sweeps. Degrades their detection probability per sweep without affecting other ships. Requires knowing the target is there.
+-   **Noise generation.** Flood the local EM environment with false signals, raising the noise floor artificially. Every scan in the system becomes less effective — including the ECM operator's own scans.
+-   **Signature spoofing.** Generate false ship signatures. PNP scans return ghost contacts that aren't real. The scanner wastes time investigating phantoms.
+-   **Scan disruption.** Targeted interference with a specific ship's sensor sweeps. Degrades their detection probability per sweep without affecting other ships. Requires knowing the target is there.
 
 ### ECCM (Electronic Counter-Countermeasures)
 
 Defensive measures against ECM:
 
-- **Signal filtering.** Better sensors can distinguish real signals from ECM noise. High-experience sensors with drift toward detection are better at filtering.
-- **Pattern recognition.** ECM noise has patterns that differ from natural noise. A skilled sensor (high usage, detection drift) can learn to ignore them. This is a concrete benefit of component drift — a veteran sensor has "seen" ECM before.
-- **Frequency hopping.** Change sweep parameters to avoid targeted disruption. Costs scan efficiency but resists targeted ECM.
+-   **Signal filtering.** Better sensors can distinguish real signals from ECM noise. High-experience sensors with drift toward detection are better at filtering.
+-   **Pattern recognition.** ECM noise has patterns that differ from natural noise. A skilled sensor (high usage, detection drift) can learn to ignore them. This is a concrete benefit of component drift — a veteran sensor has "seen" ECM before.
+-   **Frequency hopping.** Change sweep parameters to avoid targeted disruption. Costs scan efficiency but resists targeted ECM.
 
 ### Station ECM
 
@@ -272,9 +277,10 @@ Each sensor type has a different detection profile, adding to their existing exp
 **DSC (Deep Space Cartographer).** Best at detecting faint, infrequent signals against high noise. The DSC's long dwell time integrates signal over longer periods, pulling weak signals out of noise. Good at finding ships trying to be quiet. Poor at quickly identifying strong, obvious contacts (wastes its integration time on signals the ACU would catch instantly).
 
 This means sensor choice affects PVP beyond just scan range:
-- The ACU is the aggressive hunter — finds active targets fast, but loud and obvious
-- The DSC is the patient hunter — finds hidden targets, quiet operation, but slow
-- The VRS is the balanced choice — adequate at both, optimal at neither
+
+-   The ACU is the aggressive hunter — finds active targets fast, but loud and obvious
+-   The DSC is the patient hunter — finds hidden targets, quiet operation, but slow
+-   The VRS is the balanced choice — adequate at both, optimal at neither
 
 ## What Scanning Reveals
 
@@ -282,7 +288,7 @@ Detection isn't binary. The quality of information depends on the detection meth
 
 **Passive detection.** Minimal information. "Emission detected — possible ship activity." No identity, no location within the system, just awareness that something is there. Enough to trigger a flee script or raise alertness.
 
-**PNP scan hit.** More information. Ship type (hull class), approximate loadout signature (combat-fitted vs cargo-fitted), activity state (mining, scanning, idle, jumping). Not identity — you know *what* is there, not *who*.
+**PNP scan hit.** More information. Ship type (hull class), approximate loadout signature (combat-fitted vs cargo-fitted), activity state (mining, scanning, idle, jumping). Not identity — you know _what_ is there, not _who_.
 
 **Sustained contact.** Multiple scan hits on the same target build a profile. After several sweep detections, you can identify the ship. Name, owner, possibly bounty status. This takes time and multiple successful sweeps — quick identification requires aggressive scanning, which means more emissions.
 
@@ -290,14 +296,14 @@ Detection isn't binary. The quality of information depends on the detection meth
 
 ## Open Questions
 
-- **Emission values.** What are the actual numbers? Each action type needs an emission strength value, and the noise floor calculation needs to produce meaningful detection probabilities. Too easy and nobody is safe. Too hard and PVP is impossible.
+-   **Emission values.** What are the actual numbers? Each action type needs an emission strength value, and the noise floor calculation needs to produce meaningful detection probabilities. Too easy and nobody is safe. Too hard and PVP is impossible.
 
-- **Passive detection frequency.** How often does the engine evaluate passive detection? Every checkpoint? A separate tick? Continuous (computed from timestamps like power)?
+-   **Passive detection frequency.** How often does the engine evaluate passive detection? Every checkpoint? A separate tick? Continuous (computed from timestamps like power)?
 
-- **ECM balance.** ECM that's too strong makes scanning useless. ECM that's too weak isn't worth the equipment slot. The balance needs simulation testing.
+-   **ECM balance.** ECM that's too strong makes scanning useless. ECM that's too weak isn't worth the equipment slot. The balance needs simulation testing.
 
-- **Detection range within a system.** The current model treats a system as a single location. Should some emissions have "range" within the system abstraction? (e.g., mining on the far side of the system is harder to detect than mining near you.) This adds complexity but might be worth it for tactical depth.
+-   **Detection range within a system.** The current model treats a system as a single location. Should some emissions have "range" within the system abstraction? (e.g., mining on the far side of the system is harder to detect than mining near you.) This adds complexity but might be worth it for tactical depth.
 
-- **Information decay.** Once you detect a ship, how long is that information valid? Ships move, change activity, jump out. Stale contacts create false confidence. Some decay mechanism prevents "I scanned 2 hours ago so I know everything."
+-   **Information decay.** Once you detect a ship, how long is that information valid? Ships move, change activity, jump out. Stale contacts create false confidence. Some decay mechanism prevents "I scanned 2 hours ago so I know everything."
 
-- **Scan data as tradeable commodity.** System survey data is already tradeable. Should real-time detection data be tradeable? "I'll sell you the current ship contacts in this system." Creates an intelligence market.
+-   **Scan data as tradeable commodity.** System survey data is already tradeable. Should real-time detection data be tradeable? "I'll sell you the current ship contacts in this system." Creates an intelligence market.

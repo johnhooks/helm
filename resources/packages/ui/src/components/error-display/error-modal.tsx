@@ -14,24 +14,24 @@ export interface ErrorModalProps extends ErrorContentProps {
 	isOpen?: boolean;
 }
 
-export function ErrorModal( {
+export function ErrorModal({
 	onDismiss,
 	isOpen = true,
 	...contentProps
-}: ErrorModalProps ) {
+}: ErrorModalProps) {
 	return (
 		<LcarsModal
 			title="Error"
 			tone="danger"
-			isOpen={ isOpen }
-			onRequestClose={ onDismiss }
+			isOpen={isOpen}
+			onRequestClose={onDismiss}
 			footer={
-				<Button variant="secondary" onClick={ onDismiss }>
+				<Button variant="secondary" onClick={onDismiss}>
 					Dismiss
 				</Button>
 			}
 		>
-			<ErrorContent { ...contentProps } />
+			<ErrorContent {...contentProps} />
 		</LcarsModal>
 	);
 }

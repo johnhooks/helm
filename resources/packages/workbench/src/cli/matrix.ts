@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 import { computeShipReport } from '../report';
 import { getProductsByType } from '../data/products';
 import { HULLS } from '../data/hulls';
@@ -26,7 +28,7 @@ function getSlotValues(slot: SlotType): string[] {
 function cartesian(arrays: string[][]): string[][] {
 	return arrays.reduce<string[][]>(
 		(acc, arr) => acc.flatMap((combo) => arr.map((val) => [...combo, val])),
-		[[]],
+		[[]]
 	);
 }
 
@@ -41,7 +43,9 @@ export function matrix({ flags }: ParsedFlags): void {
 	const validSlots: SlotType[] = ['hull', ...COMPONENT_TYPES];
 	for (const slot of varySlots) {
 		if (!validSlots.includes(slot)) {
-			console.error(`Unknown slot "${slot}". Valid: ${validSlots.join(', ')}`); // eslint-disable-line no-console
+			console.error(
+				`Unknown slot "${slot}". Valid: ${validSlots.join(', ')}`
+			); // eslint-disable-line no-console
 			process.exit(1);
 		}
 	}
@@ -52,7 +56,11 @@ export function matrix({ flags }: ParsedFlags): void {
 	// Build pinned flags (everything except vary/tuning/const.*)
 	const pinnedFlags: Record<string, string> = {};
 	for (const [key, value] of Object.entries(flags)) {
-		if (key !== 'vary' && !key.startsWith('const.') && !TUNING_KEYS.has(key)) {
+		if (
+			key !== 'vary' &&
+			!key.startsWith('const.') &&
+			!TUNING_KEYS.has(key)
+		) {
 			pinnedFlags[key] = value;
 		}
 	}
@@ -68,7 +76,11 @@ export function matrix({ flags }: ParsedFlags): void {
 		});
 
 		const loadout = hydrateLoadout(loadoutFlags);
-		const shipReport = computeShipReport(toReportLoadout(loadout), tuning, constants);
+		const shipReport = computeShipReport(
+			toReportLoadout(loadout),
+			tuning,
+			constants
+		);
 
 		return {
 			loadout: loadoutSlugs(loadout),

@@ -29,7 +29,7 @@ import { DEFAULT_DSP_CONSTANTS, DEFAULT_EMISSION_PROFILES } from './types';
 export function invertSigmoid(
 	confidence: number,
 	threshold: number = DEFAULT_DSP_CONSTANTS.detectionThreshold,
-	steepness: number = DEFAULT_DSP_CONSTANTS.detectionSteepness,
+	steepness: number = DEFAULT_DSP_CONSTANTS.detectionSteepness
 ): number {
 	if (confidence <= 0) {
 		return 0;
@@ -69,16 +69,20 @@ export function estimateEmissionPower(
 	samplePeriod: number = DEFAULT_DSP_CONSTANTS.samplePeriodSeconds,
 	matchedGain: number = 1.0,
 	maskingNoise: number = 0,
-	pilotSkill: number = 1.0,
+	pilotSkill: number = 1.0
 ): number {
 	// Step 1: recover integrated+filtered SNR from confidence
 	const integratedSNR = invertSigmoid(confidence);
 
 	// Step 2: undo matched filter gain
-	const rawIntegratedSNR = matchedGain > 0 ? integratedSNR / matchedGain : integratedSNR;
+	const rawIntegratedSNR =
+		matchedGain > 0 ? integratedSNR / matchedGain : integratedSNR;
 
 	// Step 3: undo integration gain (/ sqrt(N))
-	const sampleCount = Math.max(1, Math.floor(integrationSeconds / samplePeriod));
+	const sampleCount = Math.max(
+		1,
+		Math.floor(integrationSeconds / samplePeriod)
+	);
 	const instantSNR = rawIntegratedSNR / Math.sqrt(sampleCount);
 
 	// Step 4: SNR * total noise = effective signal
@@ -102,7 +106,7 @@ export function estimateEmissionPower(
  */
 export function classifyEmission(
 	estimatedPower: number,
-	profiles: Record<string, EmissionProfile> = DEFAULT_EMISSION_PROFILES,
+	profiles: Record<string, EmissionProfile> = DEFAULT_EMISSION_PROFILES
 ): Array<{ type: string; distance: number }> {
 	const results = Object.entries(profiles).map(([type, profile]) => ({
 		type,

@@ -7,7 +7,13 @@ import { ActionStatus, isActionComplete } from '../enums/action-status';
 import { ActionType } from '../enums/action-type';
 import type { Ship } from '../ship';
 import type { NavGraph } from '../nav-graph';
-import type { Action, ActionContext, ActionPreview, EmissionDeclaration, EmissionRecord } from './types';
+import type {
+	Action,
+	ActionContext,
+	ActionPreview,
+	EmissionDeclaration,
+	EmissionRecord,
+} from './types';
 import { ActionError, ActionErrorCode } from './types';
 import { getHandler } from './registry';
 import { computeEMSnapshot } from '../em-snapshot';
@@ -60,7 +66,7 @@ export class Engine implements ActionContext {
 			(e) =>
 				e.nodeId === nodeId &&
 				e.startedAt <= t &&
-				(e.endedAt === null || e.endedAt > t),
+				(e.endedAt === null || e.endedAt > t)
 		);
 	}
 
@@ -73,7 +79,7 @@ export class Engine implements ActionContext {
 		actionId: number,
 		declarations: EmissionDeclaration[],
 		startedAt: number,
-		defaultNodeId: number,
+		defaultNodeId: number
 	): void {
 		for (const decl of declarations) {
 			this.emissions.push({
@@ -103,7 +109,7 @@ export class Engine implements ActionContext {
 	submitAction(
 		ship: Ship,
 		type: ActionType,
-		params: Record<string, unknown> = {},
+		params: Record<string, unknown> = {}
 	): Action {
 		const shipId = ship.resolve().id;
 
@@ -115,7 +121,7 @@ export class Engine implements ActionContext {
 		if (this.currentActionByShip.has(shipId)) {
 			throw new ActionError(
 				ActionErrorCode.ActionInProgress,
-				'An action is already in progress',
+				'An action is already in progress'
 			);
 		}
 
@@ -123,7 +129,7 @@ export class Engine implements ActionContext {
 		if (!handler) {
 			throw new ActionError(
 				ActionErrorCode.ActionNoHandler,
-				`No handler registered for action type: ${type}`,
+				`No handler registered for action type: ${type}`
 			);
 		}
 
@@ -149,7 +155,13 @@ export class Engine implements ActionContext {
 		const nodeId = ship.resolve().nodeId ?? 0;
 
 		if (intent.emissions?.length) {
-			this.recordEmissions(shipId, action.id, intent.emissions, now, nodeId);
+			this.recordEmissions(
+				shipId,
+				action.id,
+				intent.emissions,
+				now,
+				nodeId
+			);
 		}
 
 		if (intent.deferredUntil === null) {
@@ -181,7 +193,8 @@ export class Engine implements ActionContext {
 				break;
 			}
 
-			const nextPassiveScan = this.findNextPassiveScanBefore(earliestDeferral);
+			const nextPassiveScan =
+				this.findNextPassiveScanBefore(earliestDeferral);
 			if (nextPassiveScan !== null) {
 				this.clock.advanceTo(nextPassiveScan);
 				all.push(...this.processPassiveScans());
@@ -199,7 +212,10 @@ export class Engine implements ActionContext {
 		let earliest: number | null = null;
 		for (const actionId of this.currentActionByShip.values()) {
 			const action = this.actions.find((a) => a.id === actionId);
-			if (action?.deferredUntil !== null && action?.deferredUntil !== undefined) {
+			if (
+				action?.deferredUntil !== null &&
+				action?.deferredUntil !== undefined
+			) {
 				if (earliest === null || action.deferredUntil < earliest) {
 					earliest = action.deferredUntil;
 				}
@@ -227,11 +243,14 @@ export class Engine implements ActionContext {
 	previewAction(
 		ship: Ship,
 		type: ActionType,
-		params: Record<string, unknown> = {},
+		params: Record<string, unknown> = {}
 	): ActionPreview {
 		const handler = getHandler(type);
 		if (!handler) {
-			return { valid: false, error: `No handler for action type: ${type}` };
+			return {
+				valid: false,
+				error: `No handler for action type: ${type}`,
+			};
 		}
 
 		const clonedClock = createClock(this.clock.now());
@@ -272,7 +291,11 @@ export class Engine implements ActionContext {
 			Object.assign(tempAction.result, outcome.result);
 			tempAction.status = outcome.status;
 
-			if (outcome.deferredUntil !== null && outcome.deferredUntil !== undefined && !isActionComplete(outcome.status)) {
+			if (
+				outcome.deferredUntil !== null &&
+				outcome.deferredUntil !== undefined &&
+				!isActionComplete(outcome.status)
+			) {
 				tempAction.deferredUntil = outcome.deferredUntil;
 				iterations++;
 			} else {
@@ -334,14 +357,14 @@ export class Engine implements ActionContext {
 			spectralClass,
 			actionEmissions,
 			shipsAtNode,
-			t,
+			t
 		);
 	}
 
 	queryPassiveDetection(
 		shipId: string,
 		integrationSeconds: number,
-		atTime?: number,
+		atTime?: number
 	): PassiveDetectionResult | null {
 		const ship = this.shipRegistry.get(shipId);
 		if (!ship) {
@@ -363,13 +386,15 @@ export class Engine implements ActionContext {
 
 		// Filter out querying ship's own emissions from sources
 		// (own emissions still contribute to noise floor via the snapshot)
-		const otherSources = snapshot.sources.filter((s) => s.shipId !== shipId);
+		const otherSources = snapshot.sources.filter(
+			(s) => s.shipId !== shipId
+		);
 
 		const detections = passiveReport(
 			otherSources,
 			snapshot.noiseFloor,
 			sensorAffinity,
-			integrationSeconds,
+			integrationSeconds
 		);
 
 		const enriched: EnrichedDetection[] = detections.map((d) => ({
@@ -422,12 +447,16 @@ export class Engine implements ActionContext {
 	private createPassiveScanAction(
 		shipId: string,
 		ship: Ship,
-		now: number,
+		now: number
 	): Action | null {
 		const state = ship.resolve();
 		const integrationSeconds = state.passiveScanInterval;
 
-		const result = this.queryPassiveDetection(shipId, integrationSeconds, now);
+		const result = this.queryPassiveDetection(
+			shipId,
+			integrationSeconds,
+			now
+		);
 		if (!result || result.detections.length === 0) {
 			return null;
 		}
@@ -486,7 +515,11 @@ export class Engine implements ActionContext {
 			// Merge result
 			Object.assign(action.result, outcome.result);
 
-			if (outcome.deferredUntil !== null && outcome.deferredUntil !== undefined && !isActionComplete(outcome.status)) {
+			if (
+				outcome.deferredUntil !== null &&
+				outcome.deferredUntil !== undefined &&
+				!isActionComplete(outcome.status)
+			) {
 				// Multi-phase: action continues to next phase
 				action.status = outcome.status;
 				action.deferredUntil = outcome.deferredUntil;
@@ -499,7 +532,7 @@ export class Engine implements ActionContext {
 						actionId,
 						outcome.emissions,
 						now,
-						currentNodeId,
+						currentNodeId
 					);
 				}
 			} else {

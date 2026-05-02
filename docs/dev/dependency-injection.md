@@ -146,18 +146,18 @@ final class Provider extends ServiceProvider
 
 ### Guidelines
 
-- **No factory closures** unless you need conditional logic or multi-step initialization
-- **No unused imports** — auto-wiring means the provider doesn't reference dependency classes
-- **`register()` for bindings**, `boot()` for hooks — all providers are registered before any boot
-- **One singleton per class** — DI52 handles the dependency graph
+-   **No factory closures** unless you need conditional logic or multi-step initialization
+-   **No unused imports** — auto-wiring means the provider doesn't reference dependency classes
+-   **`register()` for bindings**, `boot()` for hooks — all providers are registered before any boot
+-   **One singleton per class** — DI52 handles the dependency graph
 
 ## When You Still Need a Factory Closure
 
 Rare cases where auto-wiring isn't enough:
 
-- **Conditional initialization** — different implementations based on runtime state
-- **Multi-step setup** — object needs method calls after construction
-- **Non-class dependencies from WordPress** — values only available at runtime via function calls that can't be expressed as `when()->needs()->give()`
+-   **Conditional initialization** — different implementations based on runtime state
+-   **Multi-step setup** — object needs method calls after construction
+-   **Non-class dependencies from WordPress** — values only available at runtime via function calls that can't be expressed as `when()->needs()->give()`
 
 ```php
 $this->container->singleton(MyService::class, function () {

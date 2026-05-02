@@ -8,13 +8,15 @@ export function renderHullBalance(ctx: ReportContext): ReportFile {
 
 	lines.push(heading(1, 'Hull & Component Balance'));
 	lines.push('');
-	lines.push(metaBlock({
-		'Generated': ctx.generated,
-		'Sources': 'runBalance(), runAnalyse()',
-		'Balance rows': balance.rows.length,
-		'Outliers': balance.outliers.length,
-		'Analysis categories': analyse.categories.length,
-	}));
+	lines.push(
+		metaBlock({
+			Generated: ctx.generated,
+			Sources: 'runBalance(), runAnalyse()',
+			'Balance rows': balance.rows.length,
+			Outliers: balance.outliers.length,
+			'Analysis categories': analyse.categories.length,
+		})
+	);
 	lines.push('');
 
 	// ── Outlier analysis ──
@@ -51,14 +53,24 @@ export function renderHullBalance(ctx: ReportContext): ReportFile {
 		matrixColumns.splice(1, 0, ['Core', 'core']);
 	}
 	if (balance.rows.some((row) => row.drive)) {
-		matrixColumns.splice(balance.rows.some((row) => row.core) ? 2 : 1, 0, ['Drive', 'drive']);
+		matrixColumns.splice(balance.rows.some((row) => row.core) ? 2 : 1, 0, [
+			'Drive',
+			'drive',
+		]);
 	}
 
-	lines.push(table(matrixColumns, balance.rows as unknown as Record<string, unknown>[]));
+	lines.push(
+		table(
+			matrixColumns,
+			balance.rows as unknown as Record<string, unknown>[]
+		)
+	);
 	lines.push('');
 
 	// ── Core × Drive compatibility ──
-	const coreDriveCategory = analyse.categories.find((c) => c.category === 'Core x Drive Matrix');
+	const coreDriveCategory = analyse.categories.find(
+		(c) => c.category === 'Core x Drive Matrix'
+	);
 	if (coreDriveCategory) {
 		lines.push(heading(2, 'Core × Drive Compatibility'));
 		lines.push('');
@@ -76,25 +88,31 @@ export function renderHullBalance(ctx: ReportContext): ReportFile {
 		const constrained = allRows.filter((row) => row.perfRatio < 1);
 		const optimal = allRows.length - constrained.length;
 
-		lines.push(`${optimal} of ${allRows.length} combos run at perfRatio=1.0 (fully matched). `
-			+ `${constrained.length} combos are drive-constrained:`);
+		lines.push(
+			`${optimal} of ${allRows.length} combos run at perfRatio=1.0 (fully matched). ` +
+				`${constrained.length} combos are drive-constrained:`
+		);
 		lines.push('');
 
-		lines.push(table(
-			[
-				['Combo', 'combo'],
-				['perfRatio', 'perfRatio'],
-				['Capacitor', 'capacitor'],
-				['Regen/hr', 'regenRate'],
-				['Jump Comfort', 'jumpComfort'],
-			],
-			constrained.sort((a, b) => a.perfRatio - b.perfRatio),
-		));
+		lines.push(
+			table(
+				[
+					['Combo', 'combo'],
+					['perfRatio', 'perfRatio'],
+					['Capacitor', 'capacitor'],
+					['Regen/hr', 'regenRate'],
+					['Jump Comfort', 'jumpComfort'],
+				],
+				constrained.sort((a, b) => a.perfRatio - b.perfRatio)
+			)
+		);
 		lines.push('');
 	}
 
 	// ── Power Budget ──
-	const powerBudget = analyse.categories.find((c) => c.category === 'Power Budget Validation');
+	const powerBudget = analyse.categories.find(
+		(c) => c.category === 'Power Budget Validation'
+	);
 	if (powerBudget) {
 		lines.push(heading(2, 'Power Budget Validation'));
 		lines.push('');
@@ -107,7 +125,9 @@ export function renderHullBalance(ctx: ReportContext): ReportFile {
 	}
 
 	// ── Hull Specializations ──
-	const hullSpecs = analyse.categories.find((c) => c.category === 'Hull Specializations');
+	const hullSpecs = analyse.categories.find(
+		(c) => c.category === 'Hull Specializations'
+	);
 	if (hullSpecs) {
 		lines.push(heading(2, 'Hull Specializations'));
 		lines.push('');
@@ -120,7 +140,9 @@ export function renderHullBalance(ctx: ReportContext): ReportFile {
 	}
 
 	// ── Crossover Products ──
-	const crossovers = analyse.categories.find((c) => c.category === 'Crossover Products');
+	const crossovers = analyse.categories.find(
+		(c) => c.category === 'Crossover Products'
+	);
 	if (crossovers) {
 		lines.push(heading(2, 'Crossover Products'));
 		lines.push('');
@@ -136,22 +158,26 @@ export function renderHullBalance(ctx: ReportContext): ReportFile {
 			cargo: s.output.footprint.cargo,
 		}));
 
-		lines.push(table(
-			[
-				['Loadout', 'name'],
-				['perfRatio', 'perfRatio'],
-				['Jump Comfort', 'jumpComfort'],
-				['Scan Comfort', 'scanComfort'],
-				['Shield Cap', 'shieldCap'],
-				['Cargo', 'cargo'],
-			],
-			crossRows,
-		));
+		lines.push(
+			table(
+				[
+					['Loadout', 'name'],
+					['perfRatio', 'perfRatio'],
+					['Jump Comfort', 'jumpComfort'],
+					['Scan Comfort', 'scanComfort'],
+					['Shield Cap', 'shieldCap'],
+					['Cargo', 'cargo'],
+				],
+				crossRows
+			)
+		);
 		lines.push('');
 	}
 
 	// ── Core Lifecycle ──
-	const coreLifecycle = analyse.categories.find((c) => c.category === 'Core Lifecycle');
+	const coreLifecycle = analyse.categories.find(
+		(c) => c.category === 'Core Lifecycle'
+	);
 	if (coreLifecycle) {
 		lines.push(heading(2, 'Core Lifecycle'));
 		lines.push('');
@@ -159,11 +185,18 @@ export function renderHullBalance(ctx: ReportContext): ReportFile {
 		lines.push('');
 
 		// Show only throttle=1.0 scenarios (the finite jump counts)
-		const finiteScenarios = coreLifecycle.scenarios.filter((s) => s.name.includes('throttle=1.0'));
+		const finiteScenarios = coreLifecycle.scenarios.filter((s) =>
+			s.name.includes('throttle=1.0')
+		);
 		const lifecycleRows = finiteScenarios.map((s) => {
-			const jump5 = s.output.jump.sampleJumps.find((j: { distance: number }) => j.distance === 5);
+			const jump5 = s.output.jump.sampleJumps.find(
+				(j: { distance: number }) => j.distance === 5
+			);
 			const coreCost = jump5?.coreCost ?? 0;
-			const jumps = coreCost > 0 ? Math.floor(s.output.power.coreLife / coreCost) : Infinity;
+			const jumps =
+				coreCost > 0
+					? Math.floor(s.output.power.coreLife / coreCost)
+					: Infinity;
 			return {
 				combo: s.name.replace(' @ throttle=1.0', ''),
 				coreLife: s.output.power.coreLife,
@@ -172,20 +205,24 @@ export function renderHullBalance(ctx: ReportContext): ReportFile {
 			};
 		});
 
-		lines.push(table(
-			[
-				['Combo', 'combo'],
-				['Core Life', 'coreLife'],
-				['Cost/5ly Jump', 'coreCost'],
-				['Jumps Until Death', 'jumps'],
-			],
-			lifecycleRows,
-		));
+		lines.push(
+			table(
+				[
+					['Combo', 'combo'],
+					['Core Life', 'coreLife'],
+					['Cost/5ly Jump', 'coreCost'],
+					['Jumps Until Death', 'jumps'],
+				],
+				lifecycleRows
+			)
+		);
 		lines.push('');
 	}
 
 	// ── Edge Cases ──
-	const edgeCases = analyse.categories.find((c) => c.category === 'Edge Cases');
+	const edgeCases = analyse.categories.find(
+		(c) => c.category === 'Edge Cases'
+	);
 	if (edgeCases) {
 		lines.push(heading(2, 'Edge Cases'));
 		lines.push('');

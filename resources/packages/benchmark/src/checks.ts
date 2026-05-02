@@ -19,7 +19,9 @@ export async function checkReadiness(): Promise<void> {
 		status = JSON.parse(raw) as StatusOutput;
 	} catch (err) {
 		die(
-			`Could not read helm status. Is Lando running?\n  ${(err as Error).message}`
+			`Could not read helm status. Is Lando running?\n  ${
+				(err as Error).message
+			}`
 		);
 	}
 

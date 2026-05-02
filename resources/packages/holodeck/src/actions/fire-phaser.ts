@@ -1,28 +1,43 @@
 import {
-	phaserDraw, phaserShieldDrain, phaserHullDamage,
+	phaserDraw,
+	phaserShieldDrain,
+	phaserHullDamage,
 	ecmLockDegradation,
 	DEFAULT_DSP_CONSTANTS,
-	emissionPower, DEFAULT_EMISSION_PROFILES,
+	emissionPower,
+	DEFAULT_EMISSION_PROFILES,
 } from '@helm/formulas';
 import type { Ship } from '../ship';
 import type { CatalogProduct } from '../types/catalog';
-import type { Action, ActionContext, ActionHandler, ActionIntent, ActionOutcome } from './types';
+import type {
+	Action,
+	ActionContext,
+	ActionHandler,
+	ActionIntent,
+	ActionOutcome,
+} from './types';
 import { ActionError, ActionErrorCode } from './types';
 import { ActionStatus } from '../enums/action-status';
 
 const DEFAULT_DURATION = 3600;
 
 export const firePhaserHandler: ActionHandler = {
-	validate(ship: Ship, params: Record<string, unknown>, context: ActionContext): void {
+	validate(
+		ship: Ship,
+		params: Record<string, unknown>,
+		context: ActionContext
+	): void {
 		const state = ship.resolve();
 
 		const phaser = state.loadout.equipment.find(
-			(eq) => eq.product.type === 'weapon' && eq.product.slug.includes('phaser'),
+			(eq) =>
+				eq.product.type === 'weapon' &&
+				eq.product.slug.includes('phaser')
 		);
 		if (!phaser) {
 			throw new ActionError(
 				ActionErrorCode.ShipMissingEquipment,
-				'Ship has no phaser in loadout',
+				'Ship has no phaser in loadout'
 			);
 		}
 
@@ -30,7 +45,7 @@ export const firePhaserHandler: ActionHandler = {
 		if (!targetId) {
 			throw new ActionError(
 				ActionErrorCode.ActionMissingParam,
-				'Missing target_ship_id',
+				'Missing target_ship_id'
 			);
 		}
 
@@ -38,14 +53,14 @@ export const firePhaserHandler: ActionHandler = {
 		if (!target) {
 			throw new ActionError(
 				ActionErrorCode.TargetNotFound,
-				`Target ship not found: ${targetId}`,
+				`Target ship not found: ${targetId}`
 			);
 		}
 
 		if (target.resolve().hull <= 0) {
 			throw new ActionError(
 				ActionErrorCode.TargetDestroyed,
-				'Target ship is destroyed',
+				'Target ship is destroyed'
 			);
 		}
 	},
@@ -54,19 +69,24 @@ export const firePhaserHandler: ActionHandler = {
 		ship: Ship,
 		params: Record<string, unknown>,
 		now: number,
-		context: ActionContext,
+		context: ActionContext
 	): ActionIntent {
 		const state = ship.resolve();
 		const targetId = params.target_ship_id as string;
 		const duration = (params.duration as number) ?? DEFAULT_DURATION;
 
 		const phaser = state.loadout.equipment.find(
-			(eq) => eq.product.type === 'weapon' && eq.product.slug.includes('phaser'),
+			(eq) =>
+				eq.product.type === 'weapon' &&
+				eq.product.slug.includes('phaser')
 		)!;
 
 		const weaponMult = state.loadout.hull.weaponDrawMultiplier ?? 1.0;
 		const baseDrainRate = phaser.product.mult_a ?? 0;
-		const drainRate = phaserShieldDrain(baseDrainRate, state.shieldPriority);
+		const drainRate = phaserShieldDrain(
+			baseDrainRate,
+			state.shieldPriority
+		);
 		const baseDraw = (phaser.product as CatalogProduct).draw ?? 0;
 		const powerDraw = phaserDraw(baseDraw, weaponMult);
 
@@ -76,7 +96,7 @@ export const firePhaserHandler: ActionHandler = {
 		if (target) {
 			const targetState = target.resolve();
 			const ecm = targetState.loadout.equipment.find(
-				(eq) => eq.product.slug === 'ecm_mk1',
+				(eq) => eq.product.slug === 'ecm_mk1'
 			);
 			if (ecm && target.isEquipmentActive('ecm_mk1')) {
 				ecmDegradation = ecmLockDegradation(ecm.product.mult_a ?? 0);
@@ -93,11 +113,14 @@ export const firePhaserHandler: ActionHandler = {
 				duration,
 				ecm_degradation: ecmDegradation,
 			},
-			emissions: [{
-				emissionType: 'weapons_fire',
-				spectralType: DEFAULT_EMISSION_PROFILES.weapons_fire.spectralType,
-				basePower: emissionPower('weapons_fire'),
-			}],
+			emissions: [
+				{
+					emissionType: 'weapons_fire',
+					spectralType:
+						DEFAULT_EMISSION_PROFILES.weapons_fire.spectralType,
+					basePower: emissionPower('weapons_fire'),
+				},
+			],
 		};
 	},
 
@@ -118,14 +141,18 @@ export const firePhaserHandler: ActionHandler = {
 		if (!target || target.resolve().hull <= 0) {
 			return {
 				status: ActionStatus.Fulfilled,
-				result: { shield_drained: 0, hull_damage: 0, target_destroyed: false },
+				result: {
+					shield_drained: 0,
+					hull_damage: 0,
+					target_destroyed: false,
+				},
 			};
 		}
 
 		// Calculate effective drain
 		let totalDrain = drainRate * durationHours;
 		if (ecmDegradation > 0) {
-			totalDrain *= (1 - ecmDegradation);
+			totalDrain *= 1 - ecmDegradation;
 		}
 
 		const beforeShield = target.resolve().shield;
@@ -136,16 +163,25 @@ export const firePhaserHandler: ActionHandler = {
 
 		if (beforeShield <= 0) {
 			// Shields already down — full duration hits hull
-			const hullDmgRate = phaserHullDamage(baseDrainRate, 1.0, hullDamageMult);
+			const hullDmgRate = phaserHullDamage(
+				baseDrainRate,
+				1.0,
+				hullDamageMult
+			);
 			hullDamage = hullDmgRate * durationHours * (1 - ecmDegradation);
 			target.absorbDamage(hullDamage);
 		} else if (totalDrain >= beforeShield) {
 			// Shields depleted mid-burst — remaining time hits hull
 			shieldDrained = beforeShield;
 			const shieldDepletionFraction = beforeShield / totalDrain;
-			const remainingHours = durationHours * (1 - shieldDepletionFraction);
+			const remainingHours =
+				durationHours * (1 - shieldDepletionFraction);
 
-			const hullDmgRate = phaserHullDamage(baseDrainRate, 1.0, hullDamageMult);
+			const hullDmgRate = phaserHullDamage(
+				baseDrainRate,
+				1.0,
+				hullDamageMult
+			);
 			hullDamage = hullDmgRate * remainingHours * (1 - ecmDegradation);
 
 			target.absorbDamage(beforeShield + hullDamage);

@@ -5,7 +5,7 @@ import { makeLoadout } from '../test-helpers';
 
 function createCargoSystem(
 	cargo: Record<string, number> = {},
-	ammo: Record<string, number> = {},
+	ammo: Record<string, number> = {}
 ) {
 	const state = createInternalState(makeLoadout(), { cargo, ammo });
 	return new CargoSystem(state);

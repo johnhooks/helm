@@ -88,11 +88,12 @@ Systems/Power/
 ```
 
 Each Provider registers:
-- Service bindings
-- WordPress hooks/filters
-- REST routes
-- CLI commands
-- Action Scheduler jobs
+
+-   Service bindings
+-   WordPress hooks/filters
+-   REST routes
+-   CLI commands
+-   Action Scheduler jobs
 
 ### Service Providers
 
@@ -142,16 +143,18 @@ resources/packages/
 ### Package Responsibilities
 
 **lcars** - Standalone UI library:
-- LCARS design tokens (colors, typography, spacing)
-- React components (buttons, panels, displays, meters)
-- No WordPress dependencies
-- Could be published to npm independently
+
+-   LCARS design tokens (colors, typography, spacing)
+-   React components (buttons, panels, displays, meters)
+-   No WordPress dependencies
+-   Could be published to npm independently
 
 **bridge** - WordPress admin application:
-- Uses lcars components
-- WordPress script dependencies
-- REST API integration
-- Built with wp-scripts
+
+-   Uses lcars components
+-   WordPress script dependencies
+-   REST API integration
+-   Built with wp-scripts
 
 ### Build
 
@@ -159,12 +162,12 @@ Root `package.json` orchestrates builds:
 
 ```json
 {
-  "workspaces": ["resources/packages/*"],
-  "scripts": {
-    "build": "wp-scripts build",
-    "dev": "wp-scripts start",
-    "test": "vitest"
-  }
+	"workspaces": ["resources/packages/*"],
+	"scripts": {
+		"build": "wp-scripts build",
+		"dev": "wp-scripts start",
+		"test": "vitest"
+	}
 }
 ```
 
@@ -190,6 +193,7 @@ tests/
 ```
 
 Run with slic:
+
 ```bash
 slic run wpunit
 ```
@@ -207,6 +211,7 @@ resources/packages/lcars/
 ```
 
 Run with:
+
 ```bash
 bun run test
 ```
@@ -224,6 +229,7 @@ tests-e2e/
 ```
 
 Run with:
+
 ```bash
 bun run test:e2e
 ```
@@ -258,15 +264,15 @@ bun run test:e2e
 
 ```json
 {
-  "require": {
-    "php": "^8.1",
-    "lucatume/di52": "^3.0",
-    "woocommerce/action-scheduler": "^3.0"
-  },
-  "require-dev": {
-    "lucatume/wp-browser": "^3.0",
-    "phpstan/phpstan": "^1.0"
-  }
+	"require": {
+		"php": "^8.1",
+		"lucatume/di52": "^3.0",
+		"woocommerce/action-scheduler": "^3.0"
+	},
+	"require-dev": {
+		"lucatume/wp-browser": "^3.0",
+		"phpstan/phpstan": "^1.0"
+	}
 }
 ```
 
@@ -274,12 +280,12 @@ bun run test:e2e
 
 ```json
 {
-  "devDependencies": {
-    "@wordpress/scripts": "^27.0",
-    "vitest": "^1.0",
-    "@playwright/test": "^1.0",
-    "typescript": "^5.0"
-  }
+	"devDependencies": {
+		"@wordpress/scripts": "^27.0",
+		"vitest": "^1.0",
+		"@playwright/test": "^1.0",
+		"typescript": "^5.0"
+	}
 }
 ```
 
@@ -289,15 +295,15 @@ PSR-4 autoloading in composer.json:
 
 ```json
 {
-  "autoload": {
-    "psr-4": {
-      "Helm\\": "src/Helm/"
-    }
-  },
-  "autoload-dev": {
-    "psr-4": {
-      "Tests\\": "tests/"
-    }
-  }
+	"autoload": {
+		"psr-4": {
+			"Helm\\": "src/Helm/"
+		}
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"Tests\\": "tests/"
+		}
+	}
 }
 ```

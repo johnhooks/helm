@@ -21,7 +21,7 @@ export class SensorSystem {
 		state: InternalShipState,
 		loadout: Loadout,
 		power: PowerSystem,
-		constants?: Constants,
+		constants?: Constants
 	) {
 		this.state = state;
 		this.loadout = loadout;
@@ -30,13 +30,16 @@ export class SensorSystem {
 	}
 
 	getRange(): number {
-		return (this.loadout.sensor.product.sustain ?? 0) * this.power.getOutputMultiplier();
+		return (
+			(this.loadout.sensor.product.sustain ?? 0) *
+			this.power.getOutputMultiplier()
+		);
 	}
 
 	getComfortRange(): number {
 		const base = scanComfortRange(
 			this.loadout.sensor.product,
-			this.power.getOutputMultiplier(),
+			this.power.getOutputMultiplier()
 		);
 		const hullMult = this.loadout.hull.scanComfortMultiplier ?? 1.0;
 		return base * hullMult;
@@ -55,7 +58,7 @@ export class SensorSystem {
 			distance,
 			this.loadout.sensor.product,
 			effort,
-			this.constants,
+			this.constants
 		);
 	}
 
@@ -65,11 +68,13 @@ export class SensorSystem {
 			distance,
 			this.getComfortRange(),
 			effort,
-			this.state.pilot.scanning,
+			this.state.pilot.scanning
 		);
 	}
 
 	getSensorAffinity(): SensorAffinity | null {
-		return (this.loadout.sensor.product as CatalogProduct).sensorDsp ?? null;
+		return (
+			(this.loadout.sensor.product as CatalogProduct).sensorDsp ?? null
+		);
 	}
 }

@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 /**
  * Action command — submit a single action to a holodeck Ship via the Engine.
  *
@@ -22,7 +24,16 @@ import type { ParsedFlags } from './parse';
 import { hydrateLoadout, loadoutSlugs, resolvePilot } from './parse';
 import { r } from '../format';
 
-function resolveState(state: { power: number; powerMax: number; shield: number; shieldMax: number; hull: number; hullMax: number; coreLife: number; nodeId: number | null }) {
+function resolveState(state: {
+	power: number;
+	powerMax: number;
+	shield: number;
+	shieldMax: number;
+	hull: number;
+	hullMax: number;
+	coreLife: number;
+	nodeId: number | null;
+}) {
 	return {
 		power: r(state.power),
 		powerMax: r(state.powerMax),
@@ -38,13 +49,19 @@ function resolveState(state: { power: number; powerMax: number; shield: number; 
 export function action({ flags }: ParsedFlags): void {
 	const actionType = flags.action as string | undefined;
 	if (!actionType) {
-		console.error('Usage: bun run wb action --action=jump|scan_route [--distance=N] [--target-node=N]'); // eslint-disable-line no-console
+		console.error(
+			'Usage: bun run wb action --action=jump|scan_route [--distance=N] [--target-node=N]'
+		); // eslint-disable-line no-console
 		console.error(''); // eslint-disable-line no-console
 		console.error('Flags:'); // eslint-disable-line no-console
 		console.error('  --action=jump|scan_route   Action type (required)'); // eslint-disable-line no-console
 		console.error('  --distance=N               Distance (default 1)'); // eslint-disable-line no-console
-		console.error('  --target-node=N            Target node ID (default 2)'); // eslint-disable-line no-console
-		console.error('  --node=N                   Ship starting position (default 1)'); // eslint-disable-line no-console
+		console.error(
+			'  --target-node=N            Target node ID (default 2)'
+		); // eslint-disable-line no-console
+		console.error(
+			'  --node=N                   Ship starting position (default 1)'
+		); // eslint-disable-line no-console
 		console.error('  --throttle=N               Jump throttle tuning'); // eslint-disable-line no-console
 		console.error('  --effort=N                 Scan effort tuning'); // eslint-disable-line no-console
 		console.error('  + all loadout/pilot flags from ship command'); // eslint-disable-line no-console
@@ -87,10 +104,18 @@ export function action({ flags }: ParsedFlags): void {
 	const beforeState = resolveState(ship.resolve());
 
 	// Preview
-	const preview = engine.previewAction(ship, actionType as ActionType, params);
+	const preview = engine.previewAction(
+		ship,
+		actionType as ActionType,
+		params
+	);
 
 	// Submit and resolve
-	const submitted = engine.submitAction(ship, actionType as ActionType, params);
+	const submitted = engine.submitAction(
+		ship,
+		actionType as ActionType,
+		params
+	);
 	engine.advanceUntilIdle();
 
 	// Capture after state
@@ -113,7 +138,9 @@ export function action({ flags }: ParsedFlags): void {
 			valid: preview.valid,
 			...(preview.error ? { error: preview.error } : {}),
 			...(preview.intent ? { intent: preview.intent } : {}),
-			...(preview.projectedState ? { projectedState: resolveState(preview.projectedState) } : {}),
+			...(preview.projectedState
+				? { projectedState: resolveState(preview.projectedState) }
+				: {}),
 		},
 	};
 

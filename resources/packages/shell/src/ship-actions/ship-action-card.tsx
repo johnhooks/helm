@@ -24,12 +24,12 @@ export interface ShipActionCardProps {
 	draft?: DraftAction;
 }
 
-export function ShipActionCard( { type, action, draft }: ShipActionCardProps ) {
-	switch ( type ) {
+export function ShipActionCard({ type, action, draft }: ShipActionCardProps) {
+	switch (type) {
 		case 'scan_route':
-			return <>{ renderScanAction( { action, draft } ) }</>;
+			return <>{renderScanAction({ action, draft })}</>;
 		case 'jump':
-			return <>{ renderJumpAction( { action, draft } ) }</>;
+			return <>{renderJumpAction({ action, draft })}</>;
 		case 'survey':
 		case 'scan_planet':
 		case 'mine':
@@ -41,13 +41,13 @@ export function ShipActionCard( { type, action, draft }: ShipActionCardProps ) {
 		case 'upgrade':
 			throw new HelmError(
 				ErrorCode.ActionsMissingFill,
-				`No ship action renderer for type: ${ type }`
+				`No ship action renderer for type: ${type}`
 			);
 		default: {
 			const _exhaustive: never = type;
 			throw new HelmError(
 				ErrorCode.ActionsMissingFill,
-				`Unhandled ship action type: ${ String( _exhaustive ) }`
+				`Unhandled ship action type: ${String(_exhaustive)}`
 			);
 		}
 	}

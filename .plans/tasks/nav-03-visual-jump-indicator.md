@@ -3,8 +3,8 @@ status: ready
 area: navigation
 priority: p2
 depends_on:
-  - nav-02-wire-jump-trigger
-  - nav-06-persist-scan-discoveries
+    - nav-02-wire-jump-trigger
+    - nav-06-persist-scan-discoveries
 ---
 
 # Visual Jump Indicator on Starfield
@@ -54,20 +54,20 @@ result.
 
 ## Requirements
 
-- Stars directly adjacent to the player's current node through one known user
-  edge must wear a distinct ring or halo on the starfield.
-- Stars reachable only through an indirect known path must not receive this
-  direct-jump ring.
-- The indicator color must match the jump card's `sky` tone exactly; the
-  hex value must come from a single source of truth so the LCARS CSS
-  variable and the Three.js material cannot drift.
-- The indicator must not overwrite or visually compete with the star's
-  spectral color.
-- The indicator must not hide or conflict with the existing selection
-  highlight and the current-location marker. If a jumpable star is also
-  selected, both treatments must remain legible.
-- The indicator state must update reactively as scan results arrive, so a
-  star becoming jumpable mid-session (after a scan completes) should gain
-  the ring without a manual refresh.
-- The current node itself must not receive the jumpable indicator.
-- No change to the jump action's server or REST behavior.
+-   Stars directly adjacent to the player's current node through one known user
+    edge must wear a distinct ring or halo on the starfield.
+-   Stars reachable only through an indirect known path must not receive this
+    direct-jump ring.
+-   The indicator color must match the jump card's `sky` tone exactly; the
+    hex value must come from a single source of truth so the LCARS CSS
+    variable and the Three.js material cannot drift.
+-   The indicator must not overwrite or visually compete with the star's
+    spectral color.
+-   The indicator must not hide or conflict with the existing selection
+    highlight and the current-location marker. If a jumpable star is also
+    selected, both treatments must remain legible.
+-   The indicator state must update reactively as scan results arrive, so a
+    star becoming jumpable mid-session (after a scan completes) should gain
+    the ring without a manual refresh.
+-   The current node itself must not receive the jumpable indicator.
+-   No change to the jump action's server or REST behavior.

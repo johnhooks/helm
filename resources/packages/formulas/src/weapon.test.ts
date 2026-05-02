@@ -1,8 +1,12 @@
 import { describe, it, expect } from 'vitest';
 import {
-	phaserDraw, phaserShieldDrain, phaserHullDamage,
-	torpedoHitChance, torpedoDamage,
-	pdsInterception, ecmLockDegradation,
+	phaserDraw,
+	phaserShieldDrain,
+	phaserHullDamage,
+	torpedoHitChance,
+	torpedoDamage,
+	pdsInterception,
+	ecmLockDegradation,
 	shieldAbsorption,
 } from './weapon';
 
@@ -16,7 +20,7 @@ describe('phaserDraw', () => {
 	});
 
 	it('two phasers on Striker', () => {
-		expect(phaserDraw(0.70, 0.6)).toBeCloseTo(0.42);
+		expect(phaserDraw(0.7, 0.6)).toBeCloseTo(0.42);
 	});
 });
 

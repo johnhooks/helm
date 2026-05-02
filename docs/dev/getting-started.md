@@ -4,10 +4,10 @@ For deploying to a server, see [docs/getting-started.md](../getting-started.md).
 
 ## Requirements
 
-- WordPress 6.9
-- PHP 8.1+, MySQL 5.7+ / MariaDB 10.4+
-- [Composer](https://getcomposer.org/), [WP-CLI](https://wp-cli.org/), [Bun](https://bun.sh/)
-- [slic](https://github.com/developer-toolbelt/slic) — for the PHP test suite
+-   WordPress 6.9
+-   PHP 8.1+, MySQL 5.7+ / MariaDB 10.4+
+-   [Composer](https://getcomposer.org/), [WP-CLI](https://wp-cli.org/), [Bun](https://bun.sh/)
+-   [slic](https://github.com/developer-toolbelt/slic) — for the PHP test suite
 
 Use whatever local WordPress setup you prefer. The core contributors use Lando ([setup below](#local-development-with-lando)).
 
@@ -56,9 +56,9 @@ Bun runs on the host, so `bun install` / `bun run dev` stay unprefixed.
 
 ### If something breaks
 
-- `wp: not found` inside the container — `lando rebuild -y`, then `lando install-wp`.
-- Install incomplete — `lando install-wp` is idempotent.
-- Start over — `lando stop`, `rm -rf tmp/wordpress/`, `lando start`.
+-   `wp: not found` inside the container — `lando rebuild -y`, then `lando install-wp`.
+-   Install incomplete — `lando install-wp` is idempotent.
+-   Start over — `lando stop`, `rm -rf tmp/wordpress/`, `lando start`.
 
 ## Testing
 

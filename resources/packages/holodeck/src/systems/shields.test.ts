@@ -5,12 +5,12 @@ import { makeLoadout, makeComponent, makeShield } from '../test-helpers';
 
 function createShieldSystem(
 	overrides: Parameters<typeof createInternalState>[1] = {},
-	shieldOverrides: Record<string, unknown> = {},
+	shieldOverrides: Record<string, unknown> = {}
 ) {
 	const loadout = makeLoadout(
 		Object.keys(shieldOverrides).length
 			? { shield: makeComponent(makeShield(shieldOverrides), 'shield') }
-			: {},
+			: {}
 	);
 	const state = createInternalState(loadout, overrides);
 	return new ShieldSystem(state, loadout);

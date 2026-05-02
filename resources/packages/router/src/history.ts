@@ -30,9 +30,7 @@ export function createWpHistory() {
 					search.set(key, value);
 				}
 			});
-			const searchStr = search.toString()
-				? `?${search.toString()}`
-				: '';
+			const searchStr = search.toString() ? `?${search.toString()}` : '';
 
 			return {
 				href: `${pathname}${searchStr}`,
@@ -51,18 +49,16 @@ export function createWpHistory() {
 			// Preserve WordPress's page param, add our path + TanStack search.
 			// Boolean flags (value "true") are written as bare keys (&fullscreen
 			// instead of &fullscreen=true) for cleaner URLs.
-			const wpPage = new URLSearchParams(
-				window.location.search,
-			).get('page');
+			const wpPage = new URLSearchParams(window.location.search).get(
+				'page'
+			);
 			const parts: string[] = [];
 
 			if (wpPage) {
 				parts.push(`page=${encodeURIComponent(wpPage)}`);
 			}
 			if (pathname && pathname !== '/') {
-				parts.push(
-					`${PATH_PARAM}=${encodeURIComponent(pathname)}`,
-				);
+				parts.push(`${PATH_PARAM}=${encodeURIComponent(pathname)}`);
 			}
 			if (tanstackSearch) {
 				new URLSearchParams(tanstackSearch).forEach((value, key) => {
@@ -70,7 +66,9 @@ export function createWpHistory() {
 						parts.push(encodeURIComponent(key));
 					} else {
 						parts.push(
-							`${encodeURIComponent(key)}=${encodeURIComponent(value)}`,
+							`${encodeURIComponent(key)}=${encodeURIComponent(
+								value
+							)}`
 						);
 					}
 				});

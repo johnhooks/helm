@@ -1,37 +1,37 @@
-import { useMemo } from "react";
+import { useMemo } from 'react';
 import {
-  SphereGeometry,
-  ShaderMaterial,
-  BackSide,
-  AdditiveBlending,
-  Color,
-} from "three";
+	SphereGeometry,
+	ShaderMaterial,
+	BackSide,
+	AdditiveBlending,
+	Color,
+} from 'three';
 
 export interface GalacticPlaneProps {
-  /**
-   * Radius of the sky sphere
-   */
-  radius?: number;
-  /**
-   * Base opacity of the glow
-   */
-  opacity?: number;
-  /**
-   * Color of the galactic band
-   */
-  color?: string;
-  /**
-   * How tight the band is (higher = thinner band)
-   */
-  bandTightness?: number;
-  /**
-   * Direction toward galactic core (brighter spot) - normalized vector on XZ plane
-   */
-  coreDirection?: [number, number, number];
-  /**
-   * Intensity of the core glow (0-1)
-   */
-  coreIntensity?: number;
+	/**
+	 * Radius of the sky sphere
+	 */
+	radius?: number;
+	/**
+	 * Base opacity of the glow
+	 */
+	opacity?: number;
+	/**
+	 * Color of the galactic band
+	 */
+	color?: string;
+	/**
+	 * How tight the band is (higher = thinner band)
+	 */
+	bandTightness?: number;
+	/**
+	 * Direction toward galactic core (brighter spot) - normalized vector on XZ plane
+	 */
+	coreDirection?: [number, number, number];
+	/**
+	 * Intensity of the core glow (0-1)
+	 */
+	coreIntensity?: number;
 }
 
 // Vertex shader - pass world position to fragment
@@ -95,50 +95,50 @@ const fragmentShader = `
 `;
 
 export function GalacticPlane({
-  radius = 180,
-  opacity = 0.25,
-  color = "#6080a0",
-  bandTightness = 3.0,
-  coreDirection = [1, 0, 0.2],
-  coreIntensity = 0.5,
+	radius = 180,
+	opacity = 0.25,
+	color = '#6080a0',
+	bandTightness = 3.0,
+	coreDirection = [1, 0, 0.2],
+	coreIntensity = 0.5,
 }: GalacticPlaneProps) {
-  const geometry = useMemo(() => {
-    // Large sphere surrounding the scene
-    return new SphereGeometry(radius, 64, 32);
-  }, [radius]);
+	const geometry = useMemo(() => {
+		// Large sphere surrounding the scene
+		return new SphereGeometry(radius, 64, 32);
+	}, [radius]);
 
-  const material = useMemo(() => {
-    // Normalize core direction
-    const len = Math.sqrt(
-      coreDirection[0] ** 2 +
-        coreDirection[1] ** 2 +
-        coreDirection[2] ** 2
-    );
-    const normalizedCore =
-      len > 0
-        ? [
-            coreDirection[0] / len,
-            coreDirection[1] / len,
-            coreDirection[2] / len,
-          ]
-        : [1, 0, 0];
+	const material = useMemo(() => {
+		// Normalize core direction
+		const len = Math.sqrt(
+			coreDirection[0] ** 2 +
+				coreDirection[1] ** 2 +
+				coreDirection[2] ** 2
+		);
+		const normalizedCore =
+			len > 0
+				? [
+						coreDirection[0] / len,
+						coreDirection[1] / len,
+						coreDirection[2] / len,
+				  ]
+				: [1, 0, 0];
 
-    return new ShaderMaterial({
-      uniforms: {
-        uOpacity: { value: opacity },
-        uColor: { value: new Color(color) },
-        uBandTightness: { value: bandTightness },
-        uCoreDirection: { value: normalizedCore },
-        uCoreIntensity: { value: coreIntensity },
-      },
-      vertexShader,
-      fragmentShader,
-      transparent: true,
-      side: BackSide,  // Render inside of sphere
-      blending: AdditiveBlending,
-      depthWrite: false,
-    });
-  }, [opacity, color, bandTightness, coreDirection, coreIntensity]);
+		return new ShaderMaterial({
+			uniforms: {
+				uOpacity: { value: opacity },
+				uColor: { value: new Color(color) },
+				uBandTightness: { value: bandTightness },
+				uCoreDirection: { value: normalizedCore },
+				uCoreIntensity: { value: coreIntensity },
+			},
+			vertexShader,
+			fragmentShader,
+			transparent: true,
+			side: BackSide, // Render inside of sphere
+			blending: AdditiveBlending,
+			depthWrite: false,
+		});
+	}, [opacity, color, bandTightness, coreDirection, coreIntensity]);
 
-  return <mesh geometry={geometry} material={material} />;
+	return <mesh geometry={geometry} material={material} />;
 }

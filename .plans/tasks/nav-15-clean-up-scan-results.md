@@ -3,9 +3,9 @@ status: draft
 area: navigation
 priority: p2
 depends_on:
-  - nav-06-persist-scan-discoveries
-  - nav-07-show-routes-toggle
-  - nav-13-add-scan-result-reconciler
+    - nav-06-persist-scan-discoveries
+    - nav-07-show-routes-toggle
+    - nav-13-add-scan-result-reconciler
 ---
 
 # Clean up scan results
@@ -58,34 +58,34 @@ the canonical `/helm/v1/edges` shape.
 
 ## Requirements
 
-- Scan cards must not treat `action.result.edges` or `action.result.nodes` as
-  canonical navigation graph data.
-- Completed scan cards should select available edge and node information from
-  the nav store using `discovered_edge_ids` and `discovered_node_ids`.
-- The nav store must expose a read for canonical user edges by id that returns
-  only locally available datacore rows and defaults to an empty array.
-- The nav store must expose a read for nav nodes by id that returns only
-  locally available datacore rows and defaults to an empty array.
-- Nav selectors used by the cards should return empty arrays or equivalent
-  empty values when referenced graph data is not available yet.
-- These selectors must not infer readiness from action history or fetch
-  canonical data from scan action payloads.
-- Cards must render useful incomplete states when selected graph data is empty
-  because reconciliation is still in flight.
-- Active scan cards must continue to render duration, efficiency, distance,
-  and progress from the active action result and action params.
-- Review whether `edges_discovered`, `waypoints_created`, and `path` are still
-  needed as stable scan-log summary fields once cards select graph data from
-  nav.
-- Remove transitional embedded `edges` and `nodes` from scan route results only
-  after card and map consumers no longer depend on them.
-- Update the action TypeScript contracts, scan stories, card tests, and
-  WPUnit resolver tests to match the final scan result shape.
-- Update `ScanRoute\Resolver` so completed scan results stop writing embedded
-  `edges` and `nodes` once all consumers have moved to discovered ids and nav
-  selectors.
-- Do not add `discovered_at` or canonical edge distance back to scan action
-  result edges.
-- Tests must cover fulfilled scan cards with available nav graph data,
-  fulfilled scan cards while graph data is unavailable, and active scan cards
-  without embedded discovery payloads.
+-   Scan cards must not treat `action.result.edges` or `action.result.nodes` as
+    canonical navigation graph data.
+-   Completed scan cards should select available edge and node information from
+    the nav store using `discovered_edge_ids` and `discovered_node_ids`.
+-   The nav store must expose a read for canonical user edges by id that returns
+    only locally available datacore rows and defaults to an empty array.
+-   The nav store must expose a read for nav nodes by id that returns only
+    locally available datacore rows and defaults to an empty array.
+-   Nav selectors used by the cards should return empty arrays or equivalent
+    empty values when referenced graph data is not available yet.
+-   These selectors must not infer readiness from action history or fetch
+    canonical data from scan action payloads.
+-   Cards must render useful incomplete states when selected graph data is empty
+    because reconciliation is still in flight.
+-   Active scan cards must continue to render duration, efficiency, distance,
+    and progress from the active action result and action params.
+-   Review whether `edges_discovered`, `waypoints_created`, and `path` are still
+    needed as stable scan-log summary fields once cards select graph data from
+    nav.
+-   Remove transitional embedded `edges` and `nodes` from scan route results only
+    after card and map consumers no longer depend on them.
+-   Update the action TypeScript contracts, scan stories, card tests, and
+    WPUnit resolver tests to match the final scan result shape.
+-   Update `ScanRoute\Resolver` so completed scan results stop writing embedded
+    `edges` and `nodes` once all consumers have moved to discovered ids and nav
+    selectors.
+-   Do not add `discovered_at` or canonical edge distance back to scan action
+    result edges.
+-   Tests must cover fulfilled scan cards with available nav graph data,
+    fulfilled scan cards while graph data is unavailable, and active scan cards
+    without embedded discovery payloads.

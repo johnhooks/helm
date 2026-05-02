@@ -16,7 +16,9 @@
  * @param maxMeaningful - Count at which the curve effectively plateaus (~1.0)
  */
 export function buffFactor(count: number, maxMeaningful = 5000): number {
-	if (count <= 0) { return 0; }
+	if (count <= 0) {
+		return 0;
+	}
 	return Math.min(1.0, Math.log(1 + count) / Math.log(1 + maxMeaningful));
 }
 
@@ -36,7 +38,7 @@ export function skillMultiplier(
 	count: number,
 	maxMeaningful = 5000,
 	minMult = 1.0,
-	maxMult = 1.25,
+	maxMult = 1.25
 ): number {
 	const factor = buffFactor(count, maxMeaningful);
 	return minMult + factor * (maxMult - minMult);

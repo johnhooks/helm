@@ -15,24 +15,18 @@ export interface ErrorContentProps {
 	causes?: string[];
 }
 
-export function ErrorContent( {
-	code,
-	detail,
-	causes,
-}: ErrorContentProps ) {
+export function ErrorContent({ code, detail, causes }: ErrorContentProps) {
 	return (
 		<div className="helm-error-content">
-			<StatusBadge tone="danger">{ code }</StatusBadge>
-			{ detail && (
-				<p className="helm-error-content__detail">{ detail }</p>
-			) }
-			{ causes && causes.length > 0 && (
+			<StatusBadge tone="danger">{code}</StatusBadge>
+			{detail && <p className="helm-error-content__detail">{detail}</p>}
+			{causes && causes.length > 0 && (
 				<ul className="helm-error-causes">
-					{ causes.map( ( cause, i ) => (
-						<li key={ i }>{ cause }</li>
-					) ) }
+					{causes.map((cause, i) => (
+						<li key={i}>{cause}</li>
+					))}
 				</ul>
-			) }
+			)}
 		</div>
 	);
 }

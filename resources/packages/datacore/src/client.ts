@@ -33,25 +33,38 @@ function nextId(): string {
  * @param  options
  * @throws {HelmError} with code `helm.datacore.unsupported` if the browser lacks required APIs.
  */
-export async function createDatacore(options: DatacoreOptions): Promise<Datacore> {
+export async function createDatacore(
+	options: DatacoreOptions
+): Promise<Datacore> {
 	if (typeof Worker === 'undefined') {
 		throw HelmError.safe(
 			ErrorCode.DatacoreUnsupported,
-			__('Datacore requires Web Workers, which is not available in this browser.', 'helm'),
+			__(
+				'Datacore requires Web Workers, which is not available in this browser.',
+				'helm'
+			)
 		);
 	}
 	if (!navigator.storage?.getDirectory) {
 		throw HelmError.safe(
 			ErrorCode.DatacoreUnsupported,
-			__('Datacore requires Origin Private File System, which is not available in this browser.', 'helm'),
+			__(
+				'Datacore requires Origin Private File System, which is not available in this browser.',
+				'helm'
+			)
 		);
 	}
 
 	const pending = new Map<string, PendingRequest>();
 
-	const workerUrl = options.workerUrl ?? new URL('./worker.ts', import.meta.url);
-	const isModule = String(workerUrl).endsWith('.ts') || String(workerUrl).endsWith('.mjs');
-	const worker = new Worker(workerUrl, isModule ? { type: 'module' } : undefined);
+	const workerUrl =
+		options.workerUrl ?? new URL('./worker.ts', import.meta.url);
+	const isModule =
+		String(workerUrl).endsWith('.ts') || String(workerUrl).endsWith('.mjs');
+	const worker = new Worker(
+		workerUrl,
+		isModule ? { type: 'module' } : undefined
+	);
 
 	worker.onmessage = (event: MessageEvent<WorkerResponse>) => {
 		const msg = event.data;
@@ -63,7 +76,12 @@ export async function createDatacore(options: DatacoreOptions): Promise<Datacore
 		pending.delete(msg.id);
 
 		if (msg.type === 'error') {
-			req.reject(new HelmError(ErrorCode.DatacoreWorkerError, msg.payload.message));
+			req.reject(
+				new HelmError(
+					ErrorCode.DatacoreWorkerError,
+					msg.payload.message
+				)
+			);
 		} else {
 			req.resolve(msg);
 		}
@@ -86,7 +104,7 @@ export async function createDatacore(options: DatacoreOptions): Promise<Datacore
 
 	async function sendQuery<Row>(
 		sql: string,
-		params?: SQLiteParam[],
+		params?: SQLiteParam[]
 	): Promise<Row[]> {
 		const response = await send({
 			id: nextId(),

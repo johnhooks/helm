@@ -38,7 +38,7 @@ import { DEFAULT_DSP_CONSTANTS } from './types';
 export function detectionProbability(
 	snrValue: number,
 	threshold: number = DEFAULT_DSP_CONSTANTS.detectionThreshold,
-	steepness: number = DEFAULT_DSP_CONSTANTS.detectionSteepness,
+	steepness: number = DEFAULT_DSP_CONSTANTS.detectionSteepness
 ): number {
 	return 1 / (1 + Math.exp(-steepness * (snrValue - threshold)));
 }
@@ -60,7 +60,10 @@ export function detectionProbability(
  * @param perSweepChance - Detection probability for a single sweep (0-1)
  * @param sweepCount - Number of independent sweeps
  */
-export function cumulativeDetection(perSweepChance: number, sweepCount: number): number {
+export function cumulativeDetection(
+	perSweepChance: number,
+	sweepCount: number
+): number {
 	if (sweepCount <= 0) {
 		return 0;
 	}
@@ -88,7 +91,10 @@ export function cumulativeDetection(perSweepChance: number, sweepCount: number):
  * @param affinity - Sensor affinity profile (from SENSOR_AFFINITIES)
  * @param spectralType - The emission's spectral character
  */
-export function matchedFilterGain(affinity: SensorAffinity, spectralType: SpectralType): number {
+export function matchedFilterGain(
+	affinity: SensorAffinity,
+	spectralType: SpectralType
+): number {
 	switch (spectralType) {
 		case 'pulse':
 			return affinity.pulseGain;

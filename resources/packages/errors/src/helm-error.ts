@@ -56,7 +56,7 @@ export class HelmError extends Error {
 						new HelmError(e.code, e.message, {
 							isSafe: true,
 							data: e.data ?? {},
-						}),
+						})
 				),
 			});
 		}
@@ -90,9 +90,13 @@ export class HelmError extends Error {
 			} catch {
 				// JSON parse failed — not a WP REST response.
 			}
-			return new HelmError(ErrorCode.Unknown, `HTTP ${ error.status } ${ error.statusText }`.trim(), {
-				isSafe: false,
-			});
+			return new HelmError(
+				ErrorCode.Unknown,
+				`HTTP ${error.status} ${error.statusText}`.trim(),
+				{
+					isSafe: false,
+				}
+			);
 		}
 
 		return HelmError.from(error);

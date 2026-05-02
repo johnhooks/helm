@@ -1,27 +1,71 @@
 import { describe, it, expect } from 'vitest';
 import type { Product } from '@helm/types';
 import { DEFAULT_CONSTANTS } from './types';
-import { scanComfortRange, scanPowerCost, scanDuration, scanSuccessChance } from './scan';
+import {
+	scanComfortRange,
+	scanPowerCost,
+	scanDuration,
+	scanSuccessChance,
+} from './scan';
 
 const vrsMk1: Product = {
-	id: 1, slug: 'vrs_mk1', type: 'sensor', label: 'VRS Mk I', version: 1,
-	footprint: 25, hp: null, rate: null, sustain: 5.0, capacity: null,
-	chance: 0.7, mult_a: 1.0, mult_b: null, mult_c: null,
-	mult_d: null, mult_e: null, mult_f: null,
+	id: 1,
+	slug: 'vrs_mk1',
+	type: 'sensor',
+	label: 'VRS Mk I',
+	version: 1,
+	footprint: 25,
+	hp: null,
+	rate: null,
+	sustain: 5.0,
+	capacity: null,
+	chance: 0.7,
+	mult_a: 1.0,
+	mult_b: null,
+	mult_c: null,
+	mult_d: null,
+	mult_e: null,
+	mult_f: null,
 };
 
 const dscMk1: Product = {
-	id: 2, slug: 'dsc_mk1', type: 'sensor', label: 'DSC Mk I', version: 1,
-	footprint: 40, hp: null, rate: null, sustain: 7.0, capacity: null,
-	chance: 0.6, mult_a: 2.0, mult_b: null, mult_c: null,
-	mult_d: null, mult_e: null, mult_f: null,
+	id: 2,
+	slug: 'dsc_mk1',
+	type: 'sensor',
+	label: 'DSC Mk I',
+	version: 1,
+	footprint: 40,
+	hp: null,
+	rate: null,
+	sustain: 7.0,
+	capacity: null,
+	chance: 0.6,
+	mult_a: 2.0,
+	mult_b: null,
+	mult_c: null,
+	mult_d: null,
+	mult_e: null,
+	mult_f: null,
 };
 
 const acuMk1: Product = {
-	id: 3, slug: 'acu_mk1', type: 'sensor', label: 'ACU Mk I', version: 1,
-	footprint: 15, hp: null, rate: null, sustain: 3.0, capacity: null,
-	chance: 0.85, mult_a: 0.5, mult_b: null, mult_c: null,
-	mult_d: null, mult_e: null, mult_f: null,
+	id: 3,
+	slug: 'acu_mk1',
+	type: 'sensor',
+	label: 'ACU Mk I',
+	version: 1,
+	footprint: 15,
+	hp: null,
+	rate: null,
+	sustain: 3.0,
+	capacity: null,
+	chance: 0.85,
+	mult_a: 0.5,
+	mult_b: null,
+	mult_c: null,
+	mult_d: null,
+	mult_e: null,
+	mult_f: null,
 };
 
 const constants = DEFAULT_CONSTANTS;
@@ -111,7 +155,9 @@ describe('scanSuccessChance', () => {
 		// ACU at 2x comfort (6 ly, comfort 3): strain = 2.0, chance = 0.85 / 2.0 = 0.425
 		expect(scanSuccessChance(acuMk1, 6, 3.0, 1.0)).toBeCloseTo(0.425);
 		// Still better than VRS at 2x comfort (0.35)
-		expect(scanSuccessChance(acuMk1, 6, 3.0, 1.0)).toBeGreaterThan(scanSuccessChance(vrsMk1, 10, 5.0, 1.0));
+		expect(scanSuccessChance(acuMk1, 6, 3.0, 1.0)).toBeGreaterThan(
+			scanSuccessChance(vrsMk1, 10, 5.0, 1.0)
+		);
 	});
 
 	it('effort 2.0 past comfort recovers chance, capped at base', () => {
@@ -132,8 +178,9 @@ describe('scanSuccessChance', () => {
 	});
 
 	it('pilotSkill default 1.0 matches no-arg behavior', () => {
-		expect(scanSuccessChance(vrsMk1, 5, 5.0, 1.0, 1.0))
-			.toBe(scanSuccessChance(vrsMk1, 5, 5.0, 1.0));
+		expect(scanSuccessChance(vrsMk1, 5, 5.0, 1.0, 1.0)).toBe(
+			scanSuccessChance(vrsMk1, 5, 5.0, 1.0)
+		);
 	});
 
 	it('pilotSkill 1.25 raises ceiling and effective chance within comfort', () => {

@@ -3,7 +3,14 @@ import * as SQLite from 'wa-sqlite';
 import { AccessHandlePoolVFS } from 'wa-sqlite/src/examples/AccessHandlePoolVFS.js';
 import { exec, run } from './db';
 import type { Database } from './db';
-import type { ExecMessage, QueryMessage, RunMessage, WorkerRequest, WorkerResponse, SQLiteValue } from './types';
+import type {
+	ExecMessage,
+	QueryMessage,
+	RunMessage,
+	WorkerRequest,
+	WorkerResponse,
+	SQLiteValue,
+} from './types';
 
 const VFS_DIR = 'helm-datacore';
 
@@ -14,7 +21,9 @@ function post(message: WorkerResponse): void {
 }
 
 function requireDb(): Database {
-	if (!database) {throw new Error('Database not initialized');}
+	if (!database) {
+		throw new Error('Database not initialized');
+	}
 	return database;
 }
 
@@ -29,7 +38,7 @@ async function init(id: string): Promise<void> {
 
 	const db = await sqlite3.open_v2(
 		'datacore.db',
-		SQLite.SQLITE_OPEN_CREATE | SQLite.SQLITE_OPEN_READWRITE,
+		SQLite.SQLITE_OPEN_CREATE | SQLite.SQLITE_OPEN_READWRITE
 	);
 
 	database = { sqlite3, db };

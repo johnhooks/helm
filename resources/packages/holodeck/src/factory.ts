@@ -25,7 +25,7 @@ export function createShip(
 	clock: Clock,
 	rng: Rng,
 	config?: ShipConfig,
-	constants?: Constants,
+	constants?: Constants
 ): Ship {
 	const state = createInternalState(loadout, config);
 	return new Ship(state, clock, rng, constants);

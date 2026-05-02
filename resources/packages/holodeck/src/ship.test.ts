@@ -13,8 +13,16 @@ function setup(config?: Parameters<typeof createShip>[3]) {
 }
 
 function setupWithEquipment(config?: Parameters<typeof createShip>[3]) {
-	const pds = makeProduct({ slug: 'pds_mk1', type: 'equipment', mult_a: 0.45 });
-	const ecm = makeProduct({ slug: 'ecm_mk1', type: 'equipment', mult_a: 0.3 });
+	const pds = makeProduct({
+		slug: 'pds_mk1',
+		type: 'equipment',
+		mult_a: 0.45,
+	});
+	const ecm = makeProduct({
+		slug: 'ecm_mk1',
+		type: 'equipment',
+		mult_a: 0.3,
+	});
 	const loadout = makeLoadout({
 		equipment: [
 			makeComponent(pds, 'equip_1'),
@@ -249,7 +257,9 @@ describe('Ship', () => {
 
 		it('activateEquipment throws for unknown slug', () => {
 			const { ship } = setupWithEquipment();
-			expect(() => ship.activateEquipment('nonexistent')).toThrow('Equipment "nonexistent" not in loadout');
+			expect(() => ship.activateEquipment('nonexistent')).toThrow(
+				'Equipment "nonexistent" not in loadout'
+			);
 		});
 
 		it('getActiveEquipment returns current active list', () => {
@@ -276,10 +286,15 @@ describe('Ship', () => {
 		});
 
 		it('config activeEquipment initializes active set', () => {
-			const { ship } = setupWithEquipment({ activeEquipment: ['pds_mk1', 'ecm_mk1'] });
+			const { ship } = setupWithEquipment({
+				activeEquipment: ['pds_mk1', 'ecm_mk1'],
+			});
 			expect(ship.isEquipmentActive('pds_mk1')).toBe(true);
 			expect(ship.isEquipmentActive('ecm_mk1')).toBe(true);
-			expect(ship.resolve().activeEquipment).toEqual(['pds_mk1', 'ecm_mk1']);
+			expect(ship.resolve().activeEquipment).toEqual([
+				'pds_mk1',
+				'ecm_mk1',
+			]);
 		});
 	});
 });

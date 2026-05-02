@@ -34,9 +34,15 @@ function makeTorpedoAttacker(clock: ReturnType<typeof createClock>) {
 	});
 }
 
-function makeDefender(clock: ReturnType<typeof createClock>, equipment: string[] = []) {
+function makeDefender(
+	clock: ReturnType<typeof createClock>,
+	equipment: string[] = []
+) {
 	const loadout = buildLoadout('pioneer', {}, equipment);
-	return createShip(loadout, clock, createRng(99), { id: 'miner', nodeId: 1 });
+	return createShip(loadout, clock, createRng(99), {
+		id: 'miner',
+		nodeId: 1,
+	});
 }
 
 describe('Combat — Multi-Ship Integration', () => {
@@ -97,7 +103,8 @@ describe('Combat — Multi-Ship Integration', () => {
 				duration: 3600,
 			});
 			engine1.advanceUntilIdle();
-			const drainWithoutEcm = miner1.resolve().shieldMax - miner1.resolve().shield;
+			const drainWithoutEcm =
+				miner1.resolve().shieldMax - miner1.resolve().shield;
 
 			// Same scenario with ECM active
 			const clock2 = createClock(0);
@@ -113,7 +120,8 @@ describe('Combat — Multi-Ship Integration', () => {
 				duration: 3600,
 			});
 			engine2.advanceUntilIdle();
-			const drainWithEcm = miner2.resolve().shieldMax - miner2.resolve().shield;
+			const drainWithEcm =
+				miner2.resolve().shieldMax - miner2.resolve().shield;
 
 			// ECM should reduce effective drain
 			expect(drainWithEcm).toBeLessThan(drainWithoutEcm);
@@ -129,7 +137,7 @@ describe('Combat — Multi-Ship Integration', () => {
 				engine.submitAction(wolf, ActionType.FirePhaser, {
 					target_ship_id: 'ghost',
 					duration: 3600,
-				}),
+				})
 			).toThrow(ActionError);
 		});
 
@@ -145,7 +153,7 @@ describe('Combat — Multi-Ship Integration', () => {
 				engine.submitAction(miner, ActionType.FirePhaser, {
 					target_ship_id: 'target',
 					duration: 3600,
-				}),
+				})
 			).toThrow(ActionError);
 		});
 	});
@@ -186,13 +194,17 @@ describe('Combat — Multi-Ship Integration', () => {
 				target_ship_id: 'miner',
 			});
 			const resolved = engine.advanceUntilIdle();
-			const torpedo = resolved.find((a) => a.type === ActionType.FireTorpedo)!;
+			const torpedo = resolved.find(
+				(a) => a.type === ActionType.FireTorpedo
+			)!;
 			const result = torpedo.result;
 
 			if (result.hit) {
 				// If hit, target should have taken damage
 				const afterState = miner.resolve();
-				expect(afterState.shield).toBeLessThanOrEqual(beforeState.shield);
+				expect(afterState.shield).toBeLessThanOrEqual(
+					beforeState.shield
+				);
 				expect(result.damage).toBeGreaterThan(0);
 			}
 			// Either hit or miss, status is fulfilled
@@ -215,7 +227,9 @@ describe('Combat — Multi-Ship Integration', () => {
 					target_ship_id: 'miner',
 				});
 				const resolved = engine.advanceUntilIdle();
-				const torpedo = resolved.find((a) => a.type === ActionType.FireTorpedo)!;
+				const torpedo = resolved.find(
+					(a) => a.type === ActionType.FireTorpedo
+				)!;
 				results.push(torpedo.result);
 			}
 
@@ -230,7 +244,11 @@ describe('Combat — Multi-Ship Integration', () => {
 			});
 
 			// At least some activity (deterministic with seed 42)
-			expect(intercepted.length + hits.length + results.filter((r) => !r.hit && !r.intercepted).length).toBe(4);
+			expect(
+				intercepted.length +
+					hits.length +
+					results.filter((r) => !r.hit && !r.intercepted).length
+			).toBe(4);
 		});
 
 		it('validates sufficient ammo', () => {
@@ -249,7 +267,7 @@ describe('Combat — Multi-Ship Integration', () => {
 			expect(() =>
 				engine.submitAction(wolf, ActionType.FireTorpedo, {
 					target_ship_id: 'miner',
-				}),
+				})
 			).toThrow(ActionError);
 
 			try {
@@ -257,7 +275,9 @@ describe('Combat — Multi-Ship Integration', () => {
 					target_ship_id: 'miner',
 				});
 			} catch (e) {
-				expect((e as ActionError).code).toBe(ActionErrorCode.ShipInsufficientAmmo);
+				expect((e as ActionError).code).toBe(
+					ActionErrorCode.ShipInsufficientAmmo
+				);
 			}
 		});
 
@@ -270,7 +290,7 @@ describe('Combat — Multi-Ship Integration', () => {
 			expect(() =>
 				engine.submitAction(wolf, ActionType.FireTorpedo, {
 					target_ship_id: 'ghost',
-				}),
+				})
 			).toThrow(ActionError);
 		});
 	});
@@ -305,25 +325,35 @@ describe('Combat — Multi-Ship Integration', () => {
 			const engine = createEngine(clock);
 
 			const ship1 = createShip(
-				buildLoadout('pioneer'), clock, createRng(1), { id: 'ship1', nodeId: 1 },
+				buildLoadout('pioneer'),
+				clock,
+				createRng(1),
+				{ id: 'ship1', nodeId: 1 }
 			);
 			const ship2 = createShip(
-				buildLoadout('surveyor'), clock, createRng(2), { id: 'ship2', nodeId: 5 },
+				buildLoadout('surveyor'),
+				clock,
+				createRng(2),
+				{ id: 'ship2', nodeId: 5 }
 			);
 			engine.registerShip('ship1', ship1);
 			engine.registerShip('ship2', ship2);
 
 			// Both submit jump actions
 			engine.submitAction(ship1, ActionType.Jump, {
-				target_node_id: 10, distance: 2,
+				target_node_id: 10,
+				distance: 2,
 			});
 			engine.submitAction(ship2, ActionType.Jump, {
-				target_node_id: 20, distance: 3,
+				target_node_id: 20,
+				distance: 3,
 			});
 
 			const resolved = engine.advanceUntilIdle();
 			expect(resolved).toHaveLength(2);
-			expect(resolved.every((a) => a.status === ActionStatus.Fulfilled)).toBe(true);
+			expect(
+				resolved.every((a) => a.status === ActionStatus.Fulfilled)
+			).toBe(true);
 
 			expect(ship1.resolve().nodeId).toBe(10);
 			expect(ship2.resolve().nodeId).toBe(20);
@@ -333,7 +363,10 @@ describe('Combat — Multi-Ship Integration', () => {
 			const clock = createClock(0);
 			const engine = createEngine(clock);
 
-			const loadout = buildLoadout('striker', {}, ['phaser_array', 'torpedo_launcher']);
+			const loadout = buildLoadout('striker', {}, [
+				'phaser_array',
+				'torpedo_launcher',
+			]);
 			const wolf = createShip(loadout, clock, createRng(42), {
 				id: 'wolf',
 				nodeId: 1,
@@ -361,7 +394,11 @@ describe('Combat — Multi-Ship Integration', () => {
 
 			// All actions resolved
 			expect(engine.getActions(wolf)).toHaveLength(2);
-			expect(engine.getActions(wolf).every((a) => a.status === ActionStatus.Fulfilled)).toBe(true);
+			expect(
+				engine
+					.getActions(wolf)
+					.every((a) => a.status === ActionStatus.Fulfilled)
+			).toBe(true);
 		});
 
 		it('engine auto-registers ships on submitAction', () => {

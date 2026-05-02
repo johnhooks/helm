@@ -34,23 +34,26 @@ ActionResult returned to caller
 Ship data is split between two storage mechanisms:
 
 **Ship CPT (wp_posts + meta)** - Identity and WordPress integration
-- Post title → ship name
-- Post content → captain's log / description
-- Post author → owner user ID
-- Comments → crew notes, event log
-- Meta: ship UUID
+
+-   Post title → ship name
+-   Post content → captain's log / description
+-   Post author → owner user ID
+-   Comments → crew notes, event log
+-   Meta: ship UUID
 
 **Ship Systems Table (helm_ship_systems)** - All mutable state
-- Component configuration (core_type, drive_type, sensor_type, etc.)
-- power_full_at, power_max, core_life
-- shields_full_at, shields_max
-- hull_integrity, hull_max
-- node_id (current position)
-- cargo
-- current_action_id
+
+-   Component configuration (core_type, drive_type, sensor_type, etc.)
+-   power_full_at, power_max, core_life
+-   shields_full_at, shields_max
+-   hull_integrity, hull_max
+-   node_id (current position)
+-   cargo
+-   current_action_id
 
 **User Meta** - Player-level data
-- credits (economy is per-player, not per-ship)
+
+-   credits (economy is per-player, not per-ship)
 
 This split gives us WordPress admin integration while keeping operational state in a fast, typed custom table with dirty tracking.
 
@@ -170,11 +173,11 @@ Component types (CoreType, DriveType, etc.) are enums with behavior. The same Sy
 
 The starship interface. From outside, you talk to ShipLink - the internal systems are implementation details.
 
-- Receives actions
-- Gathers data from systems (read-only queries and calculations)
-- Ship mutates ShipSystems directly based on system calculations
-- Collects results from each system
-- Returns aggregate ActionResult
+-   Receives actions
+-   Gathers data from systems (read-only queries and calculations)
+-   Ship mutates ShipSystems directly based on system calculations
+-   Collects results from each system
+-   Returns aggregate ActionResult
 
 ```php
 interface ShipLink {
@@ -370,30 +373,34 @@ class ActionResult {
 ### ShipSystems = Pure Data
 
 ShipSystems contains NO domain logic. All behavior lives in System classes:
-- Easier to test systems in isolation
-- Clear separation of concerns
-- Adding a column = change model, changing behavior = change system
+
+-   Easier to test systems in isolation
+-   Clear separation of concerns
+-   Adding a column = change model, changing behavior = change system
 
 ### Systems Own Their Domain
 
 Each System is responsible for:
-- Reading its relevant properties from ShipSystems
-- Computing derived values (current power from timestamps, etc.)
-- Providing `calculate*` methods that return what mutations would produce
-- Providing state checks (isDestroyed, isDepleted, etc.)
+
+-   Reading its relevant properties from ShipSystems
+-   Computing derived values (current power from timestamps, etc.)
+-   Providing `calculate*` methods that return what mutations would produce
+-   Providing state checks (isDestroyed, isDepleted, etc.)
 
 Ship uses system calculations to decide what to mutate.
 
 ### ShipLink Has No Persistence Knowledge
 
 ShipLink operates on the data it receives. It doesn't know about repositories or databases. The caller handles persistence:
-- ShipLink is testable without database
-- Factory can build ShipLink from any source
-- Persistence strategy can change without affecting ShipLink
+
+-   ShipLink is testable without database
+-   Factory can build ShipLink from any source
+-   Persistence strategy can change without affecting ShipLink
 
 ### Dirty Tracking for Efficiency
 
 ShipSystems extends `Database\Model` with dirty tracking:
+
 ```php
 $systems->hullIntegrity = 50.0;
 if ($systems->isDirty()) {
@@ -404,13 +411,14 @@ if ($systems->isDirty()) {
 ### Errors as WP_Error
 
 Using WordPress's native error type because:
-- REST API handles it natively
-- Familiar to WP developers
-- Supports error codes, messages, and data
+
+-   REST API handles it natively
+-   Familiar to WP developers
+-   Supports error codes, messages, and data
 
 ## Future Considerations
 
-- **Component damage**: Systems could have degraded states affecting performance
-- **Crew bonuses**: Crew abilities could modify system behavior
-- **AI automation**: Standing orders could trigger actions automatically
-- **Event broadcasting**: Notify other systems/players of significant events
+-   **Component damage**: Systems could have degraded states affecting performance
+-   **Crew bonuses**: Crew abilities could modify system behavior
+-   **AI automation**: Standing orders could trigger actions automatically
+-   **Event broadcasting**: Notify other systems/players of significant events

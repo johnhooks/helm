@@ -28,10 +28,10 @@ AI Agent (Claude, ChatGPT, etc.)
 
 The Abilities API provides:
 
-- **Discoverability** - AI agents can list and inspect available abilities
-- **Interoperability** - Uniform schema enables workflow composition
-- **Security-first** - Explicit permission controls govern invocation
-- **Multi-context** - Same ability works via PHP, JavaScript, and REST API
+-   **Discoverability** - AI agents can list and inspect available abilities
+-   **Interoperability** - Uniform schema enables workflow composition
+-   **Security-first** - Explicit permission controls govern invocation
+-   **Multi-context** - Same ability works via PHP, JavaScript, and REST API
 
 ### Registration
 
@@ -91,11 +91,11 @@ Input and output use JSON Schema (version 4 subset):
 
 When `show_in_rest` is true, automatic endpoints are created:
 
-| Endpoint | Method | Purpose |
-|----------|--------|---------|
-| `/wp-json/wp-abilities/v1/abilities` | GET | List all abilities |
-| `/wp-json/wp-abilities/v1/{namespace/ability}` | GET | Ability details |
-| `/wp-json/wp-abilities/v1/{namespace/ability}/run` | POST | Execute ability |
+| Endpoint                                           | Method | Purpose            |
+| -------------------------------------------------- | ------ | ------------------ |
+| `/wp-json/wp-abilities/v1/abilities`               | GET    | List all abilities |
+| `/wp-json/wp-abilities/v1/{namespace/ability}`     | GET    | Ability details    |
+| `/wp-json/wp-abilities/v1/{namespace/ability}/run` | POST   | Execute ability    |
 
 ### PHP and JavaScript Access
 
@@ -109,7 +109,7 @@ $result = $ability->execute( array() );
 // JavaScript
 import { executeAbility } from '@wordpress/abilities';
 
-const status = await executeAbility( 'helm/shields-status', {} );
+const status = await executeAbility('helm/shields-status', {});
 ```
 
 ---
@@ -120,11 +120,11 @@ The official [MCP Adapter](https://github.com/WordPress/mcp-adapter) bridges Wor
 
 ### What It Does
 
-- Converts WordPress abilities into MCP tools
-- Exposes data as MCP resources
-- Provides structured MCP prompts
-- Handles HTTP and STDIO transport
-- Manages authentication
+-   Converts WordPress abilities into MCP tools
+-   Exposes data as MCP resources
+-   Provides structured MCP prompts
+-   Handles HTTP and STDIO transport
+-   Manages authentication
 
 ### Installation
 
@@ -264,12 +264,12 @@ The AI can only do what you authorize. Critical decisions require human override
 
 ### Tiered Authority
 
-| Tier | Capabilities | Example Actions |
-|------|--------------|-----------------|
-| Observer | View all systems | Read status, monitor alerts |
-| Operator | View + operate non-critical | Reinforce shields, run scans, adjust power |
-| Officer | View + operate + some critical | Set course, manage crew |
-| Command | Full access | Fire weapons, override safety, self-destruct |
+| Tier     | Capabilities                   | Example Actions                              |
+| -------- | ------------------------------ | -------------------------------------------- |
+| Observer | View all systems               | Read status, monitor alerts                  |
+| Operator | View + operate non-critical    | Reinforce shields, run scans, adjust power   |
+| Officer  | View + operate + some critical | Set course, manage crew                      |
+| Command  | Full access                    | Fire weapons, override safety, self-destruct |
 
 AI crew typically runs at Operator tier. Escalates to human for Officer+ decisions.
 
@@ -321,11 +321,11 @@ wp_register_ability( 'helm/standing-orders', array(
 
 Humans configure via WordPress admin:
 
-- **Shield threshold**: Alert me when shields drop below ____%
-- **Auto-reinforce**: Automatically reinforce shields under fire
-- **Auto-scan**: Automatically scan new contacts
-- **Engage hostiles**: Never / Defensive only / At discretion
-- **Wake conditions**: What situations require human attention
+-   **Shield threshold**: Alert me when shields drop below \_\_\_\_%
+-   **Auto-reinforce**: Automatically reinforce shields under fire
+-   **Auto-scan**: Automatically scan new contacts
+-   **Engage hostiles**: Never / Defensive only / At discretion
+-   **Wake conditions**: What situations require human attention
 
 ---
 
@@ -419,23 +419,26 @@ add_action( 'wp_abilities_api_categories_init', function() {
 ### AI Crew Response to Attack
 
 1. **Sensors detect incoming fire**
-   - AI calls `helm/sensors-contacts` - sees hostile
-   - AI calls `helm/standing-orders` - checks rules of engagement
+
+    - AI calls `helm/sensors-contacts` - sees hostile
+    - AI calls `helm/standing-orders` - checks rules of engagement
 
 2. **Shields take hit**
-   - AI calls `helm/shields-status` - sees 60% strength, fore arc damaged
-   - Standing orders say auto-reinforce is enabled
-   - AI calls `helm/shields-reinforce` with `{ arc: 'fore', percentage: 75 }`
+
+    - AI calls `helm/shields-status` - sees 60% strength, fore arc damaged
+    - Standing orders say auto-reinforce is enabled
+    - AI calls `helm/shields-reinforce` with `{ arc: 'fore', percentage: 75 }`
 
 3. **Situation escalates**
-   - Shields drop to 18% (below 20% threshold)
-   - AI calls `helm/alert-human` with critical priority
-   - Human receives push notification
+
+    - Shields drop to 18% (below 20% threshold)
+    - AI calls `helm/alert-human` with critical priority
+    - Human receives push notification
 
 4. **Human takes over or delegates**
-   - Human logs in, assesses situation
-   - Either takes manual control or updates standing orders
-   - AI continues operating within new parameters
+    - Human logs in, assesses situation
+    - Either takes manual control or updates standing orders
+    - AI continues operating within new parameters
 
 ---
 
@@ -443,9 +446,9 @@ add_action( 'wp_abilities_api_categories_init', function() {
 
 ### Authentication
 
-- AI crew gets WordPress user account with custom role
-- Application passwords or OAuth for API access
-- MCP Adapter handles credential management
+-   AI crew gets WordPress user account with custom role
+-   Application passwords or OAuth for API access
+-   MCP Adapter handles credential management
 
 ### Audit Trail
 
@@ -489,8 +492,8 @@ Prevent runaway AI from overwhelming systems:
 
 ## References
 
-- [Introducing the WordPress Abilities API](https://developer.wordpress.org/news/2025/11/introducing-the-wordpress-abilities-api/)
-- [Abilities API in WordPress 6.9](https://make.wordpress.org/core/2025/11/10/abilities-api-in-wordpress-6-9/)
-- [WordPress MCP Adapter](https://github.com/WordPress/mcp-adapter)
-- [WordPress.com MCP Documentation](https://developer.wordpress.com/docs/mcp/)
-- [Model Context Protocol Specification](https://modelcontextprotocol.io/)
+-   [Introducing the WordPress Abilities API](https://developer.wordpress.org/news/2025/11/introducing-the-wordpress-abilities-api/)
+-   [Abilities API in WordPress 6.9](https://make.wordpress.org/core/2025/11/10/abilities-api-in-wordpress-6-9/)
+-   [WordPress MCP Adapter](https://github.com/WordPress/mcp-adapter)
+-   [WordPress.com MCP Documentation](https://developer.wordpress.com/docs/mcp/)
+-   [Model Context Protocol Specification](https://modelcontextprotocol.io/)

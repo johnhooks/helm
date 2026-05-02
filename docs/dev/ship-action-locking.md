@@ -24,11 +24,11 @@ A ship can hold multiple locks simultaneously. Each lock gates a different capab
 
 ### Lock Types
 
-| Type | Blocks | Created by |
-|------|--------|------------|
-| `action_slot` | Submitting new actions | Action handler on submit |
-| `passive_scan` | Passive scan batch processing | Passive scan tick |
-| `global` | Everything — actions, scans, incoming damage | Jump transit, system events |
+| Type           | Blocks                                       | Created by                  |
+| -------------- | -------------------------------------------- | --------------------------- |
+| `action_slot`  | Submitting new actions                       | Action handler on submit    |
+| `passive_scan` | Passive scan batch processing                | Passive scan tick           |
+| `global`       | Everything — actions, scans, incoming damage | Jump transit, system events |
 
 New lock types can be added without schema changes. Future candidates: `weapons` (shared lock for phaser/torpedo), `fleet` (formation lock), action-type-specific locks for grouped abilities.
 
@@ -75,8 +75,8 @@ COMMIT
 
 Some locks aren't tied to an action:
 
-- **Global lock during jump transit:** Ship is between nodes. Nothing processes. Created by the jump resolver when the ship moves, expires when cooldown completes.
-- **Passive scan lock:** Prevents the batch tick from double-processing a ship mid-computation. Short-lived (seconds). Created and released by the tick itself.
+-   **Global lock during jump transit:** Ship is between nodes. Nothing processes. Created by the jump resolver when the ship moves, expires when cooldown completes.
+-   **Passive scan lock:** Prevents the batch tick from double-processing a ship mid-computation. Short-lived (seconds). Created and released by the tick itself.
 
 These have `action_id = NULL`. They follow the same expiry rules.
 
@@ -98,7 +98,7 @@ The batch tick acquires a short `passive_scan` lock per ship during processing t
 
 Locks and actions are related but independent:
 
-- **Actions** record what happened. History, results, timeline.
-- **Locks** record what's blocked right now. Operational state, cheap to query.
+-   **Actions** record what happened. History, results, timeline.
+-   **Locks** record what's blocked right now. Operational state, cheap to query.
 
 You don't derive locks from actions. You don't derive history from locks. Each serves its purpose. The `action_id` foreign key is for traceability, not for lock resolution.

@@ -3,7 +3,7 @@ status: done
 area: navigation
 priority: p1
 depends_on:
-  - nav-01-hide-current-star-actions
+    - nav-01-hide-current-star-actions
 ---
 
 # Wire Jump Trigger in Bridge UI
@@ -42,15 +42,15 @@ the current always-on `route unknown` placeholder.
 
 ## Requirements
 
-- Jump menu item must be **enabled** only when a discovered route exists from
-  the current node to the selected star.
-- Jump menu item must be **disabled** when the selected star is the current
-  node, or when no discovered route exists.
-- Disabled state must communicate *why* via the menu item's `detail` text.
-- An active action (scan or jump) in `pending` or `running` status must
-  continue to suppress new draft creation, matching current scan behavior.
-- Clicking Jump must draft an action with the same params shape the server
-  handler already expects: `target_node_id`, `source_node_id`, `distance_ly`.
-- No server, REST, contract, or card-component changes. This is purely a
-  UI-wiring task in the bridge package.
-- The existing scan wiring must not regress.
+-   Jump menu item must be **enabled** only when a discovered route exists from
+    the current node to the selected star.
+-   Jump menu item must be **disabled** when the selected star is the current
+    node, or when no discovered route exists.
+-   Disabled state must communicate _why_ via the menu item's `detail` text.
+-   An active action (scan or jump) in `pending` or `running` status must
+    continue to suppress new draft creation, matching current scan behavior.
+-   Clicking Jump must draft an action with the same params shape the server
+    handler already expects: `target_node_id`, `source_node_id`, `distance_ly`.
+-   No server, REST, contract, or card-component changes. This is purely a
+    UI-wiring task in the bridge package.
+-   The existing scan wiring must not regress.

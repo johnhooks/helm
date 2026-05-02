@@ -8,9 +8,19 @@
 import { computeShipReport } from '../report';
 import type { ParsedFlags } from './parse';
 import { resolveTuning, resolveConstants, COMPONENT_TYPES } from './parse';
-import { getProductsByType, getProduct, DEFAULT_LOADOUT_SLUGS } from '../data/products';
+import {
+	getProductsByType,
+	getProduct,
+	DEFAULT_LOADOUT_SLUGS,
+} from '../data/products';
 import { HULLS } from '../data/hulls';
-import type { ComponentType, ReportLoadout, ShipReport, Hull, CatalogProduct } from '../types';
+import type {
+	ComponentType,
+	ReportLoadout,
+	ShipReport,
+	Hull,
+	CatalogProduct,
+} from '../types';
 import { r } from '../format';
 
 interface BalanceRow {
@@ -31,13 +41,19 @@ interface BalanceRow {
 }
 
 function resolveDefault(type: string): CatalogProduct {
-	const slug = DEFAULT_LOADOUT_SLUGS[type as keyof typeof DEFAULT_LOADOUT_SLUGS];
+	const slug =
+		DEFAULT_LOADOUT_SLUGS[type as keyof typeof DEFAULT_LOADOUT_SLUGS];
 	const p = getProduct(slug);
-	if (!p) {throw new Error(`No default product for ${type}`);}
+	if (!p) {
+		throw new Error(`No default product for ${type}`);
+	}
 	return p;
 }
 
-function buildLoadout(hull: Hull, overrides: Partial<Record<ComponentType, CatalogProduct>> = {}): ReportLoadout {
+function buildLoadout(
+	hull: Hull,
+	overrides: Partial<Record<ComponentType, CatalogProduct>> = {}
+): ReportLoadout {
 	return {
 		hull,
 		core: overrides.core ?? resolveDefault('core'),
@@ -48,7 +64,11 @@ function buildLoadout(hull: Hull, overrides: Partial<Record<ComponentType, Catal
 	};
 }
 
-function extractRow(hull: Hull, report: ShipReport, extras?: Record<string, string>): BalanceRow {
+function extractRow(
+	hull: Hull,
+	report: ShipReport,
+	extras?: Record<string, string>
+): BalanceRow {
 	return {
 		hull: hull.slug,
 		...extras,
@@ -67,7 +87,9 @@ function extractRow(hull: Hull, report: ShipReport, extras?: Record<string, stri
 }
 
 function stddev(values: number[]): number {
-	if (values.length === 0) {return 0;}
+	if (values.length === 0) {
+		return 0;
+	}
 	const mean = values.reduce((a, b) => a + b, 0) / values.length;
 	const sq = values.reduce((a, v) => a + (v - mean) ** 2, 0) / values.length;
 	return Math.sqrt(sq);
@@ -76,20 +98,37 @@ function stddev(values: number[]): number {
 function flagOutliers(rows: BalanceRow[]): string[] {
 	const warnings: string[] = [];
 	const numericKeys: (keyof BalanceRow)[] = [
-		'hullIntegrity', 'capacitor', 'coreLife', 'regenRate', 'perfRatio',
-		'jumpComfort', 'scanComfort', 'shieldCapacity', 'shieldRegen', 'cargo',
+		'hullIntegrity',
+		'capacitor',
+		'coreLife',
+		'regenRate',
+		'perfRatio',
+		'jumpComfort',
+		'scanComfort',
+		'shieldCapacity',
+		'shieldRegen',
+		'cargo',
 	];
 
 	for (const key of numericKeys) {
 		const values = rows.map((row) => row[key] as number);
 		const mean = values.reduce((a, b) => a + b, 0) / values.length;
 		const sd = stddev(values);
-		if (sd === 0) {continue;}
+		if (sd === 0) {
+			continue;
+		}
 
 		for (let i = 0; i < rows.length; i++) {
 			const z = Math.abs((values[i] - mean) / sd);
 			if (z > 2) {
-				warnings.push(`OUTLIER: ${rows[i].hull}${rows[i].core ? ` + ${rows[i].core}` : ''} — ${key}=${values[i]} (${z.toFixed(1)}σ from mean ${r(mean, 1)})`);
+				warnings.push(
+					`OUTLIER: ${rows[i].hull}${
+						rows[i].core ? ` + ${rows[i].core}` : ''
+					} — ${key}=${values[i]} (${z.toFixed(1)}σ from mean ${r(
+						mean,
+						1
+					)})`
+				);
 			}
 		}
 	}
@@ -129,9 +168,13 @@ export function runBalance({ flags }: ParsedFlags): BalanceOutput {
 
 		for (const hull of HULLS) {
 			// Generate combos for varied slots
-			const combos = cartesian(varySlots.map((s) => slotProducts[s] ?? []));
+			const combos = cartesian(
+				varySlots.map((s) => slotProducts[s] ?? [])
+			);
 			for (const combo of combos) {
-				const overrides: Partial<Record<ComponentType, CatalogProduct>> = {};
+				const overrides: Partial<
+					Record<ComponentType, CatalogProduct>
+				> = {};
 				const extras: Record<string, string> = {};
 				varySlots.forEach((slot, i) => {
 					overrides[slot] = combo[i];
@@ -170,6 +213,6 @@ export function balance(parsed: ParsedFlags): void {
 function cartesian(arrays: CatalogProduct[][]): CatalogProduct[][] {
 	return arrays.reduce<CatalogProduct[][]>(
 		(acc, arr) => acc.flatMap((combo) => arr.map((val) => [...combo, val])),
-		[[]],
+		[[]]
 	);
 }

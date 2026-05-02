@@ -31,15 +31,16 @@ bun run bench --format=json
 
 ## Interpreting Results
 
-- **avg** — mean response time across all iterations
-- **p95** — 95th percentile response time
-- **ttfb** — time to first byte (when headers arrive)
-- **size** — response body size in bytes
+-   **avg** — mean response time across all iterations
+-   **p95** — 95th percentile response time
+-   **ttfb** — time to first byte (when headers arrive)
+-   **size** — response body size in bytes
 
 Reports are saved to `tmp/benchmarks/` with timestamp and git SHA in the filename.
 
 When reporting results to the user, summarize:
-- Which endpoints are fastest/slowest
-- How embedded responses compare to non-embedded
-- Any regressions compared to previous runs (highlight > 10% slower)
-- Any notable improvements (highlight > 10% faster)
+
+-   Which endpoints are fastest/slowest
+-   How embedded responses compare to non-embedded
+-   Any regressions compared to previous runs (highlight > 10% slower)
+-   Any notable improvements (highlight > 10% faster)

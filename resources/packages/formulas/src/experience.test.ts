@@ -29,7 +29,9 @@ describe('buffFactor', () => {
 	it('is monotonically increasing', () => {
 		const counts = [0, 1, 10, 50, 100, 500, 1000, 5000];
 		for (let i = 1; i < counts.length; i++) {
-			expect(buffFactor(counts[i])).toBeGreaterThan(buffFactor(counts[i - 1]));
+			expect(buffFactor(counts[i])).toBeGreaterThan(
+				buffFactor(counts[i - 1])
+			);
 		}
 	});
 
@@ -76,7 +78,9 @@ describe('skillMultiplier', () => {
 	it('is monotonically increasing', () => {
 		const counts = [0, 1, 10, 50, 100, 500, 1000, 5000];
 		for (let i = 1; i < counts.length; i++) {
-			expect(skillMultiplier(counts[i])).toBeGreaterThan(skillMultiplier(counts[i - 1]));
+			expect(skillMultiplier(counts[i])).toBeGreaterThan(
+				skillMultiplier(counts[i - 1])
+			);
 		}
 	});
 });

@@ -3,8 +3,8 @@ status: done
 area: navigation
 priority: p1
 depends_on:
-  - nav-08-track-edge-discoveries-per-player
-  - nav-09-add-user-edge-datacore-queries
+    - nav-08-track-edge-discoveries-per-player
+    - nav-09-add-user-edge-datacore-queries
 ---
 
 # Sync user edges on load

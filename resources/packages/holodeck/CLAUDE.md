@@ -16,8 +16,8 @@ Simulation-oriented interfaces (`Loadout`, `ShipState`, `ShipAction`). These are
 
 Hull and product data load from `tests/_data/catalog/` (shared with PHP). Holodeck provides typed access; the JSON is the source of truth.
 
-- `hulls.json` — hull definitions
-- `products/` — product catalog (core, drive, sensor, shield, nav, weapon, equipment)
+-   `hulls.json` — hull definitions
+-   `products/` — product catalog (core, drive, sensor, shield, nav, weapon, equipment)
 
 ## Tuning
 
@@ -28,8 +28,9 @@ Tuning is per-action, not ship state. Throttle (jump speed/cost) and effort (sca
 `PilotSkills` (from `@helm/formulas`) holds pre-computed multipliers (1.0→1.25) derived from player action counters. Lives on the WP user, survives ship loss. Stored in `InternalShipState.pilot` and exposed in `ShipState.pilot`.
 
 Currently wired:
-- `scanning` → `SensorSystem.getScanSuccessChance()` (boosts scan success)
-- `jumping` → `NavigationSystem.getDiscoveryProbability()` (boosts discovery)
+
+-   `scanning` → `SensorSystem.getScanSuccessChance()` (boosts scan success)
+-   `jumping` → `NavigationSystem.getDiscoveryProbability()` (boosts discovery)
 
 Other fields (trading, mining, salvaging, phasers, torpedoes) exist but aren't wired until those systems get formula support.
 

@@ -18,10 +18,18 @@ export function ship({ flags }: ParsedFlags): void {
 	const clock = createClock(time);
 	const rng = createRng(42);
 	const s = createShip(loadout, clock, rng, {
-		powerFullAt: flags['power-at'] ? parseFloat(flags['power-at']) : undefined,
-		shieldsFullAt: flags['shields-at'] ? parseFloat(flags['shields-at']) : undefined,
-		hullIntegrity: flags['hull-integrity'] ? parseFloat(flags['hull-integrity']) : undefined,
-		coreLife: flags['core-life'] ? parseFloat(flags['core-life']) : undefined,
+		powerFullAt: flags['power-at']
+			? parseFloat(flags['power-at'])
+			: undefined,
+		shieldsFullAt: flags['shields-at']
+			? parseFloat(flags['shields-at'])
+			: undefined,
+		hullIntegrity: flags['hull-integrity']
+			? parseFloat(flags['hull-integrity'])
+			: undefined,
+		coreLife: flags['core-life']
+			? parseFloat(flags['core-life'])
+			: undefined,
 		pilot,
 	});
 
@@ -115,9 +123,14 @@ export function ship({ flags }: ParsedFlags): void {
 				})),
 			})),
 			priority: tuningSweep.map((priority) => {
-				const ps = createShip(loadout, createClock(time), createRng(42), {
-					shieldPriority: priority,
-				});
+				const ps = createShip(
+					loadout,
+					createClock(time),
+					createRng(42),
+					{
+						shieldPriority: priority,
+					}
+				);
 				return {
 					priority,
 					regenRate: r(ps.shields.getRegenRate()),

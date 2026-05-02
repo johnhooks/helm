@@ -1,2 +1,2 @@
-export { LogCard } from "./log-card";
-export type { LogCardProps } from "./log-card";
+export { LogCard } from './log-card';
+export type { LogCardProps } from './log-card';

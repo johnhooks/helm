@@ -69,7 +69,11 @@ interface StateSnapshot {
 
 interface TimelineEntry {
 	t: number;
-	action: { ship: string; type: string; params?: Record<string, unknown> } | null;
+	action: {
+		ship: string;
+		type: string;
+		params?: Record<string, unknown>;
+	} | null;
 	result: Record<string, unknown> | null;
 	ships: Record<string, StateSnapshot>;
 }
@@ -89,7 +93,9 @@ function snapshotState(state: ShipState): StateSnapshot {
 	};
 }
 
-function snapshotAllShips(ships: Record<string, Ship>): Record<string, StateSnapshot> {
+function snapshotAllShips(
+	ships: Record<string, Ship>
+): Record<string, StateSnapshot> {
 	const result: Record<string, StateSnapshot> = {};
 	for (const [name, ship] of Object.entries(ships)) {
 		result[name] = snapshotState(ship.resolve());
@@ -104,7 +110,10 @@ function registerAllHandlers(): void {
 	registerHandler(ActionType.FireTorpedo, fireTorpedoHandler);
 }
 
-export function runScenario(scenario: ScenarioFile): { timeline: TimelineEntry[]; actions: Action[] } {
+export function runScenario(scenario: ScenarioFile): {
+	timeline: TimelineEntry[];
+	actions: Action[];
+} {
 	registerAllHandlers();
 
 	const clock = createClock(0);
@@ -123,7 +132,7 @@ export function runScenario(scenario: ScenarioFile): { timeline: TimelineEntry[]
 				shield: spec.shield,
 				nav: spec.nav,
 			},
-			spec.equipment,
+			spec.equipment
 		);
 
 		// Compute default ammo from equipment capacity
@@ -171,7 +180,11 @@ export function runScenario(scenario: ScenarioFile): { timeline: TimelineEntry[]
 			ship.activateEquipment(slug);
 			timeline.push({
 				t: clock.now(),
-				action: { ship: actionSpec.ship, type: actionSpec.type, params: actionSpec.params },
+				action: {
+					ship: actionSpec.ship,
+					type: actionSpec.type,
+					params: actionSpec.params,
+				},
 				result: { activated: slug },
 				ships: snapshotAllShips(ships),
 			});
@@ -183,7 +196,11 @@ export function runScenario(scenario: ScenarioFile): { timeline: TimelineEntry[]
 			ship.deactivateEquipment(slug);
 			timeline.push({
 				t: clock.now(),
-				action: { ship: actionSpec.ship, type: actionSpec.type, params: actionSpec.params },
+				action: {
+					ship: actionSpec.ship,
+					type: actionSpec.type,
+					params: actionSpec.params,
+				},
 				result: { deactivated: slug },
 				ships: snapshotAllShips(ships),
 			});
@@ -195,8 +212,15 @@ export function runScenario(scenario: ScenarioFile): { timeline: TimelineEntry[]
 			const dmg = ship.absorbDamage(amount);
 			timeline.push({
 				t: clock.now(),
-				action: { ship: actionSpec.ship, type: actionSpec.type, params: actionSpec.params },
-				result: { shieldAbsorbed: dmg.shieldAbsorbed, hullDamage: dmg.hullDamage },
+				action: {
+					ship: actionSpec.ship,
+					type: actionSpec.type,
+					params: actionSpec.params,
+				},
+				result: {
+					shieldAbsorbed: dmg.shieldAbsorbed,
+					hullDamage: dmg.hullDamage,
+				},
 				ships: snapshotAllShips(ships),
 			});
 			continue;
@@ -214,10 +238,19 @@ export function runScenario(scenario: ScenarioFile): { timeline: TimelineEntry[]
 			const action = engine.processPassiveScan(actionSpec.ship);
 			const detectionResult: Record<string, unknown> = action
 				? { ...action.result }
-				: { detections: [], noise_floor: 0, source_count: 0, integration_seconds: 0 };
+				: {
+						detections: [],
+						noise_floor: 0,
+						source_count: 0,
+						integration_seconds: 0,
+				  };
 			timeline.push({
 				t: clock.now(),
-				action: { ship: actionSpec.ship, type: actionSpec.type, params: actionSpec.params },
+				action: {
+					ship: actionSpec.ship,
+					type: actionSpec.type,
+					params: actionSpec.params,
+				},
 				result: detectionResult,
 				ships: snapshotAllShips(ships),
 			});
@@ -227,7 +260,7 @@ export function runScenario(scenario: ScenarioFile): { timeline: TimelineEntry[]
 		const action = engine.submitAction(
 			ship,
 			actionSpec.type as ActionType,
-			actionSpec.params ?? {},
+			actionSpec.params ?? {}
 		);
 		const allResolved = engine.advanceUntilIdle();
 
@@ -243,12 +276,18 @@ export function runScenario(scenario: ScenarioFile): { timeline: TimelineEntry[]
 			}
 		}
 
-		const finalAction = allResolved.find((a) => a.type !== ActionType.ScanPassive) ?? action;
+		const finalAction =
+			allResolved.find((a) => a.type !== ActionType.ScanPassive) ??
+			action;
 		resolvedActions.push(finalAction);
 
 		timeline.push({
 			t: clock.now(),
-			action: { ship: actionSpec.ship, type: actionSpec.type, params: actionSpec.params },
+			action: {
+				ship: actionSpec.ship,
+				type: actionSpec.type,
+				params: actionSpec.params,
+			},
 			result: { ...finalAction.result },
 			ships: snapshotAllShips(ships),
 		});

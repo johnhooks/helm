@@ -27,7 +27,7 @@ export function computeEMSnapshot(
 	spectralClass: string,
 	actionEmissions: EmissionRecord[],
 	shipsAtNode: Array<{ shipId: string; ship: Ship }>,
-	atTime: number,
+	atTime: number
 ): EMSnapshot {
 	// 1. Stellar baseline
 	const baseline = stellarNoise(spectralClass);
@@ -36,7 +36,11 @@ export function computeEMSnapshot(
 	const allEmissions: EmissionRecord[] = [...actionEmissions];
 
 	for (const { shipId, ship } of shipsAtNode) {
-		const equipmentEmissions = computeEquipmentEmissions(ship, shipId, atTime);
+		const equipmentEmissions = computeEquipmentEmissions(
+			ship,
+			shipId,
+			atTime
+		);
 		allEmissions.push(...equipmentEmissions);
 	}
 
@@ -58,7 +62,9 @@ export function computeEMSnapshot(
 			sources.push({
 				power,
 				spectralType: emission.spectralType,
-				label: emission.label ?? `${emission.shipId}:${emission.emissionType}`,
+				label:
+					emission.label ??
+					`${emission.shipId}:${emission.emissionType}`,
 				shipId: emission.shipId,
 				emissionType: emission.emissionType,
 			});

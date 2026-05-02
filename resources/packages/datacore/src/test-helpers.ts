@@ -12,7 +12,7 @@ function findWasmPath(): string {
 	const wasmPath = resolve(
 		dirname(require.resolve('wa-sqlite/package.json')),
 		'dist',
-		'wa-sqlite.wasm',
+		'wa-sqlite.wasm'
 	);
 	return wasmPath;
 }
@@ -28,7 +28,9 @@ export async function openMemoryDb(): Promise<Database> {
 	const wasmBinary = readFileSync(findWasmPath());
 
 	// Dynamic import since the .mjs module uses import.meta.url
-	const { default: SQLiteESMFactory } = await import('wa-sqlite/dist/wa-sqlite.mjs');
+	const { default: SQLiteESMFactory } = await import(
+		'wa-sqlite/dist/wa-sqlite.mjs'
+	);
 
 	const module = await SQLiteESMFactory({
 		wasmBinary,
@@ -39,7 +41,7 @@ export async function openMemoryDb(): Promise<Database> {
 	sqlite3.vfs_register(vfs as any, true);
 	const db = await sqlite3.open_v2(
 		'test.db',
-		SQLite.SQLITE_OPEN_CREATE | SQLite.SQLITE_OPEN_READWRITE,
+		SQLite.SQLITE_OPEN_CREATE | SQLite.SQLITE_OPEN_READWRITE
 	);
 	return { sqlite3, db };
 }

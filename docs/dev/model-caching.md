@@ -14,8 +14,8 @@ We follow the same pattern for our custom tables.
 
 Our models extend StellarWP's `Model` base class. Internally, a Model instance holds:
 
-- `ModelPropertyCollection` — contains `ModelPropertyDefinition` objects with `castWith()` closures
-- `ModelRelationshipCollection` — contains relationship loaders bound as closures
+-   `ModelPropertyCollection` — contains `ModelPropertyDefinition` objects with `castWith()` closures
+-   `ModelRelationshipCollection` — contains relationship loaders bound as closures
 
 PHP cannot serialize closures. With the default in-memory cache this is invisible (no serialization occurs), but with a persistent backend, `wp_cache_set($id, $product)` would fatal:
 
@@ -89,16 +89,16 @@ if ($embed !== null && (! is_array($embed) || in_array($linkRel, $embed, true)))
 }
 ```
 
-- `?_embed` (no value) — `$embed` is a string, not an array — prime everything
-- `?_embed[]=helm:product` — `$embed` is `['helm:product']` — prime only if our rel matches
-- No `_embed` param — `$embed` is `null` — skip priming entirely
+-   `?_embed` (no value) — `$embed` is a string, not an array — prime everything
+-   `?_embed[]=helm:product` — `$embed` is `['helm:product']` — prime only if our rel matches
+-   No `_embed` param — `$embed` is `null` — skip priming entirely
 
 ## Cache Groups
 
 Each repository that implements caching uses its own cache group:
 
-| Repository | Cache Group | Key |
-|---|---|---|
+| Repository          | Cache Group     | Key        |
+| ------------------- | --------------- | ---------- |
 | `ProductRepository` | `helm_products` | Product ID |
 
 No TTL is set. Products are seeded/static data, so entries live for the request duration (in-memory) or until evicted (persistent backend).
@@ -136,9 +136,9 @@ wp_cache_flush_group('helm_products');
 
 Invalidate on any write path that changes the cached row:
 
-- `insert()` — not strictly necessary (the ID is new, so no stale entry exists), but invalidate if the insert replaces a soft-deleted record or uses `ON DUPLICATE KEY UPDATE`
-- `update()` — always invalidate
-- `delete()` — always invalidate
+-   `insert()` — not strictly necessary (the ID is new, so no stale entry exists), but invalidate if the insert replaces a soft-deleted record or uses `ON DUPLICATE KEY UPDATE`
+-   `update()` — always invalidate
+-   `delete()` — always invalidate
 
 Don't invalidate on read paths. If a `find()` returns stale data from a persistent cache, the problem is a missing invalidation on the write side, not a cache bug on the read side.
 

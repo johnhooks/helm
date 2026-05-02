@@ -8,7 +8,7 @@ Every component listed here is manufactured by a company with opinions. Those op
 
 ## Epoch Labs — Warp Cores
 
-*"Reliable power for unreliable space."*
+_"Reliable power for unreliable space."_
 
 Epoch Labs grew out of the CERN Subspace Research Division — the same lab where the first wormhole was accidentally opened. When the military wanted warp cores, they contracted the people who understood the physics. When the civilian market opened up, Epoch was the only company with a proven design.
 
@@ -18,7 +18,7 @@ Their philosophy is conservative engineering with well-understood tradeoffs. Eve
 
 ### Epoch-E Endurance
 
-*For pilots who plan to come back.*
+_For pilots who plan to come back._
 
 The Epoch-E runs cold. Deliberately, aggressively cold. Where the Rapid variant pushes thermal limits for output, the Endurance pulls back to a comfortable operating point and stays there. The result is a core with the highest hit points in the lineup (1,000 at Mk I) and the lowest consumption multiplier (0.75x). You'll regen slower — 5.0 base rate versus the Standard's 10.0 — and your output sits at 0.9x instead of the 1.0 baseline. But your core will outlast everything else in the catalog.
 
@@ -26,14 +26,14 @@ The tradeoff is real: every system on your ship that depends on core output — 
 
 Epoch-E pilots don't rush. They file flight plans. They bring enough fuel. They come home.
 
-> *"The Endurance is for professionals. The Rapid is for people who think they're professionals."*
+> _"The Endurance is for professionals. The Rapid is for people who think they're professionals."_
 > — Epoch Labs technical bulletin, unattributed
 
 **Mk II improvements:** HP climbs to 1,200, regen reaches 8.0, and the output creeps up to 0.95x while consumption drops further to 0.70x. The Mk II Endurance is the core for deep-range survey ships that can't afford a breakdown twelve light-years from the nearest station.
 
 ### Epoch-S Standard
 
-*The core everyone else is measured against.*
+_The core everyone else is measured against._
 
 The Epoch-S is the 1.0. Output multiplier: 1.0. Consumption multiplier: 1.0. Everything in the formulas that says "core output" is calibrated to this core. If you want to understand what a drive or sensor can do, install a Standard and read the numbers. That's the baseline.
 
@@ -41,14 +41,14 @@ This isn't a criticism. The Standard exists at 1.0 because Epoch deliberately de
 
 Pilots who fly Standards tend to know their ship's limits precisely — because the math is clean.
 
-> *"I could run an Epoch-S in my sleep. That's the point."*
+> _"I could run an Epoch-S in my sleep. That's the point."_
 > — Licensed freight pilot, Pioneer-class
 
 **Mk II improvements:** HP rises to 900, regen hits 14.0, and consumption starts to drop (0.93x). The Mk II Standard is a better Standard. Epoch doesn't innovate here — they refine.
 
 ### Epoch-R Rapid
 
-*When you need it now.*
+_When you need it now._
 
 The Rapid runs hot by design. Regen rate of 20.0 — double the Standard, quadruple the Endurance. Output at 1.1x. But the consumption multiplier is 1.5x, meaning every jump costs your core 50% more structural life than the same jump on a Standard. And with only 500 HP, the math is merciless. The Rapid will give you everything it has. It won't have it for long.
 
@@ -56,7 +56,7 @@ This is the core for short-haul pilots, combat escorts, and anyone whose mission
 
 Every experienced pilot has a story about an Epoch-R that saved them. Every experienced pilot also has a story about an Epoch-R that died at the worst possible time. Both stories are true. That's the product.
 
-> *"The Rapid is a consumable. Plan accordingly."*
+> _"The Rapid is a consumable. Plan accordingly."_
 > — DR-Series Propulsion internal training document
 
 **Mk II improvements:** HP up to 650 (still the lowest), regen at 24.0 (still the highest), and the consumption multiplier starts to come down — 1.30x versus the original 1.5x. Epoch heard the complaints. They didn't change the philosophy. They just made the philosophy survive slightly longer.
@@ -65,7 +65,7 @@ Every experienced pilot has a story about an Epoch-R that saved them. Every expe
 
 ## DR-Series Propulsion — Drives
 
-*"Get there."*
+_"Get there."_
 
 DR-Series — officially "Deep Range Systems" but nobody calls them that — builds drives. Just drives. They've never made anything else, and they're loudly proud of this fact. Their marketing is aggressively blue-collar: "We make the thing that moves you. Buy a good one."
 
@@ -75,7 +75,7 @@ Founded by a collective of drive engineers who left a megacorp to build drives w
 
 ### DR-305 Economy
 
-*Patient money.*
+_Patient money._
 
 The 305 is the drive for people who think about fuel costs. Sustain range of 10.0 light-years — the longest in the catalog. Consumption at 0.6x. Power draw of just 2.0. It sips where other drives gulp. The tradeoff is speed: at 0.5x amplitude, the 305 takes twice as long to cover the same distance as the 505.
 
@@ -83,14 +83,14 @@ But here's the thing the 305 pilots know: within that 10-light-year comfort rang
 
 The spool signature is gentle — 3 minutes at a back-loaded curve (1.5), peaking at 1.2 power. Civilian. Quiet-ish. A DSC array will still hear you, but you're not announcing yourself to the sector.
 
-> *"The 305 isn't slow. Everything else is just impatient."*
+> _"The 305 isn't slow. Everything else is just impatient."_
 > — DR-Series marketing, framed in every dealership
 
 **Mk II improvements:** Comfort range extends to 11.0 ly, consumption drops to 0.55x, and the spool signature quiets down further — peak power at 1.05, cooldown reduced to 90 seconds. The Mk II 305 is even harder to detect and even cheaper to run. Frontier freight pilots call it the "ghost hauler."
 
 ### DR-505 Standard
 
-*The fleet standard.*
+_The fleet standard._
 
 The 505 is the 1.0 of drives, the way the Epoch-S is the 1.0 of cores. Sustain of 7.0 ly, all multipliers at 1.0, power draw of 4.0. It exists at the center of every tradeoff. It's the drive the navy uses because it doesn't excel at anything and doesn't fail at anything. Logistics love it.
 
@@ -98,14 +98,14 @@ The spool curve is linear (1.0) — 4 minutes of steady buildup to 1.5 peak powe
 
 Most pilots start on a 505. Many stay on one. There's no shame in running what works.
 
-> *"I replaced my 505 with a 705 once. Replaced it back a week later. I don't need to go that fast and I don't need those fuel bills."*
+> _"I replaced my 505 with a 705 once. Replaced it back a week later. I don't need to go that fast and I don't need those fuel bills."_
 > — Private comms, Pioneer pilot forum
 
 **Mk II improvements:** Sustain reaches 8.0 ly, consumption drops to 0.92x, spool peak falls to 1.3. The Mk II 505 is a better 505 in every direction. The fleet standard keeps getting more standard.
 
 ### DR-705 Boost
 
-*Speed costs. Here's the invoice.*
+_Speed costs. Here's the invoice._
 
 The 705 is the biggest, fastest, hungriest drive DR-Series makes. Amplitude of 2.0x means half the travel time of a 505. Consumption at 1.5x and a power draw of 8.0 mean you're paying for every second of that speed. The comfort range is only 5.0 ly — beyond that, strain costs start climbing on the quadratic curve.
 
@@ -115,14 +115,14 @@ The spool signature is unmistakable — front-loaded curve (0.5) reaching 2.5 pe
 
 Throttle range extends to 3.0 (versus the 305's 2.0 cap), meaning a 705 in overdrive is covering ground at 6x the rate of a 305 at standard throttle — at ruinous cost.
 
-> *"If you're looking at the fuel gauge, you bought the wrong drive."*
+> _"If you're looking at the fuel gauge, you bought the wrong drive."_
 > — Unsigned graffiti, Pioneer Station maintenance bay
 
 **Mk II improvements:** Sustain extends to 6.0 ly, consumption drops to 1.30x, and the spool spike softens slightly to 2.1 peak. Still loud. Still fast. DR-Series filed the sharpest edges off but didn't blunt the blade.
 
 ### SDR-2 — Stealth Drive
 
-*For when getting there isn't enough. You have to get there unnoticed.*
+_For when getting there isn't enough. You have to get there unnoticed._
 
 The SDR doesn't appear in DR-Series marketing materials and doesn't carry the DR prefix. The origin is uncertain — the spec sheet lists no manufacturer, just a designation. Pilots who've installed one describe the engineering as "familiar but wrong," like drive components designed by people who were thinking about a completely different problem. The prevailing theory is that it's a defense contractor prototype that reached civilian markets through surplus channels. Nobody confirms. Nobody denies.
 
@@ -136,24 +136,24 @@ The throttle caps at 1.5, which means even in overdrive the SDR never produces t
 
 Pilots who install SDRs don't talk about it on the forums. That's also part of the design.
 
-> *"I didn't see anything."*
+> _"I didn't see anything."_
 > — DSC Mk II operator, survey report filed as "uneventful"
 
 ### Aegis Testudo — Transit Shield Harmonics
 
-*"They built a drive that thinks it's a shield emitter."*
+_"They built a drive that thinks it's a shield emitter."_
 
 The Testudo is what happens when a shield company builds a drive. Aegis Foundry's engineers spent years studying how shield harmonics interact with warp field geometry, and they realized the two systems share resonance patterns. The drive they built doesn't generate a conventional warp field — it generates a shield-harmonic field that happens to move you through space. Slowly. The name comes from the Roman tortoise formation — moving while shielded. Aegis engineers have a military history fetish. Nobody complains, because it works.
 
 Sustain of 6.0 ly at v1 (6.5 at v3) — worse than a DR-305. Amplitude of 0.7x — faster than a DR-305, but that's where the advantages end. Consumption scaling of 0.55x at v1 (0.60x at v3) is comparable to economy drives, but core damage at 1.20x (1.10x at v3) is brutal — second only to the DR-705. Power draw of 3.5. Footprint of 28. Throttle caps at 1.5. The Testudo moves you faster than a 305 but wears your core down doing it. The speed isn't the selling point. The shields are.
 
-But shield harmonics don't shut down during transit. In a conventional drive, shields go offline during the jump — the warp field interferes with shield field geometry, and you travel unprotected. The Testudo's warp field *is* shield field geometry. Shields regenerate at 0.5x their normal rate throughout the entire transit phase. For long jumps in dangerous space, that means arriving with shields partially recovered instead of arriving naked.
+But shield harmonics don't shut down during transit. In a conventional drive, shields go offline during the jump — the warp field interferes with shield field geometry, and you travel unprotected. The Testudo's warp field _is_ shield field geometry. Shields regenerate at 0.5x their normal rate throughout the entire transit phase. For long jumps in dangerous space, that means arriving with shields partially recovered instead of arriving naked.
 
 The DSP envelope is unlike any other drive. The spool is 240 seconds — long, even by DR-505 standards — but the curve is aggressively back-loaded (1.8) and peaks at only 0.70 power (dropping to 0.60 by v3). The sustain signature is 0.60 peak (0.50 at v3). Cooldown runs 200 seconds at 0.50 peak. The whole emission profile reads like a continuous hum, not a drive chirp. ACU pulse filters, tuned for hard electromagnetic spikes, barely register it. A DSC array will eventually hear it, but the signature is so gradual that integration times stretch to hours.
 
 Aegis doesn't advertise the stealth characteristics. They don't need to. Pilots who install one figure it out quickly.
 
-> *"I thought the drive was broken. No spool spike, no transit flash. Then I realized I'd jumped four light-years and my shields were at 60%. It's not broken. It's Aegis."*
+> _"I thought the drive was broken. No spool spike, no transit flash. Then I realized I'd jumped four light-years and my shields were at 60%. It's not broken. It's Aegis."_
 > — Pilot log, name withheld
 
 The **Aegis Phalanx** is the Mk III evolution — tighter harmonics, better shielding fraction (0.6x), reduced core damage (1.05x). The name follows the military formation theme: where the Testudo moves, the Phalanx holds ground.
@@ -166,7 +166,7 @@ The sensor market is the most competitive vertical in the hardware industry. Thr
 
 ### Deep Scan Dynamics — DSC Arrays
 
-*"What's out there?"*
+_"What's out there?"_
 
 The frontier company. Founded by scouts who got tired of not seeing far enough. DSC arrays are enormous — antenna farms, signal processors, shielded receivers — because distance requires aperture. Their products are physically large (40 footprint, the biggest sensor in the catalog), slow to survey (2.0x processing time), but see further than anything else.
 
@@ -176,7 +176,7 @@ Active scanning is not the DSC's strength. With 0.70 active affinity and 0.70 pu
 
 Detection probability starts at 60% — the lowest base chance in the catalog. This isn't a flaw. It's a design choice. The DSC trades per-scan accuracy for the ability to find things at ranges where other sensors see nothing but noise.
 
-> *"Range isn't a feature. Range is the sensor. Everything else is convenience."*
+> _"Range isn't a feature. Range is the sensor. Everything else is convenience."_
 > — Deep Scan Dynamics technical manual, first page
 
 **Mk I:** 7.0 ly sustain, 60% chance, 2.0x survey time, 3.0 power draw. Passive 1.40, continuous gain 1.50. The antenna farm.
@@ -185,7 +185,7 @@ Detection probability starts at 60% — the lowest base chance in the catalog. T
 
 ### Versa Instruments — VRS Arrays
 
-*"Everything. Adequately."*
+_"Everything. Adequately."_
 
 The generalist. Versa builds sensors that don't embarrass themselves at anything. Their engineering philosophy is "good enough at both jobs is better than amazing at one." Pilots who can't decide between range and resolution buy Versa and don't regret it.
 
@@ -195,7 +195,7 @@ This makes the VRS boring on paper and excellent in practice. A VRS pilot never 
 
 Footprint of 25 (manageable), sustain of 5.0 ly (reasonable), 70% detection chance (honest), 1.0x survey time (baseline), 2.0 power draw (efficient). The VRS is the sensor for ships that do everything and can't afford to do any of it badly.
 
-> *"I've never heard anyone say 'I love my VRS.' I've also never heard anyone say they replaced one."*
+> _"I've never heard anyone say 'I love my VRS.' I've also never heard anyone say they replaced one."_
 > — Versa Instruments investor relations, quarterly call
 
 **Mk I:** The numbers above. Clean and central.
@@ -204,7 +204,7 @@ Footprint of 25 (manageable), sustain of 5.0 ly (reasonable), 70% detection chan
 
 ### Acuity Systems — ACU Arrays
 
-*"What's down there?"*
+_"What's down there?"_
 
 The detail company. Acuity builds sensors for people who want to know everything about what's in front of them, not what's far away. Their arrays are compact (15 footprint — the smallest sensor), fast-cycling (0.5x survey time), and produce detection results that other sensors can't match within range. Limited sustain of 3.0 ly. But within those 3 light-years, nothing hides.
 
@@ -214,7 +214,7 @@ This makes the ACU the predator's sensor. You know something is there. You want 
 
 Base detection chance of 85%. Within comfort range, with a clean active scan, the ACU finds what it's looking for. That 15% failure rate is the universe's noise floor, not a sensor limitation.
 
-> *"DSC sells antenna farms. Versa sells compromise. We sell answers."*
+> _"DSC sells antenna farms. Versa sells compromise. We sell answers."_
 > — Acuity Systems founder, keynote address
 
 **Mk I:** 3.0 ly sustain, 85% chance, 0.5x survey, 1.0 draw. Active 1.40, pulse gain 1.50. Small, fast, precise.
@@ -223,7 +223,7 @@ Base detection chance of 85%. Within comfort range, with a clean active scan, th
 
 ### MIL Mk II — Military Sensor Array
 
-*Designation. Not a brand.*
+_Designation. Not a brand._
 
 The MIL array doesn't come from a sensor manufacturer. It comes from a defense procurement program. The documentation uses specification numbers instead of marketing language. There is no tagline. There is no founder's keynote. There's a technical readiness level assessment and a contract number.
 
@@ -235,12 +235,12 @@ Sustain of 4.0 ly and a base detection chance of 75% — the MIL doesn't see as 
 
 Mk II only. There was no Mk I on the civilian market. Make of that what you will.
 
-> *"The MIL array isn't better. It's less compromised. There's a difference, and it costs four power."*
+> _"The MIL array isn't better. It's less compromised. There's a difference, and it costs four power."_
 > — Retired fleet sensor operator, anonymous forum post
 
 ### Epoch Sensor 2 — Core Resonance Scanner
 
-*"It sees what's alive."*
+_"It sees what's alive."_
 
 The Epoch Sensor doesn't come from a sensor company. It comes from Epoch Labs — the core people. Their engineers spent years studying warp core harmonics and eventually asked the obvious question: if we can read our own core's signature with this precision, what happens if we point the receiver outward?
 
@@ -248,18 +248,18 @@ The answer is a sensor that reads core harmonics instead of the EM spectrum. It'
 
 But it has two properties that no other sensor can match. First, its scans draw power from the warp core's structural life instead of the ship's capacitor. The power bus draw is a negligible 0.5 — the sensor barely touches the electrical system because it's feeding directly off core resonance. You can scan endlessly if you're willing to burn core HP. For ships with an Epoch-E Endurance (1,000+ HP, slow but patient), the math becomes interesting: hundreds of scans before the core notices.
 
-Second, its DSP affinity is unlike anything else in the catalog. Active affinity of 0.50 and pulse gain of 0.40 — the worst numbers in the game by far. The Epoch Sensor can barely detect a DR-705 spooling at close range. But the continuous gain sits at 1.10-1.15 — above neutral, above VRS, specifically tuned to detect running warp cores. The Epoch Sensor can't find a ship that's hiding. It can find a ship that's *operating*.
+Second, its DSP affinity is unlike anything else in the catalog. Active affinity of 0.50 and pulse gain of 0.40 — the worst numbers in the game by far. The Epoch Sensor can barely detect a DR-705 spooling at close range. But the continuous gain sits at 1.10-1.15 — above neutral, above VRS, specifically tuned to detect running warp cores. The Epoch Sensor can't find a ship that's hiding. It can find a ship that's _operating_.
 
 Pilots who install Epoch Sensors tend to be explorers running long survey missions where capacitor budget matters more than scan quality. Or hunters who know their target is running hot and just need to know where.
 
-> *"Epoch built a sensor that eats your core and barely works. I've found three derelicts with it that my DSC never saw. I'm not switching back."*
+> _"Epoch built a sensor that eats your core and barely works. I've found three derelicts with it that my DSC never saw. I'm not switching back."_
 > — Deep-range surveyor, private correspondence
 
 ---
 
 ## Aegis Foundry — Shields
 
-*"Between you and the void."*
+_"Between you and the void."_
 
 Aegis started as a military contractor building hull plating for naval vessels during the Internet Wars. When warp technology democratized and civilian ships needed protection, Aegis pivoted to energy shields — same defense philosophy, new medium. They think about protection in terms of layers, coverage, and recovery time.
 
@@ -267,7 +267,7 @@ Aegis started as a military contractor building hull plating for naval vessels d
 
 ### Aegis Alpha
 
-*Take hits. Take more hits.*
+_Take hits. Take more hits._
 
 The Alpha is Aegis's smallest shield — 10 footprint, the lightest in the lineup. But small doesn't mean weak. It means fast. Regen rate of 20.0 (double the Delta, quadruple the Eta) and a power draw of just 3.0. Capacity is only 50 units, which means the Alpha can't absorb a heavy blow. But it can recover from a light one before the next one arrives.
 
@@ -275,14 +275,14 @@ The Alpha is for pilots who expect combat to be a series of exchanges, not a sin
 
 The priority tuning range is the widest in the shield lineup: 0.25x to 2.0x. At minimum priority, the Alpha is barely there — trickling regen, minimal draw, keeping power available for other systems. At maximum priority, it's cycling at 40.0 regen and pulling 6.0 power. A pilot can ride the priority dial moment to moment, dumping power into shields when taking fire and pulling it back when maneuvering.
 
-> *"The Alpha doesn't protect you. It recovers you. Know the difference."*
+> _"The Alpha doesn't protect you. It recovers you. Know the difference."_
 > — Aegis Foundry product brief
 
 **Mk II improvements:** Regen climbs to 24.0, capacity reaches 70 at v1 and 85 at v3. The Mk II Alpha regens nearly as fast as the original cycles, with enough buffer to survive hits that would have punched through the Mk I. Same 10 footprint, same 3.0 draw. Aegis made the Alpha more Alpha.
 
 ### Aegis Delta
 
-*The one you probably want.*
+_The one you probably want._
 
 The Delta is Aegis's recommendation for most civilian frames. 100 capacity absorbs meaningful damage without requiring the massive power budget of the Eta. Regen of 10.0 recovers at a reasonable pace. Footprint of 20 fits most loadouts. Draw of 5.0 is manageable.
 
@@ -290,14 +290,14 @@ Like the Epoch-S and the DR-505, the Delta exists at the center. It's not the be
 
 Priority range of 0.5x to 2.0x. At full priority, the Delta regens at 20.0 and pulls 10.0 power — numbers that start to matter on ships with smaller cores. The Delta rewards careful power management: run low priority during transit, push to full when threats appear.
 
-> *"The Delta is our most popular product. That means either we designed it right or nobody reads the spec sheets. Probably both."*
+> _"The Delta is our most popular product. That means either we designed it right or nobody reads the spec sheets. Probably both."_
 > — Aegis Foundry sales conference, recorded
 
 **Mk II improvements:** Capacity to 140, regen to 14.0. The Mk II Delta is noticeable — it's no longer the safe middle choice, it's starting to feel genuinely capable. Pilots upgrading from the first generation report surviving encounters they wouldn't have before. Same draw. Aegis doesn't change the price of survival.
 
 ### Aegis Eta
 
-*The wall.*
+_The wall._
 
 The Eta is 200 capacity. That number defines everything else about the product. At 200, the Eta absorbs hits that would vaporize an Alpha and crack a Delta. The regen rate of 5.0 means recovery is measured in hours, not minutes — if the Eta goes down, you're unshielded for a long time. But the Eta going down means you absorbed 200 units of damage and you're still flying. That's the pitch.
 
@@ -307,16 +307,16 @@ Priority range of 0.5x to 3.0x — the highest ceiling in the catalog. At 3.0 pr
 
 The Eta is not popular. It is respected.
 
-> *"I've seen an Eta take a hit that would have killed me twice. The pilot didn't even change course. I have opinions about people like that."*
+> _"I've seen an Eta take a hit that would have killed me twice. The pilot didn't even change course. I have opinions about people like that."_
 > — DR-705 pilot, incident report
 
 **Mk II improvements:** Capacity reaches 275 at v1. Regen improves to 8.0. The Mk II Eta is the heaviest shield ever offered on the civilian market. Aegis's internal documentation calls it "the last shield you'll need." Their engineers call it "the reason we exist."
 
 ### DSC Shield Mk II — Sensor-Shield Coupling
 
-*"They couldn't stop thinking about range."*
+_"They couldn't stop thinking about range."_
 
-The DSC Shield is what happens when Deep Scan Dynamics looks at a shield emitter and sees an antenna. DSC engineers observed that shield field geometry shares mathematical properties with passive sensor apertures — both are large-area wavefront receivers. They asked: what if the shield *was* the antenna?
+The DSC Shield is what happens when Deep Scan Dynamics looks at a shield emitter and sees an antenna. DSC engineers observed that shield field geometry shares mathematical properties with passive sensor apertures — both are large-area wavefront receivers. They asked: what if the shield _was_ the antenna?
 
 The result is a shield that is barely a shield. Capacity of 25 at v1 (30 at v3) — half the Aegis Alpha, the weakest native shield. Regen of 6.0 (reaching 8.0 at v3) — less than a third of the Alpha's rate. In any straight fight, the DSC Shield will fail before the enemy finishes their opening volley. Priority range caps at 1.5 (versus the Alpha's 2.0), so you can't even compensate by overdriving it.
 
@@ -326,14 +326,14 @@ The power draw is just 2.0 — lower than any Aegis shield — because the DSC S
 
 Pilots who run DSC Shields don't expect to survive combat. They expect to see combat coming early enough to not be there when it arrives.
 
-> *"My shields went down in one hit. But I saw the hit coming from three systems away. I'll take that trade."*
+> _"My shields went down in one hit. But I saw the hit coming from three systems away. I'll take that trade."_
 > — DSC Mk II operator, running DSC Shield Mk II v2
 
 ---
 
 ## Nav Computers
 
-*Software doesn't have a brand. It has a version number.*
+_Software doesn't have a brand. It has a version number._
 
 Navigation computers are the only ship component with no manufacturer identity. They're firmware — software packages that run on the ship's base computing hardware. Nobody knows who wrote the original nav stack. It ships with the frame, and upgrades are available through station software vendors. No branding. No marketing. No tagline. Just a tier number.
 
@@ -369,68 +369,68 @@ For pilots who want to understand the spec sheets.
 
 ### Cores
 
-| Stat | What it means |
-|------|---------------|
-| **HP** | Core structural integrity. Every jump costs HP based on strain and consumption. When it hits zero, the core is dead. |
-| **Rate** | Power regen per tick. Higher rate means faster capacitor recovery between actions. |
-| **Output (mult_a)** | How much raw power the core provides to all systems. Drives, sensors, and shields all scale with this number. |
+| Stat                     | What it means                                                                                                             |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
+| **HP**                   | Core structural integrity. Every jump costs HP based on strain and consumption. When it hits zero, the core is dead.      |
+| **Rate**                 | Power regen per tick. Higher rate means faster capacitor recovery between actions.                                        |
+| **Output (mult_a)**      | How much raw power the core provides to all systems. Drives, sensors, and shields all scale with this number.             |
 | **Consumption (mult_b)** | How fast jumps wear the core down. Lower is better. Multiplied against distance and strain to determine HP cost per jump. |
 
 ### Drives
 
-| Stat | What it means |
-|------|---------------|
-| **Sustain** | Comfort range in light-years. Within this distance, no strain penalty. Beyond it, costs climb quadratically. |
-| **Consumption (mult_a)** | Resource burn rate. Higher means the drive consumes more resources per action. |
-| **Consumption (mult_b)** | Core damage multiplier per jump. Paired with the core's own mult_b to determine wear. |
-| **Amplitude (mult_c)** | Speed multiplier. Higher amplitude means shorter travel time. |
-| **Transit shield fraction (mult_d)** | Crossover mechanic. Fraction of normal shield regen that continues during jump transit. Only present on Aegis Testudo. |
-| **Draw** | Continuous power consumption while the drive is installed and active. |
-| **Spool** | DSP emission profile during drive startup. Duration, peak power, and curve shape determine how visible the drive is when spooling. |
+| Stat                                 | What it means                                                                                                                      |
+| ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
+| **Sustain**                          | Comfort range in light-years. Within this distance, no strain penalty. Beyond it, costs climb quadratically.                       |
+| **Consumption (mult_a)**             | Resource burn rate. Higher means the drive consumes more resources per action.                                                     |
+| **Consumption (mult_b)**             | Core damage multiplier per jump. Paired with the core's own mult_b to determine wear.                                              |
+| **Amplitude (mult_c)**               | Speed multiplier. Higher amplitude means shorter travel time.                                                                      |
+| **Transit shield fraction (mult_d)** | Crossover mechanic. Fraction of normal shield regen that continues during jump transit. Only present on Aegis Testudo.             |
+| **Draw**                             | Continuous power consumption while the drive is installed and active.                                                              |
+| **Spool**                            | DSP emission profile during drive startup. Duration, peak power, and curve shape determine how visible the drive is when spooling. |
 
 ### Sensors
 
-| Stat | What it means |
-|------|---------------|
-| **Sustain** | Comfort range in light-years. Scans within this range have no strain penalty. |
-| **Chance** | Base detection probability per scan at optimal range. The ceiling before strain reduces it. |
-| **Survey (mult_a)** | Time multiplier for scan completion. Lower is faster. |
-| **Core resonance split (mult_d)** | Crossover mechanic. Fraction of scan power cost redirected from capacitor to core HP damage. 1.0 = all cost becomes core damage. Only present on Epoch Sensor 2. |
-| **Draw** | Continuous power consumption. |
-| **Active / Passive** | DSP affinity for active scans (you ping) vs passive detection (you listen). Higher means better results for that mode. |
-| **Pulse / Continuous Gain** | Matched filter effectiveness against different emission types. Pulse gain helps detect drive spools and active scans. Continuous gain helps detect mining, shield regen, and sustained operations. |
+| Stat                              | What it means                                                                                                                                                                                      |
+| --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Sustain**                       | Comfort range in light-years. Scans within this range have no strain penalty.                                                                                                                      |
+| **Chance**                        | Base detection probability per scan at optimal range. The ceiling before strain reduces it.                                                                                                        |
+| **Survey (mult_a)**               | Time multiplier for scan completion. Lower is faster.                                                                                                                                              |
+| **Core resonance split (mult_d)** | Crossover mechanic. Fraction of scan power cost redirected from capacitor to core HP damage. 1.0 = all cost becomes core damage. Only present on Epoch Sensor 2.                                   |
+| **Draw**                          | Continuous power consumption.                                                                                                                                                                      |
+| **Active / Passive**              | DSP affinity for active scans (you ping) vs passive detection (you listen). Higher means better results for that mode.                                                                             |
+| **Pulse / Continuous Gain**       | Matched filter effectiveness against different emission types. Pulse gain helps detect drive spools and active scans. Continuous gain helps detect mining, shield regen, and sustained operations. |
 
 ### Shields
 
-| Stat | What it means |
-|------|---------------|
-| **Capacity** | Total damage absorption before shields fail. |
-| **Rate** | Base regen speed. Actual regen = rate x priority. |
-| **Draw** | Base power consumption. Actual draw = draw x priority. |
+| Stat                            | What it means                                                                                                                                |
+| ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Capacity**                    | Total damage absorption before shields fail.                                                                                                 |
+| **Rate**                        | Base regen speed. Actual regen = rate x priority.                                                                                            |
+| **Draw**                        | Base power consumption. Actual draw = draw x priority.                                                                                       |
 | **Sensor range bonus (mult_d)** | Crossover mechanic. Passive sensor affinity multiplier while shields are active. 0.4 = 1.4x passive range. Only present on DSC Shield Mk II. |
-| **Priority range** | How far the pilot can push or pull the shield's power allocation. Higher max priority means more aggressive regen at higher power cost. |
+| **Priority range**              | How far the pilot can push or pull the shield's power allocation. Higher max priority means more aggressive regen at higher power cost.      |
 
 ### Nav
 
-| Stat | What it means |
-|------|---------------|
-| **Skill (mult_a)** | Discovery probability multiplier. Higher skill means more finds per hop. |
+| Stat                    | What it means                                                                                               |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------- |
+| **Skill (mult_a)**      | Discovery probability multiplier. Higher skill means more finds per hop.                                    |
 | **Efficiency (mult_b)** | Decay resistance. Higher efficiency means discovery probability holds up better at deeper exploration hops. |
 
 ### Column Reference
 
 Generic stat columns on the product table. Each component type uses a subset — unused columns are null.
 
-| Column | Core | Drive | Sensor | Shield | Nav |
-|--------|------|-------|--------|--------|-----|
-| `hp` | structural integrity | - | - | - | - |
-| `rate` | power regen | - | - | shield regen | - |
-| `sustain` | - | comfort range | comfort range | - | - |
-| `capacity` | - | - | - | shield capacity | - |
-| `chance` | - | - | detection chance | - | - |
-| `mult_a` | output | consumption | survey duration | - | skill |
-| `mult_b` | cost | core damage | - | - | efficiency |
-| `mult_c` | - | amplitude | - | - | - |
-| `mult_d` | - | transit shield fraction | core resonance split | sensor range bonus | - |
-| `mult_e` | - | - | - | - | - |
-| `mult_f` | - | - | - | - | - |
+| Column     | Core                 | Drive                   | Sensor               | Shield             | Nav        |
+| ---------- | -------------------- | ----------------------- | -------------------- | ------------------ | ---------- |
+| `hp`       | structural integrity | -                       | -                    | -                  | -          |
+| `rate`     | power regen          | -                       | -                    | shield regen       | -          |
+| `sustain`  | -                    | comfort range           | comfort range        | -                  | -          |
+| `capacity` | -                    | -                       | -                    | shield capacity    | -          |
+| `chance`   | -                    | -                       | detection chance     | -                  | -          |
+| `mult_a`   | output               | consumption             | survey duration      | -                  | skill      |
+| `mult_b`   | cost                 | core damage             | -                    | -                  | efficiency |
+| `mult_c`   | -                    | amplitude               | -                    | -                  | -          |
+| `mult_d`   | -                    | transit shield fraction | core resonance split | sensor range bonus | -          |
+| `mult_e`   | -                    | -                       | -                    | -                  | -          |
+| `mult_f`   | -                    | -                       | -                    | -                  | -          |

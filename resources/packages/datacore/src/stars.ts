@@ -34,7 +34,6 @@ JOIN nodes n ON s.node_id = n.id
 WHERE s.is_primary = 1
 `;
 
-
 /**
  * All stars at a given node (including companions in multi-star systems).
  */
@@ -77,7 +76,7 @@ export function createStarsRepository(conn: Connection) {
 					star.mass,
 					star.radius,
 					star.is_primary ? 1 : 0,
-				],
+				]
 			);
 		},
 
@@ -85,14 +84,26 @@ export function createStarsRepository(conn: Connection) {
 			const chunkSize = 83; // 12 columns × 83 = 996 params (SQLite limit: 999)
 			for (let i = 0; i < stars.length; i += chunkSize) {
 				const chunk = stars.slice(i, i + chunkSize);
-				const placeholders = chunk.map(() => '(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)').join(', ');
+				const placeholders = chunk
+					.map(() => '(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+					.join(', ');
 				const params = chunk.flatMap((s) => [
-					s.id, s.node_id, s.title, s.catalog_id, s.spectral_class, s.post_type,
-					s.x, s.y, s.z, s.mass, s.radius, s.is_primary ? 1 : 0,
+					s.id,
+					s.node_id,
+					s.title,
+					s.catalog_id,
+					s.spectral_class,
+					s.post_type,
+					s.x,
+					s.y,
+					s.z,
+					s.mass,
+					s.radius,
+					s.is_primary ? 1 : 0,
 				]);
 				await conn.run(
 					`INSERT INTO stars (id, node_id, title, catalog_id, spectral_class, post_type, x, y, z, mass, radius, is_primary) VALUES ${placeholders}`,
-					params,
+					params
 				);
 			}
 		},

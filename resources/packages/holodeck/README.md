@@ -40,7 +40,7 @@ It exists as a separate package from the workbench because it maps directly to `
 
 ## Further Reading
 
-- `docs/plans/workbench.md` — package architecture, stage history, design decisions
-- `docs/plans/simulation-testing.md` — how holodeck and PHP simulation work together
-- `docs/dev/simulation.md` — PHP simulation layer
-- `docs/dev/dsp.md` — detection system design philosophy
+-   `docs/plans/workbench.md` — package architecture, stage history, design decisions
+-   `docs/plans/simulation-testing.md` — how holodeck and PHP simulation work together
+-   `docs/dev/simulation.md` — PHP simulation layer
+-   `docs/dev/dsp.md` — detection system design philosophy

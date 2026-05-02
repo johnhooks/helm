@@ -6,19 +6,19 @@ How we validate game mechanics through multi-action scenarios with time accelera
 
 The game we've designed has mechanics that only emerge through multi-action sequences playing out over time:
 
-- A jump envelope draws power across three phases, leaving the ship in a specific power state that affects the next action
-- A scan's sweep peaks roll for detection at checkpoints, with cumulative probability building across the scan duration
-- Stellar effects modify formula inputs system-wide, changing how every action in that system resolves
-- An interdiction interrupts a jump at a waypoint checkpoint, triggering shield drain, cargo transfer, and a recovery window
-- Component drift accumulates across hundreds of actions, gradually shifting performance profiles
+-   A jump envelope draws power across three phases, leaving the ship in a specific power state that affects the next action
+-   A scan's sweep peaks roll for detection at checkpoints, with cumulative probability building across the scan duration
+-   Stellar effects modify formula inputs system-wide, changing how every action in that system resolves
+-   An interdiction interrupts a jump at a waypoint checkpoint, triggering shield drain, cargo transfer, and a recovery window
+-   Component drift accumulates across hundreds of actions, gradually shifting performance profiles
 
 None of this can be validated by running a single formula in isolation. We need to play out scenarios and answer real design questions:
 
-- Can a hauler realistically jump across an entire sector on one core?
-- How hard is it really to find prey as a PVP player scanning for hours?
-- How safe is a miner out in nullsec — what are the actual odds of being found?
-- After an interdiction, how long is the victim actually stranded given their loadout?
-- Does the piracy-vs-mining economy math actually work out the way we designed?
+-   Can a hauler realistically jump across an entire sector on one core?
+-   How hard is it really to find prey as a PVP player scanning for hours?
+-   How safe is a miner out in nullsec — what are the actual odds of being found?
+-   After an interdiction, how long is the victim actually stranded given their loadout?
+-   Does the piracy-vs-mining economy math actually work out the way we designed?
 
 The simulation has to run the real game code. If we build a separate system to approximate the engine, the two will drift apart, and we'll be debugging discrepancies instead of designing gameplay.
 
@@ -36,13 +36,13 @@ What the holodeck cannot do: run the real PHP action lifecycle. It can't prove t
 
 ### PHP Simulation Mode (validation-time)
 
-The PHP simulation runs the *actual game code* — the same `ActionFactory`, `ActionResolver`, `Ship`, `Power`, `Shields` classes that production uses — but with two modifications:
+The PHP simulation runs the _actual game code_ — the same `ActionFactory`, `ActionResolver`, `Ship`, `Power`, `Shields` classes that production uses — but with two modifications:
 
 1. **In-memory storage.** Repository contracts are bound to in-memory implementations instead of `$wpdb`. No database reads, no database writes. State lives in PHP arrays seeded from `tests/_data/catalog/`.
 
 2. **Controlled time.** `Date::now()` returns simulation time, not real time. Advancing means jumping the clock to the next `deferred_until` timestamp and running the processor. No cron, no waiting.
 
-WordPress still boots (via WP-CLI). All hooks fire. All providers register. The container wires everything normally. The only difference is *which concrete classes* are bound to the repository contracts. The game logic doesn't know it's in a simulation.
+WordPress still boots (via WP-CLI). All hooks fire. All providers register. The container wires everything normally. The only difference is _which concrete classes_ are bound to the repository contracts. The game logic doesn't know it's in a simulation.
 
 ### How They Work Together
 
@@ -83,19 +83,19 @@ The fix: extract interfaces from every repository, have the concrete classes imp
 
 Repositories that need contracts (used by the game loop):
 
-| Repository | Table | Game Loop Role |
-|---|---|---|
-| `ShipStateRepository` | `helm_ship_state` | Ship operational state (power, shields, hull, location) |
-| `ActionRepository` | `helm_ship_actions` | Action queue (pending, running, fulfilled) |
-| `InventoryRepository` | `helm_inventory` | Fitted components + cargo |
-| `ProductRepository` | `helm_products` | Component catalog (read-only in game loop) |
-| `NodeRepository` | `helm_nav_nodes` | Navigation graph nodes |
-| `EdgeRepository` | `helm_nav_edges` | Navigation graph edges |
+| Repository            | Table               | Game Loop Role                                          |
+| --------------------- | ------------------- | ------------------------------------------------------- |
+| `ShipStateRepository` | `helm_ship_state`   | Ship operational state (power, shields, hull, location) |
+| `ActionRepository`    | `helm_ship_actions` | Action queue (pending, running, fulfilled)              |
+| `InventoryRepository` | `helm_inventory`    | Fitted components + cargo                               |
+| `ProductRepository`   | `helm_products`     | Component catalog (read-only in game loop)              |
+| `NodeRepository`      | `helm_nav_nodes`    | Navigation graph nodes                                  |
+| `EdgeRepository`      | `helm_nav_edges`    | Navigation graph edges                                  |
 
 Repositories that do NOT need contracts yet (not in the game loop):
 
-- `StarRepository`, `PlanetRepository`, `StationRepository`, `AnomalyRepository` — these are world-building CPT wrappers. The simulation doesn't need stars or planets to run a jump action.
-- `RouteRepository`, `CelestialRepository`, `DiscoveryRepository` — future work.
+-   `StarRepository`, `PlanetRepository`, `StationRepository`, `AnomalyRepository` — these are world-building CPT wrappers. The simulation doesn't need stars or planets to run a jump action.
+-   `RouteRepository`, `CelestialRepository`, `DiscoveryRepository` — future work.
 
 ### Time Control (`Date` — Carbon-inspired)
 
@@ -212,12 +212,12 @@ The critical insight: `advanceUntilIdle()` doesn't step through time in incremen
 
 In-memory repositories are seeded from `tests/_data/catalog/`:
 
-| Data | Source | Repository |
-|---|---|---|
-| Products | `tests/_data/catalog/products/*.json` | `MemoryProductRepository` |
-| Hulls | `tests/_data/catalog/hulls.json` | Used by `LoadoutFactory` |
-| Nav graph | `tests/_data/catalog/graph.json` | `MemoryNodeRepository` + `MemoryEdgeRepository` |
-| Ships | Created programmatically via `Simulation::createShip()` | `MemoryShipStateRepository` + `MemoryInventoryRepository` |
+| Data      | Source                                                  | Repository                                                |
+| --------- | ------------------------------------------------------- | --------------------------------------------------------- |
+| Products  | `tests/_data/catalog/products/*.json`                   | `MemoryProductRepository`                                 |
+| Hulls     | `tests/_data/catalog/hulls.json`                        | Used by `LoadoutFactory`                                  |
+| Nav graph | `tests/_data/catalog/graph.json`                        | `MemoryNodeRepository` + `MemoryEdgeRepository`           |
+| Ships     | Created programmatically via `Simulation::createShip()` | `MemoryShipStateRepository` + `MemoryInventoryRepository` |
 
 This is the same data the holodeck and workbench consume. One source of truth.
 
@@ -283,12 +283,14 @@ tests/_data/ship-state/power-from-timestamp.json
 ```
 
 **Holodeck test** (vitest):
+
 ```ts
 const sys = createPowerSystem({ powerFullAt: 3600 });
 expect(sys.getCurrentPower(0)).toBe(fixture.expected.currentPower);
 ```
 
 **PHP test** (wpunit or simulation):
+
 ```php
 $power = new Power($state, $loadout);
 $this->assertEquals($fixture->expected->currentPower, $power->getCurrentPower($now));
@@ -324,20 +326,20 @@ Wire `ActionFactory::create()` and `ActionResolver::resolve()` through the simul
 
 ### Future Phases (unchanged from original)
 
-- **Engine Layer** — `ActionContext` with effect stacking, environment modifiers
-- **Stellar Effects** — Per-system effects from star properties
-- **Detection and Interaction** — Multi-ship emission/detection model
-- **Scenario Framework** — JSON scenario definitions with assertions and verdicts
+-   **Engine Layer** — `ActionContext` with effect stacking, environment modifiers
+-   **Stellar Effects** — Per-system effects from star properties
+-   **Detection and Interaction** — Multi-ship emission/detection model
+-   **Scenario Framework** — JSON scenario definitions with assertions and verdicts
 
 ## Resolved Questions
 
-- **State isolation.** In-memory repositories. No database, no transactions, no cleanup. Fastest option, and since the repository contracts are the seam, the game logic runs identically.
+-   **State isolation.** In-memory repositories. No database, no transactions, no cleanup. Fastest option, and since the repository contracts are the seam, the game logic runs identically.
 
-- **Deterministic randomness.** The holodeck already has a seeded RNG (`createRng(seed)`). PHP needs the same — a seeded RNG service in the container that the simulation controls. Both environments use the same seed for the same scenario.
+-   **Deterministic randomness.** The holodeck already has a seeded RNG (`createRng(seed)`). PHP needs the same — a seeded RNG service in the container that the simulation controls. Both environments use the same seed for the same scenario.
 
-- **Performance.** In-memory repositories + clock jumping (not stepping) means a 24-hour scenario with 10 actions is ~10 resolver calls. No database overhead, no cron polling. Should be sub-second.
+-   **Performance.** In-memory repositories + clock jumping (not stepping) means a 24-hour scenario with 10 actions is ~10 resolver calls. No database overhead, no cron polling. Should be sub-second.
 
-- **Scenario portability.** JSON fixtures in `tests/_data/`. Both environments consume them. A scenario that passes in holodeck and PHP today becomes a regression test tomorrow.
+-   **Scenario portability.** JSON fixtures in `tests/_data/`. Both environments consume them. A scenario that passes in holodeck and PHP today becomes a regression test tomorrow.
 
 ## Scenario Examples
 

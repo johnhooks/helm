@@ -27,10 +27,10 @@ scanComfortRange = sensor.sustain × coreOutput
 Fresh Mk I components with an Epoch-S core in default configuration produce comfort ranges near the baseline values:
 
 | Component | sustain | Comfort Range |
-|-----------|---------|---------------|
+| --------- | ------- | ------------- |
 | DR-305    | 10.0    | 10.0 ly       |
 | DR-505    | 7.0     | 7.0 ly        |
-| DR-705    | 5.0     | ~3.3 ly *     |
+| DR-705    | 5.0     | ~3.3 ly \*    |
 | DSC Mk I  | 7.0     | 7.0 ly        |
 | VRS Mk I  | 5.0     | 5.0 ly        |
 | ACU Mk I  | 3.0     | 3.0 ly        |
@@ -47,22 +47,22 @@ strain(distance, comfortRange) =
   else: 1 + ((distance / comfortRange) - 1) ^ 2
 ```
 
-| distance / comfort | strain | practical meaning               |
-|--------------------|--------|---------------------------------|
-| ≤ 1.0×             | 1.00   | linear cost, full chance        |
-| 1.25×              | 1.06   | barely noticeable               |
-| 1.5×               | 1.25   | 25% surcharge                   |
-| 2.0×               | 2.00   | double cost, half chance        |
-| 3.0×               | 5.00   | emergency only                  |
+| distance / comfort | strain | practical meaning        |
+| ------------------ | ------ | ------------------------ |
+| ≤ 1.0×             | 1.00   | linear cost, full chance |
+| 1.25×              | 1.06   | barely noticeable        |
+| 1.5×               | 1.25   | 25% surcharge            |
+| 2.0×               | 2.00   | double cost, half chance |
+| 3.0×               | 5.00   | emergency only           |
 
 ### What Strain Affects
 
 Strain multiplies **costs** and divides **probabilities**. It never affects speed or duration — a ship in transit moves at the same velocity regardless of strain. The penalty is economic, not physical.
 
-| System | Strained                        | NOT strained          |
-|--------|---------------------------------|-----------------------|
-| Jump   | core life cost, power cost      | duration (speed)      |
-| Scan   | power cost, success chance      | duration (sweep rate) |
+| System | Strained                   | NOT strained          |
+| ------ | -------------------------- | --------------------- |
+| Jump   | core life cost, power cost | duration (speed)      |
+| Scan   | power cost, success chance | duration (sweep rate) |
 
 ---
 
@@ -80,9 +80,9 @@ scanDuration = distance × baseScanSecondsPerLy × sensor.mult_a × effort
 scanPowerCost = distance × baseScanPowerPerLy × strain
 ```
 
-- **effort 0.5:** Half duration, half chance. Quick ping — did I miss something? Maybe. But I saved time and can scan again.
-- **effort 1.0:** Baseline. Full rated chance within comfort, degraded past it.
-- **effort 2.0:** Double duration, chance approaches base even past comfort. The careful, expensive scan.
+-   **effort 0.5:** Half duration, half chance. Quick ping — did I miss something? Maybe. But I saved time and can scan again.
+-   **effort 1.0:** Baseline. Full rated chance within comfort, degraded past it.
+-   **effort 2.0:** Double duration, chance approaches base even past comfort. The careful, expensive scan.
 
 Power cost is NOT affected by effort. You're using the sensor for the same purpose, just more or less carefully. The power cost reflects signal strength (distance + strain), not processing time.
 
@@ -96,9 +96,9 @@ jumpPowerCost = distance × baseJumpPowerPerLy × strain
 jumpDuration  = (distance × baseJumpSecondsPerLy) / (amplitude × throttle)
 ```
 
-- **throttle 0.5:** Half speed, half core life cost. The economical cruise.
-- **throttle 1.0:** Baseline. Rated speed and cost.
-- **throttle 2.0:** Double speed, double core life cost. Burning hot.
+-   **throttle 0.5:** Half speed, half core life cost. The economical cruise.
+-   **throttle 1.0:** Baseline. Rated speed and cost.
+-   **throttle 2.0:** Double speed, double core life cost. Burning hot.
 
 Power cost is NOT affected by throttle. The drive draws the same power to initiate and sustain the jump regardless of how hard it pushes — throttle determines how efficiently that energy converts to speed and how much stress it puts on the core.
 
@@ -115,8 +115,8 @@ shieldRegenRate = shield.rate × priority
 shieldDraw      = shield.baseDraw × priority
 ```
 
-- **priority 0.5:** Slow regen, minimal power draw. Shields recover in the background without starving other systems.
-- **priority 2.0:** Fast regen, heavy power draw. Get shields up NOW at the cost of everything else.
+-   **priority 0.5:** Slow regen, minimal power draw. Shields recover in the background without starving other systems.
+-   **priority 2.0:** Fast regen, heavy power draw. Get shields up NOW at the cost of everything else.
 
 ### Remembered Preferences
 
@@ -136,7 +136,7 @@ The UI defaults to the saved preference. The pilot adjusts before confirming eac
 
 ## 3. Product Specializations
 
-Each product model unlocks a unique tuning capability that others in the same slot don't have. Stats define what a component *is*. The specialization defines what it *can do that nothing else can*.
+Each product model unlocks a unique tuning capability that others in the same slot don't have. Stats define what a component _is_. The specialization defines what it _can do that nothing else can_.
 
 ### Sensors
 
@@ -227,16 +227,16 @@ Per-product tuning config in the product data:
 
 ```json
 {
-  "slug": "dr_705",
-  "sustain": 5.0,
-  "mult_a": 2.0,
-  "mult_b": 1.5,
-  "mult_c": 2.0,
-  "tuning": {
-    "param": "throttle",
-    "min": 0.5,
-    "max": 3.0
-  }
+	"slug": "dr_705",
+	"sustain": 5.0,
+	"mult_a": 2.0,
+	"mult_b": 1.5,
+	"mult_c": 2.0,
+	"tuning": {
+		"param": "throttle",
+		"min": 0.5,
+		"max": 3.0
+	}
 }
 ```
 
@@ -290,17 +290,19 @@ perfRatio = min(1.0, coreOutput / totalDraw)
 ```
 
 perfRatio feeds into comfort range and amplitude. When perfRatio < 1.0:
-- Comfort range shrinks (less effective sustain)
-- Jump amplitude drops (slower travel)
-- Everything degrades equally — the pilot must choose what to turn off
+
+-   Comfort range shrinks (less effective sustain)
+-   Jump amplitude drops (slower travel)
+-   Everything degrades equally — the pilot must choose what to turn off
 
 ### Tuning for Power Budget
 
 The power system is tuned so that a fresh ship with a default loadout:
-- Can make a comfort-range jump and arrive with ~30-50% power remaining
-- Can perform a comfort-range scan without fully depleting
-- Cannot do a comfort-range jump AND a comfort-range scan back-to-back without waiting for recharge
-- Has shields drawing slowly enough that recharge outpaces shield draw when nothing else is active
+
+-   Can make a comfort-range jump and arrive with ~30-50% power remaining
+-   Can perform a comfort-range scan without fully depleting
+-   Cannot do a comfort-range jump AND a comfort-range scan back-to-back without waiting for recharge
+-   Has shields drawing slowly enough that recharge outpaces shield draw when nothing else is active
 
 **Open:** Specific values for `baseJumpPowerPerLy` and `baseScanPowerPerLy` need playtesting. The constraint is that power should feel meaningful but not punishing at comfort range.
 
@@ -328,11 +330,12 @@ The ship travels at the same speed regardless of distance. Strain is an energy t
 ### The Jump Decision
 
 Before every jump, the pilot sees:
-- **Distance** and whether it's within comfort
-- **Core life cost** at the current throttle setting (strained if past comfort)
-- **Power cost** (strained if past comfort) and whether they have enough
-- **Duration** at the current throttle
-- **Strain factor** as a multiplier they can evaluate
+
+-   **Distance** and whether it's within comfort
+-   **Core life cost** at the current throttle setting (strained if past comfort)
+-   **Power cost** (strained if past comfort) and whether they have enough
+-   **Duration** at the current throttle
+-   **Strain factor** as a multiplier they can evaluate
 
 The pilot adjusts throttle and commits. The action record captures distance, throttle, and computed costs.
 
@@ -355,6 +358,7 @@ chance    = min(sensor.chance, (sensor.chance / strain) × effort)
 ### The Triple Pressure
 
 Past comfort range, three things work against you:
+
 1. **Power cost** climbs (strain multiplier)
 2. **Success chance** drops (strain divides base chance)
 3. **Time invested** increases (linear with distance)
@@ -364,11 +368,12 @@ The pilot's effort setting lets them push back on chance at the cost of more tim
 ### The Scan Decision
 
 Before every scan, the pilot sees:
-- **Distance** and whether it's within comfort
-- **Power cost** (strained if past comfort)
-- **Success chance** at the current effort setting, degraded by distance
-- **Duration** at the current effort
-- **Strain factor** as context for the cost/chance numbers
+
+-   **Distance** and whether it's within comfort
+-   **Power cost** (strained if past comfort)
+-   **Success chance** at the current effort setting, degraded by distance
+-   **Duration** at the current effort
+-   **Strain factor** as context for the cost/chance numbers
 
 The pilot adjusts effort and commits. If the scan fails, the power and time are lost. That's the gamble.
 
@@ -392,14 +397,15 @@ timeFull  = (capacity / regenRate) × 3600
 Shield draw competes with core recharge. At high priority, shields recover fast but starve the power capacitor. At low priority, shields creep up slowly while power stays available for jumps and scans.
 
 After a jump (power depleted), the pilot faces a choice:
-- **High shield priority:** Shields come up fast, but power recovers slowly. Safe against threats but delays next action.
-- **Low shield priority:** Power recovers fast, enabling a quick scan or follow-up jump, but shields stay low. Efficient but vulnerable.
+
+-   **High shield priority:** Shields come up fast, but power recovers slowly. Safe against threats but delays next action.
+-   **Low shield priority:** Power recovers fast, enabling a quick scan or follow-up jump, but shields stay low. Efficient but vulnerable.
 
 ---
 
 ## 8. Component Experience
 
-Components improve with use. A logarithmic curve rewards early use heavily and plateaus at veteran levels. Each component type has a paired buff and nerf — experience doesn't just make things better, it makes them *opinionated*.
+Components improve with use. A logarithmic curve rewards early use heavily and plateaus at veteran levels. Each component type has a paired buff and nerf — experience doesn't just make things better, it makes them _opinionated_.
 
 ### The Curve
 
@@ -425,6 +431,7 @@ effectiveStat = baseStat × (1 - buffFactor × maxNerf)     // for nerfs
 ### Buff/Nerf Pairs
 
 **Core:**
+
 ```
 Buff: output stability    mult_a × (1 + factor × 0.15)
   At 100 uses: 1.0 → 1.15 output. Cascades through comfort range,
@@ -435,6 +442,7 @@ Nerf: capacity decay      hp × (1 - factor × 0.12)
 ```
 
 **Drive:**
+
 ```
 Buff: amplitude bonus     mult_c × (1 + factor × 0.20)
   At 100 uses: 1.0 → 1.20 amplitude. Faster jumps.
@@ -444,6 +452,7 @@ Nerf: consumption creep   mult_b × (1 + factor × 0.25)
 ```
 
 **Sensor:**
+
 ```
 Buff: accuracy bonus      chance × (1 + factor × 0.15)
   At 100 uses: DSC 0.60 → 0.69 chance. Counters distance penalty.
@@ -453,6 +462,7 @@ Nerf: power hunger        draw × (1 + factor × 0.30)
 ```
 
 **Shield:**
+
 ```
 Buff: regen bonus         rate × (1 + factor × 0.20)
   At 100 uses: rate × 1.20. Faster recovery.
@@ -462,6 +472,7 @@ Nerf: capacity fade       capacity × (1 - factor × 0.10)
 ```
 
 **Nav Computer:**
+
 ```
 Buff: route efficiency    mult_a × (1 + factor × 0.10)
   At 100 uses: skill × 1.10.
@@ -503,22 +514,22 @@ A 100-use drive at 0.3 condition: amplitude 1.20 × 0.65 = 0.78 effective. Worse
 
 ```typescript
 interface Product {
-  id: number;
-  slug: string;
-  type: string;
-  label: string;
-  version: number;
-  hp: number | null;
-  footprint: number;
-  rate: number | null;
-  sustain: number | null;
-  capacity: number | null;
-  chance: number | null;
-  draw: number | null;
-  mult_a: number | null;
-  mult_b: number | null;
-  mult_c: number | null;
-  tuning: { param: string; min: number; max: number } | null;
+	id: number;
+	slug: string;
+	type: string;
+	label: string;
+	version: number;
+	hp: number | null;
+	footprint: number;
+	rate: number | null;
+	sustain: number | null;
+	capacity: number | null;
+	chance: number | null;
+	draw: number | null;
+	mult_a: number | null;
+	mult_b: number | null;
+	mult_c: number | null;
+	tuning: { param: string; min: number; max: number } | null;
 }
 ```
 
@@ -563,11 +574,23 @@ Per component type, not per product. Lives in `data/experience.json`:
 
 ```json
 {
-  "core":   { "buff": { "stat": "mult_a", "max": 0.15 }, "nerf": { "stat": "hp",    "max": 0.12 } },
-  "drive":  { "buff": { "stat": "mult_c", "max": 0.20 }, "nerf": { "stat": "mult_b", "max": 0.25 } },
-  "sensor": { "buff": { "stat": "chance", "max": 0.15 }, "nerf": { "stat": "draw",   "max": 0.30 } },
-  "shield": { "buff": { "stat": "rate",   "max": 0.20 }, "nerf": { "stat": "capacity","max": 0.10 } },
-  "nav":    { "buff": { "stat": "mult_a", "max": 0.10 }, "nerf": null }
+	"core": {
+		"buff": { "stat": "mult_a", "max": 0.15 },
+		"nerf": { "stat": "hp", "max": 0.12 }
+	},
+	"drive": {
+		"buff": { "stat": "mult_c", "max": 0.2 },
+		"nerf": { "stat": "mult_b", "max": 0.25 }
+	},
+	"sensor": {
+		"buff": { "stat": "chance", "max": 0.15 },
+		"nerf": { "stat": "draw", "max": 0.3 }
+	},
+	"shield": {
+		"buff": { "stat": "rate", "max": 0.2 },
+		"nerf": { "stat": "capacity", "max": 0.1 }
+	},
+	"nav": { "buff": { "stat": "mult_a", "max": 0.1 }, "nerf": null }
 }
 ```
 
@@ -591,10 +614,10 @@ helm_components
 
 No `power_mode` column. Active system draw is inferred from existing state:
 
-- Drive draw → active if ship has a jump action in progress
-- Shield draw → active if `shields_full_at` is in the future
-- Sensor draw → active if ship has a scan action in progress
-- Equipment draw → active if equipment is running an operation
+-   Drive draw → active if ship has a jump action in progress
+-   Shield draw → active if `shields_full_at` is in the future
+-   Sensor draw → active if ship has a scan action in progress
+-   Equipment draw → active if equipment is running an operation
 
 Per-action tuning preferences stored in user meta, not ship state.
 
@@ -616,10 +639,10 @@ The workbench proves every formula before it touches the game.
 
 ### Current State (modeled)
 
-- Comfort range + strain (jumps and scans)
-- Strain on jump core life cost
-- Strain on scan power cost and success chance
-- Sample distances extending past comfort with strain/chance per sample
+-   Comfort range + strain (jumps and scans)
+-   Strain on jump core life cost
+-   Strain on scan power cost and success chance
+-   Sample distances extending past comfort with strain/chance per sample
 
 ### Next Steps
 
@@ -657,8 +680,8 @@ bun run wb matrix --vary=drive --jump.throttle=0.5,1.0,2.0
 
 ## Open Questions
 
-- **`drive.mult_a` is unused.** Currently equals `mult_c` for all drives. Options: remove it, repurpose it (strain curve shape?), or defer.
-- **`baseJumpPowerPerLy` tuning.** Needs playtesting. Constraint: comfort-range jump should leave ~30-50% power remaining.
-- **Experience widening specializations.** How much should the range extend? Linear with buffFactor? Capped? Needs a formula.
-- **Nav computer experience.** Weakest candidate — no mechanical wear, no obvious nerf. Revisit when nav has manufacturer identity.
-- **Version as manufacturing run.** Resolved: versions are manufacturing runs, not firmware. When a manufacturer releases v2, existing v1 units stay as-is. Only v2 is manufactured going forward. Old versions persist in the economy as legacy hardware — tradeable, repairable, but no longer produced.
+-   **`drive.mult_a` is unused.** Currently equals `mult_c` for all drives. Options: remove it, repurpose it (strain curve shape?), or defer.
+-   **`baseJumpPowerPerLy` tuning.** Needs playtesting. Constraint: comfort-range jump should leave ~30-50% power remaining.
+-   **Experience widening specializations.** How much should the range extend? Linear with buffFactor? Capped? Needs a formula.
+-   **Nav computer experience.** Weakest candidate — no mechanical wear, no obvious nerf. Revisit when nav has manufacturer identity.
+-   **Version as manufacturing run.** Resolved: versions are manufacturing runs, not firmware. When a manufacturer releases v2, existing v1 units stay as-is. Only v2 is manufactured going forward. Old versions persist in the economy as legacy hardware — tradeable, repairable, but no longer produced.

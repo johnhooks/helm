@@ -47,14 +47,14 @@ confusing empty action region or a lone divider.
 
 ## Requirements
 
-- When the selected star is the player's current node, the context menu
-  must not show a **Scan Route** action.
-- When the selected star is the player's current node, the context menu
-  must not show a **Jump** action.
-- The star's name and subtitle (spectral class) must still appear so the
-  menu continues to function as an info readout for the current star.
-- The menu's rendering must not show empty action slots, stray dividers,
-  or visual artifacts when the action list is empty.
-- The change must not introduce any regression when the selected star is
-  any other star — all current scan behavior stays intact there.
-- No server or contract changes.
+-   When the selected star is the player's current node, the context menu
+    must not show a **Scan Route** action.
+-   When the selected star is the player's current node, the context menu
+    must not show a **Jump** action.
+-   The star's name and subtitle (spectral class) must still appear so the
+    menu continues to function as an info readout for the current star.
+-   The menu's rendering must not show empty action slots, stray dividers,
+    or visual artifacts when the action list is empty.
+-   The change must not introduce any regression when the selected star is
+    any other star — all current scan behavior stays intact there.
+-   No server or contract changes.

@@ -55,7 +55,10 @@ describe('EM Snapshot', () => {
 		const clock = createClock();
 		const engine = createEngine(clock);
 		const loadout = buildLoadout('pioneer');
-		const ship = createShip(loadout, clock, createRng(42), { id: 'scanner', nodeId: 1 });
+		const ship = createShip(loadout, clock, createRng(42), {
+			id: 'scanner',
+			nodeId: 1,
+		});
 		engine.registerShip('scanner', ship);
 
 		engine.submitAction(ship, ActionType.ScanRoute, {
@@ -67,7 +70,9 @@ describe('EM Snapshot', () => {
 		expect(snapshot.sources.length).toBeGreaterThan(0);
 		expect(snapshot.noiseFloor).toBeGreaterThan(snapshot.stellarBaseline);
 
-		const scanSource = snapshot.sources.find((s) => s.emissionType === 'pnp_scan');
+		const scanSource = snapshot.sources.find(
+			(s) => s.emissionType === 'pnp_scan'
+		);
 		expect(scanSource).toBeDefined();
 		expect(scanSource!.shipId).toBe('scanner');
 	});
@@ -76,7 +81,10 @@ describe('EM Snapshot', () => {
 		const clock = createClock();
 		const engine = createEngine(clock);
 		const loadout = buildLoadout('pioneer', {}, ['ecm_mk1']);
-		const ship = createShip(loadout, clock, createRng(42), { id: 'ecm-ship', nodeId: 1 });
+		const ship = createShip(loadout, clock, createRng(42), {
+			id: 'ecm-ship',
+			nodeId: 1,
+		});
 		engine.registerShip('ecm-ship', ship);
 		ship.activateEquipment('ecm_mk1');
 
@@ -85,7 +93,9 @@ describe('EM Snapshot', () => {
 		expect(snapshot.ecmNoise).toBe(emissionPower('ecm'));
 
 		// ECM should NOT appear in sources
-		const ecmSource = snapshot.sources.find((s) => s.emissionType === 'ecm');
+		const ecmSource = snapshot.sources.find(
+			(s) => s.emissionType === 'ecm'
+		);
 		expect(ecmSource).toBeUndefined();
 	});
 
@@ -94,15 +104,27 @@ describe('EM Snapshot', () => {
 		const engine = createEngine(clock);
 
 		const loadout1 = buildLoadout('pioneer');
-		const ship1 = createShip(loadout1, clock, createRng(1), { id: 'ship1', nodeId: 1 });
+		const ship1 = createShip(loadout1, clock, createRng(1), {
+			id: 'ship1',
+			nodeId: 1,
+		});
 		engine.registerShip('ship1', ship1);
 
 		const loadout2 = buildLoadout('pioneer');
-		const ship2 = createShip(loadout2, clock, createRng(2), { id: 'ship2', nodeId: 1 });
+		const ship2 = createShip(loadout2, clock, createRng(2), {
+			id: 'ship2',
+			nodeId: 1,
+		});
 		engine.registerShip('ship2', ship2);
 
-		engine.submitAction(ship1, ActionType.ScanRoute, { target_node_id: 42, distance: 2 });
-		engine.submitAction(ship2, ActionType.ScanRoute, { target_node_id: 43, distance: 3 });
+		engine.submitAction(ship1, ActionType.ScanRoute, {
+			target_node_id: 42,
+			distance: 2,
+		});
+		engine.submitAction(ship2, ActionType.ScanRoute, {
+			target_node_id: 43,
+			distance: 3,
+		});
 
 		const snapshot = engine.computeEMSnapshot(1);
 		expect(snapshot.sources.length).toBe(2);
@@ -113,11 +135,16 @@ describe('EM Snapshot', () => {
 			const l = buildLoadout('pioneer');
 			const s = createShip(l, c, createRng(1), { id: 'solo', nodeId: 1 });
 			e.registerShip('solo', s);
-			e.submitAction(s, ActionType.ScanRoute, { target_node_id: 42, distance: 2 });
+			e.submitAction(s, ActionType.ScanRoute, {
+				target_node_id: 42,
+				distance: 2,
+			});
 			return e.computeEMSnapshot(1);
 		})();
 
-		expect(snapshot.noiseFloor).toBeGreaterThan(singleShipSnapshot.noiseFloor);
+		expect(snapshot.noiseFloor).toBeGreaterThan(
+			singleShipSnapshot.noiseFloor
+		);
 	});
 
 	it('shield regen appears as faint emission', () => {
@@ -126,7 +153,10 @@ describe('EM Snapshot', () => {
 
 		// Create a ship with damaged shields (shield < shieldMax)
 		const loadout = buildLoadout('pioneer');
-		const ship = createShip(loadout, clock, createRng(42), { id: 'damaged', nodeId: 1 });
+		const ship = createShip(loadout, clock, createRng(42), {
+			id: 'damaged',
+			nodeId: 1,
+		});
 		engine.registerShip('damaged', ship);
 
 		// Damage the ship so shields are regenerating
@@ -135,7 +165,9 @@ describe('EM Snapshot', () => {
 		expect(state.shield).toBeLessThan(state.shieldMax);
 
 		const snapshot = engine.computeEMSnapshot(1);
-		const regenSource = snapshot.sources.find((s) => s.emissionType === 'shield_regen');
+		const regenSource = snapshot.sources.find(
+			(s) => s.emissionType === 'shield_regen'
+		);
 		expect(regenSource).toBeDefined();
 		expect(regenSource!.power).toBe(emissionPower('shield_regen'));
 	});

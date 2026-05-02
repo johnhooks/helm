@@ -3,7 +3,9 @@ import type {
 	EmissionProfile,
 	SensorAffinity,
 	DSPConstants,
- EmissionSource, Detection } from '@helm/formulas';
+	EmissionSource,
+	Detection,
+} from '@helm/formulas';
 import {
 	DEFAULT_EMISSION_PROFILES,
 	DEFAULT_DSP_CONSTANTS,
@@ -98,7 +100,8 @@ function emissionProfiles(): DSPCategory {
 
 	// Sort by base power descending for ranking visibility
 	scenarios.sort(
-		(a, b) => (b.output.basePower as number) - (a.output.basePower as number),
+		(a, b) =>
+			(b.output.basePower as number) - (a.output.basePower as number)
 	);
 
 	return {
@@ -120,7 +123,9 @@ function stellarNoiseCategory(): DSPCategory {
 			const noise = stellarNoise(cls);
 			return {
 				name: `${cls}-class`,
-				description: `Stellar noise = ${noise}. ${cls === 'G' ? 'Reference level (1.0).' : ''}`,
+				description: `Stellar noise = ${noise}. ${
+					cls === 'G' ? 'Reference level (1.0).' : ''
+				}`,
 				input: { stellarClass: cls },
 				output: { noise: r(noise) },
 			};
@@ -145,7 +150,9 @@ function noiseFloorComposition(): DSPCategory {
 			const shipRMS = Math.sqrt(count) * minerEmission;
 			return {
 				name: `${count} miners`,
-				description: `Stellar=${baseline}, ${count} miners at ${minerEmission} each. RMS ship noise=${r(shipRMS)}.`,
+				description: `Stellar=${baseline}, ${count} miners at ${minerEmission} each. RMS ship noise=${r(
+					shipRMS
+				)}.`,
 				input: {
 					stellarClass: 'G',
 					minerCount: count,
@@ -168,7 +175,10 @@ function snrScenarios(): DSPCategory {
 	const quietNoise = noiseFloor(stellarNoise('M'), []);
 	const normalNoise = noiseFloor(stellarNoise('G'), []);
 	const busyNoise = noiseFloor(stellarNoise('G'), [1.0, 1.0, 1.0, 1.0, 1.0]);
-	const crowdedNoise = noiseFloor(stellarNoise('G'), Array(100).fill(1.0) as number[]);
+	const crowdedNoise = noiseFloor(
+		stellarNoise('G'),
+		Array(100).fill(1.0) as number[]
+	);
 
 	const pnp = emissionPower('pnp_scan');
 	const mining = emissionPower('mining');
@@ -178,71 +188,163 @@ function snrScenarios(): DSPCategory {
 		{
 			name: 'PNP in quiet system (M-class, empty)',
 			description: 'Loudest scan in quietest environment.',
-			input: { signal: 'pnp_scan', signalPower: pnp, noise: r(quietNoise) },
+			input: {
+				signal: 'pnp_scan',
+				signalPower: pnp,
+				noise: r(quietNoise),
+			},
 			output: {
 				snr: r(snr(pnp, quietNoise)),
-				activeDetection: r(detectionProbability(snr(pnp, quietNoise), ACTIVE_THRESHOLD)),
-				passiveInstant: r(detectionProbability(snr(pnp, quietNoise), PASSIVE_THRESHOLD)),
+				activeDetection: r(
+					detectionProbability(snr(pnp, quietNoise), ACTIVE_THRESHOLD)
+				),
+				passiveInstant: r(
+					detectionProbability(
+						snr(pnp, quietNoise),
+						PASSIVE_THRESHOLD
+					)
+				),
 			},
 		},
 		{
 			name: 'PNP in normal system (G-class, empty)',
 			description: 'PNP in Sol-like system.',
-			input: { signal: 'pnp_scan', signalPower: pnp, noise: r(normalNoise) },
+			input: {
+				signal: 'pnp_scan',
+				signalPower: pnp,
+				noise: r(normalNoise),
+			},
 			output: {
 				snr: r(snr(pnp, normalNoise)),
-				activeDetection: r(detectionProbability(snr(pnp, normalNoise), ACTIVE_THRESHOLD)),
-				passiveInstant: r(detectionProbability(snr(pnp, normalNoise), PASSIVE_THRESHOLD)),
+				activeDetection: r(
+					detectionProbability(
+						snr(pnp, normalNoise),
+						ACTIVE_THRESHOLD
+					)
+				),
+				passiveInstant: r(
+					detectionProbability(
+						snr(pnp, normalNoise),
+						PASSIVE_THRESHOLD
+					)
+				),
 			},
 		},
 		{
 			name: 'PNP in busy system (G-class, 5 miners)',
 			description: 'PNP with background ship traffic. RMS noise model.',
-			input: { signal: 'pnp_scan', signalPower: pnp, noise: r(busyNoise) },
+			input: {
+				signal: 'pnp_scan',
+				signalPower: pnp,
+				noise: r(busyNoise),
+			},
 			output: {
 				snr: r(snr(pnp, busyNoise)),
-				activeDetection: r(detectionProbability(snr(pnp, busyNoise), ACTIVE_THRESHOLD)),
-				passiveInstant: r(detectionProbability(snr(pnp, busyNoise), PASSIVE_THRESHOLD)),
+				activeDetection: r(
+					detectionProbability(snr(pnp, busyNoise), ACTIVE_THRESHOLD)
+				),
+				passiveInstant: r(
+					detectionProbability(snr(pnp, busyNoise), PASSIVE_THRESHOLD)
+				),
 			},
 		},
 		{
 			name: 'PNP in crowded system (G-class, 100 miners)',
-			description: 'PNP in a major hub. Can active scanning still find it?',
-			input: { signal: 'pnp_scan', signalPower: pnp, noise: r(crowdedNoise) },
+			description:
+				'PNP in a major hub. Can active scanning still find it?',
+			input: {
+				signal: 'pnp_scan',
+				signalPower: pnp,
+				noise: r(crowdedNoise),
+			},
 			output: {
 				snr: r(snr(pnp, crowdedNoise)),
-				activeDetection: r(detectionProbability(snr(pnp, crowdedNoise), ACTIVE_THRESHOLD)),
-				passiveInstant: r(detectionProbability(snr(pnp, crowdedNoise), PASSIVE_THRESHOLD)),
+				activeDetection: r(
+					detectionProbability(
+						snr(pnp, crowdedNoise),
+						ACTIVE_THRESHOLD
+					)
+				),
+				passiveInstant: r(
+					detectionProbability(
+						snr(pnp, crowdedNoise),
+						PASSIVE_THRESHOLD
+					)
+				),
 			},
 		},
 		{
 			name: 'Miner in open space (G-class, empty)',
 			description: 'Lone miner with no masking. Moderate signal.',
-			input: { signal: 'mining', signalPower: mining, noise: r(normalNoise) },
+			input: {
+				signal: 'mining',
+				signalPower: mining,
+				noise: r(normalNoise),
+			},
 			output: {
 				snr: r(snr(mining, normalNoise)),
-				activeDetection: r(detectionProbability(snr(mining, normalNoise), ACTIVE_THRESHOLD)),
-				passiveInstant: r(detectionProbability(snr(mining, normalNoise), PASSIVE_THRESHOLD)),
+				activeDetection: r(
+					detectionProbability(
+						snr(mining, normalNoise),
+						ACTIVE_THRESHOLD
+					)
+				),
+				passiveInstant: r(
+					detectionProbability(
+						snr(mining, normalNoise),
+						PASSIVE_THRESHOLD
+					)
+				),
 			},
 		},
 		{
 			name: 'Miner in belt (G-class, belt masking 2.0)',
-			description: 'Belt noise correlates with mining emissions — harder to separate.',
-			input: { signal: 'mining', signalPower: mining, noise: r(normalNoise), maskingNoise: 2.0 },
+			description:
+				'Belt noise correlates with mining emissions — harder to separate.',
+			input: {
+				signal: 'mining',
+				signalPower: mining,
+				noise: r(normalNoise),
+				maskingNoise: 2.0,
+			},
 			output: {
 				snr: r(maskedSNR(mining, normalNoise, 2.0)),
-				activeDetection: r(detectionProbability(maskedSNR(mining, normalNoise, 2.0), ACTIVE_THRESHOLD)),
-				passiveInstant: r(detectionProbability(maskedSNR(mining, normalNoise, 2.0), PASSIVE_THRESHOLD)),
+				activeDetection: r(
+					detectionProbability(
+						maskedSNR(mining, normalNoise, 2.0),
+						ACTIVE_THRESHOLD
+					)
+				),
+				passiveInstant: r(
+					detectionProbability(
+						maskedSNR(mining, normalNoise, 2.0),
+						PASSIVE_THRESHOLD
+					)
+				),
 			},
 		},
 		{
 			name: 'Shield regen (G-class, empty)',
 			description: 'Weakest non-idle emission. Needs long integration.',
-			input: { signal: 'shield_regen', signalPower: shield, noise: r(normalNoise) },
+			input: {
+				signal: 'shield_regen',
+				signalPower: shield,
+				noise: r(normalNoise),
+			},
 			output: {
 				snr: r(snr(shield, normalNoise)),
-				activeDetection: r(detectionProbability(snr(shield, normalNoise), ACTIVE_THRESHOLD)),
-				passiveInstant: r(detectionProbability(snr(shield, normalNoise), PASSIVE_THRESHOLD)),
+				activeDetection: r(
+					detectionProbability(
+						snr(shield, normalNoise),
+						ACTIVE_THRESHOLD
+					)
+				),
+				passiveInstant: r(
+					detectionProbability(
+						snr(shield, normalNoise),
+						PASSIVE_THRESHOLD
+					)
+				),
 			},
 		},
 	];
@@ -275,8 +377,12 @@ function detectionCurves(): DSPCategory {
 			description: `Active and passive detection probability at SNR=${s}.`,
 			input: { snr: s },
 			output: {
-				activeP: r(detectionProbability(s, ACTIVE_THRESHOLD, steepness)),
-				passiveP: r(detectionProbability(s, PASSIVE_THRESHOLD, steepness)),
+				activeP: r(
+					detectionProbability(s, ACTIVE_THRESHOLD, steepness)
+				),
+				passiveP: r(
+					detectionProbability(s, PASSIVE_THRESHOLD, steepness)
+				),
 			},
 		})),
 	};
@@ -301,7 +407,11 @@ function activeScanAccumulation(): DSPCategory {
 
 		scenarios.push({
 			name: `${sensorKey} — sweep accumulation`,
-			description: `Per-sweep P=${r(perSweep)} (active threshold=${ACTIVE_THRESHOLD}). Active affinity=${affinity.active}, continuousGain=${affinity.continuousGain}.`,
+			description: `Per-sweep P=${r(
+				perSweep
+			)} (active threshold=${ACTIVE_THRESHOLD}). Active affinity=${
+				affinity.active
+			}, continuousGain=${affinity.continuousGain}.`,
 			input: {
 				sensor: sensorKey,
 				target: 'mining',
@@ -311,15 +421,17 @@ function activeScanAccumulation(): DSPCategory {
 				perSweepChance: r(perSweep),
 			},
 			output: Object.fromEntries(
-				sweepCounts.map((n) => [`sweeps_${n}`, r(cumulativeDetection(perSweep, n))]),
+				sweepCounts.map((n) => [
+					`sweeps_${n}`,
+					r(cumulativeDetection(perSweep, n)),
+				])
 			),
 		});
 	}
 
 	return {
 		category: 'Active Scan Accumulation',
-		description:
-			`Per-sweep probability (active threshold=${ACTIVE_THRESHOLD}) × sweep count (1-20) for each sensor against a miner in G-class.`,
+		description: `Per-sweep probability (active threshold=${ACTIVE_THRESHOLD}) × sweep count (1-20) for each sensor against a miner in G-class.`,
 		scenarios,
 	};
 }
@@ -373,8 +485,7 @@ function passiveIntegration(): DSPCategory {
 
 	return {
 		category: 'Passive Integration Over Time',
-		description:
-			`Miner in G-class integrated over 30min to 48hr for each sensor. Sample period=${samplePeriod}s. Passive threshold=${PASSIVE_THRESHOLD}. The core "check back later" mechanic.`,
+		description: `Miner in G-class integrated over 30min to 48hr for each sensor. Sample period=${samplePeriod}s. Passive threshold=${PASSIVE_THRESHOLD}. The core "check back later" mechanic.`,
 		scenarios,
 	};
 }
@@ -386,11 +497,31 @@ function sensorComparison(): DSPCategory {
 	const integrationTime = hours(6); // 6 hours — meaningful passive window
 
 	const sources: EmissionSource[] = [
-		{ power: emissionPower('pnp_scan'), spectralType: 'pulse', label: 'pnp_scan' },
-		{ power: emissionPower('drive_spool'), spectralType: 'pulse', label: 'drive_spool' },
-		{ power: emissionPower('mining'), spectralType: 'continuous', label: 'mining' },
-		{ power: emissionPower('shield_regen'), spectralType: 'continuous', label: 'shield_regen' },
-		{ power: emissionPower('belt_scan'), spectralType: 'sweep', label: 'belt_scan' },
+		{
+			power: emissionPower('pnp_scan'),
+			spectralType: 'pulse',
+			label: 'pnp_scan',
+		},
+		{
+			power: emissionPower('drive_spool'),
+			spectralType: 'pulse',
+			label: 'drive_spool',
+		},
+		{
+			power: emissionPower('mining'),
+			spectralType: 'continuous',
+			label: 'mining',
+		},
+		{
+			power: emissionPower('shield_regen'),
+			spectralType: 'continuous',
+			label: 'shield_regen',
+		},
+		{
+			power: emissionPower('belt_scan'),
+			spectralType: 'sweep',
+			label: 'belt_scan',
+		},
 	];
 
 	return {
@@ -399,7 +530,12 @@ function sensorComparison(): DSPCategory {
 			'All 3 sensors against the same mixed emission sources (6hr integration, G-class). The core gameplay differentiation test.',
 		scenarios: SENSOR_KEYS.map((sensorKey) => {
 			const affinity = SENSOR_AFFINITIES[sensorKey];
-			const detections = passiveReport(sources, noise, affinity, integrationTime);
+			const detections = passiveReport(
+				sources,
+				noise,
+				affinity,
+				integrationTime
+			);
 
 			return {
 				name: sensorKey,
@@ -408,7 +544,11 @@ function sensorComparison(): DSPCategory {
 					sensor: sensorKey,
 					integrationSeconds: integrationTime,
 					noise: r(noise),
-					sources: sources.map((s) => ({ label: s.label, power: s.power, spectralType: s.spectralType })),
+					sources: sources.map((s) => ({
+						label: s.label,
+						power: s.power,
+						spectralType: s.spectralType,
+					})),
 				},
 				output: {
 					detections: detections.map((d: Detection) => ({
@@ -445,9 +585,10 @@ function minerInBelt(): DSPCategory {
 
 			for (const h of integrationHours) {
 				const seconds = hours(h);
-				const rawSNR = masking > 0
-					? maskedSNR(signal * affinity.passive, noise, masking)
-					: snr(signal * affinity.passive, noise);
+				const rawSNR =
+					masking > 0
+						? maskedSNR(signal * affinity.passive, noise, masking)
+						: snr(signal * affinity.passive, noise);
 				const samples = Math.max(1, Math.floor(seconds / samplePeriod));
 				const integrated = integrationGain(rawSNR, samples);
 				const filtered = integrated * gain;
@@ -456,7 +597,11 @@ function minerInBelt(): DSPCategory {
 
 			scenarios.push({
 				name: `${sensorKey} / masking=${masking}`,
-				description: `${sensorKey} sensor, belt masking=${masking}. ${masking === 0 ? 'Open space (no belt).' : `Belt density correlates with mining at ${masking}x noise.`}`,
+				description: `${sensorKey} sensor, belt masking=${masking}. ${
+					masking === 0
+						? 'Open space (no belt).'
+						: `Belt density correlates with mining at ${masking}x noise.`
+				}`,
 				input: {
 					sensor: sensorKey,
 					target: 'mining',
@@ -485,7 +630,7 @@ function driveEnvelopeShapes(): DSPCategory {
 	return {
 		category: 'Drive Envelope Shapes',
 		description:
-			'All 3 drive classes × spool/sustain/cooldown time series. Military\'s brutal attack spike vs civilian\'s gentle warmup.',
+			"All 3 drive classes × spool/sustain/cooldown time series. Military's brutal attack spike vs civilian's gentle warmup.",
 		scenarios: DRIVE_KEYS.map((key) => {
 			const envelope = DEFAULT_DRIVE_ENVELOPES[key];
 			const series = envelopeTimeSeries(envelope, 60);
@@ -502,7 +647,10 @@ function driveEnvelopeShapes(): DSPCategory {
 				},
 				output: {
 					peakPower: peak,
-					totalDuration: envelope.spool.duration + envelope.sustain.duration + envelope.cooldown.duration,
+					totalDuration:
+						envelope.spool.duration +
+						envelope.sustain.duration +
+						envelope.cooldown.duration,
 					timeSeries: series.map((s) => ({
 						t: r(s.t, 1),
 						phase: s.phase,
@@ -532,16 +680,32 @@ function envelopeDetectionTimeline(): DSPCategory {
 		scenarios: DRIVE_KEYS.map((key) => {
 			const envelope = DEFAULT_DRIVE_ENVELOPES[key];
 			const spoolDuration = envelope.spool.duration;
-			const timeline: Array<{ t: number; phase: string; power: number; confidence: number }> = [];
+			const timeline: Array<{
+				t: number;
+				phase: string;
+				power: number;
+				confidence: number;
+			}> = [];
 
 			for (let i = 0; i <= steps; i++) {
 				const t = (i / steps) * spoolDuration;
 				const state = envelopeAt(t, envelope);
 				const power = state.power * baseEmission;
 				const confidence = passiveDetection(
-					power, noise, dsc.passive, samplePeriod, samplePeriod, gain, 0,
+					power,
+					noise,
+					dsc.passive,
+					samplePeriod,
+					samplePeriod,
+					gain,
+					0
 				);
-				timeline.push({ t: r(t, 1), phase: state.phase, power: r(power), confidence: r(confidence) });
+				timeline.push({
+					t: r(t, 1),
+					phase: state.phase,
+					power: r(power),
+					confidence: r(confidence),
+				});
 			}
 
 			// Find first time step where confidence > 0.5
@@ -549,7 +713,11 @@ function envelopeDetectionTimeline(): DSPCategory {
 
 			return {
 				name: envelope.label,
-				description: `Spool duration=${spoolDuration}s. ${crossover ? `Crosses 50% at ~${crossover.t}s.` : 'Never crosses 50% during spool.'}`,
+				description: `Spool duration=${spoolDuration}s. ${
+					crossover
+						? `Crosses 50% at ~${crossover.t}s.`
+						: 'Never crosses 50% during spool.'
+				}`,
 				input: {
 					drive: key,
 					sensor: 'dsc',
@@ -596,7 +764,9 @@ function signaturePowerEstimation(): DSPCategory {
 		},
 		{
 			name: 'Military drive spool',
-			power: emissionPower('drive_spool') * DEFAULT_DRIVE_ENVELOPES['dr-705'].spool.peakPower,
+			power:
+				emissionPower('drive_spool') *
+				DEFAULT_DRIVE_ENVELOPES['dr-705'].spool.peakPower,
 			spectralType: 'pulse' as const,
 			integration: hours(1),
 			masking: 0,
@@ -612,12 +782,24 @@ function signaturePowerEstimation(): DSPCategory {
 
 			// Forward: compute detection confidence
 			const confidence = passiveDetection(
-				obs.power, noise, dsc.passive, obs.integration, samplePeriod, gain, obs.masking,
+				obs.power,
+				noise,
+				dsc.passive,
+				obs.integration,
+				samplePeriod,
+				gain,
+				obs.masking
 			);
 
 			// Inverse: estimate power from confidence
 			const estimated = estimateEmissionPower(
-				confidence, noise, dsc.passive, obs.integration, samplePeriod, gain, obs.masking,
+				confidence,
+				noise,
+				dsc.passive,
+				obs.integration,
+				samplePeriod,
+				gain,
+				obs.masking
 			);
 
 			// Classify: what does this power level look like?
@@ -626,7 +808,11 @@ function signaturePowerEstimation(): DSPCategory {
 
 			return {
 				name: obs.name,
-				description: `True power=${r(obs.power)}. Confidence=${r(confidence)}. Estimated=${r(estimated)}. Error=${r(Math.abs(estimated - obs.power))}.`,
+				description: `True power=${r(obs.power)}. Confidence=${r(
+					confidence
+				)}. Estimated=${r(estimated)}. Error=${r(
+					Math.abs(estimated - obs.power)
+				)}.`,
 				input: {
 					truePower: r(obs.power),
 					spectralType: obs.spectralType,
@@ -659,7 +845,10 @@ function driveClassification(): DSPCategory {
 	const baseEmission = DEFAULT_EMISSION_PROFILES.drive_spool.base;
 
 	// Build drive profiles for classification: peak emission power per drive
-	const driveProfiles: Record<string, { base: number; spectralType: 'pulse' }> = {};
+	const driveProfiles: Record<
+		string,
+		{ base: number; spectralType: 'pulse' }
+	> = {};
 	for (const key of DRIVE_KEYS) {
 		const envelope = DEFAULT_DRIVE_ENVELOPES[key];
 		driveProfiles[key] = {
@@ -671,19 +860,31 @@ function driveClassification(): DSPCategory {
 	return {
 		category: 'Drive Classification from Envelope',
 		description:
-			'Observe each drive spool\'s peak emission, estimate its power, classify against the 3 drive profiles. Can you tell a military drive from a civilian drive by its signature?',
+			"Observe each drive spool's peak emission, estimate its power, classify against the 3 drive profiles. Can you tell a military drive from a civilian drive by its signature?",
 		scenarios: DRIVE_KEYS.map((key) => {
 			const envelope = DEFAULT_DRIVE_ENVELOPES[key];
 			const peakPower = envelopePeakPower(envelope) * baseEmission;
 
 			// Detect at peak emission
 			const confidence = passiveDetection(
-				peakPower, noise, dsc.passive, samplePeriod, samplePeriod, gain, 0,
+				peakPower,
+				noise,
+				dsc.passive,
+				samplePeriod,
+				samplePeriod,
+				gain,
+				0
 			);
 
 			// Estimate power from the detection
 			const estimated = estimateEmissionPower(
-				confidence, noise, dsc.passive, samplePeriod, samplePeriod, gain, 0,
+				confidence,
+				noise,
+				dsc.passive,
+				samplePeriod,
+				samplePeriod,
+				gain,
+				0
 			);
 
 			// Classify against drive profiles
@@ -691,7 +892,9 @@ function driveClassification(): DSPCategory {
 
 			return {
 				name: `Observing ${envelope.label}`,
-				description: `Peak emission=${r(peakPower)}. Confidence=${r(confidence)}. Can the observer identify the drive class?`,
+				description: `Peak emission=${r(peakPower)}. Confidence=${r(
+					confidence
+				)}. Can the observer identify the drive class?`,
 				input: {
 					drive: key,
 					truePeakPower: r(peakPower),
@@ -735,19 +938,45 @@ function informationTierScenarios(): DSPCategory {
 			target: 'mining',
 			noise: r(noise),
 		},
-		output: Object.fromEntries(durations.map(h => {
-			const conf = passiveDetection(miningPower, noise, dsc.passive, hours(h), samplePeriod, dscContGain, 0);
-			return [`${h}hr`, { confidence: r(conf), tier: informationTier(conf) }];
-		})),
+		output: Object.fromEntries(
+			durations.map((h) => {
+				const conf = passiveDetection(
+					miningPower,
+					noise,
+					dsc.passive,
+					hours(h),
+					samplePeriod,
+					dscContGain,
+					0
+				);
+				return [
+					`${h}hr`,
+					{ confidence: r(conf), tier: informationTier(conf) },
+				];
+			})
+		),
 	});
 
 	// Tier for various emissions at fixed time (VRS, 6hr)
-	const emissionTypes = ['pnp_scan', 'drive_spool', 'mining', 'shield_regen'] as const;
+	const emissionTypes = [
+		'pnp_scan',
+		'drive_spool',
+		'mining',
+		'shield_regen',
+	] as const;
 	for (const type of emissionTypes) {
 		const power = emissionPower(type);
 		const profile = DEFAULT_EMISSION_PROFILES[type];
 		const gain = matchedFilterGain(vrs, profile.spectralType);
-		const conf = passiveDetection(power, noise, vrs.passive, hours(6), samplePeriod, gain, 0);
+		const conf = passiveDetection(
+			power,
+			noise,
+			vrs.passive,
+			hours(6),
+			samplePeriod,
+			gain,
+			0
+		);
 		scenarios.push({
 			name: `VRS 6hr: ${type}`,
 			description: `What can VRS learn about ${type} after 6 hours?`,
@@ -763,7 +992,8 @@ function informationTierScenarios(): DSPCategory {
 
 	scenarios.push({
 		name: 'Equipment/experience threshold shifts',
-		description: 'How correlator modules and veteran bonuses shift information tiers.',
+		description:
+			'How correlator modules and veteran bonuses shift information tiers.',
 		input: {
 			baseThresholds,
 			correlatorBonus: 0.05,

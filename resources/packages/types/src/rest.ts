@@ -7,7 +7,7 @@ export const LinkRel = {
 	Systems: 'helm:systems',
 } as const;
 
-export type LinkRel = ( typeof LinkRel )[ keyof typeof LinkRel ];
+export type LinkRel = (typeof LinkRel)[keyof typeof LinkRel];
 
 /**
  * WP REST API link object.
@@ -20,17 +20,17 @@ export interface RestLink {
 /**
  * WP REST API `_links` shape — a map of link relations to link arrays.
  */
-export type RestLinks = Record< string, RestLink[] >;
+export type RestLinks = Record<string, RestLink[]>;
 
 /**
  * Adds WP REST `_links` to any response type.
  */
-export type WithRestLinks< T > = T & { _links?: RestLinks };
+export type WithRestLinks<T> = T & { _links?: RestLinks };
 
 /**
  * Adds WP REST `_embedded` to any response type.
  */
-export type WithRestEmbeds< T, E > = T & { _embedded?: E };
+export type WithRestEmbeds<T, E> = T & { _embedded?: E };
 
 /**
  * Filter operators — subset of `@wordpress/dataviews` `Operator` that maps to

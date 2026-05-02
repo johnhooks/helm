@@ -1,10 +1,18 @@
 import {
-	emissionPower, tunedEmission, DEFAULT_EMISSION_PROFILES,
+	emissionPower,
+	tunedEmission,
+	DEFAULT_EMISSION_PROFILES,
 	firstHopChance,
 } from '@helm/formulas';
 import type { Ship } from '../ship';
 import type { GraphNode, GraphEdge } from '../data/graph';
-import type { Action, ActionContext, ActionHandler, ActionIntent, ActionOutcome } from './types';
+import type {
+	Action,
+	ActionContext,
+	ActionHandler,
+	ActionIntent,
+	ActionOutcome,
+} from './types';
 import { ActionError, ActionErrorCode } from './types';
 import { ActionStatus } from '../enums/action-status';
 import {
@@ -16,27 +24,31 @@ import {
 const MAX_HOPS = 50;
 
 export const scanRouteHandler: ActionHandler = {
-	validate(ship: Ship, params: Record<string, unknown>, context: ActionContext): void {
+	validate(
+		ship: Ship,
+		params: Record<string, unknown>,
+		context: ActionContext
+	): void {
 		const state = ship.resolve();
 
 		if (state.nodeId === null) {
 			throw new ActionError(
 				ActionErrorCode.ShipNoPosition,
-				'Ship has no position',
+				'Ship has no position'
 			);
 		}
 
 		if (params.target_node_id === undefined) {
 			throw new ActionError(
 				ActionErrorCode.NavigationMissingTarget,
-				'Missing target_node_id',
+				'Missing target_node_id'
 			);
 		}
 
 		if (params.target_node_id === state.nodeId) {
 			throw new ActionError(
 				ActionErrorCode.NavigationAlreadyAtTarget,
-				'Already at target node',
+				'Already at target node'
 			);
 		}
 
@@ -47,13 +59,13 @@ export const scanRouteHandler: ActionHandler = {
 			if (!fromNode) {
 				throw new ActionError(
 					ActionErrorCode.NavigationNoGraph,
-					`From node ${state.nodeId} not found in graph`,
+					`From node ${state.nodeId} not found in graph`
 				);
 			}
 			if (!toNode) {
 				throw new ActionError(
 					ActionErrorCode.NavigationNoGraph,
-					`Target node ${params.target_node_id} not found in graph`,
+					`Target node ${params.target_node_id} not found in graph`
 				);
 			}
 		}
@@ -63,7 +75,7 @@ export const scanRouteHandler: ActionHandler = {
 		ship: Ship,
 		params: Record<string, unknown>,
 		now: number,
-		context: ActionContext,
+		context: ActionContext
 	): ActionIntent {
 		const state = ship.resolve();
 		const effort = (params.effort as number) ?? 1.0;
@@ -72,12 +84,18 @@ export const scanRouteHandler: ActionHandler = {
 		let distance: number;
 
 		if (graph) {
-			distance = graph.distanceBetween(state.nodeId!, params.target_node_id as number);
+			distance = graph.distanceBetween(
+				state.nodeId!,
+				params.target_node_id as number
+			);
 		} else {
 			distance = (params.distance as number) ?? 1;
 		}
 
-		const successChance = ship.sensors.getScanSuccessChance(distance, effort);
+		const successChance = ship.sensors.getScanSuccessChance(
+			distance,
+			effort
+		);
 		const powerCost = ship.sensors.getScanPowerCost(distance);
 		const duration = ship.sensors.getScanDuration(distance, effort);
 
@@ -92,11 +110,14 @@ export const scanRouteHandler: ActionHandler = {
 				power_cost: powerCost,
 				duration,
 			},
-			emissions: [{
-				emissionType: 'pnp_scan',
-				spectralType: DEFAULT_EMISSION_PROFILES.pnp_scan.spectralType,
-				basePower: tunedEmission(emissionPower('pnp_scan'), effort),
-			}],
+			emissions: [
+				{
+					emissionType: 'pnp_scan',
+					spectralType:
+						DEFAULT_EMISSION_PROFILES.pnp_scan.spectralType,
+					basePower: tunedEmission(emissionPower('pnp_scan'), effort),
+				},
+			],
 		};
 	},
 
@@ -147,7 +168,11 @@ export const scanRouteHandler: ActionHandler = {
 		// (matches PHP NavComputer::rollFirstHop)
 		if (successChance < 1.0) {
 			const difficulty = corridorDifficulty(masterSeed, fromId, toId);
-			const effectiveChance = firstHopChance(successChance, action.result.distance as number, difficulty);
+			const effectiveChance = firstHopChance(
+				successChance,
+				action.result.distance as number,
+				difficulty
+			);
 			const roll = ship.rng.next();
 
 			if (roll > effectiveChance) {
@@ -186,7 +211,11 @@ export const scanRouteHandler: ActionHandler = {
 			}
 
 			// Generate next waypoint (deterministic)
-			const waypointData = computeWaypoint(masterSeed, currentNode, toNode);
+			const waypointData = computeWaypoint(
+				masterSeed,
+				currentNode,
+				toNode
+			);
 
 			// Find or create the waypoint node
 			let waypointNode = graph.findNodeByHash(waypointData.hash);
@@ -202,8 +231,15 @@ export const scanRouteHandler: ActionHandler = {
 			}
 
 			// Create edge to waypoint
-			const edgeDist = graph.distanceBetween(currentNode.id, waypointNode.id);
-			const edge = graph.addEdge(currentNode.id, waypointNode.id, edgeDist);
+			const edgeDist = graph.distanceBetween(
+				currentNode.id,
+				waypointNode.id
+			);
+			const edge = graph.addEdge(
+				currentNode.id,
+				waypointNode.id,
+				edgeDist
+			);
 			discoveredEdges.push(edge);
 			currentNode = waypointNode;
 			hopIndex++;
@@ -237,7 +273,14 @@ export const scanRouteHandler: ActionHandler = {
 };
 
 function serializeNode(node: GraphNode): Record<string, unknown> {
-	return { id: node.id, type: node.type, x: node.x, y: node.y, z: node.z, hash: node.hash };
+	return {
+		id: node.id,
+		type: node.type,
+		x: node.x,
+		y: node.y,
+		z: node.z,
+		hash: node.hash,
+	};
 }
 
 function serializeEdge(edge: GraphEdge): Record<string, unknown> {

@@ -1,4 +1,8 @@
-import { emissionPower, envelopeAt, DEFAULT_EMISSION_PROFILES } from '@helm/formulas';
+import {
+	emissionPower,
+	envelopeAt,
+	DEFAULT_EMISSION_PROFILES,
+} from '@helm/formulas';
 import type { Ship } from './ship';
 import type { EmissionRecord } from './actions/types';
 
@@ -7,7 +11,10 @@ import type { EmissionRecord } from './actions/types';
  * If the record has an envelope, use envelopeAt() to compute the
  * time-varying power. Otherwise return flat basePower.
  */
-export function emissionPowerAtTime(record: EmissionRecord, atTime: number): number {
+export function emissionPowerAtTime(
+	record: EmissionRecord,
+	atTime: number
+): number {
 	if (!record.envelope) {
 		return record.basePower;
 	}
@@ -26,7 +33,7 @@ export function emissionPowerAtTime(record: EmissionRecord, atTime: number): num
 export function computeEquipmentEmissions(
 	ship: Ship,
 	shipId: string,
-	_atTime: number,
+	_atTime: number
 ): EmissionRecord[] {
 	const state = ship.resolve();
 	const emissions: EmissionRecord[] = [];

@@ -15,7 +15,7 @@ export const NAV_CONSTANTS = {
 export function firstHopChance(
 	baseChance: number,
 	distance: number,
-	difficulty: number,
+	difficulty: number
 ): number {
 	const distancePenalty = Math.exp(-distance / NAV_CONSTANTS.DISTANCE_SCALE);
 	const effective = baseChance * distancePenalty * (1.0 - difficulty * 0.3);
@@ -27,7 +27,13 @@ export function discoveryProbability(
 	efficiency: number,
 	depth: number,
 	hopDecayFactor: number,
-	pilotSkill = 1.0,
+	pilotSkill = 1.0
 ): number {
-	return Math.max(0.01, Math.min(0.95, skill * efficiency * Math.pow(hopDecayFactor, depth) * pilotSkill));
+	return Math.max(
+		0.01,
+		Math.min(
+			0.95,
+			skill * efficiency * Math.pow(hopDecayFactor, depth) * pilotSkill
+		)
+	);
 }

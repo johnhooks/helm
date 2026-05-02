@@ -8,11 +8,11 @@ The stellar map is the in-system counterpart to the astrometric star field. Astr
 
 Shipped in `@helm/stellar` and `@helm/ui`:
 
-- `SystemPlanet` / `SystemContents` types in `@helm/types`
-- `SystemMap` component in `@helm/ui` — horizontal grid of star glyph + planet glyphs with labels and orbit distances
-- `planetSizeMap` in `@helm/ui` — maps planet type to glyph size
-- `SystemView` in `@helm/stellar` — composes SystemMap with a header (star name, spectral class, scan progress)
-- Storybook stories covering small/large/scanned/unscanned systems
+-   `SystemPlanet` / `SystemContents` types in `@helm/types`
+-   `SystemMap` component in `@helm/ui` — horizontal grid of star glyph + planet glyphs with labels and orbit distances
+-   `planetSizeMap` in `@helm/ui` — maps planet type to glyph size
+-   `SystemView` in `@helm/stellar` — composes SystemMap with a header (star name, spectral class, scan progress)
+-   Storybook stories covering small/large/scanned/unscanned systems
 
 ## Viewport Layout
 
@@ -82,16 +82,16 @@ SideDrawer
 └── drawer: Ship Systems + Ship Log
 ```
 
-- `SystemMap` lives in `@helm/ui` — a pure presentational primitive
-- `SystemView` lives in `@helm/stellar` — composes the map with routing and state
-- Planet list and planet detail are future components in `@helm/stellar`
+-   `SystemMap` lives in `@helm/ui` — a pure presentational primitive
+-   `SystemView` lives in `@helm/stellar` — composes the map with routing and state
+-   Planet list and planet detail are future components in `@helm/stellar`
 
 ## Packages
 
-| Package | Role |
-|---------|------|
-| `@helm/types` | `SystemPlanet`, `SystemContents` |
-| `@helm/ui` | `SystemMap`, `planetSizeMap` |
+| Package         | Role                                     |
+| --------------- | ---------------------------------------- |
+| `@helm/types`   | `SystemPlanet`, `SystemContents`         |
+| `@helm/ui`      | `SystemMap`, `planetSizeMap`             |
 | `@helm/stellar` | `SystemView`, planet list, planet detail |
 
 ## Next Steps

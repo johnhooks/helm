@@ -3,6 +3,7 @@
 This document provides a comprehensive reference for the @wordpress/data package, WordPress's centralized state management solution.
 
 ## Table of Contents
+
 1. [Core Exports](#core-exports)
 2. [Store Creation](#store-creation)
 3. [Actions](#actions)
@@ -15,12 +16,13 @@ This document provides a comprehensive reference for the @wordpress/data package
 ## Core Exports
 
 ### Store Management
+
 ```javascript
 import {
-  createReduxStore,    // Create a store descriptor
-  register,            // Register a store with the registry
-  createRegistry,      // Create a new registry instance
-  combineReducers      // Redux-style reducer combiner
+	createReduxStore, // Create a store descriptor
+	register, // Register a store with the registry
+	createRegistry, // Create a new registry instance
+	combineReducers, // Redux-style reducer combiner
 } from '@wordpress/data';
 ```
 
@@ -30,21 +32,22 @@ import {
 
 ```javascript
 import {
-  select,              // Access store selectors synchronously,
-  dispatch,            // Access store actions
-  subscribe,           // Subscribe to store changes
-  resolveSelect,       // Select with resolver support (returns Promise)
-  suspendSelect        // Select with React Suspense support
+	select, // Access store selectors synchronously,
+	dispatch, // Access store actions
+	subscribe, // Subscribe to store changes
+	resolveSelect, // Select with resolver support (returns Promise)
+	suspendSelect, // Select with React Suspense support
 } from '@wordpress/data';
 ```
 
 ### React Hooks
+
 ```javascript
 import {
-  useSelect,           // Hook to select data from stores
-  useSuspenseSelect,   // Suspense-enabled version of useSelect
-  useDispatch,         // Hook to get action dispatchers
-  useRegistry          // Hook to access the registry
+	useSelect, // Hook to select data from stores
+	useSuspenseSelect, // Suspense-enabled version of useSelect
+	useDispatch, // Hook to get action dispatchers
+	useRegistry, // Hook to access the registry
 } from '@wordpress/data';
 ```
 
@@ -54,9 +57,9 @@ import {
 
 ```typescript
 import {
-  withSelect,          // ❌ Do not use. HOC for selecting data (legacy)
-  withDispatch,        // ❌ Do not use. HOC for dispatching actions (legacy)
-  withRegistry         // ❌ Do not use. HOC for accessing registry (legacy)
+	withSelect, // ❌ Do not use. HOC for selecting data (legacy)
+	withDispatch, // ❌ Do not use. HOC for dispatching actions (legacy)
+	withRegistry, // ❌ Do not use. HOC for accessing registry (legacy)
 } from '@wordpress/data';
 ```
 
@@ -96,17 +99,17 @@ register(store);
 import { combineReducers } from '@wordpress/data';
 import { State, Action } from './types';
 
-function systems (state: State, action: Action) {
-  // systems reducer logic
+function systems(state: State, action: Action) {
+	// systems reducer logic
 }
 
-function systemEdits (state: State, action: Action) {
-  // edits reducer logic
+function systemEdits(state: State, action: Action) {
+	// edits reducer logic
 }
 
 export const reducer = combineReducers({
-  systems,
-  systemEdits,
+	systems,
+	systemEdits,
 });
 ```
 
@@ -117,15 +120,16 @@ export const reducer = combineReducers({
 **Important**: Actions should be inlined within thunk actions unless they are intended for use outside the module. This keeps the API surface clean and makes it clear which actions are public vs internal.
 
 ### Simple Actions (Only if needed externally)
+
 ```typescript
 // In actions.ts of the datastore
 import { Action } from './types';
 
 export function resetShipState(shipId: number) {
-  return {
-    type: 'RESET_SHIP_STATE',
-    shipId,
-  };
+	return {
+		type: 'RESET_SHIP_STATE',
+		shipId,
+	};
 }
 ```
 
@@ -168,6 +172,7 @@ export const startScan: (systemId: number): ShipThunk =>
 **Avoid using generator actions in new code.** Only use generator functions when working with existing code that already implements this pattern. Prefer async/await syntax for all new action implementations.
 
 ### Cross-Store Operations in Thunks
+
 ```typescript
 // In actions.ts of the datastore
 import { Ship, ShipThunk } from './types';
@@ -207,54 +212,60 @@ export const completeDiscovery: (discoveryId: number): ShipThunk =>
 **Critical Concept**: Selectors must return stable references. When a selector creates a new object or array (not stored directly in state), it will cause consuming components to re-render on every state change, even if the data hasn't actually changed.
 
 ### Basic Selectors (Safe for Direct State Access)
+
 ```typescript
 // In selectors.ts of the datastore.
 import { State } from './types';
 
 // ✅ GOOD: Returns reference from state directly
 export function getSystems(state: State) {
-  return state.systems; // Direct state reference
+	return state.systems; // Direct state reference
 }
 
 // ✅ GOOD: Primitive values are always stable
 export function getSystemCount(state: State) {
-  return state.systems.length; // Primitive number
+	return state.systems.length; // Primitive number
 }
 
 // ✅ GOOD: find() returns existing object reference
 export function getSystemById(state: State, id: string) {
-  return state.systems.find(system => system.id === id);
+	return state.systems.find((system) => system.id === id);
 }
 ```
 
 ### Problematic Selectors (Need Memoization)
+
 ```typescript
 // In selectors.ts of the datastore.
 import { State } from './types';
 
 // ❌ BAD: Creates new array on every call
 export function getVisitedSystems(state: State) {
-  return state.systems.filter(system => system.visited);
+	return state.systems.filter((system) => system.visited);
 }
 
 // ❌ BAD: Creates new object on every call
 export function getSystemsSummary(state: State) {
-  return {
-    total: state.systems.length,
-    visited: state.systems.filter(system => system.visited).length
-  };
+	return {
+		total: state.systems.length,
+		visited: state.systems.filter((system) => system.visited).length,
+	};
 }
 
 // ❌ BAD: map() creates new array with new objects
 export function getSystemsWithDistance(state: State) {
-  return state.systems.map(system => ({
-    ...system,
-    distanceFromShip: calculateDistance(state.ship.position, system.position)
-  }));
+	return state.systems.map((system) => ({
+		...system,
+		distanceFromShip: calculateDistance(
+			state.ship.position,
+			system.position
+		),
+	}));
 }
 ```
 
 ### Memoized Selectors with createSelector (rememo)
+
 ```typescript
 // In selectors.ts of the datastore.
 import { createSelector } from '@wordpress/data'; // Uses rememo internally
@@ -263,69 +274,76 @@ import { State } from './types';
 
 // ✅ GOOD: Memoized filter - returns same array reference if dependencies unchanged
 export const getVisitedSystems = createSelector(
-  (state: State) => state.systems.filter(system => system.visited),
-  (state: State) => [state.systems] // Dependencies
+	(state: State) => state.systems.filter((system) => system.visited),
+	(state: State) => [state.systems] // Dependencies
 );
 
 // ✅ GOOD: Memoized computed object
 export const getSystemsSummary = createSelector(
-  (state: State) => ({
-    total: state.systems.length,
-    visited: state.systems.filter(system => system.visited).length,
-    reachable: state.systems.filter(system => system.inRange).length
-  }),
-  (state: State) => [state.systems] // Recomputes only when systems change
+	(state: State) => ({
+		total: state.systems.length,
+		visited: state.systems.filter((system) => system.visited).length,
+		reachable: state.systems.filter((system) => system.inRange).length,
+	}),
+	(state: State) => [state.systems] // Recomputes only when systems change
 );
 
 // ✅ GOOD: Memoized selector with arguments
 export const getSystemsBySpectralClass = createSelector(
-  (state: State, spectralClass: string) => {
-    return state.systems.filter(system => system.star.spectralClass === spectralClass);
-  },
-  // Dependencies include both state and arguments
-  (state: State, spectralClass: string) => [state.systems, spectralClass]
+	(state: State, spectralClass: string) => {
+		return state.systems.filter(
+			(system) => system.star.spectralClass === spectralClass
+		);
+	},
+	// Dependencies include both state and arguments
+	(state: State, spectralClass: string) => [state.systems, spectralClass]
 );
 
 // ✅ GOOD: Memoized transformation
 export const getSystemsWithComputedFields = createSelector(
-  (state: State) => state.systems.map(system => ({
-    ...system,
-    displayName: `${system.name} (${system.star.spectralClass})`,
-    isReachable: system.distance <= state.ship.jumpRange
-  })),
-  (state) => [state.systems, state.ship.jumpRange]
+	(state: State) =>
+		state.systems.map((system) => ({
+			...system,
+			displayName: `${system.name} (${system.star.spectralClass})`,
+			isReachable: system.distance <= state.ship.jumpRange,
+		})),
+	(state) => [state.systems, state.ship.jumpRange]
 );
 
 // ✅ GOOD: Multiple dependencies
 export const getReachableSystemsForShip = createSelector(
-  (state: State) => {
-    const { position, jumpRange } = state.ship;
+	(state: State) => {
+		const { position, jumpRange } = state.ship;
 
-    return state.systems.filter(system =>
-      calculateDistance(position, system.position) <= jumpRange
-    );
-  },
-  (state) => [state.systems, state.ship.position, state.ship.jumpRange]
+		return state.systems.filter(
+			(system) =>
+				calculateDistance(position, system.position) <= jumpRange
+		);
+	},
+	(state) => [state.systems, state.ship.position, state.ship.jumpRange]
 );
 ```
 
 ### Registry Selectors (Cross-Store)
+
 ```typescript
 // In selectors.ts of the datastore.
 import { createRegistrySelector } from '@wordpress/data';
 
-import { store as catalogStore } from '../catalog/store'
+import { store as catalogStore } from '../catalog/store';
 
 import { State } from './types';
 
-export const getActiveActionsWithSystems = createRegistrySelector(select => (state: State) => {
-  const actions = state.activeActions;
+export const getActiveActionsWithSystems = createRegistrySelector(
+	(select) => (state: State) => {
+		const actions = state.activeActions;
 
-  return actions.map(action => ({
-    ...action,
-    system: select(catalogStore).getSystemById(action.systemId)
-  }));
-});
+		return actions.map((action) => ({
+			...action,
+			system: select(catalogStore).getSystemById(action.systemId),
+		}));
+	}
+);
 ```
 
 ## Resolvers
@@ -344,17 +362,17 @@ import { Star, CatalogThunk, StarListQuery } from './types';
 
 // Resolver function matches selector name
 export const getStars =
-  (query: StarListQuery): CatalogThunk =>
-  async ({ dispatch }) => {
-    // Used as the query identifier.
-    const queryAsString = addQueryArgs('/helm/v1/stars', query);
+	(query: StarListQuery): CatalogThunk =>
+	async ({ dispatch }) => {
+		// Used as the query identifier.
+		const queryAsString = addQueryArgs('/helm/v1/stars', query);
 
-    const stars = await apiFetch<Star[]>({ path: queryAsString });
+		const stars = await apiFetch<Star[]>({ path: queryAsString });
 
-    dispatch.receiveStarsQuery(queryAsString, stars);
+		dispatch.receiveStarsQuery(queryAsString, stars);
 
-    return stars;
-};
+		return stars;
+	};
 ```
 
 ### Collection Resolver (Error Handling Pattern)
@@ -367,35 +385,35 @@ import { Star, CatalogThunk, StarListQuery } from './types';
 
 // Resolver function matches selector name
 export const getStars =
-  (query: StarListQuery): CatalogThunk =>
-  async ({ dispatch }) => {
-    // Used as the query identifier.
-    const queryAsString = addQueryArgs('/helm/v1/stars', query);
+	(query: StarListQuery): CatalogThunk =>
+	async ({ dispatch }) => {
+		// Used as the query identifier.
+		const queryAsString = addQueryArgs('/helm/v1/stars', query);
 
-    dispatch({
-      type: 'FETCH_STARS_START',
-      queryId: queryAsString,
-    });
+		dispatch({
+			type: 'FETCH_STARS_START',
+			queryId: queryAsString,
+		});
 
-    try {
-      const stars = await apiFetch<Star[]>({ path: queryAsString });
+		try {
+			const stars = await apiFetch<Star[]>({ path: queryAsString });
 
-      dispatch({
-        type: 'FETCH_STARS_FINISHED',
-        queryId: queryAsString,
-        stars,
-      });
-    } catch (error) {
-      // Handle errors properly with toErrorMap
-      const errors = await toErrorMap(error);
+			dispatch({
+				type: 'FETCH_STARS_FINISHED',
+				queryId: queryAsString,
+				stars,
+			});
+		} catch (error) {
+			// Handle errors properly with toErrorMap
+			const errors = await toErrorMap(error);
 
-      dispatch({
-        type: 'FETCH_STARS_FAILED',
-        queryId: queryAsString,
-        errors,
-      })
-    }
-  };
+			dispatch({
+				type: 'FETCH_STARS_FAILED',
+				queryId: queryAsString,
+				errors,
+			});
+		}
+	};
 ```
 
 ### Basic Item Resolver
@@ -408,16 +426,16 @@ import { System, CatalogThunk } from './types';
 
 // Resolver function matches selector name
 export const getSystemById =
-  (id: string): CatalogThunk =>
-    async ({ dispatch }) => {
-      const system = await apiFetch<System>({
-        path: `/helm/v1/systems/${id}`
-      });
+	(id: string): CatalogThunk =>
+	async ({ dispatch }) => {
+		const system = await apiFetch<System>({
+			path: `/helm/v1/systems/${id}`,
+		});
 
-      dispatch.receiveSystem(system);
+		dispatch.receiveSystem(system);
 
-      return system;
-  };
+		return system;
+	};
 ```
 
 ### Item Resolver (Cross-Store)
@@ -432,22 +450,22 @@ import { System, CatalogThunk } from './types';
 
 // Resolver function matches selector name
 export const getSystemById =
-  (id: string): CatalogThunk =>
-    async ({ dispatch, registry }) => {
-      const system = await apiFetch<System>({
-        path: `/helm/v1/systems/${id}`
-      });
+	(id: string): CatalogThunk =>
+	async ({ dispatch, registry }) => {
+		const system = await apiFetch<System>({
+			path: `/helm/v1/systems/${id}`,
+		});
 
-      dispatch.receiveSystem(system);
+		dispatch.receiveSystem(system);
 
-      // Update ship store if this is the current system
-      const currentSystemId = registry.select(shipStore).getCurrentSystemId();
-      if (currentSystemId === id) {
-        registry.dispatch(shipStore).receiveCurrentSystem(system);
-      }
+		// Update ship store if this is the current system
+		const currentSystemId = registry.select(shipStore).getCurrentSystemId();
+		if (currentSystemId === id) {
+			registry.dispatch(shipStore).receiveCurrentSystem(system);
+		}
 
-      return system;
-  };
+		return system;
+	};
 ```
 
 ### Generator Resolvers (Legacy Pattern)
@@ -460,20 +478,23 @@ export const getSystemById =
 
 ```tsx
 // Return a single selector value
-const visitedSystems = useSelect(select => select(catalogStore).getVisitedSystems(), []);
+const visitedSystems = useSelect(
+	(select) => select(catalogStore).getVisitedSystems(),
+	[]
+);
 
 // Return multiple selector values
-const { systems, shipPosition } = useSelect(select => ({
-  systems: select(catalogStore).getSystems(),
-  shipPosition: select(shipStore).getPosition(),
+const { systems, shipPosition } = useSelect((select) => ({
+	systems: select(catalogStore).getSystems(),
+	shipPosition: select(shipStore).getPosition(),
 }));
 
 // With dependencies
 const [spectralClass, setSpectralClass] = useState('G');
 
 const filteredSystems = useSelect(
-  select => select(catalogStore).getSystemsBySpectralClass(spectralClass),
-  [spectralClass]
+	(select) => select(catalogStore).getSystemsBySpectralClass(spectralClass),
+	[spectralClass]
 );
 ```
 
@@ -487,34 +508,38 @@ const { startScan, setDestination } = useDispatch(shipStore);
 
 ```tsx
 export default function SystemDetail({ systemId }) {
-  const system = useSelect(
-    select => select(catalogStore).getSystemById(systemId),
-    [systemId]
-  );
+	const system = useSelect(
+		(select) => select(catalogStore).getSystemById(systemId),
+		[systemId]
+	);
 
-  const { startScan, setDestination } = useDispatch(shipStore);
+	const { startScan, setDestination } = useDispatch(shipStore);
 
-  const handleScan = () => {
-    startScan(systemId);
-  };
+	const handleScan = () => {
+		startScan(systemId);
+	};
 
-  const handleTravel = () => {
-    setDestination(systemId);
-  };
+	const handleTravel = () => {
+		setDestination(systemId);
+	};
 
-  return (
-    <Panel variant="bordered" tone="sky">
-      <TitleBar title={system.name} subtitle={system.star.spectralClass} />
-      <Button onClick={handleScan}>Scan System</Button>
-      <Button onClick={handleTravel}>Set Course</Button>
-    </Panel>
-  );
+	return (
+		<Panel variant="bordered" tone="sky">
+			<TitleBar
+				title={system.name}
+				subtitle={system.star.spectralClass}
+			/>
+			<Button onClick={handleScan}>Scan System</Button>
+			<Button onClick={handleTravel}>Set Course</Button>
+		</Panel>
+	);
 }
 ```
 
 ## TypeScript Usage
 
 ### Store Type Definitions
+
 ```typescript
 // types.ts in the datastore.
 import {
@@ -532,67 +557,68 @@ import * as selectors from './selectors';
 
 // Define state shape
 interface State {
-  systems: {
-    byId: Record<string, System>;
-    queries: Record<string, string[]>
-  }
-  stars: {
-    byId: Record<string, Star>;
-    allIds: string[];
-  }
-  ui: {
-    pendingQueries: Record<string, boolean>;
-    errors: Record<string, ErrorMap>
-  }
+	systems: {
+		byId: Record<string, System>;
+		queries: Record<string, string[]>;
+	};
+	stars: {
+		byId: Record<string, Star>;
+		allIds: string[];
+	};
+	ui: {
+		pendingQueries: Record<string, boolean>;
+		errors: Record<string, ErrorMap>;
+	};
 }
 
 export type Action =
-  | {
-      type: 'RECEIVE_STARS_QUERY';
-      stars: Star[];
-      queryId: string,
-    }
-  | {
-      type: 'RECEIVE_SYSTEM';
-      system: System;
-    }
-  | {
-      type: 'FETCH_STARS_START';
-      queryId: string;
-    }
-  | {
-      type: 'FETCH_STARS_FINISHED';
-      queryId: string;
-      stars: Star[];
-    }
-  | {
-      type: 'FETCH_STARS_FAILED';
-      queryId: string;
-      errors: ErrorMap;
-    }
+	| {
+			type: 'RECEIVE_STARS_QUERY';
+			stars: Star[];
+			queryId: string;
+	  }
+	| {
+			type: 'RECEIVE_SYSTEM';
+			system: System;
+	  }
+	| {
+			type: 'FETCH_STARS_START';
+			queryId: string;
+	  }
+	| {
+			type: 'FETCH_STARS_FINISHED';
+			queryId: string;
+			stars: Star[];
+	  }
+	| {
+			type: 'FETCH_STARS_FAILED';
+			queryId: string;
+			errors: ErrorMap;
+	  };
 
 export type CatalogThunk = Thunk<
-  Action,
-  StoreDescriptor<ReduxStoreConfig<State, typeof actions, typeof selectors>>
+	Action,
+	StoreDescriptor<ReduxStoreConfig<State, typeof actions, typeof selectors>>
 >;
 ```
-
 
 ### Invalidating Resolutions
 
 #### In Async/Await Thunks (TypeScript)
+
 ```typescript
 const actions = {
-  discoverSystem: (id: string, data: any): Thunk<Action, Store> =>
-    async ({ dispatch }) => {
-      dispatch({ type: 'DISCOVER_SYSTEM', id, data });
+	discoverSystem:
+		(id: string, data: any): Thunk<Action, Store> =>
+		async ({ dispatch }) => {
+			dispatch({ type: 'DISCOVER_SYSTEM', id, data });
 
-      // Invalidate a single selector
-      dispatch.invalidateResolution('getSystemById', [id]);
+			// Invalidate a single selector
+			dispatch.invalidateResolution('getSystemById', [id]);
 
-      // Or invalidate all resolutions
-      dispatch.invalidateResolutionForStore();
-    }
+			// Or invalidate all resolutions
+			dispatch.invalidateResolutionForStore();
+		},
 };
 ```
 

@@ -21,11 +21,17 @@ afterEach(async () => {
 
 describe('query', () => {
 	it('returns rows as objects keyed by column name', async () => {
-		await run(database, "INSERT INTO nodes (id, type, x, y, z) VALUES (?, ?, ?, ?, ?)", [
-			1, 'system', 10.5, 20.3, -5.1,
-		]);
+		await run(
+			database,
+			'INSERT INTO nodes (id, type, x, y, z) VALUES (?, ?, ?, ?, ?)',
+			[1, 'system', 10.5, 20.3, -5.1]
+		);
 
-		const result = await query(database, 'SELECT id, type, x, y, z FROM nodes WHERE id = ?', [1]);
+		const result = await query(
+			database,
+			'SELECT id, type, x, y, z FROM nodes WHERE id = ?',
+			[1]
+		);
 		expect(result.rows).toHaveLength(1);
 		expect(result.rows[0]).toEqual({
 			id: 1,
@@ -38,46 +44,89 @@ describe('query', () => {
 	});
 
 	it('returns empty array for no matches', async () => {
-		const result = await query(database, 'SELECT * FROM nodes WHERE id = ?', [999]);
+		const result = await query(
+			database,
+			'SELECT * FROM nodes WHERE id = ?',
+			[999]
+		);
 		expect(result.rows).toHaveLength(0);
 	});
 });
 
 describe('run', () => {
 	it('inserts data', async () => {
-		await run(database, "INSERT INTO nodes (id, type, x, y, z) VALUES (?, ?, ?, ?, ?)", [
-			1, 'system', 1.0, 2.0, 3.0,
-		]);
+		await run(
+			database,
+			'INSERT INTO nodes (id, type, x, y, z) VALUES (?, ?, ?, ?, ?)',
+			[1, 'system', 1.0, 2.0, 3.0]
+		);
 
-		const result = await query(database, 'SELECT COUNT(*) as count FROM nodes');
+		const result = await query(
+			database,
+			'SELECT COUNT(*) as count FROM nodes'
+		);
 		expect(result.rows[0].count).toBe(1);
 	});
 });
 
 describe('exec', () => {
 	it('executes raw SQL', async () => {
-		await exec(database, "INSERT INTO nodes (id, type, x, y, z) VALUES (1, 'system', 0, 0, 0)");
-		const result = await query(database, 'SELECT COUNT(*) as count FROM nodes');
+		await exec(
+			database,
+			"INSERT INTO nodes (id, type, x, y, z) VALUES (1, 'system', 0, 0, 0)"
+		);
+		const result = await query(
+			database,
+			'SELECT COUNT(*) as count FROM nodes'
+		);
 		expect(result.rows[0].count).toBe(1);
 	});
 });
 
 describe('star map query', () => {
 	it('joins nodes and stars with is_primary filter', async () => {
-		await run(database, "INSERT INTO nodes (id, type, x, y, z) VALUES (?, ?, ?, ?, ?)", [
-			10, 'system', 1.0, 2.0, 3.0,
-		]);
 		await run(
 			database,
-			`INSERT INTO stars (id, node_id, title, catalog_id, spectral_class, post_type, x, y, z, mass, radius, is_primary)
-			 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-			[100, 10, 'Alpha', 'ALPHA_1', 'G', 'helm_star', 1.1, 2.1, 3.1, 1.0, 1.0, 1],
+			'INSERT INTO nodes (id, type, x, y, z) VALUES (?, ?, ?, ?, ?)',
+			[10, 'system', 1.0, 2.0, 3.0]
 		);
 		await run(
 			database,
 			`INSERT INTO stars (id, node_id, title, catalog_id, spectral_class, post_type, x, y, z, mass, radius, is_primary)
 			 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-			[101, 10, 'Alpha B', 'ALPHA_2', 'K', 'helm_star', 1.1, 2.1, 3.1, 0.5, 0.7, 0],
+			[
+				100,
+				10,
+				'Alpha',
+				'ALPHA_1',
+				'G',
+				'helm_star',
+				1.1,
+				2.1,
+				3.1,
+				1.0,
+				1.0,
+				1,
+			]
+		);
+		await run(
+			database,
+			`INSERT INTO stars (id, node_id, title, catalog_id, spectral_class, post_type, x, y, z, mass, radius, is_primary)
+			 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+			[
+				101,
+				10,
+				'Alpha B',
+				'ALPHA_2',
+				'K',
+				'helm_star',
+				1.1,
+				2.1,
+				3.1,
+				0.5,
+				0.7,
+				0,
+			]
 		);
 
 		const result = await query(
@@ -86,7 +135,7 @@ describe('star map query', () => {
 			        n.x, n.y, n.z, s.mass, s.radius, n.type AS node_type
 			 FROM stars s
 			 JOIN nodes n ON s.node_id = n.id
-			 WHERE s.is_primary = 1`,
+			 WHERE s.is_primary = 1`
 		);
 
 		expect(result.rows).toHaveLength(1);

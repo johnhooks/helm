@@ -4,11 +4,11 @@ LCARS-inspired UI kit for ship operations. Compact, glanceable, WordPress-native
 
 ## Intent
 
-- **Dark mode only** - no light mode; space is dark
-- **Compact, glanceable layouts** that fit within WP widgets without losing hierarchy
-- **Less color-dependent** structure: color supports meaning but never carries it alone
-- **Operational clarity** over ornamentation; elegance comes from restraint and rhythm
-- **Accessible**: WCAG AA contrast, focus rings, reduced motion support
+-   **Dark mode only** - no light mode; space is dark
+-   **Compact, glanceable layouts** that fit within WP widgets without losing hierarchy
+-   **Less color-dependent** structure: color supports meaning but never carries it alone
+-   **Operational clarity** over ornamentation; elegance comes from restraint and rhythm
+-   **Accessible**: WCAG AA contrast, focus rings, reduced motion support
 
 ## Principles
 
@@ -31,10 +31,10 @@ LCARS-inspired UI kit for ship operations. Compact, glanceable, WordPress-native
 
 ### Typography
 
-- Antonio as the primary typeface (condensed, LCARS-inspired)
-- Labels uppercase for scannability
-- Mixed case for longer status text
-- Numeric values are the largest element in any readout group
+-   Antonio as the primary typeface (condensed, LCARS-inspired)
+-   Labels uppercase for scannability
+-   Mixed case for longer status text
+-   Numeric values are the largest element in any readout group
 
 ### Color Philosophy
 
@@ -44,11 +44,11 @@ Every component defaults to `tone="neutral"` (warm gray). This keeps the console
 
 ### Shape Language
 
-- **Edge-aligned stacks**: vertical button columns anchored to left or right edge
-- **Square interior edges** where buttons meet the panel edge; outer corners stay rounded
-- **Header/footer bars**: horizontal bars with labels at top or bottom
-- **Indicator shapes**: orbs, bars, stacks, matrices for quick status cues
-- Consistent radii across components for visual coherence
+-   **Edge-aligned stacks**: vertical button columns anchored to left or right edge
+-   **Square interior edges** where buttons meet the panel edge; outer corners stay rounded
+-   **Header/footer bars**: horizontal bars with labels at top or bottom
+-   **Indicator shapes**: orbs, bars, stacks, matrices for quick status cues
+-   Consistent radii across components for visual coherence
 
 ## Tokens
 
@@ -118,7 +118,7 @@ Hand-picked dark foreground colors for text on tone-colored backgrounds. Grouped
 --helm-ui-radius-md: 12px;
 --helm-ui-radius-lg: 16px;
 --helm-ui-stack-gap: 8px;
---helm-ui-font-family: "Antonio", "Helvetica Neue", Arial, sans-serif;
+--helm-ui-font-family: 'Antonio', 'Helvetica Neue', Arial, sans-serif;
 ```
 
 ## Tone System
@@ -169,9 +169,9 @@ background: var(--helm-tone); /* for fills like progress bars */
 
 ```css
 .helm-surface--toned {
-  --helm-surface-bg: var(--helm-tone);
-  --helm-surface-fg: var(--helm-tone-fg);
-  /* ... hover, border, muted variants derived automatically */
+	--helm-surface-bg: var(--helm-tone);
+	--helm-surface-fg: var(--helm-tone-fg);
+	/* ... hover, border, muted variants derived automatically */
 }
 ```
 
@@ -184,16 +184,16 @@ This means adding a new tone requires only one block in `tones.css` + one entry 
 For components where the tone colors text, borders, or small fills on a dark background:
 
 ```tsx
-import type { LcarsTone } from "../../tones";
+import type { LcarsTone } from '../../tones';
 
 interface MyComponentProps {
-  tone?: LcarsTone;
+	tone?: LcarsTone;
 }
 
-export function MyComponent({ tone = "neutral" }: MyComponentProps) {
-  const classNames = ["helm-my-component", `helm-tone--${tone}`].join(" ");
+export function MyComponent({ tone = 'neutral' }: MyComponentProps) {
+	const classNames = ['helm-my-component', `helm-tone--${tone}`].join(' ');
 
-  return <div className={classNames}>...</div>;
+	return <div className={classNames}>...</div>;
 }
 ```
 
@@ -201,10 +201,10 @@ In CSS, reference `var(--helm-tone)` for the accent color:
 
 ```css
 .helm-my-component__label {
-  color: var(--helm-tone);
+	color: var(--helm-tone);
 }
 .helm-my-component__border {
-  border-color: var(--helm-tone);
+	border-color: var(--helm-tone);
 }
 ```
 
@@ -214,21 +214,21 @@ For components where the tone is a solid background with contrasting text (butto
 
 ```tsx
 const classNames = [
-  "helm-my-control",
-  `helm-tone--${tone}`,
-  "helm-surface--toned",
-].join(" ");
+	'helm-my-control',
+	`helm-tone--${tone}`,
+	'helm-surface--toned',
+].join(' ');
 ```
 
 In CSS, reference `--helm-surface-*` variables:
 
 ```css
 .helm-my-control {
-  background: var(--helm-surface-bg);
-  color: var(--helm-surface-fg);
+	background: var(--helm-surface-bg);
+	color: var(--helm-surface-fg);
 }
 .helm-my-control:hover {
-  background: var(--helm-surface-bg-hover);
+	background: var(--helm-surface-bg-hover);
 }
 ```
 
@@ -239,14 +239,14 @@ Components with a tone prop use `var(--helm-tone)` so the focus ring matches the
 ```css
 /* Toned component */
 .helm-my-component:focus-visible {
-  outline: 2px solid var(--helm-tone);
-  outline-offset: 2px;
+	outline: 2px solid var(--helm-tone);
+	outline-offset: 2px;
 }
 
 /* Structural component (no tone prop) */
 .helm-layout__toggle:focus-visible {
-  outline: 2px solid var(--helm-ui-color-accent);
-  outline-offset: 2px;
+	outline: 2px solid var(--helm-ui-color-accent);
+	outline-offset: 2px;
 }
 ```
 
@@ -256,13 +256,13 @@ All animations must respect `prefers-reduced-motion`:
 
 ```css
 .helm-my-component--active .helm-my-component__element {
-  animation: my-pulse 2s ease-in-out infinite;
+	animation: my-pulse 2s ease-in-out infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .helm-my-component--active .helm-my-component__element {
-    animation: none;
-  }
+	.helm-my-component--active .helm-my-component__element {
+		animation: none;
+	}
 }
 ```
 
@@ -317,37 +317,37 @@ All indicators support the full tone palette for consistent coloring.
 
 Primary pattern for system controls:
 
-- Button panel on left or right edge
-- Title bar opposite the buttons
-- Content fills remaining space
-- 4-6 buttons maximum per panel
+-   Button panel on left or right edge
+-   Title bar opposite the buttons
+-   Content fills remaining space
+-   4-6 buttons maximum per panel
 
 ### Status Grid
 
 2x2 or 2x3 grid of readouts:
 
-- Consistent indicator width for alignment
-- Short labels, abbreviated units
-- Values prominent, labels secondary
+-   Consistent indicator width for alignment
+-   Short labels, abbreviated units
+-   Values prominent, labels secondary
 
 ### Compact Density
 
-- Limit to 4-6 items per widget
-- Prefer short status lines over paragraphs
-- Use indicators for trends, text for values
+-   Limit to 4-6 items per widget
+-   Prefer short status lines over paragraphs
+-   Use indicators for trends, text for values
 
 ## Accessibility
 
-- Minimum text size: 12px
-- WCAG AA contrast for all text
-- Focus rings visible and tone-aware (match component color)
-- Respects `prefers-reduced-motion` — all animations disabled
-- All interactive elements keyboard accessible
+-   Minimum text size: 12px
+-   WCAG AA contrast for all text
+-   Focus rings visible and tone-aware (match component color)
+-   Respects `prefers-reduced-motion` — all animations disabled
+-   All interactive elements keyboard accessible
 
 ## Future Considerations
 
 UI library additions under consideration:
 
-- **Alert**: Dismissible/persistent notifications
-- **Elbow**: LCARS corner connector (adds complexity, deferred)
-- **Data Table**: Dense list for contacts/logs
+-   **Alert**: Dismissible/persistent notifications
+-   **Elbow**: LCARS corner connector (adds complexity, deferred)
+-   **Data Table**: Dense list for contacts/logs

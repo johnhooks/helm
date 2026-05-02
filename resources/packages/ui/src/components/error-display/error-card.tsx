@@ -4,10 +4,10 @@ import type { ErrorContentProps } from './error-content';
 
 export type ErrorCardProps = ErrorContentProps;
 
-export function ErrorCard( props: ErrorCardProps ) {
+export function ErrorCard(props: ErrorCardProps) {
 	return (
 		<Panel variant="bordered" tone="danger">
-			<ErrorContent { ...props } />
+			<ErrorContent {...props} />
 		</Panel>
 	);
 }

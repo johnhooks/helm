@@ -1,15 +1,25 @@
 /**
  * Transit Shield Harmonics — shields regenerate at a fraction of normal rate during jump transit.
  */
-export function transitShieldRegenRate(shieldRegenRate: number, magnitude: number): number {
+export function transitShieldRegenRate(
+	shieldRegenRate: number,
+	magnitude: number
+): number {
 	return shieldRegenRate * magnitude;
 }
 
 /**
  * HP recovered during a single jump transit phase.
  */
-export function transitShieldRecovered(shieldRegenRate: number, transitSeconds: number, magnitude: number): number {
-	return transitShieldRegenRate(shieldRegenRate, magnitude) * (transitSeconds / 3600);
+export function transitShieldRecovered(
+	shieldRegenRate: number,
+	transitSeconds: number,
+	magnitude: number
+): number {
+	return (
+		transitShieldRegenRate(shieldRegenRate, magnitude) *
+		(transitSeconds / 3600)
+	);
 }
 
 /**
@@ -19,7 +29,7 @@ export function transitShieldRecovered(shieldRegenRate: number, transitSeconds: 
  */
 export function coreResonanceCost(
 	scanPowerCost: number,
-	magnitude: number,
+	magnitude: number
 ): { capacitorCost: number; coreDamage: number } {
 	const clamped = Math.max(0, Math.min(1, magnitude));
 	return {

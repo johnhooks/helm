@@ -9,7 +9,15 @@ import navData from '../../../../../tests/_data/catalog/products/nav.json';
 import weaponData from '../../../../../tests/_data/catalog/products/weapon.json';
 import equipmentData from '../../../../../tests/_data/catalog/products/equipment.json';
 
-export type ComponentType = 'core' | 'drive' | 'sensor' | 'shield' | 'nav' | 'weapon' | 'cloak' | 'equipment';
+export type ComponentType =
+	| 'core'
+	| 'drive'
+	| 'sensor'
+	| 'shield'
+	| 'nav'
+	| 'weapon'
+	| 'cloak'
+	| 'equipment';
 
 type RawProduct = {
 	slug: string;
@@ -31,11 +39,21 @@ type RawProduct = {
 	draw?: number;
 	tuning?: { param: string; min: number; max: number };
 	dsp?:
-		| { active: number; passive: number; pulseGain: number; continuousGain: number; pvpGain: number }
+		| {
+				active: number;
+				passive: number;
+				pulseGain: number;
+				continuousGain: number;
+				pvpGain: number;
+		  }
 		| {
 				spool: { duration: number; peakPower: number; curve: number };
 				sustain: { duration: number; peakPower: number; curve: number };
-				cooldown: { duration: number; peakPower: number; curve: number };
+				cooldown: {
+					duration: number;
+					peakPower: number;
+					curve: number;
+				};
 		  };
 };
 
@@ -93,7 +111,15 @@ const navs = loadProducts(navData as ProductJson);
 const weapons = loadProducts(weaponData as ProductJson);
 const equipment = loadProducts(equipmentData as ProductJson);
 
-const allProducts = [...cores, ...drives, ...sensors, ...shields, ...navs, ...weapons, ...equipment];
+const allProducts = [
+	...cores,
+	...drives,
+	...sensors,
+	...shields,
+	...navs,
+	...weapons,
+	...equipment,
+];
 
 export function getProductsByType(type: ComponentType): CatalogProduct[] {
 	return allProducts.filter((p) => p.type === type);

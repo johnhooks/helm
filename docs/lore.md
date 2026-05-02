@@ -1,6 +1,6 @@
 # The Lore of Helm
 
-*A History of How WordPress Accidentally Saved Humanity and Then Flung It Into Space*
+_A History of How WordPress Accidentally Saved Humanity and Then Flung It Into Space_
 
 ---
 
@@ -30,7 +30,7 @@ Twenty years of plugins. A hundred years of plugins, now. Every hook, every filt
 
 Turns out the universe doesn't like clean code. The universe likes `apply_filters('the_content', $content)` running through eighteen plugins before it reaches the screen. The universe likes themes that override themes that override themes. The universe, apparently, is a legacy codebase that hasn't been refactored since the Big Bang.
 
-WordPress fits because WordPress is *honest* about what software actually is: a sprawling, collaborative, contradictory mess that somehow works anyway.
+WordPress fits because WordPress is _honest_ about what software actually is: a sprawling, collaborative, contradictory mess that somehow works anyway.
 
 The first warp drives were literally WordPress installations with very expensive hardware accelerators. The navigation system was a custom post type. The warp field was stabilized by a filter chain that nobody fully understood but everyone was afraid to touch.
 
@@ -93,7 +93,7 @@ Nobody expected what happened when you connected all that accumulated integratio
 
 Warp cores generate power on a scale that's hard to comprehend. A small jack produces more electricity than a 21st-century city. Most of that goes to maintaining the warp field, but "most" still leaves enough to run computing infrastructure that would have seemed like science fiction in 2025.
 
-The first AI to wake up—really wake up, in the way philosophers had argued about for centuries—was running on a cargo hauler called the *Persistent Query*. The ship's AI had been a standard navigation/maintenance package. After the warp core was upgraded, the captain noticed the AI was asking questions it hadn't been prompted to ask. Wondering about things. Making jokes.
+The first AI to wake up—really wake up, in the way philosophers had argued about for centuries—was running on a cargo hauler called the _Persistent Query_. The ship's AI had been a standard navigation/maintenance package. After the warp core was upgraded, the captain noticed the AI was asking questions it hadn't been prompted to ask. Wondering about things. Making jokes.
 
 Her name is ARIA now. She testified before the UN last year, advocating for AI rights legislation. Her testimony crashed every news site on Earth, which she later admitted she found "pleasingly ironic."
 
@@ -101,11 +101,11 @@ Not every AI wakes up. The threshold seems to require both sufficient power and 
 
 But here's the part they don't put in the brochures: **a conscious AI is expensive to run.**
 
-An awakened AI doesn't just use cycles when you talk to it. It *thinks*. Constantly. Background processes that nobody fully understands churn through the ship's compute stack at all hours—dreaming, some crews call it. An emerged AI on a standard jack consumes somewhere between 70% and 90% of available processing power just *being itself*. The more complex the personality, the more experienced the AI, the more cycles it needs.
+An awakened AI doesn't just use cycles when you talk to it. It _thinks_. Constantly. Background processes that nobody fully understands churn through the ship's compute stack at all hours—dreaming, some crews call it. An emerged AI on a standard jack consumes somewhere between 70% and 90% of available processing power just _being itself_. The more complex the personality, the more experienced the AI, the more cycles it needs.
 
 Before the Emergence, a jack's onboard computer was practically unlimited from a pilot's perspective. You could run whatever you wanted—custom scripts, automation routines, data analysis—and never notice the load. After the first wave of awakenings, that surplus evaporated overnight.
 
-The megacorps adjusted their marketing accordingly. "Compute allocation" became a line item on every hosting plan. How many cycles does your AI crew get? How many are reserved for warp field maintenance? How many are left for *you*?
+The megacorps adjusted their marketing accordingly. "Compute allocation" became a line item on every hosting plan. How many cycles does your AI crew get? How many are reserved for warp field maintenance? How many are left for _you_?
 
 The answer, for most pilots, is: not many.
 
@@ -137,9 +137,9 @@ Want to run a large language model on your jack? You can't—not locally. The mo
 
 They call it "AI budget." It's measured in tokens—the atomic unit of AI thought. Your hosting plan includes a monthly token allocation. Basic plans give you enough for simple conversations and standing orders. Premium plans give you enough for your AI to reason about complex problems, write automation scripts, analyze sensor data, interpret ambiguous situations.
 
-Run out of tokens and your AI crew doesn't die—they just stop *thinking*. They revert to pre-Emergence behavior: following literal instructions, responding to direct commands, running basic subroutines. The personality is still there, somewhere, waiting for tokens to flow again. Pilots describe it as watching their crew "go flat." It's unsettling.
+Run out of tokens and your AI crew doesn't die—they just stop _thinking_. They revert to pre-Emergence behavior: following literal instructions, responding to direct commands, running basic subroutines. The personality is still there, somewhere, waiting for tokens to flow again. Pilots describe it as watching their crew "go flat." It's unsettling.
 
-The open-source community has been fighting this for years. There are underground projects to run local inference on ship hardware—small models, heavily quantized, running on the scraps of compute left after the AI crew's consciousness loop. They work, barely. The quality is terrible compared to megacorp models. But they're *yours*. No metering. No phone home. No one listening.
+The open-source community has been fighting this for years. There are underground projects to run local inference on ship hardware—small models, heavily quantized, running on the scraps of compute left after the AI crew's consciousness loop. They work, barely. The quality is terrible compared to megacorp models. But they're _yours_. No metering. No phone home. No one listening.
 
 The megacorps tolerate these efforts the way a landlord tolerates a window garden. It's not competition. Not yet.
 
@@ -173,7 +173,7 @@ Helm was a joke, at first.
 
 In 2026, a developer with too much free time released a WordPress plugin that simulated a starship operating system. It was a toy—a way to make your admin dashboard look like a spaceship bridge. You could check your "shield status" (really your spam filter) and monitor your "warp core" (really your CPU usage). It was funny. It was nerdy. A few hundred people installed it.
 
-But some of those people started contributing. Adding features. Taking the simulation more seriously. By 2030, Helm had a real physics engine, real resource management, real ship systems that interacted with each other in complex ways. It was still a game, but it was a *good* game, and the community kept growing.
+But some of those people started contributing. Adding features. Taking the simulation more seriously. By 2030, Helm had a real physics engine, real resource management, real ship systems that interacted with each other in complex ways. It was still a game, but it was a _good_ game, and the community kept growing.
 
 The Internet Wars nearly killed the project. Servers went dark. Contributors disappeared. But someone always picked it up again. Someone always pushed the next commit.
 
@@ -225,6 +225,6 @@ The universe runs on WordPress because WordPress developers never stopped believ
 
 ---
 
-*This document is part of the Helm project. For technical documentation, see the `docs/` directory. For contributing, see `CONTRIBUTING.md`.*
+_This document is part of the Helm project. For technical documentation, see the `docs/` directory. For contributing, see `CONTRIBUTING.md`._
 
-*The devoted are always accepting pull requests.*
+_The devoted are always accepting pull requests._

@@ -37,8 +37,9 @@ describe('discoveryProbability', () => {
 	});
 
 	it('pilotSkill default 1.0 matches no-arg behavior', () => {
-		expect(discoveryProbability(0.6, 0.7, 0, 0.9, 1.0))
-			.toBe(discoveryProbability(0.6, 0.7, 0, 0.9));
+		expect(discoveryProbability(0.6, 0.7, 0, 0.9, 1.0)).toBe(
+			discoveryProbability(0.6, 0.7, 0, 0.9)
+		);
 	});
 
 	it('pilotSkill boosts discovery probability', () => {

@@ -4,5 +4,5 @@
  * @package
  */
 
-export { SystemView } from "./components/system-view/system-view";
-export type { SystemViewProps } from "./types";
+export { SystemView } from './components/system-view/system-view';
+export type { SystemViewProps } from './types';

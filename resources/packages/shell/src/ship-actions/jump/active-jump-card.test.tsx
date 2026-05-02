@@ -5,7 +5,7 @@ import { ActiveJumpCard } from './active-jump-card';
 
 const TARGET_NAME = 'Tau Ceti';
 
-const baseAction: ShipAction< 'jump' > = {
+const baseAction: ShipAction<'jump'> = {
 	id: 201,
 	ship_post_id: 42,
 	type: 'jump',
@@ -21,14 +21,14 @@ const baseAction: ShipAction< 'jump' > = {
 	updated_at: '2026-02-16T12:00:00Z',
 };
 
-describe( 'ActiveJumpCard', () => {
-	it( 'renders with null result', () => {
-		render( <ActiveJumpCard action={ baseAction } targetName={ TARGET_NAME } /> );
-		expect( screen.getByText( /Tau Ceti/ ) ).toBeInTheDocument();
-	} );
+describe('ActiveJumpCard', () => {
+	it('renders with null result', () => {
+		render(<ActiveJumpCard action={baseAction} targetName={TARGET_NAME} />);
+		expect(screen.getByText(/Tau Ceti/)).toBeInTheDocument();
+	});
 
-	it( 'renders duration and core cost from result', () => {
-		const action: ShipAction< 'jump' > = {
+	it('renders duration and core cost from result', () => {
+		const action: ShipAction<'jump'> = {
 			...baseAction,
 			result: {
 				from_node_id: 1,
@@ -38,17 +38,17 @@ describe( 'ActiveJumpCard', () => {
 				duration: 345600,
 			},
 		};
-		render( <ActiveJumpCard action={ action } targetName={ TARGET_NAME } /> );
-		expect( screen.getByText( '345600' ) ).toBeInTheDocument();
-		expect( screen.getByText( '12' ) ).toBeInTheDocument();
-	} );
+		render(<ActiveJumpCard action={action} targetName={TARGET_NAME} />);
+		expect(screen.getByText('345600')).toBeInTheDocument();
+		expect(screen.getByText('12')).toBeInTheDocument();
+	});
 
-	it( 'renders countdown when deferred_until is set', () => {
-		const action: ShipAction< 'jump' > = {
+	it('renders countdown when deferred_until is set', () => {
+		const action: ShipAction<'jump'> = {
 			...baseAction,
-			deferred_until: new Date( Date.now() + 1000 * 60 * 60 ).toISOString(),
+			deferred_until: new Date(Date.now() + 1000 * 60 * 60).toISOString(),
 		};
-		render( <ActiveJumpCard action={ action } targetName={ TARGET_NAME } /> );
-		expect( screen.getByText( /Remaining/ ) ).toBeInTheDocument();
-	} );
-} );
+		render(<ActiveJumpCard action={action} targetName={TARGET_NAME} />);
+		expect(screen.getByText(/Remaining/)).toBeInTheDocument();
+	});
+});

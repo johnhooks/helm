@@ -19,13 +19,19 @@ describe('phaseEmission', () => {
 	});
 
 	it('returns peakPower at t=duration', () => {
-		expect(phaseEmission(civilian.spool.duration, civilian.spool)).toBeCloseTo(1.2);
-		expect(phaseEmission(military.spool.duration, military.spool)).toBeCloseTo(2.5);
+		expect(
+			phaseEmission(civilian.spool.duration, civilian.spool)
+		).toBeCloseTo(1.2);
+		expect(
+			phaseEmission(military.spool.duration, military.spool)
+		).toBeCloseTo(2.5);
 	});
 
 	it('clamps t to [0, duration]', () => {
 		expect(phaseEmission(-5, civilian.spool)).toBe(0);
-		expect(phaseEmission(civilian.spool.duration + 100, civilian.spool)).toBeCloseTo(1.2);
+		expect(
+			phaseEmission(civilian.spool.duration + 100, civilian.spool)
+		).toBeCloseTo(1.2);
 	});
 
 	it('curve < 1 is front-loaded (military)', () => {
@@ -55,7 +61,9 @@ describe('phaseEmission', () => {
 describe('envelopeEmission', () => {
 	it('spool rises from 0 to peak', () => {
 		expect(envelopeEmission(0, 'spool', civilian)).toBe(0);
-		expect(envelopeEmission(civilian.spool.duration, 'spool', civilian)).toBeCloseTo(1.2);
+		expect(
+			envelopeEmission(civilian.spool.duration, 'spool', civilian)
+		).toBeCloseTo(1.2);
 	});
 
 	it('sustain is flat regardless of t', () => {
@@ -65,11 +73,15 @@ describe('envelopeEmission', () => {
 
 	it('cooldown falls from peak to 0', () => {
 		expect(envelopeEmission(0, 'cooldown', civilian)).toBeCloseTo(0.8);
-		expect(envelopeEmission(civilian.cooldown.duration, 'cooldown', civilian)).toBeCloseTo(0);
+		expect(
+			envelopeEmission(civilian.cooldown.duration, 'cooldown', civilian)
+		).toBeCloseTo(0);
 	});
 
 	it('military spool reaches peak at duration', () => {
-		expect(envelopeEmission(military.spool.duration, 'spool', military)).toBeCloseTo(2.5);
+		expect(
+			envelopeEmission(military.spool.duration, 'spool', military)
+		).toBeCloseTo(2.5);
 	});
 
 	it('military cooldown starts hot at 1.8', () => {
@@ -108,7 +120,8 @@ describe('envelopeAt', () => {
 	});
 
 	it('transitions to cooldown after sustain', () => {
-		const cooldownStart = civilian.spool.duration + civilian.sustain.duration;
+		const cooldownStart =
+			civilian.spool.duration + civilian.sustain.duration;
 		const state = envelopeAt(cooldownStart + 1, civilian);
 		expect(state.phase).toBe('cooldown');
 		expect(state.phaseElapsed).toBeCloseTo(1);
@@ -148,7 +161,9 @@ describe('envelopeAt', () => {
 		// 25% through spool — military is front-loaded (curve 0.5)
 		const t25pct = envelopeAt(spoolEnd * 0.25, military);
 		expect(t25pct.phase).toBe('spool');
-		expect(t25pct.power).toBeGreaterThanOrEqual(military.spool.peakPower * 0.5);
+		expect(t25pct.power).toBeGreaterThanOrEqual(
+			military.spool.peakPower * 0.5
+		);
 
 		// End of spool
 		const tSpoolEnd = envelopeAt(spoolEnd, military);
@@ -163,7 +178,10 @@ describe('envelopeAt', () => {
 		// Cooldown start
 		const tCooldownStart = envelopeAt(sustainEnd + 0.1, military);
 		expect(tCooldownStart.phase).toBe('cooldown');
-		expect(tCooldownStart.power).toBeCloseTo(military.cooldown.peakPower, 0);
+		expect(tCooldownStart.power).toBeCloseTo(
+			military.cooldown.peakPower,
+			0
+		);
 
 		// Idle after total
 		const tIdle = envelopeAt(total + 1, military);
@@ -207,7 +225,9 @@ describe('envelopeTimeSeries', () => {
 	it('starts at t=0 and ends at total duration', () => {
 		const series = envelopeTimeSeries(civilian, 10);
 		expect(series[0].t).toBe(0);
-		expect(series[series.length - 1].t).toBeCloseTo(envelopeDuration(civilian));
+		expect(series[series.length - 1].t).toBeCloseTo(
+			envelopeDuration(civilian)
+		);
 	});
 
 	it('transitions through all three phases', () => {
@@ -242,14 +262,18 @@ describe('envelopeTimeSeries', () => {
 
 describe('envelopePeakPower', () => {
 	it('returns the maximum across all phases', () => {
-		expect(envelopePeakPower(military)).toBe(2.5);   // spool peak
-		expect(envelopePeakPower(civilian)).toBe(1.2);   // spool peak
+		expect(envelopePeakPower(military)).toBe(2.5); // spool peak
+		expect(envelopePeakPower(civilian)).toBe(1.2); // spool peak
 		expect(envelopePeakPower(industrial)).toBe(1.5); // spool peak
 	});
 
 	it('military has highest peak (most detectable burst)', () => {
-		expect(envelopePeakPower(military)).toBeGreaterThan(envelopePeakPower(industrial));
-		expect(envelopePeakPower(industrial)).toBeGreaterThan(envelopePeakPower(civilian));
+		expect(envelopePeakPower(military)).toBeGreaterThan(
+			envelopePeakPower(industrial)
+		);
+		expect(envelopePeakPower(industrial)).toBeGreaterThan(
+			envelopePeakPower(civilian)
+		);
 	});
 });
 
@@ -266,8 +290,12 @@ describe('drive personality differences', () => {
 	});
 
 	it('military sustain is quieter than civilian (stealthy at cruise)', () => {
-		expect(military.sustain.peakPower).toBeLessThan(civilian.sustain.peakPower);
-		expect(industrial.sustain.peakPower).toBeGreaterThan(civilian.sustain.peakPower);
+		expect(military.sustain.peakPower).toBeLessThan(
+			civilian.sustain.peakPower
+		);
+		expect(industrial.sustain.peakPower).toBeGreaterThan(
+			civilian.sustain.peakPower
+		);
 	});
 });
 
@@ -283,11 +311,17 @@ describe('timestamp-based usage pattern', () => {
 		expect(atSpool.phase).toBe('spool');
 
 		// During sustain
-		const atSustain = envelopeAt(startedAt + spoolEnd + 0.5 - startedAt, military);
+		const atSustain = envelopeAt(
+			startedAt + spoolEnd + 0.5 - startedAt,
+			military
+		);
 		expect(atSustain.phase).toBe('sustain');
 
 		// During cooldown
-		const atCooldown = envelopeAt(startedAt + sustainEnd + 5 - startedAt, military);
+		const atCooldown = envelopeAt(
+			startedAt + sustainEnd + 5 - startedAt,
+			military
+		);
 		expect(atCooldown.phase).toBe('cooldown');
 
 		// Idle after total
@@ -298,7 +332,7 @@ describe('timestamp-based usage pattern', () => {
 	it('multiple waveforms evaluated at the same instant are phase-coherent', () => {
 		const total = envelopeDuration(military);
 		const now = 1709165000;
-		const driveA_startedAt = now - 10;          // 10s ago → spool
+		const driveA_startedAt = now - 10; // 10s ago → spool
 		const driveB_startedAt = now - (total + 5); // past total → idle
 
 		const stateA = envelopeAt(now - driveA_startedAt, military);

@@ -12,7 +12,7 @@ export function createMetaRepository(conn: Connection) {
 		async getMeta(key: string): Promise<string | null> {
 			const rows = await conn.query<{ value: string | null }>(
 				'SELECT value FROM _meta WHERE key = ?',
-				[key],
+				[key]
 			);
 			return rows[0]?.value ?? null;
 		},
@@ -20,7 +20,7 @@ export function createMetaRepository(conn: Connection) {
 		async setMeta(key: string, value: string): Promise<void> {
 			await conn.run(
 				'INSERT OR REPLACE INTO _meta (key, value) VALUES (?, ?)',
-				[key, value],
+				[key, value]
 			);
 		},
 	};

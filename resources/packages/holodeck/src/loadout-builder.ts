@@ -2,10 +2,17 @@ import type { Loadout } from './types/loadout';
 import type { InstalledComponent } from './types/component';
 import type { CatalogProduct } from './types/catalog';
 import type { ComponentType } from './data/products';
-import { getProduct, getProductsByType, DEFAULT_LOADOUT_SLUGS } from './data/products';
+import {
+	getProduct,
+	getProductsByType,
+	DEFAULT_LOADOUT_SLUGS,
+} from './data/products';
 import { getHull, HULLS } from './data/hulls';
 
-function toComponent(product: CatalogProduct, slot: string): InstalledComponent {
+function toComponent(
+	product: CatalogProduct,
+	slot: string
+): InstalledComponent {
 	return {
 		product,
 		slot,
@@ -23,7 +30,9 @@ function resolve(type: ComponentType, slug: string): CatalogProduct {
 		throw new Error(`Unknown ${type} "${slug}". Valid: ${valid}`);
 	}
 	if (product.type !== type) {
-		throw new Error(`Product "${slug}" is type "${product.type}", expected "${type}"`);
+		throw new Error(
+			`Product "${slug}" is type "${product.type}", expected "${type}"`
+		);
 	}
 	return product;
 }
@@ -36,7 +45,9 @@ function resolveEquipment(slug: string): CatalogProduct {
 		throw new Error(`Unknown equipment "${slug}"`);
 	}
 	if (!EQUIPMENT_TYPES.has(product.type)) {
-		throw new Error(`Product "${slug}" is type "${product.type}", expected equipment/weapon/cloak`);
+		throw new Error(
+			`Product "${slug}" is type "${product.type}", expected equipment/weapon/cloak`
+		);
 	}
 	return product;
 }
@@ -49,7 +60,7 @@ function resolveEquipment(slug: string): CatalogProduct {
 export function buildLoadout(
 	hullSlug: string,
 	componentSlugs?: Partial<Record<string, string>>,
-	equipmentSlugs?: string[],
+	equipmentSlugs?: string[]
 ): Loadout {
 	const hull = getHull(hullSlug);
 	if (!hull) {
@@ -66,6 +77,8 @@ export function buildLoadout(
 		sensor: toComponent(resolve('sensor', slugs.sensor), 'sensor'),
 		shield: toComponent(resolve('shield', slugs.shield), 'shield'),
 		nav: toComponent(resolve('nav', slugs.nav), 'nav'),
-		equipment: (equipmentSlugs ?? []).map((slug, i) => toComponent(resolveEquipment(slug), `equip_${i + 1}`)),
+		equipment: (equipmentSlugs ?? []).map((slug, i) =>
+			toComponent(resolveEquipment(slug), `equip_${i + 1}`)
+		),
 	};
 }

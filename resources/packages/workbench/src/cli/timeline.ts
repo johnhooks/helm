@@ -5,6 +5,8 @@
  * bun run wb timeline --file=timeline.json
  */
 
+/* eslint-disable no-console */
+
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { createShip, createClock, createRng } from '@helm/holodeck';
@@ -95,7 +97,9 @@ export function timeline({ flags }: ParsedFlags): void {
 	} else if (flags.steps) {
 		steps = JSON.parse(flags.steps);
 	} else {
-		console.error('Usage: bun run wb timeline --steps=\'[...]\' or --file=timeline.json'); // eslint-disable-line no-console
+		console.error(
+			"Usage: bun run wb timeline --steps='[...]' or --file=timeline.json"
+		); // eslint-disable-line no-console
 		process.exit(1);
 	}
 
@@ -110,7 +114,7 @@ export function timeline({ flags }: ParsedFlags): void {
 		// Apply file pilot first (as defaults), then CLI flags win
 		for (const [key, value] of Object.entries(filePilot)) {
 			const k = key as keyof PilotSkills;
-			if (!((`pilot.${k}`) in flags)) {
+			if (!(`pilot.${k}` in flags)) {
 				pilot[k] = value;
 			}
 		}
@@ -145,7 +149,10 @@ export function timeline({ flags }: ParsedFlags): void {
 			case 'absorbDamage': {
 				params = { amount: step.amount };
 				const dmg = ship.absorbDamage(step.amount ?? 0);
-				result = { shieldAbsorbed: r(dmg.shieldAbsorbed), hullDamage: r(dmg.hullDamage) };
+				result = {
+					shieldAbsorbed: r(dmg.shieldAbsorbed),
+					hullDamage: r(dmg.hullDamage),
+				};
 				break;
 			}
 
@@ -195,8 +202,12 @@ export function timeline({ flags }: ParsedFlags): void {
 			action: step.action,
 			state: resolveState(state),
 		};
-		if (params) {snapshot.params = params;}
-		if (result) {snapshot.result = result;}
+		if (params) {
+			snapshot.params = params;
+		}
+		if (result) {
+			snapshot.result = result;
+		}
 
 		snapshots.push(snapshot);
 	}

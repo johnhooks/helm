@@ -14,30 +14,30 @@ const PER_PAGE = 500;
  *
  * @internal
  */
-export async function fetchAllNodes(): Promise< ApiNodeResponse[] > {
+export async function fetchAllNodes(): Promise<ApiNodeResponse[]> {
 	const allNodes: ApiNodeResponse[] = [];
 	let page = 1;
 	let totalPages = 1;
 
 	try {
 		do {
-			const response = await apiFetch( {
-				path: `/helm/v1/nodes?_embed=${ LinkRel.Stars }&per_page=${ PER_PAGE }&page=${ page }`,
+			const response = await apiFetch({
+				path: `/helm/v1/nodes?_embed=${LinkRel.Stars}&per_page=${PER_PAGE}&page=${page}`,
 				parse: false as const,
-			} );
+			});
 
-			totalPages = Number( response.headers.get( 'X-WP-TotalPages' ) ) || 1;
+			totalPages = Number(response.headers.get('X-WP-TotalPages')) || 1;
 
 			const nodes: ApiNodeResponse[] = await response.json();
-			allNodes.push( ...nodes );
+			allNodes.push(...nodes);
 
 			page++;
-		} while ( page <= totalPages );
-	} catch ( error ) {
+		} while (page <= totalPages);
+	} catch (error) {
 		throw HelmError.safe(
 			ErrorCode.CacheFetchFailed,
-			__( 'Failed to fetch node data from the server.', 'helm' ),
-			error,
+			__('Failed to fetch node data from the server.', 'helm'),
+			error
 		);
 	}
 
@@ -49,21 +49,23 @@ export async function fetchAllNodes(): Promise< ApiNodeResponse[] > {
  *
  * @internal
  */
-export async function fetchNodesByIds( ids: number[] ): Promise< ApiNodeResponse[] > {
-	const uniqueIds = [ ...new Set( ids ) ];
-	if ( uniqueIds.length === 0 ) {
+export async function fetchNodesByIds(
+	ids: number[]
+): Promise<ApiNodeResponse[]> {
+	const uniqueIds = [...new Set(ids)];
+	if (uniqueIds.length === 0) {
 		return [];
 	}
 
 	try {
-		return await apiFetch< ApiNodeResponse[] >( {
-			path: `/helm/v1/nodes?include=${ uniqueIds.join( ',' ) }`,
-		} );
-	} catch ( error ) {
+		return await apiFetch<ApiNodeResponse[]>({
+			path: `/helm/v1/nodes?include=${uniqueIds.join(',')}`,
+		});
+	} catch (error) {
 		throw HelmError.safe(
 			ErrorCode.CacheFetchFailed,
-			__( 'Failed to fetch node data from the server.', 'helm' ),
-			error,
+			__('Failed to fetch node data from the server.', 'helm'),
+			error
 		);
 	}
 }

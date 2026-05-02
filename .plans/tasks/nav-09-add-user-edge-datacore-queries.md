@@ -3,7 +3,7 @@ status: done
 area: navigation
 priority: p1
 depends_on:
-  - nav-08-track-edge-discoveries-per-player
+    - nav-08-track-edge-discoveries-per-player
 ---
 
 # Add user edge datacore queries
@@ -37,9 +37,9 @@ known user edges touching a node and derive the connected node ids for that
 node from datacore alone. In practice the route-known check also needs a
 direct boolean probe, so the datacore query surface includes:
 
-- `getUserEdgesAtNode(nodeId)`
-- `hasUserEdgesAtNode(nodeId)`
-- `getConnectedNodeIds(nodeId)`
+-   `getUserEdgesAtNode(nodeId)`
+-   `hasUserEdgesAtNode(nodeId)`
+-   `getConnectedNodeIds(nodeId)`
 
 These operations are idempotent, work with the existing hydrate and reconcile
 flows from nav-06, and preserve the server as the source of truth. This task
@@ -53,13 +53,13 @@ The shipped datacore work added a dedicated `user_edges` SQLite table keyed by
 `(user_id, id)` with endpoint-node indexes so node-oriented lookups stay local
 and cheap. The public datacore API now exposes:
 
-- Insert helpers for one edge or many edges.
-- `clearUserEdges()` for hydrate clear-and-replace flows.
-- `getUserEdgesAtNode(nodeId)` for callers that need the full local edge rows.
-- `hasUserEdgesAtNode(nodeId)` for route-known checks without materializing the
-  matching edges.
-- `getConnectedNodeIds(nodeId)` for deriving adjacent known nodes from the
-  local graph.
+-   Insert helpers for one edge or many edges.
+-   `clearUserEdges()` for hydrate clear-and-replace flows.
+-   `getUserEdgesAtNode(nodeId)` for callers that need the full local edge rows.
+-   `hasUserEdgesAtNode(nodeId)` for route-known checks without materializing the
+    matching edges.
+-   `getConnectedNodeIds(nodeId)` for deriving adjacent known nodes from the
+    local graph.
 
 The implementation remains scoped to datacore storage and query behavior. It
 does not add a new server write path, and it keeps hydrate/reconcile as the

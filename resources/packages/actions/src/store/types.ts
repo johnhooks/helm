@@ -14,27 +14,32 @@ export type ShipActionType =
 	| 'repair'
 	| 'upgrade';
 
-export type ShipActionStatus = 'pending' | 'running' | 'fulfilled' | 'partial' | 'failed';
+export type ShipActionStatus =
+	| 'pending'
+	| 'running'
+	| 'fulfilled'
+	| 'partial'
+	| 'failed';
 
-export interface ShipAction< T extends ShipActionType = ShipActionType > {
+export interface ShipAction<T extends ShipActionType = ShipActionType> {
 	id: number;
 	ship_post_id: number;
 	type: T;
 	status: ShipActionStatus;
-	params: ActionContract< T >[ 'params' ];
+	params: ActionContract<T>['params'];
 	result:
-		| ActionContract< T >[ 'activeResult' ]
-		| ActionContract< T >[ 'fulfilledResult' ]
-		| ActionContract< T >[ 'failedResult' ]
+		| ActionContract<T>['activeResult']
+		| ActionContract<T>['fulfilledResult']
+		| ActionContract<T>['failedResult']
 		| null;
 	deferred_until: string | null;
 	created_at: string;
 	updated_at: string;
 }
 
-export type DraftAction< T extends ShipActionType = ShipActionType > = {
+export type DraftAction<T extends ShipActionType = ShipActionType> = {
 	type: T;
-	params: ActionContract< T >[ 'params' ];
+	params: ActionContract<T>['params'];
 };
 
 export interface QueryMeta {
@@ -44,11 +49,11 @@ export interface QueryMeta {
 }
 
 export interface ActionsState {
-	byId: Record< number, ShipAction >;
-	queries: Record< string, number[] >;
-	meta: Record< string, QueryMeta >;
-	isLoading: Record< string, boolean >;
-	error: Record< string, HelmError >;
+	byId: Record<number, ShipAction>;
+	queries: Record<string, number[]>;
+	meta: Record<string, QueryMeta>;
+	isLoading: Record<string, boolean>;
+	error: Record<string, HelmError>;
 }
 
 export interface CreateState {
@@ -80,8 +85,18 @@ export type Action =
 	| { type: 'CREATE_DRAFT'; action: DraftAction }
 	| { type: 'CLEAR_DRAFT' }
 	| { type: 'FETCH_ACTIONS_START'; queryId: string }
-	| { type: 'FETCH_ACTIONS_FINISHED'; queryId: string; actions: ShipAction[]; next: string | null }
+	| {
+			type: 'FETCH_ACTIONS_FINISHED';
+			queryId: string;
+			actions: ShipAction[];
+			next: string | null;
+	  }
 	| { type: 'FETCH_ACTIONS_FAILED'; queryId: string; error: HelmError }
 	| { type: 'LOAD_MORE_START'; queryId: string }
-	| { type: 'LOAD_MORE_FINISHED'; queryId: string; actions: ShipAction[]; next: string | null }
+	| {
+			type: 'LOAD_MORE_FINISHED';
+			queryId: string;
+			actions: ShipAction[];
+			next: string | null;
+	  }
 	| { type: 'LOAD_MORE_FAILED'; queryId: string; error: HelmError };

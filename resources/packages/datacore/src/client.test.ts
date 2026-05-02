@@ -111,7 +111,11 @@ describe('createDatacore', () => {
 
 		let captured: { sql: string; params?: unknown[] } | null = null;
 		MockWorker.instance.onPosted((msg: unknown) => {
-			const m = msg as { id: string; type: string; payload?: { sql: string; params?: unknown[] } };
+			const m = msg as {
+				id: string;
+				type: string;
+				payload?: { sql: string; params?: unknown[] };
+			};
 			if (m.type === 'run') {
 				captured = m.payload!;
 				MockWorker.instance.receive({
@@ -122,11 +126,25 @@ describe('createDatacore', () => {
 			}
 		});
 
-		await dc.insertNode({ id: 1, type: 'system', x: 10, y: 20, z: 30, created_at: '2025-01-01' });
+		await dc.insertNode({
+			id: 1,
+			type: 'system',
+			x: 10,
+			y: 20,
+			z: 30,
+			created_at: '2025-01-01',
+		});
 
 		expect(captured).not.toBeNull();
 		expect(captured!.sql).toContain('INSERT INTO nodes');
-		expect(captured!.params).toEqual([1, 'system', 10, 20, 30, '2025-01-01']);
+		expect(captured!.params).toEqual([
+			1,
+			'system',
+			10,
+			20,
+			30,
+			'2025-01-01',
+		]);
 	});
 
 	it('insertStar converts is_primary boolean to integer', async () => {
@@ -134,7 +152,11 @@ describe('createDatacore', () => {
 
 		let captured: { sql: string; params?: unknown[] } | null = null;
 		MockWorker.instance.onPosted((msg: unknown) => {
-			const m = msg as { id: string; type: string; payload?: { sql: string; params?: unknown[] } };
+			const m = msg as {
+				id: string;
+				type: string;
+				payload?: { sql: string; params?: unknown[] };
+			};
 			if (m.type === 'run') {
 				captured = m.payload!;
 				MockWorker.instance.receive({
@@ -146,9 +168,18 @@ describe('createDatacore', () => {
 		});
 
 		await dc.insertStar({
-			id: 100, title: 'Sol', node_id: 1, catalog_id: 'SOL',
-			spectral_class: 'G', post_type: 'helm_star',
-			x: 0, y: 0, z: 0, mass: 1.0, radius: 1.0, is_primary: true,
+			id: 100,
+			title: 'Sol',
+			node_id: 1,
+			catalog_id: 'SOL',
+			spectral_class: 'G',
+			post_type: 'helm_star',
+			x: 0,
+			y: 0,
+			z: 0,
+			mass: 1.0,
+			radius: 1.0,
+			is_primary: true,
 		});
 
 		expect(captured).not.toBeNull();
@@ -158,9 +189,18 @@ describe('createDatacore', () => {
 
 		// Now test false → 0
 		await dc.insertStar({
-			id: 101, title: 'Companion', node_id: 1, catalog_id: 'COMP',
-			spectral_class: 'K', post_type: 'helm_star',
-			x: 0, y: 0, z: 0, mass: 0.5, radius: 0.5, is_primary: false,
+			id: 101,
+			title: 'Companion',
+			node_id: 1,
+			catalog_id: 'COMP',
+			spectral_class: 'K',
+			post_type: 'helm_star',
+			x: 0,
+			y: 0,
+			z: 0,
+			mass: 0.5,
+			radius: 0.5,
+			is_primary: false,
 		});
 
 		expect(captured!.params![11]).toBe(0);
@@ -171,7 +211,11 @@ describe('createDatacore', () => {
 
 		let captured: { sql: string; params?: unknown[] } | null = null;
 		MockWorker.instance.onPosted((msg: unknown) => {
-			const m = msg as { id: string; type: string; payload?: { sql: string; params?: unknown[] } };
+			const m = msg as {
+				id: string;
+				type: string;
+				payload?: { sql: string; params?: unknown[] };
+			};
 			if (m.type === 'run') {
 				captured = m.payload!;
 				MockWorker.instance.receive({
@@ -193,7 +237,11 @@ describe('createDatacore', () => {
 
 		let captured: { sql: string; params?: unknown[] } | null = null;
 		MockWorker.instance.onPosted((msg: unknown) => {
-			const m = msg as { id: string; type: string; payload?: { sql: string; params?: unknown[] } };
+			const m = msg as {
+				id: string;
+				type: string;
+				payload?: { sql: string; params?: unknown[] };
+			};
 			if (m.type === 'run') {
 				captured = m.payload!;
 				MockWorker.instance.receive({
@@ -215,7 +263,11 @@ describe('createDatacore', () => {
 
 		let captured: { sql: string; params?: unknown[] } | null = null;
 		MockWorker.instance.onPosted((msg: unknown) => {
-			const m = msg as { id: string; type: string; payload?: { sql: string; params?: unknown[] } };
+			const m = msg as {
+				id: string;
+				type: string;
+				payload?: { sql: string; params?: unknown[] };
+			};
 			if (m.type === 'run') {
 				captured = m.payload!;
 				MockWorker.instance.receive({
@@ -237,7 +289,14 @@ describe('createDatacore', () => {
 		expect(captured).not.toBeNull();
 		expect(captured!.sql).toContain('INSERT INTO user_edges');
 		expect(captured!.sql).toContain('ON CONFLICT(user_id, id) DO UPDATE');
-		expect(captured!.params).toEqual([42, 7, 10, 11, 1.25, '2026-04-20T00:00:00+00:00']);
+		expect(captured!.params).toEqual([
+			42,
+			7,
+			10,
+			11,
+			1.25,
+			'2026-04-20T00:00:00+00:00',
+		]);
 	});
 
 	it('clearUserEdges deletes only the current user rows', async () => {
@@ -245,7 +304,11 @@ describe('createDatacore', () => {
 
 		let captured: { sql: string; params?: unknown[] } | null = null;
 		MockWorker.instance.onPosted((msg: unknown) => {
-			const m = msg as { id: string; type: string; payload?: { sql: string; params?: unknown[] } };
+			const m = msg as {
+				id: string;
+				type: string;
+				payload?: { sql: string; params?: unknown[] };
+			};
 			if (m.type === 'run') {
 				captured = m.payload!;
 				MockWorker.instance.receive({
@@ -268,7 +331,11 @@ describe('createDatacore', () => {
 
 		const execSqls: string[] = [];
 		MockWorker.instance.onPosted((msg: unknown) => {
-			const m = msg as { id: string; type: string; payload?: { sql: string } };
+			const m = msg as {
+				id: string;
+				type: string;
+				payload?: { sql: string };
+			};
 			if (m.type === 'exec') {
 				execSqls.push(m.payload!.sql);
 				MockWorker.instance.receive({
@@ -292,7 +359,11 @@ describe('createDatacore', () => {
 
 		const execSqls: string[] = [];
 		MockWorker.instance.onPosted((msg: unknown) => {
-			const m = msg as { id: string; type: string; payload?: { sql: string } };
+			const m = msg as {
+				id: string;
+				type: string;
+				payload?: { sql: string };
+			};
 			if (m.type === 'exec') {
 				execSqls.push(m.payload!.sql);
 				MockWorker.instance.receive({
@@ -306,7 +377,7 @@ describe('createDatacore', () => {
 		await expect(
 			dc.transaction(async () => {
 				throw new Error('Boom');
-			}),
+			})
 		).rejects.toThrow('Boom');
 
 		expect(execSqls).toHaveLength(3);
@@ -320,7 +391,11 @@ describe('createDatacore', () => {
 
 		const execSqls: string[] = [];
 		MockWorker.instance.onPosted((msg: unknown) => {
-			const m = msg as { id: string; type: string; payload?: { sql: string } };
+			const m = msg as {
+				id: string;
+				type: string;
+				payload?: { sql: string };
+			};
 			if (m.type === 'exec') {
 				execSqls.push(m.payload!.sql);
 				MockWorker.instance.receive({
@@ -356,27 +431,55 @@ describe('createDatacore', () => {
 					id: m.id,
 					type: 'result',
 					payload: {
-						rows: [[100, 1, 'Sol', 'SOL_1', 'G', 1.0, 2.0, 3.0, 1.0, 1.0, 'system']],
-						columns: ['id', 'node_id', 'title', 'catalog_id', 'spectral_class', 'x', 'y', 'z', 'mass', 'radius', 'node_type'],
+						rows: [
+							[
+								100,
+								1,
+								'Sol',
+								'SOL_1',
+								'G',
+								1.0,
+								2.0,
+								3.0,
+								1.0,
+								1.0,
+								'system',
+							],
+						],
+						columns: [
+							'id',
+							'node_id',
+							'title',
+							'catalog_id',
+							'spectral_class',
+							'x',
+							'y',
+							'z',
+							'mass',
+							'radius',
+							'node_type',
+						],
 					},
 				});
 			}
 		});
 
 		const stars = await dc.getStarMap();
-		expect(stars).toEqual([{
-			id: 100,
-			node_id: 1,
-			title: 'Sol',
-			catalog_id: 'SOL_1',
-			spectral_class: 'G',
-			x: 1.0,
-			y: 2.0,
-			z: 3.0,
-			mass: 1.0,
-			radius: 1.0,
-			node_type: 'system',
-		}]);
+		expect(stars).toEqual([
+			{
+				id: 100,
+				node_id: 1,
+				title: 'Sol',
+				catalog_id: 'SOL_1',
+				spectral_class: 'G',
+				x: 1.0,
+				y: 2.0,
+				z: 3.0,
+				mass: 1.0,
+				radius: 1.0,
+				node_type: 'system',
+			},
+		]);
 	});
 
 	it('getStarsAtNode returns Star[] with boolean is_primary', async () => {
@@ -390,10 +493,49 @@ describe('createDatacore', () => {
 					type: 'result',
 					payload: {
 						rows: [
-							[100, 'Alpha', 10, 'ALPHA_1', 'G', 'helm_star', 1.1, 2.1, 3.1, 1.0, 1.0, 1],
-							[101, 'Alpha B', 10, 'ALPHA_2', 'K', 'helm_star', 1.1, 2.1, 3.1, 0.5, 0.7, 0],
+							[
+								100,
+								'Alpha',
+								10,
+								'ALPHA_1',
+								'G',
+								'helm_star',
+								1.1,
+								2.1,
+								3.1,
+								1.0,
+								1.0,
+								1,
+							],
+							[
+								101,
+								'Alpha B',
+								10,
+								'ALPHA_2',
+								'K',
+								'helm_star',
+								1.1,
+								2.1,
+								3.1,
+								0.5,
+								0.7,
+								0,
+							],
 						],
-						columns: ['id', 'title', 'node_id', 'catalog_id', 'spectral_class', 'post_type', 'x', 'y', 'z', 'mass', 'radius', 'is_primary'],
+						columns: [
+							'id',
+							'title',
+							'node_id',
+							'catalog_id',
+							'spectral_class',
+							'post_type',
+							'x',
+							'y',
+							'z',
+							'mass',
+							'radius',
+							'is_primary',
+						],
 					},
 				});
 			}
@@ -421,7 +563,13 @@ describe('createDatacore', () => {
 							[7, 10, 11, 1.25, '2026-04-20T00:00:00+00:00'],
 							[8, 10, 12, 2.5, '2026-04-21T00:00:00+00:00'],
 						],
-						columns: ['id', 'node_a_id', 'node_b_id', 'distance', 'discovered_at'],
+						columns: [
+							'id',
+							'node_a_id',
+							'node_b_id',
+							'distance',
+							'discovered_at',
+						],
 					},
 				});
 			}
@@ -540,7 +688,13 @@ describe('createDatacore', () => {
 							[7, 10, 11, 1.25, '2026-04-20T00:00:00+00:00'],
 							[8, 11, 12, 2.5, '2026-04-21T00:00:00+00:00'],
 						],
-						columns: ['id', 'node_a_id', 'node_b_id', 'distance', 'discovered_at'],
+						columns: [
+							'id',
+							'node_a_id',
+							'node_b_id',
+							'distance',
+							'discovered_at',
+						],
 					},
 				});
 			}
@@ -567,7 +721,16 @@ describe('createDatacore', () => {
 					id: m.id,
 					type: 'result',
 					payload: {
-						rows: [[1, 'system', 10.5, 20.3, -5.1, '2025-01-01T00:00:00']],
+						rows: [
+							[
+								1,
+								'system',
+								10.5,
+								20.3,
+								-5.1,
+								'2025-01-01T00:00:00',
+							],
+						],
 						columns: ['id', 'type', 'x', 'y', 'z', 'created_at'],
 					},
 				});
@@ -591,7 +754,10 @@ describe('createDatacore', () => {
 				MockWorker.instance.receive({
 					id: m.id,
 					type: 'result',
-					payload: { rows: [], columns: ['id', 'type', 'x', 'y', 'z', 'created_at'] },
+					payload: {
+						rows: [],
+						columns: ['id', 'type', 'x', 'y', 'z', 'created_at'],
+					},
 				});
 			}
 		});
@@ -702,7 +868,9 @@ describe('createDatacore', () => {
 			}
 		});
 
-		await expect(dc.getMeta('key')).rejects.toThrow(ErrorCode.DatacoreWorkerError);
+		await expect(dc.getMeta('key')).rejects.toThrow(
+			ErrorCode.DatacoreWorkerError
+		);
 	});
 });
 
@@ -717,14 +885,18 @@ describe('unsupported browser errors', () => {
 		vi.stubGlobal('Worker', undefined);
 
 		await expect(createDatacore({ userId: 42 })).rejects.toThrow(HelmError);
-		await expect(createDatacore({ userId: 42 })).rejects.toThrow(ErrorCode.DatacoreUnsupported);
+		await expect(createDatacore({ userId: 42 })).rejects.toThrow(
+			ErrorCode.DatacoreUnsupported
+		);
 	});
 
 	it('throws HelmError when OPFS is unavailable', async () => {
 		vi.stubGlobal('navigator', { storage: {} });
 
 		await expect(createDatacore({ userId: 42 })).rejects.toThrow(HelmError);
-		await expect(createDatacore({ userId: 42 })).rejects.toThrow(ErrorCode.DatacoreUnsupported);
+		await expect(createDatacore({ userId: 42 })).rejects.toThrow(
+			ErrorCode.DatacoreUnsupported
+		);
 	});
 
 	it('error detail names the missing API', async () => {
@@ -734,7 +906,9 @@ describe('unsupported browser errors', () => {
 			await createDatacore({ userId: 42 });
 		} catch (e) {
 			expect(HelmError.is(e)).toBe(true);
-			expect((e as HelmError).detail).toContain('Origin Private File System');
+			expect((e as HelmError).detail).toContain(
+				'Origin Private File System'
+			);
 		}
 	});
 });

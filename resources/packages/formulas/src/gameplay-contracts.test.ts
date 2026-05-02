@@ -42,28 +42,52 @@ const dscContGain = matchedFilterGain(dsc, 'continuous');
 describe('submarine warfare — hiding and detection', () => {
 	it('idle ships are undetectable even after 48hr DSC observation', () => {
 		const conf = passiveDetection(
-			emissionPower('idle'), gNoise, dsc.passive, hours(48), samplePeriod, dscContGain, 0,
+			emissionPower('idle'),
+			gNoise,
+			dsc.passive,
+			hours(48),
+			samplePeriod,
+			dscContGain,
+			0
 		);
 		expect(conf).toBeLessThan(0.05);
 	});
 
 	it('belt miner is safe for ~6hr vs DSC (masking=3.0)', () => {
 		const conf = passiveDetection(
-			emissionPower('mining'), gNoise, dsc.passive, hours(6), samplePeriod, dscContGain, 3.0,
+			emissionPower('mining'),
+			gNoise,
+			dsc.passive,
+			hours(6),
+			samplePeriod,
+			dscContGain,
+			3.0
 		);
 		expect(conf).toBeLessThan(0.5);
 	});
 
 	it('open-space miner detectable by DSC after ~6hr integration', () => {
 		const conf = passiveDetection(
-			emissionPower('mining'), gNoise, dsc.passive, hours(6), samplePeriod, dscContGain, 0,
+			emissionPower('mining'),
+			gNoise,
+			dsc.passive,
+			hours(6),
+			samplePeriod,
+			dscContGain,
+			0
 		);
 		expect(conf).toBeGreaterThan(0.9);
 	});
 
 	it('shield regen barely detectable even with DSC at 12hr', () => {
 		const conf = passiveDetection(
-			emissionPower('shield_regen'), gNoise, dsc.passive, hours(12), samplePeriod, dscContGain, 0,
+			emissionPower('shield_regen'),
+			gNoise,
+			dsc.passive,
+			hours(12),
+			samplePeriod,
+			dscContGain,
+			0
 		);
 		expect(conf).toBeLessThan(0.5);
 	});
@@ -73,7 +97,15 @@ describe('sensor differentiation — distinct playstyles', () => {
 	it('DSC > VRS > ACU for passive continuous detection', () => {
 		const pd = (aff: typeof dsc) => {
 			const gain = matchedFilterGain(aff, 'continuous');
-			return passiveDetection(emissionPower('mining'), gNoise, aff.passive, hours(2), samplePeriod, gain, 0);
+			return passiveDetection(
+				emissionPower('mining'),
+				gNoise,
+				aff.passive,
+				hours(2),
+				samplePeriod,
+				gain,
+				0
+			);
 		};
 		expect(pd(dsc)).toBeGreaterThan(pd(vrs));
 		expect(pd(vrs)).toBeGreaterThan(pd(acu));
@@ -82,7 +114,13 @@ describe('sensor differentiation — distinct playstyles', () => {
 	it('ACU is genuinely poor at passive detection (< 0.4 at 6hr)', () => {
 		const acuGain = matchedFilterGain(acu, 'continuous');
 		const conf = passiveDetection(
-			emissionPower('mining'), gNoise, acu.passive, hours(6), samplePeriod, acuGain, 0,
+			emissionPower('mining'),
+			gNoise,
+			acu.passive,
+			hours(6),
+			samplePeriod,
+			acuGain,
+			0
 		);
 		expect(conf).toBeLessThan(0.4);
 	});
@@ -129,9 +167,18 @@ describe('emission and detection tuning', () => {
 	it('integration gain shows sqrt(N) scaling (diminishing returns)', () => {
 		const rawSNR = snr(emissionPower('mining'), gNoise);
 
-		const int1hr = integrationGain(rawSNR, Math.floor(hours(1) / samplePeriod));
-		const int4hr = integrationGain(rawSNR, Math.floor(hours(4) / samplePeriod));
-		const int16hr = integrationGain(rawSNR, Math.floor(hours(16) / samplePeriod));
+		const int1hr = integrationGain(
+			rawSNR,
+			Math.floor(hours(1) / samplePeriod)
+		);
+		const int4hr = integrationGain(
+			rawSNR,
+			Math.floor(hours(4) / samplePeriod)
+		);
+		const int16hr = integrationGain(
+			rawSNR,
+			Math.floor(hours(16) / samplePeriod)
+		);
 
 		// 4x time should give ~2x gain (sqrt scaling)
 		const ratio1to4 = int4hr / int1hr;
@@ -144,8 +191,14 @@ describe('emission and detection tuning', () => {
 	it('noise floor scales sub-linearly with ship count (RMS model)', () => {
 		const minerEmission = emissionPower('mining');
 		const baseline = stellarNoise('G');
-		const noise10 = noiseFloor(baseline, Array(10).fill(minerEmission) as number[]);
-		const noise100 = noiseFloor(baseline, Array(100).fill(minerEmission) as number[]);
+		const noise10 = noiseFloor(
+			baseline,
+			Array(10).fill(minerEmission) as number[]
+		);
+		const noise100 = noiseFloor(
+			baseline,
+			Array(100).fill(minerEmission) as number[]
+		);
 
 		// 10x more ships should NOT give 10x more noise
 		const ratio = (noise100 - baseline) / (noise10 - baseline);
@@ -158,14 +211,28 @@ describe('emission and detection tuning', () => {
 describe('detection curves — active vs passive thresholds', () => {
 	it('active detection is possible at lower SNR than passive', () => {
 		const lowSNR = 2.0;
-		const activeP = detectionProbability(lowSNR, DEFAULT_DSP_CONSTANTS.activeThreshold);
-		const passiveP = detectionProbability(lowSNR, DEFAULT_DSP_CONSTANTS.detectionThreshold);
+		const activeP = detectionProbability(
+			lowSNR,
+			DEFAULT_DSP_CONSTANTS.activeThreshold
+		);
+		const passiveP = detectionProbability(
+			lowSNR,
+			DEFAULT_DSP_CONSTANTS.detectionThreshold
+		);
 
 		expect(activeP).toBeGreaterThan(passiveP);
 	});
 
 	it('passive confidence cap prevents certainty (must use active for 100%)', () => {
-		const conf = passiveDetection(100.0, 0.1, 2.0, hours(48), samplePeriod, 2.0, 0);
+		const conf = passiveDetection(
+			100.0,
+			0.1,
+			2.0,
+			hours(48),
+			samplePeriod,
+			2.0,
+			0
+		);
 		expect(conf).toBe(DEFAULT_DSP_CONSTANTS.passiveConfidenceCap);
 		expect(conf).toBeLessThan(1.0);
 	});
@@ -176,8 +243,10 @@ describe('self-interference — own emissions degrade scanning', () => {
 		const baseline = stellarNoise('G');
 		const cooldownBase = DEFAULT_EMISSION_PROFILES.drive_cooldown.base;
 
-		const milPeak = DEFAULT_DRIVE_ENVELOPES['dr-705'].cooldown.peakPower * cooldownBase;
-		const civPeak = DEFAULT_DRIVE_ENVELOPES['dr-305'].cooldown.peakPower * cooldownBase;
+		const milPeak =
+			DEFAULT_DRIVE_ENVELOPES['dr-705'].cooldown.peakPower * cooldownBase;
+		const civPeak =
+			DEFAULT_DRIVE_ENVELOPES['dr-305'].cooldown.peakPower * cooldownBase;
 
 		const milNoise = noiseFloor(baseline, [milPeak]);
 		const civNoise = noiseFloor(baseline, [civPeak]);
@@ -190,16 +259,29 @@ describe('self-interference — own emissions degrade scanning', () => {
 	it('military cooldown meaningfully degrades scanning', () => {
 		const baseline = stellarNoise('G');
 		const cooldownBase = DEFAULT_EMISSION_PROFILES.drive_cooldown.base;
-		const milPeak = DEFAULT_DRIVE_ENVELOPES['dr-705'].cooldown.peakPower * cooldownBase;
+		const milPeak =
+			DEFAULT_DRIVE_ENVELOPES['dr-705'].cooldown.peakPower * cooldownBase;
 
 		const cleanNoise = noiseFloor(baseline, []);
 		const hotNoise = noiseFloor(baseline, [milPeak]);
 
 		const cleanConf = passiveDetection(
-			emissionPower('mining'), cleanNoise, dsc.passive, hours(2), samplePeriod, dscContGain, 0,
+			emissionPower('mining'),
+			cleanNoise,
+			dsc.passive,
+			hours(2),
+			samplePeriod,
+			dscContGain,
+			0
 		);
 		const hotConf = passiveDetection(
-			emissionPower('mining'), hotNoise, dsc.passive, hours(2), samplePeriod, dscContGain, 0,
+			emissionPower('mining'),
+			hotNoise,
+			dsc.passive,
+			hours(2),
+			samplePeriod,
+			dscContGain,
+			0
 		);
 
 		// Military cooldown should degrade scanning by at least 20%

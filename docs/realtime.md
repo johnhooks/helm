@@ -33,6 +33,7 @@ WordPress (Helm)                 WebSocket Server            Browser
 ### How It Works
 
 **Server side (PHP):**
+
 ```php
 // Action completes — broadcast to the ship's owner
 helm_broadcast(
@@ -47,40 +48,39 @@ helm_broadcast(
 ```
 
 **Client side (JavaScript):**
+
 ```javascript
 // Listen for your ship's events
-ws.subscribe(`user.${userId}`)
-    .on('ActionCompleted', (e) => {
-        showNotification(`${e.action} completed on ${e.ship_id}`);
-        refreshShipStatus();
-    });
+ws.subscribe(`user.${userId}`).on('ActionCompleted', (e) => {
+	showNotification(`${e.action} completed on ${e.ship_id}`);
+	refreshShipStatus();
+});
 
 // System-wide events
-ws.subscribe(`system.${systemId}`)
-    .on('OtherDetected', (e) => {
-        showAlert('Unknown ship detected in system');
-    });
+ws.subscribe(`system.${systemId}`).on('OtherDetected', (e) => {
+	showAlert('Unknown ship detected in system');
+});
 
 // Who's online in a system (presence)
 ws.presence(`system.${systemId}`)
-    .here((users) => updatePlayerList(users))
-    .joining((user) => addPlayer(user))
-    .leaving((user) => removePlayer(user));
+	.here((users) => updatePlayerList(users))
+	.joining((user) => addPlayer(user))
+	.leaving((user) => removePlayer(user));
 ```
 
 ### Pros
 
-- Instant delivery — sub-second latency
-- True push — no polling, no wasted requests
-- Presence channels — know who's online and where
-- Scales well (handles thousands of connections)
+-   Instant delivery — sub-second latency
+-   True push — no polling, no wasted requests
+-   Presence channels — know who's online and where
+-   Scales well (handles thousands of connections)
 
 ### Cons
 
-- Requires a separate service (WebSocket server)
-- Additional infrastructure to deploy and maintain
-- WebSocket connections can drop, need reconnection logic
-- Not all hosting environments support WebSocket proxying
+-   Requires a separate service (WebSocket server)
+-   Additional infrastructure to deploy and maintain
+-   WebSocket connections can drop, need reconnection logic
+-   Not all hosting environments support WebSocket proxying
 
 ## Option 2: WP Heartbeat API
 
@@ -105,6 +105,7 @@ Browser                          WordPress (Helm)
 ### How It Works
 
 **Server side (PHP):**
+
 ```php
 // Queue an event for a user (stored in transient or custom table)
 function helm_queue_event(int $userId, string $event, array $data): void {
@@ -136,17 +137,18 @@ add_filter('heartbeat_received', function (array $response, array $data) {
 ```
 
 **Client side (JavaScript):**
+
 ```javascript
 // Send data with each heartbeat tick
 wp.heartbeat.enqueue('helm_poll', { since: lastEventTimestamp });
 
 // Receive events on each heartbeat response
 jQuery(document).on('heartbeat-tick', (e, data) => {
-    if (data.helm_events) {
-        data.helm_events.forEach((event) => {
-            handleGameEvent(event.event, event.data);
-        });
-    }
+	if (data.helm_events) {
+		data.helm_events.forEach((event) => {
+			handleGameEvent(event.event, event.data);
+		});
+	}
 });
 ```
 
@@ -222,52 +224,54 @@ add_filter('heartbeat_received', function (array $response, array $data) {
 
 ### Pros
 
-- Zero additional infrastructure — it's just WordPress
-- Works on any WordPress host (shared hosting, managed, anything)
-- Already battle-tested (WordPress uses it for autosave, post locking)
-- No WebSocket server to maintain
-- No connection management, reconnection logic, or proxy configuration
-- Respects WordPress auth natively
+-   Zero additional infrastructure — it's just WordPress
+-   Works on any WordPress host (shared hosting, managed, anything)
+-   Already battle-tested (WordPress uses it for autosave, post locking)
+-   No WebSocket server to maintain
+-   No connection management, reconnection logic, or proxy configuration
+-   Respects WordPress auth natively
 
 ### Cons
 
-- Polling, not push — 15-60 second delay
-- Every tick is an HTTP request (server load scales with connected users)
-- Not real-time — "near-time" at best
-- No presence awareness (can't see who's online without extra work)
-- Could be abused at high tick rates (server load)
-- WordPress throttles Heartbeat on inactive tabs (60s minimum)
+-   Polling, not push — 15-60 second delay
+-   Every tick is an HTTP request (server load scales with connected users)
+-   Not real-time — "near-time" at best
+-   No presence awareness (can't see who's online without extra work)
+-   Could be abused at high tick rates (server load)
+-   WordPress throttles Heartbeat on inactive tabs (60s minimum)
 
 ## Comparison
 
-| Feature | WebSockets | Heartbeat (Polling) |
-|---------|------------|---------------------|
-| Latency | Sub-second | 15-60 seconds |
-| Infrastructure | WebSocket server required | WordPress only |
-| Hosting requirements | WebSocket support | Any WordPress host |
-| Presence (who's online) | Built-in | Would need custom work |
-| Server load | WebSocket connections (light) | HTTP requests per tick (heavier) |
-| Scaling | Good (handles thousands) | Poor (HTTP request per user per tick) |
-| Reliability | Connections can drop | Every tick is independent |
-| Offline delivery | Missed while disconnected | Queued in transients |
-| Complexity | Higher (separate service) | Lower (WordPress-native) |
+| Feature                 | WebSockets                    | Heartbeat (Polling)                   |
+| ----------------------- | ----------------------------- | ------------------------------------- |
+| Latency                 | Sub-second                    | 15-60 seconds                         |
+| Infrastructure          | WebSocket server required     | WordPress only                        |
+| Hosting requirements    | WebSocket support             | Any WordPress host                    |
+| Presence (who's online) | Built-in                      | Would need custom work                |
+| Server load             | WebSocket connections (light) | HTTP requests per tick (heavier)      |
+| Scaling                 | Good (handles thousands)      | Poor (HTTP request per user per tick) |
+| Reliability             | Connections can drop          | Every tick is independent             |
+| Offline delivery        | Missed while disconnected     | Queued in transients                  |
+| Complexity              | Higher (separate service)     | Lower (WordPress-native)              |
 
 ## Approach: Heartbeat First, WebSockets When Needed
 
 Start with Heartbeat. It fits the project philosophy: use WordPress APIs until we hit the limits of the platform. The game is async — actions take hours. A 15-second delay on notifications is invisible when your scan took 6 hours.
 
 **Heartbeat handles everything initially:**
-- Action completions
-- System events
-- Platform alerts
-- Market activity
-- State synchronization
+
+-   Action completions
+-   System events
+-   Platform alerts
+-   Market activity
+-   State synchronization
 
 **WebSockets come later when we need:**
-- Presence (who's online, who's in this system)
-- Sub-second delivery for time-sensitive events
-- Scale beyond what Heartbeat polling can handle
-- Real-time combat resolution (if combat becomes synchronous)
+
+-   Presence (who's online, who's in this system)
+-   Sub-second delivery for time-sensitive events
+-   Scale beyond what Heartbeat polling can handle
+-   Real-time combat resolution (if combat becomes synchronous)
 
 ### Unified Event Interface
 

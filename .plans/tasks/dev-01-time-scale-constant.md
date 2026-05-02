@@ -35,16 +35,16 @@ at production pace.
 
 Constraints:
 
-- Configuration lives only in `wp-config.php`. No admin UI, no Origin
-  setting, no per-user override. A prod environment that never defines the
-  constant simply runs at production pace.
-- Scaling applies uniformly across the codebase. Individual actions,
-  systems, or tick loops do not get to opt out.
-- Non-time game math is untouched. Costs, efficiencies, distances, skill
-  values, and anything else that is not a duration or a rate reads the
-  same at every scale.
-- The WPUnit and Vitest suites continue to run at real-time math by
-  default, so the constant cannot skew test behavior.
+-   Configuration lives only in `wp-config.php`. No admin UI, no Origin
+    setting, no per-user override. A prod environment that never defines the
+    constant simply runs at production pace.
+-   Scaling applies uniformly across the codebase. Individual actions,
+    systems, or tick loops do not get to opt out.
+-   Non-time game math is untouched. Costs, efficiencies, distances, skill
+    values, and anything else that is not a duration or a rate reads the
+    same at every scale.
+-   The WPUnit and Vitest suites continue to run at real-time math by
+    default, so the constant cannot skew test behavior.
 
 ## Implementation details
 
@@ -96,28 +96,28 @@ not scale with `HELM_TIME_SCALE`.
 
 ## Requirements
 
-- `HELM_TIME_SCALE` is read from `wp-config.php`; when undefined, invalid, or
-  less than or equal to 1, Helm behaves exactly as it does today.
-- A valid scale factor greater than 1 converts generated future timestamps from
-  game seconds to wall-clock seconds using `ceil(game_seconds / factor)`, with
-  a minimum of one wall-clock second for any non-zero duration.
-- `Date::now()`, SQL `NOW()`, Action Scheduler, WordPress cron, and WordPress
-  Heartbeat remain wall-clock based.
-- Scan and jump action results continue to store their `duration` fields in
-  unscaled game seconds.
-- Scan and jump action `deferred_until` timestamps are scaled wall-clock
-  timestamps.
-- Power and shield recovery timestamps are scaled wall-clock timestamps when
-  new `power_full_at` or `shields_full_at` values are calculated.
-- Non-time gameplay values are not scaled. This includes costs, distances,
-  efficiency, skill, power capacity, shield capacity, resource quantities, and
-  core life consumption.
-- WordPress Heartbeat cadence is unchanged by `HELM_TIME_SCALE`.
-- The recurring action-processor cadence is not linearly scaled by
-  `HELM_TIME_SCALE`; due-time one-off processor jobs may be scheduled for new
-  actions, with the recurring sweep retained as a fallback.
-- WPUnit tests cover time-scale normalization, scaled-second conversion,
-  minimum-duration clamping, scan and jump `deferred_until` scaling, and power
-  and shield recovery timestamp scaling.
-- Existing tests run at factor 1 unless they explicitly define or exercise
-  `HELM_TIME_SCALE`.
+-   `HELM_TIME_SCALE` is read from `wp-config.php`; when undefined, invalid, or
+    less than or equal to 1, Helm behaves exactly as it does today.
+-   A valid scale factor greater than 1 converts generated future timestamps from
+    game seconds to wall-clock seconds using `ceil(game_seconds / factor)`, with
+    a minimum of one wall-clock second for any non-zero duration.
+-   `Date::now()`, SQL `NOW()`, Action Scheduler, WordPress cron, and WordPress
+    Heartbeat remain wall-clock based.
+-   Scan and jump action results continue to store their `duration` fields in
+    unscaled game seconds.
+-   Scan and jump action `deferred_until` timestamps are scaled wall-clock
+    timestamps.
+-   Power and shield recovery timestamps are scaled wall-clock timestamps when
+    new `power_full_at` or `shields_full_at` values are calculated.
+-   Non-time gameplay values are not scaled. This includes costs, distances,
+    efficiency, skill, power capacity, shield capacity, resource quantities, and
+    core life consumption.
+-   WordPress Heartbeat cadence is unchanged by `HELM_TIME_SCALE`.
+-   The recurring action-processor cadence is not linearly scaled by
+    `HELM_TIME_SCALE`; due-time one-off processor jobs may be scheduled for new
+    actions, with the recurring sweep retained as a fallback.
+-   WPUnit tests cover time-scale normalization, scaled-second conversion,
+    minimum-duration clamping, scan and jump `deferred_until` scaling, and power
+    and shield recovery timestamp scaling.
+-   Existing tests run at factor 1 unless they explicitly define or exercise
+    `HELM_TIME_SCALE`.

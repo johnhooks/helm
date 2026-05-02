@@ -16,7 +16,10 @@ export class ShieldSystem {
 	 * Same pattern as PowerSystem: null or past = at max.
 	 */
 	getCurrentStrength(now: number): number {
-		if (this.state.shieldsFullAt === null || this.state.shieldsFullAt <= now) {
+		if (
+			this.state.shieldsFullAt === null ||
+			this.state.shieldsFullAt <= now
+		) {
 			return this.state.shieldsMax;
 		}
 		const secondsUntilFull = this.state.shieldsFullAt - now;
@@ -42,7 +45,10 @@ export class ShieldSystem {
 	/**
 	 * Compute new shieldsFullAt after taking damage.
 	 */
-	calculateShieldsFullAtAfterDamage(amount: number, now: number): number | null {
+	calculateShieldsFullAtAfterDamage(
+		amount: number,
+		now: number
+	): number | null {
 		const current = this.getCurrentStrength(now);
 		const newStrength = Math.max(0, current - amount);
 		if (newStrength >= this.state.shieldsMax) {
@@ -64,7 +70,7 @@ export class ShieldSystem {
 	 */
 	calculateDamageAbsorption(
 		damage: number,
-		now: number,
+		now: number
 	): { absorbed: number; overflow: number } {
 		const current = this.getCurrentStrength(now);
 		if (current >= damage) {

@@ -4,10 +4,10 @@ Installing and initializing Helm on a WordPress host. For local development, see
 
 ## Requirements
 
-- WordPress 6.9
-- PHP 8.1+, MySQL 5.7+ / MariaDB 10.4+
-- [WP-CLI](https://wp-cli.org/) — initialization is CLI-only
-- [Composer](https://getcomposer.org/) and [Bun](https://bun.sh/) if you're building from source (not needed if you deploy a pre-built artifact with `vendor/` and `build/` included)
+-   WordPress 6.9
+-   PHP 8.1+, MySQL 5.7+ / MariaDB 10.4+
+-   [WP-CLI](https://wp-cli.org/) — initialization is CLI-only
+-   [Composer](https://getcomposer.org/) and [Bun](https://bun.sh/) if you're building from source (not needed if you deploy a pre-built artifact with `vendor/` and `build/` included)
 
 ## Install
 

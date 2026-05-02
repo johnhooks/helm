@@ -132,7 +132,13 @@ describe('NavGraph', () => {
 	describe('findNodeByHash', () => {
 		it('finds node by hash', () => {
 			const graph = createEmptyNavGraph();
-			graph.addNode({ type: 'waypoint', x: 1, y: 2, z: 3, hash: 'abc123' });
+			graph.addNode({
+				type: 'waypoint',
+				x: 1,
+				y: 2,
+				z: 3,
+				hash: 'abc123',
+			});
 			const found = graph.findNodeByHash('abc123');
 			expect(found).toBeDefined();
 			expect(found!.x).toBe(1);

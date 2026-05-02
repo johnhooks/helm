@@ -6,13 +6,17 @@ export function renderSummary(ctx: ReportContext): ReportFile {
 
 	lines.push(heading(1, 'Helm Workbench Report'));
 	lines.push('');
-	lines.push(metaBlock({
-		'Generated': ctx.generated,
-		'DSP checks': ctx.dspProgress.summary.total,
-		'Balance rows': ctx.balance.rows.length,
-		'Detection matrix': ctx.detection.stats.totalCombinations,
-		'Baselines': ctx.diffs ? 'available' : 'none (run `bun run wb baseline save --all`)',
-	}));
+	lines.push(
+		metaBlock({
+			Generated: ctx.generated,
+			'DSP checks': ctx.dspProgress.summary.total,
+			'Balance rows': ctx.balance.rows.length,
+			'Detection matrix': ctx.detection.stats.totalCombinations,
+			Baselines: ctx.diffs
+				? 'available'
+				: 'none (run `bun run wb baseline save --all`)',
+		})
+	);
 	lines.push('');
 
 	// ── At a Glance ──
@@ -20,7 +24,14 @@ export function renderSummary(ctx: ReportContext): ReportFile {
 	lines.push('');
 
 	const { summary } = ctx.dspProgress;
-	lines.push(`- **DSP Health:** ${verdictBadge({ PASS: summary.pass, WARN: summary.warn, FAIL: summary.fail, INFO: summary.info })}`);
+	lines.push(
+		`- **DSP Health:** ${verdictBadge({
+			PASS: summary.pass,
+			WARN: summary.warn,
+			FAIL: summary.fail,
+			INFO: summary.info,
+		})}`
+	);
 	lines.push(`- **Balance Outliers:** ${ctx.balance.outliers.length}`);
 
 	const verdictDist = Object.entries(ctx.detection.stats.verdictCounts)
@@ -29,10 +40,21 @@ export function renderSummary(ctx: ReportContext): ReportFile {
 	lines.push(`- **Detection Verdicts:** ${verdictDist}`);
 
 	if (ctx.diffs) {
-		const totalChanges = ctx.diffs.reduce((n, d) => n + d.entries.length, 0);
-		const totalRegressions = ctx.diffs.reduce((n, d) => n + d.summary.regressions, 0);
-		const totalImprovements = ctx.diffs.reduce((n, d) => n + d.summary.improvements, 0);
-		lines.push(`- **Regressions:** ${totalRegressions} regression(s), ${totalImprovements} improvement(s), ${totalChanges} total change(s)`);
+		const totalChanges = ctx.diffs.reduce(
+			(n, d) => n + d.entries.length,
+			0
+		);
+		const totalRegressions = ctx.diffs.reduce(
+			(n, d) => n + d.summary.regressions,
+			0
+		);
+		const totalImprovements = ctx.diffs.reduce(
+			(n, d) => n + d.summary.improvements,
+			0
+		);
+		lines.push(
+			`- **Regressions:** ${totalRegressions} regression(s), ${totalImprovements} improvement(s), ${totalChanges} total change(s)`
+		);
 	}
 
 	lines.push('');
@@ -44,7 +66,11 @@ export function renderSummary(ctx: ReportContext): ReportFile {
 	for (const section of ctx.dspProgress.sections) {
 		for (const check of section.checks) {
 			if (check.verdict === 'FAIL') {
-				attentionItems.push(flag(`FAIL — ${section.title} > ${check.goal}: ${check.detail}`));
+				attentionItems.push(
+					flag(
+						`FAIL — ${section.title} > ${check.goal}: ${check.detail}`
+					)
+				);
 			}
 		}
 	}
@@ -53,7 +79,11 @@ export function renderSummary(ctx: ReportContext): ReportFile {
 	for (const section of ctx.dspProgress.sections) {
 		for (const check of section.checks) {
 			if (check.verdict === 'WARN') {
-				attentionItems.push(flag(`WARN — ${section.title} > ${check.goal}: ${check.detail}`));
+				attentionItems.push(
+					flag(
+						`WARN — ${section.title} > ${check.goal}: ${check.detail}`
+					)
+				);
 			}
 		}
 	}
@@ -68,8 +98,18 @@ export function renderSummary(ctx: ReportContext): ReportFile {
 		for (const diff of ctx.diffs) {
 			for (const entry of diff.entries) {
 				if (entry.regression) {
-					const location = entry.field ? `${entry.path} > ${entry.field}` : entry.path;
-					attentionItems.push(flag(`REGRESSION — ${diff.command}: ${location} (${JSON.stringify(entry.before)} → ${JSON.stringify(entry.after)})`));
+					const location = entry.field
+						? `${entry.path} > ${entry.field}`
+						: entry.path;
+					attentionItems.push(
+						flag(
+							`REGRESSION — ${
+								diff.command
+							}: ${location} (${JSON.stringify(
+								entry.before
+							)} → ${JSON.stringify(entry.after)})`
+						)
+					);
 				}
 			}
 		}
@@ -85,7 +125,9 @@ export function renderSummary(ctx: ReportContext): ReportFile {
 	} else {
 		lines.push(heading(2, 'Attention Required'));
 		lines.push('');
-		lines.push('_No issues found. All DSP checks passing, no outliers, no regressions._');
+		lines.push(
+			'_No issues found. All DSP checks passing, no outliers, no regressions._'
+		);
 		lines.push('');
 	}
 
@@ -108,23 +150,25 @@ export function renderSummary(ctx: ReportContext): ReportFile {
 		slots: row.equipmentSlots,
 	}));
 
-	lines.push(table(
-		[
-			['Hull', 'hull'],
-			['Integrity', 'integrity'],
-			['Capacitor', 'capacitor'],
-			['Core Life', 'coreLife'],
-			['Regen/hr', 'regenRate'],
-			['perfRatio', 'perfRatio'],
-			['Jump Comfort', 'jumpComfort'],
-			['Scan Comfort', 'scanComfort'],
-			['Shield Cap', 'shieldCap'],
-			['Shield Regen', 'shieldRegen'],
-			['Cargo', 'cargo'],
-			['Slots', 'slots'],
-		],
-		hullRows,
-	));
+	lines.push(
+		table(
+			[
+				['Hull', 'hull'],
+				['Integrity', 'integrity'],
+				['Capacitor', 'capacitor'],
+				['Core Life', 'coreLife'],
+				['Regen/hr', 'regenRate'],
+				['perfRatio', 'perfRatio'],
+				['Jump Comfort', 'jumpComfort'],
+				['Scan Comfort', 'scanComfort'],
+				['Shield Cap', 'shieldCap'],
+				['Shield Regen', 'shieldRegen'],
+				['Cargo', 'cargo'],
+				['Slots', 'slots'],
+			],
+			hullRows
+		)
+	);
 	lines.push('');
 
 	// ── Links ──

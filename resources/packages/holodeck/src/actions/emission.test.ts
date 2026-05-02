@@ -61,7 +61,9 @@ describe('Emission Tracking', () => {
 
 			// Spool emission ended at origin
 			const originEmissions = engine.getActiveEmissions(1, spoolEnd);
-			const spoolEmission = originEmissions.find((e) => e.emissionType === 'drive_spool');
+			const spoolEmission = originEmissions.find(
+				(e) => e.emissionType === 'drive_spool'
+			);
 			expect(spoolEmission).toBeUndefined();
 
 			// Cooldown emission active at destination
@@ -142,11 +144,17 @@ describe('Emission Tracking', () => {
 			const clock = createClock();
 			const engine = createEngine(clock);
 			const wolfLoadout = buildLoadout('striker', {}, ['phaser_array']);
-			const wolf = createShip(wolfLoadout, clock, createRng(42), { id: 'wolf', nodeId: 1 });
+			const wolf = createShip(wolfLoadout, clock, createRng(42), {
+				id: 'wolf',
+				nodeId: 1,
+			});
 			engine.registerShip('wolf', wolf);
 
 			const preyLoadout = buildLoadout('pioneer');
-			const prey = createShip(preyLoadout, clock, createRng(99), { id: 'prey', nodeId: 1 });
+			const prey = createShip(preyLoadout, clock, createRng(99), {
+				id: 'prey',
+				nodeId: 1,
+			});
 			engine.registerShip('prey', prey);
 
 			return { engine, clock, wolf, prey };
@@ -169,7 +177,9 @@ describe('Emission Tracking', () => {
 		it('torpedo creates weapons_fire emission', () => {
 			const clock = createClock();
 			const engine = createEngine(clock);
-			const wolfLoadout = buildLoadout('specter', {}, ['torpedo_launcher']);
+			const wolfLoadout = buildLoadout('specter', {}, [
+				'torpedo_launcher',
+			]);
 			const wolf = createShip(wolfLoadout, clock, createRng(42), {
 				id: 'wolf',
 				nodeId: 1,
@@ -178,7 +188,10 @@ describe('Emission Tracking', () => {
 			engine.registerShip('wolf', wolf);
 
 			const preyLoadout = buildLoadout('pioneer');
-			const prey = createShip(preyLoadout, clock, createRng(99), { id: 'prey', nodeId: 1 });
+			const prey = createShip(preyLoadout, clock, createRng(99), {
+				id: 'prey',
+				nodeId: 1,
+			});
 			engine.registerShip('prey', prey);
 
 			engine.submitAction(wolf, ActionType.FireTorpedo, {
@@ -197,11 +210,17 @@ describe('Emission Tracking', () => {
 			const engine = createEngine(clock);
 
 			const loadout1 = makeLoadout();
-			const ship1 = createShip(loadout1, clock, createRng(1), { id: 'ship1', nodeId: 1 });
+			const ship1 = createShip(loadout1, clock, createRng(1), {
+				id: 'ship1',
+				nodeId: 1,
+			});
 			engine.registerShip('ship1', ship1);
 
 			const loadout2 = makeLoadout();
-			const ship2 = createShip(loadout2, clock, createRng(2), { id: 'ship2', nodeId: 1 });
+			const ship2 = createShip(loadout2, clock, createRng(2), {
+				id: 'ship2',
+				nodeId: 1,
+			});
 			engine.registerShip('ship2', ship2);
 
 			engine.submitAction(ship1, ActionType.ScanRoute, {
@@ -259,7 +278,10 @@ describe('Emission Tracking', () => {
 			const clock = createClock();
 			const engine = createEngine(clock);
 			const loadout = buildLoadout('pioneer', { drive: driveSlug });
-			const ship = createShip(loadout, clock, createRng(42), { id: 'jumper', nodeId: 1 });
+			const ship = createShip(loadout, clock, createRng(42), {
+				id: 'jumper',
+				nodeId: 1,
+			});
 			engine.registerShip('jumper', ship);
 			return { engine, ship, clock, loadout };
 		}
@@ -335,7 +357,7 @@ describe('Emission Tracking', () => {
 
 			// DR-705 spool peakPower (2.5) > DR-305 spool peakPower (1.2)
 			expect(emissions705[0].envelope!.spool.peakPower).toBeGreaterThan(
-				emissions305[0].envelope!.spool.peakPower,
+				emissions305[0].envelope!.spool.peakPower
 			);
 		});
 
@@ -352,9 +374,15 @@ describe('Emission Tracking', () => {
 			const envelope = emission.envelope!;
 
 			// Power at start of spool
-			const earlyPower = emissionPowerAtTime(emission, emission.startedAt + 1);
+			const earlyPower = emissionPowerAtTime(
+				emission,
+				emission.startedAt + 1
+			);
 			// Power at mid-spool
-			const midPower = emissionPowerAtTime(emission, emission.startedAt + 90);
+			const midPower = emissionPowerAtTime(
+				emission,
+				emission.startedAt + 90
+			);
 
 			// Both should be > 0 (spool is active)
 			expect(earlyPower).toBeGreaterThan(0);
@@ -376,7 +404,10 @@ describe('Emission Tracking', () => {
 			const emission = engine.getActiveEmissions(1)[0];
 
 			// Way past the spool-only envelope duration — should be idle
-			const latePower = emissionPowerAtTime(emission, emission.startedAt + 10000);
+			const latePower = emissionPowerAtTime(
+				emission,
+				emission.startedAt + 10000
+			);
 			expect(latePower).toBe(0);
 		});
 

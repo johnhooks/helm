@@ -15,7 +15,10 @@ describe('emissionPower', () => {
 	});
 
 	it('accepts custom profiles', () => {
-		const custom = { ...DEFAULT_EMISSION_PROFILES, mining: { base: 3.0, spectralType: 'continuous' as const } };
+		const custom = {
+			...DEFAULT_EMISSION_PROFILES,
+			mining: { base: 3.0, spectralType: 'continuous' as const },
+		};
 		expect(emissionPower('mining', 1.0, custom)).toBe(3.0);
 	});
 
@@ -40,7 +43,9 @@ describe('emissionPower', () => {
 	});
 
 	it('planet scan is quieter than system survey', () => {
-		expect(emissionPower('planet_scan')).toBeLessThan(emissionPower('system_survey'));
+		expect(emissionPower('planet_scan')).toBeLessThan(
+			emissionPower('system_survey')
+		);
 	});
 
 	it('drive spool is louder than sustain which is louder than cooldown', () => {

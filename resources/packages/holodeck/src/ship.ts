@@ -28,7 +28,7 @@ export class Ship {
 		private readonly state: InternalShipState,
 		private readonly clock: Clock,
 		readonly rng: Rng,
-		constants?: Constants,
+		constants?: Constants
 	) {
 		this.constants = constants ?? DEFAULT_CONSTANTS;
 		const loadout = state.loadout;
@@ -42,13 +42,13 @@ export class Ship {
 			state,
 			loadout,
 			this.power,
-			this.constants,
+			this.constants
 		);
 		this.sensors = new SensorSystem(
 			state,
 			loadout,
 			this.power,
-			this.constants,
+			this.constants
 		);
 	}
 
@@ -77,7 +77,7 @@ export class Ship {
 
 	activateEquipment(slug: string): void {
 		const hasInLoadout = this.state.loadout.equipment.some(
-			(eq) => eq.product.slug === slug,
+			(eq) => eq.product.slug === slug
 		);
 		if (!hasInLoadout) {
 			throw new Error(`Equipment "${slug}" not in loadout`);
@@ -117,7 +117,8 @@ export class Ship {
 	}
 
 	scheduleNextPassiveScan(completedAt: number): void {
-		this.state.nextPassiveScanAt = completedAt + this.state.passiveScanInterval;
+		this.state.nextPassiveScanAt =
+			completedAt + this.state.passiveScanInterval;
 	}
 
 	getNextPassiveScanAt(): number {
@@ -130,10 +131,15 @@ export class Ship {
 			this.power.calculatePowerFullAtAfterConsumption(amount, now);
 	}
 
-	absorbDamage(amount: number): { shieldAbsorbed: number; hullDamage: number } {
+	absorbDamage(amount: number): {
+		shieldAbsorbed: number;
+		hullDamage: number;
+	} {
 		const now = this.clock.now();
-		const { absorbed, overflow } =
-			this.shields.calculateDamageAbsorption(amount, now);
+		const { absorbed, overflow } = this.shields.calculateDamageAbsorption(
+			amount,
+			now
+		);
 
 		if (absorbed > 0) {
 			this.state.shieldsFullAt =

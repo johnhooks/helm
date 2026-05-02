@@ -5,14 +5,18 @@ import type { ErrorContentProps } from './error-content';
 
 export type ErrorPageProps = ErrorContentProps;
 
-export function ErrorPage( props: ErrorPageProps ) {
+export function ErrorPage(props: ErrorPageProps) {
 	return (
 		<div className="helm-error-page">
-			<Panel variant="bordered" tone="danger" className="helm-error-page__panel">
+			<Panel
+				variant="bordered"
+				tone="danger"
+				className="helm-error-page__panel"
+			>
 				<div className="helm-error-page__icon">
-					<Icon icon={ error } size={ 32 } />
+					<Icon icon={error} size={32} />
 				</div>
-				<ErrorContent { ...props } />
+				<ErrorContent {...props} />
 			</Panel>
 		</div>
 	);

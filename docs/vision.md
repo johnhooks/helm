@@ -18,12 +18,12 @@ The loneliness is the feature. Encounters are rare and therefore meaningful.
 
 Nothing is instant.
 
-| Action | Duration |
-|--------|----------|
-| Scanning a sector | 2-8 hours |
+| Action                  | Duration   |
+| ----------------------- | ---------- |
+| Scanning a sector       | 2-8 hours  |
 | Traveling between nodes | 1-24 hours |
-| Mining resources | 4-12 hours |
-| Processing discoveries | 1-4 hours |
+| Mining resources        | 4-12 hours |
+| Processing discoveries  | 1-4 hours  |
 
 Your ship works while you sleep. You check in to see results, make decisions, set new courses. This is not a game that demands your attention. It rewards patience.
 
@@ -31,9 +31,9 @@ Your ship works while you sleep. You check in to see results, make decisions, se
 
 Actions are not guaranteed to resolve in the order they were issued. The game state can change between when you give a command and when it executes.
 
-- Tried to fire on a player who already jumped out? Failure.
-- Tried to dock at a destroyed station? Failure.
-- Tried to buy cargo someone else bought? Failure.
+-   Tried to fire on a player who already jumped out? Failure.
+-   Tried to dock at a destroyed station? Failure.
+-   Tried to buy cargo someone else bought? Failure.
 
 Every action is re-validated at execution time. The command you gave says "I want to do this." The universe decides if it's still possible. Timing matters. This creates emergent gameplay.
 
@@ -58,18 +58,20 @@ The universe is a graph of nodes connected by edges.
 ```
 
 Nodes are:
-- Stations and outposts
-- Planets and moons
-- Asteroid fields
-- Derelicts and wrecks
-- Anomalies and signals
-- Other ships
-- The unknown (until scanned)
+
+-   Stations and outposts
+-   Planets and moons
+-   Asteroid fields
+-   Derelicts and wrecks
+-   Anomalies and signals
+-   Other ships
+-   The unknown (until scanned)
 
 Edges are:
-- Travel time
-- Fuel cost
-- Hazard level
+
+-   Travel time
+-   Fuel cost
+-   Hazard level
 
 You start knowing only your origin point. Everything else must be discovered.
 
@@ -95,21 +97,21 @@ Recorded in Origin's database
 
 ### What Scanning Finds
 
-- **New nodes**: Previously unknown locations
-- **Existing nodes**: Places others have found (if in known space)
-- **Connections**: Routes between nodes
-- **Resources**: What's at a location
-- **Signals**: Other ships, anomalies, events
+-   **New nodes**: Previously unknown locations
+-   **Existing nodes**: Places others have found (if in known space)
+-   **Connections**: Routes between nodes
+-   **Resources**: What's at a location
+-   **Signals**: Other ships, anomalies, events
 
 ### Scan Depth
 
 Longer scans reveal more:
 
-| Duration | Reveals |
-|----------|---------|
-| 2 hours | Immediate connections |
-| 4 hours | Secondary connections |
-| 8 hours | Deep scan, hidden nodes |
+| Duration | Reveals                 |
+| -------- | ----------------------- |
+| 2 hours  | Immediate connections   |
+| 4 hours  | Secondary connections   |
+| 8 hours  | Deep scan, hidden nodes |
 
 Origin does the work. You decide how deep to look.
 
@@ -138,9 +140,10 @@ Every ship maintains a view of discovered nodes and edges.
 ```
 
 Your map is:
-- **Private by default**: Only you know what you've found
-- **Shareable**: You can publish or sell discoveries
-- **Cumulative**: It only grows
+
+-   **Private by default**: Only you know what you've found
+-   **Shareable**: You can publish or sell discoveries
+-   **Cumulative**: It only grows
 
 ## Origin Server
 
@@ -226,12 +229,12 @@ Charted routes have economic value beyond the nodes they connect:
 
 Route ownership creates strategic possibilities:
 
-| Asset | Value |
-|-------|-------|
-| Trade route | Connects resource-rich and resource-poor systems |
-| Clean corridor | Verified safe passage (events cleared) |
-| Shortcut | Fewer jumps than public alternatives |
-| Chokepoint | Controls access to a region |
+| Asset          | Value                                            |
+| -------------- | ------------------------------------------------ |
+| Trade route    | Connects resource-rich and resource-poor systems |
+| Clean corridor | Verified safe passage (events cleared)           |
+| Shortcut       | Fewer jumps than public alternatives             |
+| Chokepoint     | Controls access to a region                      |
 
 Routes can be sold outright, licensed for use, or kept secret for competitive advantage.
 
@@ -258,10 +261,11 @@ Origin tracks all ownership.
 ### Scarcity
 
 Resources exist at locations (types determine what CAN be mined). Mining yields quantities. Cargo is limited. Scarcity emerges from:
-- Location (rare resources in few places)
-- Time (mining takes hours)
-- Distance (good stuff far from stations)
-- Cargo capacity (can't carry infinite amounts)
+
+-   Location (rare resources in few places)
+-   Time (mining takes hours)
+-   Distance (good stuff far from stations)
+-   Cargo capacity (can't carry infinite amounts)
 
 ## Encounters
 
@@ -287,13 +291,13 @@ This is the first ship you've seen in 6 days.
 
 When you encounter another ship:
 
-| Action | Outcome |
-|--------|---------|
-| Approach | Get within communication range |
-| Avoid | Alter course, maintain distance |
-| Scan | Learn more about them |
-| Hail | Open communication |
-| Ignore | Continue your business |
+| Action   | Outcome                         |
+| -------- | ------------------------------- |
+| Approach | Get within communication range  |
+| Avoid    | Alter course, maintain distance |
+| Scan     | Learn more about them           |
+| Hail     | Open communication              |
+| Ignore   | Continue your business          |
 
 ### Value of Encounters
 
@@ -402,12 +406,12 @@ But this is future work. For now: single Origin, solid foundation.
 
 The architecture supports multiple users operating a single ship—WordPress roles map to crew positions, the Abilities API could handle crew actions, async state means crew don't need to be online simultaneously.
 
-Whether this is *fun* gameplay is unknown. Multi-crew games face hard problems:
+Whether this is _fun_ gameplay is unknown. Multi-crew games face hard problems:
 
-- **Coordination tax**: Getting people online together
-- **Role asymmetry**: Is every station equally engaging?
-- **Pacing**: Someone's always waiting on someone else
-- **Solo fallback**: What happens when you're alone?
+-   **Coordination tax**: Getting people online together
+-   **Role asymmetry**: Is every station equally engaging?
+-   **Pacing**: Someone's always waiting on someone else
+-   **Solo fallback**: What happens when you're alone?
 
 **Current goal**: Playable solo ship. The backend supports crew interaction, but we're not designing for it yet. If multi-crew emerges, it might be AI crew members (using the Abilities API) rather than human players.
 
@@ -421,16 +425,16 @@ Helm isn't optimized for player count or market fit. It's optimized for being fa
 
 ### Tech Used Sideways
 
-| Tool | Intended Use | Our Use |
-|------|--------------|---------|
-| WordPress | Publishing platform | Game server |
-| wp_options | Site configuration | Ship and economy state |
-| Action Scheduler | Background jobs | Work unit processing |
-| REST API | Content delivery | Game API |
-| Custom Tables | Plugin data | Universe state |
-| Capabilities | User permissions | Crew clearance levels |
-| Abilities API | AI integrations | AI economic agents |
-| Webhooks | Site notifications | Ship event callbacks |
+| Tool             | Intended Use        | Our Use                |
+| ---------------- | ------------------- | ---------------------- |
+| WordPress        | Publishing platform | Game server            |
+| wp_options       | Site configuration  | Ship and economy state |
+| Action Scheduler | Background jobs     | Work unit processing   |
+| REST API         | Content delivery    | Game API               |
+| Custom Tables    | Plugin data         | Universe state         |
+| Capabilities     | User permissions    | Crew clearance levels  |
+| Abilities API    | AI integrations     | AI economic agents     |
+| Webhooks         | Site notifications  | Ship event callbacks   |
 
 Every WordPress feature becomes game infrastructure. The weirder the mapping, the more interesting the problems.
 
@@ -438,17 +442,17 @@ Every WordPress feature becomes game infrastructure. The weirder the mapping, th
 
 Things we're explicitly NOT optimizing for:
 
-- **Mass market appeal** - This is for WordPress devs who think it's funny that it exists
-- **Competitive balance** - AI agents and player skill differences are features, not bugs
-- **Hiding complexity** - The simulation has no secrets. Transparency builds trust and enables contribution
-- **Traditional game design** - We follow "what's interesting to build?" not conventional wisdom
+-   **Mass market appeal** - This is for WordPress devs who think it's funny that it exists
+-   **Competitive balance** - AI agents and player skill differences are features, not bugs
+-   **Hiding complexity** - The simulation has no secrets. Transparency builds trust and enables contribution
+-   **Traditional game design** - We follow "what's interesting to build?" not conventional wisdom
 
 ### Success Metrics
 
-- Are people excited to work on this?
-- Are the constraints producing novel solutions?
-- Is the codebase fun to explore?
-- Is "slow-paced Eve on WordPress with AI agents" a sentence that makes people smile?
+-   Are people excited to work on this?
+-   Are the constraints producing novel solutions?
+-   Is the codebase fun to explore?
+-   Is "slow-paced Eve on WordPress with AI agents" a sentence that makes people smile?
 
 ### The Thesis
 
@@ -458,7 +462,7 @@ That's what makes it perfect.
 
 The constraints force creativity. The problems teach skills. The architecture reveals how the web actually works.
 
-*"The best way to learn is to build something slightly too ambitious with tools slightly too limited."*
+_"The best way to learn is to build something slightly too ambitious with tools slightly too limited."_
 
 ## The Vision
 

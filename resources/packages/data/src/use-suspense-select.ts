@@ -14,9 +14,9 @@ import type { MapSelect } from '@wordpress/data';
  * );
  * ```
  */
-export function useSuspenseSelect< T extends MapSelect >(
+export function useSuspenseSelect<T extends MapSelect>(
 	mapSelect: T,
-	deps: unknown[],
-): ReturnType< T > {
-	return _useSuspenseSelect( mapSelect, deps );
+	deps: unknown[]
+): ReturnType<T> {
+	return _useSuspenseSelect(mapSelect, deps);
 }

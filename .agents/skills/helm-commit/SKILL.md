@@ -16,12 +16,13 @@ Optional body line with more detail (max 80 chars)
 ```
 
 ### Types
-- `feat`: New feature
-- `fix`: Bug fix
-- `docs`: Documentation
-- `refactor`: Code restructuring
-- `test`: Tests only
-- `chore`: Maintenance, deps
+
+-   `feat`: New feature
+-   `fix`: Bug fix
+-   `docs`: Documentation
+-   `refactor`: Code restructuring
+-   `test`: Tests only
+-   `chore`: Maintenance, deps
 
 ## Rules
 
@@ -39,6 +40,7 @@ Optional body line with more detail (max 80 chars)
 ## Examples
 
 Good:
+
 ```
 feat: add navigation computer
 
@@ -50,6 +52,7 @@ fix: correct waypoint scatter calculation
 ```
 
 Bad:
+
 ```
 feat: add navigation computer with deterministic waypoints and corridor seeds
 ```

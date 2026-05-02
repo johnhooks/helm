@@ -11,58 +11,73 @@ import { createIndexQueryId } from './utils';
 import li from 'li';
 
 export const createAction =
-	( shipId: number, actionType: ShipActionType, params: DraftAction[ 'params' ] = {} ): Thunk< Action, typeof store > =>
-	async ( { dispatch } ) => {
-		dispatch( { type: 'CREATE_ACTION_START' } );
+	(
+		shipId: number,
+		actionType: ShipActionType,
+		params: DraftAction['params'] = {}
+	): Thunk<Action, typeof store> =>
+	async ({ dispatch }) => {
+		dispatch({ type: 'CREATE_ACTION_START' });
 
 		try {
-			const action = await apiFetch< ShipAction >( {
-				path: `/helm/v1/ships/${ shipId }/actions`,
+			const action = await apiFetch<ShipAction>({
+				path: `/helm/v1/ships/${shipId}/actions`,
 				method: 'POST',
 				data: { type: actionType, params },
-			} );
+			});
 
-			dispatch( { type: 'CREATE_ACTION_FINISHED', action } );
-		} catch ( error ) {
-			dispatch( {
+			dispatch({ type: 'CREATE_ACTION_FINISHED', action });
+		} catch (error) {
+			dispatch({
 				type: 'CREATE_ACTION_FAILED',
-				error: HelmError.safe( ErrorCode.ActionsCreateFailed, __( 'Ship link failed to dispatch the requested action', 'helm' ), await HelmError.asyncFrom( error ) ),
-			} );
+				error: HelmError.safe(
+					ErrorCode.ActionsCreateFailed,
+					__(
+						'Ship link failed to dispatch the requested action',
+						'helm'
+					),
+					await HelmError.asyncFrom(error)
+				),
+			});
 		}
 	};
 
-export function receiveAction( action: ShipAction ): Action {
+export function receiveAction(action: ShipAction): Action {
 	return { type: 'RECEIVE_ACTION', action };
 }
 
 export const receiveHeartbeat =
-	( actions: ShipAction[], cursor: string ): Thunk< Action, typeof store > =>
-	async ( { dispatch, registry } ) => {
-		dispatch( { type: 'RECEIVE_HEARTBEAT', actions, cursor } );
+	(actions: ShipAction[], cursor: string): Thunk<Action, typeof store> =>
+	async ({ dispatch, registry }) => {
+		dispatch({ type: 'RECEIVE_HEARTBEAT', actions, cursor });
 
 		// A fulfilled jump has moved ship.node_id and burned core life on the
 		// server. Invalidate the ship resolver so the next read refetches.
-		const refreshedShipIds = new Set< number >();
-		const discoveredEdgeIds = new Set< number >();
-		for ( const action of actions ) {
-			if ( isJump( action ) && isFulfilled( action ) ) {
-				refreshedShipIds.add( action.ship_post_id );
+		const refreshedShipIds = new Set<number>();
+		const discoveredEdgeIds = new Set<number>();
+		for (const action of actions) {
+			if (isJump(action) && isFulfilled(action)) {
+				refreshedShipIds.add(action.ship_post_id);
 			}
-			if ( isScanRoute( action ) && isFulfilled( action ) && action.result ) {
-				for ( const edgeId of action.result.discovered_edge_ids ?? [] ) {
-					discoveredEdgeIds.add( edgeId );
+			if (isScanRoute(action) && isFulfilled(action) && action.result) {
+				for (const edgeId of action.result.discovered_edge_ids ?? []) {
+					discoveredEdgeIds.add(edgeId);
 				}
 			}
 		}
-		for ( const shipId of refreshedShipIds ) {
-			registry.dispatch( shipsStore ).invalidateResolution( 'getShip', [ shipId ] );
+		for (const shipId of refreshedShipIds) {
+			registry
+				.dispatch(shipsStore)
+				.invalidateResolution('getShip', [shipId]);
 		}
-		if ( discoveredEdgeIds.size > 0 ) {
-			await registry.dispatch( navStore ).syncUserEdgesByIds( [ ...discoveredEdgeIds ] );
+		if (discoveredEdgeIds.size > 0) {
+			await registry
+				.dispatch(navStore)
+				.syncUserEdgesByIds([...discoveredEdgeIds]);
 		}
 	};
 
-export function draftCreate( action: DraftAction ): Action {
+export function draftCreate(action: DraftAction): Action {
 	return { type: 'CREATE_DRAFT', action };
 }
 
@@ -76,43 +91,58 @@ export function clearDraft(): Action {
  * @throws {HelmError} If no draft exists.
  */
 export const submitDraft =
-	( shipId: number ): Thunk< Action, typeof store > =>
-	async ( { dispatch, select } ) => {
+	(shipId: number): Thunk<Action, typeof store> =>
+	async ({ dispatch, select }) => {
 		const draft = select.getDraft();
-		assert( draft, ErrorCode.ActionsNoDraft, 'submitDraft called without a draft' );
+		assert(
+			draft,
+			ErrorCode.ActionsNoDraft,
+			'submitDraft called without a draft'
+		);
 
-		dispatch.createAction( shipId, draft.type, draft.params );
+		dispatch.createAction(shipId, draft.type, draft.params);
 	};
 
 export const loadMore =
-	( shipId: number ): Thunk< Action, typeof store > =>
-	async ( { dispatch, select } ) => {
-		const meta = select.getQueryMeta( shipId );
+	(shipId: number): Thunk<Action, typeof store> =>
+	async ({ dispatch, select }) => {
+		const meta = select.getQueryMeta(shipId);
 
 		// No next page or already loading — skip.
-		if ( ! meta?.next || meta.isLoading ) {
+		if (!meta?.next || meta.isLoading) {
 			return;
 		}
 
-		const queryId = createIndexQueryId( shipId );
-		dispatch( { type: 'LOAD_MORE_START', queryId } );
+		const queryId = createIndexQueryId(shipId);
+		dispatch({ type: 'LOAD_MORE_START', queryId });
 
 		try {
-			const response = await apiFetch( {
+			const response = await apiFetch({
 				url: meta.next,
 				parse: false as const,
-			} );
+			});
 
-			const actions = ( await response.json() ) as ShipAction[];
-			const linkHeader = response.headers.get( 'Link' );
-			const links = linkHeader ? ( li.parse( linkHeader ) as Record< string, string > ) : {};
+			const actions = (await response.json()) as ShipAction[];
+			const linkHeader = response.headers.get('Link');
+			const links = linkHeader
+				? (li.parse(linkHeader) as Record<string, string>)
+				: {};
 
-			dispatch( { type: 'LOAD_MORE_FINISHED', queryId, actions, next: links.next ?? null } );
-		} catch ( error ) {
-			dispatch( {
+			dispatch({
+				type: 'LOAD_MORE_FINISHED',
+				queryId,
+				actions,
+				next: links.next ?? null,
+			});
+		} catch (error) {
+			dispatch({
 				type: 'LOAD_MORE_FAILED',
 				queryId,
-				error: HelmError.safe( ErrorCode.ActionsInvalidResponse, __( 'Ship link failed to retrieve the ship log', 'helm' ), await HelmError.asyncFrom( error ) ),
-			} );
+				error: HelmError.safe(
+					ErrorCode.ActionsInvalidResponse,
+					__('Ship link failed to retrieve the ship log', 'helm'),
+					await HelmError.asyncFrom(error)
+				),
+			});
 		}
 	};

@@ -3,7 +3,7 @@ status: draft
 area: navigation
 priority: p2
 depends_on:
-  - nav-07-show-routes-toggle
+    - nav-07-show-routes-toggle
 ---
 
 # Show active scan lines on the starfield
@@ -44,19 +44,19 @@ the datacore-backed known-route layer when "Show routes" is enabled.
 
 Requirements:
 
-- Pending and running `scan_route` actions draw a temporary line between their
-  source and target nodes.
-- The line must be based on node positions and must not require or invent an
-  edge record.
-- The target star position should come from the star map when available. The
-  source position may need to come from datacore when the ship is at a waypoint.
-- The active scan line renders independently of the "Show routes" toggle.
-- The line uses the LCARS `lilac` tone and an opacity profile distinct from
-  discovered route lines.
-- The line has a subtle throbbing or pulsing animation during normal motion
-  settings and a static fallback when reduced motion is requested.
-- Completed, partial, fulfilled, and failed scan actions must not keep showing
-  the active scan line.
-- The active scan line must not be clickable and must not introduce route hover
-  or selection affordances.
-- No server or scan action contract changes.
+-   Pending and running `scan_route` actions draw a temporary line between their
+    source and target nodes.
+-   The line must be based on node positions and must not require or invent an
+    edge record.
+-   The target star position should come from the star map when available. The
+    source position may need to come from datacore when the ship is at a waypoint.
+-   The active scan line renders independently of the "Show routes" toggle.
+-   The line uses the LCARS `lilac` tone and an opacity profile distinct from
+    discovered route lines.
+-   The line has a subtle throbbing or pulsing animation during normal motion
+    settings and a static fallback when reduced motion is requested.
+-   Completed, partial, fulfilled, and failed scan actions must not keep showing
+    the active scan line.
+-   The active scan line must not be clickable and must not introduce route hover
+    or selection affordances.
+-   No server or scan action contract changes.

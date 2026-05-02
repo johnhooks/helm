@@ -9,8 +9,8 @@ export function initializeDefaultState(): State {
 	};
 }
 
-function ship( state: State[ 'ship' ], action: Action ): State[ 'ship' ] {
-	switch ( action.type ) {
+function ship(state: State['ship'], action: Action): State['ship'] {
+	switch (action.type) {
 		case 'FETCH_SHIP_FINISHED':
 		case 'RECEIVE_SHIP':
 			return { ...state, ship: action.ship, error: null };
@@ -26,8 +26,8 @@ function ship( state: State[ 'ship' ], action: Action ): State[ 'ship' ] {
 	}
 }
 
-function systems( state: State[ 'systems' ], action: Action ): State[ 'systems' ] {
-	switch ( action.type ) {
+function systems(state: State['systems'], action: Action): State['systems'] {
+	switch (action.type) {
 		case 'FETCH_SYSTEMS_FINISHED':
 		case 'RECEIVE_SYSTEMS':
 			return { ...state, systems: action.systems, error: null };
@@ -40,8 +40,8 @@ function systems( state: State[ 'systems' ], action: Action ): State[ 'systems' 
 	}
 }
 
-function edits( state: State[ 'edits' ], action: Action ): State[ 'edits' ] {
-	switch ( action.type ) {
+function edits(state: State['edits'], action: Action): State['edits'] {
+	switch (action.type) {
 		case 'EDIT_SHIP':
 			return { ...state, ship: { ...state.ship, ...action.edits } };
 
@@ -65,4 +65,4 @@ function edits( state: State[ 'edits' ], action: Action ): State[ 'edits' ] {
 	}
 }
 
-export const reducer = combineReducers( { ship, systems, edits } );
+export const reducer = combineReducers({ ship, systems, edits });

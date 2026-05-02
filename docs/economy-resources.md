@@ -147,17 +147,19 @@ calibration_started_at: '2026-02-06T...' // When started
 
 **Implications:**
 
-- First mining action ever: 24h calibration + mining time
-- Switching resources: 24h recalibration + mining time
-- Mining same resource: just mining time
+-   First mining action ever: 24h calibration + mining time
+-   Switching resources: 24h recalibration + mining time
+-   Mining same resource: just mining time
 
 This creates meaningful specialization:
-- Players commit to resource types
-- Scout for belts matching your calibration before traveling
-- Only recalibrate for high-value targets (platinum, rare_earth)
-- Multiple ships = multiple calibrations
+
+-   Players commit to resource types
+-   Scout for belts matching your calibration before traveling
+-   Only recalibrate for high-value targets (platinum, rare_earth)
+-   Multiple ships = multiple calibrations
 
 **Mine action params:**
+
 ```php
 [
     'belt_id' => 'SOL_BELT1',
@@ -229,18 +231,20 @@ This creates natural exploration pressure. Core system belts near Sol are mined 
 Two ways to extract resources, with different risk/reward profiles:
 
 **Ship Mining (solo, mobile)**
-- Ship pulls up to a belt, mines directly
-- Limited to one cargo hold per run
-- Can cloak — low risk, low yield
-- Good for: solo players, quick runs, maintaining your ship
+
+-   Ship pulls up to a belt, mines directly
+-   Limited to one cargo hold per run
+-   Can cloak — low risk, low yield
+-   Good for: solo players, quick runs, maintaining your ship
 
 **Platform Mining (infrastructure, persistent)**
-- Deploy a mining platform at a belt
-- Platform mines continuously while you're away
-- Visible to anyone scanning the system — must be defended
-- Requires logistics: collect resources, transport them
-- Much higher total yield over time
-- Good for: groups, long-term investment, supply chains
+
+-   Deploy a mining platform at a belt
+-   Platform mines continuously while you're away
+-   Visible to anyone scanning the system — must be defended
+-   Requires logistics: collect resources, transport them
+-   Much higher total yield over time
+-   Good for: groups, long-term investment, supply chains
 
 ```
 SHIP MINING
@@ -272,12 +276,12 @@ Each step takes time and resources from the previous step. Planet mining is the 
 
 Resources are finite and unevenly distributed:
 
-- **Depletion** - Belts run down over time as players mine them
-- **Location** - Rare resources appear in few systems
-- **Distance** - Rich belts are far from stations and safety
-- **Time** - Mining takes hours, transport takes more
-- **Cargo** - Can't carry infinite amounts
-- **Geography** - Random distribution creates natural clusters and dead zones
+-   **Depletion** - Belts run down over time as players mine them
+-   **Location** - Rare resources appear in few systems
+-   **Distance** - Rich belts are far from stations and safety
+-   **Time** - Mining takes hours, transport takes more
+-   **Cargo** - Can't carry infinite amounts
+-   **Geography** - Random distribution creates natural clusters and dead zones
 
 ## Cargo System
 
@@ -845,6 +849,7 @@ Origin IS a record keeper:
 ### Money Supply
 
 Credits enter the system through:
+
 ```
 SOURCES
 ├── First discovery bonuses
@@ -871,24 +876,27 @@ The Helm economy:
 6. **Blueprints** - Gate advanced production
 
 Scarcity drivers:
-- **Depletion** - Belts run down, planets require bootstrapping
-- **Location** - Rare resources in few places
-- **Time** - Everything takes hours
-- **Distance** - Good stuff far from markets
-- **Knowledge** - Finding the good spots
-- **Geography** - Random distribution creates natural clusters
+
+-   **Depletion** - Belts run down, planets require bootstrapping
+-   **Location** - Rare resources in few places
+-   **Time** - Everything takes hours
+-   **Distance** - Good stuff far from markets
+-   **Knowledge** - Finding the good spots
+-   **Geography** - Random distribution creates natural clusters
 
 Player roles emerge:
-- **Miners** - Extract and sell raw (ship or platform)
-- **Industrialists** - Manufacture goods, build infrastructure
-- **Traders** - Arbitrage between stations, haul platform output
-- **Explorers** - Find new belts before they're depleted
-- **Logistics** - Transport platform output to markets
+
+-   **Miners** - Extract and sell raw (ship or platform)
+-   **Industrialists** - Manufacture goods, build infrastructure
+-   **Traders** - Arbitrage between stations, haul platform output
+-   **Explorers** - Find new belts before they're depleted
+-   **Logistics** - Transport platform output to markets
 
 It's Eve, but:
-- On WordPress
-- Async (hours, not minutes)
-- Federatable (single Origin now, trade deals between Origins later)
-- Open source
+
+-   On WordPress
+-   Async (hours, not minutes)
+-   Federatable (single Origin now, trade deals between Origins later)
+-   Open source
 
 Spreadsheets in space.

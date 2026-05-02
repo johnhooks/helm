@@ -5,12 +5,13 @@ An alien presence competing for the same universe. Discovered gradually, never f
 ## Design Intent
 
 The Others exist to:
-- Give players a shared enemy and reason to cooperate
-- Provide PvE combat that feels meaningful
-- Create endgame content that escalates over time
-- Make the universe feel alive and contested
-- Channel aggression toward a worthy target instead of other players
-- Provide unique salvage (alien components with different properties)
+
+-   Give players a shared enemy and reason to cooperate
+-   Provide PvE combat that feels meaningful
+-   Create endgame content that escalates over time
+-   Make the universe feel alive and contested
+-   Channel aggression toward a worthy target instead of other players
+-   Provide unique salvage (alien components with different properties)
 
 The Others are not a story you read. They're a presence you discover through gameplay.
 
@@ -143,11 +144,12 @@ They're not genius AI. They're rational actors following economic logic — the 
 ### Scaling
 
 The developer controls:
-- How many Other ships exist in the universe
-- How fast they expand
-- How aggressive they become when threatened
-- What sectors they spawn in
-- When new phases activate
+
+-   How many Other ships exist in the universe
+-   How fast they expand
+-   How aggressive they become when threatened
+-   What sectors they spawn in
+-   When new phases activate
 
 This is the content lever. Quiet month? Introduce Others to a new sector. Players getting complacent? Escalate aggression. Too much pressure? Others pull back from a sector (players "won" that territory).
 
@@ -271,6 +273,7 @@ wp_options
 ```
 
 CLI commands for the developer:
+
 ```
 wp helm others phase 2          # activate Phase 2
 wp helm others spawn sector-7   # spawn Other ship in sector

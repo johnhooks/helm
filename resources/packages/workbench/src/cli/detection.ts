@@ -22,10 +22,19 @@ import {
 	passiveDetection,
 	phaserHullDamage,
 } from '@helm/formulas';
-import type { SensorAffinity, EmissionType, SpectralType } from '@helm/formulas';
+import type {
+	SensorAffinity,
+	EmissionType,
+	SpectralType,
+} from '@helm/formulas';
 import {
-	getSensorAffinity, getWeaponStats, getShieldStats, getCoreStats, getHullData,
-	HULLS, getProduct,
+	getSensorAffinity,
+	getWeaponStats,
+	getShieldStats,
+	getCoreStats,
+	getHullData,
+	HULLS,
+	getProduct,
 } from './holodeck-setup';
 import { r } from '../format';
 
@@ -87,12 +96,18 @@ interface Environment {
 
 function buildWolves(): WolfConfig[] {
 	const wolf = (
-		id: string, label: string, hullSlug: string,
-		sensorSlug: string, affinityKey: string, role: WolfConfig['role'],
+		id: string,
+		label: string,
+		hullSlug: string,
+		sensorSlug: string,
+		affinityKey: string,
+		role: WolfConfig['role']
 	): WolfConfig => {
 		const hd = getHullData(hullSlug);
 		return {
-			id, label, hull: hullSlug,
+			id,
+			label,
+			hull: hullSlug,
 			hullSignature: hd.hullSignature,
 			sensor: sensorSlug,
 			affinity: SENSOR_AFFINITIES[affinityKey],
@@ -101,10 +116,38 @@ function buildWolves(): WolfConfig[] {
 	};
 
 	return [
-		wolf('striker_acu', 'Striker + ACU (active hunter)', 'striker', 'acu_mk1', 'acu', 'active'),
-		wolf('specter_dsc', 'Specter + DSC (passive listener)', 'specter', 'dsc_mk1', 'dsc', 'passive'),
-		wolf('pioneer_vrs', 'Pioneer + VRS (generalist)', 'pioneer', 'vrs_mk1', 'vrs', 'both'),
-		wolf('surveyor_dsc', 'Surveyor + DSC (science vessel)', 'surveyor', 'dsc_mk1', 'dsc', 'passive'),
+		wolf(
+			'striker_acu',
+			'Striker + ACU (active hunter)',
+			'striker',
+			'acu_mk1',
+			'acu',
+			'active'
+		),
+		wolf(
+			'specter_dsc',
+			'Specter + DSC (passive listener)',
+			'specter',
+			'dsc_mk1',
+			'dsc',
+			'passive'
+		),
+		wolf(
+			'pioneer_vrs',
+			'Pioneer + VRS (generalist)',
+			'pioneer',
+			'vrs_mk1',
+			'vrs',
+			'both'
+		),
+		wolf(
+			'surveyor_dsc',
+			'Surveyor + DSC (science vessel)',
+			'surveyor',
+			'dsc_mk1',
+			'dsc',
+			'passive'
+		),
 	];
 }
 
@@ -122,51 +165,200 @@ function buildTargets(): TargetConfig[] {
 	// hullSignature: how "visible" the hull is (Specter 0.5, Bulwark 1.4)
 	// cloakFactor: 1.0 normally, (1 - veilArray.mult_a) when Veil Array active
 	const target = (
-		id: string, label: string, hull: string,
-		emission: EmissionType, spectralType: SpectralType,
-		activity: string, masking: number, cloak: boolean = false,
+		id: string,
+		label: string,
+		hull: string,
+		emission: EmissionType,
+		spectralType: SpectralType,
+		activity: string,
+		masking: number,
+		cloak: boolean = false
 	): TargetConfig => {
 		const hd = h(hull);
 		const base = emissionPower(emission);
-		const cf = cloak ? (1 - VEIL_ARRAY_REDUCTION) : 1.0;
+		const cf = cloak ? 1 - VEIL_ARRAY_REDUCTION : 1.0;
 		return {
-			id, label, hull,
+			id,
+			label,
+			hull,
 			hullSignature: hd.hullSignature,
 			hullIntegrity: hd.hullIntegrity,
 			shieldCapacity: AEGIS_DELTA.capacity * hd.shieldMult,
-			activity, emission,
+			activity,
+			emission,
 			baseEmission: base,
 			cloakFactor: cf,
 			effectiveEmission: base * hd.hullSignature * cf,
-			spectralType, masking,
+			spectralType,
+			masking,
 		};
 	};
 
 	return [
-		target('pioneer_mining_open', 'Pioneer mining (open)', 'pioneer', 'mining', 'continuous', 'mining', 0),
-		target('pioneer_pnp_scan', 'Pioneer scanning (PNP)', 'pioneer', 'pnp_scan', 'pulse', 'pnp_scan', 0),
-		target('scout_belt_scan', 'Scout belt scanning', 'scout', 'belt_scan', 'sweep', 'belt_scan', 0),
-		target('surveyor_mining_belt', 'Surveyor mining (belt)', 'surveyor', 'mining', 'continuous', 'mining in belt', 2.0),
-		target('surveyor_mining_open', 'Surveyor mining (open)', 'surveyor', 'mining', 'continuous', 'mining', 0),
-		target('bulwark_transit', 'Bulwark transiting', 'bulwark', 'drive_sustain', 'continuous', 'drive_sustain', 0),
-		target('bulwark_spool', 'Bulwark spooling drive', 'bulwark', 'drive_spool', 'pulse', 'drive_spool', 0),
-		target('striker_combat', 'Striker weapons fire', 'striker', 'weapons_fire', 'pulse', 'combat', 0),
-		target('specter_idle', 'Specter idle (cloaked)', 'specter', 'shield_regen', 'continuous', 'idle', 0, true),
-		target('specter_uncloaked', 'Specter idle (uncloaked)', 'specter', 'shield_regen', 'continuous', 'idle', 0, false),
-		target('scout_shield_regen', 'Scout shield regen', 'scout', 'shield_regen', 'continuous', 'shield_regen', 0),
-		target('pioneer_ecm', 'Pioneer running ECM', 'pioneer', 'ecm', 'continuous', 'ecm', 0),
+		target(
+			'pioneer_mining_open',
+			'Pioneer mining (open)',
+			'pioneer',
+			'mining',
+			'continuous',
+			'mining',
+			0
+		),
+		target(
+			'pioneer_pnp_scan',
+			'Pioneer scanning (PNP)',
+			'pioneer',
+			'pnp_scan',
+			'pulse',
+			'pnp_scan',
+			0
+		),
+		target(
+			'scout_belt_scan',
+			'Scout belt scanning',
+			'scout',
+			'belt_scan',
+			'sweep',
+			'belt_scan',
+			0
+		),
+		target(
+			'surveyor_mining_belt',
+			'Surveyor mining (belt)',
+			'surveyor',
+			'mining',
+			'continuous',
+			'mining in belt',
+			2.0
+		),
+		target(
+			'surveyor_mining_open',
+			'Surveyor mining (open)',
+			'surveyor',
+			'mining',
+			'continuous',
+			'mining',
+			0
+		),
+		target(
+			'bulwark_transit',
+			'Bulwark transiting',
+			'bulwark',
+			'drive_sustain',
+			'continuous',
+			'drive_sustain',
+			0
+		),
+		target(
+			'bulwark_spool',
+			'Bulwark spooling drive',
+			'bulwark',
+			'drive_spool',
+			'pulse',
+			'drive_spool',
+			0
+		),
+		target(
+			'striker_combat',
+			'Striker weapons fire',
+			'striker',
+			'weapons_fire',
+			'pulse',
+			'combat',
+			0
+		),
+		target(
+			'specter_idle',
+			'Specter idle (cloaked)',
+			'specter',
+			'shield_regen',
+			'continuous',
+			'idle',
+			0,
+			true
+		),
+		target(
+			'specter_uncloaked',
+			'Specter idle (uncloaked)',
+			'specter',
+			'shield_regen',
+			'continuous',
+			'idle',
+			0,
+			false
+		),
+		target(
+			'scout_shield_regen',
+			'Scout shield regen',
+			'scout',
+			'shield_regen',
+			'continuous',
+			'shield_regen',
+			0
+		),
+		target(
+			'pioneer_ecm',
+			'Pioneer running ECM',
+			'pioneer',
+			'ecm',
+			'continuous',
+			'ecm',
+			0
+		),
 	];
 }
 
 function buildEnvironments(): Environment[] {
 	const envDefs = [
-		{ id: 'quiet', label: 'Quiet (M-class, empty)', stellarClass: 'M', shipCount: 0, beltMasking: 0 },
-		{ id: 'normal', label: 'Normal (G-class, empty)', stellarClass: 'G', shipCount: 0, beltMasking: 0 },
-		{ id: 'busy', label: 'Busy (G-class, 10 miners)', stellarClass: 'G', shipCount: 10, beltMasking: 0 },
-		{ id: 'crowded', label: 'Crowded (G-class, 50 miners)', stellarClass: 'G', shipCount: 50, beltMasking: 0 },
-		{ id: 'belt', label: 'Belt (G-class, masking 2.0)', stellarClass: 'G', shipCount: 5, beltMasking: 2.0 },
-		{ id: 'bright', label: 'Bright (O-class, empty)', stellarClass: 'O', shipCount: 0, beltMasking: 0 },
-		{ id: 'dense_belt', label: 'Dense belt (G-class, masking 4.0)', stellarClass: 'G', shipCount: 10, beltMasking: 4.0 },
+		{
+			id: 'quiet',
+			label: 'Quiet (M-class, empty)',
+			stellarClass: 'M',
+			shipCount: 0,
+			beltMasking: 0,
+		},
+		{
+			id: 'normal',
+			label: 'Normal (G-class, empty)',
+			stellarClass: 'G',
+			shipCount: 0,
+			beltMasking: 0,
+		},
+		{
+			id: 'busy',
+			label: 'Busy (G-class, 10 miners)',
+			stellarClass: 'G',
+			shipCount: 10,
+			beltMasking: 0,
+		},
+		{
+			id: 'crowded',
+			label: 'Crowded (G-class, 50 miners)',
+			stellarClass: 'G',
+			shipCount: 50,
+			beltMasking: 0,
+		},
+		{
+			id: 'belt',
+			label: 'Belt (G-class, masking 2.0)',
+			stellarClass: 'G',
+			shipCount: 5,
+			beltMasking: 2.0,
+		},
+		{
+			id: 'bright',
+			label: 'Bright (O-class, empty)',
+			stellarClass: 'O',
+			shipCount: 0,
+			beltMasking: 0,
+		},
+		{
+			id: 'dense_belt',
+			label: 'Dense belt (G-class, masking 4.0)',
+			stellarClass: 'G',
+			shipCount: 10,
+			beltMasking: 4.0,
+		},
 	];
 
 	return envDefs.map((e) => ({
@@ -181,7 +373,10 @@ function hours(h: number): number {
 	return h * 3600;
 }
 
-function computeNoise(env: { stellarClass: string; shipCount: number }): number {
+function computeNoise(env: {
+	stellarClass: string;
+	shipCount: number;
+}): number {
 	const stellar = stellarNoise(env.stellarClass);
 	const minerEmission = emissionPower('mining');
 	const emissions = Array(env.shipCount).fill(minerEmission) as number[];
@@ -234,7 +429,7 @@ interface DetectionResult {
 function computeDetection(
 	wolf: WolfConfig,
 	target: TargetConfig,
-	env: Environment,
+	env: Environment
 ): DetectionResult {
 	const samplePeriod = DEFAULT_DSP_CONSTANTS.samplePeriodSeconds;
 	const totalMasking = Math.max(target.masking, env.beltMasking);
@@ -247,14 +442,25 @@ function computeDetection(
 	const activeSNR = computeSNR(activeSignal, env.noise, totalMasking);
 	const gain = matchedFilterGain(wolf.affinity, target.spectralType);
 	const effectiveSNR = activeSNR * gain;
-	const perSweep = detectionProbability(effectiveSNR, DEFAULT_DSP_CONSTANTS.activeThreshold);
+	const perSweep = detectionProbability(
+		effectiveSNR,
+		DEFAULT_DSP_CONSTANTS.activeThreshold
+	);
 
 	// Passive — also uses effectiveEmission
 	const passiveGain = matchedFilterGain(wolf.affinity, target.spectralType);
-	const pd = (h: number) => r(passiveDetection(
-		signal, env.noise, wolf.affinity.passive,
-		hours(h), samplePeriod, passiveGain, totalMasking,
-	));
+	const pd = (h: number) =>
+		r(
+			passiveDetection(
+				signal,
+				env.noise,
+				wolf.affinity.passive,
+				hours(h),
+				samplePeriod,
+				passiveGain,
+				totalMasking
+			)
+		);
 
 	return {
 		wolf: wolf.label,
@@ -523,7 +729,8 @@ function buildPvpEncounters(): PvpEncounterConfig[] {
 	};
 	const cap = EPOCH_S.capacity;
 
-	const eff = (base: number, sig: number, cloak: number) => base * sig * cloak;
+	const eff = (base: number, sig: number, cloak: number) =>
+		base * sig * cloak;
 
 	const strikerH = h('striker');
 	const specterH = h('specter');
@@ -536,16 +743,26 @@ function buildPvpEncounters(): PvpEncounterConfig[] {
 			id: 'striker_vs_specter_cloaked',
 			label: 'Striker (ACU) vs Specter (DSC, cloaked)',
 			wolf: {
-				hull: 'striker', ...strikerH,
-				sensor: 'acu_mk1', affinity: SENSOR_AFFINITIES.acu, capacitor: cap,
+				hull: 'striker',
+				...strikerH,
+				sensor: 'acu_mk1',
+				affinity: SENSOR_AFFINITIES.acu,
+				capacitor: cap,
 			},
 			target: {
-				hull: 'specter', ...specterH,
-				sensor: 'dsc_mk1', affinity: SENSOR_AFFINITIES.dsc,
-				activity: 'idle (cloaked)', emission: 'shield_regen',
+				hull: 'specter',
+				...specterH,
+				sensor: 'dsc_mk1',
+				affinity: SENSOR_AFFINITIES.dsc,
+				activity: 'idle (cloaked)',
+				emission: 'shield_regen',
 				baseEmission: emissionPower('shield_regen'),
 				cloakFactor: 1 - VEIL_ARRAY_REDUCTION,
-				effectiveEmission: eff(emissionPower('shield_regen'), specterH.hullSignature, 1 - VEIL_ARRAY_REDUCTION),
+				effectiveEmission: eff(
+					emissionPower('shield_regen'),
+					specterH.hullSignature,
+					1 - VEIL_ARRAY_REDUCTION
+				),
 			},
 		},
 		// Striker hunting uncloaked Specter
@@ -553,16 +770,26 @@ function buildPvpEncounters(): PvpEncounterConfig[] {
 			id: 'striker_vs_specter_uncloaked',
 			label: 'Striker (ACU) vs Specter (DSC, uncloaked)',
 			wolf: {
-				hull: 'striker', ...strikerH,
-				sensor: 'acu_mk1', affinity: SENSOR_AFFINITIES.acu, capacitor: cap,
+				hull: 'striker',
+				...strikerH,
+				sensor: 'acu_mk1',
+				affinity: SENSOR_AFFINITIES.acu,
+				capacitor: cap,
 			},
 			target: {
-				hull: 'specter', ...specterH,
-				sensor: 'dsc_mk1', affinity: SENSOR_AFFINITIES.dsc,
-				activity: 'idle', emission: 'shield_regen',
+				hull: 'specter',
+				...specterH,
+				sensor: 'dsc_mk1',
+				affinity: SENSOR_AFFINITIES.dsc,
+				activity: 'idle',
+				emission: 'shield_regen',
 				baseEmission: emissionPower('shield_regen'),
 				cloakFactor: 1.0,
-				effectiveEmission: eff(emissionPower('shield_regen'), specterH.hullSignature, 1.0),
+				effectiveEmission: eff(
+					emissionPower('shield_regen'),
+					specterH.hullSignature,
+					1.0
+				),
 			},
 		},
 		// Striker hunting mining Pioneer
@@ -570,16 +797,26 @@ function buildPvpEncounters(): PvpEncounterConfig[] {
 			id: 'striker_vs_pioneer_mining',
 			label: 'Striker (ACU) vs Pioneer (VRS, mining)',
 			wolf: {
-				hull: 'striker', ...strikerH,
-				sensor: 'acu_mk1', affinity: SENSOR_AFFINITIES.acu, capacitor: cap,
+				hull: 'striker',
+				...strikerH,
+				sensor: 'acu_mk1',
+				affinity: SENSOR_AFFINITIES.acu,
+				capacitor: cap,
 			},
 			target: {
-				hull: 'pioneer', ...pioneerH,
-				sensor: 'vrs_mk1', affinity: SENSOR_AFFINITIES.vrs,
-				activity: 'mining', emission: 'mining',
+				hull: 'pioneer',
+				...pioneerH,
+				sensor: 'vrs_mk1',
+				affinity: SENSOR_AFFINITIES.vrs,
+				activity: 'mining',
+				emission: 'mining',
 				baseEmission: emissionPower('mining'),
 				cloakFactor: 1.0,
-				effectiveEmission: eff(emissionPower('mining'), pioneerH.hullSignature, 1.0),
+				effectiveEmission: eff(
+					emissionPower('mining'),
+					pioneerH.hullSignature,
+					1.0
+				),
 			},
 		},
 		// Striker hunting Bulwark (hard target)
@@ -587,16 +824,26 @@ function buildPvpEncounters(): PvpEncounterConfig[] {
 			id: 'striker_vs_bulwark',
 			label: 'Striker (ACU) vs Bulwark (VRS, transit)',
 			wolf: {
-				hull: 'striker', ...strikerH,
-				sensor: 'acu_mk1', affinity: SENSOR_AFFINITIES.acu, capacitor: cap,
+				hull: 'striker',
+				...strikerH,
+				sensor: 'acu_mk1',
+				affinity: SENSOR_AFFINITIES.acu,
+				capacitor: cap,
 			},
 			target: {
-				hull: 'bulwark', ...bulwarkH,
-				sensor: 'vrs_mk1', affinity: SENSOR_AFFINITIES.vrs,
-				activity: 'transit', emission: 'drive_sustain',
+				hull: 'bulwark',
+				...bulwarkH,
+				sensor: 'vrs_mk1',
+				affinity: SENSOR_AFFINITIES.vrs,
+				activity: 'transit',
+				emission: 'drive_sustain',
 				baseEmission: emissionPower('drive_sustain'),
 				cloakFactor: 1.0,
-				effectiveEmission: eff(emissionPower('drive_sustain'), bulwarkH.hullSignature, 1.0),
+				effectiveEmission: eff(
+					emissionPower('drive_sustain'),
+					bulwarkH.hullSignature,
+					1.0
+				),
 			},
 		},
 		// Specter ambushing Pioneer (reverse: stealth attacker)
@@ -604,16 +851,26 @@ function buildPvpEncounters(): PvpEncounterConfig[] {
 			id: 'specter_vs_pioneer_mining',
 			label: 'Specter (DSC) vs Pioneer (VRS, mining)',
 			wolf: {
-				hull: 'specter', ...specterH,
-				sensor: 'dsc_mk1', affinity: SENSOR_AFFINITIES.dsc, capacitor: cap,
+				hull: 'specter',
+				...specterH,
+				sensor: 'dsc_mk1',
+				affinity: SENSOR_AFFINITIES.dsc,
+				capacitor: cap,
 			},
 			target: {
-				hull: 'pioneer', ...pioneerH,
-				sensor: 'vrs_mk1', affinity: SENSOR_AFFINITIES.vrs,
-				activity: 'mining', emission: 'mining',
+				hull: 'pioneer',
+				...pioneerH,
+				sensor: 'vrs_mk1',
+				affinity: SENSOR_AFFINITIES.vrs,
+				activity: 'mining',
+				emission: 'mining',
 				baseEmission: emissionPower('mining'),
 				cloakFactor: 1.0,
-				effectiveEmission: eff(emissionPower('mining'), pioneerH.hullSignature, 1.0),
+				effectiveEmission: eff(
+					emissionPower('mining'),
+					pioneerH.hullSignature,
+					1.0
+				),
 			},
 		},
 		// Mirror match: Striker vs Striker
@@ -621,16 +878,26 @@ function buildPvpEncounters(): PvpEncounterConfig[] {
 			id: 'striker_vs_striker',
 			label: 'Striker (ACU) vs Striker (ACU, combat)',
 			wolf: {
-				hull: 'striker', ...strikerH,
-				sensor: 'acu_mk1', affinity: SENSOR_AFFINITIES.acu, capacitor: cap,
+				hull: 'striker',
+				...strikerH,
+				sensor: 'acu_mk1',
+				affinity: SENSOR_AFFINITIES.acu,
+				capacitor: cap,
 			},
 			target: {
-				hull: 'striker', ...strikerH,
-				sensor: 'acu_mk1', affinity: SENSOR_AFFINITIES.acu,
-				activity: 'combat', emission: 'weapons_fire',
+				hull: 'striker',
+				...strikerH,
+				sensor: 'acu_mk1',
+				affinity: SENSOR_AFFINITIES.acu,
+				activity: 'combat',
+				emission: 'weapons_fire',
 				baseEmission: emissionPower('weapons_fire'),
 				cloakFactor: 1.0,
-				effectiveEmission: eff(emissionPower('weapons_fire'), strikerH.hullSignature, 1.0),
+				effectiveEmission: eff(
+					emissionPower('weapons_fire'),
+					strikerH.hullSignature,
+					1.0
+				),
 			},
 		},
 		// Pioneer (VRS) trying to PVP scan — generalist at combat scanning
@@ -638,22 +905,35 @@ function buildPvpEncounters(): PvpEncounterConfig[] {
 			id: 'pioneer_vs_specter_cloaked',
 			label: 'Pioneer (VRS) vs Specter (DSC, cloaked)',
 			wolf: {
-				hull: 'pioneer', ...pioneerH,
-				sensor: 'vrs_mk1', affinity: SENSOR_AFFINITIES.vrs, capacitor: cap,
+				hull: 'pioneer',
+				...pioneerH,
+				sensor: 'vrs_mk1',
+				affinity: SENSOR_AFFINITIES.vrs,
+				capacitor: cap,
 			},
 			target: {
-				hull: 'specter', ...specterH,
-				sensor: 'dsc_mk1', affinity: SENSOR_AFFINITIES.dsc,
-				activity: 'idle (cloaked)', emission: 'shield_regen',
+				hull: 'specter',
+				...specterH,
+				sensor: 'dsc_mk1',
+				affinity: SENSOR_AFFINITIES.dsc,
+				activity: 'idle (cloaked)',
+				emission: 'shield_regen',
 				baseEmission: emissionPower('shield_regen'),
 				cloakFactor: 1 - VEIL_ARRAY_REDUCTION,
-				effectiveEmission: eff(emissionPower('shield_regen'), specterH.hullSignature, 1 - VEIL_ARRAY_REDUCTION),
+				effectiveEmission: eff(
+					emissionPower('shield_regen'),
+					specterH.hullSignature,
+					1 - VEIL_ARRAY_REDUCTION
+				),
 			},
 		},
 	];
 }
 
-function computePvpEncounter(encounter: PvpEncounterConfig, env: Environment): PvpEncounterResult {
+function computePvpEncounter(
+	encounter: PvpEncounterConfig,
+	env: Environment
+): PvpEncounterResult {
 	const C = DEFAULT_DSP_CONSTANTS;
 	const pvpEmissionBase = emissionPower('pvp_scan');
 	const { wolf, target } = encounter;
@@ -673,7 +953,7 @@ function computePvpEncounter(encounter: PvpEncounterConfig, env: Environment): P
 	let scansFor90: number | null = null;
 
 	for (let i = 1; i <= Math.max(maxScans, 6); i++) {
-		cumMiss *= (1 - perScan);
+		cumMiss *= 1 - perScan;
 		const conf = r(1 - cumMiss);
 		const spent = i * C.pvpScanPowerCost;
 		steps.push({
@@ -683,8 +963,12 @@ function computePvpEncounter(encounter: PvpEncounterConfig, env: Environment): P
 			powerRemaining: Math.max(0, wolf.capacitor - spent),
 			elapsedSeconds: i * C.pvpScanDurationSeconds,
 		});
-		if (scansFor70 === null && conf >= 0.7) { scansFor70 = i; }
-		if (scansFor90 === null && conf >= 0.9) { scansFor90 = i; }
+		if (scansFor70 === null && conf >= 0.7) {
+			scansFor70 = i;
+		}
+		if (scansFor90 === null && conf >= 0.9) {
+			scansFor90 = i;
+		}
 	}
 
 	// ── Target's counter-detection of wolf's PVP scan ping ──
@@ -697,40 +981,69 @@ function computePvpEncounter(encounter: PvpEncounterConfig, env: Environment): P
 	for (let i = 1; i <= Math.max(maxScans, 6); i++) {
 		const elapsed = i * C.pvpScanDurationSeconds;
 		// Target passively integrates wolf's emission over the scan duration
-		const conf = r(passiveDetection(
-			wolfEffectiveEmission, env.noise, target.affinity.passive,
-			elapsed, C.samplePeriodSeconds, targetGain, 0,
-		));
+		const conf = r(
+			passiveDetection(
+				wolfEffectiveEmission,
+				env.noise,
+				target.affinity.passive,
+				elapsed,
+				C.samplePeriodSeconds,
+				targetGain,
+				0
+			)
+		);
 
 		let tier = 'none';
-		if (conf >= 0.85) { tier = 'analysis'; }
-		else if (conf >= 0.65) { tier = 'type'; }
-		else if (conf >= 0.40) { tier = 'class'; }
-		else if (conf >= 0.15) { tier = 'anomaly'; }
+		if (conf >= 0.85) {
+			tier = 'analysis';
+		} else if (conf >= 0.65) {
+			tier = 'type';
+		} else if (conf >= 0.4) {
+			tier = 'class';
+		} else if (conf >= 0.15) {
+			tier = 'anomaly';
+		}
 
-		counterSteps.push({ scan: i, elapsedSeconds: elapsed, targetConfidence: conf, tier });
+		counterSteps.push({
+			scan: i,
+			elapsedSeconds: elapsed,
+			targetConfidence: conf,
+			tier,
+		});
 	}
 
 	// ── Target lock — the step between detection and firing ──
 	// Lock time = baseLockSeconds / pvpGain
 	// ACU (1.5) locks fast (~87s). DSC (0.4) locks slow (~325s).
 	const wolfLockTime = Math.round(C.baseLockSeconds / wolf.affinity.pvpGain);
-	const targetLockTime = Math.round(C.baseLockSeconds / target.affinity.pvpGain);
+	const targetLockTime = Math.round(
+		C.baseLockSeconds / target.affinity.pvpGain
+	);
 
 	// ── Race analysis (detect + lock = ready to fire) ──
-	const wolfDetectsAt = scansFor70 ? steps[scansFor70 - 1].elapsedSeconds : null;
-	const wolfLocksAt = wolfDetectsAt !== null ? wolfDetectsAt + wolfLockTime : null;
+	const wolfDetectsAt = scansFor70
+		? steps[scansFor70 - 1].elapsedSeconds
+		: null;
+	const wolfLocksAt =
+		wolfDetectsAt !== null ? wolfDetectsAt + wolfLockTime : null;
 
 	const firstAnomaly = counterSteps.find((s) => s.tier !== 'none');
 	const targetDetectsAt = firstAnomaly ? firstAnomaly.elapsedSeconds : null;
-	const targetLocksAt = targetDetectsAt !== null ? targetDetectsAt + targetLockTime : null;
+	const targetLocksAt =
+		targetDetectsAt !== null ? targetDetectsAt + targetLockTime : null;
 
-	const wolfTimeline = wolfLocksAt !== null
-		? `detect at ${formatTime(wolfDetectsAt!)} + lock ${formatTime(wolfLockTime)} = fire at ${formatTime(wolfLocksAt)}`
-		: null;
-	const targetTimeline = targetLocksAt !== null
-		? `detect at ${formatTime(targetDetectsAt!)} + lock ${formatTime(targetLockTime)} = fire at ${formatTime(targetLocksAt)}`
-		: null;
+	const wolfTimeline =
+		wolfLocksAt !== null
+			? `detect at ${formatTime(wolfDetectsAt!)} + lock ${formatTime(
+					wolfLockTime
+			  )} = fire at ${formatTime(wolfLocksAt)}`
+			: null;
+	const targetTimeline =
+		targetLocksAt !== null
+			? `detect at ${formatTime(targetDetectsAt!)} + lock ${formatTime(
+					targetLockTime
+			  )} = fire at ${formatTime(targetLocksAt)}`
+			: null;
 
 	let headStart = 'N/A';
 	let verdict: string;
@@ -738,22 +1051,33 @@ function computePvpEncounter(encounter: PvpEncounterConfig, env: Environment): P
 	if (wolfLocksAt === null && targetLocksAt === null) {
 		verdict = 'Neither side can lock — ghost ships in the void';
 	} else if (wolfLocksAt === null) {
-		verdict = 'Wolf cannot find target — PVP scan ineffective against this target';
+		verdict =
+			'Wolf cannot find target — PVP scan ineffective against this target';
 	} else if (targetLocksAt === null) {
-		verdict = `Wolf fires at ${formatTime(wolfLocksAt)} — target never detects the ping (perfect ambush)`;
+		verdict = `Wolf fires at ${formatTime(
+			wolfLocksAt
+		)} — target never detects the ping (perfect ambush)`;
 	} else {
 		const diff = wolfLocksAt - targetLocksAt;
 		const absDiff = Math.abs(diff);
 
 		if (absDiff <= 30) {
 			headStart = `coin flip (${absDiff}s difference)`;
-			verdict = `COIN FLIP — wolf fires at ${formatTime(wolfLocksAt)}, target fires at ${formatTime(targetLocksAt)}`;
+			verdict = `COIN FLIP — wolf fires at ${formatTime(
+				wolfLocksAt
+			)}, target fires at ${formatTime(targetLocksAt)}`;
 		} else if (diff > 0) {
 			headStart = `target fires ${formatTime(diff)} first`;
-			verdict = `Target fires first at ${formatTime(targetLocksAt)}, wolf at ${formatTime(wolfLocksAt)} (${formatTime(diff)} late)`;
+			verdict = `Target fires first at ${formatTime(
+				targetLocksAt
+			)}, wolf at ${formatTime(wolfLocksAt)} (${formatTime(diff)} late)`;
 		} else {
 			headStart = `wolf fires ${formatTime(-diff)} first`;
-			verdict = `Wolf fires first at ${formatTime(wolfLocksAt)}, target at ${formatTime(targetLocksAt)} (${formatTime(-diff)} late)`;
+			verdict = `Wolf fires first at ${formatTime(
+				wolfLocksAt
+			)}, target at ${formatTime(targetLocksAt)} (${formatTime(
+				-diff
+			)} late)`;
 		}
 
 		// Power context
@@ -772,9 +1096,10 @@ function computePvpEncounter(encounter: PvpEncounterConfig, env: Environment): P
 	// (Striker vs Specter is the canonical matchup)
 	const hasPhaserWolf = wolf.hull === 'striker';
 	const hasTorpedoTarget = target.hull === 'specter';
-	const combatResolution = (hasPhaserWolf && hasTorpedoTarget)
-		? computeCombatResolution(encounter, wolfLocksAt, targetLocksAt)
-		: null;
+	const combatResolution =
+		hasPhaserWolf && hasTorpedoTarget
+			? computeCombatResolution(encounter, wolfLocksAt, targetLocksAt)
+			: null;
 
 	return {
 		id: encounter.id,
@@ -806,8 +1131,14 @@ function computePvpEncounter(encounter: PvpEncounterConfig, env: Environment): P
 			steps: counterSteps,
 		},
 		targetLock: {
-			wolfLock: { pvpGain: wolf.affinity.pvpGain, lockTimeSeconds: wolfLockTime },
-			targetLock: { pvpGain: target.affinity.pvpGain, lockTimeSeconds: targetLockTime },
+			wolfLock: {
+				pvpGain: wolf.affinity.pvpGain,
+				lockTimeSeconds: wolfLockTime,
+			},
+			targetLock: {
+				pvpGain: target.affinity.pvpGain,
+				lockTimeSeconds: targetLockTime,
+			},
 		},
 		race: {
 			wolfDetectsAt,
@@ -834,9 +1165,11 @@ function computePvpEncounter(encounter: PvpEncounterConfig, env: Environment): P
 function computeCombatResolution(
 	encounter: PvpEncounterConfig,
 	wolfFiresAt: number | null,
-	targetFiresAt: number | null,
+	targetFiresAt: number | null
 ): CombatResolution | null {
-	if (wolfFiresAt === null && targetFiresAt === null) {return null;}
+	if (wolfFiresAt === null && targetFiresAt === null) {
+		return null;
+	}
 
 	const C = DEFAULT_DSP_CONSTANTS;
 	const { wolf, target } = encounter;
@@ -851,18 +1184,28 @@ function computeCombatResolution(
 	const targetHullHP = target.hullIntegrity;
 
 	// Net shield drain (accounting for target regen)
-	const netShieldDrain = phaserDrainRate - (targetCloaked ? 0 : shieldRegenRate);
-	const shieldDepletionHours = targetShieldCap > 0 && netShieldDrain > 0 ? targetShieldCap / netShieldDrain : 0;
+	const netShieldDrain =
+		phaserDrainRate - (targetCloaked ? 0 : shieldRegenRate);
+	const shieldDepletionHours =
+		targetShieldCap > 0 && netShieldDrain > 0
+			? targetShieldCap / netShieldDrain
+			: 0;
 	const shieldDepletionSeconds = shieldDepletionHours * 3600;
 
 	// Hull damage phase
-	const hullDmgPerHour = phaserHullDamage(phaserDrainRate, 1.0, C.phaserHullDamageMult);
-	const hullKillHours = hullDmgPerHour > 0 ? targetHullHP / hullDmgPerHour : Infinity;
+	const hullDmgPerHour = phaserHullDamage(
+		phaserDrainRate,
+		1.0,
+		C.phaserHullDamageMult
+	);
+	const hullKillHours =
+		hullDmgPerHour > 0 ? targetHullHP / hullDmgPerHour : Infinity;
 	const hullKillSeconds = hullKillHours * 3600;
 
 	// Total time from wolf firing to target death
 	const wolfKillTime = shieldDepletionSeconds + hullKillSeconds;
-	const wolfKillsAt = wolfFiresAt !== null ? wolfFiresAt + wolfKillTime : null;
+	const wolfKillsAt =
+		wolfFiresAt !== null ? wolfFiresAt + wolfKillTime : null;
 
 	// ── Target's torpedo kill timeline ──
 	const torpCount = TORPEDO.capacity;
@@ -878,11 +1221,15 @@ function computeCombatResolution(
 	// Binomial: P(X >= k) = sum_{i=k}^{n} C(n,i) * p^i * (1-p)^(n-i)
 	let pKill = 0;
 	for (let i = hitsNeeded; i <= torpCount; i++) {
-		pKill += binomial(torpCount, i) * Math.pow(torpAccuracy, i) * Math.pow(1 - torpAccuracy, torpCount - i);
+		pKill +=
+			binomial(torpCount, i) *
+			Math.pow(torpAccuracy, i) *
+			Math.pow(1 - torpAccuracy, torpCount - i);
 	}
 	pKill = Math.min(1, Math.max(0, pKill));
 
-	const torpedoesArriveAt = targetFiresAt !== null ? targetFiresAt + torpFlightTime : Infinity;
+	const torpedoesArriveAt =
+		targetFiresAt !== null ? targetFiresAt + torpFlightTime : Infinity;
 
 	// ── Who dies first? ──
 	let whoWinsTimingRace: string;
@@ -893,28 +1240,46 @@ function computeCombatResolution(
 
 	if (wolfKillsAtSafe < torpedoesArriveAtSafe) {
 		whoWinsTimingRace = 'wolf';
-		timingMarginSeconds = Math.round(torpedoesArriveAtSafe - wolfKillsAtSafe);
+		timingMarginSeconds = Math.round(
+			torpedoesArriveAtSafe - wolfKillsAtSafe
+		);
 	} else if (torpedoesArriveAtSafe < wolfKillsAtSafe) {
 		whoWinsTimingRace = 'target';
-		timingMarginSeconds = Math.round(wolfKillsAtSafe - torpedoesArriveAtSafe);
+		timingMarginSeconds = Math.round(
+			wolfKillsAtSafe - torpedoesArriveAtSafe
+		);
 	} else {
 		whoWinsTimingRace = 'simultaneous';
 		timingMarginSeconds = 0;
 	}
 
 	// Wolf survival probability factors in both timing and torpedo accuracy
-	const wolfSurvival = whoWinsTimingRace === 'wolf' ? 1.0 : (1 - pKill);
+	const wolfSurvival = whoWinsTimingRace === 'wolf' ? 1.0 : 1 - pKill;
 
 	let verdict: string;
 	if (wolfFiresAt === null) {
 		verdict = 'Wolf never fires — target wins by default';
 	} else if (targetFiresAt === null) {
-		verdict = `Wolf kills target at ${formatTime(Math.round(wolfKillsAtSafe))} — target never fires`;
+		verdict = `Wolf kills target at ${formatTime(
+			Math.round(wolfKillsAtSafe)
+		)} — target never fires`;
 	} else if (whoWinsTimingRace === 'wolf') {
-		verdict = `Wolf kills target at ${formatTime(Math.round(wolfKillsAtSafe))} before torpedoes arrive at ${formatTime(Math.round(torpedoesArriveAtSafe))} (${formatTime(timingMarginSeconds)} margin)`;
+		verdict = `Wolf kills target at ${formatTime(
+			Math.round(wolfKillsAtSafe)
+		)} before torpedoes arrive at ${formatTime(
+			Math.round(torpedoesArriveAtSafe)
+		)} (${formatTime(timingMarginSeconds)} margin)`;
 	} else {
-		verdict = `Torpedoes arrive at ${formatTime(Math.round(torpedoesArriveAtSafe))}, wolf kills at ${formatTime(Math.round(wolfKillsAtSafe))} (${formatTime(timingMarginSeconds)} late). `
-			+ `P(torpedo kill) = ${r(pKill * 100, 1)}%. Wolf survives ${r(wolfSurvival * 100, 1)}% of the time`;
+		verdict =
+			`Torpedoes arrive at ${formatTime(
+				Math.round(torpedoesArriveAtSafe)
+			)}, wolf kills at ${formatTime(
+				Math.round(wolfKillsAtSafe)
+			)} (${formatTime(timingMarginSeconds)} late). ` +
+			`P(torpedo kill) = ${r(pKill * 100, 1)}%. Wolf survives ${r(
+				wolfSurvival * 100,
+				1
+			)}% of the time`;
 	}
 
 	return {
@@ -922,10 +1287,21 @@ function computeCombatResolution(
 		targetWeapon: 'torpedo_launcher',
 		wolfTimeline: {
 			firesAt: wolfFiresAt ?? -1,
-			killsTargetAt: wolfKillsAt !== null ? Math.round(wolfKillsAt) : null,
-			killMethod: `phaser shield drain (${r(shieldDepletionSeconds, 0)}s) + hull burn (${r(hullKillSeconds, 0)}s)`,
-			detail: `shields ${targetShieldCap}HP at ${netShieldDrain}/hr net drain → ${r(shieldDepletionSeconds, 0)}s. `
-				+ `hull ${targetHullHP}HP at ${hullDmgPerHour}/hr → ${r(hullKillSeconds, 0)}s. total: ${r(wolfKillTime, 0)}s`,
+			killsTargetAt:
+				wolfKillsAt !== null ? Math.round(wolfKillsAt) : null,
+			killMethod: `phaser shield drain (${r(
+				shieldDepletionSeconds,
+				0
+			)}s) + hull burn (${r(hullKillSeconds, 0)}s)`,
+			detail:
+				`shields ${targetShieldCap}HP at ${netShieldDrain}/hr net drain → ${r(
+					shieldDepletionSeconds,
+					0
+				)}s. ` +
+				`hull ${targetHullHP}HP at ${hullDmgPerHour}/hr → ${r(
+					hullKillSeconds,
+					0
+				)}s. total: ${r(wolfKillTime, 0)}s`,
 		},
 		targetTimeline: {
 			firesAt: targetFiresAt ?? -1,
@@ -934,7 +1310,11 @@ function computeCombatResolution(
 			torpedoCount: torpCount,
 			hitChance: torpAccuracy,
 			pKill: r(pKill),
-			detail: `${torpCount} torpedoes at ${torpAccuracy * 100}% accuracy. need ${hitsNeeded}+ hits (${hitsNeeded * torpDamage}+ dmg) vs ${wolfTotalHP}HP. P(kill) = ${r(pKill * 100, 1)}%`,
+			detail: `${torpCount} torpedoes at ${
+				torpAccuracy * 100
+			}% accuracy. need ${hitsNeeded}+ hits (${
+				hitsNeeded * torpDamage
+			}+ dmg) vs ${wolfTotalHP}HP. P(kill) = ${r(pKill * 100, 1)}%`,
 		},
 		outcome: {
 			whoWinsTimingRace,
@@ -947,8 +1327,12 @@ function computeCombatResolution(
 }
 
 function binomial(n: number, k: number): number {
-	if (k < 0 || k > n) {return 0;}
-	if (k === 0 || k === n) {return 1;}
+	if (k < 0 || k > n) {
+		return 0;
+	}
+	if (k === 0 || k === n) {
+		return 1;
+	}
 	let result = 1;
 	for (let i = 0; i < k; i++) {
 		result *= (n - i) / (i + 1);
@@ -957,7 +1341,9 @@ function binomial(n: number, k: number): number {
 }
 
 function formatTime(seconds: number): string {
-	if (seconds < 60) { return `${seconds}s`; }
+	if (seconds < 60) {
+		return `${seconds}s`;
+	}
 	const min = Math.floor(seconds / 60);
 	const sec = seconds % 60;
 	return sec > 0 ? `${min}m${sec}s` : `${min}m`;
@@ -995,8 +1381,8 @@ function combatProjections(): CombatProjection[] {
 		{ id: 'specter_dsc', hull: 'specter', weaponDrawMult: 1.0 },
 	];
 
-	const targets = buildTargets().filter((t, i, arr) =>
-		arr.findIndex((x) => x.hull === t.hull) === i,
+	const targets = buildTargets().filter(
+		(t, i, arr) => arr.findIndex((x) => x.hull === t.hull) === i
 	); // unique hulls
 
 	const phaserDrainRate = PHASER.damage;
@@ -1011,12 +1397,19 @@ function combatProjections(): CombatProjection[] {
 		for (const target of targets) {
 			const drain = phaserDrainRate;
 			const netDrain = drain - shieldRegenPerHour;
-			const hoursToDeplete = netDrain > 0 ? target.shieldCapacity / netDrain : Infinity;
+			const hoursToDeplete =
+				netDrain > 0 ? target.shieldCapacity / netDrain : Infinity;
 
 			const expectedHits = torpMagazine * torpAccuracy;
 			const expectedTotal = expectedHits * torpDamage;
-			const expectedShieldDmg = Math.min(expectedTotal, target.shieldCapacity);
-			const expectedHullDmg = Math.max(0, expectedTotal - target.shieldCapacity);
+			const expectedShieldDmg = Math.min(
+				expectedTotal,
+				target.shieldCapacity
+			);
+			const expectedHullDmg = Math.max(
+				0,
+				expectedTotal - target.shieldCapacity
+			);
 
 			results.push({
 				wolfId: wolf.id,
@@ -1049,7 +1442,12 @@ function combatProjections(): CombatProjection[] {
 
 // ── Main ─────────────────────────────────────────────────────
 
-export type { DetectionResult, SummaryRow, PvpEncounterResult, CombatProjection };
+export type {
+	DetectionResult,
+	SummaryRow,
+	PvpEncounterResult,
+	CombatProjection,
+};
 
 export interface DetectionOutput {
 	generated: string;
@@ -1093,7 +1491,9 @@ export function runDetection(): DetectionOutput {
 	// Compute PVP scan encounters (the "race" mechanic)
 	const pvpEncounters = buildPvpEncounters();
 	const defaultEnv = environments.find((e) => e.id === 'normal')!;
-	const pvpResults = pvpEncounters.map((enc) => computePvpEncounter(enc, defaultEnv));
+	const pvpResults = pvpEncounters.map((enc) =>
+		computePvpEncounter(enc, defaultEnv)
+	);
 
 	return {
 		generated: new Date().toISOString(),
@@ -1101,16 +1501,22 @@ export function runDetection(): DetectionOutput {
 			constants: {
 				activeThreshold: DEFAULT_DSP_CONSTANTS.activeThreshold,
 				passiveThreshold: DEFAULT_DSP_CONSTANTS.detectionThreshold,
-				passiveConfidenceCap: DEFAULT_DSP_CONSTANTS.passiveConfidenceCap,
+				passiveConfidenceCap:
+					DEFAULT_DSP_CONSTANTS.passiveConfidenceCap,
 				samplePeriodSeconds: DEFAULT_DSP_CONSTANTS.samplePeriodSeconds,
 				detectionSteepness: DEFAULT_DSP_CONSTANTS.detectionSteepness,
 				pvpScanPowerCost: DEFAULT_DSP_CONSTANTS.pvpScanPowerCost,
 				pvpSweepsPerScan: DEFAULT_DSP_CONSTANTS.pvpSweepsPerScan,
-				pvpDetectionThreshold: DEFAULT_DSP_CONSTANTS.pvpDetectionThreshold,
-				pvpScanDurationSeconds: DEFAULT_DSP_CONSTANTS.pvpScanDurationSeconds,
+				pvpDetectionThreshold:
+					DEFAULT_DSP_CONSTANTS.pvpDetectionThreshold,
+				pvpScanDurationSeconds:
+					DEFAULT_DSP_CONSTANTS.pvpScanDurationSeconds,
 			},
 			emissionLevels: Object.fromEntries(
-				Object.entries(DEFAULT_EMISSION_PROFILES).map(([k, v]) => [k, { base: v.base, spectralType: v.spectralType }]),
+				Object.entries(DEFAULT_EMISSION_PROFILES).map(([k, v]) => [
+					k,
+					{ base: v.base, spectralType: v.spectralType },
+				])
 			),
 			sensorAffinities: SENSOR_AFFINITIES,
 			hulls: HULLS.map((h) => ({

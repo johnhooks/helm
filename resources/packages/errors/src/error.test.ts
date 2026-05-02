@@ -8,8 +8,12 @@ import { isWpRestErrorResponse } from './utils';
 describe('ErrorCode', () => {
 	it('has client-side datacore codes', () => {
 		expect(ErrorCode.DatacoreUnsupported).toBe('helm.datacore.unsupported');
-		expect(ErrorCode.DatacoreWorkerError).toBe('helm.datacore.worker_error');
-		expect(ErrorCode.DatacoreUnexpectedResponse).toBe('helm.datacore.unexpected_response');
+		expect(ErrorCode.DatacoreWorkerError).toBe(
+			'helm.datacore.worker_error'
+		);
+		expect(ErrorCode.DatacoreUnexpectedResponse).toBe(
+			'helm.datacore.unexpected_response'
+		);
 	});
 
 	it('has client-side cache codes', () => {
@@ -22,7 +26,10 @@ describe('ErrorCode', () => {
 	});
 
 	it('works as HelmError code', () => {
-		const err = new HelmError(ErrorCode.DatacoreUnsupported, 'Not supported');
+		const err = new HelmError(
+			ErrorCode.DatacoreUnsupported,
+			'Not supported'
+		);
 		expect(err.message).toBe('helm.datacore.unsupported');
 	});
 });
@@ -31,7 +38,9 @@ describe('ServerErrorCode', () => {
 	it('mirrors PHP error codes with helm. prefix', () => {
 		expect(ServerErrorCode.ShipNotFound).toBe('helm.ship.not_found');
 		expect(ServerErrorCode.ActionFailed).toBe('helm.action.failed');
-		expect(ServerErrorCode.NavigationNoRoute).toBe('helm.navigation.no_route');
+		expect(ServerErrorCode.NavigationNoRoute).toBe(
+			'helm.navigation.no_route'
+		);
 	});
 
 	it('can match against HelmError.message from server responses', () => {
@@ -141,7 +150,11 @@ describe('HelmError.from()', () => {
 		const wpError = {
 			code: 'helm.validation',
 			message: 'Validation failed',
-			data: { status: 400, params: { name: 'Required' }, details: { field: 'name' } },
+			data: {
+				status: 400,
+				params: { name: 'Required' },
+				details: { field: 'name' },
+			},
 		};
 
 		const err = HelmError.from(wpError);
@@ -288,7 +301,10 @@ describe('HelmError.asyncFrom()', () => {
 
 describe('HelmError.safe()', () => {
 	it('creates a safe error with isSafe true', () => {
-		const err = HelmError.safe('helm.datacore.worker_error', 'A database error occurred.');
+		const err = HelmError.safe(
+			'helm.datacore.worker_error',
+			'A database error occurred.'
+		);
 
 		expect(err.message).toBe('helm.datacore.worker_error');
 		expect(err.detail).toBe('A database error occurred.');
@@ -298,8 +314,14 @@ describe('HelmError.safe()', () => {
 	});
 
 	it('stores the original error in native Error.cause', () => {
-		const original = new Error('SQLITE_CORRUPT: database disk image is malformed');
-		const err = HelmError.safe('helm.datacore.worker_error', 'A database error occurred.', original);
+		const original = new Error(
+			'SQLITE_CORRUPT: database disk image is malformed'
+		);
+		const err = HelmError.safe(
+			'helm.datacore.worker_error',
+			'A database error occurred.',
+			original
+		);
 
 		expect(err.isSafe).toBe(true);
 		expect(err.cause).toBe(original);
@@ -333,9 +355,9 @@ describe('HelmError.is()', () => {
 
 describe('isWpRestErrorResponse()', () => {
 	it('returns true for valid WP REST error shape', () => {
-		expect(
-			isWpRestErrorResponse({ code: 'test', message: 'msg' }),
-		).toBe(true);
+		expect(isWpRestErrorResponse({ code: 'test', message: 'msg' })).toBe(
+			true
+		);
 	});
 
 	it('returns true with data and additional_errors', () => {
@@ -345,7 +367,7 @@ describe('isWpRestErrorResponse()', () => {
 				message: 'msg',
 				data: { status: 400 },
 				additional_errors: [],
-			}),
+			})
 		).toBe(true);
 	});
 
@@ -361,8 +383,12 @@ describe('isWpRestErrorResponse()', () => {
 	});
 
 	it('returns false when code or message is not a string', () => {
-		expect(isWpRestErrorResponse({ code: 123, message: 'msg' })).toBe(false);
-		expect(isWpRestErrorResponse({ code: 'test', message: 123 })).toBe(false);
+		expect(isWpRestErrorResponse({ code: 123, message: 'msg' })).toBe(
+			false
+		);
+		expect(isWpRestErrorResponse({ code: 'test', message: 123 })).toBe(
+			false
+		);
 	});
 });
 
@@ -387,8 +413,12 @@ describe('formatError()', () => {
 		const err = new HelmError('helm.action.failed', 'Action failed', {
 			isSafe: true,
 			causes: [
-				new HelmError('helm.navigation.no_route', 'No known route', { isSafe: true }),
-				new HelmError('helm.fuel.empty', 'Not enough fuel', { isSafe: true }),
+				new HelmError('helm.navigation.no_route', 'No known route', {
+					isSafe: true,
+				}),
+				new HelmError('helm.fuel.empty', 'Not enough fuel', {
+					isSafe: true,
+				}),
 			],
 		});
 
@@ -400,7 +430,11 @@ describe('formatError()', () => {
 
 	it('collects vertical cause chain via Error.cause', () => {
 		const inner = HelmError.safe('helm.server', 'Server error');
-		const outer = HelmError.safe('helm.store', 'Could not load data.', inner);
+		const outer = HelmError.safe(
+			'helm.store',
+			'Could not load data.',
+			inner
+		);
 
 		const result = formatError(outer);
 
@@ -412,10 +446,16 @@ describe('formatError()', () => {
 		const inner = new HelmError('helm.action.failed', 'Jump failed', {
 			isSafe: true,
 			causes: [
-				new HelmError('helm.navigation.no_route', 'No route', { isSafe: true }),
+				new HelmError('helm.navigation.no_route', 'No route', {
+					isSafe: true,
+				}),
 			],
 		});
-		const outer = HelmError.safe('helm.store', 'Could not perform action.', inner);
+		const outer = HelmError.safe(
+			'helm.store',
+			'Could not perform action.',
+			inner
+		);
 
 		const result = formatError(outer);
 

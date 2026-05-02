@@ -50,9 +50,9 @@ const rootRoute = createRootRoute({
 
 		return (
 			<AppRoot>
-				<ErrorBoundary FallbackComponent={ HelmErrorPageFallback }>
-					<Suspense fallback={ null }>
-						<ShipProvider shipId={ shipId }>
+				<ErrorBoundary FallbackComponent={HelmErrorPageFallback}>
+					<Suspense fallback={null}>
+						<ShipProvider shipId={shipId}>
 							<Outlet />
 						</ShipProvider>
 					</Suspense>

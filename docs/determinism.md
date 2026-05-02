@@ -21,9 +21,10 @@ One bit different = verification fails.
 ```
 
 We maintain deterministic computation now so future federation is possible. Even in single-Origin mode, determinism ensures:
-- Reproducible bug reports
-- Predictable game behavior
-- Foundation for cross-Origin verification later
+
+-   Reproducible bug reports
+-   Predictable game behavior
+-   Foundation for cross-Origin verification later
 
 ## The Enemy: Floating Point
 
@@ -717,29 +718,29 @@ name: Determinism Tests
 on: [push, pull_request]
 
 jobs:
-  test:
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest]
-        php: ['8.1', '8.2', '8.3']
-        include:
-          - os: ubuntu-latest
-            arch: amd64
-          - os: macos-latest
-            arch: arm64
+    test:
+        strategy:
+            matrix:
+                os: [ubuntu-latest, macos-latest]
+                php: ['8.1', '8.2', '8.3']
+                include:
+                    - os: ubuntu-latest
+                      arch: amd64
+                    - os: macos-latest
+                      arch: arm64
 
-    runs-on: ${{ matrix.os }}
+        runs-on: ${{ matrix.os }}
 
-    steps:
-      - uses: actions/checkout@v4
+        steps:
+            - uses: actions/checkout@v4
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php }}
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: ${{ matrix.php }}
 
-      - name: Run determinism tests
-        run: vendor/bin/phpunit --filter Determinism
+            - name: Run determinism tests
+              run: vendor/bin/phpunit --filter Determinism
 ```
 
 ### Verification Test Harness

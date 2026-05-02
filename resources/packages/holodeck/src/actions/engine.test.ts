@@ -64,7 +64,7 @@ describe('Engine — Action Lifecycle', () => {
 			engine.submitAction(ship, ActionType.Jump, {
 				target_node_id: 43,
 				distance: 1,
-			}),
+			})
 		).toThrow(ActionError);
 
 		try {
@@ -73,7 +73,9 @@ describe('Engine — Action Lifecycle', () => {
 				distance: 1,
 			});
 		} catch (e) {
-			expect((e as ActionError).code).toBe(ActionErrorCode.ActionInProgress);
+			expect((e as ActionError).code).toBe(
+				ActionErrorCode.ActionInProgress
+			);
 		}
 	});
 
@@ -113,7 +115,9 @@ describe('Engine — Action Lifecycle', () => {
 		// Advance halfway through spool — should not resolve
 		const firstAdvance = engine.advance(halfSpool);
 		expect(firstAdvance).toHaveLength(0);
-		expect(engine.getCurrentAction(ship)!.status).toBe(ActionStatus.Pending);
+		expect(engine.getCurrentAction(ship)!.status).toBe(
+			ActionStatus.Pending
+		);
 		expect(ship.resolve().nodeId).toBe(1); // still at origin
 
 		// Advance to spool end — ship moves, cooldown begins
@@ -202,7 +206,7 @@ describe('Engine — Action Lifecycle', () => {
 			expect(preview.projectedState).toBeDefined();
 			expect(preview.projectedState!.nodeId).toBe(42);
 			expect(preview.projectedState!.coreLife).toBeLessThan(
-				stateBefore.coreLife,
+				stateBefore.coreLife
 			);
 
 			// Real ship must NOT be mutated
@@ -288,7 +292,9 @@ describe('Engine — Action Lifecycle', () => {
 		// All 3 actions in history
 		expect(engine.getActions(ship)).toHaveLength(3);
 		expect(
-			engine.getActions(ship).every((a) => a.status === ActionStatus.Fulfilled),
+			engine
+				.getActions(ship)
+				.every((a) => a.status === ActionStatus.Fulfilled)
 		).toBe(true);
 	});
 
@@ -315,13 +321,15 @@ describe('Engine — Action Lifecycle', () => {
 		const { engine, ship } = setup();
 
 		expect(() =>
-			engine.submitAction(ship, 'unknown_type' as ActionType, {}),
+			engine.submitAction(ship, 'unknown_type' as ActionType, {})
 		).toThrow(ActionError);
 
 		try {
 			engine.submitAction(ship, 'unknown_type' as ActionType, {});
 		} catch (e) {
-			expect((e as ActionError).code).toBe(ActionErrorCode.ActionNoHandler);
+			expect((e as ActionError).code).toBe(
+				ActionErrorCode.ActionNoHandler
+			);
 		}
 	});
 
@@ -380,13 +388,19 @@ describe('Engine — Action Lifecycle', () => {
 			const ship = createShip(loadout, clock, rng, { nodeId: 1 });
 
 			expect(() =>
-				engine.submitAction(ship, ActionType.Jump, { target_node_id: 2 }),
+				engine.submitAction(ship, ActionType.Jump, {
+					target_node_id: 2,
+				})
 			).toThrow(ActionError);
 
 			try {
-				engine.submitAction(ship, ActionType.Jump, { target_node_id: 2 });
+				engine.submitAction(ship, ActionType.Jump, {
+					target_node_id: 2,
+				});
 			} catch (e) {
-				expect((e as ActionError).code).toBe(ActionErrorCode.NavigationNoRoute);
+				expect((e as ActionError).code).toBe(
+					ActionErrorCode.NavigationNoRoute
+				);
 			}
 		});
 	});
@@ -409,7 +423,9 @@ describe('Engine — Action Lifecycle', () => {
 			engine.registerShip('jumper', jumper);
 
 			// DSC listener at same node, short interval to fire during spool
-			const listenerLoadout = buildLoadout('surveyor', { sensor: 'dsc_mk1' });
+			const listenerLoadout = buildLoadout('surveyor', {
+				sensor: 'dsc_mk1',
+			});
 			const listener = createShip(listenerLoadout, clock, createRng(2), {
 				id: 'listener',
 				nodeId: 1,
@@ -418,7 +434,9 @@ describe('Engine — Action Lifecycle', () => {
 			engine.registerShip('listener', listener);
 
 			// Scan to discover edge, then jump
-			engine.submitAction(jumper, ActionType.ScanRoute, { target_node_id: 2 });
+			engine.submitAction(jumper, ActionType.ScanRoute, {
+				target_node_id: 2,
+			});
 			engine.advanceUntilIdle();
 
 			engine.submitAction(jumper, ActionType.Jump, { target_node_id: 2 });
@@ -426,14 +444,16 @@ describe('Engine — Action Lifecycle', () => {
 
 			// Should contain passive scan actions from the listener
 			const passiveScans = resolved.filter(
-				(a) => a.type === ActionType.ScanPassive,
+				(a) => a.type === ActionType.ScanPassive
 			);
 			expect(passiveScans.length).toBeGreaterThan(0);
-			expect(passiveScans.every((a) => a.shipId === 'listener')).toBe(true);
+			expect(passiveScans.every((a) => a.shipId === 'listener')).toBe(
+				true
+			);
 
 			// Should also contain the resolved jump action
 			const jumpActions = resolved.filter(
-				(a) => a.type === ActionType.Jump,
+				(a) => a.type === ActionType.Jump
 			);
 			expect(jumpActions).toHaveLength(1);
 			expect(jumpActions[0].status).toBe(ActionStatus.Fulfilled);

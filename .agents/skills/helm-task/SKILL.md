@@ -24,9 +24,9 @@ This is a conversation, not a one-shot generation. Work with the user to underst
 
 Files live at `.plans/tasks/{namespace}-{NN}-{slug}.md`.
 
-- `namespace` groups related work (e.g. `nav`, `scan`, `combat`, `build`). Reuse an existing namespace if one fits. Invent a new one if none does.
-- `NN` is the next zero-padded sequence number within that namespace.
-- `slug` is a short hyphenated summary, four to six words.
+-   `namespace` groups related work (e.g. `nav`, `scan`, `combat`, `build`). Reuse an existing namespace if one fits. Invent a new one if none does.
+-   `NN` is the next zero-padded sequence number within that namespace.
+-   `slug` is a short hyphenated summary, four to six words.
 
 ## Writing style
 
@@ -40,12 +40,12 @@ Never mention Claude, AI, or the fact that this plan was generated. The plan is 
 
 The frontmatter uses these fields:
 
-- `status` (required): One of `draft`, `ready`, `active`, `blocked`, `done`. New tasks start as `draft` unless the user explicitly says the work is ready to implement.
-- `area` (required): The product or implementation area, such as `navigation`, `rest`, `testing`, `dsp`, `simulation`, `ui`, or `dev`.
-- `priority` (required): One of `p0`, `p1`, `p2`, `p3`. Use `p0` only for urgent broken-mainline or release-blocking work. Use `p1` for important planned work, `p2` for normal backlog work, and `p3` for cleanup or nice-to-have work.
-- `depends_on` (optional): A list of task ids that must land first, using the filename without `.md`, e.g. `nav-01-hide-current-star-actions`.
-- `blocked_by` (optional): A short human-readable blocker when `status` is `blocked`.
-- `pr` (optional): GitHub PR number once work is in progress or done, e.g. `"#145"`.
+-   `status` (required): One of `draft`, `ready`, `active`, `blocked`, `done`. New tasks start as `draft` unless the user explicitly says the work is ready to implement.
+-   `area` (required): The product or implementation area, such as `navigation`, `rest`, `testing`, `dsp`, `simulation`, `ui`, or `dev`.
+-   `priority` (required): One of `p0`, `p1`, `p2`, `p3`. Use `p0` only for urgent broken-mainline or release-blocking work. Use `p1` for important planned work, `p2` for normal backlog work, and `p3` for cleanup or nice-to-have work.
+-   `depends_on` (optional): A list of task ids that must land first, using the filename without `.md`, e.g. `nav-01-hide-current-star-actions`.
+-   `blocked_by` (optional): A short human-readable blocker when `status` is `blocked`.
+-   `pr` (optional): GitHub PR number once work is in progress or done, e.g. `"#145"`.
 
 The task id is the filename without `.md`. Keep metadata short and factual. Do not duplicate the whole problem statement in frontmatter.
 
@@ -64,13 +64,13 @@ Group tasks by status in this order:
 Each tracker entry should be one line:
 
 ```markdown
-- [task-id](tasks/task-id.md) - Short title. `area` `priority`
+-   [task-id](tasks/task-id.md) - Short title. `area` `priority`
 ```
 
 For blocked tasks, include the blocker after the priority:
 
 ```markdown
-- [task-id](tasks/task-id.md) - Short title. `area` `priority` Blocked by: dependency or decision.
+-   [task-id](tasks/task-id.md) - Short title. `area` `priority` Blocked by: dependency or decision.
 ```
 
 When creating a task, add it to the section that matches its `status`. When changing a task's status, move it in `.plans/README.md` in the same edit. The tracker should summarize the queue and make the next implementable work obvious; details belong in the task files.

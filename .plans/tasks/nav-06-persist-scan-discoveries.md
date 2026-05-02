@@ -3,9 +3,9 @@ status: done
 area: navigation
 priority: p1
 depends_on:
-  - nav-08-track-edge-discoveries-per-player
-  - nav-09-add-user-edge-datacore-queries
-  - nav-10-sync-user-edges-on-load
+    - nav-08-track-edge-discoveries-per-player
+    - nav-09-add-user-edge-datacore-queries
+    - nav-10-sync-user-edges-on-load
 ---
 
 # Persist scan discoveries in the datacore
@@ -115,12 +115,12 @@ backfill.
 
 Keep the action-result and user-edge contracts separate:
 
-- `action.result.edges` may contain only the edge id and endpoint node ids
-  needed for immediate UI hints and graph reconciliation.
-- `action.result.nodes` may contain the scan result nodes needed for the
-  active/completed scan card and temporary map feedback.
-- datacore `user_edges` must be written from canonical `UserEdge` rows
-  returned by `/helm/v1/edges`, including `distance` and `discovered_at`.
+-   `action.result.edges` may contain only the edge id and endpoint node ids
+    needed for immediate UI hints and graph reconciliation.
+-   `action.result.nodes` may contain the scan result nodes needed for the
+    active/completed scan card and temporary map feedback.
+-   datacore `user_edges` must be written from canonical `UserEdge` rows
+    returned by `/helm/v1/edges`, including `distance` and `discovered_at`.
 
 Hydrate can reuse the existing edge freshness path from nav-10 and fetch all
 pages if the server freshness headers differ from local metadata. In-session
@@ -140,40 +140,40 @@ nav-11 tightens the backend visibility contract.
 
 ## Requirements
 
-- On bridge hydrate the client sends a `HEAD` to the nav-08 edge
-  endpoint, compares `X-WP-Total` and `X-Helm-Edge-Last-Discovered`
-  against the datacore meta from the previous sync, and skips the fetch
-  when both match.
-- When either header differs, the client issues a `GET`, replaces the
-  datacore edge table inside a single transaction, fetches any referenced
-  node ids absent from the datacore in one batched request, and writes
-  the new header pair into datacore meta.
-- Scan action results received via heartbeat, once their status is
-  fulfilled or partial, trigger reconciliation of canonical user-edge data
-  into datacore.
-- Reconciliation must not treat `action.result.edges` as canonical
-  `UserEdge` rows. In particular, it must not invent or copy
-  `discovered_at` from the action result.
-- Canonical datacore edge writes must use rows returned by `/helm/v1/edges`
-  so `distance` and `discovered_at` match the server's per-player
-  discovery record.
-- Any node ids referenced by a reconciled scan result or fetched user-edge
-  rows but absent from datacore are inserted before the edges that reference
-  them.
-- Multiple missing node ids from a single reconcile or hydrate must be
-  fetched in a single request, not one request per missing id.
-- Hydrating twice in a row, or reconciling the same scan result twice,
-  leaves the datacore in the state it was in after the first pass.
-- The datacore exposes enough of the edge graph for callers to answer
-  "is there a known route touching node X?" and "what nodes are connected
-  to the current node by known edges?" without reading the actions store.
-- Hydrate and reconcile are the only write paths introduced by this task.
-  Other features must not start writing edges independently.
-- No visual UI changes ship in this task; the context menu and starfield
-  indicators consume the new data in their own follow-up tasks.
-- No action contract changes. Depends on nav-08 for the server endpoint
-  and its headers. Any missing batched fetch-nodes-by-id endpoint may be
-  added alongside this task if one does not already exist.
-- Historical scan results already in the actions store on app init are
-  not reconciled by this task. A follow-up task will do that by reusing
-  the same reconcile entry point.
+-   On bridge hydrate the client sends a `HEAD` to the nav-08 edge
+    endpoint, compares `X-WP-Total` and `X-Helm-Edge-Last-Discovered`
+    against the datacore meta from the previous sync, and skips the fetch
+    when both match.
+-   When either header differs, the client issues a `GET`, replaces the
+    datacore edge table inside a single transaction, fetches any referenced
+    node ids absent from the datacore in one batched request, and writes
+    the new header pair into datacore meta.
+-   Scan action results received via heartbeat, once their status is
+    fulfilled or partial, trigger reconciliation of canonical user-edge data
+    into datacore.
+-   Reconciliation must not treat `action.result.edges` as canonical
+    `UserEdge` rows. In particular, it must not invent or copy
+    `discovered_at` from the action result.
+-   Canonical datacore edge writes must use rows returned by `/helm/v1/edges`
+    so `distance` and `discovered_at` match the server's per-player
+    discovery record.
+-   Any node ids referenced by a reconciled scan result or fetched user-edge
+    rows but absent from datacore are inserted before the edges that reference
+    them.
+-   Multiple missing node ids from a single reconcile or hydrate must be
+    fetched in a single request, not one request per missing id.
+-   Hydrating twice in a row, or reconciling the same scan result twice,
+    leaves the datacore in the state it was in after the first pass.
+-   The datacore exposes enough of the edge graph for callers to answer
+    "is there a known route touching node X?" and "what nodes are connected
+    to the current node by known edges?" without reading the actions store.
+-   Hydrate and reconcile are the only write paths introduced by this task.
+    Other features must not start writing edges independently.
+-   No visual UI changes ship in this task; the context menu and starfield
+    indicators consume the new data in their own follow-up tasks.
+-   No action contract changes. Depends on nav-08 for the server endpoint
+    and its headers. Any missing batched fetch-nodes-by-id endpoint may be
+    added alongside this task if one does not already exist.
+-   Historical scan results already in the actions store on app init are
+    not reconciled by this task. A follow-up task will do that by reusing
+    the same reconcile entry point.

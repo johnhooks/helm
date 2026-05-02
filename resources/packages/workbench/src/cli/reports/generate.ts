@@ -19,7 +19,9 @@ const REPORTS_DIR = resolve(import.meta.dirname, '../../../reports');
 
 function loadBaseline(command: BaselineCommand): unknown | null {
 	const path = resolve(BASELINES_DIR, `${command}.json`);
-	if (!existsSync(path)) { return null; }
+	if (!existsSync(path)) {
+		return null;
+	}
 	return JSON.parse(readFileSync(path, 'utf-8'));
 }
 
@@ -33,15 +35,17 @@ function loadDiffs(ctx: {
 	let hasAny = false;
 
 	const commandData: Record<BaselineCommand, unknown> = {
-		'analyse': ctx.analyse,
+		analyse: ctx.analyse,
 		'dsp-progress': ctx.dspProgress,
-		'balance': ctx.balance,
-		'detection': ctx.detection,
+		balance: ctx.balance,
+		detection: ctx.detection,
 	};
 
 	for (const command of BASELINE_COMMANDS) {
 		const baseline = loadBaseline(command);
-		if (baseline === null) { continue; }
+		if (baseline === null) {
+			continue;
+		}
 		hasAny = true;
 		results.push(diffBaseline(command, baseline, commandData[command]));
 	}
@@ -96,7 +100,9 @@ export function generateReports(): void {
 	log(`Generated ${files.length} reports in reports/`);
 
 	if (!diffs) {
-		log('  (no baselines found — regression.md skipped. Run: bun run wb baseline save --all)');
+		log(
+			'  (no baselines found — regression.md skipped. Run: bun run wb baseline save --all)'
+		);
 	}
 
 	// Surface critical findings
@@ -111,7 +117,10 @@ export function generateReports(): void {
 		log(`  !  ${balance.outliers.length} balance outlier(s)`);
 	}
 	if (diffs) {
-		const totalRegressions = diffs.reduce((n, d) => n + d.summary.regressions, 0);
+		const totalRegressions = diffs.reduce(
+			(n, d) => n + d.summary.regressions,
+			0
+		);
 		if (totalRegressions > 0) {
 			log(`  !! ${totalRegressions} regression(s) since baseline`);
 		}

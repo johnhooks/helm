@@ -39,15 +39,18 @@ import { DEFAULT_DSP_CONSTANTS } from './types';
  * @param stellarClass - OBAFGKM spectral class as a single character
  * @param modifier - Multiplier for local conditions (default 1.0)
  */
-export function stellarNoise(stellarClass: string, modifier: number = 1.0): number {
+export function stellarNoise(
+	stellarClass: string,
+	modifier: number = 1.0
+): number {
 	const baseLevels: Record<string, number> = {
-		O: 8.0,    // Blue supergiant — electromagnetically violent
-		B: 5.0,    // Hot blue — very loud
-		A: 3.0,    // White — moderate-high
-		F: 1.8,    // Yellow-white — above average
-		G: 1.0,    // Sun-like — the reference level
-		K: 0.6,    // Orange — quieter
-		M: 0.3,    // Red dwarf — nearly silent
+		O: 8.0, // Blue supergiant — electromagnetically violent
+		B: 5.0, // Hot blue — very loud
+		A: 3.0, // White — moderate-high
+		F: 1.8, // Yellow-white — above average
+		G: 1.0, // Sun-like — the reference level
+		K: 0.6, // Orange — quieter
+		M: 0.3, // Red dwarf — nearly silent
 	};
 
 	const base = baseLevels[stellarClass.toUpperCase()] ?? 1.0;
@@ -82,8 +85,10 @@ export function noiseFloor(
 	beltNoise: number = 0,
 	ecmNoise: number = 0,
 	randomNoise: number = 0,
-	shipNoiseFactor: number = DEFAULT_DSP_CONSTANTS.shipNoiseFactor,
+	shipNoiseFactor: number = DEFAULT_DSP_CONSTANTS.shipNoiseFactor
 ): number {
-	const totalShipNoise = shipNoiseFactor * Math.sqrt(shipEmissions.reduce((sum, e) => sum + e * e, 0));
+	const totalShipNoise =
+		shipNoiseFactor *
+		Math.sqrt(shipEmissions.reduce((sum, e) => sum + e * e, 0));
 	return baseline + totalShipNoise + beltNoise + ecmNoise + randomNoise;
 }

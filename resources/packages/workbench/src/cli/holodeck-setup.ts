@@ -21,13 +21,7 @@ import {
 	firePhaserHandler,
 	fireTorpedoHandler,
 } from '@helm/holodeck';
-import type {
-	Engine,
-	Ship,
-	Clock,
-	Rng,
-	Hull,
-} from '@helm/holodeck';
+import type { Engine, Ship, Clock, Rng, Hull } from '@helm/holodeck';
 import type { SensorAffinity } from '@helm/formulas';
 
 // ── Engine setup ─────────────────────────────────────────────
@@ -35,7 +29,9 @@ import type { SensorAffinity } from '@helm/formulas';
 let handlersRegistered = false;
 
 function ensureHandlers(): void {
-	if (handlersRegistered) { return; }
+	if (handlersRegistered) {
+		return;
+	}
 	registerHandler(ActionType.Jump, jumpHandler);
 	registerHandler(ActionType.ScanRoute, scanRouteHandler);
 	registerHandler(ActionType.FirePhaser, firePhaserHandler);
@@ -87,7 +83,7 @@ export function createShipAtNode(
 	id: string,
 	hullSlug: string,
 	components?: ShipComponents,
-	options?: ShipOptions,
+	options?: ShipOptions
 ): Ship {
 	const loadout = buildLoadout(
 		hullSlug,
@@ -98,7 +94,7 @@ export function createShipAtNode(
 			shield: components?.shield,
 			nav: components?.nav,
 		},
-		options?.equipment,
+		options?.equipment
 	);
 
 	// Compute default ammo from weapon capacity
@@ -149,7 +145,9 @@ export interface CoreStats {
  */
 export function getWeaponStats(slug: string): WeaponStats {
 	const p = getProduct(slug);
-	if (!p) { throw new Error(`Unknown weapon product: ${slug}`); }
+	if (!p) {
+		throw new Error(`Unknown weapon product: ${slug}`);
+	}
 	return {
 		slug: p.slug,
 		damage: p.mult_a ?? 0,
@@ -165,7 +163,9 @@ export function getWeaponStats(slug: string): WeaponStats {
  */
 export function getShieldStats(slug: string): ShieldStats {
 	const p = getProduct(slug);
-	if (!p) { throw new Error(`Unknown shield product: ${slug}`); }
+	if (!p) {
+		throw new Error(`Unknown shield product: ${slug}`);
+	}
 	return {
 		slug: p.slug,
 		capacity: p.capacity ?? 0,
@@ -180,7 +180,9 @@ export function getShieldStats(slug: string): ShieldStats {
  */
 export function getCoreStats(slug: string): CoreStats {
 	const p = getProduct(slug);
-	if (!p) { throw new Error(`Unknown core product: ${slug}`); }
+	if (!p) {
+		throw new Error(`Unknown core product: ${slug}`);
+	}
 	return {
 		slug: p.slug,
 		capacity: p.capacity ?? 0,
@@ -197,7 +199,9 @@ export function getHullData(slug: string): Hull & {
 	stealthDrawMultiplier: number;
 } {
 	const hull = getHull(slug);
-	if (!hull) { throw new Error(`Unknown hull: ${slug}`); }
+	if (!hull) {
+		throw new Error(`Unknown hull: ${slug}`);
+	}
 	return {
 		...hull,
 		shieldCapacityMultiplier: hull.shieldCapacityMultiplier ?? 1.0,
@@ -211,16 +215,23 @@ export function getHullData(slug: string): Hull & {
  */
 export function getSensorAffinity(slug: string): SensorAffinity {
 	const p = getProduct(slug);
-	if (!p) { throw new Error(`Unknown sensor product: ${slug}`); }
-	if (!p.sensorDsp) { throw new Error(`Sensor ${slug} has no sensorDsp`); }
+	if (!p) {
+		throw new Error(`Unknown sensor product: ${slug}`);
+	}
+	if (!p.sensorDsp) {
+		throw new Error(`Sensor ${slug} has no sensorDsp`);
+	}
 	return p.sensorDsp;
 }
 
 // Re-export commonly used holodeck items for convenience
-export {
-	getProduct,
-	getHull,
-	HULLS,
-	buildLoadout,
+export { getProduct, getHull, HULLS, buildLoadout } from '@helm/holodeck';
+export type {
+	Engine,
+	Ship,
+	Clock,
+	Rng,
+	Hull,
+	CatalogProduct,
+	Loadout,
 } from '@helm/holodeck';
-export type { Engine, Ship, Clock, Rng, Hull, CatalogProduct, Loadout } from '@helm/holodeck';

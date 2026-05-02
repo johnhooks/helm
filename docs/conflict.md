@@ -6,9 +6,10 @@ How combat works, why space is dangerous but not cruel, and where aggression bel
 
 Space is wild. Players in a space MMO expect that. But Helm is async — you check in over morning coffee, not during a raid timer. Combat has to respect that. The pilot who logs off for the night shouldn't come back to a destroyed ship.
 
-The answer isn't making space safe. It's making destruction rare, expensive, and socially punished — while making the *threat* of encounter ever-present. There are more bison than wolves for a reason. It's hard to be a predator.
+The answer isn't making space safe. It's making destruction rare, expensive, and socially punished — while making the _threat_ of encounter ever-present. There are more bison than wolves for a reason. It's hard to be a predator.
 
 Combat channels through three tiers:
+
 1. **The Others** — PvE. Necessary, rewarding, the primary combat content.
 2. **Interdiction** — PvP. The wolf catches prey, takes cargo, both ships survive.
 3. **Destruction** — PvP escalation. Deliberate, taboo, comes with a bounty.
@@ -47,9 +48,9 @@ But occasionally — rarely — it lines up. "Contact detected" in a PNP context
 
 Each sensor type has a different PNP profile based on its sweep period:
 
-- **ACU (rapid sweeps):** Finds targets faster but broadcasts more frequently. Loud hunter, quick results.
-- **VRS (moderate sweeps):** Balance of detection speed and stealth.
-- **DSC (long dwell):** Fewer emissions per hour. Quieter hunting, but much slower to find anything.
+-   **ACU (rapid sweeps):** Finds targets faster but broadcasts more frequently. Loud hunter, quick results.
+-   **VRS (moderate sweeps):** Balance of detection speed and stealth.
+-   **DSC (long dwell):** Fewer emissions per hour. Quieter hunting, but much slower to find anything.
 
 ---
 
@@ -69,19 +70,19 @@ Interdiction is the default combat interaction. A wolf catches prey and takes ca
 
 When shields drop, there's a **cargo transfer window** — a time frame (hours) during which the loot is accessible. This matters because the defender might not be online.
 
-- If the **defender is online:** they can choose which cargo to jettison and which to try to protect. Maybe they dump the cheap ore and keep the rare find. Negotiation is possible — "take the platinum, leave the alien salvage."
-- If the **defender is offline:** the attacker gets access to the full hold, limited by their own cargo capacity. The defender comes back to find their hold lighter but their ship intact.
-- If **neither acts** before the window closes: the interdiction field collapses, remaining cargo stays with the defender.
+-   If the **defender is online:** they can choose which cargo to jettison and which to try to protect. Maybe they dump the cheap ore and keep the rare find. Negotiation is possible — "take the platinum, leave the alien salvage."
+-   If the **defender is offline:** the attacker gets access to the full hold, limited by their own cargo capacity. The defender comes back to find their hold lighter but their ship intact.
+-   If **neither acts** before the window closes: the interdiction field collapses, remaining cargo stays with the defender.
 
 ### The Attacker's Constraints
 
 Interdiction isn't free:
 
-- **PNP scanning cost:** Core life and power burned finding the target.
-- **Engagement wear:** Weapons, shields, and core all take condition damage during the shield drain.
-- **Time:** Hours spent draining shields is hours not spent mining or exploring.
-- **Cargo capacity:** A combat-fitted ship has limited cargo space. You can't take everything.
-- **Reputation hit:** Minor, but logged. Frequent interdictions stack up.
+-   **PNP scanning cost:** Core life and power burned finding the target.
+-   **Engagement wear:** Weapons, shields, and core all take condition damage during the shield drain.
+-   **Time:** Hours spent draining shields is hours not spent mining or exploring.
+-   **Cargo capacity:** A combat-fitted ship has limited cargo space. You can't take everything.
+-   **Reputation hit:** Minor, but logged. Frequent interdictions stack up.
 
 The pirate often creates more value for salvagers (who find the scattered leftovers) than they capture for themselves.
 
@@ -101,8 +102,8 @@ A solo pirate has a cargo problem. A PVP-fitted ship is loaded with weapons and 
 
 The wolf pack solves this through division of labor:
 
-- **The interceptor:** Combat-fitted. Scans, interdicts, drains shields. Carries almost nothing.
-- **The haulers:** Lightly armed or unarmed. Show up after shields drop with empty cargo holds. Strip the target clean.
+-   **The interceptor:** Combat-fitted. Scans, interdicts, drains shields. Carries almost nothing.
+-   **The haulers:** Lightly armed or unarmed. Show up after shields drop with empty cargo holds. Strip the target clean.
 
 The interceptor is the tool, not the hauler. It's there to crack the shell. The pack carries the meat. Just like actual wolves — the kill is shared because no single wolf can consume it alone.
 
@@ -130,10 +131,10 @@ And it cascades. The second interdiction leaves another looted ship. More bait. 
 
 This is why destruction is almost always wrong from the wolf's perspective:
 
-- **Destroying costs resources** — component wear, power, time
-- **Destroying generates bounty** — reputation damage, station exile
-- **Destroying eliminates the bait** — no wreck, no salvager, no second target
-- **Looting is the profit, the wreck is the infrastructure**
+-   **Destroying costs resources** — component wear, power, time
+-   **Destroying generates bounty** — reputation damage, station exile
+-   **Destroying eliminates the bait** — no wreck, no salvager, no second target
+-   **Looting is the profit, the wreck is the infrastructure**
 
 The wolf who understands this never destroys anything. They interdict, loot, leave, and wait. The wreck does the recruiting. The salvager's greed does the rest.
 
@@ -153,9 +154,9 @@ This is never accidental. The game makes you choose it explicitly. There's no lo
 
 ### Why Would Anyone Do It?
 
-- **Grudge.** Personal vendetta. Expensive revenge.
-- **Territory.** Sending a message: "don't come back here."
-- **Griefing.** Some players just want to destroy things.
+-   **Grudge.** Personal vendetta. Expensive revenge.
+-   **Territory.** Sending a message: "don't come back here."
+-   **Griefing.** Some players just want to destroy things.
 
 All of these are valid player motivations. The game doesn't prevent them. It just makes the cost enormous.
 
@@ -164,20 +165,23 @@ All of these are valid player motivations. The game doesn't prevent them. It jus
 Destroying a player ship triggers an automatic bounty from the Origin. This isn't a minor reputation hit — it's a material consequence.
 
 **First destruction:**
-- Large bounty placed on the attacker, visible to all players
-- Reputation hit with all stations in the sector
-- The victim's ship record (name, loadout, age) is attached to the bounty — everyone knows what was lost
+
+-   Large bounty placed on the attacker, visible to all players
+-   Reputation hit with all stations in the sector
+-   The victim's ship record (name, loadout, age) is attached to the bounty — everyone knows what was lost
 
 **Escalating destructions:**
-- Bounty multiplies with each kill
-- Station access degrades: higher prices → refused service → refused docking
-- The attacker's ship signature becomes flagged — easier to detect on passive scans
-- Other pirates distance themselves (association draws heat)
+
+-   Bounty multiplies with each kill
+-   Station access degrades: higher prices → refused service → refused docking
+-   The attacker's ship signature becomes flagged — easier to detect on passive scans
+-   Other pirates distance themselves (association draws heat)
 
 **At the extreme:**
-- Effectively exiled from the economy. Can't dock, can't trade, can't resupply.
-- The bounty is large enough that hunting the destroyer becomes profitable for other players.
-- The wolf that kills for sport becomes prey.
+
+-   Effectively exiled from the economy. Can't dock, can't trade, can't resupply.
+-   The bounty is large enough that hunting the destroyer becomes profitable for other players.
+-   The wolf that kills for sport becomes prey.
 
 ### The Bounty Hunter
 
@@ -195,10 +199,10 @@ The hull is damaged but potentially salvageable. The components inside — drive
 
 This matters in several ways:
 
-- **The victim can recover.** Allies retrieve the wreck, repair the components, rebuild. The investment isn't zeroed out — it's set back. Expensive and painful, but not starting from scratch.
-- **Salvagers move in.** A wreck is a salvage opportunity. Experienced components are the most valuable items in the game. Someone will come for them.
-- **The attacker gains nothing extra.** Destruction doesn't drop loot beyond what interdiction already took. The cargo was transferred during the shield drain. What's left in the wreck is damaged components — useful to a salvager, worthless to the attacker who's already moving on.
-- **Post-battle salvage events.** A station siege leaves the system littered with wrecks from both sides. Salvagers converge. The winning side might not collect their own losses before scavengers pick through the debris. Major battles create economic events that draw players from across the region.
+-   **The victim can recover.** Allies retrieve the wreck, repair the components, rebuild. The investment isn't zeroed out — it's set back. Expensive and painful, but not starting from scratch.
+-   **Salvagers move in.** A wreck is a salvage opportunity. Experienced components are the most valuable items in the game. Someone will come for them.
+-   **The attacker gains nothing extra.** Destruction doesn't drop loot beyond what interdiction already took. The cargo was transferred during the shield drain. What's left in the wreck is damaged components — useful to a salvager, worthless to the attacker who's already moving on.
+-   **Post-battle salvage events.** A station siege leaves the system littered with wrecks from both sides. Salvagers converge. The winning side might not collect their own losses before scavengers pick through the debris. Major battles create economic events that draw players from across the region.
 
 Ship destruction is a state change, not an erasure. The universe accumulates history. See `gameplay.md` for the full salvage economy.
 
@@ -212,20 +216,21 @@ The bounty system doesn't prevent destruction. It gates it behind infrastructure
 
 This creates the bison/wolf ecosystem naturally:
 
-- **Wolves need dens.** Destruction as a lifestyle requires territory. Building and defending that territory is expensive. The group pays for its predators through infrastructure investment.
-- **The bison know where the wolves live.** Faction territory is visible — their stations, their security policy, their reputation. Pilots learn which systems to avoid. "Don't jump through Kepler corridor, that's Razor territory." The danger is legible, not random.
-- **The wolves are still constrained.** They can only operate near their own territory for resupply. Ranging deep means a long trip home with a damaged ship. The further from the den, the more vulnerable the wolf.
-- **The bison are generally safe.** Most of space has no wolf packs. Most interactions are peaceful. But the possibility exists, and that background awareness is what makes space feel alive.
+-   **Wolves need dens.** Destruction as a lifestyle requires territory. Building and defending that territory is expensive. The group pays for its predators through infrastructure investment.
+-   **The bison know where the wolves live.** Faction territory is visible — their stations, their security policy, their reputation. Pilots learn which systems to avoid. "Don't jump through Kepler corridor, that's Razor territory." The danger is legible, not random.
+-   **The wolves are still constrained.** They can only operate near their own territory for resupply. Ranging deep means a long trip home with a damaged ship. The further from the den, the more vulnerable the wolf.
+-   **The bison are generally safe.** Most of space has no wolf packs. Most interactions are peaceful. But the possibility exists, and that background awareness is what makes space feel alive.
 
 The result: organized PVP destruction happens in specific, known areas of space. It's a regional threat, not a universal one. A new player in hisec never encounters it. A miner in neutral frontier space rarely encounters it. A hauler who routes through wolf territory? That's a choice, and the game made the risk legible before they jumped.
 
 ### Recovery
 
 A destroyer can work their bounty off, but it takes a long time:
-- Constructive actions (trading, hauling, defending against Others) slowly reduce the bounty
-- Weeks or months of real time to clear a serious bounty
-- Stations have long memories — access returns gradually, not all at once
-- The record never fully disappears — other players can always see that it happened
+
+-   Constructive actions (trading, hauling, defending against Others) slowly reduce the bounty
+-   Weeks or months of real time to clear a serious bounty
+-   Stations have long memories — access returns gradually, not all at once
+-   The record never fully disappears — other players can always see that it happened
 
 ---
 
@@ -282,11 +287,11 @@ Time spent hunting, fighting, and repairing is time not spent mining, trading, o
 
 Fighting Others is necessary and rewarding. They compete for your resources, threaten your platforms, and carry alien components worth salvaging.
 
-- Defending your platforms protects your investment
-- Clearing Others from a sector restores resource access
-- Salvaging Other ships yields alien components (unique, valuable)
-- Community standing improves — stations reward Other kills
-- No reputation penalty
+-   Defending your platforms protects your investment
+-   Clearing Others from a sector restores resource access
+-   Salvaging Other ships yields alien components (unique, valuable)
+-   Community standing improves — stations reward Other kills
+-   No reputation penalty
 
 The same combat mechanics that make piracy costly make fighting Others rewarding. The mutual damage still applies — but the loot is alien tech you can't get any other way, and stations reward you for it.
 
@@ -296,7 +301,7 @@ Your mining platform is threatened — by another player or by Others. Combat to
 
 ### Station Siege
 
-If ship-to-ship PVP is hard, taking down a station should be *much* harder. A station is a permanent structure — someone spent weeks building it. Destroying one requires a coordinated group, sustained commitment, and enormous cost. A solo pirate can't even scratch a station. A small group can harass it. Only a serious fleet can threaten it.
+If ship-to-ship PVP is hard, taking down a station should be _much_ harder. A station is a permanent structure — someone spent weeks building it. Destroying one requires a coordinated group, sustained commitment, and enormous cost. A solo pirate can't even scratch a station. A small group can harass it. Only a serious fleet can threaten it.
 
 **Sieges take time.** Days, not hours. A station has shields, hull, and infrastructure that dwarf anything a ship carries. The attackers have to maintain pressure across multiple real-time sessions. They can't just show up, blow it up, and leave. It's a campaign.
 
@@ -304,7 +309,7 @@ If ship-to-ship PVP is hard, taking down a station should be *much* harder. A st
 
 **The defender has advantages.** They're already there. They have the station's defenses. They have resupply. They can call for help. The attackers burned core life getting there, are operating far from their own resupply, and every hour on station is component wear they can't easily repair.
 
-**Sieges change ownership, not existence.** The typical outcome of a successful siege isn't a pile of rubble — it's a change of hands. Stations are too valuable to destroy. Someone spent weeks building it, and the attackers want to *use* it, not delete it. A successful siege forces a transfer of ownership. The old owner loses their station. The new owner inherits the infrastructure, the docking fees, the market, the security policy decisions.
+**Sieges change ownership, not existence.** The typical outcome of a successful siege isn't a pile of rubble — it's a change of hands. Stations are too valuable to destroy. Someone spent weeks building it, and the attackers want to _use_ it, not delete it. A successful siege forces a transfer of ownership. The old owner loses their station. The new owner inherits the infrastructure, the docking fees, the market, the security policy decisions.
 
 Actual destruction of a station would require sustained effort well beyond what it takes to seize control — and for what? You'd be destroying the very thing that makes the system valuable. It's possible, but it's almost never the goal. A group that destroys a station instead of taking it is making a statement so expensive that the entire server notices.
 
@@ -326,12 +331,12 @@ Not all space is equal. Security scales with proximity to civilization.
 
 The core ~10 systems have active station security. In hisec, even **running a PNP scan** is treated as hostile intent. Security detects it and responds.
 
-- PNP scan detected → security flags the ship immediately
-- Continued scanning → security engages (interdiction, impound)
-- Actual attack → overwhelming response, ship seized
-- New players are safe in the core — not just from combat, but from being hunted at all
+-   PNP scan detected → security flags the ship immediately
+-   Continued scanning → security engages (interdiction, impound)
+-   Actual attack → overwhelming response, ship seized
+-   New players are safe in the core — not just from combat, but from being hunted at all
 
-You can't even *look* for targets in hisec without drawing security. The wolf has to leave civilized space to hunt.
+You can't even _look_ for targets in hisec without drawing security. The wolf has to leave civilized space to hunt.
 
 ### Low-Security (Player Stations)
 
@@ -364,16 +369,18 @@ The security model pushes predators outward. You can't hunt in hisec. You can hu
 Derived entirely from existing components and their wear:
 
 **Offensive:**
-- Weapons: equipment slot (if installed)
-- Targeting: sensor accuracy (worn sensors with drift = better targeting)
-- Power: core output (affects weapon cycling)
-- Maneuver: drive speed (evasion, pursuit)
+
+-   Weapons: equipment slot (if installed)
+-   Targeting: sensor accuracy (worn sensors with drift = better targeting)
+-   Power: core output (affects weapon cycling)
+-   Maneuver: drive speed (evasion, pursuit)
 
 **Defensive:**
-- Shields: capacity + regen + harmonic state (see `docs/plans/envelopes.md`)
-- Hull: integrity (base + repair module)
-- Evasion: drive speed + sensor awareness
-- Escape: drive range + current power (can you spool and jump out?)
+
+-   Shields: capacity + regen + harmonic state (see `docs/plans/envelopes.md`)
+-   Hull: integrity (base + repair module)
+-   Evasion: drive speed + sensor awareness
+-   Escape: drive range + current power (can you spool and jump out?)
 
 No separate combat stats. Everything comes from the same components used for exploration, mining, and hauling. A scout with a DSC Mk I and DR-705 is actually decent in a fight — good targeting, high evasion — but has no dedicated weapons and light shields.
 
@@ -383,11 +390,11 @@ No separate combat stats. Everything comes from the same components used for exp
 
 Being a pirate IS a valid playstyle. It's just hard.
 
-- **Where to repair?** Reputation too low for most stations. Remote stations or premium prices.
-- **Where to sell?** Known pirates can't use normal markets. Player-to-player trades, black markets.
-- **How to sustain?** Every engagement damages your ship. Components degrade, repair resources are scarce.
-- **Where to hide?** Core systems have security. Frontier stations may refuse you. Deep space is lonely.
-- **Is it worth it?** Probably not financially. But some people want to be space pirates. And that's their choice.
+-   **Where to repair?** Reputation too low for most stations. Remote stations or premium prices.
+-   **Where to sell?** Known pirates can't use normal markets. Player-to-player trades, black markets.
+-   **How to sustain?** Every engagement damages your ship. Components degrade, repair resources are scarce.
+-   **Where to hide?** Core systems have security. Frontier stations may refuse you. Deep space is lonely.
+-   **Is it worth it?** Probably not financially. But some people want to be space pirates. And that's their choice.
 
 The game doesn't forbid it. It just makes the math clear. A pirate is choosing a harder path because they want to, not because the game rewards it. Their existence creates content for everyone else — bounty hunting, cautionary tales, the background tension that makes space feel wild.
 
@@ -423,12 +430,12 @@ This is the foundation of the async safety model: a player who logs off is safe 
 
 Each system a ship powers up adds to its emission profile:
 
-| Step | What happens | Emission | Detectable? |
-|------|-------------|----------|-------------|
-| Idle / passive scan | Listening only | 0 | No |
-| Engage shields | Shield power-up ramp | 0.2 (faint) | Barely — DSC with long integration might |
-| Arm weapons / active scan | Targeting lock | 5.0+ (loud) | Yes — this is the commitment point |
-| Fire | Weapons discharge | 6.0 | Very |
+| Step                      | What happens         | Emission    | Detectable?                              |
+| ------------------------- | -------------------- | ----------- | ---------------------------------------- |
+| Idle / passive scan       | Listening only       | 0           | No                                       |
+| Engage shields            | Shield power-up ramp | 0.2 (faint) | Barely — DSC with long integration might |
+| Arm weapons / active scan | Targeting lock       | 5.0+ (loud) | Yes — this is the commitment point       |
+| Fire                      | Weapons discharge    | 6.0         | Very                                     |
 
 The reveal is gradual and player-driven. Each step up the ladder trades stealth for capability. The ambush predator must sacrifice information asymmetry to engage.
 
@@ -442,22 +449,22 @@ Ship behavior falls into two categories, distinguished by whether it occupies th
 
 Actions block the ship's action slot. A ship can only perform one at a time. They go through the handler lifecycle: validate, handle, defer, resolve. They produce results the player sees.
 
-- **jump** — multi-phase travel (spool / cooldown), emits drive envelopes
-- **scan_route** — discover navigation routes, emits pnp_scan
-- **passive_scan** — listen for emissions over integration period, emits nothing
-- **pvp_scan** — targeting lock on a detected contact, emits loudly
-- **fire_phaser / fire_torpedo** — combat, emits weapons_fire
-- **Mining / Salvaging** — resource extraction, emits faintly
+-   **jump** — multi-phase travel (spool / cooldown), emits drive envelopes
+-   **scan_route** — discover navigation routes, emits pnp_scan
+-   **passive_scan** — listen for emissions over integration period, emits nothing
+-   **pvp_scan** — targeting lock on a detected contact, emits loudly
+-   **fire_phaser / fire_torpedo** — combat, emits weapons_fire
+-   **Mining / Salvaging** — resource extraction, emits faintly
 
 ### State (timestamp-based, runs in parallel)
 
 State transitions are instant mutations that start a timestamp clock. Formulas compute current values on demand. These do NOT occupy the action slot — a ship can engage shields while running a passive scan.
 
-- **Shield engagement** — `shields_engaged_at`, power-up curve formula gives current strength
-- **Shield regen** — `shields_full_at`, regen rate fills shields after damage
-- **Weapon arming** — `weapons_armed_at`, readiness ramp
-- **ECM activation** — `ecm_activated_at`, warm-up period
-- **Power regen** — `power_full_at`, capacitor refill
+-   **Shield engagement** — `shields_engaged_at`, power-up curve formula gives current strength
+-   **Shield regen** — `shields_full_at`, regen rate fills shields after damage
+-   **Weapon arming** — `weapons_armed_at`, readiness ramp
+-   **ECM activation** — `ecm_activated_at`, warm-up period
+-   **Power regen** — `power_full_at`, capacitor refill
 
 The pattern is always: `current_value = formula(now - timestamp, max, rate)`.
 
@@ -484,18 +491,18 @@ The sensor determines detection quality — how well you see things, how early, 
 
 **Targeting lock speed comes from the weapon system and pilot skill, not the sensor.** A DSC and ACU that both produce a 0.7 confidence detection feed into the same lock mechanics. The sensor choice is purely about detection quality:
 
-- **DSC:** Better passive ears. Sees faint continuous emissions earlier. The scout sensor, the miner's early warning.
-- **ACU:** Better pulse matching. Catches transient events (drive spools, scan sweeps). The combat awareness sensor.
+-   **DSC:** Better passive ears. Sees faint continuous emissions earlier. The scout sensor, the miner's early warning.
+-   **ACU:** Better pulse matching. Catches transient events (drive spools, scan sweeps). The combat awareness sensor.
 
 ### Parent-Child Actions
 
 When an attacker's action produces an effect on a target, the system creates a child action on the target's ship. The parent-child link exists for system analysis; it is never exposed to the other player.
 
-- `actor = self` — you initiated this (scan, jump, fire)
-- `actor = <ship_id>` — another player caused this (damage, interdiction)
-- `actor = system` — the game caused this (environmental, tick event)
+-   `actor = self` — you initiated this (scan, jump, fire)
+-   `actor = <ship_id>` — another player caused this (damage, interdiction)
+-   `actor = system` — the game caused this (environmental, tick event)
 
-The target's client sees their own action records — some self-initiated, some caused by others. Whether they know *who* caused it depends on their passive scan detection tier, not the action record.
+The target's client sees their own action records — some self-initiated, some caused by others. Whether they know _who_ caused it depends on their passive scan detection tier, not the action record.
 
 For gameplay, a ship only needs its current action and its parent. Full chain walking is an analysis concern, never a runtime query.
 
@@ -505,7 +512,7 @@ For gameplay, a ship only needs its current action and its parent. Full chain wa
 
 Detailed mechanical walkthroughs of engagement scenarios live in `docs/dev/scenarios/`:
 
-- `spectre-vs-striker.md` — Ambush predator vs combat patrol. Covers solo and pair tactics, timing windows, detection chains.
+-   `spectre-vs-striker.md` — Ambush predator vs combat patrol. Covers solo and pair tactics, timing windows, detection chains.
 
 ---
 

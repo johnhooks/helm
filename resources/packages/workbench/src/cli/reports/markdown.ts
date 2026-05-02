@@ -13,8 +13,13 @@ export function heading(level: number, text: string): string {
  * Render a markdown table from rows of key-value objects.
  * Columns are specified as [header, key] pairs.
  */
-export function table(columns: [string, string][], rows: Record<string, unknown>[]): string {
-	if (rows.length === 0) { return '_No data._\n'; }
+export function table(
+	columns: [string, string][],
+	rows: Record<string, unknown>[]
+): string {
+	if (rows.length === 0) {
+		return '_No data._\n';
+	}
 
 	const headers = columns.map(([h]) => h);
 	const keys = columns.map(([, k]) => k);
@@ -26,8 +31,12 @@ export function table(columns: [string, string][], rows: Record<string, unknown>
 	for (const row of rows) {
 		const cells = keys.map((k) => {
 			const v = row[k];
-			if (v === null || v === undefined) { return '—'; }
-			if (typeof v === 'number') { return String(v); }
+			if (v === null || v === undefined) {
+				return '—';
+			}
+			if (typeof v === 'number') {
+				return String(v);
+			}
 			return String(v);
 		});
 		lines.push(`| ${cells.join(' | ')} |`);
@@ -41,10 +50,18 @@ export function table(columns: [string, string][], rows: Record<string, unknown>
  */
 export function verdictBadge(counts: Record<string, number>): string {
 	const parts: string[] = [];
-	if (counts.PASS) { parts.push(`${counts.PASS} PASS`); }
-	if (counts.WARN) { parts.push(`${counts.WARN} WARN`); }
-	if (counts.FAIL) { parts.push(`${counts.FAIL} FAIL`); }
-	if (counts.INFO) { parts.push(`${counts.INFO} INFO`); }
+	if (counts.PASS) {
+		parts.push(`${counts.PASS} PASS`);
+	}
+	if (counts.WARN) {
+		parts.push(`${counts.WARN} WARN`);
+	}
+	if (counts.FAIL) {
+		parts.push(`${counts.FAIL} FAIL`);
+	}
+	if (counts.INFO) {
+		parts.push(`${counts.INFO} INFO`);
+	}
 	return `[${parts.join(' / ')}]`;
 }
 

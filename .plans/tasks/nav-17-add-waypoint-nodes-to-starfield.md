@@ -3,7 +3,7 @@ status: draft
 area: navigation
 priority: p2
 depends_on:
-  - nav-07-show-routes-toggle
+    - nav-07-show-routes-toggle
 ---
 
 # Add waypoint nodes to the starfield
@@ -47,22 +47,22 @@ a star title. A waypoint target can use a stable fallback label such as
 
 Requirements:
 
-- Render waypoint nodes referenced by known user edges as visible markers in
-  the starfield.
-- Waypoint markers must use a visual treatment distinct from stars and should
-  not reuse spectral color.
-- Waypoints must be sourced from authorized datacore node records, not from
-  transient scan action payloads.
-- Waypoint visibility must follow discovered edge knowledge. Unknown waypoints
-  must not appear.
-- Selecting a waypoint must produce a node-target selection, not a fake
-  `StarNode`.
-- The context menu must support waypoint targets with waypoint-specific labels.
-- Jump must be available for a waypoint when a direct known edge connects it to
-  the current node and no action is already active.
-- Jump draft, active, and completed cards must display waypoint targets without
-  calling star-only selectors that expect a title.
-- Scan Route should not be offered for waypoint targets in this task.
-- Existing star selection, star labels, and star context actions must continue
-  to behave as they do today.
-- No backend jump contract changes.
+-   Render waypoint nodes referenced by known user edges as visible markers in
+    the starfield.
+-   Waypoint markers must use a visual treatment distinct from stars and should
+    not reuse spectral color.
+-   Waypoints must be sourced from authorized datacore node records, not from
+    transient scan action payloads.
+-   Waypoint visibility must follow discovered edge knowledge. Unknown waypoints
+    must not appear.
+-   Selecting a waypoint must produce a node-target selection, not a fake
+    `StarNode`.
+-   The context menu must support waypoint targets with waypoint-specific labels.
+-   Jump must be available for a waypoint when a direct known edge connects it to
+    the current node and no action is already active.
+-   Jump draft, active, and completed cards must display waypoint targets without
+    calling star-only selectors that expect a title.
+-   Scan Route should not be offered for waypoint targets in this task.
+-   Existing star selection, star labels, and star context actions must continue
+    to behave as they do today.
+-   No backend jump contract changes.

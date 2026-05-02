@@ -10,13 +10,13 @@ Everything in the station log traces back to a ship_action or a system event. Th
 
 ## Log vs Actions
 
-| | Ship Actions | Station Log |
-|---|---|---|
-| **Role** | Event system — drives state changes | Ledger — records consequences |
-| **Initiator** | Ship (player or system) | Always external |
-| **Lifecycle** | Phases, locks, deferred resolution | Immediate — written during ship action resolution |
-| **State changes** | Mutates ship state | Mutates station state |
-| **Source of truth** | Yes — what happened and why | Projection — what happened to this station |
+|                     | Ship Actions                        | Station Log                                       |
+| ------------------- | ----------------------------------- | ------------------------------------------------- |
+| **Role**            | Event system — drives state changes | Ledger — records consequences                     |
+| **Initiator**       | Ship (player or system)             | Always external                                   |
+| **Lifecycle**       | Phases, locks, deferred resolution  | Immediate — written during ship action resolution |
+| **State changes**   | Mutates ship state                  | Mutates station state                             |
+| **Source of truth** | Yes — what happened and why         | Projection — what happened to this station        |
 
 ## Schema
 
@@ -32,16 +32,16 @@ station_log:
 
 ## Event Types
 
-| Type | Trigger | Example |
-|------|---------|---------|
-| `siege_damage` | Ship siege action resolves | Shields reduced by 12%, hull hit for 5 |
-| `covert_op` | Ship covert action resolves | Intel extracted, sabotage applied |
-| `intervention` | PVP engagement near station | Defense guns fired on aggressor, shield extended to defender |
-| `service_used` | Ship uses station service | Repair, refuel, trade |
-| `trade` | Ship buys/sells at station market | 50 titanium sold, refs ledger entry |
-| `docking_fee` | Ship docks at station | 200 credits collected, refs ledger entry |
-| `tax` | Tax applied to transaction | Sales tax on trade, refs ledger entry |
-| `state_change` | Cumulative damage threshold | Station enters damaged state, services degraded |
+| Type           | Trigger                           | Example                                                      |
+| -------------- | --------------------------------- | ------------------------------------------------------------ |
+| `siege_damage` | Ship siege action resolves        | Shields reduced by 12%, hull hit for 5                       |
+| `covert_op`    | Ship covert action resolves       | Intel extracted, sabotage applied                            |
+| `intervention` | PVP engagement near station       | Defense guns fired on aggressor, shield extended to defender |
+| `service_used` | Ship uses station service         | Repair, refuel, trade                                        |
+| `trade`        | Ship buys/sells at station market | 50 titanium sold, refs ledger entry                          |
+| `docking_fee`  | Ship docks at station             | 200 credits collected, refs ledger entry                     |
+| `tax`          | Tax applied to transaction        | Sales tax on trade, refs ledger entry                        |
+| `state_change` | Cumulative damage threshold       | Station enters damaged state, services degraded              |
 
 New event types added as station interactions expand.
 
@@ -62,9 +62,9 @@ The station doesn't "respond" as a separate action. The response (defense guns, 
 
 When a PVP engagement (fire_torpedo, fire_phaser) resolves near a station, the handler checks for station presence and allegiance. The station's effect is a modifier on the engagement result:
 
-- Defense guns add damage to the aggressor
-- Station shields extend to allied defenders
-- Penalties applied based on station allegiance
+-   Defense guns add damage to the aggressor
+-   Station shields extend to allied defenders
+-   Penalties applied based on station allegiance
 
 The intervention is recorded as a station log entry referencing the PVP ship_action. The ship's action result includes the station modifier. Neither side submits a separate action — the station's influence is baked into the resolution.
 
@@ -101,9 +101,9 @@ Multiple log entries per ship_action is expected. A single trade can produce a `
 
 Some station log entries have no ship_action parent:
 
-- Scheduled maintenance cycles
-- Economy ticks (resource generation, price updates)
-- Decay from neglect (undefended station degrades over time)
+-   Scheduled maintenance cycles
+-   Economy ticks (resource generation, price updates)
+-   Decay from neglect (undefended station degrades over time)
 
 These are system-driven, written by background jobs. `ship_action_id = NULL`.
 
@@ -111,12 +111,12 @@ These are system-driven, written by background jobs. `ship_action_id = NULL`.
 
 Stations have persistent state that ship actions and system events modify:
 
-- **Defenses** — shield strength, gun emplacements, repair capacity
-- **Allegiance** — faction ownership, player reputation effects
-- **Services** — what the station offers (repair, trade, intel) and current availability
-- **Condition** — cumulative damage affects service availability and defense capability
-- **Treasury** — accumulated credits from taxes, fees, trade margins
-- **Market** — inventory, prices, supply/demand state
+-   **Defenses** — shield strength, gun emplacements, repair capacity
+-   **Allegiance** — faction ownership, player reputation effects
+-   **Services** — what the station offers (repair, trade, intel) and current availability
+-   **Condition** — cumulative damage affects service availability and defense capability
+-   **Treasury** — accumulated credits from taxes, fees, trade margins
+-   **Market** — inventory, prices, supply/demand state
 
 State is modified during ship action resolution or system ticks. The station log records each change for auditability.
 
@@ -124,15 +124,15 @@ State is modified during ship action resolution or system ticks. The station log
 
 Station log entries are not ship_actions — they don't flow through the ship action broadcast pipeline. Stations need their own notification path:
 
-- Ships docked or near a station may subscribe to station updates
-- Station state changes (damage, service outage) broadcast to nearby/docked ships
-- Same transport-agnostic approach as ship action broadcasting — REST polling now, WebSocket push later
+-   Ships docked or near a station may subscribe to station updates
+-   Station state changes (damage, service outage) broadcast to nearby/docked ships
+-   Same transport-agnostic approach as ship action broadcasting — REST polling now, WebSocket push later
 
 ## Not in Scope
 
-- Station construction or ownership transfer mechanics
-- Ledger system design (credits, items, ownership transfers, inventory)
-- Price determination mechanics (supply/demand curves, NPC vs player markets)
-- Tax rate governance (who sets rates — faction, player owner, system)
-- Station-to-station interactions (supply lines, trade routes)
-- Autonomous station behavior (self-repair is a system tick, not station agency)
+-   Station construction or ownership transfer mechanics
+-   Ledger system design (credits, items, ownership transfers, inventory)
+-   Price determination mechanics (supply/demand curves, NPC vs player markets)
+-   Tax rate governance (who sets rates — faction, player owner, system)
+-   Station-to-station interactions (supply lines, trade routes)
+-   Autonomous station behavior (self-repair is a system tick, not station agency)

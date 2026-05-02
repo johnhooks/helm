@@ -2,7 +2,7 @@ import { __ } from '@wordpress/i18n';
 import { HelmError } from './helm-error';
 
 const DEFAULT_CODE = 'helm.assert';
-const DEFAULT_MESSAGE = __( 'An expected value was not found.', 'helm' );
+const DEFAULT_MESSAGE = __('An expected value was not found.', 'helm');
 
 /**
  * Asserts a value is neither null nor undefined, narrowing the type for TS.
@@ -17,12 +17,12 @@ const DEFAULT_MESSAGE = __( 'An expected value was not found.', 'helm' );
  * // ship is now narrowed to Ship (not Ship | undefined)
  * ```
  */
-export function assert< T >(
+export function assert<T>(
 	value: T | null | undefined,
 	code: string = DEFAULT_CODE,
-	message: string = DEFAULT_MESSAGE,
+	message: string = DEFAULT_MESSAGE
 ): asserts value is T {
-	if ( value === null || value === undefined ) {
-		throw new HelmError( code, message );
+	if (value === null || value === undefined) {
+		throw new HelmError(code, message);
 	}
 }

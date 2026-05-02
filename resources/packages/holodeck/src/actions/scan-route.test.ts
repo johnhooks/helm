@@ -29,40 +29,44 @@ describe('ScanRoute Handler', () => {
 		it('rejects when ship has no position', () => {
 			const { ship } = setup({ nodeId: null });
 			expect(() =>
-				scanRouteHandler.validate(ship, { target_node_id: 2 }, ctx),
+				scanRouteHandler.validate(ship, { target_node_id: 2 }, ctx)
 			).toThrow(ActionError);
 
 			try {
 				scanRouteHandler.validate(ship, { target_node_id: 2 }, ctx);
 			} catch (e) {
-				expect((e as ActionError).code).toBe(ActionErrorCode.ShipNoPosition);
+				expect((e as ActionError).code).toBe(
+					ActionErrorCode.ShipNoPosition
+				);
 			}
 		});
 
 		it('rejects when already at target', () => {
 			const { ship } = setup();
 			expect(() =>
-				scanRouteHandler.validate(ship, { target_node_id: 1 }, ctx),
+				scanRouteHandler.validate(ship, { target_node_id: 1 }, ctx)
 			).toThrow(ActionError);
 
 			try {
 				scanRouteHandler.validate(ship, { target_node_id: 1 }, ctx);
 			} catch (e) {
 				expect((e as ActionError).code).toBe(
-					ActionErrorCode.NavigationAlreadyAtTarget,
+					ActionErrorCode.NavigationAlreadyAtTarget
 				);
 			}
 		});
 
 		it('rejects when missing target_node_id', () => {
 			const { ship } = setup();
-			expect(() => scanRouteHandler.validate(ship, {}, ctx)).toThrow(ActionError);
+			expect(() => scanRouteHandler.validate(ship, {}, ctx)).toThrow(
+				ActionError
+			);
 
 			try {
 				scanRouteHandler.validate(ship, {}, ctx);
 			} catch (e) {
 				expect((e as ActionError).code).toBe(
-					ActionErrorCode.NavigationMissingTarget,
+					ActionErrorCode.NavigationMissingTarget
 				);
 			}
 		});
@@ -70,7 +74,11 @@ describe('ScanRoute Handler', () => {
 		it('passes with valid params', () => {
 			const { ship } = setup();
 			expect(() =>
-				scanRouteHandler.validate(ship, { target_node_id: 2, distance: 1 }, ctx),
+				scanRouteHandler.validate(
+					ship,
+					{ target_node_id: 2, distance: 1 },
+					ctx
+				)
 			).not.toThrow();
 		});
 	});
@@ -82,7 +90,7 @@ describe('ScanRoute Handler', () => {
 				ship,
 				{ target_node_id: 2, distance: 3 },
 				0,
-				ctx,
+				ctx
 			);
 
 			const expectedDuration = ship.sensors.getScanDuration(3, 1.0);
@@ -97,7 +105,7 @@ describe('ScanRoute Handler', () => {
 				ship,
 				{ target_node_id: 2, distance: 3 },
 				0,
-				ctx,
+				ctx
 			);
 
 			const expectedChance = ship.sensors.getScanSuccessChance(3, 1.0);
@@ -110,7 +118,7 @@ describe('ScanRoute Handler', () => {
 				ship,
 				{ target_node_id: 2, distance: 3 },
 				0,
-				ctx,
+				ctx
 			);
 
 			const expectedPowerCost = ship.sensors.getScanPowerCost(3);
@@ -123,7 +131,7 @@ describe('ScanRoute Handler', () => {
 				ship,
 				{ target_node_id: 42, distance: 2 },
 				100,
-				ctx,
+				ctx
 			);
 
 			expect(intent.result.from_node_id).toBe(1);
@@ -136,21 +144,21 @@ describe('ScanRoute Handler', () => {
 				ship,
 				{ target_node_id: 2, distance: 3 },
 				0,
-				ctx,
+				ctx
 			);
 			const intentLowEffort = scanRouteHandler.handle(
 				ship,
 				{ target_node_id: 2, distance: 3, effort: 0.5 },
 				0,
-				ctx,
+				ctx
 			);
 
 			// Lower effort → shorter duration, lower success chance
 			expect(intentLowEffort.result.duration).toBeLessThan(
-				intentDefault.result.duration as number,
+				intentDefault.result.duration as number
 			);
 			expect(intentLowEffort.result.success_chance).toBeLessThan(
-				intentDefault.result.success_chance as number,
+				intentDefault.result.success_chance as number
 			);
 		});
 	});
@@ -164,7 +172,7 @@ describe('ScanRoute Handler', () => {
 				ship,
 				{ target_node_id: 2, distance: 1 },
 				0,
-				ctx,
+				ctx
 			);
 
 			const action = {
@@ -199,7 +207,7 @@ describe('ScanRoute Handler', () => {
 					ship,
 					{ target_node_id: 2, distance: 1 },
 					0,
-					ctx,
+					ctx
 				);
 
 				const action = {
@@ -272,20 +280,33 @@ describe('ScanRoute Handler', () => {
 			const loadout = makeLoadout();
 			const clock = createClock();
 			const rng = createRng(42);
-			const ship = createShip(loadout, clock, rng, { nodeId: 1, ...config });
+			const ship = createShip(loadout, clock, rng, {
+				nodeId: 1,
+				...config,
+			});
 			return { ship, clock, loadout, graph, ctx: graphCtx };
 		}
 
 		it('validates nodes exist in graph', () => {
 			const { ship, ctx: graphCtx } = setupWithGraph();
 			expect(() =>
-				scanRouteHandler.validate(ship, { target_node_id: 999 }, graphCtx),
+				scanRouteHandler.validate(
+					ship,
+					{ target_node_id: 999 },
+					graphCtx
+				)
 			).toThrow(ActionError);
 
 			try {
-				scanRouteHandler.validate(ship, { target_node_id: 999 }, graphCtx);
+				scanRouteHandler.validate(
+					ship,
+					{ target_node_id: 999 },
+					graphCtx
+				);
 			} catch (e) {
-				expect((e as ActionError).code).toBe(ActionErrorCode.NavigationNoGraph);
+				expect((e as ActionError).code).toBe(
+					ActionErrorCode.NavigationNoGraph
+				);
 			}
 		});
 
@@ -295,7 +316,7 @@ describe('ScanRoute Handler', () => {
 				ship,
 				{ target_node_id: 3 },
 				0,
-				graphCtx,
+				graphCtx
 			);
 
 			// Distance from (0,0,0) to (5,3,2) = sqrt(38) ≈ 6.164
@@ -310,7 +331,7 @@ describe('ScanRoute Handler', () => {
 				ship,
 				{ target_node_id: 2 },
 				0,
-				graphCtx,
+				graphCtx
 			);
 
 			const action = {
@@ -340,7 +361,7 @@ describe('ScanRoute Handler', () => {
 				ship,
 				{ target_node_id: 3 },
 				0,
-				graphCtx,
+				graphCtx
 			);
 
 			const action = {

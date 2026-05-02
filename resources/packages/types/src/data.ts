@@ -27,9 +27,7 @@ type MetadataActionCreators = {
 	invalidateResolutionForStore: () => {
 		readonly type: 'INVALIDATE_RESOLUTION_FOR_STORE';
 	};
-	invalidateResolutionForStoreSelector: (
-		selectorName: string
-	) => {
+	invalidateResolutionForStoreSelector: (selectorName: string) => {
 		readonly type: 'INVALIDATE_RESOLUTION_FOR_STORE_SELECTOR';
 		readonly selectorName: string;
 	};
@@ -50,44 +48,40 @@ type MetadataAction =
 			readonly selectorName: string;
 	  };
 
-export type PromisifiedSelectorsOf< S > = S extends StoreDescriptor< AnyConfig >
+export type PromisifiedSelectorsOf<S> = S extends StoreDescriptor<AnyConfig>
 	? {
-			[ key in keyof CurriedSelectorsOf< S > ]: PromisifySelectorOf<
-				CurriedSelectorsOf< S >[ key ]
+			[key in keyof CurriedSelectorsOf<S>]: PromisifySelectorOf<
+				CurriedSelectorsOf<S>[key]
 			>;
 	  }
 	: never;
 
-type PromisifySelectorOf< F extends Function > = F extends (
+type PromisifySelectorOf<F extends Function> = F extends (
 	...args: infer P
 ) => infer R
-	? ( ...args: P ) => Promise< R >
+	? (...args: P) => Promise<R>
 	: F;
 
 /**
  * Dispatchable action creators for a store descriptor.
  */
-export type RegistryDispatch<
-	S extends string | StoreDescriptor< AnyConfig >,
-> = (
+export type RegistryDispatch<S extends string | StoreDescriptor<AnyConfig>> = (
 	storeNameOrDescriptor: S
-) => S extends StoreDescriptor< infer C >
-	? ActionCreatorsOf< C > & MetadataActionCreators
+) => S extends StoreDescriptor<infer C>
+	? ActionCreatorsOf<C> & MetadataActionCreators
 	: unknown;
 
 /**
  * Selectors for a store descriptor.
  */
-export type RegistrySelect<
-	S extends string | StoreDescriptor< AnyConfig >,
-> = (
+export type RegistrySelect<S extends string | StoreDescriptor<AnyConfig>> = (
 	storeNameOrDescriptor: S
-) => S extends StoreDescriptor< infer C > ? CurriedSelectorsOf< C > : unknown;
+) => S extends StoreDescriptor<infer C> ? CurriedSelectorsOf<C> : unknown;
 
 /**
  * Dispatch an action to the configured store.
  */
-export type DispatchFunction< A extends ReduxAction > = (
+export type DispatchFunction<A extends ReduxAction> = (
 	action: A | MetadataAction
 ) => void;
 
@@ -95,20 +89,18 @@ export type DispatchFunction< A extends ReduxAction > = (
  * A redux store registry.
  */
 export type Registry = {
-	dispatch: < S extends string | StoreDescriptor< AnyConfig > >(
+	dispatch: <S extends string | StoreDescriptor<AnyConfig>>(
 		storeNameOrDescriptor: S
-	) => S extends StoreDescriptor< infer C >
-		? ActionCreatorsOf< C > & MetadataActionCreators
+	) => S extends StoreDescriptor<infer C>
+		? ActionCreatorsOf<C> & MetadataActionCreators
 		: unknown;
-	select: < S extends string | StoreDescriptor< AnyConfig > >(
+	select: <S extends string | StoreDescriptor<AnyConfig>>(
 		storeNameOrDescriptor: S
-	) => S extends StoreDescriptor< AnyConfig >
-		? CurriedSelectorsOf< S >
-		: unknown;
-	resolveSelect: < S extends string | StoreDescriptor< AnyConfig > >(
+	) => S extends StoreDescriptor<AnyConfig> ? CurriedSelectorsOf<S> : unknown;
+	resolveSelect: <S extends string | StoreDescriptor<AnyConfig>>(
 		storeNameOrDescriptor: S
-	) => S extends StoreDescriptor< AnyConfig >
-		? PromisifiedSelectorsOf< S >
+	) => S extends StoreDescriptor<AnyConfig>
+		? PromisifiedSelectorsOf<S>
 		: unknown;
 };
 
@@ -117,25 +109,25 @@ export type Registry = {
  */
 export type ThunkArgs<
 	A extends ReduxAction,
-	S extends StoreDescriptor< AnyConfig >,
+	S extends StoreDescriptor<AnyConfig>,
 > = {
 	/**
 	 * Dispatch an action to the store.
 	 */
-	dispatch: ( S extends StoreDescriptor< infer Config >
-		? ActionCreatorsOf< Config > & MetadataActionCreators
-		: unknown ) &
-		DispatchFunction< A >;
+	dispatch: (S extends StoreDescriptor<infer Config>
+		? ActionCreatorsOf<Config> & MetadataActionCreators
+		: unknown) &
+		DispatchFunction<A>;
 
 	/**
 	 * Selectors for the store.
 	 */
-	select: CurriedSelectorsOf< S >;
+	select: CurriedSelectorsOf<S>;
 
 	/**
 	 * Selectors for the store that return a promise awaiting their resolver.
 	 */
-	resolveSelect: PromisifiedSelectorsOf< S >;
+	resolveSelect: PromisifiedSelectorsOf<S>;
 
 	/**
 	 * The store registry object.
@@ -148,8 +140,8 @@ export type ThunkArgs<
  */
 export type Thunk<
 	A extends ReduxAction,
-	S extends StoreDescriptor< AnyConfig >,
+	S extends StoreDescriptor<AnyConfig>,
 	T extends unknown = void,
-> = T extends Awaited< infer R >
-	? ( args: ThunkArgs< A, S > ) => Promise< R >
-	: ( args: ThunkArgs< A, S > ) => T;
+> = T extends Awaited<infer R>
+	? (args: ThunkArgs<A, S>) => Promise<R>
+	: (args: ThunkArgs<A, S>) => T;

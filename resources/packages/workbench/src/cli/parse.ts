@@ -5,7 +5,13 @@ import { buildLoadout, DEFAULT_LOADOUT_SLUGS } from '@helm/holodeck';
 import type { ComponentType, ReportLoadout } from '../types';
 import { DEFAULT_CONSTANTS, DEFAULT_TUNING } from '../types';
 
-export const COMPONENT_TYPES: ComponentType[] = ['core', 'drive', 'sensor', 'shield', 'nav'];
+export const COMPONENT_TYPES: ComponentType[] = [
+	'core',
+	'drive',
+	'sensor',
+	'shield',
+	'nav',
+];
 
 export const DEFAULT_SLUGS: Record<string, string> = {
 	hull: 'pioneer',
@@ -68,8 +74,12 @@ export function toReportLoadout(loadout: Loadout): ReportLoadout {
 export function resolveTuning(flags: Record<string, string>): ActionTuning {
 	return {
 		effort: flags.effort ? parseFloat(flags.effort) : DEFAULT_TUNING.effort,
-		throttle: flags.throttle ? parseFloat(flags.throttle) : DEFAULT_TUNING.throttle,
-		priority: flags.priority ? parseFloat(flags.priority) : DEFAULT_TUNING.priority,
+		throttle: flags.throttle
+			? parseFloat(flags.throttle)
+			: DEFAULT_TUNING.throttle,
+		priority: flags.priority
+			? parseFloat(flags.priority)
+			: DEFAULT_TUNING.priority,
 	};
 }
 

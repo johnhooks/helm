@@ -8,16 +8,23 @@ export function renderDspHealth(ctx: ReportContext): ReportFile {
 
 	lines.push(heading(1, 'DSP Formula Health'));
 	lines.push('');
-	lines.push(metaBlock({
-		'Generated': ctx.generated,
-		'Source': 'runDspProgress()',
-		'Total checks': summary.total,
-		'Results': `${summary.pass} PASS, ${summary.warn} WARN, ${summary.fail} FAIL, ${summary.info} INFO`,
-	}));
+	lines.push(
+		metaBlock({
+			Generated: ctx.generated,
+			Source: 'runDspProgress()',
+			'Total checks': summary.total,
+			Results: `${summary.pass} PASS, ${summary.warn} WARN, ${summary.fail} FAIL, ${summary.info} INFO`,
+		})
+	);
 	lines.push('');
 
 	// ── Warnings front-loaded ──
-	const warnings: { section: string; goal: string; verdict: string; detail: string }[] = [];
+	const warnings: {
+		section: string;
+		goal: string;
+		verdict: string;
+		detail: string;
+	}[] = [];
 	for (const section of sections) {
 		for (const check of section.checks) {
 			if (check.verdict === 'WARN' || check.verdict === 'FAIL') {
@@ -36,8 +43,12 @@ export function renderDspHealth(ctx: ReportContext): ReportFile {
 		lines.push('');
 		// FAIL first, then WARN
 		const sorted = [...warnings].sort((a, b) => {
-			if (a.verdict === 'FAIL' && b.verdict !== 'FAIL') { return -1; }
-			if (a.verdict !== 'FAIL' && b.verdict === 'FAIL') { return 1; }
+			if (a.verdict === 'FAIL' && b.verdict !== 'FAIL') {
+				return -1;
+			}
+			if (a.verdict !== 'FAIL' && b.verdict === 'FAIL') {
+				return 1;
+			}
 			return 0;
 		});
 		for (const w of sorted) {
@@ -79,7 +90,9 @@ export function renderDspHealth(ctx: ReportContext): ReportFile {
 		}
 
 		if (info.length > 0) {
-			lines.push(`<details><summary>${info.length} INFO check(s)</summary>`);
+			lines.push(
+				`<details><summary>${info.length} INFO check(s)</summary>`
+			);
 			lines.push('');
 			for (const check of info) {
 				lines.push(`- **INFO** ${check.goal}`);

@@ -3,7 +3,7 @@ status: ready
 area: testing
 priority: p2
 depends_on:
-  - nav-08-track-edge-discoveries-per-player
+    - nav-08-track-edge-discoveries-per-player
 ---
 
 # Refactor scan resolver test to stub navigation service
@@ -45,29 +45,29 @@ application.
 Rewrite `ResolverTest` so the resolver is tested in isolation from the
 scan internals.
 
-- Stub `NavigationService::scan` to return a canned `ScanResult` with
-  known nodes and edges, using `Codeception\Stub::make` the same way
-  `UserEdgeUpsertTest` does.
-- Keep the real `Resolver`, the real action model, and real seed rows
-  for any graph ids the canned result references.
-- Drop every `markTestSkipped` guard. The canned result makes the
-  success path deterministic, so assertions either pass or fail
-  honestly.
-- Cover the success-path result shape explicitly: each field the
-  resolver writes on `$action->result` should have a matching assertion
-  against the canned input. This is the contract the test is for.
-- Add a test for the failure branch that the old test never exercised.
-  A `ScanResult::failure()` from the stub should leave
-  `$action->result['success'] = false`, empty arrays where appropriate,
-  and no side effects on downstream collaborators.
+-   Stub `NavigationService::scan` to return a canned `ScanResult` with
+    known nodes and edges, using `Codeception\Stub::make` the same way
+    `UserEdgeUpsertTest` does.
+-   Keep the real `Resolver`, the real action model, and real seed rows
+    for any graph ids the canned result references.
+-   Drop every `markTestSkipped` guard. The canned result makes the
+    success path deterministic, so assertions either pass or fail
+    honestly.
+-   Cover the success-path result shape explicitly: each field the
+    resolver writes on `$action->result` should have a matching assertion
+    against the canned input. This is the contract the test is for.
+-   Add a test for the failure branch that the old test never exercised.
+    A `ScanResult::failure()` from the stub should leave
+    `$action->result['success'] = false`, empty arrays where appropriate,
+    and no side effects on downstream collaborators.
 
 Constraints:
 
-- No new dev dependencies. Codeception's `Stub::make` is already
-  available via wp-browser.
-- Do not change the resolver's production behavior. If the test is
-  hard to write because the resolver has a design flaw, raise that as
-  a separate task rather than papering over it.
-- If dropping `final` from `NavigationService` is still required for
-  the stub to work (nav-08 already did this), re-verify it is still
-  dropped and leave a comment on the class pointing at the test need.
+-   No new dev dependencies. Codeception's `Stub::make` is already
+    available via wp-browser.
+-   Do not change the resolver's production behavior. If the test is
+    hard to write because the resolver has a design flaw, raise that as
+    a separate task rather than papering over it.
+-   If dropping `final` from `NavigationService` is still required for
+    the stub to work (nav-08 already did this), re-verify it is still
+    dropped and leave a comment on the class pointing at the test need.

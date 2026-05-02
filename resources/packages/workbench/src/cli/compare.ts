@@ -10,7 +10,7 @@ import {
 
 function extractPrefixed(
 	flags: Record<string, string>,
-	prefix: string,
+	prefix: string
 ): Record<string, string> {
 	const out: Record<string, string> = {};
 	const dot = prefix + '.';
@@ -29,9 +29,12 @@ type Primitive = string | number | boolean | null;
 function computeDelta(
 	a: unknown,
 	b: unknown,
-	path = '',
+	path = ''
 ): Record<string, { a: Primitive; b: Primitive; delta: number | null }> {
-	const result: Record<string, { a: Primitive; b: Primitive; delta: number | null }> = {};
+	const result: Record<
+		string,
+		{ a: Primitive; b: Primitive; delta: number | null }
+	> = {};
 
 	if (typeof a === 'number' && typeof b === 'number') {
 		if (a !== b) {
@@ -51,7 +54,7 @@ function computeDelta(
 			const sub = computeDelta(
 				(a as Record<string, unknown>)[key],
 				(b as Record<string, unknown>)[key],
-				path ? `${path}.${key}` : key,
+				path ? `${path}.${key}` : key
 			);
 			Object.assign(result, sub);
 		}
@@ -82,7 +85,12 @@ export function compare({ flags }: ParsedFlags): void {
 	// Shared non-prefixed flags serve as the base for both
 	const baseFlags: Record<string, string> = {};
 	for (const [key, value] of Object.entries(flags)) {
-		if (!key.startsWith('a.') && !key.startsWith('b.') && !key.startsWith('const.') && !TUNING_KEYS.has(key)) {
+		if (
+			!key.startsWith('a.') &&
+			!key.startsWith('b.') &&
+			!key.startsWith('const.') &&
+			!TUNING_KEYS.has(key)
+		) {
 			baseFlags[key] = value;
 		}
 	}
@@ -93,8 +101,16 @@ export function compare({ flags }: ParsedFlags): void {
 	const loadoutA = hydrateLoadout(aFlags);
 	const loadoutB = hydrateLoadout(bFlags);
 
-	const reportA = computeShipReport(toReportLoadout(loadoutA), tuning, constants);
-	const reportB = computeShipReport(toReportLoadout(loadoutB), tuning, constants);
+	const reportA = computeShipReport(
+		toReportLoadout(loadoutA),
+		tuning,
+		constants
+	);
+	const reportB = computeShipReport(
+		toReportLoadout(loadoutB),
+		tuning,
+		constants
+	);
 
 	const delta = computeDelta(reportA, reportB);
 

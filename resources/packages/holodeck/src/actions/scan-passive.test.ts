@@ -305,7 +305,7 @@ describe('Engine — Passive Scans', () => {
 		// advance past the listener's scan interval (scan still active)
 		const resolved = engine.advance(30);
 		const passiveActions = resolved.filter(
-			(a) => a.type === ActionType.ScanPassive,
+			(a) => a.type === ActionType.ScanPassive
 		);
 		expect(passiveActions).toHaveLength(1);
 		expect(passiveActions[0].shipId).toBe('listener');

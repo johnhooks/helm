@@ -7,18 +7,20 @@ How to use the workbench CLI to test and validate game mechanics. For formula de
 The workbench proves formulas produce sane, balanced numbers before they touch the game server. It operates on static product data and pure functions — no WordPress, no database, no time simulation.
 
 **What it can validate:**
-- Formula correctness (strain, comfort range, costs, durations)
-- Component differentiation (no two products are equivalent)
-- Power budget constraints (jump/scan costs vs capacitor)
-- Tuning isolation (throttle only affects jumps, etc.)
-- Edge cases (underpowered combos, extreme tuning)
-- Core lifecycle (jumps before death)
+
+-   Formula correctness (strain, comfort range, costs, durations)
+-   Component differentiation (no two products are equivalent)
+-   Power budget constraints (jump/scan costs vs capacitor)
+-   Tuning isolation (throttle only affects jumps, etc.)
+-   Edge cases (underpowered combos, extreme tuning)
+-   Core lifecycle (jumps before death)
 
 **What it can't validate (yet):**
-- Time-based simulation (recharge timing, action sequencing)
-- Multi-action sequences (jump then scan then wait)
-- Experience curves and condition modifiers
-- Equipment draw and system contention (perfRatio from runtime draw)
+
+-   Time-based simulation (recharge timing, action sequencing)
+-   Multi-action sequences (jump then scan then wait)
+-   Experience curves and condition modifiers
+-   Equipment draw and system contention (perfRatio from runtime draw)
 
 ## Quick Start
 
@@ -80,20 +82,20 @@ Each scenario captures both input (what was configured) and output (what the for
 
 ### Categories
 
-| Category | Scenarios | What It Tests |
-|----------|-----------|---------------|
-| Baseline | 1 | Reference ship — the number everything is measured against |
-| Tuning Isolation | 4 | Each tuning param only affects its own system |
-| Throttle Sweep | 4 | Jump metrics at 0.5/1.0/1.5/2.0 |
-| Effort Sweep | 4 | Scan metrics at 0.5/1.0/1.5/2.0 |
-| Priority Sweep | 4 | Shield metrics at 0.5/1.0/1.5/2.0 |
-| Power Budget | 4 | Ship-physics Section 4 constraints |
-| Core x Drive Matrix | 9 | All core×drive combos: perfRatio, comfort, costs |
-| Sensor Matrix | 3 | All sensors: comfort, chance, duration |
-| Shield x Priority | 9 | All shields × priority 0.5/1.0/2.0 |
-| Core Lifecycle | 18 | Jumps before core death at throttle 1.0 and 0.5 |
-| Hull Comparison | 4 | All hulls: cargo, power budget, shield budget |
-| Edge Cases | 7 | Worst perfRatio, max draw, extreme loadouts |
+| Category            | Scenarios | What It Tests                                              |
+| ------------------- | --------- | ---------------------------------------------------------- |
+| Baseline            | 1         | Reference ship — the number everything is measured against |
+| Tuning Isolation    | 4         | Each tuning param only affects its own system              |
+| Throttle Sweep      | 4         | Jump metrics at 0.5/1.0/1.5/2.0                            |
+| Effort Sweep        | 4         | Scan metrics at 0.5/1.0/1.5/2.0                            |
+| Priority Sweep      | 4         | Shield metrics at 0.5/1.0/1.5/2.0                          |
+| Power Budget        | 4         | Ship-physics Section 4 constraints                         |
+| Core x Drive Matrix | 9         | All core×drive combos: perfRatio, comfort, costs           |
+| Sensor Matrix       | 3         | All sensors: comfort, chance, duration                     |
+| Shield x Priority   | 9         | All shields × priority 0.5/1.0/2.0                         |
+| Core Lifecycle      | 18        | Jumps before core death at throttle 1.0 and 0.5            |
+| Hull Comparison     | 4         | All hulls: cargo, power budget, shield budget              |
+| Edge Cases          | 7         | Worst perfRatio, max draw, extreme loadouts                |
 
 ### Saving and Diffing
 
@@ -127,10 +129,11 @@ Validate these whenever formulas or product data change:
 5. **Effort cap** — Effort never pushes scan chance above the sensor's base chance, even within comfort range. Check `min(base, (base/strain)*effort)` at effort=2.0.
 
 6. **Power budget** — Validate against ship-physics Section 4:
-   - Comfort-range jump costs 50-70% of capacitor
-   - Comfort-range scan costs a small fraction (shouldn't deplete)
-   - Jump + scan combined exceeds capacitor (forces sequencing)
-   - Shield draw at priority 1.0 is below core regen rate
+
+    - Comfort-range jump costs 50-70% of capacitor
+    - Comfort-range scan costs a small fraction (shouldn't deplete)
+    - Jump + scan combined exceeds capacitor (forces sequencing)
+    - Shield draw at priority 1.0 is below core regen rate
 
 7. **Strain progression** — At distance/comfort ratios of 1.0×/1.5×/2.0×/3.0×, strain values should be 1.0/1.25/2.0/5.0. Check sampleJumps and sampleScans.
 
@@ -144,31 +147,31 @@ Validate these whenever formulas or product data change:
 
 ### Reference Values (Default Loadout, Pioneer Hull)
 
-| Metric | Expected | Rationale |
-|--------|----------|-----------|
-| Jump comfort range | 7 ly | DR-505 sustain(7) × output(1.0) × perfRatio(1.0) |
-| Scan comfort range | 5 ly | VRS sustain(5) × output(1.0) |
-| Jump power (comfort) | 40-56 | 50-70% of 100 capacitor |
-| Scan power (comfort) | ~10 | Low enough to not deplete |
-| Jump + scan combined | > 50 | Forces sequencing decisions |
-| Shield draw (pri 1.0) | 5 | Well below regen rate of 10/hr |
-| Core lifecycle | 150 jumps | Epoch-S 750hp / (5ly × 1.0 × 1.0) at 5ly |
+| Metric                | Expected  | Rationale                                        |
+| --------------------- | --------- | ------------------------------------------------ |
+| Jump comfort range    | 7 ly      | DR-505 sustain(7) × output(1.0) × perfRatio(1.0) |
+| Scan comfort range    | 5 ly      | VRS sustain(5) × output(1.0)                     |
+| Jump power (comfort)  | 40-56     | 50-70% of 100 capacitor                          |
+| Scan power (comfort)  | ~10       | Low enough to not deplete                        |
+| Jump + scan combined  | > 50      | Forces sequencing decisions                      |
+| Shield draw (pri 1.0) | 5         | Well below regen rate of 10/hr                   |
+| Core lifecycle        | 150 jumps | Epoch-S 750hp / (5ly × 1.0 × 1.0) at 5ly         |
 
 ### What "Good" Looks Like
 
-- **Comfort range**: Where linear costs apply. Should be 3-10 ly depending on component.
-- **perfRatio**: 1.0 = core output meets drive demand. < 1.0 = underpowered. The DR-705 on Epoch-S/E is intentionally underpowered (~0.67/0.6).
-- **Strain at 2× comfort**: Should be exactly 2.0. Doubles all costs, halves chance.
-- **Core lifecycle**: Default loadout should sustain 100+ comfort-range jumps. Economy builds (Epoch-E + DR-305) should reach 400+.
+-   **Comfort range**: Where linear costs apply. Should be 3-10 ly depending on component.
+-   **perfRatio**: 1.0 = core output meets drive demand. < 1.0 = underpowered. The DR-705 on Epoch-S/E is intentionally underpowered (~0.67/0.6).
+-   **Strain at 2× comfort**: Should be exactly 2.0. Doubles all costs, halves chance.
+-   **Core lifecycle**: Default loadout should sustain 100+ comfort-range jumps. Economy builds (Epoch-E + DR-305) should reach 400+.
 
 ### Red Flags
 
-- perfRatio = 0 or Infinity
-- Comfort range = 0 (no sustain or output)
-- Chance > base (effort cap violated)
-- Core cost > 0 at throttle ≤ 0.5 (limp-home violated)
-- Shield timeToFull = Infinity (regen rate = 0)
-- Negative values anywhere
+-   perfRatio = 0 or Infinity
+-   Comfort range = 0 (no sustain or output)
+-   Chance > base (effort cap violated)
+-   Core cost > 0 at throttle ≤ 0.5 (limp-home violated)
+-   Shield timeToFull = Infinity (regen rate = 0)
+-   Negative values anywhere
 
 ## Investigating a Problem
 
@@ -179,15 +182,16 @@ When a number looks wrong:
 2. **Compare against baseline.** Use `bun run wb compare` to see the delta between the problem loadout and the default. The delta object shows exactly which metrics changed and by how much.
 
 3. **Trace the formula chain.** Every output value traces back through a chain:
-   - `comfortRange` ← sustain × coreOutput × perfRatio (jumps) or sustain × coreOutput (scans)
-   - `perfRatio` ← min(1, coreOutput / drive.mult_b)
-   - `coreOutput` ← core.mult_a
-   - `strain` ← 1 + ((distance/comfort) - 1)² when past comfort
-   - `coreCost` ← distance × core.mult_b × drive.mult_b × throttle × strain
-   - `powerCost` ← distance × basePerLy × strain
-   - `chance` ← min(base, (base/strain) × effort)
-   - `duration` ← ceil(distance × baseSeconds / (amplitude × throttle)) for jumps
-   - `duration` ← ceil(distance × baseSeconds × sensor.mult_a × effort) for scans
+
+    - `comfortRange` ← sustain × coreOutput × perfRatio (jumps) or sustain × coreOutput (scans)
+    - `perfRatio` ← min(1, coreOutput / drive.mult_b)
+    - `coreOutput` ← core.mult_a
+    - `strain` ← 1 + ((distance/comfort) - 1)² when past comfort
+    - `coreCost` ← distance × core.mult_b × drive.mult_b × throttle × strain
+    - `powerCost` ← distance × basePerLy × strain
+    - `chance` ← min(base, (base/strain) × effort)
+    - `duration` ← ceil(distance × baseSeconds / (amplitude × throttle)) for jumps
+    - `duration` ← ceil(distance × baseSeconds × sensor.mult_a × effort) for scans
 
 4. **Check the product data.** The raw data lives in `resources/workbench/data/products/`. Verify the field you're tracing has the expected value.
 

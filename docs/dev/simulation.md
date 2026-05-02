@@ -6,10 +6,10 @@ The simulation layer runs the full PHP game loop without a database. Ships, acti
 
 The game engine is built on WordPress: `wp_posts` for ships, `wp_options` for state, custom tables for actions, inventory, navigation. Every query goes through `$wpdb`. That's fine in production but painful for testing and design iteration:
 
-- **Speed.** Database tests take seconds. In-memory tests take milliseconds.
-- **Isolation.** No transaction rollback edge cases, no stale object cache, no leaked state between tests.
-- **CLI access.** Inspect a ship's system readings or run a multi-step scenario without standing up a WordPress instance.
-- **Parity testing.** Run the same fixture data through PHP and TypeScript to verify both implementations agree.
+-   **Speed.** Database tests take seconds. In-memory tests take milliseconds.
+-   **Isolation.** No transaction rollback edge cases, no stale object cache, no leaked state between tests.
+-   **CLI access.** Inspect a ship's system readings or run a multi-step scenario without standing up a WordPress instance.
+-   **Parity testing.** Run the same fixture data through PHP and TypeScript to verify both implementations agree.
 
 The simulation doesn't mock the game logic. It replaces the storage layer and runs the real `ActionFactory`, `ActionResolver`, `ActionProcessor`, `ShipFactory`, and all ship systems exactly as production does.
 
@@ -27,14 +27,14 @@ Simulation path:
 
 Six repository contracts define the storage boundary:
 
-| Contract | Production | Simulation |
-|----------|-----------|------------|
+| Contract              | Production                | Simulation                  |
+| --------------------- | ------------------------- | --------------------------- |
 | `ShipStateRepository` | `WpdbShipStateRepository` | `MemoryShipStateRepository` |
-| `ActionRepository` | `WpdbActionRepository` | `MemoryActionRepository` |
+| `ActionRepository`    | `WpdbActionRepository`    | `MemoryActionRepository`    |
 | `InventoryRepository` | `WpdbInventoryRepository` | `MemoryInventoryRepository` |
-| `ProductRepository` | `WpdbProductRepository` | `MemoryProductRepository` |
-| `NodeRepository` | `WpdbNodeRepository` | `MemoryNodeRepository` |
-| `EdgeRepository` | `WpdbEdgeRepository` | `MemoryEdgeRepository` |
+| `ProductRepository`   | `WpdbProductRepository`   | `MemoryProductRepository`   |
+| `NodeRepository`      | `WpdbNodeRepository`      | `MemoryNodeRepository`      |
+| `EdgeRepository`      | `WpdbEdgeRepository`      | `MemoryEdgeRepository`      |
 
 Plus `LoadoutFactory` (contract) with `WpdbLoadoutFactory` (production) and `MemoryLoadoutFactory` (simulation).
 
@@ -168,24 +168,32 @@ Scenarios define ships and a sequence of actions:
 
 ```json
 {
-  "name": "Scan and Jump",
-  "description": "Ship at Sol scans toward Proxima Centauri, then jumps.",
-  "masterSeed": "helm",
-  "ships": {
-    "explorer": {
-      "hull": "pioneer",
-      "core": "epoch_s",
-      "drive": "dr_505",
-      "sensor": "vrs_mk1",
-      "shield": "aegis_delta",
-      "nav": "nav_tier_3",
-      "node": 1
-    }
-  },
-  "actions": [
-    { "ship": "explorer", "type": "scan_route", "params": { "target_node_id": 2 } },
-    { "ship": "explorer", "type": "jump", "params": { "target_node_id": 2 } }
-  ]
+	"name": "Scan and Jump",
+	"description": "Ship at Sol scans toward Proxima Centauri, then jumps.",
+	"masterSeed": "helm",
+	"ships": {
+		"explorer": {
+			"hull": "pioneer",
+			"core": "epoch_s",
+			"drive": "dr_505",
+			"sensor": "vrs_mk1",
+			"shield": "aegis_delta",
+			"nav": "nav_tier_3",
+			"node": 1
+		}
+	},
+	"actions": [
+		{
+			"ship": "explorer",
+			"type": "scan_route",
+			"params": { "target_node_id": 2 }
+		},
+		{
+			"ship": "explorer",
+			"type": "jump",
+			"params": { "target_node_id": 2 }
+		}
+	]
 }
 ```
 
@@ -217,13 +225,13 @@ slic run "Wpunit --filter ContractTest"
 
 Fixtures live in `tests/_data/fixtures/ship-state/`:
 
-| File | Cases | Systems tested |
-|------|-------|---------------|
-| `power.json` | 6 | `getCurrentPower`, `getRegenRate`, `getOutputMultiplier` |
-| `shields.json` | 4 | `getCurrentStrength`, `getRegenRate` |
-| `propulsion.json` | 4 | `getJumpDuration`, `calculateCoreCost`, `getPerformanceRatio`, `getMaxRange` |
-| `sensors.json` | 4 | `getRange`, `getRouteScanDuration`, `getRouteScanCost` |
-| `combined.json` | 2 | Cross-system snapshots |
+| File              | Cases | Systems tested                                                               |
+| ----------------- | ----- | ---------------------------------------------------------------------------- |
+| `power.json`      | 6     | `getCurrentPower`, `getRegenRate`, `getOutputMultiplier`                     |
+| `shields.json`    | 4     | `getCurrentStrength`, `getRegenRate`                                         |
+| `propulsion.json` | 4     | `getJumpDuration`, `calculateCoreCost`, `getPerformanceRatio`, `getMaxRange` |
+| `sensors.json`    | 4     | `getRange`, `getRouteScanDuration`, `getRouteScanCost`                       |
+| `combined.json`   | 2     | Cross-system snapshots                                                       |
 
 Each fixture specifies a `state` (partial ShipState), `loadout` (product slugs), `now` (unix timestamp), and `expected` values. PHP tests use `assertEqualsWithDelta($expected, $actual, 0.01)`.
 
@@ -243,47 +251,47 @@ bun run test -- --filter contract
 
 ### Simulation runtime
 
-| File | Role |
-|------|------|
-| `src/Helm/Simulation/Provider.php` | Rebinds container for simulation mode |
-| `src/Helm/Simulation/Simulation.php` | Scenario driver (create ships, dispatch, advance) |
-| `src/Helm/Simulation/MemoryShipIdentity.php` | Ship identity DTO (replaces `ShipPost`) |
-| `src/Helm/Simulation/MemoryShipStateRepository.php` | In-memory ship state |
-| `src/Helm/Simulation/MemoryActionRepository.php` | In-memory actions with `claimReady()` |
-| `src/Helm/Simulation/MemoryInventoryRepository.php` | In-memory inventory |
-| `src/Helm/Simulation/MemoryProductRepository.php` | In-memory product catalog |
-| `src/Helm/Simulation/MemoryNodeRepository.php` | In-memory navigation nodes |
-| `src/Helm/Simulation/MemoryEdgeRepository.php` | In-memory navigation edges |
-| `src/Helm/Simulation/MemoryLoadoutFactory.php` | Builds loadouts from in-memory repos |
+| File                                                | Role                                              |
+| --------------------------------------------------- | ------------------------------------------------- |
+| `src/Helm/Simulation/Provider.php`                  | Rebinds container for simulation mode             |
+| `src/Helm/Simulation/Simulation.php`                | Scenario driver (create ships, dispatch, advance) |
+| `src/Helm/Simulation/MemoryShipIdentity.php`        | Ship identity DTO (replaces `ShipPost`)           |
+| `src/Helm/Simulation/MemoryShipStateRepository.php` | In-memory ship state                              |
+| `src/Helm/Simulation/MemoryActionRepository.php`    | In-memory actions with `claimReady()`             |
+| `src/Helm/Simulation/MemoryInventoryRepository.php` | In-memory inventory                               |
+| `src/Helm/Simulation/MemoryProductRepository.php`   | In-memory product catalog                         |
+| `src/Helm/Simulation/MemoryNodeRepository.php`      | In-memory navigation nodes                        |
+| `src/Helm/Simulation/MemoryEdgeRepository.php`      | In-memory navigation edges                        |
+| `src/Helm/Simulation/MemoryLoadoutFactory.php`      | Builds loadouts from in-memory repos              |
 
 ### Contracts
 
-| File | Role |
-|------|------|
-| `src/Helm/ShipLink/Contracts/ShipStateRepository.php` | Ship state storage interface |
-| `src/Helm/ShipLink/Contracts/ActionRepository.php` | Action storage interface |
-| `src/Helm/ShipLink/Contracts/LoadoutFactory.php` | Loadout building interface |
-| `src/Helm/Inventory/Contracts/InventoryRepository.php` | Inventory storage interface |
-| `src/Helm/Products/Contracts/ProductRepository.php` | Product catalog interface |
-| `src/Helm/Navigation/Contracts/NodeRepository.php` | Navigation node interface |
-| `src/Helm/Navigation/Contracts/EdgeRepository.php` | Navigation edge interface |
-| `src/Helm/Ships/ShipIdentity.php` | Ship identity interface |
+| File                                                   | Role                         |
+| ------------------------------------------------------ | ---------------------------- |
+| `src/Helm/ShipLink/Contracts/ShipStateRepository.php`  | Ship state storage interface |
+| `src/Helm/ShipLink/Contracts/ActionRepository.php`     | Action storage interface     |
+| `src/Helm/ShipLink/Contracts/LoadoutFactory.php`       | Loadout building interface   |
+| `src/Helm/Inventory/Contracts/InventoryRepository.php` | Inventory storage interface  |
+| `src/Helm/Products/Contracts/ProductRepository.php`    | Product catalog interface    |
+| `src/Helm/Navigation/Contracts/NodeRepository.php`     | Navigation node interface    |
+| `src/Helm/Navigation/Contracts/EdgeRepository.php`     | Navigation edge interface    |
+| `src/Helm/Ships/ShipIdentity.php`                      | Ship identity interface      |
 
 ### CLI
 
-| File | Role |
-|------|------|
+| File                          | Role                                     |
+| ----------------------------- | ---------------------------------------- |
 | `src/Helm/CLI/SimCommand.php` | `wp helm sim ship` and `wp helm sim run` |
 
 ### Tests
 
-| File | Role |
-|------|------|
-| `tests/Wpunit/Simulation/SimulationTest.php` | End-to-end simulation tests |
-| `tests/Wpunit/Simulation/ContractTest.php` | Fixture-driven parity tests |
-| `tests/Support/Helper/FixtureLoader.php` | JSON fixture loading utility |
-| `tests/Support/Helper/SystemBuilder.php` | Builds system objects from fixture data |
-| `tests/_data/fixtures/ship-state/*.json` | Shared cross-platform fixtures |
+| File                                         | Role                                    |
+| -------------------------------------------- | --------------------------------------- |
+| `tests/Wpunit/Simulation/SimulationTest.php` | End-to-end simulation tests             |
+| `tests/Wpunit/Simulation/ContractTest.php`   | Fixture-driven parity tests             |
+| `tests/Support/Helper/FixtureLoader.php`     | JSON fixture loading utility            |
+| `tests/Support/Helper/SystemBuilder.php`     | Builds system objects from fixture data |
+| `tests/_data/fixtures/ship-state/*.json`     | Shared cross-platform fixtures          |
 
 ### Scenarios
 

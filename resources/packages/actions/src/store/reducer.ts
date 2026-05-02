@@ -23,60 +23,62 @@ export function initializeDefaultState(): State {
 	};
 }
 
-function actions( state: State['actions'], action: Action ): State['actions'] {
-	switch ( action.type ) {
+function actions(state: State['actions'], action: Action): State['actions'] {
+	switch (action.type) {
 		case 'CREATE_ACTION_FINISHED': {
-			const queryId = createIndexQueryId( action.action.ship_post_id );
-			const existingIds = state.queries[ queryId ];
+			const queryId = createIndexQueryId(action.action.ship_post_id);
+			const existingIds = state.queries[queryId];
 			return {
 				...state,
-				byId: { ...state.byId, [ action.action.id ]: action.action },
-				...( existingIds && {
+				byId: { ...state.byId, [action.action.id]: action.action },
+				...(existingIds && {
 					queries: {
 						...state.queries,
-						[ queryId ]: [ action.action.id, ...existingIds ],
+						[queryId]: [action.action.id, ...existingIds],
 					},
-				} ),
+				}),
 			};
 		}
 		case 'FETCH_ACTION_START': {
-			const { [ action.actionId ]: _, ...remainingErrors } = state.error;
+			const { [action.actionId]: _, ...remainingErrors } = state.error;
 			return {
 				...state,
-				isLoading: { ...state.isLoading, [ action.actionId ]: true },
+				isLoading: { ...state.isLoading, [action.actionId]: true },
 				error: remainingErrors,
 			};
 		}
 		case 'FETCH_ACTION_FINISHED': {
-			const { [ action.action.id ]: _l, ...remainingLoading } = state.isLoading;
-			const { [ action.action.id ]: _e, ...remainingErrors } = state.error;
+			const { [action.action.id]: _l, ...remainingLoading } =
+				state.isLoading;
+			const { [action.action.id]: _e, ...remainingErrors } = state.error;
 			return {
 				...state,
-				byId: { ...state.byId, [ action.action.id ]: action.action },
+				byId: { ...state.byId, [action.action.id]: action.action },
 				isLoading: remainingLoading,
 				error: remainingErrors,
 			};
 		}
 		case 'FETCH_ACTION_FAILED': {
-			const { [ action.actionId ]: _, ...remainingLoading } = state.isLoading;
+			const { [action.actionId]: _, ...remainingLoading } =
+				state.isLoading;
 			return {
 				...state,
 				isLoading: remainingLoading,
-				error: { ...state.error, [ action.actionId ]: action.error },
+				error: { ...state.error, [action.actionId]: action.error },
 			};
 		}
 		case 'RECEIVE_ACTION':
 			return {
 				...state,
-				byId: { ...state.byId, [ action.action.id ]: action.action },
+				byId: { ...state.byId, [action.action.id]: action.action },
 			};
 		case 'RECEIVE_HEARTBEAT': {
-			if ( action.actions.length === 0 ) {
+			if (action.actions.length === 0) {
 				return state;
 			}
 			const mergedById = { ...state.byId };
-			for ( const a of action.actions ) {
-				mergedById[ a.id ] = a;
+			for (const a of action.actions) {
+				mergedById[a.id] = a;
 			}
 			return { ...state, byId: mergedById };
 		}
@@ -85,8 +87,8 @@ function actions( state: State['actions'], action: Action ): State['actions'] {
 				...state,
 				meta: {
 					...state.meta,
-					[ action.queryId ]: {
-						...( state.meta[ action.queryId ] ?? { next: null } ),
+					[action.queryId]: {
+						...(state.meta[action.queryId] ?? { next: null }),
 						isLoading: true,
 						error: null,
 					},
@@ -95,20 +97,20 @@ function actions( state: State['actions'], action: Action ): State['actions'] {
 		case 'FETCH_ACTIONS_FINISHED': {
 			const newById = { ...state.byId };
 			const newIds: number[] = [];
-			for ( const a of action.actions ) {
-				newById[ a.id ] = a;
-				newIds.push( a.id );
+			for (const a of action.actions) {
+				newById[a.id] = a;
+				newIds.push(a.id);
 			}
 			return {
 				...state,
 				byId: newById,
 				queries: {
 					...state.queries,
-					[ action.queryId ]: newIds,
+					[action.queryId]: newIds,
 				},
 				meta: {
 					...state.meta,
-					[ action.queryId ]: {
+					[action.queryId]: {
 						next: action.next,
 						isLoading: false,
 						error: null,
@@ -121,8 +123,8 @@ function actions( state: State['actions'], action: Action ): State['actions'] {
 				...state,
 				meta: {
 					...state.meta,
-					[ action.queryId ]: {
-						...( state.meta[ action.queryId ] ?? { next: null } ),
+					[action.queryId]: {
+						...(state.meta[action.queryId] ?? { next: null }),
 						isLoading: false,
 						error: action.error,
 					},
@@ -133,8 +135,11 @@ function actions( state: State['actions'], action: Action ): State['actions'] {
 				...state,
 				meta: {
 					...state.meta,
-					[ action.queryId ]: {
-						...( state.meta[ action.queryId ] ?? { next: null, error: null } ),
+					[action.queryId]: {
+						...(state.meta[action.queryId] ?? {
+							next: null,
+							error: null,
+						}),
 						isLoading: true,
 						error: null,
 					},
@@ -143,21 +148,21 @@ function actions( state: State['actions'], action: Action ): State['actions'] {
 		case 'LOAD_MORE_FINISHED': {
 			const mergedById = { ...state.byId };
 			const appendedIds: number[] = [];
-			for ( const a of action.actions ) {
-				mergedById[ a.id ] = a;
-				appendedIds.push( a.id );
+			for (const a of action.actions) {
+				mergedById[a.id] = a;
+				appendedIds.push(a.id);
 			}
-			const existingIds = state.queries[ action.queryId ] ?? [];
+			const existingIds = state.queries[action.queryId] ?? [];
 			return {
 				...state,
 				byId: mergedById,
 				queries: {
 					...state.queries,
-					[ action.queryId ]: [ ...existingIds, ...appendedIds ],
+					[action.queryId]: [...existingIds, ...appendedIds],
 				},
 				meta: {
 					...state.meta,
-					[ action.queryId ]: {
+					[action.queryId]: {
 						next: action.next,
 						isLoading: false,
 						error: null,
@@ -170,8 +175,8 @@ function actions( state: State['actions'], action: Action ): State['actions'] {
 				...state,
 				meta: {
 					...state.meta,
-					[ action.queryId ]: {
-						...( state.meta[ action.queryId ] ?? { next: null } ),
+					[action.queryId]: {
+						...(state.meta[action.queryId] ?? { next: null }),
 						isLoading: false,
 						error: action.error,
 					},
@@ -182,8 +187,8 @@ function actions( state: State['actions'], action: Action ): State['actions'] {
 	}
 }
 
-function create( state: State['create'], action: Action ): State['create'] {
-	switch ( action.type ) {
+function create(state: State['create'], action: Action): State['create'] {
+	switch (action.type) {
 		case 'CREATE_DRAFT':
 			return {
 				action: action.action,
@@ -216,8 +221,11 @@ function create( state: State['create'], action: Action ): State['create'] {
 	}
 }
 
-function heartbeat( state: State['heartbeat'], action: Action ): State['heartbeat'] {
-	switch ( action.type ) {
+function heartbeat(
+	state: State['heartbeat'],
+	action: Action
+): State['heartbeat'] {
+	switch (action.type) {
 		case 'RECEIVE_HEARTBEAT':
 			return { ...state, cursor: action.cursor };
 		default:
@@ -225,4 +233,4 @@ function heartbeat( state: State['heartbeat'], action: Action ): State['heartbea
 	}
 }
 
-export const reducer = combineReducers( { actions, create, heartbeat } );
+export const reducer = combineReducers({ actions, create, heartbeat });

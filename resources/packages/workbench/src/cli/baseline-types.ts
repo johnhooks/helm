@@ -1,4 +1,9 @@
-export const BASELINE_COMMANDS = ['analyse', 'dsp-progress', 'balance', 'detection'] as const;
+export const BASELINE_COMMANDS = [
+	'analyse',
+	'dsp-progress',
+	'balance',
+	'detection',
+] as const;
 export type BaselineCommand = (typeof BASELINE_COMMANDS)[number];
 
 export interface DiffEntry {

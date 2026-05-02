@@ -48,15 +48,26 @@ function validateEmbedded(body: unknown): string | null {
 	if (!embedded) {
 		return 'missing _embedded on node';
 	}
-	const stars = embedded[ LinkRel.Stars ];
+	const stars = embedded[LinkRel.Stars];
 	if (!Array.isArray(stars)) {
-		return `expected _embedded["${ LinkRel.Stars }"] array, got ${typeof stars}`;
+		return `expected _embedded["${
+			LinkRel.Stars
+		}"] array, got ${typeof stars}`;
 	}
 	if (stars.length === 0) {
-		return `_embedded["${ LinkRel.Stars }"] is empty`;
+		return `_embedded["${LinkRel.Stars}"] is empty`;
 	}
 	const star = stars[0] as Record<string, unknown>;
-	for (const key of ['id', 'post_type', 'title', 'catalog_id', 'spectral_class', 'x', 'y', 'z']) {
+	for (const key of [
+		'id',
+		'post_type',
+		'title',
+		'catalog_id',
+		'spectral_class',
+		'x',
+		'y',
+		'z',
+	]) {
 		if (!(key in star)) {
 			return `missing field "${key}" on star`;
 		}

@@ -53,7 +53,7 @@ export function snr(signalPower: number, noisePower: number): number {
 export function maskedSNR(
 	signalPower: number,
 	noisePower: number,
-	correlatedNoise: number,
+	correlatedNoise: number
 ): number {
 	const totalNoise = noisePower + correlatedNoise;
 	if (totalNoise <= 0) {
@@ -77,7 +77,10 @@ export function maskedSNR(
  * @param instantSNR - SNR from a single sample
  * @param sampleCount - Number of independent samples accumulated
  */
-export function integrationGain(instantSNR: number, sampleCount: number): number {
+export function integrationGain(
+	instantSNR: number,
+	sampleCount: number
+): number {
 	if (sampleCount <= 0) {
 		return 0;
 	}

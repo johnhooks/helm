@@ -3,8 +3,8 @@ import type { State } from '../types';
 import { initializeDefaultState } from '../reducer';
 
 export function createProduct(
-	overrides: Partial< Product > = {}
-): WithRestLinks< Product > {
+	overrides: Partial<Product> = {}
+): WithRestLinks<Product> {
 	return {
 		id: 1,
 		slug: 'epoch_s',
@@ -27,9 +27,7 @@ export function createProduct(
 	};
 }
 
-export function createState(
-	overrides: Partial< State > = {}
-): State {
+export function createState(overrides: Partial<State> = {}): State {
 	const defaults = initializeDefaultState();
 	return {
 		...defaults,

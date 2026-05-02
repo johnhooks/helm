@@ -16,13 +16,15 @@ The queue system handles deferred work - jobs that need to execute later or asyn
 ### Two Orthogonal Concerns
 
 **Queue Storage** - Where jobs live, how they're claimed
-- Database with `SELECT FOR UPDATE SKIP LOCKED`
-- Redis with `BLPOP` (future)
+
+-   Database with `SELECT FOR UPDATE SKIP LOCKED`
+-   Redis with `BLPOP` (future)
 
 **Worker Dispatch** - How workers are spawned and run
-- Action Scheduler loopbacks (HTTP requests to self)
-- Persistent CLI workers (future)
-- External workers - Lambda, CF Workers (future)
+
+-   Action Scheduler loopbacks (HTTP requests to self)
+-   Persistent CLI workers (future)
+-   External workers - Lambda, CF Workers (future)
 
 These combine independently. You can swap the queue without changing workers, or vice versa.
 
@@ -269,21 +271,24 @@ add_action('helm_queue_worker', function () {
 ### Why This Works
 
 **True parallelism via HTTP loopbacks:**
-- Each `as_enqueue_async_action()` triggers an HTTP request to the site
-- Nginx/Apache spawns a new PHP-FPM worker for each request
-- Workers run in separate processes, potentially on different CPU cores
-- `SKIP LOCKED` ensures workers grab different rows without blocking
+
+-   Each `as_enqueue_async_action()` triggers an HTTP request to the site
+-   Nginx/Apache spawns a new PHP-FPM worker for each request
+-   Workers run in separate processes, potentially on different CPU cores
+-   `SKIP LOCKED` ensures workers grab different rows without blocking
 
 **Automatic scaling:**
-- Orchestrator spawns workers based on queue depth
-- Low load (10 actions): 1 worker
-- High load (200 actions): 4 workers
-- No workers when queue is empty
+
+-   Orchestrator spawns workers based on queue depth
+-   Low load (10 actions): 1 worker
+-   High load (200 actions): 4 workers
+-   No workers when queue is empty
 
 **Crash recovery:**
-- `processing_at` timestamp acts as a lease
-- If worker crashes, actions become available after timeout (5 minutes)
-- Other workers will pick them up
+
+-   `processing_at` timestamp acts as a lease
+-   If worker crashes, actions become available after timeout (5 minutes)
+-   Other workers will pick them up
 
 ---
 
@@ -398,13 +403,13 @@ stderr_logfile=/var/log/helm/worker_%(process_num)02d_error.log
 
 ### Benefits Over AS Loopbacks
 
-| Aspect | AS Loopbacks | CLI Workers |
-|--------|--------------|-------------|
-| Latency | ~1-60 seconds (cron interval) | ~1 second (poll interval) |
-| Overhead | HTTP request per batch | None (already running) |
-| Memory | Fresh per request | Persistent (watch for leaks) |
-| Management | Automatic | Requires Supervisor |
-| Scaling | Limited by max workers | Add more processes |
+| Aspect     | AS Loopbacks                  | CLI Workers                  |
+| ---------- | ----------------------------- | ---------------------------- |
+| Latency    | ~1-60 seconds (cron interval) | ~1 second (poll interval)    |
+| Overhead   | HTTP request per batch        | None (already running)       |
+| Memory     | Fresh per request             | Persistent (watch for leaks) |
+| Management | Automatic                     | Requires Supervisor          |
+| Scaling    | Limited by max workers        | Add more processes           |
 
 ---
 
@@ -486,10 +491,10 @@ Redis for queue operations, database for action data:
 
 ### Benefits
 
-- **Faster claiming** - Redis operations are sub-millisecond
-- **Pub/sub** - Workers can subscribe and wake instantly on new jobs
-- **Atomic operations** - Lua scripts for complex claim logic
-- **No table locking** - Database only for reads/writes, not contention
+-   **Faster claiming** - Redis operations are sub-millisecond
+-   **Pub/sub** - Workers can subscribe and wake instantly on new jobs
+-   **Atomic operations** - Lua scripts for complex claim logic
+-   **No table locking** - Database only for reads/writes, not contention
 
 ---
 
@@ -557,40 +562,44 @@ register_rest_route('helm/v1', '/actions/(?P<id>\d+)/process', [
 
 ## Comparison
 
-| Phase | Queue | Workers | Throughput | Latency | Complexity |
-|-------|-------|---------|------------|---------|------------|
-| 1 | Database | AS Loopbacks | ~200/min | ~60s | Low |
-| 2 | Database | CLI Workers | ~500/min | ~1s | Medium |
-| 3 | Redis | CLI Workers | ~2000/min | ~100ms | Medium |
-| 4 | SQS/RabbitMQ | Lambda/External | ~10000+/min | ~100ms | High |
+| Phase | Queue        | Workers         | Throughput  | Latency | Complexity |
+| ----- | ------------ | --------------- | ----------- | ------- | ---------- |
+| 1     | Database     | AS Loopbacks    | ~200/min    | ~60s    | Low        |
+| 2     | Database     | CLI Workers     | ~500/min    | ~1s     | Medium     |
+| 3     | Redis        | CLI Workers     | ~2000/min   | ~100ms  | Medium     |
+| 4     | SQS/RabbitMQ | Lambda/External | ~10000+/min | ~100ms  | High       |
 
 ---
 
 ## Implementation Roadmap
 
 ### Now (Phase 1)
-- [ ] Define `ActionQueue` interface
-- [ ] Implement `DatabaseActionQueue` with `SKIP LOCKED`
-- [ ] Define `WorkerDispatcher` interface
-- [ ] Implement `ASLoopbackDispatcher`
-- [ ] Create orchestrator and worker AS hooks
-- [ ] Wire up with ActionProcessor
+
+-   [ ] Define `ActionQueue` interface
+-   [ ] Implement `DatabaseActionQueue` with `SKIP LOCKED`
+-   [ ] Define `WorkerDispatcher` interface
+-   [ ] Implement `ASLoopbackDispatcher`
+-   [ ] Create orchestrator and worker AS hooks
+-   [ ] Wire up with ActionProcessor
 
 ### Growing Pains (Phase 2)
-- [ ] Implement `wp helm queue:work` CLI command
-- [ ] Create Supervisor config template
-- [ ] Add `CLIWorkerDispatcher`
-- [ ] Document deployment with process management
+
+-   [ ] Implement `wp helm queue:work` CLI command
+-   [ ] Create Supervisor config template
+-   [ ] Add `CLIWorkerDispatcher`
+-   [ ] Document deployment with process management
 
 ### Scale (Phase 3)
-- [ ] Implement `RedisActionQueue`
-- [ ] Add pub/sub for instant worker notification
-- [ ] Hybrid: Redis queue + DB storage
+
+-   [ ] Implement `RedisActionQueue`
+-   [ ] Add pub/sub for instant worker notification
+-   [ ] Hybrid: Redis queue + DB storage
 
 ### Massive Scale (Phase 4)
-- [ ] Evaluate external queue (SQS, RabbitMQ)
-- [ ] Build REST API for external workers
-- [ ] Consider dedicated worker service (Laravel, Node)
+
+-   [ ] Evaluate external queue (SQS, RabbitMQ)
+-   [ ] Build REST API for external workers
+-   [ ] Consider dedicated worker service (Laravel, Node)
 
 ---
 
@@ -613,26 +622,28 @@ Partition by day on `created_at`. Pending actions are always recent, so queries 
 
 The `p_future` partition catches any records that don't fit in defined partitions. If maintenance fails:
 
-| Gap | Impact |
-|-----|--------|
-| 1 day | Data lands in `p_future`, carved out when maintenance runs |
-| 1 week | Week's data lumped together, still works |
-| Forever | Works like a regular non-partitioned table |
+| Gap     | Impact                                                     |
+| ------- | ---------------------------------------------------------- |
+| 1 day   | Data lands in `p_future`, carved out when maintenance runs |
+| 1 week  | Week's data lumped together, still works                   |
+| Forever | Works like a regular non-partitioned table                 |
 
 Partitioning is an optimization, not a correctness requirement.
 
 ### Schema Management
 
 WordPress's `dbDelta()` doesn't support partitioning syntax. The `helm_ship_actions` table would be managed separately:
-- Created with raw SQL including `PARTITION BY RANGE`
-- Future changes use version-based migrations (explicit `ALTER TABLE` statements)
-- Separate schema version tracked in options
+
+-   Created with raw SQL including `PARTITION BY RANGE`
+-   Future changes use version-based migrations (explicit `ALTER TABLE` statements)
+-   Separate schema version tracked in options
 
 Other tables continue using `dbDelta()`.
 
 ### Maintenance Cron
 
 Daily maintenance via `helm_maintain_action_partitions`:
+
 1. `REORGANIZE PARTITION` splits `p_future` to create tomorrow's partition
 2. `DROP PARTITION` removes partitions past retention (e.g., 30 days)
 
@@ -644,10 +655,10 @@ Both operations are O(1) regardless of row count.
 
 Helm's queue system requires modern database features:
 
-- **MySQL 8.0+** or **MariaDB 10.6+**
-- **InnoDB** storage engine
-- **`SELECT FOR UPDATE SKIP LOCKED`** - non-blocking concurrent claims
-- **Table partitioning** - time-based partitioning for scale
-- **JSON columns** - native JSON for params/results
+-   **MySQL 8.0+** or **MariaDB 10.6+**
+-   **InnoDB** storage engine
+-   **`SELECT FOR UPDATE SKIP LOCKED`** - non-blocking concurrent claims
+-   **Table partitioning** - time-based partitioning for scale
+-   **JSON columns** - native JSON for params/results
 
 MariaDB 10.6+ specifically required for `SKIP LOCKED` support.

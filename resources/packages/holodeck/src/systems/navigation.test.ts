@@ -5,12 +5,12 @@ import { makeLoadout, makeComponent, makeNav } from '../test-helpers';
 
 function createNavSystem(
 	overrides: Parameters<typeof createInternalState>[1] = {},
-	navOverrides: Record<string, unknown> = {},
+	navOverrides: Record<string, unknown> = {}
 ) {
 	const loadout = makeLoadout(
 		Object.keys(navOverrides).length
 			? { nav: makeComponent(makeNav(navOverrides), 'nav') }
-			: {},
+			: {}
 	);
 	const state = createInternalState(loadout, overrides);
 	return new NavigationSystem(state, loadout);

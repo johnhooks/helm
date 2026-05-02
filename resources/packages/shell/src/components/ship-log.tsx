@@ -19,64 +19,57 @@ interface ShipLogProps {
 	shipId: number;
 }
 
-function DraftLogCard( { draft }: { draft: DraftAction } ) {
+function DraftLogCard({ draft }: { draft: DraftAction }) {
 	return (
-		<ErrorBoundary FallbackComponent={ ShipActionErrorFallback }>
-			<ShipActionCard
-				type={ draft.type }
-				draft={ draft }
-			/>
+		<ErrorBoundary FallbackComponent={ShipActionErrorFallback}>
+			<ShipActionCard type={draft.type} draft={draft} />
 		</ErrorBoundary>
 	);
 }
 
-function ShipLogCard( { action }: { action: ShipAction } ) {
+function ShipLogCard({ action }: { action: ShipAction }) {
 	return (
-		<ErrorBoundary FallbackComponent={ ShipActionErrorFallback }>
-			<ShipActionCard
-				type={ action.type }
-				action={ action }
-			/>
+		<ErrorBoundary FallbackComponent={ShipActionErrorFallback}>
+			<ShipActionCard type={action.type} action={action} />
 		</ErrorBoundary>
 	);
 }
 
-export function ShipLog( { shipId }: ShipLogProps ) {
+export function ShipLog({ shipId }: ShipLogProps) {
 	const { actions, canLoadMore, isLoading, draft } = useSelect(
-		( select ) => ( {
-			actions: select( actionsStore ).getActions( shipId ),
-			canLoadMore: select( actionsStore ).canLoadMore( shipId ),
-			isLoading: select( actionsStore ).isLoading( shipId ),
-			draft: select( actionsStore ).getDraft(),
-		} ),
-		[ shipId ]
+		(select) => ({
+			actions: select(actionsStore).getActions(shipId),
+			canLoadMore: select(actionsStore).canLoadMore(shipId),
+			isLoading: select(actionsStore).isLoading(shipId),
+			draft: select(actionsStore).getDraft(),
+		}),
+		[shipId]
 	);
 
-	const { loadMore } = useDispatch( actionsStore );
+	const { loadMore } = useDispatch(actionsStore);
 
 	return (
 		<div className="helm-ship-log">
-			<div className="helm-ship-log__label">{ __( 'Ship Log', 'helm' ) }</div>
+			<div className="helm-ship-log__label">{__('Ship Log', 'helm')}</div>
 			<div className="helm-ship-log__list">
-				{ draft && <DraftLogCard draft={ draft } /> }
-				{ actions.map( ( action ) => (
-					<ShipLogCard key={ action.id } action={ action } />
-				) ) }
-				{ canLoadMore && (
+				{draft && <DraftLogCard draft={draft} />}
+				{actions.map((action) => (
+					<ShipLogCard key={action.id} action={action} />
+				))}
+				{canLoadMore && (
 					<div className="helm-ship-log__load-more">
 						<Button
 							variant="tertiary"
 							size="sm"
-							onClick={ () => loadMore( shipId ) }
-							disabled={ isLoading }
+							onClick={() => loadMore(shipId)}
+							disabled={isLoading}
 						>
-							{ isLoading
-								? __( 'Loading\u2026', 'helm' )
-								: __( 'Load more', 'helm' )
-							}
+							{isLoading
+								? __('Loading\u2026', 'helm')
+								: __('Load more', 'helm')}
 						</Button>
 					</div>
-				) }
+				)}
 			</div>
 		</div>
 	);

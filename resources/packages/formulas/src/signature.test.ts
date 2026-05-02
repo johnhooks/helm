@@ -1,10 +1,19 @@
 import { describe, it, expect } from 'vitest';
-import { DEFAULT_DSP_CONSTANTS, DEFAULT_EMISSION_PROFILES, SENSOR_AFFINITIES } from './types';
+import {
+	DEFAULT_DSP_CONSTANTS,
+	DEFAULT_EMISSION_PROFILES,
+	SENSOR_AFFINITIES,
+} from './types';
 import { detectionProbability, matchedFilterGain } from './detection';
 import { passiveDetection } from './passive';
-import { invertSigmoid, estimateEmissionPower, classifyEmission } from './signature';
+import {
+	invertSigmoid,
+	estimateEmissionPower,
+	classifyEmission,
+} from './signature';
 
-const { detectionThreshold: threshold, detectionSteepness: steepness } = DEFAULT_DSP_CONSTANTS;
+const { detectionThreshold: threshold, detectionSteepness: steepness } =
+	DEFAULT_DSP_CONSTANTS;
 const samplePeriod = DEFAULT_DSP_CONSTANTS.samplePeriodSeconds;
 
 describe('invertSigmoid', () => {
@@ -50,14 +59,28 @@ describe('estimateEmissionPower', () => {
 		const integration = 1800; // 30 min — 6 samples at 300s period
 
 		const confidence = passiveDetection(
-			truePower, noise, affinity, integration, samplePeriod, 1.0, 0,
+			truePower,
+			noise,
+			affinity,
+			integration,
+			samplePeriod,
+			1.0,
+			0
 		);
 
 		// Verify we're below the cap so inversion is accurate
-		expect(confidence).toBeLessThan(DEFAULT_DSP_CONSTANTS.passiveConfidenceCap);
+		expect(confidence).toBeLessThan(
+			DEFAULT_DSP_CONSTANTS.passiveConfidenceCap
+		);
 
 		const estimated = estimateEmissionPower(
-			confidence, noise, affinity, integration, samplePeriod, 1.0, 0,
+			confidence,
+			noise,
+			affinity,
+			integration,
+			samplePeriod,
+			1.0,
+			0
 		);
 
 		expect(estimated).toBeCloseTo(truePower, 1);
@@ -72,13 +95,27 @@ describe('estimateEmissionPower', () => {
 		const integration = 600; // 10 min — 2 samples
 
 		const confidence = passiveDetection(
-			truePower, noise, dsc.passive, integration, samplePeriod, gain, 0,
+			truePower,
+			noise,
+			dsc.passive,
+			integration,
+			samplePeriod,
+			gain,
+			0
 		);
 
-		expect(confidence).toBeLessThan(DEFAULT_DSP_CONSTANTS.passiveConfidenceCap);
+		expect(confidence).toBeLessThan(
+			DEFAULT_DSP_CONSTANTS.passiveConfidenceCap
+		);
 
 		const estimated = estimateEmissionPower(
-			confidence, noise, dsc.passive, integration, samplePeriod, gain, 0,
+			confidence,
+			noise,
+			dsc.passive,
+			integration,
+			samplePeriod,
+			gain,
+			0
 		);
 
 		expect(estimated).toBeCloseTo(truePower, 1);
@@ -89,14 +126,26 @@ describe('estimateEmissionPower', () => {
 		// power needed for that confidence — the true power is higher.
 		const truePower = 5.0;
 		const noise = 1.0;
-		const confidence = passiveDetection(truePower, noise, 1.0, 3600, samplePeriod);
+		const confidence = passiveDetection(
+			truePower,
+			noise,
+			1.0,
+			3600,
+			samplePeriod
+		);
 
 		// Confidence is capped
 		expect(confidence).toBe(DEFAULT_DSP_CONSTANTS.passiveConfidenceCap);
 
 		// Estimation underestimates — this is expected. Passive can't give
 		// you the full picture. Use active scan for precise power readings.
-		const estimated = estimateEmissionPower(confidence, noise, 1.0, 3600, samplePeriod);
+		const estimated = estimateEmissionPower(
+			confidence,
+			noise,
+			1.0,
+			3600,
+			samplePeriod
+		);
 		expect(estimated).toBeLessThan(truePower);
 		expect(estimated).toBeGreaterThan(0);
 	});
@@ -108,13 +157,27 @@ describe('estimateEmissionPower', () => {
 		const integration = 3600; // 1hr — masking keeps confidence below cap
 
 		const confidence = passiveDetection(
-			truePower, noise, 1.0, integration, samplePeriod, 1.0, masking,
+			truePower,
+			noise,
+			1.0,
+			integration,
+			samplePeriod,
+			1.0,
+			masking
 		);
 
-		expect(confidence).toBeLessThan(DEFAULT_DSP_CONSTANTS.passiveConfidenceCap);
+		expect(confidence).toBeLessThan(
+			DEFAULT_DSP_CONSTANTS.passiveConfidenceCap
+		);
 
 		const estimated = estimateEmissionPower(
-			confidence, noise, 1.0, integration, samplePeriod, 1.0, masking,
+			confidence,
+			noise,
+			1.0,
+			integration,
+			samplePeriod,
+			1.0,
+			masking
 		);
 
 		expect(estimated).toBeCloseTo(truePower, 1);
@@ -134,13 +197,29 @@ describe('estimateEmissionPower', () => {
 		const integration = 1800;
 
 		const confidence = passiveDetection(
-			truePower, noise, affinity, integration, samplePeriod, 1.0, 0, pilotSkill,
+			truePower,
+			noise,
+			affinity,
+			integration,
+			samplePeriod,
+			1.0,
+			0,
+			pilotSkill
 		);
 
-		expect(confidence).toBeLessThan(DEFAULT_DSP_CONSTANTS.passiveConfidenceCap);
+		expect(confidence).toBeLessThan(
+			DEFAULT_DSP_CONSTANTS.passiveConfidenceCap
+		);
 
 		const estimated = estimateEmissionPower(
-			confidence, noise, affinity, integration, samplePeriod, 1.0, 0, pilotSkill,
+			confidence,
+			noise,
+			affinity,
+			integration,
+			samplePeriod,
+			1.0,
+			0,
+			pilotSkill
 		);
 
 		expect(estimated).toBeCloseTo(truePower, 1);
@@ -154,16 +233,37 @@ describe('estimateEmissionPower', () => {
 		const integration = 1800;
 
 		const confidence = passiveDetection(
-			truePower, noise, affinity, integration, samplePeriod, 1.0, 0, pilotSkill,
+			truePower,
+			noise,
+			affinity,
+			integration,
+			samplePeriod,
+			1.0,
+			0,
+			pilotSkill
 		);
 
 		// Without pilotSkill, estimation overestimates by the skill factor
 		const estimatedWrong = estimateEmissionPower(
-			confidence, noise, affinity, integration, samplePeriod, 1.0, 0, 1.0,
+			confidence,
+			noise,
+			affinity,
+			integration,
+			samplePeriod,
+			1.0,
+			0,
+			1.0
 		);
 
 		const estimatedCorrect = estimateEmissionPower(
-			confidence, noise, affinity, integration, samplePeriod, 1.0, 0, pilotSkill,
+			confidence,
+			noise,
+			affinity,
+			integration,
+			samplePeriod,
+			1.0,
+			0,
+			pilotSkill
 		);
 
 		expect(estimatedWrong).toBeGreaterThan(truePower);
@@ -189,7 +289,9 @@ describe('classifyEmission', () => {
 	it('returns all profiles sorted by distance', () => {
 		const result = classifyEmission(3.0);
 		for (let i = 0; i < result.length - 1; i++) {
-			expect(result[i].distance).toBeLessThanOrEqual(result[i + 1].distance);
+			expect(result[i].distance).toBeLessThanOrEqual(
+				result[i + 1].distance
+			);
 		}
 	});
 
@@ -199,12 +301,17 @@ describe('classifyEmission', () => {
 		const tiedEntries = result.filter((r) => r.distance === 0);
 		expect(tiedEntries.length).toBeGreaterThanOrEqual(2);
 		for (let i = 0; i < tiedEntries.length - 1; i++) {
-			expect(tiedEntries[i].type.localeCompare(tiedEntries[i + 1].type)).toBeLessThanOrEqual(0);
+			expect(
+				tiedEntries[i].type.localeCompare(tiedEntries[i + 1].type)
+			).toBeLessThanOrEqual(0);
 		}
 	});
 
 	it('works with custom profiles', () => {
-		const profiles: Record<string, { base: number; spectralType: 'pulse' }> = {
+		const profiles: Record<
+			string,
+			{ base: number; spectralType: 'pulse' }
+		> = {
 			foo: { base: 10, spectralType: 'pulse' },
 			bar: { base: 20, spectralType: 'pulse' },
 		};

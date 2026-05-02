@@ -7,11 +7,13 @@ export function renderRegression(ctx: ReportContext): ReportFile {
 
 	lines.push(heading(1, 'Regression Report'));
 	lines.push('');
-	lines.push(metaBlock({
-		'Generated': ctx.generated,
-		'Source': 'diffBaseline() for all 4 commands',
-		'Baselines compared': diffs.map((d) => d.command).join(', '),
-	}));
+	lines.push(
+		metaBlock({
+			Generated: ctx.generated,
+			Source: 'diffBaseline() for all 4 commands',
+			'Baselines compared': diffs.map((d) => d.command).join(', '),
+		})
+	);
 	lines.push('');
 
 	// ── Summary table ──
@@ -28,35 +30,47 @@ export function renderRegression(ctx: ReportContext): ReportFile {
 		removed: d.summary.removed,
 	}));
 
-	lines.push(table(
-		[
-			['Command', 'command'],
-			['Baseline', 'baseline'],
-			['Changes', 'changes'],
-			['Regressions', 'regressions'],
-			['Improvements', 'improvements'],
-			['Added', 'added'],
-			['Removed', 'removed'],
-		],
-		summaryRows,
-	));
+	lines.push(
+		table(
+			[
+				['Command', 'command'],
+				['Baseline', 'baseline'],
+				['Changes', 'changes'],
+				['Regressions', 'regressions'],
+				['Improvements', 'improvements'],
+				['Added', 'added'],
+				['Removed', 'removed'],
+			],
+			summaryRows
+		)
+	);
 	lines.push('');
 
 	// ── Regressions ──
 	const allRegressions = diffs.flatMap((d) =>
-		d.entries.filter((e) => e.regression).map((e) => ({ command: d.command, entry: e })),
+		d.entries
+			.filter((e) => e.regression)
+			.map((e) => ({ command: d.command, entry: e }))
 	);
 
 	if (allRegressions.length > 0) {
 		lines.push(heading(2, 'Regressions'));
 		lines.push('');
 		for (const { command, entry } of allRegressions) {
-			const location = entry.field ? `${entry.path} > ${entry.field}` : entry.path;
+			const location = entry.field
+				? `${entry.path} > ${entry.field}`
+				: entry.path;
 			if (entry.delta !== undefined) {
 				const sign = entry.delta > 0 ? '+' : '';
-				lines.push(`- **${command}** — ${location}: ${entry.before} → ${entry.after} (${sign}${entry.delta})`);
+				lines.push(
+					`- **${command}** — ${location}: ${entry.before} → ${entry.after} (${sign}${entry.delta})`
+				);
 			} else {
-				lines.push(`- **${command}** — ${location}: ${JSON.stringify(entry.before)} → ${JSON.stringify(entry.after)}`);
+				lines.push(
+					`- **${command}** — ${location}: ${JSON.stringify(
+						entry.before
+					)} → ${JSON.stringify(entry.after)}`
+				);
 			}
 		}
 		lines.push('');
@@ -64,19 +78,29 @@ export function renderRegression(ctx: ReportContext): ReportFile {
 
 	// ── Improvements ──
 	const allImprovements = diffs.flatMap((d) =>
-		d.entries.filter((e) => e.improvement).map((e) => ({ command: d.command, entry: e })),
+		d.entries
+			.filter((e) => e.improvement)
+			.map((e) => ({ command: d.command, entry: e }))
 	);
 
 	if (allImprovements.length > 0) {
 		lines.push(heading(2, 'Improvements'));
 		lines.push('');
 		for (const { command, entry } of allImprovements) {
-			const location = entry.field ? `${entry.path} > ${entry.field}` : entry.path;
+			const location = entry.field
+				? `${entry.path} > ${entry.field}`
+				: entry.path;
 			if (entry.delta !== undefined) {
 				const sign = entry.delta > 0 ? '+' : '';
-				lines.push(`- **${command}** — ${location}: ${entry.before} → ${entry.after} (${sign}${entry.delta})`);
+				lines.push(
+					`- **${command}** — ${location}: ${entry.before} → ${entry.after} (${sign}${entry.delta})`
+				);
 			} else {
-				lines.push(`- **${command}** — ${location}: ${JSON.stringify(entry.before)} → ${JSON.stringify(entry.after)}`);
+				lines.push(
+					`- **${command}** — ${location}: ${JSON.stringify(
+						entry.before
+					)} → ${JSON.stringify(entry.after)}`
+				);
 			}
 		}
 		lines.push('');
@@ -84,7 +108,9 @@ export function renderRegression(ctx: ReportContext): ReportFile {
 
 	// ── Other changes ──
 	const otherChanges = diffs.flatMap((d) =>
-		d.entries.filter((e) => !e.regression && !e.improvement).map((e) => ({ command: d.command, entry: e })),
+		d.entries
+			.filter((e) => !e.regression && !e.improvement)
+			.map((e) => ({ command: d.command, entry: e }))
 	);
 
 	if (otherChanges.length > 0) {
@@ -106,16 +132,30 @@ export function renderRegression(ctx: ReportContext): ReportFile {
 			// Limit to first 50 to keep report readable
 			const shown = changes.slice(0, 50);
 			for (const { entry } of shown) {
-				const location = entry.field ? `${entry.path} > ${entry.field}` : entry.path;
+				const location = entry.field
+					? `${entry.path} > ${entry.field}`
+					: entry.path;
 				if (entry.type === 'added') {
-					lines.push(`- ADDED: ${location} = ${JSON.stringify(entry.after)}`);
+					lines.push(
+						`- ADDED: ${location} = ${JSON.stringify(entry.after)}`
+					);
 				} else if (entry.type === 'removed') {
-					lines.push(`- REMOVED: ${location} (was ${JSON.stringify(entry.before)})`);
+					lines.push(
+						`- REMOVED: ${location} (was ${JSON.stringify(
+							entry.before
+						)})`
+					);
 				} else if (entry.delta !== undefined) {
 					const sign = entry.delta > 0 ? '+' : '';
-					lines.push(`- ${location}: ${entry.before} → ${entry.after} (${sign}${entry.delta})`);
+					lines.push(
+						`- ${location}: ${entry.before} → ${entry.after} (${sign}${entry.delta})`
+					);
 				} else {
-					lines.push(`- ${location}: ${JSON.stringify(entry.before)} → ${JSON.stringify(entry.after)}`);
+					lines.push(
+						`- ${location}: ${JSON.stringify(
+							entry.before
+						)} → ${JSON.stringify(entry.after)}`
+					);
 				}
 			}
 
@@ -126,7 +166,11 @@ export function renderRegression(ctx: ReportContext): ReportFile {
 		}
 	}
 
-	if (allRegressions.length === 0 && allImprovements.length === 0 && otherChanges.length === 0) {
+	if (
+		allRegressions.length === 0 &&
+		allImprovements.length === 0 &&
+		otherChanges.length === 0
+	) {
 		lines.push('_No changes detected since baseline._');
 		lines.push('');
 	}

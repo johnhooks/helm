@@ -44,18 +44,20 @@ Higher frequency also costs more capacitor, and for PVP-quality detections, the 
 ## Setup
 
 **Spectre** (ambush predator):
-- Hull: Specter (light, fast, low signature)
-- Sensor: DSC Mk I (best passive detection)
-- Equipment: Torpedo launcher
-- Position: Node 47, dark (no shields, no active equipment, no actions)
-- Passive scan interval: 60s (fast, expensive — hunting mode)
+
+-   Hull: Specter (light, fast, low signature)
+-   Sensor: DSC Mk I (best passive detection)
+-   Equipment: Torpedo launcher
+-   Position: Node 47, dark (no shields, no active equipment, no actions)
+-   Passive scan interval: 60s (fast, expensive — hunting mode)
 
 **Striker** (combat patrol):
-- Hull: Striker (heavy shields, weapons ready)
-- Sensor: ACU Mk I (good pulse detection)
-- Equipment: Phaser array, ECM Mk I
-- Position: Node 42, shields up, scanning
-- Passive scan interval: 300s (default — not actively hunting)
+
+-   Hull: Striker (heavy shields, weapons ready)
+-   Sensor: ACU Mk I (good pulse detection)
+-   Equipment: Phaser array, ECM Mk I
+-   Position: Node 42, shields up, scanning
+-   Passive scan interval: 300s (default — not actively hunting)
 
 ---
 
@@ -74,21 +76,22 @@ t=420   Striker: cooldown complete, jump action fulfilled
 ```
 
 **Emission state at Node 47 during cooldown (t=240-420):**
-- Striker: `drive_cooldown` (fading envelope, continuous spectral type)
-- Striker: `shield_regen` (shields already engaged, continuous, faint 0.2 power)
-- Spectre: nothing (dark)
+
+-   Striker: `drive_cooldown` (fading envelope, continuous spectral type)
+-   Striker: `shield_regen` (shields already engaged, continuous, faint 0.2 power)
+-   Spectre: nothing (dark)
 
 ### Implementation Status
 
-| Mechanic | Status | Notes |
-|----------|--------|-------|
-| Multi-phase jump (spool/cooldown) | **Implemented** | Holodeck `jumpHandler`, three-phase resolve |
-| Drive envelope on spool/cooldown emissions | **Implemented** | Stage 4.5C, reads `CatalogProduct.driveDsp` |
-| Emission tracking (record on submit, end on resolve) | **Implemented** | Stage 4.5A, `Engine.recordEmissions()` / `endEmissions()` |
-| Cooldown emission at destination node | **Implemented** | Resolve phase creates emission at ship's new node |
-| Shield engagement as timestamp state | **Not implemented** | Currently shields are always "on". Need `shields_engaged_at` |
-| Shield power-up curve formula | **Not implemented** | Need formula for ramp from 0 to max strength over time |
-| Shield regen emission from engagement | **Partial** | `computeEquipmentEmissions()` checks `shield < shieldMax`, but no engagement concept yet |
+| Mechanic                                             | Status              | Notes                                                                                    |
+| ---------------------------------------------------- | ------------------- | ---------------------------------------------------------------------------------------- |
+| Multi-phase jump (spool/cooldown)                    | **Implemented**     | Holodeck `jumpHandler`, three-phase resolve                                              |
+| Drive envelope on spool/cooldown emissions           | **Implemented**     | Stage 4.5C, reads `CatalogProduct.driveDsp`                                              |
+| Emission tracking (record on submit, end on resolve) | **Implemented**     | Stage 4.5A, `Engine.recordEmissions()` / `endEmissions()`                                |
+| Cooldown emission at destination node                | **Implemented**     | Resolve phase creates emission at ship's new node                                        |
+| Shield engagement as timestamp state                 | **Not implemented** | Currently shields are always "on". Need `shields_engaged_at`                             |
+| Shield power-up curve formula                        | **Not implemented** | Need formula for ramp from 0 to max strength over time                                   |
+| Shield regen emission from engagement                | **Partial**         | `computeEquipmentEmissions()` checks `shield < shieldMax`, but no engagement concept yet |
 
 ---
 
@@ -136,20 +139,20 @@ The DSC sensor's affinity for continuous emissions gives the Spectre good confid
 
 ### Implementation Status
 
-| Mechanic | Status | Notes |
-|----------|--------|-------|
-| Passive detection computation | **Implemented** | Stage 4.5B, `Engine.queryPassiveDetection()` |
-| EM snapshot (aggregate emissions at node) | **Implemented** | `computeEMSnapshot()` with stellar baseline, noise floor, sources |
-| Sensor affinity from catalog | **Implemented** | `SensorSystem.getSensorAffinity()` reads `CatalogProduct.sensorDsp` |
-| `passiveReport()` formula | **Implemented** | `@helm/formulas`, returns detections with confidence |
-| `informationTier()` mapping | **Implemented** | `@helm/formulas`, confidence -> anomaly/class/type/analysis |
-| `passive_scan` as system-created ship_action | **Implemented** | `Engine.processPassiveScans()` creates fulfilled actions at configured interval |
-| `passive_scan_interval` as ship state | **Implemented** | `InternalShipState.passiveScanInterval`, default 300s, passed via `ShipConfig` |
-| Capacitor drain from scan frequency | **Not implemented** | Need power cost formula scaling with interval |
-| Integration gain across ticks | **Not implemented** | Need to accumulate samples across multiple passive_scan records |
-| Dark ship produces zero emissions | **Implemented** | `computeEquipmentEmissions()` only emits for active equipment / shield regen |
-| Own emissions excluded from detections | **Implemented** | `queryPassiveDetection()` filters by shipId |
-| Own emissions contribute to noise floor | **Implemented** | Noise floor computed before filtering |
+| Mechanic                                     | Status              | Notes                                                                           |
+| -------------------------------------------- | ------------------- | ------------------------------------------------------------------------------- |
+| Passive detection computation                | **Implemented**     | Stage 4.5B, `Engine.queryPassiveDetection()`                                    |
+| EM snapshot (aggregate emissions at node)    | **Implemented**     | `computeEMSnapshot()` with stellar baseline, noise floor, sources               |
+| Sensor affinity from catalog                 | **Implemented**     | `SensorSystem.getSensorAffinity()` reads `CatalogProduct.sensorDsp`             |
+| `passiveReport()` formula                    | **Implemented**     | `@helm/formulas`, returns detections with confidence                            |
+| `informationTier()` mapping                  | **Implemented**     | `@helm/formulas`, confidence -> anomaly/class/type/analysis                     |
+| `passive_scan` as system-created ship_action | **Implemented**     | `Engine.processPassiveScans()` creates fulfilled actions at configured interval |
+| `passive_scan_interval` as ship state        | **Implemented**     | `InternalShipState.passiveScanInterval`, default 300s, passed via `ShipConfig`  |
+| Capacitor drain from scan frequency          | **Not implemented** | Need power cost formula scaling with interval                                   |
+| Integration gain across ticks                | **Not implemented** | Need to accumulate samples across multiple passive_scan records                 |
+| Dark ship produces zero emissions            | **Implemented**     | `computeEquipmentEmissions()` only emits for active equipment / shield regen    |
+| Own emissions excluded from detections       | **Implemented**     | `queryPassiveDetection()` filters by shipId                                     |
+| Own emissions contribute to noise floor      | **Implemented**     | Noise floor computed before filtering                                           |
 
 ---
 
@@ -176,15 +179,15 @@ The critical timing question: **how long does the Spectre's shield power-up take
 
 ### Implementation Status
 
-| Mechanic | Status | Notes |
-|----------|--------|-------|
-| Equipment activation as state toggle | **Implemented** | `Ship.activateEquipment()` / `deactivateEquipment()` |
-| `shields_engaged_at` timestamp | **Not implemented** | Shields currently have no engagement/disengagement concept |
-| Shield power-up curve | **Not implemented** | Need formula: `shield_strength_at(now - shields_engaged_at)` |
-| `weapons_armed_at` timestamp | **Not implemented** | Weapons currently have no arming concept |
-| Weapon readiness curve | **Not implemented** | Need formula for weapon charge-up time |
-| Shield engagement emission profile | **Not implemented** | Power-up phase should emit louder than steady-state regen |
-| Weapon arming emission | **Not implemented** | May or may not produce detectable emission |
+| Mechanic                             | Status              | Notes                                                        |
+| ------------------------------------ | ------------------- | ------------------------------------------------------------ |
+| Equipment activation as state toggle | **Implemented**     | `Ship.activateEquipment()` / `deactivateEquipment()`         |
+| `shields_engaged_at` timestamp       | **Not implemented** | Shields currently have no engagement/disengagement concept   |
+| Shield power-up curve                | **Not implemented** | Need formula: `shield_strength_at(now - shields_engaged_at)` |
+| `weapons_armed_at` timestamp         | **Not implemented** | Weapons currently have no arming concept                     |
+| Weapon readiness curve               | **Not implemented** | Need formula for weapon charge-up time                       |
+| Shield engagement emission profile   | **Not implemented** | Power-up phase should emit louder than steady-state regen    |
+| Weapon arming emission               | **Not implemented** | May or may not produce detectable emission                   |
 
 ---
 
@@ -220,16 +223,16 @@ t=890   Spectre: fire_torpedo Phase 3 -> engagement result
 
 ### Implementation Status
 
-| Mechanic | Status | Notes |
-|----------|--------|-------|
-| `fire_torpedo` handler | **Implemented** | Single-phase: validate, handle, resolve. Applies damage. |
-| `fire_torpedo` as multi-phase (lock -> fire -> impact) | **Not implemented** | Currently single-phase instant resolve after flight time |
-| Detection confidence as targeting lock input | **Not implemented** | Currently `fire_torpedo` doesn't require prior detection |
-| Targeting lock duration from weapon + pilot skill | **Not implemented** | Need formula: lock_seconds = f(weapon, pilot_skill) |
-| Lock probability from detection confidence | **Not implemented** | Need formula: lock_chance = f(confidence, weapon_accuracy) |
-| Child action on target ship | **Not implemented** | Currently damage applied directly in handler. No action record on target. |
-| `parent_id` on ship_action | **Not implemented** | No action chain/relationship model yet |
-| Weapons_fire emission during lock phase | **Implemented** | `fire_torpedo` handler declares `weapons_fire` emission |
+| Mechanic                                               | Status              | Notes                                                                     |
+| ------------------------------------------------------ | ------------------- | ------------------------------------------------------------------------- |
+| `fire_torpedo` handler                                 | **Implemented**     | Single-phase: validate, handle, resolve. Applies damage.                  |
+| `fire_torpedo` as multi-phase (lock -> fire -> impact) | **Not implemented** | Currently single-phase instant resolve after flight time                  |
+| Detection confidence as targeting lock input           | **Not implemented** | Currently `fire_torpedo` doesn't require prior detection                  |
+| Targeting lock duration from weapon + pilot skill      | **Not implemented** | Need formula: lock_seconds = f(weapon, pilot_skill)                       |
+| Lock probability from detection confidence             | **Not implemented** | Need formula: lock_chance = f(confidence, weapon_accuracy)                |
+| Child action on target ship                            | **Not implemented** | Currently damage applied directly in handler. No action record on target. |
+| `parent_id` on ship_action                             | **Not implemented** | No action chain/relationship model yet                                    |
+| Weapons_fire emission during lock phase                | **Implemented**     | `fire_torpedo` handler declares `weapons_fire` emission                   |
 
 ---
 
@@ -251,11 +254,11 @@ The passive scan gave warning — if the Striker's interval caught the emission 
 
 ### Implementation Status
 
-| Mechanic | Status | Notes |
-|----------|--------|-------|
-| Impact as ship_action on target's ship | **Not implemented** | Need child action creation in fire handler's resolve |
+| Mechanic                                     | Status              | Notes                                                |
+| -------------------------------------------- | ------------------- | ---------------------------------------------------- |
+| Impact as ship_action on target's ship       | **Not implemented** | Need child action creation in fire handler's resolve |
 | Identity from detection tier (not parent_id) | **Not implemented** | Detection tier determines what label the target sees |
-| Passive scan warning before impact | **Not implemented** | Requires passive_scan system + timing overlap |
+| Passive scan warning before impact           | **Not implemented** | Requires passive_scan system + timing overlap        |
 
 ---
 
@@ -267,11 +270,11 @@ The Spectre's advantage was information asymmetry — it knew the Striker was th
 
 ### Implementation Status
 
-| Mechanic | Status | Notes |
-|----------|--------|-------|
-| Sustained phaser combat | **Implemented** | `fire_phaser` handler with duration-based drain |
-| Mutual damage in combat | **Implemented** | Both ships take component wear |
-| Escape via jump spool | **Implemented** | Can submit jump action to flee (spool reveals position) |
+| Mechanic                | Status          | Notes                                                   |
+| ----------------------- | --------------- | ------------------------------------------------------- |
+| Sustained phaser combat | **Implemented** | `fire_phaser` handler with duration-based drain         |
+| Mutual damage in combat | **Implemented** | Both ships take component wear                          |
+| Escape via jump spool   | **Implemented** | Can submit jump action to flee (spool reveals position) |
 
 ---
 
@@ -292,16 +295,16 @@ The coordination requirement is real — both players need to be online and time
 
 ### Key Questions for Workbench Validation
 
-| Question | Target Answer | How to Measure |
-|----------|--------------|----------------|
-| Can a single torpedo salvo break Striker shields? | Usually no | Scenario: solo Spectre vs Striker |
-| Do two simultaneous salvos break shields? | Usually yes | Scenario: pair Spectre vs Striker |
-| Striker reaction window (detect -> impact)? | 60-180 seconds | Measure t(weapons_fire detected) to t(torpedo_impact) |
-| Shield power-up time for Spectre? | 30-60 seconds | Formula tuning target |
-| Does Striker ECM degrade Spectre's passive scan? | Meaningfully but not fatally | Scenario with/without ECM, compare confidence |
-| Can any scan detect a fully dark ship? | Never | Must be: zero emissions = zero detection |
-| How many ticks to reach lock threshold? | 3-8 ticks (DSC) vs 5-12 (ACU) | Sweep across sensor types and intervals |
-| Capacitor cost of 60s interval vs 300s? | Meaningful but sustainable | Spectre shouldn't drain dry from listening |
+| Question                                          | Target Answer                 | How to Measure                                        |
+| ------------------------------------------------- | ----------------------------- | ----------------------------------------------------- |
+| Can a single torpedo salvo break Striker shields? | Usually no                    | Scenario: solo Spectre vs Striker                     |
+| Do two simultaneous salvos break shields?         | Usually yes                   | Scenario: pair Spectre vs Striker                     |
+| Striker reaction window (detect -> impact)?       | 60-180 seconds                | Measure t(weapons_fire detected) to t(torpedo_impact) |
+| Shield power-up time for Spectre?                 | 30-60 seconds                 | Formula tuning target                                 |
+| Does Striker ECM degrade Spectre's passive scan?  | Meaningfully but not fatally  | Scenario with/without ECM, compare confidence         |
+| Can any scan detect a fully dark ship?            | Never                         | Must be: zero emissions = zero detection              |
+| How many ticks to reach lock threshold?           | 3-8 ticks (DSC) vs 5-12 (ACU) | Sweep across sensor types and intervals               |
+| Capacitor cost of 60s interval vs 300s?           | Meaningful but sustainable    | Spectre shouldn't drain dry from listening            |
 
 ---
 
@@ -310,39 +313,45 @@ The coordination requirement is real — both players need to be online and time
 What this scenario requires that doesn't exist yet, in rough dependency order:
 
 ### 1. Passive Scan System
-- `passive_scan_interval` as tunable ship state (like `shieldPriority`)
-- Capacitor drain formula scaling with interval
-- System creates `passive_scan` ship_action records at configured interval
-- Integration gain across accumulated samples
-- No record when node is quiet
+
+-   `passive_scan_interval` as tunable ship state (like `shieldPriority`)
+-   Capacitor drain formula scaling with interval
+-   System creates `passive_scan` ship_action records at configured interval
+-   Integration gain across accumulated samples
+-   No record when node is quiet
 
 ### 2. Shield Engagement State
-- `shields_engaged_at` on `InternalShipState`
-- Shield power-up curve formula in `@helm/formulas`
-- `ShieldSystem` reads engagement timestamp, computes current strength via `shields_full_at`
-- Emission profile: louder during power-up, silent when full
+
+-   `shields_engaged_at` on `InternalShipState`
+-   Shield power-up curve formula in `@helm/formulas`
+-   `ShieldSystem` reads engagement timestamp, computes current strength via `shields_full_at`
+-   Emission profile: louder during power-up, silent when full
 
 ### 3. Weapon Arming State
-- `weapons_armed_at` on `InternalShipState`
-- Weapon readiness formula
-- Possibly faint emission during charge
+
+-   `weapons_armed_at` on `InternalShipState`
+-   Weapon readiness formula
+-   Possibly faint emission during charge
 
 ### 4. Detection-Gated Targeting
-- `fire_torpedo` / `fire_phaser` require prior detection above confidence threshold
-- Detection confidence feeds into lock probability
-- Multi-phase fire: lock attempt -> fire -> impact
-- Lock duration from weapon system + pilot skill (not sensor)
+
+-   `fire_torpedo` / `fire_phaser` require prior detection above confidence threshold
+-   Detection confidence feeds into lock probability
+-   Multi-phase fire: lock attempt -> fire -> impact
+-   Lock duration from weapon system + pilot skill (not sensor)
 
 ### 5. Parent-Child Actions
-- `parent_id` on `ShipAction`
-- Fire handler resolve creates child impact action on target ship
-- Client queries own actions, sees impacts
-- Identity revealed based on target's detection tier, not parent relationship
+
+-   `parent_id` on `ShipAction`
+-   Fire handler resolve creates child impact action on target ship
+-   Client queries own actions, sees impacts
+-   Identity revealed based on target's detection tier, not parent relationship
 
 ### 6. Workbench Scenarios
-- Solo Spectre vs Striker scenario
-- Pair Spectre vs Striker scenario
-- Shield power-up timing sweep
-- Detection warning window measurement
-- ECM impact on ambush effectiveness
-- Scan frequency cost/benefit analysis
+
+-   Solo Spectre vs Striker scenario
+-   Pair Spectre vs Striker scenario
+-   Shield power-up timing sweep
+-   Detection warning window measurement
+-   ECM impact on ambush effectiveness
+-   Scan frequency cost/benefit analysis

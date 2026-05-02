@@ -5,20 +5,20 @@
 Hard caps on weak-stat DSP values preserve archetype identity across all marks and versions. Strengths remain uncapped — floors only limit how much a sensor's weak axis can improve, whether through a new mark or a balance-driven version change.
 
 | Sensor | active cap | passive cap | pulseGain cap | continuousGain cap |
-|--------|-----------|-------------|---------------|-------------------|
-| DSC    | 0.85      | —           | 0.85          | —                 |
-| VRS    | 1.15      | 1.15        | 1.15          | 1.15              |
-| ACU    | —         | 0.75        | —             | 0.85              |
-| MIL    | —         | 0.85        | —             | 0.90              |
-| NPL    | 0.40      | —           | 0.90          | —                 |
+| ------ | ---------- | ----------- | ------------- | ------------------ |
+| DSC    | 0.85       | —           | 0.85          | —                  |
+| VRS    | 1.15       | 1.15        | 1.15          | 1.15               |
+| ACU    | —          | 0.75        | —             | 0.85               |
+| MIL    | —          | 0.85        | —             | 0.90               |
+| NPL    | 0.40       | —           | 0.90          | —                  |
 
 **Rationale:** Without floors, accumulating stat improvements across marks and balance patches could cause archetype convergence. A DSC at high marks shouldn't approach VRS-level active scanning — that erodes its identity as a passive-first sensor. Floors guarantee permanent archetype differentiation regardless of how many marks or version changes a product line goes through:
 
-- DSC is always ≥15% worse than VRS at active scanning
-- ACU is always ≥25% worse at passive detection
-- MIL is always ≥15% worse at passive, ≥10% at continuous gain
-- VRS stays "good at everything, best at nothing" with soft caps
-- NPL is always ≥60% worse at active scanning — it never broadcasts
+-   DSC is always ≥15% worse than VRS at active scanning
+-   ACU is always ≥25% worse at passive detection
+-   MIL is always ≥15% worse at passive, ≥10% at continuous gain
+-   VRS stays "good at everything, best at nothing" with soft caps
+-   NPL is always ≥60% worse at active scanning — it never broadcasts
 
 ## Crossover Products
 
@@ -31,11 +31,12 @@ Crossovers appear at Mk II. Each is built by a manufacturer working outside thei
 Shield company applies shield-harmonic technology to warp field generation. The drive is slow, short-range, and power-hungry — but shield harmonics allow shields to regenerate at 0.5x rate during jump transit, when normally shields are offline. Named after the Roman tortoise formation — moving while shielded.
 
 **Standard stats vs DR-307 v1 (weakest native drive):**
-- Sustain: 6.0 vs 12.0 (worse range)
-- Speed: 0.55x vs 0.55x (matched)
-- Consumption: 1.20x vs 0.50x (far more expensive)
-- Draw: 3.5 vs 2.0 (hungrier)
-- Footprint: 28 vs 25 (bigger)
+
+-   Sustain: 6.0 vs 12.0 (worse range)
+-   Speed: 0.55x vs 0.55x (matched)
+-   Consumption: 1.20x vs 0.50x (far more expensive)
+-   Draw: 3.5 vs 2.0 (hungrier)
+-   Footprint: 28 vs 25 (bigger)
 
 **DSP envelope:** Unique shield-harmonics signature. Long gentle spool (240s, curve 1.8), quiet peaks, smooth cooldown. Looks like a continuous hum, not a drive chirp — ACU pulse filters barely register it. Spookily quiet for a drive, which has interesting detection implications.
 
@@ -48,11 +49,12 @@ Shield company applies shield-harmonic technology to warp field generation. The 
 Core company builds a sensor that reads warp core harmonics instead of the EM spectrum. Bad range, terrible accuracy, glacial surveys — but scans draw power from core HP instead of the capacitor. You can scan endlessly if you're willing to burn the core.
 
 **Standard stats vs ACU Mk II v1 (weakest-range native sensor):**
-- Range: 3.5 vs 4.0 (worse at v1, catches up at v3)
-- Chance: 0.45 vs 0.90 (far worse accuracy)
-- Survey: 1.80x vs 0.42x (far slower)
-- Draw: 0.5 vs 1.0 (lower — barely touches power bus)
-- Footprint: 20 vs 15 (bigger)
+
+-   Range: 3.5 vs 4.0 (worse at v1, catches up at v3)
+-   Chance: 0.45 vs 0.90 (far worse accuracy)
+-   Survey: 1.80x vs 0.42x (far slower)
+-   Draw: 0.5 vs 1.0 (lower — barely touches power bus)
+-   Footprint: 20 vs 15 (bigger)
 
 **DSP affinity:** Reads core harmonics, not EM spectrum. Worst active detection in the game (0.50-0.55), worst pulseGain (0.40-0.45), but above-neutral continuousGain (1.10-1.15) — excellent at detecting running warp cores specifically.
 
@@ -65,10 +67,11 @@ Core company builds a sensor that reads warp core harmonics instead of the EM sp
 Sensor company builds a shield using sensor array feedback loops. Paper-thin capacity, weak regen — but passive sensor range increases +40% while shields are active. The shield acts as a sensor amplifier.
 
 **Standard stats vs Aegis Alpha Mk II v1 (weakest native shield):**
-- Capacity: 25 vs 70 (far less protection)
-- Regen: 6.0 vs 24.0 (far slower recovery)
-- Draw: 2.0 vs 3.0 (lower — power efficient)
-- Footprint: 15 vs 10 (bigger)
+
+-   Capacity: 25 vs 70 (far less protection)
+-   Regen: 6.0 vs 24.0 (far slower recovery)
+-   Draw: 2.0 vs 3.0 (lower — power efficient)
+-   Footprint: 15 vs 10 (bigger)
 
 **DSP:** None — shields don't have DSP properties in this system.
 
@@ -81,18 +84,20 @@ Sensor company builds a shield using sensor array feedback loops. Paper-thin cap
 Stealth company builds a sensor optimized for detecting what others are trying to hide. Years of EM warfare research — building systems to suppress ship signatures — gave Null Point an intimate understanding of what betrays a ship: drive harmonics, shield cycling patterns, weapon discharge residuals. The NPL sensor listens for exactly those things. It is useless for exploration. It is terrifying for hunting.
 
 **Standard stats vs ACU Mk II v1 (weakest-range native sensor):**
-- Range: 3.0 vs 4.0 (worse)
-- Chance: 0.40 vs 0.90 (far worse accuracy for surveys)
-- Survey: 2.50x vs 0.42x (glacially slow — not built for this)
-- Draw: 0.8 vs 1.0 (moderate — passive-first design sips power)
-- Footprint: 20 vs 15 (bigger — antenna arrays tuned for ship-frequency EM)
+
+-   Range: 3.0 vs 4.0 (worse)
+-   Chance: 0.40 vs 0.90 (far worse accuracy for surveys)
+-   Survey: 2.50x vs 0.42x (glacially slow — not built for this)
+-   Draw: 0.8 vs 1.0 (moderate — passive-first design sips power)
+-   Footprint: 20 vs 15 (bigger — antenna arrays tuned for ship-frequency EM)
 
 **DSP affinity:** Extreme passive bias. The highest passive affinity in the game (1.80), with continuous gain to match (1.60) — it excels at picking up the sustained hum of drives, shields, and reactors. Active scanning is almost nonexistent (0.30) — Null Point doesn't believe in announcing your presence. Pulse gain is moderate (0.80) — it can catch a torpedo launch or drive spool but isn't specialized for it.
 
 **DSP identity floors:**
-- Active cap: 0.40 (permanently terrible at active scanning — never broadcasts)
-- Pulse gain cap: 0.90 (decent but never specialist-level)
-- Passive and continuous gain: uncapped (the NPL only gets better at listening)
+
+-   Active cap: 0.40 (permanently terrible at active scanning — never broadcasts)
+-   Pulse gain cap: 0.90 (decent but never specialist-level)
+-   Passive and continuous gain: uncapped (the NPL only gets better at listening)
 
 **Mechanic:** Passive Ship Classification — at `analysis` tier confidence (85%+), the NPL sensor identifies not just emission type but specific component signatures: drive class (DR-305/505/705), weapon type (phaser/torpedo), and shield state (capacity percentage). Standard sensors at analysis tier identify activity type; the NPL identifies the loadout.
 
@@ -104,11 +109,11 @@ The `mechanic` field on `WorkbenchProduct` is structured data for display and do
 
 ```typescript
 interface ProductMechanic {
-  label: string;      // "Transit Shield Harmonics"
-  trigger: string;    // "During jump transit (sustain phase)"
-  effect: string;     // "Shield regen continues at reduced rate"
-  magnitude?: number; // 0.5
-  unit?: string;      // "x normal regen"
+	label: string; // "Transit Shield Harmonics"
+	trigger: string; // "During jump transit (sustain phase)"
+	effect: string; // "Shield regen continues at reduced rate"
+	magnitude?: number; // 0.5
+	unit?: string; // "x normal regen"
 }
 ```
 

@@ -4,8 +4,8 @@ This document describes how to capture screenshots of Storybook components for v
 
 ## Prerequisites
 
-- Storybook must be running (`bun run storybook`)
-- Playwright must be installed (`@playwright/test` is already in devDependencies)
+-   Storybook must be running (`bun run storybook`)
+-   Playwright must be installed (`@playwright/test` is already in devDependencies)
 
 ## Starting Storybook
 
@@ -36,10 +36,11 @@ npx playwright screenshot --wait-for-timeout=2000 "http://localhost:6006/iframe.
 The story ID follows the pattern: `category-component--story-name`
 
 Examples:
-- `layout-widget--left-widget`
-- `layout-widget--tactical-station-pair`
-- `layout-widget--science-station-pair`
-- `layout-widget--color-variants`
+
+-   `layout-widget--left-widget`
+-   `layout-widget--tactical-station-pair`
+-   `layout-widget--science-station-pair`
+-   `layout-widget--color-variants`
 
 ### Finding Story IDs
 
@@ -88,7 +89,7 @@ done
 
 ## Tips
 
-- Use `--wait-for-timeout=2000` to ensure components fully render (especially with animations)
-- Screenshots are saved to the specified path (use `/tmp/` for temporary files)
-- The iframe URL (`iframe.html`) renders just the component without Storybook's UI
-- Add `&globals=backgrounds.value:!hex(000000)` to force dark background if needed
+-   Use `--wait-for-timeout=2000` to ensure components fully render (especially with animations)
+-   Screenshots are saved to the specified path (use `/tmp/` for temporary files)
+-   The iframe URL (`iframe.html`) renders just the component without Storybook's UI
+-   Add `&globals=backgrounds.value:!hex(000000)` to force dark background if needed

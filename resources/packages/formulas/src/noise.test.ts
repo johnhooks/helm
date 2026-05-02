@@ -48,7 +48,10 @@ describe('noiseFloor', () => {
 
 	it('combines ship emissions as attenuated RMS', () => {
 		// G-class system with 3 miners (1.0 each): 0.3 × √(1²+1²+1²) = 0.3 × √3 ≈ 0.520
-		expect(noiseFloor(1.0, [1.0, 1.0, 1.0])).toBeCloseTo(1.0 + 0.3 * Math.sqrt(3), 5);
+		expect(noiseFloor(1.0, [1.0, 1.0, 1.0])).toBeCloseTo(
+			1.0 + 0.3 * Math.sqrt(3),
+			5
+		);
 	});
 
 	it('includes belt noise', () => {

@@ -40,7 +40,7 @@ export interface InternalStateConfig {
 
 export function createInternalState(
 	loadout: Loadout,
-	config?: InternalStateConfig,
+	config?: InternalStateConfig
 ): InternalShipState {
 	const powerMax = capacitor(loadout.core.product);
 	const shieldsMax =
@@ -67,6 +67,7 @@ export function createInternalState(
 		activeEquipment: new Set(config?.activeEquipment ?? []),
 		pilot: { ...DEFAULT_PILOT_SKILLS, ...config?.pilot },
 		passiveScanInterval: config?.passiveScanInterval ?? 300,
-		nextPassiveScanAt: config?.nextPassiveScanAt ?? (config?.passiveScanInterval ?? 300),
+		nextPassiveScanAt:
+			config?.nextPassiveScanAt ?? config?.passiveScanInterval ?? 300,
 	};
 }

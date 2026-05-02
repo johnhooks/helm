@@ -1,33 +1,48 @@
 import {
-	torpedoHitChance, torpedoDamage,
-	pdsInterception, ecmLockDegradation,
+	torpedoHitChance,
+	torpedoDamage,
+	pdsInterception,
+	ecmLockDegradation,
 	shieldAbsorption,
 	DEFAULT_DSP_CONSTANTS,
-	emissionPower, DEFAULT_EMISSION_PROFILES,
+	emissionPower,
+	DEFAULT_EMISSION_PROFILES,
 } from '@helm/formulas';
 import type { Ship } from '../ship';
-import type { Action, ActionContext, ActionHandler, ActionIntent, ActionOutcome } from './types';
+import type {
+	Action,
+	ActionContext,
+	ActionHandler,
+	ActionIntent,
+	ActionOutcome,
+} from './types';
 import { ActionError, ActionErrorCode } from './types';
 import { ActionStatus } from '../enums/action-status';
 
 export const fireTorpedoHandler: ActionHandler = {
-	validate(ship: Ship, params: Record<string, unknown>, context: ActionContext): void {
+	validate(
+		ship: Ship,
+		params: Record<string, unknown>,
+		context: ActionContext
+	): void {
 		const state = ship.resolve();
 
 		const launcher = state.loadout.equipment.find(
-			(eq) => eq.product.type === 'weapon' && eq.product.slug.includes('torpedo'),
+			(eq) =>
+				eq.product.type === 'weapon' &&
+				eq.product.slug.includes('torpedo')
 		);
 		if (!launcher) {
 			throw new ActionError(
 				ActionErrorCode.ShipMissingEquipment,
-				'Ship has no torpedo launcher in loadout',
+				'Ship has no torpedo launcher in loadout'
 			);
 		}
 
 		if ((state.ammo[launcher.product.slug] ?? 0) <= 0) {
 			throw new ActionError(
 				ActionErrorCode.ShipInsufficientAmmo,
-				'No torpedoes remaining',
+				'No torpedoes remaining'
 			);
 		}
 
@@ -35,7 +50,7 @@ export const fireTorpedoHandler: ActionHandler = {
 		if (!targetId) {
 			throw new ActionError(
 				ActionErrorCode.ActionMissingParam,
-				'Missing target_ship_id',
+				'Missing target_ship_id'
 			);
 		}
 
@@ -43,14 +58,14 @@ export const fireTorpedoHandler: ActionHandler = {
 		if (!target) {
 			throw new ActionError(
 				ActionErrorCode.TargetNotFound,
-				`Target ship not found: ${targetId}`,
+				`Target ship not found: ${targetId}`
 			);
 		}
 
 		if (target.resolve().hull <= 0) {
 			throw new ActionError(
 				ActionErrorCode.TargetDestroyed,
-				'Target ship is destroyed',
+				'Target ship is destroyed'
 			);
 		}
 	},
@@ -59,13 +74,15 @@ export const fireTorpedoHandler: ActionHandler = {
 		ship: Ship,
 		params: Record<string, unknown>,
 		now: number,
-		context: ActionContext,
+		context: ActionContext
 	): ActionIntent {
 		const state = ship.resolve();
 		const targetId = params.target_ship_id as string;
 
 		const launcher = state.loadout.equipment.find(
-			(eq) => eq.product.type === 'weapon' && eq.product.slug.includes('torpedo'),
+			(eq) =>
+				eq.product.type === 'weapon' &&
+				eq.product.slug.includes('torpedo')
 		)!;
 
 		// Consume ammo immediately
@@ -80,7 +97,7 @@ export const fireTorpedoHandler: ActionHandler = {
 		if (target) {
 			const targetState = target.resolve();
 			const ecm = targetState.loadout.equipment.find(
-				(eq) => eq.product.slug === 'ecm_mk1',
+				(eq) => eq.product.slug === 'ecm_mk1'
 			);
 			if (ecm && target.isEquipmentActive('ecm_mk1')) {
 				ecmReduction = ecmLockDegradation(ecm.product.mult_a ?? 0);
@@ -92,7 +109,7 @@ export const fireTorpedoHandler: ActionHandler = {
 		if (target) {
 			const targetState = target.resolve();
 			const pds = targetState.loadout.equipment.find(
-				(eq) => eq.product.slug === 'pds_mk1',
+				(eq) => eq.product.slug === 'pds_mk1'
 			);
 			if (pds && target.isEquipmentActive('pds_mk1')) {
 				pdsChance = pdsInterception(pds.product.mult_a ?? 0, 1);
@@ -111,11 +128,14 @@ export const fireTorpedoHandler: ActionHandler = {
 				payload,
 				launcher_slug: launcher.product.slug,
 			},
-			emissions: [{
-				emissionType: 'weapons_fire',
-				spectralType: DEFAULT_EMISSION_PROFILES.weapons_fire.spectralType,
-				basePower: emissionPower('weapons_fire'),
-			}],
+			emissions: [
+				{
+					emissionType: 'weapons_fire',
+					spectralType:
+						DEFAULT_EMISSION_PROFILES.weapons_fire.spectralType,
+					basePower: emissionPower('weapons_fire'),
+				},
+			],
 		};
 	},
 
@@ -129,7 +149,13 @@ export const fireTorpedoHandler: ActionHandler = {
 		if (!target || target.resolve().hull <= 0) {
 			return {
 				status: ActionStatus.Fulfilled,
-				result: { hit: false, intercepted: false, damage: 0, shield_damage: 0, hull_damage: 0 },
+				result: {
+					hit: false,
+					intercepted: false,
+					damage: 0,
+					shield_damage: 0,
+					hull_damage: 0,
+				},
 			};
 		}
 
@@ -139,7 +165,13 @@ export const fireTorpedoHandler: ActionHandler = {
 			if (pdsRoll < pdsChance) {
 				return {
 					status: ActionStatus.Fulfilled,
-					result: { hit: false, intercepted: true, damage: 0, shield_damage: 0, hull_damage: 0 },
+					result: {
+						hit: false,
+						intercepted: true,
+						damage: 0,
+						shield_damage: 0,
+						hull_damage: 0,
+					},
 				};
 			}
 		}
@@ -149,13 +181,22 @@ export const fireTorpedoHandler: ActionHandler = {
 		if (hitRoll >= hitChance) {
 			return {
 				status: ActionStatus.Fulfilled,
-				result: { hit: false, intercepted: false, damage: payload, shield_damage: 0, hull_damage: 0 },
+				result: {
+					hit: false,
+					intercepted: false,
+					damage: payload,
+					shield_damage: 0,
+					hull_damage: 0,
+				},
 			};
 		}
 
 		// Hit — apply damage via shieldAbsorption
 		const targetState = target.resolve();
-		const { shieldDamage, hullDamage } = shieldAbsorption(payload, targetState.shield);
+		const { shieldDamage, hullDamage } = shieldAbsorption(
+			payload,
+			targetState.shield
+		);
 
 		target.absorbDamage(payload);
 

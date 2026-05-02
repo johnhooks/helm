@@ -9,13 +9,13 @@ const meta = {
 		backgrounds: { default: 'dark' },
 		docs: { disable: true },
 	},
-} satisfies Meta< typeof ShipActionErrorFallback >;
+} satisfies Meta<typeof ShipActionErrorFallback>;
 
 export default meta;
-type Story = StoryObj< typeof meta >;
+type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
 	args: {
-		error: new Error( 'Missing ShipActionFill for type: jump' ),
+		error: new Error('Missing ShipActionFill for type: jump'),
 	},
 };

@@ -24,14 +24,14 @@ Functions compose but don't depend on each other, except `scan.ts` imports `stra
 
 ## Modules
 
-| Module | Exports |
-|--------|---------|
-| `power` | `coreOutput`, `regenRate`, `perfRatio` |
-| `jump` | `strainFactor`, `jumpComfortRange`, `jumpDuration`, `jumpCoreCost`, `jumpPowerCost` |
-| `scan` | `scanComfortRange`, `scanPowerCost`, `scanDuration`, `scanSuccessChance` |
-| `shield` | `shieldRegenRate`, `shieldDraw`, `shieldTimeToFull` |
-| `nav` | `discoveryProbability` |
-| `types` | `Constants`, `ActionTuning`, `DEFAULT_CONSTANTS`, `DEFAULT_TUNING` |
+| Module   | Exports                                                                             |
+| -------- | ----------------------------------------------------------------------------------- |
+| `power`  | `coreOutput`, `regenRate`, `perfRatio`                                              |
+| `jump`   | `strainFactor`, `jumpComfortRange`, `jumpDuration`, `jumpCoreCost`, `jumpPowerCost` |
+| `scan`   | `scanComfortRange`, `scanPowerCost`, `scanDuration`, `scanSuccessChance`            |
+| `shield` | `shieldRegenRate`, `shieldDraw`, `shieldTimeToFull`                                 |
+| `nav`    | `discoveryProbability`                                                              |
+| `types`  | `Constants`, `ActionTuning`, `DEFAULT_CONSTANTS`, `DEFAULT_TUNING`                  |
 
 ## Testing
 

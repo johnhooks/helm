@@ -11,7 +11,7 @@ export class NavigationSystem {
 	constructor(
 		state: InternalShipState,
 		loadout: Loadout,
-		constants?: Constants,
+		constants?: Constants
 	) {
 		this.state = state;
 		this.loadout = loadout;
@@ -36,7 +36,7 @@ export class NavigationSystem {
 			this.getEfficiency(),
 			hopDepth,
 			this.constants.hopDecayFactor,
-			this.state.pilot.jumping,
+			this.state.pilot.jumping
 		);
 	}
 }

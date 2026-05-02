@@ -4,7 +4,7 @@
 
 Stars are already WordPress custom post types. WordPress gives every post type three things for free: custom statuses, a comment system, and RSS feeds. Used together, they turn star discovery into a social experience with passive notifications — no custom tables, no push infrastructure, no notification service.
 
-The star map renders from the datacore and is unaffected by any of this. What changes is what happens *around* a star once a player reaches it: the star gets a story, a guestbook, and a feed presence.
+The star map renders from the datacore and is unaffected by any of this. What changes is what happens _around_ a star once a player reaches it: the star gets a story, a guestbook, and a feed presence.
 
 ## What This Creates for Players
 
@@ -38,13 +38,13 @@ WordPress closes comments on drafts by default. The moment a star is published, 
 
 All custom statuses are public. They describe what has happened at a star over time:
 
-| Status | Meaning |
-|--------|---------|
-| `draft` | Seeded, undiscovered. On the map but no WordPress presence. |
-| `helm_charted` | Discovered. Has content, open comments, appears in feeds. |
-| `helm_surveyed` | A full scan has been completed. Additional detail in content. |
-| `helm_depleted` | Resources mined out. |
-| `helm_contested` | Multiple factions present. |
+| Status           | Meaning                                                       |
+| ---------------- | ------------------------------------------------------------- |
+| `draft`          | Seeded, undiscovered. On the map but no WordPress presence.   |
+| `helm_charted`   | Discovered. Has content, open comments, appears in feeds.     |
+| `helm_surveyed`  | A full scan has been completed. Additional detail in content. |
+| `helm_depleted`  | Resources mined out.                                          |
+| `helm_contested` | Multiple factions present.                                    |
 
 Each transition fires the `transition_post_status` hook, so other systems can react without coupling — award XP on first discovery, notify nearby players when a star becomes contested, append scan results to the content when surveyed.
 
@@ -58,10 +58,10 @@ The comment REST endpoint gets a filter that checks whether the player's ship is
 
 The generation prompt includes:
 
-- **Star data** — spectral class, luminosity, distance, constellation, planets, notable properties.
-- **Ship state** — name, hull condition, fuel remaining, shield strength, system wear.
-- **Player history** — how many stars they've charted, distance traveled, notable previous discoveries.
-- **Arrival context** — date and time, travel duration, side effects (fuel spent, damage taken, anomalies encountered).
+-   **Star data** — spectral class, luminosity, distance, constellation, planets, notable properties.
+-   **Ship state** — name, hull condition, fuel remaining, shield strength, system wear.
+-   **Player history** — how many stars they've charted, distance traveled, notable previous discoveries.
+-   **Arrival context** — date and time, travel duration, side effects (fuel spent, damage taken, anomalies encountered).
 
 The output is a brief narrative from the perspective of a ship's log. It goes into `post_content`, which means it appears in RSS feed items automatically, is visible in the WordPress admin, and is searchable. No custom rendering needed.
 
@@ -69,12 +69,12 @@ The output is a brief narrative from the perspective of a ship's log. It goes in
 
 WordPress generates feeds for public post types, taxonomy terms, and comment threads:
 
-| Feed | What it shows |
-|------|---------------|
-| Discovery feed | Newly discovered stars with AI-generated narratives. |
-| Regional feed | Stars discovered in a specific constellation. |
-| Star guestbook feed | Comments at a specific star. |
-| Galaxy-wide chatter | Comments across all discovered stars. |
+| Feed                | What it shows                                        |
+| ------------------- | ---------------------------------------------------- |
+| Discovery feed      | Newly discovered stars with AI-generated narratives. |
+| Regional feed       | Stars discovered in a specific constellation.        |
+| Star guestbook feed | Comments at a specific star.                         |
+| Galaxy-wide chatter | Comments across all discovered stars.                |
 
 Feeds are paginated (default 10 items). Of 4000 seeded stars, only discovered ones appear. A reader checking daily sees only what was found since yesterday.
 

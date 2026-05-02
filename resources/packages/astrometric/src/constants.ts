@@ -31,10 +31,10 @@ export const DEFAULT_JUMP_BOUNDARY = 7;
  * Default distance rings (in light-years)
  */
 export const DEFAULT_DISTANCE_RINGS = [
-  { distance: 2.5, label: "2.5 ly", type: "minor" as const },
-  { distance: 5, label: "5 ly", type: "minor" as const },
-  { distance: 7.5, label: "7.5 ly", type: "minor" as const },
-  { distance: 10, label: "10 ly", type: "major" as const },
+	{ distance: 2.5, label: '2.5 ly', type: 'minor' as const },
+	{ distance: 5, label: '5 ly', type: 'minor' as const },
+	{ distance: 7.5, label: '7.5 ly', type: 'minor' as const },
+	{ distance: 10, label: '10 ly', type: 'major' as const },
 ];
 
 /**

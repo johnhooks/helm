@@ -18,17 +18,18 @@ All gameplay in Helm follows the logic of submarine warfare. This isn't a metaph
 
 **Patience is a tactic.** Sitting still, listening, waiting — these are valid and powerful strategies. The wolf who parks near a wreck and waits for a salvager to light up is using silence as a weapon. The miner who scans for PNP emissions before starting extraction is using patience as defense.
 
-**Position is abstract.** A system is a location, not a coordinate space. You're *in* a system — mining its belts, scanning its space, docked at its station. You don't navigate within a system. This is like a submarine operating in a patrol zone, not a specific GPS coordinate. The abstraction keeps the game simple while preserving all the interesting detection and engagement dynamics.
+**Position is abstract.** A system is a location, not a coordinate space. You're _in_ a system — mining its belts, scanning its space, docked at its station. You don't navigate within a system. This is like a submarine operating in a patrol zone, not a specific GPS coordinate. The abstraction keeps the game simple while preserving all the interesting detection and engagement dynamics.
 
 This model unifies everything:
-- **Mining:** You're in a system, extracting resources, creating emissions. Detectable.
-- **Scanning:** You're in a system, sweeping for contacts. Very detectable.
-- **Station building:** You're in a system, constructing. Detectable during active construction.
-- **Siege:** Multiple ships in a system, all acting aggressively. The loudest event possible.
-- **Lying in wait:** You're in a system, doing nothing. Invisible.
-- **Interdiction:** You detect a target, engage. The engagement creates emissions visible to everyone else in the system.
 
-**No visual space.** There's no 3D world because there shouldn't be. In real space, you'd never *see* another ship. Distances are too vast, objects are too small, and combat happens across millions of kilometers. The fantasy of two ships shooting at each other through a cockpit window is pure fiction. What's real is the data — power levels, sweep patterns, detection probabilities, shield state, envelope phases. The LCARS interface *is* the game, just like a submarine crew reads sonar displays and instrument panels, not the ocean. The instruments tell the story. A bearing change on a readout is more tense than any rendered explosion.
+-   **Mining:** You're in a system, extracting resources, creating emissions. Detectable.
+-   **Scanning:** You're in a system, sweeping for contacts. Very detectable.
+-   **Station building:** You're in a system, constructing. Detectable during active construction.
+-   **Siege:** Multiple ships in a system, all acting aggressively. The loudest event possible.
+-   **Lying in wait:** You're in a system, doing nothing. Invisible.
+-   **Interdiction:** You detect a target, engage. The engagement creates emissions visible to everyone else in the system.
+
+**No visual space.** There's no 3D world because there shouldn't be. In real space, you'd never _see_ another ship. Distances are too vast, objects are too small, and combat happens across millions of kilometers. The fantasy of two ships shooting at each other through a cockpit window is pure fiction. What's real is the data — power levels, sweep patterns, detection probabilities, shield state, envelope phases. The LCARS interface _is_ the game, just like a submarine crew reads sonar displays and instrument panels, not the ocean. The instruments tell the story. A bearing change on a readout is more tense than any rendered explosion.
 
 The submarine model is why detection is hard, why idle ships are safe, why wolf packs are loud, why scavengers work during sieges for cover noise, and why the game feels like a slow, tense ocean instead of a frantic battlefield. Every design decision flows from this premise.
 
@@ -69,10 +70,11 @@ extraction_time = base_time * (initial_count / current_count)
 A fresh belt yields a cargo load in 4 hours. The same belt at 10% capacity takes 40 hours. It's never empty — just increasingly not worth your time.
 
 This means:
-- **Early discoverers get the richest belts** — your scan wasn't just cataloging, it was staking a claim
-- **Systems have a lifecycle** — rich, busy, depleted, abandoned
-- **Exploration never stops** — even veteran players need fresh belts
-- **Desperation mining works** — stranded and low on fuel? A depleted belt can still save you, slowly
+
+-   **Early discoverers get the richest belts** — your scan wasn't just cataloging, it was staking a claim
+-   **Systems have a lifecycle** — rich, busy, depleted, abandoned
+-   **Exploration never stops** — even veteran players need fresh belts
+-   **Desperation mining works** — stranded and low on fuel? A depleted belt can still save you, slowly
 
 ### Ship Mining vs. Platform Mining
 
@@ -88,7 +90,7 @@ The tension between these two modes creates natural multiplayer dynamics without
 
 Everything on a ship degrades with use. But degradation isn't purely negative — it's a tradeoff curve. Use shapes function.
 
-**Scanner** — More use means better accuracy, but draws more power. A well-worn scanner is actually *better* at finding things. It's just hungry.
+**Scanner** — More use means better accuracy, but draws more power. A well-worn scanner is actually _better_ at finding things. It's just hungry.
 
 **Warp Core** — Degrades over jumps. See `warp-core.md`. A worn core is less fuel-efficient but you've learned its quirks.
 
@@ -96,7 +98,7 @@ Everything on a ship degrades with use. But degradation isn't purely negative �
 
 **Shields** — Degraded shields recharge slower but the frequency has settled into a stable harmonic.
 
-Every system becomes a personality. Two ships with the same loadout play differently because of their wear patterns. Your ship *is* your history.
+Every system becomes a personality. Two ships with the same loadout play differently because of their wear patterns. Your ship _is_ your history.
 
 ### Maintenance Loop
 
@@ -124,7 +126,7 @@ The rare stuff — materials that let you reset a system's degradation without l
 
 A ship's age — real time since creation — affects its capabilities. A veteran ship that's been through hundreds of jumps has systems that a new ship literally can't match. The scanner has been calibrated through thousands of scans. The drive has been pushed and adapted.
 
-This isn't a level system. There's no XP bar. Time played *is* the progression. A player who's been around for a year has a ship that can plot a 60 ly jump that a new player's ship can't handle — not because they bought an upgrade, but because their ship has *become* capable of it through use.
+This isn't a level system. There's no XP bar. Time played _is_ the progression. A player who's been around for a year has a ship that can plot a 60 ly jump that a new player's ship can't handle — not because they bought an upgrade, but because their ship has _become_ capable of it through use.
 
 ## The Void Between Stars
 
@@ -145,10 +147,11 @@ Star A ──── Waypoint ──── Star B
 ```
 
 That hidden node is yours alone. It doesn't appear on anyone else's map. You can:
-- Go back and mine it (ancient ices, exotic materials, untouched resources)
-- Share coordinates with someone you trust
-- Sell the location data
-- Leave it as a personal stash
+
+-   Go back and mine it (ancient ices, exotic materials, untouched resources)
+-   Share coordinates with someone you trust
+-   Sell the location data
+-   Leave it as a personal stash
 
 Finding a rogue planet requires a deliberate choice: stop mid-transit, spend hours scanning, and risk finding nothing. Most players fly right past. The curious ones, the patient ones, are rewarded with secret space.
 
@@ -194,10 +197,10 @@ The core exists to give new players safety and a marketplace. The frontier exist
 
 Risk and reward scale with distance from the core:
 
-- **Core**: Safe, depleted, busy. Good for trading, refitting, socializing.
-- **Near frontier**: Some risk, moderate resources. Most players operate here.
-- **Deep frontier**: Real risk, rich belts, rare finds. Expeditions, not commutes.
-- **The void**: Unknown. Waypoint scanning, rogue planets, secret space.
+-   **Core**: Safe, depleted, busy. Good for trading, refitting, socializing.
+-   **Near frontier**: Some risk, moderate resources. Most players operate here.
+-   **Deep frontier**: Real risk, rich belts, rare finds. Expeditions, not commutes.
+-   **The void**: Unknown. Waypoint scanning, rogue planets, secret space.
 
 ## Resource Geography
 
@@ -211,10 +214,10 @@ Nobody placed these clusters. They emerged from the seed, just like real stellar
 
 ### Strategic Implications
 
-- **Rich sectors are contested** — worth fighting over, worth building platforms in
-- **Chokepoints emerge** — if a rich sector is only reachable through one or two systems, those systems become strategically important
-- **Dead zones are safe** — nobody cares about sparse sectors, making them good hiding spots
-- **Knowledge is tradeable** — knowing where the rich sectors are is itself an asset
+-   **Rich sectors are contested** — worth fighting over, worth building platforms in
+-   **Chokepoints emerge** — if a rich sector is only reachable through one or two systems, those systems become strategically important
+-   **Dead zones are safe** — nobody cares about sparse sectors, making them good hiding spots
+-   **Knowledge is tradeable** — knowing where the rich sectors are is itself an asset
 
 ## Automation
 
@@ -222,9 +225,9 @@ Nobody placed these clusters. They emerged from the seed, just like real stellar
 
 Since actions take real time, some automation is built into the game:
 
-- Queue multi-hop routes (ship executes each jump automatically)
-- Set mining cycles (mine, fill cargo, repeat)
-- Platform collection schedules
+-   Queue multi-hop routes (ship executes each jump automatically)
+-   Set mining cycles (mine, fill cargo, repeat)
+-   Platform collection schedules
 
 Without basic automation, the async model breaks — nobody wants to log in every 4 hours to start the next mining cycle.
 
@@ -241,7 +244,7 @@ ORIGIN fires webhook:
 └── Player checks in tomorrow: cargo sold, ship re-deployed
 ```
 
-This means the game's API surface *is* the gameplay for a certain type of player. The person writing webhook handlers to optimize their mining empire is playing a completely different game than the person manually flying belt to belt — and they're both having fun.
+This means the game's API surface _is_ the gameplay for a certain type of player. The person writing webhook handlers to optimize their mining empire is playing a completely different game than the person manually flying belt to belt — and they're both having fun.
 
 Client sites running on their own WordPress instances could receive these webhooks, building sophisticated automation chains. The game encourages this — it's the Helm equivalent of Eve's spreadsheet players.
 
@@ -280,10 +283,11 @@ WRECK DISCOVERED (via scanning)
 High-usage components are the most valuable items in the game. A scanner with 10,000 scans has accuracy buffs that took someone months to build. You can't buy time. You can't shortcut the usage curve. So a well-worn component found in a wreck is genuine treasure.
 
 This creates a secondary market more interesting than raw materials:
-- New components from manufacturers (baseline)
-- Recovered components from salvagers (damaged but experienced)
-- Veteran gear sold by upgrading players (premium)
-- Legendary finds from ancient wrecks in deep space (priceless)
+
+-   New components from manufacturers (baseline)
+-   Recovered components from salvagers (damaged but experienced)
+-   Veteran gear sold by upgrading players (premium)
+-   Legendary finds from ancient wrecks in deep space (priceless)
 
 ### Partial Salvage
 
@@ -299,9 +303,9 @@ Wrecks are passive — they sit at coordinates emitting nothing. Finding them re
 
 **Salvage during combat.** The most interesting scenario. During an active siege, both sides are scanning aggressively — PNP scans for reinforcements, system scans for tactical awareness. The system is loud with emissions. A salvager working during the chaos benefits from the noise — their salvage emissions get lost in the background. But they're operating in an active combat zone. Stray interdiction fields, combat ships looking for soft targets, and the risk of being mistaken for a combatant.
 
-The optimal scavenger play is to work *during* the siege, not after. During the siege, the noise covers you. After the siege, the system goes quiet, the scanning stops, and the lone salvager is the only emission source — suddenly exposed. But working during the siege means accepting real danger for better cover.
+The optimal scavenger play is to work _during_ the siege, not after. During the siege, the noise covers you. After the siege, the system goes quiet, the scanning stops, and the lone salvager is the only emission source — suddenly exposed. But working during the siege means accepting real danger for better cover.
 
-**The covert salvager's dilemma.** A wreck is passive and undetectable. A ship *salvaging* a wreck is active — running extraction equipment, creating emissions, just like mining creates a signature. The salvager is invisible while traveling and scanning. The moment they start extracting, they light up. Grab and run, or take time to strip the wreck properly? Every minute extracting is a minute broadcasting your position.
+**The covert salvager's dilemma.** A wreck is passive and undetectable. A ship _salvaging_ a wreck is active — running extraction equipment, creating emissions, just like mining creates a signature. The salvager is invisible while traveling and scanning. The moment they start extracting, they light up. Grab and run, or take time to strip the wreck properly? Every minute extracting is a minute broadcasting your position.
 
 This creates a natural food chain around major events. The siege commanders fight over the station. The scavengers fight over the scraps. The scouts sell intel on wreck locations. The haulers move recovered components to market. A single siege generates gameplay for dozens of players who never fired a shot.
 
@@ -329,10 +333,10 @@ The difference between 0 and 100 scans is huge. Between 1000 and 2000 is margina
 
 Player buffs and component wear stack:
 
-- **Veteran pilot + veteran ship** — formidable, peak performance
-- **Veteran pilot + fresh ship** — competent, gear needs breaking in
-- **Rookie pilot + veteran ship** — benefits from the gear, still learning
-- **Rookie pilot + fresh ship** — baseline, everything ahead of them
+-   **Veteran pilot + veteran ship** — formidable, peak performance
+-   **Veteran pilot + fresh ship** — competent, gear needs breaking in
+-   **Rookie pilot + veteran ship** — benefits from the gear, still learning
+-   **Rookie pilot + fresh ship** — baseline, everything ahead of them
 
 Losing a ship means losing component buffs until you find or buy replacements. But player buffs carry over instantly. The pain is real but not fatal.
 

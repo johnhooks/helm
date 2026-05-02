@@ -43,12 +43,12 @@ With the current flat model, a 7-hour jump on an Epoch-S (regen 10/hr) always ar
 
 With the envelope:
 
-| Combo | Sustain Draw | Net During Transit | 7hr Jump: Arrive At |
-|-------|-------------|-------------------|-------------------|
-| DR-505 + Epoch-S | 4/hr | +6/hr (gaining) | ~86% (from 44%) |
-| DR-705 + Epoch-S | 8/hr | +2/hr (barely gaining) | ~58% |
-| DR-705 + Epoch-E | 8/hr | **-3/hr (losing)** | ~23% |
-| DR-505 + Epoch-E | 4/hr | +1/hr (barely gaining) | ~51% |
+| Combo            | Sustain Draw | Net During Transit     | 7hr Jump: Arrive At |
+| ---------------- | ------------ | ---------------------- | ------------------- |
+| DR-505 + Epoch-S | 4/hr         | +6/hr (gaining)        | ~86% (from 44%)     |
+| DR-705 + Epoch-S | 8/hr         | +2/hr (barely gaining) | ~58%                |
+| DR-705 + Epoch-E | 8/hr         | **-3/hr (losing)**     | ~23%                |
+| DR-505 + Epoch-E | 4/hr         | +1/hr (barely gaining) | ~51%                |
 
 The DR-705 + Epoch-E combo **loses power during transit**. The pilot might not make it. Pre-jump state matters. Running shields at high priority during transit competes with drive draw.
 
@@ -106,11 +106,11 @@ More sweeps = more chances. A scan that misses on sweep 1 might hit on sweep 4. 
 
 All sensors make roughly the same number of sweeps at standard effort (~6). What differs is the **period** between sweeps, because scan duration differs:
 
-| Sensor | Comfort | Duration | Period | Per-Sweep Chance | Cumulative |
-|--------|---------|----------|--------|-----------------|------------|
-| ACU Mk I | 3 ly | ~30 min | ~5 min | ~26% | 85% |
-| VRS Mk I | 5 ly | ~1 hr | ~10 min | ~19% | 70% |
-| DSC Mk I | 7 ly | ~2 hrs | ~20 min | ~14% | 60% |
+| Sensor   | Comfort | Duration | Period  | Per-Sweep Chance | Cumulative |
+| -------- | ------- | -------- | ------- | ---------------- | ---------- |
+| ACU Mk I | 3 ly    | ~30 min  | ~5 min  | ~26%             | 85%        |
+| VRS Mk I | 5 ly    | ~1 hr    | ~10 min | ~19%             | 70%        |
+| DSC Mk I | 7 ly    | ~2 hrs   | ~20 min | ~14%             | 60%        |
 
 The ACU fires rapidly — quick feedback, fast answer. The DSC dwells long on each sweep — deep, patient integration. Same number of chances, different tempo.
 
@@ -118,9 +118,9 @@ The ACU fires rapidly — quick feedback, fast answer. The DSC dwells long on ea
 
 Effort scales the number of sweeps:
 
-- **effort 0.5:** 3 sweeps. Quick and dirty. Lower cumulative probability.
-- **effort 1.0:** 6 sweeps. Rated performance.
-- **effort 2.0:** 12 sweeps. Longer scan, higher cumulative probability.
+-   **effort 0.5:** 3 sweeps. Quick and dirty. Lower cumulative probability.
+-   **effort 1.0:** 6 sweeps. Rated performance.
+-   **effort 2.0:** 12 sweeps. Longer scan, higher cumulative probability.
 
 This solves the original "effort > 1.0 is useless within comfort" problem. Even within comfort range (strain = 1.0), more sweeps means more rolls. Cumulative probability at effort 2.0 is meaningfully higher than at 1.0.
 
@@ -150,9 +150,10 @@ NEW: Action created → deferred_until = next checkpoint → evaluate → resche
 ```
 
 At each checkpoint, the game evaluates current state and either:
-- **Continues:** reschedule to next checkpoint
-- **Resolves early:** scan found something, jump arrived
-- **Interrupts:** power ran out, dropped out of warp
+
+-   **Continues:** reschedule to next checkpoint
+-   **Resolves early:** scan found something, jump arrived
+-   **Interrupts:** power ran out, dropped out of warp
 
 ### Jump Checkpoints = Waypoints
 
@@ -208,12 +209,12 @@ power_at(now) = initial_power
 
 Each envelope phase is piecewise linear, so the integral is geometry:
 
-- **Spool:** `spoolDraw × spoolDuration` (rectangle)
-- **Sustain:** `sustainDraw × transitDuration` (rectangle)
-- **Cooldown:** `sustainDraw × cooldownDuration / 2` (triangle)
-- **Sweep LFO:** `baseDraw × duration + amplitude × (1 - cos(2πfT)) / (2πf)` (sine integral)
-- **Shield:** `shieldDraw × duration` (rectangle, while shields < max)
-- **Regen:** `regenRate × duration` (rectangle)
+-   **Spool:** `spoolDraw × spoolDuration` (rectangle)
+-   **Sustain:** `sustainDraw × transitDuration` (rectangle)
+-   **Cooldown:** `sustainDraw × cooldownDuration / 2` (triangle)
+-   **Sweep LFO:** `baseDraw × duration + amplitude × (1 - cos(2πfT)) / (2πf)` (sine integral)
+-   **Shield:** `shieldDraw × duration` (rectangle, while shields < max)
+-   **Regen:** `regenRate × duration` (rectangle)
 
 Overlapping draws are additive. The integral of the sum is the sum of the integrals.
 
@@ -246,8 +247,7 @@ Faster, more core life burned. Still safe. Worth it?
 Now the same ship at 41% power, shields at 30% and regenerating hard:
 
 > **Power:** 41%. Shield draw: **10/hr** (shields low, priority 1.0). Drive sustain: 4/hr. Regen: 10/hr.
-> **Net during transit: -4/hr.**
-> **W1:** 37%. **W2:** 33%. **W3:** 29%.
+> **Net during transit: -4/hr.** > **W1:** 37%. **W2:** 33%. **W3:** 29%.
 > **⚠ Power below 25% at W3. Drive may fail to sustain field.**
 
 Now the decision matters:
@@ -321,17 +321,17 @@ core.drift = {
 
 Drift modifies the buff side of the existing experience curve. The buff is strongest in the direction the component has drifted:
 
-- A drive-drifted core gets full output buff when powering jumps, partial buff when powering scans
-- A sensor-drifted sensor gets full accuracy buff on scans
-- The nerf (power draw, capacity decay) is always unconditional — wear doesn't care about specialization
+-   A drive-drifted core gets full output buff when powering jumps, partial buff when powering scans
+-   A sensor-drifted sensor gets full accuracy buff on scans
+-   The nerf (power draw, capacity decay) is always unconditional — wear doesn't care about specialization
 
 ### Why Perfection Is Impossible
 
 Drift rates are asymmetric:
 
-- **Drive drift** accumulates per jump (frequent, short actions)
-- **Sensor drift** accumulates per scan (infrequent, long actions)
-- **Shield drift** accumulates passively (slow, continuous)
+-   **Drive drift** accumulates per jump (frequent, short actions)
+-   **Sensor drift** accumulates per scan (infrequent, long actions)
+-   **Shield drift** accumulates passively (slow, continuous)
 
 The pilot who explores aggressively (lots of jumps) naturally drifts toward drive even if they want balanced drift. To build deep sensor drift, they'd need to sit and scan repeatedly — which means not exploring. The exciting gameplay produces drive-heavy drift. Balancing requires boring gameplay.
 
@@ -372,15 +372,15 @@ This maps to what `docs/gameplay.md` already describes as flavor: "Degraded shie
 
 After shields take damage, regen enters a **settling period**. During settling:
 
-- Instantaneous regen rate varies — sometimes above rated, sometimes below
-- Average regen over the full settling period equals the rated regen rate (no net buff or nerf to total recovery time)
-- The variation matters because **checkpoints sample instantaneous state** — a waypoint arrival during a regen trough means lower shields than expected
+-   Instantaneous regen rate varies — sometimes above rated, sometimes below
+-   Average regen over the full settling period equals the rated regen rate (no net buff or nerf to total recovery time)
+-   The variation matters because **checkpoints sample instantaneous state** — a waypoint arrival during a regen trough means lower shields than expected
 
 Each shield product would have a harmonic personality:
 
-- **Bastion series (tank):** Long settling period, narrow amplitude. Slow to destabilize, slow to re-stabilize. Predictable even when disrupted.
-- **Aegis series (balanced):** Moderate settling, moderate amplitude. The middle ground.
-- **Veil series (fast):** Short settling period, wide amplitude. Destabilizes easily, re-stabilizes quickly. Spiky regen — sometimes great, sometimes poor.
+-   **Bastion series (tank):** Long settling period, narrow amplitude. Slow to destabilize, slow to re-stabilize. Predictable even when disrupted.
+-   **Aegis series (balanced):** Moderate settling, moderate amplitude. The middle ground.
+-   **Veil series (fast):** Short settling period, wide amplitude. Destabilizes easily, re-stabilizes quickly. Spiky regen — sometimes great, sometimes poor.
 
 ### Why It Could Be Interesting
 
@@ -414,33 +414,33 @@ The integral (total regen over a period) has a closed-form solution, so checkpoi
 
 ### Phase 1: Drive Envelope
 
-- Add `spoolDraw`, `spoolSeconds`, `coolSeconds` to drive product data
-- Implement piecewise power integration for jump actions
-- Checkpoint scheduling at waypoints
-- Power projection in jump initialization UI
-- Update workbench to model envelope behavior
+-   Add `spoolDraw`, `spoolSeconds`, `coolSeconds` to drive product data
+-   Implement piecewise power integration for jump actions
+-   Checkpoint scheduling at waypoints
+-   Power projection in jump initialization UI
+-   Update workbench to model envelope behavior
 
 ### Phase 2: Sensor Sweep
 
-- Add `sweeps` to sensor product data
-- Implement sweep-based detection with cumulative probability
-- Checkpoint scheduling at sweep peaks
-- Update `baseScanSecondsPerLy` to ~600–1200
-- Scan initialization UI showing sweep count, period, projected probability
+-   Add `sweeps` to sensor product data
+-   Implement sweep-based detection with cumulative probability
+-   Checkpoint scheduling at sweep peaks
+-   Update `baseScanSecondsPerLy` to ~600–1200
+-   Scan initialization UI showing sweep count, period, projected probability
 
 ### Phase 3: Drift
 
-- Add `drift_weights` to component data model
-- Drift accumulation on action completion
-- Drift-modified buff computation
-- LCARS visualization of component specialization
+-   Add `drift_weights` to component data model
+-   Drift accumulation on action completion
+-   Drift-modified buff computation
+-   LCARS visualization of component specialization
 
 ### Phase 4: Decision Point UI
 
-- Real-time power projection on jump/scan initialization
-- "What if" previews for different tuning values
-- Drive cooldown status affecting scan projections
-- Route comparison for different waypoint paths
+-   Real-time power projection on jump/scan initialization
+-   "What if" previews for different tuning values
+-   Drive cooldown status affecting scan projections
+-   Route comparison for different waypoint paths
 
 ---
 
@@ -464,14 +464,14 @@ What survived from the synth exploration: the envelope concept (ADSR shapes for 
 
 ## Open Questions
 
-- **Envelope parameters:** Store explicitly in product data, or derive from existing stats? Explicit is clearer but adds fields. Derived is elegant but harder to tune independently.
+-   **Envelope parameters:** Store explicitly in product data, or derive from existing stats? Explicit is clearer but adds fields. Derived is elegant but harder to tune independently.
 
-- **Drive cooldown affecting sensors.** How much does the EM interference from cooldown actually degrade sensor sweeps? Needs tuning — too much and pilots always wait, too little and it doesn't matter.
+-   **Drive cooldown affecting sensors.** How much does the EM interference from cooldown actually degrade sensor sweeps? Needs tuning — too much and pilots always wait, too little and it doesn't matter.
 
-- **Power-at-zero behavior.** When the capacitor hits zero during a jump, does the ship immediately drop out at the nearest waypoint? Or does the drive have a brief grace period (draining core life directly)?
+-   **Power-at-zero behavior.** When the capacitor hits zero during a jump, does the ship immediately drop out at the nearest waypoint? Or does the drive have a brief grace period (draining core life directly)?
 
-- **Overlapping actions.** Can a pilot scan during a jump? If so, sensor LFO overlaps drive sustain. The draw math handles it (additive), but should the drive's field actively degrade sensor performance? Gameplay question.
+-   **Overlapping actions.** Can a pilot scan during a jump? If so, sensor LFO overlaps drive sustain. The draw math handles it (additive), but should the drive's field actively degrade sensor performance? Gameplay question.
 
-- **Cooldown stacking.** Can a pilot start a new jump before cooldown completes? If so, spool draws stack on remaining cooldown — extra power cost for impatience.
+-   **Cooldown stacking.** Can a pilot start a new jump before cooldown completes? If so, spool draws stack on remaining cooldown — extra power cost for impatience.
 
-- **Quick-scan viability.** At effort 0.25 (VRS specialization), a scan might be 3 sweeps over ~15 minutes. That's frequent enough to spam. Is "scan a lot at low effort" an interesting strategy or degenerate behavior?
+-   **Quick-scan viability.** At effort 0.25 (VRS specialization), a scan might be 3 sweeps over ~15 minutes. That's frequent enough to spam. Is "scan a lot at low effort" an interesting strategy or degenerate behavior?

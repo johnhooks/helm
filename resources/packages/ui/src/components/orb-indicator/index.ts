@@ -1,2 +1,2 @@
-export { OrbIndicator } from "./orb-indicator";
-export type { OrbIndicatorProps } from "./orb-indicator";
+export { OrbIndicator } from './orb-indicator';
+export type { OrbIndicatorProps } from './orb-indicator';

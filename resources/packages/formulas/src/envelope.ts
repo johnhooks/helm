@@ -59,7 +59,7 @@ export function phaseEmission(t: number, shape: EnvelopePhaseShape): number {
 export function envelopeEmission(
 	t: number,
 	phase: 'spool' | 'sustain' | 'cooldown',
-	envelope: DriveEnvelope,
+	envelope: DriveEnvelope
 ): number {
 	switch (phase) {
 		case 'spool':
@@ -83,7 +83,11 @@ export function envelopeEmission(
  * @param envelope - The drive envelope
  */
 export function envelopeDuration(envelope: DriveEnvelope): number {
-	return envelope.spool.duration + envelope.sustain.duration + envelope.cooldown.duration;
+	return (
+		envelope.spool.duration +
+		envelope.sustain.duration +
+		envelope.cooldown.duration
+	);
 }
 
 /**
@@ -100,7 +104,10 @@ export function envelopeDuration(envelope: DriveEnvelope): number {
  * @param elapsed - Seconds since the drive started spooling
  * @param envelope - The drive envelope
  */
-export function envelopeAt(elapsed: number, envelope: DriveEnvelope): EnvelopeState {
+export function envelopeAt(
+	elapsed: number,
+	envelope: DriveEnvelope
+): EnvelopeState {
 	if (elapsed < 0) {
 		return { phase: 'idle', phaseElapsed: 0, power: 0 };
 	}
@@ -148,7 +155,7 @@ export function envelopeAt(elapsed: number, envelope: DriveEnvelope): EnvelopeSt
  */
 export function envelopeTimeSeries(
 	envelope: DriveEnvelope,
-	steps: number,
+	steps: number
 ): Array<{ t: number; phase: string; power: number }> {
 	const totalDuration = envelopeDuration(envelope);
 
@@ -179,6 +186,6 @@ export function envelopePeakPower(envelope: DriveEnvelope): number {
 	return Math.max(
 		envelope.spool.peakPower,
 		envelope.sustain.peakPower,
-		envelope.cooldown.peakPower,
+		envelope.cooldown.peakPower
 	);
 }

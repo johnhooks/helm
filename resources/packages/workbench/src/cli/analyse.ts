@@ -1,8 +1,26 @@
 import { computeShipReport } from '../report';
-import { getProductsByType, getProduct, DEFAULT_LOADOUT_SLUGS } from '../data/products';
+import {
+	getProductsByType,
+	getProduct,
+	DEFAULT_LOADOUT_SLUGS,
+} from '../data/products';
 import { HULLS } from '../data/hulls';
-import type { ActionTuning, ComponentType, Constants, ShipReport, ReportLoadout, Hull, CatalogProduct, PilotSkills } from '../types';
-import { DEFAULT_CONSTANTS, DEFAULT_TUNING, DEFAULT_PILOT_SKILLS, PILOT_SKILL_RANGE } from '../types';
+import type {
+	ActionTuning,
+	ComponentType,
+	Constants,
+	ShipReport,
+	ReportLoadout,
+	Hull,
+	CatalogProduct,
+	PilotSkills,
+} from '../types';
+import {
+	DEFAULT_CONSTANTS,
+	DEFAULT_TUNING,
+	DEFAULT_PILOT_SKILLS,
+	PILOT_SKILL_RANGE,
+} from '../types';
 
 interface Scenario {
 	name: string;
@@ -45,13 +63,21 @@ function resolveHull(slug: string): Hull {
 
 function resolveProduct(type: ComponentType, spec: string): CatalogProduct {
 	const p = getProduct(spec);
-	if (p) {return p;}
-	const fallback = getProduct(defaultSlugs[type as keyof typeof defaultSlugs]);
-	if (!fallback) {throw new Error(`No product found for ${type}: ${spec}`);}
+	if (p) {
+		return p;
+	}
+	const fallback = getProduct(
+		defaultSlugs[type as keyof typeof defaultSlugs]
+	);
+	if (!fallback) {
+		throw new Error(`No product found for ${type}: ${spec}`);
+	}
 	return fallback;
 }
 
-function buildLoadout(overrides: Partial<Record<string, string>> = {}): ReportLoadout {
+function buildLoadout(
+	overrides: Partial<Record<string, string>> = {}
+): ReportLoadout {
 	const slugs = { ...defaultSlugs, ...overrides };
 	return {
 		hull: resolveHull(slugs.hull),
@@ -78,7 +104,7 @@ function run(
 	loadoutOverrides: Partial<Record<string, string>>,
 	tuning: ActionTuning = DEFAULT_TUNING,
 	constants: Constants = DEFAULT_CONSTANTS,
-	pilot?: PilotSkills,
+	pilot?: PilotSkills
 ): { slugs: Record<string, string>; report: ShipReport } {
 	const loadout = buildLoadout(loadoutOverrides);
 	return {
@@ -92,9 +118,14 @@ function scenario(
 	description: string,
 	loadoutOverrides: Partial<Record<string, string>>,
 	tuning: ActionTuning = DEFAULT_TUNING,
-	pilot?: PilotSkills,
+	pilot?: PilotSkills
 ): Scenario {
-	const { slugs, report } = run(loadoutOverrides, tuning, DEFAULT_CONSTANTS, pilot);
+	const { slugs, report } = run(
+		loadoutOverrides,
+		tuning,
+		DEFAULT_CONSTANTS,
+		pilot
+	);
 	return {
 		name,
 		description,
@@ -113,7 +144,7 @@ function baseline(): AnalysisCategory {
 			scenario(
 				'Reference ship',
 				'Pioneer hull, Epoch-S, DR-505, VRS Mk I, Aegis Delta, Nav Tier 3. All tuning at 1.0.',
-				{},
+				{}
 			),
 		],
 	};
@@ -123,14 +154,17 @@ function throttleSweep(): AnalysisCategory {
 	const values = [0.5, 1.0, 1.5, 2.0];
 	return {
 		category: 'Throttle Sweep',
-		description: 'Jump metrics at varying throttle levels. Default loadout.',
+		description:
+			'Jump metrics at varying throttle levels. Default loadout.',
 		scenarios: values.map((t) =>
 			scenario(
 				`throttle=${t}`,
-				`Default loadout at throttle ${t}. ${t <= 0.5 ? 'Limp-home: zero core cost.' : ''}`,
+				`Default loadout at throttle ${t}. ${
+					t <= 0.5 ? 'Limp-home: zero core cost.' : ''
+				}`,
 				{},
-				{ ...DEFAULT_TUNING, throttle: t },
-			),
+				{ ...DEFAULT_TUNING, throttle: t }
+			)
 		),
 	};
 }
@@ -145,8 +179,8 @@ function effortSweep(): AnalysisCategory {
 				`effort=${e}`,
 				`Default loadout at effort ${e}. Duration scales linearly, chance capped at base.`,
 				{},
-				{ ...DEFAULT_TUNING, effort: e },
-			),
+				{ ...DEFAULT_TUNING, effort: e }
+			)
 		),
 	};
 }
@@ -155,14 +189,15 @@ function prioritySweep(): AnalysisCategory {
 	const values = [0.5, 1.0, 1.5, 2.0];
 	return {
 		category: 'Priority Sweep',
-		description: 'Shield metrics at varying priority levels. Default loadout.',
+		description:
+			'Shield metrics at varying priority levels. Default loadout.',
 		scenarios: values.map((p) =>
 			scenario(
 				`priority=${p}`,
 				`Default loadout at priority ${p}. Regen and draw scale linearly.`,
 				{},
-				{ ...DEFAULT_TUNING, priority: p },
-			),
+				{ ...DEFAULT_TUNING, priority: p }
+			)
 		),
 	};
 }
@@ -172,9 +207,13 @@ function powerBudget(): AnalysisCategory {
 	const { report } = run({});
 	const cap = report.power.capacitor;
 	const comfortDist = Math.floor(report.jump.comfortRange);
-	const comfortJump = report.jump.sampleJumps.find((s) => s.distance === comfortDist);
+	const comfortJump = report.jump.sampleJumps.find(
+		(s) => s.distance === comfortDist
+	);
 	const scanComfortDist = Math.floor(report.scan.comfortRange);
-	const comfortScan = report.scan.sampleScans.find((s) => s.distance === scanComfortDist);
+	const comfortScan = report.scan.sampleScans.find(
+		(s) => s.distance === scanComfortDist
+	);
 
 	const jumpPower = comfortJump?.powerCost ?? 0;
 	const scanPower = comfortScan?.cost ?? 0;
@@ -185,23 +224,29 @@ function powerBudget(): AnalysisCategory {
 		scenarios: [
 			scenario(
 				'Comfort-range jump power cost',
-				`Jump ${comfortDist}ly costs ${jumpPower} power = ${Math.round((jumpPower / cap) * 100)}% of capacitor. Target: 50-70%.`,
-				{},
+				`Jump ${comfortDist}ly costs ${jumpPower} power = ${Math.round(
+					(jumpPower / cap) * 100
+				)}% of capacitor. Target: 50-70%.`,
+				{}
 			),
 			scenario(
 				'Comfort-range scan power cost',
-				`Scan ${scanComfortDist}ly costs ${scanPower} power = ${Math.round((scanPower / cap) * 100)}% of capacitor. Target: should not deplete.`,
-				{},
+				`Scan ${scanComfortDist}ly costs ${scanPower} power = ${Math.round(
+					(scanPower / cap) * 100
+				)}% of capacitor. Target: should not deplete.`,
+				{}
 			),
 			scenario(
 				'Jump + scan back-to-back',
-				`Combined ${jumpPower + scanPower} power = ${Math.round(((jumpPower + scanPower) / cap) * 100)}% of capacitor. Target: should exceed capacity.`,
-				{},
+				`Combined ${jumpPower + scanPower} power = ${Math.round(
+					((jumpPower + scanPower) / cap) * 100
+				)}% of capacitor. Target: should exceed capacity.`,
+				{}
 			),
 			scenario(
 				'Shield draw vs regen',
 				`Shield draw=${report.shield.draw}, core regen=${report.power.regenRate}/hr. Regen should outpace draw when idle.`,
-				{},
+				{}
 			),
 		],
 	};
@@ -217,14 +262,18 @@ function coreDriveMatrix(): AnalysisCategory {
 				scenario(
 					`${core.slug} + ${drive.slug}`,
 					`Core output=${core.mult_a}, drive consumption=${drive.mult_b}. perfRatio=min(1, ${core.mult_a}/${drive.mult_b}).`,
-					{ core: core.slug, drive: drive.slug },
-				),
+					{ core: core.slug, drive: drive.slug }
+				)
 			);
 		}
 	}
 	return {
 		category: 'Core x Drive Matrix',
-		description: `All core × drive combinations (${cores.length} × ${drives.length} = ${cores.length * drives.length} scenarios). Default sensor/shield/nav, pioneer hull.`,
+		description: `All core × drive combinations (${cores.length} × ${
+			drives.length
+		} = ${
+			cores.length * drives.length
+		} scenarios). Default sensor/shield/nav, pioneer hull.`,
 		scenarios,
 	};
 }
@@ -238,8 +287,8 @@ function sensorMatrix(): AnalysisCategory {
 			scenario(
 				s.slug,
 				`${s.label}: sustain=${s.sustain}, chance=${s.chance}, durationMult=${s.mult_a}.`,
-				{ sensor: s.slug },
-			),
+				{ sensor: s.slug }
+			)
 		),
 	};
 }
@@ -255,14 +304,16 @@ function shieldPriorityMatrix(): AnalysisCategory {
 					`${shield.slug} @ priority=${p}`,
 					`${shield.label}: rate=${shield.rate}, capacity=${shield.capacity}, draw=${shield.draw}.`,
 					{ shield: shield.slug },
-					{ ...DEFAULT_TUNING, priority: p },
-				),
+					{ ...DEFAULT_TUNING, priority: p }
+				)
 			);
 		}
 	}
 	return {
 		category: 'Shield x Priority Matrix',
-		description: `All shields × priority (${shields.length} × ${priorities.length} = ${shields.length * priorities.length} scenarios).`,
+		description: `All shields × priority (${shields.length} × ${
+			priorities.length
+		} = ${shields.length * priorities.length} scenarios).`,
 		scenarios,
 	};
 }
@@ -277,19 +328,26 @@ function coreLifecycle(): AnalysisCategory {
 		for (const drive of drives) {
 			const { report } = run(
 				{ core: core.slug, drive: drive.slug },
-				{ ...DEFAULT_TUNING, throttle: 1.0 },
+				{ ...DEFAULT_TUNING, throttle: 1.0 }
 			);
 			const jump5 = report.jump.sampleJumps.find((s) => s.distance === 5);
 			const coreCost = jump5?.coreCost ?? 0;
-			const jumps = coreCost > 0 ? Math.floor(report.power.coreLife / coreCost) : Infinity;
+			const jumps =
+				coreCost > 0
+					? Math.floor(report.power.coreLife / coreCost)
+					: Infinity;
 
 			scenarios.push(
 				scenario(
 					`${core.slug} + ${drive.slug} @ throttle=1.0`,
-					`5ly jumps before core death: ${jumps === Infinity ? 'infinite' : jumps}. Core life=${report.power.coreLife}, cost/jump=${coreCost.toFixed(2)}.`,
+					`5ly jumps before core death: ${
+						jumps === Infinity ? 'infinite' : jumps
+					}. Core life=${
+						report.power.coreLife
+					}, cost/jump=${coreCost.toFixed(2)}.`,
 					{ core: core.slug, drive: drive.slug },
-					{ ...DEFAULT_TUNING, throttle: 1.0 },
-				),
+					{ ...DEFAULT_TUNING, throttle: 1.0 }
+				)
 			);
 		}
 	}
@@ -302,15 +360,19 @@ function coreLifecycle(): AnalysisCategory {
 					`${core.slug} + ${drive.slug} @ throttle=0.5 (limp home)`,
 					'Throttle ≤ 0.5 should produce zero core cost (limp-home mode).',
 					{ core: core.slug, drive: drive.slug },
-					{ ...DEFAULT_TUNING, throttle: 0.5 },
-				),
+					{ ...DEFAULT_TUNING, throttle: 0.5 }
+				)
 			);
 		}
 	}
 
 	return {
 		category: 'Core Lifecycle',
-		description: `How many 5ly jumps before core death at throttle 1.0, and verification of zero cost at throttle 0.5. ${cores.length} × ${drives.length} × 2 = ${cores.length * drives.length * 2} scenarios.`,
+		description: `How many 5ly jumps before core death at throttle 1.0, and verification of zero cost at throttle 0.5. ${
+			cores.length
+		} × ${drives.length} × 2 = ${
+			cores.length * drives.length * 2
+		} scenarios.`,
 		scenarios,
 	};
 }
@@ -323,55 +385,70 @@ function edgeCases(): AnalysisCategory {
 			scenario(
 				'DR-705 + Epoch-E (worst perfRatio)',
 				'perfRatio = min(1.0, 0.9/1.5) = 0.6. Lowest efficiency combo — verify usable numbers.',
-				{ core: 'epoch_e', drive: 'dr_705' },
+				{ core: 'epoch_e', drive: 'dr_705' }
 			),
 			scenario(
 				'Aegis Eta @ priority=2.0 (highest draw)',
 				'draw=16 at priority 2.0. Check draw vs capacitor headroom.',
 				{ shield: 'aegis_eta' },
-				{ ...DEFAULT_TUNING, priority: 2.0 },
+				{ ...DEFAULT_TUNING, priority: 2.0 }
 			),
 			scenario(
 				'Aegis Eta @ priority=3.0 (max specialization)',
 				'Rapid Recovery specialization max. draw=24 at priority 3.0.',
 				{ shield: 'aegis_eta' },
-				{ ...DEFAULT_TUNING, priority: 3.0 },
+				{ ...DEFAULT_TUNING, priority: 3.0 }
 			),
 			scenario(
 				'Scout hull (lightest)',
 				'Small hull, mass 0.7. Tighter internal space — check if constraints still hold.',
-				{ hull: 'scout' },
+				{ hull: 'scout' }
 			),
 			scenario(
 				'Bulwark hull (heaviest)',
 				'Mass 1.4, largest internal space. Check power budget ratios.',
-				{ hull: 'bulwark' },
+				{ hull: 'bulwark' }
 			),
 			scenario(
 				'All economy (Epoch-E + DR-305 + ACU Mk I + Aegis Alpha)',
 				'Cheapest, most efficient components. Maximum range, minimum performance.',
-				{ core: 'epoch_e', drive: 'dr_305', sensor: 'acu_mk1', shield: 'aegis_alpha' },
+				{
+					core: 'epoch_e',
+					drive: 'dr_305',
+					sensor: 'acu_mk1',
+					shield: 'aegis_alpha',
+				}
 			),
 			scenario(
 				'All performance (Epoch-R + DR-705 + DSC Mk I + Aegis Eta)',
 				'Highest performance components. Maximum speed, minimum efficiency.',
-				{ core: 'epoch_r', drive: 'dr_705', sensor: 'dsc_mk1', shield: 'aegis_eta' },
+				{
+					core: 'epoch_r',
+					drive: 'dr_705',
+					sensor: 'dsc_mk1',
+					shield: 'aegis_eta',
+				}
 			),
 			scenario(
 				'Epoch-R + Aegis Testudo (worst crossover perfRatio)',
 				'Rapid core (highest output) with crossover drive. Worst perfRatio among crossover combos.',
-				{ core: 'epoch_r', drive: 'aegis_testudo' },
+				{ core: 'epoch_r', drive: 'aegis_testudo' }
 			),
 			scenario(
 				'DSC Shield @ priority=1.5 (crossover max priority)',
 				'Sensor-coupled shield at elevated priority. Crossover draw scaling.',
 				{ shield: 'dsc_shield_mk2' },
-				{ ...DEFAULT_TUNING, priority: 1.5 },
+				{ ...DEFAULT_TUNING, priority: 1.5 }
 			),
 			scenario(
 				'Scout hull + full crossover loadout',
 				'Tightest internal space with all three crossover products. Footprint pressure test.',
-				{ hull: 'scout', drive: 'aegis_testudo', sensor: 'epoch_sensor_2', shield: 'dsc_shield_mk2' },
+				{
+					hull: 'scout',
+					drive: 'aegis_testudo',
+					sensor: 'epoch_sensor_2',
+					shield: 'dsc_shield_mk2',
+				}
 			),
 		],
 	};
@@ -380,31 +457,32 @@ function edgeCases(): AnalysisCategory {
 function tuningIsolation(): AnalysisCategory {
 	return {
 		category: 'Tuning Isolation',
-		description: 'Verify each tuning param only affects its own system. Compare against baseline.',
+		description:
+			'Verify each tuning param only affects its own system. Compare against baseline.',
 		scenarios: [
 			scenario(
 				'Baseline (all 1.0)',
 				'Reference point for isolation checks.',
 				{},
-				{ throttle: 1.0, effort: 1.0, priority: 1.0 },
+				{ throttle: 1.0, effort: 1.0, priority: 1.0 }
 			),
 			scenario(
 				'Throttle only (2.0)',
 				'Only throttle changed. Scan and shield should be identical to baseline.',
 				{},
-				{ throttle: 2.0, effort: 1.0, priority: 1.0 },
+				{ throttle: 2.0, effort: 1.0, priority: 1.0 }
 			),
 			scenario(
 				'Effort only (2.0)',
 				'Only effort changed. Jump and shield should be identical to baseline.',
 				{},
-				{ throttle: 1.0, effort: 2.0, priority: 1.0 },
+				{ throttle: 1.0, effort: 2.0, priority: 1.0 }
 			),
 			scenario(
 				'Priority only (2.0)',
 				'Only priority changed. Jump and scan should be identical to baseline.',
 				{},
-				{ throttle: 1.0, effort: 1.0, priority: 2.0 },
+				{ throttle: 1.0, effort: 1.0, priority: 2.0 }
 			),
 		],
 	};
@@ -419,9 +497,13 @@ function hullSpecializations(): AnalysisCategory {
 		scenarios.push(
 			scenario(
 				`${hull.slug} mass effect`,
-				`${hull.label}: hullMass=${hull.hullMass}. Jump comfort=${report.jump.comfortRange.toFixed(1)} (raw 7.0 / ${hull.hullMass}).`,
-				{ hull: hull.slug },
-			),
+				`${hull.label}: hullMass=${
+					hull.hullMass
+				}. Jump comfort=${report.jump.comfortRange.toFixed(
+					1
+				)} (raw 7.0 / ${hull.hullMass}).`,
+				{ hull: hull.slug }
+			)
 		);
 	}
 
@@ -433,8 +515,8 @@ function hullSpecializations(): AnalysisCategory {
 			scenario(
 				`${hull.slug} signature`,
 				`${hull.label}: hullSignature=${sig.hullSignature}, weaponDraw=${sig.weaponDrawMultiplier}, stealthDraw=${sig.stealthDrawMultiplier}.`,
-				{ hull: hull.slug },
-			),
+				{ hull: hull.slug }
+			)
 		);
 	}
 
@@ -443,14 +525,22 @@ function hullSpecializations(): AnalysisCategory {
 	if (scout) {
 		const { report: pioneerReport } = run({ hull: 'pioneer' });
 		const { report: scoutReport } = run({ hull: 'scout' });
-		const pDuration = pioneerReport.jump.sampleJumps.find((j) => j.distance === 5)?.duration ?? 0;
-		const sDuration = scoutReport.jump.sampleJumps.find((j) => j.distance === 5)?.duration ?? 0;
+		const pDuration =
+			pioneerReport.jump.sampleJumps.find((j) => j.distance === 5)
+				?.duration ?? 0;
+		const sDuration =
+			scoutReport.jump.sampleJumps.find((j) => j.distance === 5)
+				?.duration ?? 0;
 		scenarios.push(
 			scenario(
 				'Scout amplitude bonus',
-				`Scout amplitudeMultiplier=${scout.amplitudeMultiplier}. 5ly jump: Pioneer=${pDuration}s, Scout=${sDuration}s (${Math.round((1 - sDuration / pDuration) * 100)}% faster).`,
-				{ hull: 'scout' },
-			),
+				`Scout amplitudeMultiplier=${
+					scout.amplitudeMultiplier
+				}. 5ly jump: Pioneer=${pDuration}s, Scout=${sDuration}s (${Math.round(
+					(1 - sDuration / pDuration) * 100
+				)}% faster).`,
+				{ hull: 'scout' }
+			)
 		);
 	}
 
@@ -464,13 +554,14 @@ function hullSpecializations(): AnalysisCategory {
 function hullComparison(): AnalysisCategory {
 	return {
 		category: 'Hull Comparison',
-		description: 'All 4 hulls with default loadout. Shows how hull choice affects power budget and cargo.',
+		description:
+			'All 4 hulls with default loadout. Shows how hull choice affects power budget and cargo.',
 		scenarios: HULLS.map((hull) =>
 			scenario(
 				hull.slug,
 				`${hull.label}: space=${hull.internalSpace}, mass=${hull.hullMass}, sig=${hull.hullSignature}.`,
-				{ hull: hull.slug },
-			),
+				{ hull: hull.slug }
+			)
 		),
 	};
 }
@@ -491,17 +582,22 @@ function crossoverProducts(): AnalysisCategory {
 			scenario(
 				`${slug} (solo)`,
 				`${p.label} in default loadout. Crossover baseline.`,
-				{ [type]: slug },
-			),
+				{ [type]: slug }
+			)
 		);
 	}
 
 	// Crossover vs native pairs
-	const pairs: { type: ComponentType; crossover: string; native: string }[] = [
-		{ type: 'drive', crossover: 'aegis_testudo', native: 'dr_307' },
-		{ type: 'sensor', crossover: 'epoch_sensor_2', native: 'acu_mk2' },
-		{ type: 'shield', crossover: 'dsc_shield_mk2', native: 'aegis_beta' },
-	];
+	const pairs: { type: ComponentType; crossover: string; native: string }[] =
+		[
+			{ type: 'drive', crossover: 'aegis_testudo', native: 'dr_307' },
+			{ type: 'sensor', crossover: 'epoch_sensor_2', native: 'acu_mk2' },
+			{
+				type: 'shield',
+				crossover: 'dsc_shield_mk2',
+				native: 'aegis_beta',
+			},
+		];
 
 	for (const { type, native } of pairs) {
 		const p = getProduct(native)!;
@@ -509,8 +605,8 @@ function crossoverProducts(): AnalysisCategory {
 			scenario(
 				`${native} (native comparison)`,
 				`${p.label}. Native Mk II counterpart for crossover comparison.`,
-				{ [type]: native },
-			),
+				{ [type]: native }
+			)
 		);
 	}
 
@@ -519,23 +615,23 @@ function crossoverProducts(): AnalysisCategory {
 		scenario(
 			'Epoch-E + Aegis Testudo (endurance + shield-regen)',
 			'Endurance core with shield-regen drive. Maximum sustained shield uptime.',
-			{ core: 'epoch_e', drive: 'aegis_testudo' },
+			{ core: 'epoch_e', drive: 'aegis_testudo' }
 		),
 		scenario(
 			'Epoch-R + Aegis Testudo (rapid + shield-regen)',
 			'Rapid core with shield-regen drive. Worst crossover perfRatio — high consumption, low output.',
-			{ core: 'epoch_r', drive: 'aegis_testudo' },
+			{ core: 'epoch_r', drive: 'aegis_testudo' }
 		),
 		scenario(
 			'Epoch-E + Epoch Sensor 2 (endurance + core-resonance)',
 			'Endurance core with core-resonance scanner. Maximum scan endurance.',
-			{ core: 'epoch_e', sensor: 'epoch_sensor_2' },
+			{ core: 'epoch_e', sensor: 'epoch_sensor_2' }
 		),
 		scenario(
 			'DSC Mk II + DSC Shield (sensor + sensor-coupled shield)',
 			'DSC sensor with sensor-coupled shield. Maximum passive range synergy.',
-			{ sensor: 'dsc_mk2', shield: 'dsc_shield_mk2' },
-		),
+			{ sensor: 'dsc_mk2', shield: 'dsc_shield_mk2' }
+		)
 	);
 
 	// Full crossover loadout
@@ -543,8 +639,12 @@ function crossoverProducts(): AnalysisCategory {
 		scenario(
 			'Full crossover loadout',
 			'All three crossovers equipped simultaneously. Aegis Testudo + Epoch Sensor 2 + DSC Shield.',
-			{ drive: 'aegis_testudo', sensor: 'epoch_sensor_2', shield: 'dsc_shield_mk2' },
-		),
+			{
+				drive: 'aegis_testudo',
+				sensor: 'epoch_sensor_2',
+				shield: 'dsc_shield_mk2',
+			}
+		)
 	);
 
 	return {
@@ -560,13 +660,17 @@ function pilotSkillSweep(): AnalysisCategory {
 		category: 'Pilot Skill Sweep',
 		description: `Scan and nav metrics across pilot skill multipliers ${PILOT_SKILL_RANGE.min}→${PILOT_SKILL_RANGE.max}. Default loadout, default tuning.`,
 		scenarios: values.map((v) => {
-			const pilot: PilotSkills = { ...DEFAULT_PILOT_SKILLS, scanning: v, jumping: v };
+			const pilot: PilotSkills = {
+				...DEFAULT_PILOT_SKILLS,
+				scanning: v,
+				jumping: v,
+			};
 			return scenario(
 				`pilot=${v}`,
 				`All wired pilot skills at ${v}. Scanning boosts scan success, jumping boosts discovery.`,
 				{},
 				DEFAULT_TUNING,
-				pilot,
+				pilot
 			);
 		}),
 	};

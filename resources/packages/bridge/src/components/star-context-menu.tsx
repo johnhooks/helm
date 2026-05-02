@@ -25,23 +25,23 @@ interface StarContextMenuProps {
 	onClose: () => void;
 }
 
-export function StarContextMenu( {
+export function StarContextMenu({
 	star,
 	currentNodeId,
 	selectedDistance,
 	hasActiveAction,
 	onClose,
-}: StarContextMenuProps ) {
+}: StarContextMenuProps) {
 	// Dismiss on Escape.
-	useEffect( () => {
-		const handleKeyDown = ( event: KeyboardEvent ) => {
-			if ( event.key === 'Escape' ) {
+	useEffect(() => {
+		const handleKeyDown = (event: KeyboardEvent) => {
+			if (event.key === 'Escape') {
 				onClose();
 			}
 		};
-		document.addEventListener( 'keydown', handleKeyDown );
-		return () => document.removeEventListener( 'keydown', handleKeyDown );
-	}, [ onClose ] );
+		document.addEventListener('keydown', handleKeyDown);
+		return () => document.removeEventListener('keydown', handleKeyDown);
+	}, [onClose]);
 
 	const actionProps: StarContextActionProps = {
 		star,
@@ -53,11 +53,11 @@ export function StarContextMenu( {
 
 	return (
 		<ContextMenu
-			name={ star.title }
-			subtitle={ star.spectral_class ?? undefined }
+			name={star.title}
+			subtitle={star.spectral_class ?? undefined}
 		>
-			<ScanRouteContextAction { ...actionProps } />
-			<JumpContextAction { ...actionProps } />
+			<ScanRouteContextAction {...actionProps} />
+			<JumpContextAction {...actionProps} />
 		</ContextMenu>
 	);
 }

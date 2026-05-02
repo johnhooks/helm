@@ -108,7 +108,7 @@ export function makeNav(overrides: Partial<Product> = {}): Product {
 export function makeComponent(
 	product: Product,
 	slot: string,
-	overrides: Partial<InstalledComponent> = {},
+	overrides: Partial<InstalledComponent> = {}
 ): InstalledComponent {
 	return {
 		product,

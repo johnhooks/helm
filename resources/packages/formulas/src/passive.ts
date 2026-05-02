@@ -89,7 +89,7 @@ export function passiveDetection(
 	samplePeriod: number = DEFAULT_DSP_CONSTANTS.samplePeriodSeconds,
 	matchedGain: number = 1.0,
 	maskingNoise: number = 0,
-	pilotSkill: number = 1.0,
+	pilotSkill: number = 1.0
 ): number {
 	// Step 1: effective signal power, scaled by sensor passive affinity
 	// AND pilot skill. A DSC (1.4) with a veteran pilot (1.1) hears the
@@ -97,12 +97,16 @@ export function passiveDetection(
 	const effectiveSignal = emissionPower * sensorPassiveAffinity * pilotSkill;
 
 	// Step 2: raw SNR — basic or masked
-	const rawSNR = maskingNoise > 0
-		? maskedSNR(effectiveSignal, noiseFloorValue, maskingNoise)
-		: snr(effectiveSignal, noiseFloorValue);
+	const rawSNR =
+		maskingNoise > 0
+			? maskedSNR(effectiveSignal, noiseFloorValue, maskingNoise)
+			: snr(effectiveSignal, noiseFloorValue);
 
 	// Step 3: integration gain from accumulated observation
-	const sampleCount = Math.max(1, Math.floor(integrationSeconds / samplePeriod));
+	const sampleCount = Math.max(
+		1,
+		Math.floor(integrationSeconds / samplePeriod)
+	);
 	const integratedSNR = integrationGain(rawSNR, sampleCount);
 
 	// Step 4: matched filter — sensor template correlation
@@ -138,7 +142,7 @@ export function passiveReport(
 	sensorAffinity: SensorAffinity,
 	integrationSeconds: number,
 	samplePeriod: number = DEFAULT_DSP_CONSTANTS.samplePeriodSeconds,
-	minConfidence: number = 0.1,
+	minConfidence: number = 0.1
 ): Detection[] {
 	const detections: Detection[] = [];
 
@@ -151,7 +155,7 @@ export function passiveReport(
 			integrationSeconds,
 			samplePeriod,
 			gain,
-			source.maskingNoise ?? 0,
+			source.maskingNoise ?? 0
 		);
 
 		if (confidence >= minConfidence) {

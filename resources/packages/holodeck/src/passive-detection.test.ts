@@ -93,7 +93,7 @@ describe('Passive Detection', () => {
 		expect(shortResult!.detections.length).toBeGreaterThan(0);
 		expect(longResult!.detections.length).toBeGreaterThan(0);
 		expect(longResult!.detections[0].confidence).toBeGreaterThanOrEqual(
-			shortResult!.detections[0].confidence,
+			shortResult!.detections[0].confidence
 		);
 	});
 
@@ -117,8 +117,8 @@ describe('Passive Detection', () => {
 		expect(result).not.toBeNull();
 
 		// Own scan emission should NOT appear as a detection
-		const ownDetection = result!.detections.find((d) =>
-			d.label?.includes('self'),
+		const ownDetection = result!.detections.find(
+			(d) => d.label?.includes('self')
 		);
 		expect(ownDetection).toBeUndefined();
 	});
@@ -204,14 +204,14 @@ describe('Passive Detection', () => {
 		// ECM should raise noise floor
 		expect(ecmResult!.snapshot.ecmNoise).toBeGreaterThan(0);
 		expect(ecmResult!.snapshot.noiseFloor).toBeGreaterThan(
-			baseResult!.snapshot.noiseFloor,
+			baseResult!.snapshot.noiseFloor
 		);
 
 		// Detection confidence should decrease with ECM
 		expect(baseResult!.detections.length).toBeGreaterThan(0);
 		expect(ecmResult!.detections.length).toBeGreaterThan(0);
 		expect(ecmResult!.detections[0].confidence).toBeLessThan(
-			baseResult!.detections[0].confidence,
+			baseResult!.detections[0].confidence
 		);
 	});
 
@@ -253,7 +253,7 @@ describe('Passive Detection', () => {
 			expect(detection.tier).toBe('analysis');
 		} else if (detection.confidence >= 0.65) {
 			expect(detection.tier).toBe('type');
-		} else if (detection.confidence >= 0.40) {
+		} else if (detection.confidence >= 0.4) {
 			expect(detection.tier).toBe('class');
 		} else if (detection.confidence >= 0.15) {
 			expect(detection.tier).toBe('anomaly');
@@ -305,8 +305,14 @@ describe('Passive Detection', () => {
 		engine.registerShip('miner', miner);
 
 		// Both scanning
-		engine.submitAction(wolf, ActionType.ScanRoute, { target_node_id: 42, distance: 2 });
-		engine.submitAction(miner, ActionType.ScanRoute, { target_node_id: 43, distance: 3 });
+		engine.submitAction(wolf, ActionType.ScanRoute, {
+			target_node_id: 42,
+			distance: 2,
+		});
+		engine.submitAction(miner, ActionType.ScanRoute, {
+			target_node_id: 43,
+			distance: 3,
+		});
 
 		const wolfResult = engine.queryPassiveDetection('wolf', 3600);
 		const minerResult = engine.queryPassiveDetection('miner', 3600);

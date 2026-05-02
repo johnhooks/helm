@@ -3,7 +3,7 @@ status: draft
 area: navigation
 priority: p2
 depends_on:
-  - nav-06-persist-scan-discoveries
+    - nav-06-persist-scan-discoveries
 ---
 
 # Add a scan result reconciler

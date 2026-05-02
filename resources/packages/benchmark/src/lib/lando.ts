@@ -10,7 +10,9 @@ export async function lando(...args: string[]): Promise<string> {
 
 	if (exitCode !== 0) {
 		throw new Error(
-			`lando wp ${args.join(' ')} failed (exit ${exitCode}):\n${stderr || stdout}`
+			`lando wp ${args.join(' ')} failed (exit ${exitCode}):\n${
+				stderr || stdout
+			}`
 		);
 	}
 

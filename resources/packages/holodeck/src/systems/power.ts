@@ -55,7 +55,10 @@ export class PowerSystem {
 	/**
 	 * Compute new powerFullAt after consuming an amount of power.
 	 */
-	calculatePowerFullAtAfterConsumption(amount: number, now: number): number | null {
+	calculatePowerFullAtAfterConsumption(
+		amount: number,
+		now: number
+	): number | null {
 		const current = this.getCurrentPower(now);
 		const newPower = Math.max(0, current - amount);
 		if (newPower >= this.state.powerMax) {

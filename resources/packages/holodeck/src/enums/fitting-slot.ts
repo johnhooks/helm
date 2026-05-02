@@ -9,7 +9,8 @@ export const ShipFittingSlot = {
 	Equip3: 'equip_3',
 } as const;
 
-export type ShipFittingSlot = (typeof ShipFittingSlot)[keyof typeof ShipFittingSlot];
+export type ShipFittingSlot =
+	(typeof ShipFittingSlot)[keyof typeof ShipFittingSlot];
 
 export const REQUIRED_SLOTS: readonly ShipFittingSlot[] = [
 	ShipFittingSlot.Core,

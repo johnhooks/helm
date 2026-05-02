@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 import { getAllProducts, getProductsByType } from '../data/products';
 import { HULLS } from '../data/hulls';
 import type { ParsedFlags } from './parse';
@@ -32,7 +34,9 @@ export function list({ positional, flags }: ParsedFlags): void {
 		}
 
 		default:
-			console.error(`Unknown list subject "${subject}". Use: products, hulls`); // eslint-disable-line no-console
+			console.error(
+				`Unknown list subject "${subject}". Use: products, hulls`
+			); // eslint-disable-line no-console
 			process.exit(1);
 	}
 }

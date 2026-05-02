@@ -1,10 +1,13 @@
-import type { Product, ProductEmbed, ShipState, SystemComponent } from '@helm/types';
+import type {
+	Product,
+	ProductEmbed,
+	ShipState,
+	SystemComponent,
+} from '@helm/types';
 import type { EditsState, ShipSlice, State, SystemsState } from '../types';
 import { initializeDefaultState } from '../reducer';
 
-export function createShipState(
-	overrides: Partial< ShipState > = {}
-): ShipState {
+export function createShipState(overrides: Partial<ShipState> = {}): ShipState {
 	return {
 		id: 1,
 		node_id: 100,
@@ -19,7 +22,7 @@ export function createShipState(
 }
 
 export function createSystemComponent(
-	overrides: Partial< SystemComponent > = {}
+	overrides: Partial<SystemComponent> = {}
 ): SystemComponent {
 	return {
 		id: 1,
@@ -35,7 +38,7 @@ export function createSystemComponent(
 }
 
 export function createProductEmbed(
-	overrides: Partial< Product > = {}
+	overrides: Partial<Product> = {}
 ): ProductEmbed {
 	return {
 		id: 10,
@@ -60,7 +63,7 @@ export function createProductEmbed(
 }
 
 export function createEditsState(
-	overrides: Partial< EditsState > = {}
+	overrides: Partial<EditsState> = {}
 ): EditsState {
 	return {
 		ship: null,
@@ -70,11 +73,13 @@ export function createEditsState(
 	};
 }
 
-export function createState( overrides: {
-	ship?: Partial< ShipSlice >;
-	systems?: Partial< SystemsState >;
-	edits?: Partial< EditsState >;
-} = {} ): State {
+export function createState(
+	overrides: {
+		ship?: Partial<ShipSlice>;
+		systems?: Partial<SystemsState>;
+		edits?: Partial<EditsState>;
+	} = {}
+): State {
 	const defaults = initializeDefaultState();
 	return {
 		ship: { ...defaults.ship, ...overrides.ship },

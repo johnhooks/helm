@@ -3,7 +3,7 @@ status: draft
 area: navigation
 priority: p2
 depends_on:
-  - nav-12-add-node-adjacency-path-selectors
+    - nav-12-add-node-adjacency-path-selectors
 ---
 
 # Add route-aware jump drafts
@@ -45,19 +45,19 @@ current node to that target.
 
 ## Requirements
 
-- The context menu should treat `Jump` as the route-planning entry point for
-  both direct and indirectly reachable targets.
-- Direct jumps should continue to use direct adjacency through one known user
-  edge.
-- Indirect known paths should draft a jump route plan rather than introducing a
-  separate `Plot Course` action.
-- The draft UI must display total known route distance, hop count, and next
-  node for indirect paths.
-- The draft UI must distinguish a direct one-edge jump from an indirect known
-  route.
-- If submit only starts the next leg, the draft must make that behavior clear.
-- Scan Route visibility must continue to use direct adjacency, not known-path
-  reachability.
-- Tests must cover direct jump drafts, indirect route-plan drafts, unreachable
-  targets, and the interaction between indirect reachability and scan
-  eligibility.
+-   The context menu should treat `Jump` as the route-planning entry point for
+    both direct and indirectly reachable targets.
+-   Direct jumps should continue to use direct adjacency through one known user
+    edge.
+-   Indirect known paths should draft a jump route plan rather than introducing a
+    separate `Plot Course` action.
+-   The draft UI must display total known route distance, hop count, and next
+    node for indirect paths.
+-   The draft UI must distinguish a direct one-edge jump from an indirect known
+    route.
+-   If submit only starts the next leg, the draft must make that behavior clear.
+-   Scan Route visibility must continue to use direct adjacency, not known-path
+    reachability.
+-   Tests must cover direct jump drafts, indirect route-plan drafts, unreachable
+    targets, and the interaction between indirect reachability and scan
+    eligibility.

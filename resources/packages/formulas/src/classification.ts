@@ -33,12 +33,20 @@ import { DEFAULT_TIER_THRESHOLDS } from './types';
  */
 export function informationTier(
 	confidence: number,
-	thresholds: TierThresholds = DEFAULT_TIER_THRESHOLDS,
+	thresholds: TierThresholds = DEFAULT_TIER_THRESHOLDS
 ): InformationTier | null {
-	if (confidence >= thresholds.analysis) {return 'analysis';}
-	if (confidence >= thresholds.type) {return 'type';}
-	if (confidence >= thresholds.class) {return 'class';}
-	if (confidence >= thresholds.anomaly) {return 'anomaly';}
+	if (confidence >= thresholds.analysis) {
+		return 'analysis';
+	}
+	if (confidence >= thresholds.type) {
+		return 'type';
+	}
+	if (confidence >= thresholds.class) {
+		return 'class';
+	}
+	if (confidence >= thresholds.anomaly) {
+		return 'anomaly';
+	}
 	return null;
 }
 
@@ -63,7 +71,7 @@ export function informationTier(
 export function adjustedThresholds(
 	base: TierThresholds = DEFAULT_TIER_THRESHOLDS,
 	equipmentBonus: number = 0,
-	experienceBonus: number = 0,
+	experienceBonus: number = 0
 ): TierThresholds {
 	const totalBonus = equipmentBonus + experienceBonus;
 	return {

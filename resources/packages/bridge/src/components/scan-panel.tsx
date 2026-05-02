@@ -13,62 +13,63 @@ import { __ } from '@wordpress/i18n';
 import { store as actionsStore } from '@helm/actions';
 import { Countdown, Readout, Title } from '@helm/ui';
 
-function getRemainingSeconds( deferredUntil: string | null ): number {
-	if ( ! deferredUntil ) {
+function getRemainingSeconds(deferredUntil: string | null): number {
+	if (!deferredUntil) {
 		return 0;
 	}
-	const target = new Date( deferredUntil ).getTime();
-	return Math.max( 0, Math.floor( ( target - Date.now() ) / 1000 ) );
+	const target = new Date(deferredUntil).getTime();
+	return Math.max(0, Math.floor((target - Date.now()) / 1000));
 }
 
 export function ScanPanel() {
 	const action = useSelect(
-		( select ) => select( actionsStore ).getLatestAction(),
+		(select) => select(actionsStore).getLatestAction(),
 		[]
 	);
 
 	// Live countdown timer.
-	const [ remaining, setRemaining ] = useState( () =>
-		getRemainingSeconds( action?.deferred_until ?? null )
+	const [remaining, setRemaining] = useState(() =>
+		getRemainingSeconds(action?.deferred_until ?? null)
 	);
 
-	useEffect( () => {
-		if ( ! action?.deferred_until ) {
+	useEffect(() => {
+		if (!action?.deferred_until) {
 			return;
 		}
 		const status = action.status;
-		if ( status !== 'pending' && status !== 'running' ) {
+		if (status !== 'pending' && status !== 'running') {
 			return;
 		}
 
-		setRemaining( getRemainingSeconds( action.deferred_until ) );
+		setRemaining(getRemainingSeconds(action.deferred_until));
 
-		const interval = setInterval( () => {
-			setRemaining( getRemainingSeconds( action.deferred_until! ) );
-		}, 1000 );
+		const interval = setInterval(() => {
+			setRemaining(getRemainingSeconds(action.deferred_until!));
+		}, 1000);
 
-		return () => clearInterval( interval );
-	}, [ action?.deferred_until, action?.status ] );
+		return () => clearInterval(interval);
+	}, [action?.deferred_until, action?.status]);
 
 	// Action in progress.
-	if ( action && ( action.status === 'pending' || action.status === 'running' ) ) {
-		const targetName = ( action.params as Record< string, unknown > ).target_name as string | undefined;
+	if (
+		action &&
+		(action.status === 'pending' || action.status === 'running')
+	) {
+		const targetName = (action.params as Record<string, unknown>)
+			.target_name as string | undefined;
 		return (
 			<div className="helm-scan-panel">
-				<Title label={ __( 'Scan Route', 'helm' ) } />
+				<Title label={__('Scan Route', 'helm')} />
 				<Readout
-					label={ __( 'Status', 'helm' ) }
-					value={ __( 'Scanning\u2026', 'helm' ) }
+					label={__('Status', 'helm')}
+					value={__('Scanning\u2026', 'helm')}
 				/>
-				{ targetName && (
-					<Readout
-						label={ __( 'Target', 'helm' ) }
-						value={ targetName }
-					/>
-				) }
+				{targetName && (
+					<Readout label={__('Target', 'helm')} value={targetName} />
+				)}
 				<Countdown
-					label={ __( 'ETA', 'helm' ) }
-					remaining={ remaining }
+					label={__('ETA', 'helm')}
+					remaining={remaining}
 					tone="sky"
 					active
 				/>
@@ -77,38 +78,43 @@ export function ScanPanel() {
 	}
 
 	// Action complete.
-	if ( action && ( action.status === 'fulfilled' || action.status === 'partial' || action.status === 'failed' ) ) {
-		const result = action.result as Record< string, unknown > | null;
-		const edgeCount = ( result?.edges as unknown[] )?.length ?? 0;
-		const nodeCount = ( result?.nodes as unknown[] )?.length ?? 0;
+	if (
+		action &&
+		(action.status === 'fulfilled' ||
+			action.status === 'partial' ||
+			action.status === 'failed')
+	) {
+		const result = action.result as Record<string, unknown> | null;
+		const edgeCount = (result?.edges as unknown[])?.length ?? 0;
+		const nodeCount = (result?.nodes as unknown[])?.length ?? 0;
 		const complete = result?.complete as boolean | undefined;
 
 		return (
 			<div className="helm-scan-panel">
-				<Title label={ __( 'Scan Complete', 'helm' ) } />
-				{ action.status === 'failed' ? (
+				<Title label={__('Scan Complete', 'helm')} />
+				{action.status === 'failed' ? (
 					<Readout
-						label={ __( 'Status', 'helm' ) }
-						value={ __( 'Failed', 'helm' ) }
+						label={__('Status', 'helm')}
+						value={__('Failed', 'helm')}
 					/>
 				) : (
 					<>
 						<Readout
-							label={ __( 'Waypoints', 'helm' ) }
-							value={ String( nodeCount ) }
+							label={__('Waypoints', 'helm')}
+							value={String(nodeCount)}
 						/>
 						<Readout
-							label={ __( 'Edges', 'helm' ) }
-							value={ String( edgeCount ) }
+							label={__('Edges', 'helm')}
+							value={String(edgeCount)}
 						/>
-						{ complete && (
+						{complete && (
 							<Readout
-								label={ __( 'Route', 'helm' ) }
-								value={ __( 'Charted', 'helm' ) }
+								label={__('Route', 'helm')}
+								value={__('Charted', 'helm')}
 							/>
-						) }
+						)}
 					</>
-				) }
+				)}
 			</div>
 		);
 	}

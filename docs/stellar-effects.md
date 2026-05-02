@@ -6,7 +6,7 @@ System-wide conditions that modify ship behavior. Every ship in a system is subj
 
 A stellar effect is a named modifier that applies to all ships present in a system. Effects modify formula inputs — power regen, sensor range, shield capacity, drive efficiency, scan duration, detection chance. They stack additively. A system's total effect profile is the sum of all active effects from all sources.
 
-Effects aren't buffs you collect. They're environmental conditions you operate within. You don't "have" an ion storm bonus — you're *in* an ion storm, and your ship behaves differently because of it.
+Effects aren't buffs you collect. They're environmental conditions you operate within. You don't "have" an ion storm bonus — you're _in_ an ion storm, and your ship behaves differently because of it.
 
 ## Effect Sources
 
@@ -84,19 +84,19 @@ No effect categories are special. A player-sourced sensor boost stacks with a st
 
 Effects are visible to ships in the system. The pilot can see what's active:
 
-- Stellar effects are always known (they're constant — learn them once)
-- Random effects are detected on entry or when they begin
-- Player-sourced effects are detectable with sensors (scan the system to see what's active)
-- NPC effects are always known (structural rules)
+-   Stellar effects are always known (they're constant — learn them once)
+-   Random effects are detected on entry or when they begin
+-   Player-sourced effects are detectable with sensors (scan the system to see what's active)
+-   NPC effects are always known (structural rules)
 
 A pilot jumping into an unfamiliar system sees the stellar effects immediately and can scan for active random and player effects before committing to an action.
 
 ### Duration
 
-- **Stellar:** Permanent. Part of the system.
-- **Random:** Hours to weeks. Countdown visible to players.
-- **Player-sourced:** As long as the source persists. Station security lasts as long as the station is operational. Interdiction lasts as long as the action runs. Scan emissions last as long as the scan runs.
-- **NPC:** Persistent until game conditions change.
+-   **Stellar:** Permanent. Part of the system.
+-   **Random:** Hours to weeks. Countdown visible to players.
+-   **Player-sourced:** As long as the source persists. Station security lasts as long as the station is operational. Interdiction lasts as long as the action runs. Scan emissions last as long as the scan runs.
+-   **NPC:** Persistent until game conditions change.
 
 ### Formula Integration
 

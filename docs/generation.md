@@ -159,20 +159,20 @@ function rollResources(SeededRandom $rng, string $planetType): array
 
 Resource presence by planet type:
 
-| Planet Type | Common Resources | Uncommon | Rare |
-|-------------|------------------|----------|------|
-| terrestrial | iron, silicon, nickel | copper, aluminum | rare earths |
-| superEarth | iron, silicon, titanium | rare earths, platinum | exotic metals |
-| desert | iron, silicon, copper | aluminum, lithium | rare earths |
-| ocean | water, salt, organics | deuterium, minerals | aquatic life |
-| toxic | sulfur, carbon, nitrogen | exotic gases, acids | strange matter |
-| molten | iron, nickel, magma metals | titanium, chromium | neutronium traces |
-| gasGiant | hydrogen, helium | deuterium, ammonia | exotic gases |
-| iceGiant | water, ammonia, methane | nitrogen, deuterium | helium-3 |
-| hotJupiter | hydrogen, exotic gases | plasma metals | strange matter |
-| frozen | water, ammonia, methane | nitrogen, CO2 | ancient organics |
-| dwarf | iron, nickel, ice | platinum, cobalt | artifacts |
-| asteroid | iron, nickel, cobalt | platinum, gold | artifacts |
+| Planet Type | Common Resources           | Uncommon              | Rare              |
+| ----------- | -------------------------- | --------------------- | ----------------- |
+| terrestrial | iron, silicon, nickel      | copper, aluminum      | rare earths       |
+| superEarth  | iron, silicon, titanium    | rare earths, platinum | exotic metals     |
+| desert      | iron, silicon, copper      | aluminum, lithium     | rare earths       |
+| ocean       | water, salt, organics      | deuterium, minerals   | aquatic life      |
+| toxic       | sulfur, carbon, nitrogen   | exotic gases, acids   | strange matter    |
+| molten      | iron, nickel, magma metals | titanium, chromium    | neutronium traces |
+| gasGiant    | hydrogen, helium           | deuterium, ammonia    | exotic gases      |
+| iceGiant    | water, ammonia, methane    | nitrogen, deuterium   | helium-3          |
+| hotJupiter  | hydrogen, exotic gases     | plasma metals         | strange matter    |
+| frozen      | water, ammonia, methane    | nitrogen, CO2         | ancient organics  |
+| dwarf       | iron, nickel, ice          | platinum, cobalt      | artifacts         |
+| asteroid    | iron, nickel, cobalt       | platinum, gold        | artifacts         |
 
 ### Layer 3: Stations and Settlements
 
@@ -197,11 +197,12 @@ function generateStations(SeededRandom $rng, Star $star): array
 ```
 
 Station types:
-- Trading post (common)
-- Mining operation (in resource-rich systems)
-- Research station (near anomalies)
-- Naval base (strategic locations)
-- Abandoned facility (salvage opportunity)
+
+-   Trading post (common)
+-   Mining operation (in resource-rich systems)
+-   Research station (near anomalies)
+-   Naval base (strategic locations)
+-   Abandoned facility (salvage opportunity)
 
 ### Layer 4: Anomalies
 
@@ -254,24 +255,24 @@ Percentages indicate chance when rolling a planet at that orbital position.
 
 **Inner System (< frost line):**
 
-| Type | O | B | A | F | G | K | M |
-|------|---|---|---|---|---|---|---|
-| molten | 60 | 40 | 20 | 10 | 5 | 5 | 10 |
-| terrestrial | 10 | 20 | 30 | 35 | 40 | 35 | 30 |
-| desert | 15 | 20 | 25 | 25 | 20 | 25 | 25 |
-| toxic | 10 | 15 | 15 | 15 | 15 | 15 | 15 |
-| ocean | 0 | 0 | 5 | 10 | 15 | 15 | 10 |
-| superEarth | 5 | 5 | 5 | 5 | 5 | 5 | 10 |
+| Type        | O   | B   | A   | F   | G   | K   | M   |
+| ----------- | --- | --- | --- | --- | --- | --- | --- |
+| molten      | 60  | 40  | 20  | 10  | 5   | 5   | 10  |
+| terrestrial | 10  | 20  | 30  | 35  | 40  | 35  | 30  |
+| desert      | 15  | 20  | 25  | 25  | 20  | 25  | 25  |
+| toxic       | 10  | 15  | 15  | 15  | 15  | 15  | 15  |
+| ocean       | 0   | 0   | 5   | 10  | 15  | 15  | 10  |
+| superEarth  | 5   | 5   | 5   | 5   | 5   | 5   | 10  |
 
 **Outer System (> frost line):**
 
-| Type | O | B | A | F | G | K | M |
-|------|---|---|---|---|---|---|---|
-| gasGiant | 20 | 25 | 30 | 35 | 35 | 30 | 25 |
-| iceGiant | 15 | 20 | 25 | 25 | 25 | 30 | 30 |
-| hotJupiter | 30 | 20 | 10 | 5 | 5 | 5 | 10 |
-| frozen | 20 | 25 | 25 | 25 | 25 | 25 | 25 |
-| dwarf | 15 | 10 | 10 | 10 | 10 | 10 | 10 |
+| Type       | O   | B   | A   | F   | G   | K   | M   |
+| ---------- | --- | --- | --- | --- | --- | --- | --- |
+| gasGiant   | 20  | 25  | 30  | 35  | 35  | 30  | 25  |
+| iceGiant   | 15  | 20  | 25  | 25  | 25  | 30  | 30  |
+| hotJupiter | 30  | 20  | 10  | 5   | 5   | 5   | 10  |
+| frozen     | 20  | 25  | 25  | 25  | 25  | 25  | 25  |
+| dwarf      | 15  | 10  | 10  | 10  | 10  | 10  | 10  |
 
 **Ringed modifier:** Any gas giant, ice giant, or frozen planet has 20% chance of rings.
 
@@ -314,14 +315,14 @@ const STELLAR_TYPES = [
 
 **Stellar type affects planet generation:**
 
-| Stellar Type | Planet Generation |
-|--------------|-------------------|
-| mainSequence | Normal rules |
-| giant | Fewer planets, expanded orbits, some destroyed |
-| whiteDwarf | Only distant remnant planets, ancient |
-| neutron | No planets, debris only |
-| pulsar | No planets, radiation hazard |
-| brownDwarf | Few small planets, very cold |
+| Stellar Type | Planet Generation                              |
+| ------------ | ---------------------------------------------- |
+| mainSequence | Normal rules                                   |
+| giant        | Fewer planets, expanded orbits, some destroyed |
+| whiteDwarf   | Only distant remnant planets, ancient          |
+| neutron      | No planets, debris only                        |
+| pulsar       | No planets, radiation hazard                   |
+| brownDwarf   | Few small planets, very cold                   |
 
 ### Binary System Generation
 

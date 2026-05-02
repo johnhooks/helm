@@ -18,8 +18,14 @@ interface ScanRouteActiveResult {
 	skill: number;
 	efficiency: number;
 	duration: number;
-	nodes?: Array< { id: number; type: string; x: number; y: number; z: number } >;
-	edges?: Array< { id: number; node_a_id: number; node_b_id: number } >;
+	nodes?: Array<{
+		id: number;
+		type: string;
+		x: number;
+		y: number;
+		z: number;
+	}>;
+	edges?: Array<{ id: number; node_a_id: number; node_b_id: number }>;
 	discovered_edge_ids?: number[];
 	discovered_node_ids?: number[];
 }
@@ -27,8 +33,8 @@ interface ScanRouteActiveResult {
 interface ScanRouteFulfilledResult extends ScanRouteActiveResult {
 	success: boolean;
 	complete: boolean;
-	nodes: Array< { id: number; type: string; x: number; y: number; z: number } >;
-	edges: Array< { id: number; node_a_id: number; node_b_id: number } >;
+	nodes: Array<{ id: number; type: string; x: number; y: number; z: number }>;
+	edges: Array<{ id: number; node_a_id: number; node_b_id: number }>;
 	discovered_edge_ids: number[];
 	discovered_node_ids: number[];
 	edges_discovered: number;
@@ -92,15 +98,16 @@ export interface ActionTypeMap {
 }
 
 export interface DefaultActionContract {
-	params: Record< string, unknown >;
-	activeResult: Record< string, unknown >;
-	fulfilledResult: Record< string, unknown >;
-	failedResult: Record< string, unknown >;
+	params: Record<string, unknown>;
+	activeResult: Record<string, unknown>;
+	fulfilledResult: Record<string, unknown>;
+	failedResult: Record<string, unknown>;
 }
 
 /**
  * Resolves the contract for an action type string.
  * Known types get their full contract; unknown types fall back to DefaultActionContract.
  */
-export type ActionContract< T extends string > =
-	T extends keyof ActionTypeMap ? ActionTypeMap[ T ] : DefaultActionContract;
+export type ActionContract<T extends string> = T extends keyof ActionTypeMap
+	? ActionTypeMap[T]
+	: DefaultActionContract;

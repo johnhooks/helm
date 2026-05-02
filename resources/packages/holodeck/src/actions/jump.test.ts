@@ -28,58 +28,97 @@ describe('Jump Handler', () => {
 	describe('validate', () => {
 		it('rejects when ship has no position', () => {
 			const { ship } = setup({ nodeId: null });
-			expect(() => jumpHandler.validate(ship, { target_node_id: 2, distance: 1 }, ctx))
-				.toThrow(ActionError);
+			expect(() =>
+				jumpHandler.validate(
+					ship,
+					{ target_node_id: 2, distance: 1 },
+					ctx
+				)
+			).toThrow(ActionError);
 
 			try {
-				jumpHandler.validate(ship, { target_node_id: 2, distance: 1 }, ctx);
+				jumpHandler.validate(
+					ship,
+					{ target_node_id: 2, distance: 1 },
+					ctx
+				);
 			} catch (e) {
 				expect(e).toBeInstanceOf(ActionError);
-				expect((e as ActionError).code).toBe(ActionErrorCode.ShipNoPosition);
+				expect((e as ActionError).code).toBe(
+					ActionErrorCode.ShipNoPosition
+				);
 			}
 		});
 
 		it('rejects when already at target', () => {
 			const { ship } = setup();
-			expect(() => jumpHandler.validate(ship, { target_node_id: 1, distance: 1 }, ctx))
-				.toThrow(ActionError);
+			expect(() =>
+				jumpHandler.validate(
+					ship,
+					{ target_node_id: 1, distance: 1 },
+					ctx
+				)
+			).toThrow(ActionError);
 
 			try {
-				jumpHandler.validate(ship, { target_node_id: 1, distance: 1 }, ctx);
+				jumpHandler.validate(
+					ship,
+					{ target_node_id: 1, distance: 1 },
+					ctx
+				);
 			} catch (e) {
-				expect((e as ActionError).code).toBe(ActionErrorCode.NavigationAlreadyAtTarget);
+				expect((e as ActionError).code).toBe(
+					ActionErrorCode.NavigationAlreadyAtTarget
+				);
 			}
 		});
 
 		it('rejects when missing target and distance', () => {
 			const { ship } = setup();
-			expect(() => jumpHandler.validate(ship, {}, ctx))
-				.toThrow(ActionError);
+			expect(() => jumpHandler.validate(ship, {}, ctx)).toThrow(
+				ActionError
+			);
 
 			try {
 				jumpHandler.validate(ship, {}, ctx);
 			} catch (e) {
-				expect((e as ActionError).code).toBe(ActionErrorCode.NavigationMissingTarget);
+				expect((e as ActionError).code).toBe(
+					ActionErrorCode.NavigationMissingTarget
+				);
 			}
 		});
 
 		it('rejects when insufficient core life', () => {
 			const { ship } = setup({ coreLife: 0.001 });
 			expect(() =>
-				jumpHandler.validate(ship, { target_node_id: 2, distance: 10 }, ctx),
+				jumpHandler.validate(
+					ship,
+					{ target_node_id: 2, distance: 10 },
+					ctx
+				)
 			).toThrow(ActionError);
 
 			try {
-				jumpHandler.validate(ship, { target_node_id: 2, distance: 10 }, ctx);
+				jumpHandler.validate(
+					ship,
+					{ target_node_id: 2, distance: 10 },
+					ctx
+				);
 			} catch (e) {
-				expect((e as ActionError).code).toBe(ActionErrorCode.ShipInsufficientCore);
+				expect((e as ActionError).code).toBe(
+					ActionErrorCode.ShipInsufficientCore
+				);
 			}
 		});
 
 		it('passes with valid params', () => {
 			const { ship } = setup();
 			expect(() =>
-				jumpHandler.validate(ship, { target_node_id: 2, distance: 1 }, ctx),
+				jumpHandler.validate(
+					ship,
+					{ target_node_id: 2, distance: 1 },
+					ctx
+				)
 			).not.toThrow();
 		});
 	});
@@ -91,7 +130,7 @@ describe('Jump Handler', () => {
 				ship,
 				{ target_node_id: 2, distance: 3 },
 				0,
-				ctx,
+				ctx
 			);
 
 			const expectedDuration = ship.propulsion.getJumpDuration(3, 1.0);
@@ -107,7 +146,7 @@ describe('Jump Handler', () => {
 				ship,
 				{ target_node_id: 2, distance: 3, throttle: 0.8 },
 				0,
-				ctx,
+				ctx
 			);
 
 			const expectedCoreCost = ship.propulsion.getJumpCoreCost(3, 0.8);
@@ -123,7 +162,7 @@ describe('Jump Handler', () => {
 				ship,
 				{ target_node_id: 42, distance: 2 },
 				100,
-				ctx,
+				ctx
 			);
 
 			expect(intent.result.from_node_id).toBe(1);
@@ -137,21 +176,21 @@ describe('Jump Handler', () => {
 				ship,
 				{ target_node_id: 2, distance: 3, throttle: 1.0 },
 				0,
-				ctx,
+				ctx
 			);
 			const intentHalf = jumpHandler.handle(
 				ship,
 				{ target_node_id: 2, distance: 3, throttle: 0.5 },
 				0,
-				ctx,
+				ctx
 			);
 
 			// Lower throttle → longer spool duration, lower core cost
 			expect(intentHalf.result.spool_duration).toBeGreaterThan(
-				intentFull.result.spool_duration as number,
+				intentFull.result.spool_duration as number
 			);
 			expect(intentHalf.result.core_cost).toBeLessThan(
-				intentFull.result.core_cost as number,
+				intentFull.result.core_cost as number
 			);
 		});
 
@@ -161,7 +200,7 @@ describe('Jump Handler', () => {
 				ship,
 				{ target_node_id: 2, distance: 3 },
 				0,
-				ctx,
+				ctx
 			);
 
 			expect(intent.emissions).toHaveLength(1);
@@ -179,7 +218,7 @@ describe('Jump Handler', () => {
 				ship,
 				{ target_node_id: 42, distance: 2 },
 				0,
-				ctx,
+				ctx
 			);
 
 			const action = {
@@ -196,10 +235,16 @@ describe('Jump Handler', () => {
 			// First resolve: spool → cooldown
 			const spoolOutcome = jumpHandler.resolve(ship, action, ctx);
 			expect(spoolOutcome.status).toBe('pending');
-			expect(spoolOutcome.deferredUntil).toBeGreaterThan(action.deferredUntil!);
+			expect(spoolOutcome.deferredUntil).toBeGreaterThan(
+				action.deferredUntil!
+			);
 			expect(spoolOutcome.result.phase).toBe('cooldown');
-			expect(spoolOutcome.result.spool_ended_at).toBe(action.deferredUntil);
-			expect(spoolOutcome.result.cooldown_started_at).toBe(action.deferredUntil);
+			expect(spoolOutcome.result.spool_ended_at).toBe(
+				action.deferredUntil
+			);
+			expect(spoolOutcome.result.cooldown_started_at).toBe(
+				action.deferredUntil
+			);
 
 			// Ship has moved and consumed resources
 			const stateAfterSpool = ship.resolve();
@@ -209,7 +254,9 @@ describe('Jump Handler', () => {
 
 			// Declares cooldown emission
 			expect(spoolOutcome.emissions).toHaveLength(1);
-			expect(spoolOutcome.emissions![0].emissionType).toBe('drive_cooldown');
+			expect(spoolOutcome.emissions![0].emissionType).toBe(
+				'drive_cooldown'
+			);
 		});
 
 		it('cooldown phase: fulfills action', () => {
@@ -219,7 +266,7 @@ describe('Jump Handler', () => {
 				ship,
 				{ target_node_id: 42, distance: 2 },
 				0,
-				ctx,
+				ctx
 			);
 
 			const action = {
@@ -242,7 +289,9 @@ describe('Jump Handler', () => {
 			const cooldownOutcome = jumpHandler.resolve(ship, action, ctx);
 			expect(cooldownOutcome.status).toBe('fulfilled');
 			expect(cooldownOutcome.result.phase).toBe('complete');
-			expect(cooldownOutcome.result.cooldown_ended_at).toBe(action.deferredUntil);
+			expect(cooldownOutcome.result.cooldown_ended_at).toBe(
+				action.deferredUntil
+			);
 			expect(cooldownOutcome.result.remaining_core_life).toBeDefined();
 		});
 
@@ -253,7 +302,7 @@ describe('Jump Handler', () => {
 				ship,
 				{ target_node_id: 42, distance: 2 },
 				0,
-				ctx,
+				ctx
 			);
 
 			const action = {
@@ -309,13 +358,15 @@ describe('Jump Handler', () => {
 			graph.addNode({ type: 'system', x: 10, y: 0, z: 0 }); // id 3, no edge to 1
 
 			expect(() =>
-				jumpHandler.validate(ship, { target_node_id: 3 }, graphCtx),
+				jumpHandler.validate(ship, { target_node_id: 3 }, graphCtx)
 			).toThrow(ActionError);
 
 			try {
 				jumpHandler.validate(ship, { target_node_id: 3 }, graphCtx);
 			} catch (e) {
-				expect((e as ActionError).code).toBe(ActionErrorCode.NavigationNoRoute);
+				expect((e as ActionError).code).toBe(
+					ActionErrorCode.NavigationNoRoute
+				);
 			}
 		});
 
@@ -323,7 +374,7 @@ describe('Jump Handler', () => {
 			const { ship, ctx: graphCtx } = setupWithGraph();
 
 			expect(() =>
-				jumpHandler.validate(ship, { target_node_id: 2 }, graphCtx),
+				jumpHandler.validate(ship, { target_node_id: 2 }, graphCtx)
 			).not.toThrow();
 		});
 
@@ -334,7 +385,7 @@ describe('Jump Handler', () => {
 				ship,
 				{ target_node_id: 2 },
 				0,
-				graphCtx,
+				graphCtx
 			);
 
 			expect(intent.result.distance).toBe(3.0);
@@ -347,7 +398,7 @@ describe('Jump Handler', () => {
 				ship,
 				{ target_node_id: 2 },
 				0,
-				graphCtx,
+				graphCtx
 			);
 
 			const action = {

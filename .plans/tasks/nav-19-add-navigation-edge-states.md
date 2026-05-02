@@ -3,7 +3,7 @@ status: active
 area: navigation
 priority: p1
 depends_on:
-  - nav-07-show-routes-toggle
+    - nav-07-show-routes-toggle
 ---
 
 # Add navigation edge states
@@ -51,20 +51,20 @@ adapts navigation edge states into astrometric presentation props.
 
 Navigation edge lifetime rules should be explicit:
 
-- Known user edges are persistent graph state. They may remain available from
-  selectors even when the UI has hidden known edge rendering.
-- Draft scan and draft jump edge states exist only while the matching draft
-  exists.
-- Active scan and active jump edge states exist while the matching action is
-  pending or running, and the UI should be able to render them independently
-  of `Show routes`.
-- Scan result edge states identify the latest fulfilled or partial scan result
-  only until a newer draft or action appears.
-- Jump result edge states may identify the latest fulfilled jump as recent
-  traveled movement, but the replacement rule must be explicit.
-- Failed scan and jump actions may identify the last failed edge attempt so
-  the UI can show what failed. That failure state should be temporary and
-  replaced by a newer draft or action.
+-   Known user edges are persistent graph state. They may remain available from
+    selectors even when the UI has hidden known edge rendering.
+-   Draft scan and draft jump edge states exist only while the matching draft
+    exists.
+-   Active scan and active jump edge states exist while the matching action is
+    pending or running, and the UI should be able to render them independently
+    of `Show routes`.
+-   Scan result edge states identify the latest fulfilled or partial scan result
+    only until a newer draft or action appears.
+-   Jump result edge states may identify the latest fulfilled jump as recent
+    traveled movement, but the replacement rule must be explicit.
+-   Failed scan and jump actions may identify the last failed edge attempt so
+    the UI can show what failed. That failure state should be temporary and
+    replaced by a newer draft or action.
 
 The model should preserve authority boundaries. Known user edges come from the
 nav datacore. Draft and active edge states can use action params and active
@@ -87,32 +87,32 @@ or merging unrelated node data.
 
 Requirements:
 
-- Add a `NavigationEdgeType` union.
-- Add a `NavigationEdge` shape that records source node id, target node id,
-  edge state type, optional canonical edge id, optional source action id,
-  optional action status, and whether the source is graph, draft, or action
-  data.
-- Add nav selectors that derive navigation edge states from known user edges,
-  current drafts, relevant ship actions, and current node id.
-- Use registry selectors for action and draft state rather than making the
-  bridge component assemble cross-store state by hand.
-- Keep known user-edge states separate from draft, active, and result states.
-- Active scan and active jump states must be identifiable independently from
-  any UI preference that hides known edge rendering.
-- Temporary scan result states must be dismissed when a newer draft or action
-  appears.
-- Draft scan and draft jump states must disappear when the draft is cleared or
-  submitted.
-- Jump result retention must be captured as an explicit rule, even if the
-  first implementation keeps only the latest fulfilled jump.
-- Failed scan and failed jump states must identify the attempted edge for the
-  latest failed action until a newer draft or action appears.
-- Avoid treating scan action result edge payloads as canonical graph data.
-- Use selector composition and `@wordpress/data` caching rather than custom
-  cache layers.
-- Derivation should be O(edges + relevant actions) for normal bridge inputs.
-- Navigation edge ids must be stable so selector and UI adapters can avoid
-  unnecessary churn.
-- Tests must cover known edges, draft states, active states, scan result
-  dismissal, jump result retention, UI-independent derivation, and mixed sets
-  of at least one hundred known edges.
+-   Add a `NavigationEdgeType` union.
+-   Add a `NavigationEdge` shape that records source node id, target node id,
+    edge state type, optional canonical edge id, optional source action id,
+    optional action status, and whether the source is graph, draft, or action
+    data.
+-   Add nav selectors that derive navigation edge states from known user edges,
+    current drafts, relevant ship actions, and current node id.
+-   Use registry selectors for action and draft state rather than making the
+    bridge component assemble cross-store state by hand.
+-   Keep known user-edge states separate from draft, active, and result states.
+-   Active scan and active jump states must be identifiable independently from
+    any UI preference that hides known edge rendering.
+-   Temporary scan result states must be dismissed when a newer draft or action
+    appears.
+-   Draft scan and draft jump states must disappear when the draft is cleared or
+    submitted.
+-   Jump result retention must be captured as an explicit rule, even if the
+    first implementation keeps only the latest fulfilled jump.
+-   Failed scan and failed jump states must identify the attempted edge for the
+    latest failed action until a newer draft or action appears.
+-   Avoid treating scan action result edge payloads as canonical graph data.
+-   Use selector composition and `@wordpress/data` caching rather than custom
+    cache layers.
+-   Derivation should be O(edges + relevant actions) for normal bridge inputs.
+-   Navigation edge ids must be stable so selector and UI adapters can avoid
+    unnecessary churn.
+-   Tests must cover known edges, draft states, active states, scan result
+    dismissal, jump result retention, UI-independent derivation, and mixed sets
+    of at least one hundred known edges.

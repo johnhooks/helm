@@ -1,27 +1,72 @@
 import { describe, it, expect } from 'vitest';
 import type { Product } from '@helm/types';
 import { DEFAULT_CONSTANTS } from './types';
-import { strainFactor, jumpComfortRange, jumpDuration, jumpCoreCost, jumpPowerCost } from './jump';
+import {
+	strainFactor,
+	jumpComfortRange,
+	jumpDuration,
+	jumpCoreCost,
+	jumpPowerCost,
+} from './jump';
 
 const epochS: Product = {
-	id: 1, slug: 'epoch_s', type: 'core', label: 'Epoch-S', version: 1,
-	footprint: 25, hp: 750, rate: 10.0, sustain: null, capacity: null,
-	chance: null, mult_a: 1.0, mult_b: 1.0, mult_c: null,
-	mult_d: null, mult_e: null, mult_f: null,
+	id: 1,
+	slug: 'epoch_s',
+	type: 'core',
+	label: 'Epoch-S',
+	version: 1,
+	footprint: 25,
+	hp: 750,
+	rate: 10.0,
+	sustain: null,
+	capacity: null,
+	chance: null,
+	mult_a: 1.0,
+	mult_b: 1.0,
+	mult_c: null,
+	mult_d: null,
+	mult_e: null,
+	mult_f: null,
 };
 
 const dr505: Product = {
-	id: 2, slug: 'dr_505', type: 'drive', label: 'DR-505', version: 1,
-	footprint: 30, hp: null, rate: null, sustain: 7.0, capacity: null,
-	chance: null, mult_a: 1.0, mult_b: 1.0, mult_c: 1.0,
-	mult_d: null, mult_e: null, mult_f: null,
+	id: 2,
+	slug: 'dr_505',
+	type: 'drive',
+	label: 'DR-505',
+	version: 1,
+	footprint: 30,
+	hp: null,
+	rate: null,
+	sustain: 7.0,
+	capacity: null,
+	chance: null,
+	mult_a: 1.0,
+	mult_b: 1.0,
+	mult_c: 1.0,
+	mult_d: null,
+	mult_e: null,
+	mult_f: null,
 };
 
 const dr705: Product = {
-	id: 3, slug: 'dr_705', type: 'drive', label: 'DR-705', version: 1,
-	footprint: 45, hp: null, rate: null, sustain: 5.0, capacity: null,
-	chance: null, mult_a: 2.0, mult_b: 1.5, mult_c: 2.0,
-	mult_d: null, mult_e: null, mult_f: null,
+	id: 3,
+	slug: 'dr_705',
+	type: 'drive',
+	label: 'DR-705',
+	version: 1,
+	footprint: 45,
+	hp: null,
+	rate: null,
+	sustain: 5.0,
+	capacity: null,
+	chance: null,
+	mult_a: 2.0,
+	mult_b: 1.5,
+	mult_c: 2.0,
+	mult_d: null,
+	mult_e: null,
+	mult_f: null,
 };
 
 const constants = DEFAULT_CONSTANTS;
@@ -103,7 +148,9 @@ describe('jumpDuration', () => {
 
 	it('returns Infinity when amplitude is 0', () => {
 		const zeroDrive = { ...dr505, mult_c: 0 };
-		expect(jumpDuration(1, zeroDrive, 1.0, 1.0, 1.0, constants)).toBe(Infinity);
+		expect(jumpDuration(1, zeroDrive, 1.0, 1.0, 1.0, constants)).toBe(
+			Infinity
+		);
 	});
 
 	it('throttle 0.5 doubles duration', () => {

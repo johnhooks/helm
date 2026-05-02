@@ -20,4 +20,4 @@ export interface Product {
 	mult_f: number | null;
 }
 
-export type ProductEmbed = WithRestLinks< Product >;
+export type ProductEmbed = WithRestLinks<Product>;

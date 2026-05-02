@@ -22,7 +22,7 @@ export class PropulsionSystem {
 		state: InternalShipState,
 		loadout: Loadout,
 		power: PowerSystem,
-		constants?: Constants,
+		constants?: Constants
 	) {
 		this.state = state;
 		this.loadout = loadout;
@@ -31,14 +31,17 @@ export class PropulsionSystem {
 	}
 
 	getPerformanceRatio(): number {
-		return perfRatio(this.power.getOutputMultiplier(), this.loadout.drive.product);
+		return perfRatio(
+			this.power.getOutputMultiplier(),
+			this.loadout.drive.product
+		);
 	}
 
 	getComfortRange(): number {
 		return jumpComfortRange(
 			this.loadout.drive.product,
 			this.power.getOutputMultiplier(),
-			this.getPerformanceRatio(),
+			this.getPerformanceRatio()
 		);
 	}
 
@@ -49,7 +52,7 @@ export class PropulsionSystem {
 			this.power.getOutputMultiplier(),
 			this.getPerformanceRatio(),
 			throttle,
-			this.constants,
+			this.constants
 		);
 	}
 
@@ -59,7 +62,7 @@ export class PropulsionSystem {
 			this.loadout.core.product,
 			this.loadout.drive.product,
 			throttle,
-			this.getComfortRange(),
+			this.getComfortRange()
 		);
 	}
 

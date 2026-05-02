@@ -651,6 +651,7 @@ The credit system:
 6. **Full history** - Every transaction recorded forever
 
 Money flows:
+
 ```
 Discovery → Ship → Station fees (sink)
                 → Other ships

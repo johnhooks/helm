@@ -38,7 +38,9 @@ describe('corridorSeed', () => {
 	});
 
 	it('differs for different master seeds', () => {
-		expect(corridorSeed('seed-a', 1, 2)).not.toBe(corridorSeed('seed-b', 1, 2));
+		expect(corridorSeed('seed-a', 1, 2)).not.toBe(
+			corridorSeed('seed-b', 1, 2)
+		);
 	});
 
 	it('produces a 64-char hex string', () => {
@@ -87,7 +89,9 @@ describe('waypointHash', () => {
 	});
 
 	it('differs by waypoint index', () => {
-		expect(waypointHash(SEED, 1, 2, 0)).not.toBe(waypointHash(SEED, 1, 2, 1));
+		expect(waypointHash(SEED, 1, 2, 0)).not.toBe(
+			waypointHash(SEED, 1, 2, 1)
+		);
 	});
 });
 
@@ -137,7 +141,9 @@ describe('canDirectJump', () => {
 	it('is order-independent', () => {
 		const from = makeNode(1, 0, 0, 0);
 		const to = makeNode(2, 3, 0, 0);
-		expect(canDirectJump(SEED, from, to)).toBe(canDirectJump(SEED, to, from));
+		expect(canDirectJump(SEED, from, to)).toBe(
+			canDirectJump(SEED, to, from)
+		);
 	});
 
 	it('respects custom maxRange', () => {
@@ -156,11 +162,15 @@ describe('corridorDifficulty', () => {
 	});
 
 	it('is order-independent', () => {
-		expect(corridorDifficulty(SEED, 1, 2)).toBe(corridorDifficulty(SEED, 2, 1));
+		expect(corridorDifficulty(SEED, 1, 2)).toBe(
+			corridorDifficulty(SEED, 2, 1)
+		);
 	});
 
 	it('is deterministic', () => {
-		expect(corridorDifficulty(SEED, 5, 10)).toBe(corridorDifficulty(SEED, 5, 10));
+		expect(corridorDifficulty(SEED, 5, 10)).toBe(
+			corridorDifficulty(SEED, 5, 10)
+		);
 	});
 
 	it('varies per corridor', () => {

@@ -3,7 +3,7 @@ status: done
 area: navigation
 priority: p2
 depends_on:
-  - nav-09-add-user-edge-datacore-queries
+    - nav-09-add-user-edge-datacore-queries
 ---
 
 # Add known path selectors
@@ -33,8 +33,8 @@ one-off scan payloads.
 There are also two different questions hiding behind today's "route known"
 language:
 
-- Is the target directly adjacent to the current node through one known edge?
-- Is the target reachable through any known edge path?
+-   Is the target directly adjacent to the current node through one known edge?
+-   Is the target reachable through any known edge path?
 
 Those answers drive different UI and action behavior. A scan route action is
 eligible when there is not already a direct edge between the current node and
@@ -78,19 +78,19 @@ action validation, or saved public/private route records.
 
 ## Requirements
 
-- Provide reusable nav/datacore reads for direct adjacency and target-specific
-  known-path lookup.
-- Direct adjacency means one discovered user edge connects the two requested
-  nodes in either direction.
-- Known-path lookup searches discovered user edges from origin to target,
-  including through waypoint and system nodes.
-- Traversal must not stop at intermediate systems, must handle cycles, and must
-  return the shortest path by total edge distance.
-- Path results must include reachability, directness, ordered node ids, ordered
-  edge ids, total distance, and the next node id when reachable.
-- No-path and origin-equals-target results must be distinguishable.
-- UI callers must not perform their own N-plus-1 graph traversal.
-- Do not add REST endpoints or change scan, action result, or jump server
-  behavior.
-- Tests must cover direct edge, indirect path, no path, cycle handling,
-  bidirectional edges, origin equals target, and shortest-path selection.
+-   Provide reusable nav/datacore reads for direct adjacency and target-specific
+    known-path lookup.
+-   Direct adjacency means one discovered user edge connects the two requested
+    nodes in either direction.
+-   Known-path lookup searches discovered user edges from origin to target,
+    including through waypoint and system nodes.
+-   Traversal must not stop at intermediate systems, must handle cycles, and must
+    return the shortest path by total edge distance.
+-   Path results must include reachability, directness, ordered node ids, ordered
+    edge ids, total distance, and the next node id when reachable.
+-   No-path and origin-equals-target results must be distinguishable.
+-   UI callers must not perform their own N-plus-1 graph traversal.
+-   Do not add REST endpoints or change scan, action result, or jump server
+    behavior.
+-   Tests must cover direct edge, indirect path, no path, cycle handling,
+    bidirectional edges, origin equals target, and shortest-path selection.

@@ -17,12 +17,12 @@ Directed energy weapon. Sustained shield drain over time.
 
 ### Mechanics
 
-- **Draw**: 0.35 per phaser array (constant while firing)
-- **Damage**: Continuous shield drain, low per-tick but relentless
-- **Ammo**: None — draws power only
-- **Lock**: Requires maintained sensor lock on target
-- **Footprint**: 15 m³
-- **Emission**: `continuous` spectral type, high base power (~5.0)
+-   **Draw**: 0.35 per phaser array (constant while firing)
+-   **Damage**: Continuous shield drain, low per-tick but relentless
+-   **Ammo**: None — draws power only
+-   **Lock**: Requires maintained sensor lock on target
+-   **Footprint**: 15 m³
+-   **Emission**: `continuous` spectral type, high base power (~5.0)
 
 ### Power Interaction
 
@@ -54,10 +54,10 @@ The Striker's weapon draw multiplier (0.6×) is what makes dual-phaser loadouts 
 
 Phasers produce a `continuous` EM emission while active. This is easy to detect and track:
 
-- DSC sensors (continuous specialists) build confidence quickly on a firing phaser boat
-- The emission persists for the entire engagement — hours of sustained signal
-- A phaser boat in combat is the loudest thing in the system
-- There is no way to fire phasers stealthily
+-   DSC sensors (continuous specialists) build confidence quickly on a firing phaser boat
+-   The emission persists for the entire engagement — hours of sustained signal
+-   A phaser boat in combat is the loudest thing in the system
+-   There is no way to fire phasers stealthily
 
 This is the fundamental phaser tradeoff: unlimited ammo and sustained damage, but you're lit up the entire time.
 
@@ -69,10 +69,10 @@ This is the phaser's key advantage over torpedoes: no window for the target to r
 
 ### Counters
 
-- **Break sensor lock**: Jump out, activate ECM, or Veil Array. Damage stops immediately. Re-establishing lock takes time.
-- **Outlast**: If your shield regen exceeds the phaser's drain rate, the attacker is wasting power. Heavy shields (Aegis Eta) with high capacity can outlast a single phaser easily.
-- **Return fire**: Phasers make the attacker easy to find. Counter-attack while they're locked in.
-- **Point Defense System** (equipment): No effect on phasers — they're energy weapons, nothing to intercept.
+-   **Break sensor lock**: Jump out, activate ECM, or Veil Array. Damage stops immediately. Re-establishing lock takes time.
+-   **Outlast**: If your shield regen exceeds the phaser's drain rate, the attacker is wasting power. Heavy shields (Aegis Eta) with high capacity can outlast a single phaser easily.
+-   **Return fire**: Phasers make the attacker easy to find. Counter-attack while they're locked in.
+-   **Point Defense System** (equipment): No effect on phasers — they're energy weapons, nothing to intercept.
 
 ## Torpedoes
 
@@ -80,14 +80,14 @@ Physical munition. Fire-and-forget burst damage.
 
 ### Mechanics
 
-- **Draw**: Power spike on launch only (single firing cycle), then recovery
-- **Damage**: Massive burst alpha — highest single-hit damage in the game
-- **Ammo**: Physical torpedoes, 4–6 per launcher. Each torpedo consumes cargo space. Resupply at stations.
-- **Lock**: Requires sensor lock at time of firing. Torpedo is autonomous after launch.
-- **Travel time**: Minutes to reach target. Target may evade.
-- **Hit probability**: Based on range, target drive state, and sensor accuracy. Component experience on sensors improves targeting.
-- **Footprint**: 25 m³ per launcher, plus cargo space for ammo
-- **Emission**: Brief `pulse` at launch, then silent. The torpedo itself is a cold, unpowered projectile.
+-   **Draw**: Power spike on launch only (single firing cycle), then recovery
+-   **Damage**: Massive burst alpha — highest single-hit damage in the game
+-   **Ammo**: Physical torpedoes, 4–6 per launcher. Each torpedo consumes cargo space. Resupply at stations.
+-   **Lock**: Requires sensor lock at time of firing. Torpedo is autonomous after launch.
+-   **Travel time**: Minutes to reach target. Target may evade.
+-   **Hit probability**: Based on range, target drive state, and sensor accuracy. Component experience on sensors improves targeting.
+-   **Footprint**: 25 m³ per launcher, plus cargo space for ammo
+-   **Emission**: Brief `pulse` at launch, then silent. The torpedo itself is a cold, unpowered projectile.
 
 ### Power Interaction
 
@@ -109,9 +109,9 @@ This means a torpedo boat's perfRatio is only degraded during the firing moment.
 
 Torpedoes are the covert weapon:
 
-- **Launch pulse**: A brief `pulse` emission spike at the moment of firing. Short-lived and easy to miss.
-- **Torpedo in flight**: Cold, unpowered, no emission. Effectively invisible to passive sensors.
-- **Post-launch**: The firing ship goes quiet immediately. No sustained emission to track.
+-   **Launch pulse**: A brief `pulse` emission spike at the moment of firing. Short-lived and easy to miss.
+-   **Torpedo in flight**: Cold, unpowered, no emission. Effectively invisible to passive sensors.
+-   **Post-launch**: The firing ship goes quiet immediately. No sustained emission to track.
 
 A good torpedo boat fires from the dark. The target's first warning may be the impact. If a sensor does catch the launch pulse, it's a single data point — not enough for a confident detection track unless the observer has a specialized pulse sensor (ACU) with good integration time.
 
@@ -128,20 +128,21 @@ Launch → Travel (minutes) → Impact
 ```
 
 During the travel window, the target can:
-- Detect the incoming torpedo (if they have good sensors)
-- Activate countermeasures (Point Defense System, ECM)
-- Spool drive and jump out (if they react fast enough)
-- Do nothing (if they never detected the launch)
+
+-   Detect the incoming torpedo (if they have good sensors)
+-   Activate countermeasures (Point Defense System, ECM)
+-   Spool drive and jump out (if they react fast enough)
+-   Do nothing (if they never detected the launch)
 
 The travel time scales with range — point-blank torpedoes arrive faster, long-range torpedoes give more reaction time. This creates a range vs. stealth tradeoff: fire from close for a guaranteed hit but risk detection, or fire from far to stay hidden but give the target time to react.
 
 ### Counters
 
-- **Detect the launch**: ACU sensors (pulse specialists) are the best early warning system. If you catch the launch pulse, you know someone fired. But a brief pulse in a noisy system may not give you enough confidence to identify or locate the attacker.
-- **Evade**: If you detect an incoming torpedo (or suspect one), spool your drive and jump. The torpedo has travel time — minutes of window to escape. A ship already in drive spool is harder to hit.
-- **Point Defense System** (equipment): Automated close-range interception. Doesn't guarantee a kill — effectiveness depends on the PDS quality and the torpedo's approach vector. A PDS gives you a percentage chance to destroy the torpedo before impact. Consumes power while active. This is the hard counter to torpedoes and useless against phasers.
-- **ECM** (equipment): Electronic countermeasures can confuse torpedo guidance during the travel phase, reducing hit probability. Also degrades the attacker's sensor lock if they're running phasers.
-- **Survive the hit**: Heavy shields can absorb torpedo damage. An Aegis Eta at full capacity may survive a single hit. But the alpha is designed to be devastating — most shields won't tank it cleanly.
+-   **Detect the launch**: ACU sensors (pulse specialists) are the best early warning system. If you catch the launch pulse, you know someone fired. But a brief pulse in a noisy system may not give you enough confidence to identify or locate the attacker.
+-   **Evade**: If you detect an incoming torpedo (or suspect one), spool your drive and jump. The torpedo has travel time — minutes of window to escape. A ship already in drive spool is harder to hit.
+-   **Point Defense System** (equipment): Automated close-range interception. Doesn't guarantee a kill — effectiveness depends on the PDS quality and the torpedo's approach vector. A PDS gives you a percentage chance to destroy the torpedo before impact. Consumes power while active. This is the hard counter to torpedoes and useless against phasers.
+-   **ECM** (equipment): Electronic countermeasures can confuse torpedo guidance during the travel phase, reducing hit probability. Also degrades the attacker's sensor lock if they're running phasers.
+-   **Survive the hit**: Heavy shields can absorb torpedo damage. An Aegis Eta at full capacity may survive a single hit. But the alpha is designed to be devastating — most shields won't tank it cleanly.
 
 ## Weapon Experience
 
@@ -175,11 +176,11 @@ Defensive equipment that occupies standard equipment slots. Like weapons, these 
 
 Automated close-range interception of physical munitions.
 
-- **Effective against**: Torpedoes (percentage chance to destroy before impact)
-- **Useless against**: Phasers (energy weapons, nothing to intercept)
-- **Draw**: Low constant draw while active (~0.1)
-- **Footprint**: 10 m³
-- **Mechanic**: When a torpedo enters terminal approach, PDS rolls interception. Higher-quality PDS = higher intercept chance. Multiple PDS stack diminishingly.
+-   **Effective against**: Torpedoes (percentage chance to destroy before impact)
+-   **Useless against**: Phasers (energy weapons, nothing to intercept)
+-   **Draw**: Low constant draw while active (~0.1)
+-   **Footprint**: 10 m³
+-   **Mechanic**: When a torpedo enters terminal approach, PDS rolls interception. Higher-quality PDS = higher intercept chance. Multiple PDS stack diminishingly.
 
 The PDS is the hard counter to torpedo boats. A hauler running a PDS in one equipment slot turns a torpedo ambush from "guaranteed kill" into "maybe." This forces torpedo boats to either fire multiple torpedoes (burning through limited ammo) or accept that some targets are too well-defended.
 
@@ -187,12 +188,12 @@ The PDS is the hard counter to torpedo boats. A hauler running a PDS in one equi
 
 Broadband signal jamming that degrades enemy sensor effectiveness.
 
-- **Effective against**: Both weapons (degrades targeting lock quality)
-- **Against phasers**: Reduces drain efficiency by degrading lock precision
-- **Against torpedoes**: Confuses guidance during travel phase, reducing hit probability
-- **Draw**: Moderate constant draw while active (~0.2)
-- **Footprint**: 15 m³
-- **Emission**: `ecm` spectral type — ECM is itself detectable. Running ECM announces "I know you're here."
+-   **Effective against**: Both weapons (degrades targeting lock quality)
+-   **Against phasers**: Reduces drain efficiency by degrading lock precision
+-   **Against torpedoes**: Confuses guidance during travel phase, reducing hit probability
+-   **Draw**: Moderate constant draw while active (~0.2)
+-   **Footprint**: 15 m³
+-   **Emission**: `ecm` spectral type — ECM is itself detectable. Running ECM announces "I know you're here."
 
 ECM is the generalist defensive option. Less effective than PDS against torpedoes, but it also works against phasers. The tradeoff: ECM draws more power and makes you detectable (your own EM emission increases while jamming).
 
@@ -200,14 +201,14 @@ ECM is the generalist defensive option. Less effective than PDS against torpedoe
 
 A ship has limited equipment slots. Every defensive slot is an offensive or economic slot you don't have:
 
-| Loadout | Offense | Defense | Economy |
-|---------|---------|---------|---------|
-| 2× Phaser | Maximum | None | None |
-| 1× Phaser + PDS | Moderate | Anti-torpedo | None |
-| 1× Phaser + ECM | Moderate | General defense | None |
-| 1× Torpedo + PDS | Ambush | Anti-torpedo | None |
-| 1× Mining Laser + PDS | None | Anti-torpedo | Mining |
-| PDS + ECM + Mining Laser | None | Maximum | Mining |
+| Loadout                  | Offense  | Defense         | Economy |
+| ------------------------ | -------- | --------------- | ------- |
+| 2× Phaser                | Maximum  | None            | None    |
+| 1× Phaser + PDS          | Moderate | Anti-torpedo    | None    |
+| 1× Phaser + ECM          | Moderate | General defense | None    |
+| 1× Torpedo + PDS         | Ambush   | Anti-torpedo    | None    |
+| 1× Mining Laser + PDS    | None     | Anti-torpedo    | Mining  |
+| PDS + ECM + Mining Laser | None     | Maximum         | Mining  |
 
 The Striker with 2 equipment slots faces this choice starkly: 2 phasers (all offense, no defense), or 1 phaser + countermeasure (balanced but less lethal). A Pioneer with 3 equipment slots has more flexibility but worse power economics for weapons.
 
@@ -247,40 +248,41 @@ TORPEDO ATTACK                    TARGET
 ```
 
 Key timing:
-- Establishing sensor lock: minutes to hours (depends on sensor, target signature, range)
-- **Phaser time-to-effect: instant on lock** (damage begins immediately)
-- Phaser engagement duration: hours (sustained drain vs shield capacity + regen)
-- **Torpedo time-to-effect: minutes** (travel time after launch)
-- Torpedo reaction window: the travel time IS the counter window
-- Drive spool to escape: 2–4 minutes (depends on drive class)
+
+-   Establishing sensor lock: minutes to hours (depends on sensor, target signature, range)
+-   **Phaser time-to-effect: instant on lock** (damage begins immediately)
+-   Phaser engagement duration: hours (sustained drain vs shield capacity + regen)
+-   **Torpedo time-to-effect: minutes** (travel time after launch)
+-   Torpedo reaction window: the travel time IS the counter window
+-   Drive spool to escape: 2–4 minutes (depends on drive class)
 
 The defender always has a window. Combat is never instant. The attacker's advantage is initiative — they chose when and where. The defender's advantage is that escape is always possible if they detect the threat early enough.
 
 ## Hull Interaction Summary
 
-| Hull | Weapon Viability | Why |
-|------|-----------------|-----|
-| Pioneer | 1 weapon, strained | 0.35 draw is manageable but tight with 3 equipment slots competing |
-| Scout | 1 weapon, awkward | Only 2 equipment slots, low integrity means you die fast in a fight |
-| Surveyor | 1 weapon, suboptimal | 3 slots but the hull is built for scanning, not fighting |
-| Striker | 2 phasers, intended | 0.6× weapon draw makes dual phasers viable; the glass cannon |
-| Specter | Torpedo + Veil, intended | 0.5× stealth draw makes Veil + torpedo viable; the submarine |
-| Heavy Combat (future) | 2-3 weapons, dedicated | Weapon mounts don't consume equipment slots; dual shields survive return fire |
+| Hull                  | Weapon Viability         | Why                                                                           |
+| --------------------- | ------------------------ | ----------------------------------------------------------------------------- |
+| Pioneer               | 1 weapon, strained       | 0.35 draw is manageable but tight with 3 equipment slots competing            |
+| Scout                 | 1 weapon, awkward        | Only 2 equipment slots, low integrity means you die fast in a fight           |
+| Surveyor              | 1 weapon, suboptimal     | 3 slots but the hull is built for scanning, not fighting                      |
+| Striker               | 2 phasers, intended      | 0.6× weapon draw makes dual phasers viable; the glass cannon                  |
+| Specter               | Torpedo + Veil, intended | 0.5× stealth draw makes Veil + torpedo viable; the submarine                  |
+| Heavy Combat (future) | 2-3 weapons, dedicated   | Weapon mounts don't consume equipment slots; dual shields survive return fire |
 
 ### The Striker vs. Specter Split
 
 Two combat hulls, two philosophies. They share a role (combat) but nothing else:
 
-| | Striker | Specter |
-|---|---|---|
-| Identity | Destroyer | Submarine |
-| Weapon | Phasers (sustained drain) | Torpedoes (burst alpha) |
-| Stealth | Loud (1.3× signature) | Silent (0.5× signature + Veil Array) |
-| Engagement | Visible pursuit | Invisible ambush |
-| Duration | Hours of sustained fire | Seconds of impact, then gone |
-| Counter | Break lock, outlast | Detect before launch, PDS |
-| Weakness | Easy to find and counter-attack | If found, dies immediately (60 integrity) |
-| Power trick | 0.6× weapon draw | 0.5× stealth systems draw |
+|             | Striker                         | Specter                                   |
+| ----------- | ------------------------------- | ----------------------------------------- |
+| Identity    | Destroyer                       | Submarine                                 |
+| Weapon      | Phasers (sustained drain)       | Torpedoes (burst alpha)                   |
+| Stealth     | Loud (1.3× signature)           | Silent (0.5× signature + Veil Array)      |
+| Engagement  | Visible pursuit                 | Invisible ambush                          |
+| Duration    | Hours of sustained fire         | Seconds of impact, then gone              |
+| Counter     | Break lock, outlast             | Detect before launch, PDS                 |
+| Weakness    | Easy to find and counter-attack | If found, dies immediately (60 integrity) |
+| Power trick | 0.6× weapon draw                | 0.5× stealth systems draw                 |
 
 A Striker and a Specter in the same system are terrifying: the Striker forces the target to deal with visible sustained pressure while the Specter lines up the kill shot from the dark. But they're also each other's natural counter — the Striker's loud emissions feed the Specter's sensors, and the Specter's torpedoes can ambush the Striker while it's locked in a phaser engagement.
 
@@ -288,12 +290,12 @@ A Striker and a Specter in the same system are terrifying: the Striker forces th
 
 EM emission suppression field. The core stealth equipment.
 
-- **Draw**: 0.40 (base) — crippling on most hulls
-- **Specter hull**: 0.20 (0.40 × 0.5 stealth draw bonus)
-- **Pioneer hull**: 0.40 — leaves almost no power for anything else
-- **Effect**: Suppresses the ship's EM signature, reducing detectability across all spectral types
-- **Footprint**: 20 m³
-- **Incompatible with phasers**: Phasers produce continuous EM emission that defeats the Veil's suppression. Mechanically possible to equip both, but firing phasers while veiled negates the stealth. The game should warn but not prevent this combination.
+-   **Draw**: 0.40 (base) — crippling on most hulls
+-   **Specter hull**: 0.20 (0.40 × 0.5 stealth draw bonus)
+-   **Pioneer hull**: 0.40 — leaves almost no power for anything else
+-   **Effect**: Suppresses the ship's EM signature, reducing detectability across all spectral types
+-   **Footprint**: 20 m³
+-   **Incompatible with phasers**: Phasers produce continuous EM emission that defeats the Veil's suppression. Mechanically possible to equip both, but firing phasers while veiled negates the stealth. The game should warn but not prevent this combination.
 
 The Veil Array is nearly unequipable on non-Specter hulls because the 0.40 draw competes directly with weapons, shields, and sensors. A Pioneer running a Veil has perfRatio problems before it even adds a weapon. The Scout could technically run one (low base draw components), but with only 2 equipment slots, a Veil + any weapon leaves no room for mining or utility — and the Scout doesn't have the stealth draw bonus, so it's paying full price.
 
@@ -301,12 +303,12 @@ The Specter's stealth draw bonus (0.5×) is what makes the Veil practical. At 0.
 
 ### The NPL Sensor — Built for the Hunt
 
-Null Point Labs' crossover sensor is the natural complement to the Specter/torpedo playstyle. Where DSC, VRS, and ACU are built to find celestial bodies, the NPL sensor is built to find *ships*.
+Null Point Labs' crossover sensor is the natural complement to the Specter/torpedo playstyle. Where DSC, VRS, and ACU are built to find celestial bodies, the NPL sensor is built to find _ships_.
 
-- **Passive affinity: 1.8** (best in game, far beyond DSC's ~1.4)
-- **Active affinity: 0.3** (nearly useless — Null Point doesn't believe in broadcasting)
-- **Exploration stats are terrible**: 3 ly range, 2.5× survey time, 0.4 accuracy
-- **Ship detection is unmatched**: identifies drive class, weapon type, and shield state from passive data alone
+-   **Passive affinity: 1.8** (best in game, far beyond DSC's ~1.4)
+-   **Active affinity: 0.3** (nearly useless — Null Point doesn't believe in broadcasting)
+-   **Exploration stats are terrible**: 3 ly range, 2.5× survey time, 0.4 accuracy
+-   **Ship detection is unmatched**: identifies drive class, weapon type, and shield state from passive data alone
 
 The NPL sensor on a Specter creates the ultimate submarine: passively detect targets with extreme sensitivity, identify what they're running, position with the Veil Array active, fire torpedoes, and vanish. The target never gets an active scan ping to warn them.
 

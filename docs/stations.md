@@ -14,10 +14,10 @@ Stations aren't purchased — they're constructed over time from hauled material
 
 ### Requirements
 
-- A system with no existing player station (one per system)
-- A ship present in the system to begin construction
-- Large quantities of refined materials (metals, composites, rare elements)
-- Multiple real-time days of construction
+-   A system with no existing player station (one per system)
+-   A ship present in the system to begin construction
+-   Large quantities of refined materials (metals, composites, rare elements)
+-   Multiple real-time days of construction
 
 ### Construction Phases
 
@@ -33,12 +33,12 @@ Construction is interruptible. Another player could find your half-built station
 
 A player station provides services based on its installed modules:
 
-- **Docking.** Ships can dock for shelter, storage, and access to other services. The owner sets docking permissions and fees.
-- **Market.** Buy and sell goods. The owner sets tax rates. A station with good prices and selection attracts traffic.
-- **Repair.** Component repair and maintenance. Requires stocked materials.
-- **Refuel.** Core recharge and capacitor top-off.
-- **Shipyard.** Commission new ships, swap components. Advanced module.
-- **Storage.** Secure cargo storage beyond what a ship can carry.
+-   **Docking.** Ships can dock for shelter, storage, and access to other services. The owner sets docking permissions and fees.
+-   **Market.** Buy and sell goods. The owner sets tax rates. A station with good prices and selection attracts traffic.
+-   **Repair.** Component repair and maintenance. Requires stocked materials.
+-   **Refuel.** Core recharge and capacitor top-off.
+-   **Shipyard.** Commission new ships, swap components. Advanced module.
+-   **Storage.** Secure cargo storage beyond what a ship can carry.
 
 Not every station has every service. A mining outpost might have docking and storage but no shipyard. A trade hub invests in market and repair. The owner decides what to build based on what they want the station to be.
 
@@ -52,10 +52,10 @@ A single player can own and operate a station. They control all policies, collec
 
 Players can form organizations (corps, guilds, cooperatives — the name is TBD) to share station ownership. An organization is a lightweight membership layer:
 
-- **Shared ownership.** Multiple players can manage a station. Permission tiers determine who can change security policy, access the treasury, modify modules, or grant docking rights.
-- **Shared finances.** A corp wallet that docking fees and market taxes feed into. Transparent to members with appropriate permissions.
-- **Roles, not ranks.** Functional permissions (station manager, fleet coordinator, recruiter, treasurer) rather than a military hierarchy. Keep it flat and functional.
-- **Comms.** In-game communication channel for the group. Tied to the ship's computer log system.
+-   **Shared ownership.** Multiple players can manage a station. Permission tiers determine who can change security policy, access the treasury, modify modules, or grant docking rights.
+-   **Shared finances.** A corp wallet that docking fees and market taxes feed into. Transparent to members with appropriate permissions.
+-   **Roles, not ranks.** Functional permissions (station manager, fleet coordinator, recruiter, treasurer) rather than a military hierarchy. Keep it flat and functional.
+-   **Comms.** In-game communication channel for the group. Tied to the ship's computer log system.
 
 The organization doesn't grant mechanical advantages. Two solo players with good stations are just as powerful as a two-person org with the same stations. The org just makes coordination easier — shared access, shared funds, shared comms.
 
@@ -63,9 +63,9 @@ The organization doesn't grant mechanical advantages. Two solo players with good
 
 Stations can change hands through:
 
-- **Sale.** The owner sells the station to another player or org. A market transaction like any other.
-- **Abandonment.** An owner who stops playing eventually loses their station. Maintenance lapses, systems degrade, and after a threshold the station becomes claimable.
-- **Siege.** Hostile takeover. See `conflict.md` for siege mechanics. The typical outcome is a change of hands, not destruction.
+-   **Sale.** The owner sells the station to another player or org. A market transaction like any other.
+-   **Abandonment.** An owner who stops playing eventually loses their station. Maintenance lapses, systems degrade, and after a threshold the station becomes claimable.
+-   **Siege.** Hostile takeover. See `conflict.md` for siege mechanics. The typical outcome is a change of hands, not destruction.
 
 ## Station Combat
 
@@ -87,9 +87,9 @@ A siege is a sustained campaign — days of real time, multiple ships, continuou
 
 Not all station attacks are frontal assaults. Covert operations can weaken a station from within:
 
-- **System disruption.** Disabling specific station modules — take out the security systems before the fleet arrives, knock the market offline to hurt revenue, degrade the shields to soften the station for siege.
-- **Supply interdiction.** Intercept haulers supplying the station. A station that can't resupply degrades faster. Its security systems weaken, its repair bay runs dry, its market empties.
-- **Espionage.** Infiltrate the owning organization. Gain access, change permissions, lower defenses at a critical moment. Social engineering as gameplay.
+-   **System disruption.** Disabling specific station modules — take out the security systems before the fleet arrives, knock the market offline to hurt revenue, degrade the shields to soften the station for siege.
+-   **Supply interdiction.** Intercept haulers supplying the station. A station that can't resupply degrades faster. Its security systems weaken, its repair bay runs dry, its market empties.
+-   **Espionage.** Infiltrate the owning organization. Gain access, change permissions, lower defenses at a critical moment. Social engineering as gameplay.
 
 Sabotage is slower and subtler than siege. It's prep work — weakening a target before committing the fleet. A well-prepared siege might be over quickly because saboteurs already did the hard part.
 
@@ -100,16 +100,17 @@ Sabotage is slower and subtler than siege. It's prep work — weakening a target
 This is the one context where ship destruction is expected and unpunished. The attackers chose to assault a station — they accepted the risk of losing their ships. The defenders are protecting an investment that took weeks to build. The game doesn't punish them for it.
 
 This asymmetry is intentional:
-- **Attackers** risk ship destruction with no bounty protection. They're the aggressors.
-- **Defenders** can destroy freely. They're protecting property.
-- **Third parties** who join the defense also destroy freely. The station broadcast is an open call for help.
-- **Third parties** who join the attack share the attackers' risk and reputation consequences.
+
+-   **Attackers** risk ship destruction with no bounty protection. They're the aggressors.
+-   **Defenders** can destroy freely. They're protecting property.
+-   **Third parties** who join the defense also destroy freely. The station broadcast is an open call for help.
+-   **Third parties** who join the attack share the attackers' risk and reputation consequences.
 
 A pirate who interdicts ships in open space faces bounties for destruction. A defender who destroys that same pirate's ship during a station siege faces nothing. Context matters.
 
 ### Why Stations Survive
 
-Stations change hands. They rarely cease to exist. A station is too valuable to destroy — someone spent weeks building it, and the infrastructure is the prize. The attacker wants to *own* it, not delete it.
+Stations change hands. They rarely cease to exist. A station is too valuable to destroy — someone spent weeks building it, and the infrastructure is the prize. The attacker wants to _own_ it, not delete it.
 
 Actual destruction requires sustained effort well beyond what it takes to breach and seize. A group that destroys a station instead of taking it is making a statement so expensive that the entire server notices. And the defenders can always scuttle — transfer assets, evacuate cargo, and abandon the station before it falls, denying the attackers the prize they came for.
 
@@ -117,10 +118,10 @@ Actual destruction requires sustained effort well beyond what it takes to breach
 
 A siege leaves the system littered with wrecks from both sides. Destroyed ships don't vanish — they become salvageable wrecks containing damaged but recoverable components (see `conflict.md`). The aftermath of a major station battle is an economic event:
 
-- **Defenders** recover allied wrecks, repair experienced components, rebuild.
-- **Attackers** may have losses of their own to collect — siege ships are expensive.
-- **Salvagers** converge from across the region. Experienced components from combat-fitted ships are high-value salvage. A siege graveyard is a gold rush.
-- **The winning side** might not control the field long enough to collect everything. A freshly-seized station needs immediate attention — repairs, restocking, policy changes. Meanwhile, scavengers pick through the debris.
+-   **Defenders** recover allied wrecks, repair experienced components, rebuild.
+-   **Attackers** may have losses of their own to collect — siege ships are expensive.
+-   **Salvagers** converge from across the region. Experienced components from combat-fitted ships are high-value salvage. A siege graveyard is a gold rush.
+-   **The winning side** might not control the field long enough to collect everything. A freshly-seized station needs immediate attention — repairs, restocking, policy changes. Meanwhile, scavengers pick through the debris.
 
 Major sieges become landmarks. "The Battle of Kepler" isn't just a story — it's a debris field that salvagers work for weeks.
 
@@ -140,7 +141,7 @@ The security policy is implemented through the stellar effects system (see `stel
 
 ## Territory
 
-Territory isn't declared — it's built. A player station *is* the territory claim.
+Territory isn't declared — it's built. A player station _is_ the territory claim.
 
 ### Emergent Factions
 
@@ -156,25 +157,25 @@ A small group with one well-run station in a good location can matter more than 
 
 Station placement is strategic:
 
-- **Trade route intersections.** High traffic, high docking fees, competitive markets. Contested.
-- **Resource-rich sectors.** Miners need somewhere to sell. The station nearest to the best belts wins.
-- **Chokepoints.** If a rich sector is only reachable through one or two systems, a station there controls access.
-- **Deep frontier.** Remote but safe from siege. The last resupply point before the void. Explorers pay premium prices.
+-   **Trade route intersections.** High traffic, high docking fees, competitive markets. Contested.
+-   **Resource-rich sectors.** Miners need somewhere to sell. The station nearest to the best belts wins.
+-   **Chokepoints.** If a rich sector is only reachable through one or two systems, a station there controls access.
+-   **Deep frontier.** Remote but safe from siege. The last resupply point before the void. Explorers pay premium prices.
 
 ## Station Economy
 
 ### Revenue
 
-- **Docking fees.** Per-dock charge. The owner sets the rate.
-- **Market tax.** Percentage of every transaction on the station's market.
-- **Repair fees.** Markup on repair services.
-- **Storage fees.** Recurring charge for stored cargo.
+-   **Docking fees.** Per-dock charge. The owner sets the rate.
+-   **Market tax.** Percentage of every transaction on the station's market.
+-   **Repair fees.** Markup on repair services.
+-   **Storage fees.** Recurring charge for stored cargo.
 
 ### Costs
 
-- **Maintenance.** Stations degrade like ships. Systems need materials and attention.
-- **Security.** Running a counter-PVP policy costs resources — the station's defensive systems consume power and wear down.
-- **Stocking.** A repair bay needs materials. A market needs inventory (or enough traders to self-stock).
+-   **Maintenance.** Stations degrade like ships. Systems need materials and attention.
+-   **Security.** Running a counter-PVP policy costs resources — the station's defensive systems consume power and wear down.
+-   **Stocking.** A repair bay needs materials. A market needs inventory (or enough traders to self-stock).
 
 A well-run station is profitable. A neglected station bleeds resources until it's not worth keeping.
 

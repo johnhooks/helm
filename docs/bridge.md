@@ -50,9 +50,10 @@ Each view is a composition of UI components + data bindings + transition definit
 ### Philosophy
 
 Animation is not decoration. It communicates:
-- **Relationship**: This glyph *becomes* that header (shared element)
-- **Hierarchy**: Parent fades, children stagger in (sequence)
-- **State**: Pulsing means active, dim means unavailable (feedback)
+
+-   **Relationship**: This glyph _becomes_ that header (shared element)
+-   **Hierarchy**: Parent fades, children stagger in (sequence)
+-   **State**: Pulsing means active, dim means unavailable (feedback)
 
 The interface stays **quiet by default**. Animation happens in response to user action or significant state change.
 
@@ -74,12 +75,12 @@ Bridge uses [Framer Motion](https://motion.dev/) for orchestration:
 
 **Key patterns:**
 
-| Pattern | Use Case |
-|---------|----------|
-| `layoutId` | Shared element transitions (glyph → header) |
-| `AnimatePresence` | Enter/exit animations for views |
-| `staggerChildren` | Sequential reveal of list items |
-| `spring` | Natural, physical motion feel |
+| Pattern           | Use Case                                    |
+| ----------------- | ------------------------------------------- |
+| `layoutId`        | Shared element transitions (glyph → header) |
+| `AnimatePresence` | Enter/exit animations for views             |
+| `staggerChildren` | Sequential reveal of list items             |
+| `spring`          | Natural, physical motion feel               |
 
 ### Transition Definitions
 
@@ -87,15 +88,15 @@ Views define their transitions declaratively:
 
 ```tsx
 const systemToDetailTransition = {
-  systemView: {
-    exit: { opacity: 0, scale: 0.95 },
-    transition: { duration: 0.2 }
-  },
-  detailView: {
-    initial: { opacity: 0, y: 20 },
-    animate: { opacity: 1, y: 0 },
-    transition: { delay: 0.1, staggerChildren: 0.05 }
-  }
+	systemView: {
+		exit: { opacity: 0, scale: 0.95 },
+		transition: { duration: 0.2 },
+	},
+	detailView: {
+		initial: { opacity: 0, y: 20 },
+		animate: { opacity: 1, y: 0 },
+		transition: { delay: 0.1, staggerChildren: 0.05 },
+	},
 };
 ```
 
@@ -104,9 +105,10 @@ const systemToDetailTransition = {
 ### The Problem
 
 The Origin (WordPress server) is the source of truth, but:
-- Stars don't move. Fetching 10,000 stars every session is wasteful.
-- Ship state changes. Shields recharge, scans complete, position updates.
-- Network latency matters. The UI should feel responsive.
+
+-   Stars don't move. Fetching 10,000 stars every session is wasteful.
+-   Ship state changes. Shields recharge, scans complete, position updates.
+-   Network latency matters. The UI should feel responsive.
 
 ### The Solution: Tiered Data
 
@@ -152,35 +154,36 @@ Data that rarely changes lives locally:
 
 ```typescript
 interface LocalDatabase {
-  stars: {
-    id: string;
-    position: [number, number, number];
-    spectralClass: SpectralClass;
-    name?: string;
-  }[];
+	stars: {
+		id: string;
+		position: [number, number, number];
+		spectralClass: SpectralClass;
+		name?: string;
+	}[];
 
-  systems: {
-    starId: string;
-    planets: Planet[];
-    stations: Station[];
-    lastUpdated: number;
-  }[];
+	systems: {
+		starId: string;
+		planets: Planet[];
+		stations: Station[];
+		lastUpdated: number;
+	}[];
 
-  routes: {
-    from: string;
-    to: string;
-    distance: number;
-    discovered: boolean;
-    traveledAt?: number;
-  }[];
+	routes: {
+		from: string;
+		to: string;
+		distance: number;
+		discovered: boolean;
+		traveledAt?: number;
+	}[];
 }
 ```
 
 **Sync strategy:**
-- On first load: fetch full star catalog from Origin
-- On subsequent loads: check catalog version, delta sync if needed
-- System details: fetch on first visit, cache indefinitely
-- Routes: update when discovered or traveled
+
+-   On first load: fetch full star catalog from Origin
+-   On subsequent loads: check catalog version, delta sync if needed
+-   System details: fetch on first visit, cache indefinitely
+-   Routes: update when discovered or traveled
 
 ### Dynamic State (@wordpress/data)
 
@@ -222,9 +225,10 @@ function ShieldDisplay() {
 ```
 
 **Sync strategy:**
-- Commands: POST to Origin, optimistic update locally
-- Polling: Check for action completion every 30s (configurable)
-- Push (phase 2): Laravel Reverb for WebSocket real-time updates
+
+-   Commands: POST to Origin, optimistic update locally
+-   Polling: Check for action completion every 30s (configurable)
+-   Push (phase 2): Laravel Reverb for WebSocket real-time updates
 
 ### Real-Time Updates (Phase 2)
 
@@ -237,10 +241,10 @@ Polling works but isn't ideal for time-sensitive events (discoveries, encounters
 └─────────────┘      └─────────────┘      └─────────────┘
 ```
 
-- WordPress fires events (action complete, discovery, etc.)
-- Events pushed to Reverb server
-- Clients subscribe to their ship's channel
-- Bridge receives push, updates local state, triggers UI
+-   WordPress fires events (action complete, discovery, etc.)
+-   Events pushed to Reverb server
+-   Clients subscribe to their ship's channel
+-   Bridge receives push, updates local state, triggers UI
 
 This keeps WordPress focused on game logic while Reverb handles real-time distribution.
 
@@ -353,31 +357,31 @@ resources/packages/bridge/
 
 ```json
 {
-  "dependencies": {
-    "@helm/ui": "workspace:*",
-    "@helm/astrometric": "workspace:*",
-    "@wordpress/data": "^10.0.0",
-    "framer-motion": "^11.0.0",
-    "idb": "^8.0.0"
-  }
+	"dependencies": {
+		"@helm/ui": "workspace:*",
+		"@helm/astrometric": "workspace:*",
+		"@wordpress/data": "^10.0.0",
+		"framer-motion": "^11.0.0",
+		"idb": "^8.0.0"
+	}
 }
 ```
 
-- **@wordpress/data**: State management, REST integration
-- **framer-motion**: Animation orchestration
-- **idb**: IndexedDB wrapper for local storage
+-   **@wordpress/data**: State management, REST integration
+-   **framer-motion**: Animation orchestration
+-   **idb**: IndexedDB wrapper for local storage
 
 ## Decisions
 
 **Polling → WebSockets**: Start with polling for simplicity. Phase 2 adds Laravel Reverb for real-time push. WordPress fires events, Reverb distributes to subscribed clients.
 
-**No offline mode**: There is no gameplay without an Origin. If you want to play locally, you run a local Origin (your own WordPress instance). The Origin *is* the game server - it processes time, validates actions, generates content. The client is just a viewport.
+**No offline mode**: There is no gameplay without an Origin. If you want to play locally, you run a local Origin (your own WordPress instance). The Origin _is_ the game server - it processes time, validates actions, generates content. The client is just a viewport.
 
 **Progressive loading**: Load critical shell data first (current ship state, immediate surroundings), render the UI, then async pull static data (star catalog, system details) in chunks. User sees a working interface immediately while background sync populates the cache.
 
 ## Open Questions
 
-- Chunk size for star catalog sync? (1000? 5000?)
-- Reverb channel structure? (per-ship? per-system? per-origin?)
-- Delta sync format for catalog updates?
-- How to handle Origin version mismatches?
+-   Chunk size for star catalog sync? (1000? 5000?)
+-   Reverb channel structure? (per-ship? per-system? per-origin?)
+-   Delta sync format for catalog updates?
+-   How to handle Origin version mismatches?

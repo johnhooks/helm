@@ -5,12 +5,12 @@ import { makeLoadout, makeComponent, makeCore } from '../test-helpers';
 
 function createPowerSystem(
 	overrides: Parameters<typeof createInternalState>[1] = {},
-	coreOverrides: Record<string, unknown> = {},
+	coreOverrides: Record<string, unknown> = {}
 ) {
 	const loadout = makeLoadout(
 		Object.keys(coreOverrides).length
 			? { core: makeComponent(makeCore(coreOverrides), 'core') }
-			: {},
+			: {}
 	);
 	const state = createInternalState(loadout, overrides);
 	return new PowerSystem(state, loadout);

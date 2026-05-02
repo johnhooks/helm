@@ -5,7 +5,7 @@ import { CompleteJumpCard } from './complete-jump-card';
 
 const TARGET_NAME = 'Tau Ceti';
 
-const baseAction: ShipAction< 'jump' > = {
+const baseAction: ShipAction<'jump'> = {
 	id: 201,
 	ship_post_id: 42,
 	type: 'jump',
@@ -21,9 +21,9 @@ const baseAction: ShipAction< 'jump' > = {
 	updated_at: '2026-02-16T12:00:00Z',
 };
 
-describe( 'CompleteJumpCard', () => {
-	it( 'renders fulfilled state with core cost', () => {
-		const action: ShipAction< 'jump' > = {
+describe('CompleteJumpCard', () => {
+	it('renders fulfilled state with core cost', () => {
+		const action: ShipAction<'jump'> = {
 			...baseAction,
 			status: 'fulfilled',
 			result: {
@@ -36,13 +36,13 @@ describe( 'CompleteJumpCard', () => {
 				core_before: 100,
 			},
 		};
-		render( <CompleteJumpCard action={ action } targetName={ TARGET_NAME } /> );
-		expect( screen.getByText( /Tau Ceti/ ) ).toBeInTheDocument();
-		expect( screen.getByText( '12' ) ).toBeInTheDocument();
-	} );
+		render(<CompleteJumpCard action={action} targetName={TARGET_NAME} />);
+		expect(screen.getByText(/Tau Ceti/)).toBeInTheDocument();
+		expect(screen.getByText('12')).toBeInTheDocument();
+	});
 
-	it( 'renders failed state with cause', () => {
-		const action: ShipAction< 'jump' > = {
+	it('renders failed state with cause', () => {
+		const action: ShipAction<'jump'> = {
 			...baseAction,
 			status: 'failed',
 			result: {
@@ -54,17 +54,23 @@ describe( 'CompleteJumpCard', () => {
 				cause: 'Blackhole',
 			},
 		};
-		render( <CompleteJumpCard action={ action } targetName={ TARGET_NAME } /> );
-		expect( screen.getByText( 'Blackhole' ) ).toBeInTheDocument();
-	} );
+		render(<CompleteJumpCard action={action} targetName={TARGET_NAME} />);
+		expect(screen.getByText('Blackhole')).toBeInTheDocument();
+	});
 
-	it( 'renders failed state with unknown cause when none provided', () => {
-		const action: ShipAction< 'jump' > = {
+	it('renders failed state with unknown cause when none provided', () => {
+		const action: ShipAction<'jump'> = {
 			...baseAction,
 			status: 'failed',
-			result: { from_node_id: 1, to_node_id: 7, distance: 11.9, core_cost: 0, duration: 0 },
+			result: {
+				from_node_id: 1,
+				to_node_id: 7,
+				distance: 11.9,
+				core_cost: 0,
+				duration: 0,
+			},
 		};
-		render( <CompleteJumpCard action={ action } targetName={ TARGET_NAME } /> );
-		expect( screen.getByText( 'Unknown' ) ).toBeInTheDocument();
-	} );
-} );
+		render(<CompleteJumpCard action={action} targetName={TARGET_NAME} />);
+		expect(screen.getByText('Unknown')).toBeInTheDocument();
+	});
+});

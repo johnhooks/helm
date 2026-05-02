@@ -66,14 +66,22 @@ export interface ActionContext {
 }
 
 export interface ActionHandler {
-	validate: (ship: Ship, params: Record<string, unknown>, context: ActionContext) => void;
+	validate: (
+		ship: Ship,
+		params: Record<string, unknown>,
+		context: ActionContext
+	) => void;
 	handle: (
 		ship: Ship,
 		params: Record<string, unknown>,
 		now: number,
-		context: ActionContext,
+		context: ActionContext
 	) => ActionIntent;
-	resolve: (ship: Ship, action: Action, context: ActionContext) => ActionOutcome;
+	resolve: (
+		ship: Ship,
+		action: Action,
+		context: ActionContext
+	) => ActionOutcome;
 }
 
 export const ActionErrorCode = {
@@ -99,7 +107,7 @@ export type ActionErrorCode =
 export class ActionError extends Error {
 	constructor(
 		readonly code: ActionErrorCode,
-		message: string,
+		message: string
 	) {
 		super(message);
 		this.name = 'ActionError';

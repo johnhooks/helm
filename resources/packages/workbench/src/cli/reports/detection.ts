@@ -3,14 +3,30 @@ import { heading, table, metaBlock } from './markdown';
 import { r, pct } from '../../format';
 
 function shortenVerdict(verdict: string): string {
-	if (verdict.startsWith('Easily')) { return 'easy'; }
-	if (verdict.startsWith('Active only')) { return 'active-only'; }
-	if (verdict.startsWith('Active fast')) { return 'active-fast'; }
-	if (verdict.startsWith('Moderate')) { return 'moderate'; }
-	if (verdict.startsWith('Difficult')) { return 'difficult'; }
-	if (verdict.startsWith('Nearly')) { return 'undetectable'; }
-	if (verdict.startsWith('Challenging')) { return 'challenging'; }
-	if (verdict.startsWith('Active effective')) { return 'active-effective'; }
+	if (verdict.startsWith('Easily')) {
+		return 'easy';
+	}
+	if (verdict.startsWith('Active only')) {
+		return 'active-only';
+	}
+	if (verdict.startsWith('Active fast')) {
+		return 'active-fast';
+	}
+	if (verdict.startsWith('Moderate')) {
+		return 'moderate';
+	}
+	if (verdict.startsWith('Difficult')) {
+		return 'difficult';
+	}
+	if (verdict.startsWith('Nearly')) {
+		return 'undetectable';
+	}
+	if (verdict.startsWith('Challenging')) {
+		return 'challenging';
+	}
+	if (verdict.startsWith('Active effective')) {
+		return 'active-effective';
+	}
 	return verdict.toLowerCase().slice(0, 15);
 }
 
@@ -21,16 +37,18 @@ export function renderDetection(ctx: ReportContext): ReportFile {
 
 	lines.push(heading(1, 'Detection & Stealth'));
 	lines.push('');
-	lines.push(metaBlock({
-		'Generated': ctx.generated,
-		'Source': 'runDetection()',
-		'Matrix entries': stats.totalCombinations,
-		'Wolves': stats.wolvesCount,
-		'Targets': stats.targetsCount,
-		'Environments': stats.environmentsCount,
-		'PVP encounters': stats.pvpEncounterCount,
-		'Combat projections': detection.combatProjections.length,
-	}));
+	lines.push(
+		metaBlock({
+			Generated: ctx.generated,
+			Source: 'runDetection()',
+			'Matrix entries': stats.totalCombinations,
+			Wolves: stats.wolvesCount,
+			Targets: stats.targetsCount,
+			Environments: stats.environmentsCount,
+			'PVP encounters': stats.pvpEncounterCount,
+			'Combat projections': detection.combatProjections.length,
+		})
+	);
 	lines.push('');
 
 	// ── Verdict distribution ──
@@ -45,14 +63,16 @@ export function renderDetection(ctx: ReportContext): ReportFile {
 			pct: pct(count / stats.totalCombinations),
 		}));
 
-	lines.push(table(
-		[
-			['Verdict', 'verdict'],
-			['Count', 'count'],
-			['%', 'pct'],
-		],
-		verdictRows,
-	));
+	lines.push(
+		table(
+			[
+				['Verdict', 'verdict'],
+				['Count', 'count'],
+				['%', 'pct'],
+			],
+			verdictRows
+		)
+	);
 	lines.push('');
 
 	// ── Per-wolf summary (aggregated) ──
@@ -60,7 +80,9 @@ export function renderDetection(ctx: ReportContext): ReportFile {
 	lines.push('');
 
 	for (const wolf of detection.wolves) {
-		const wolfSummary = detection.summary.filter((s) => s.wolfId === wolf.id);
+		const wolfSummary = detection.summary.filter(
+			(s) => s.wolfId === wolf.id
+		);
 		const wolfVerdicts: Record<string, number> = {};
 		for (const s of wolfSummary) {
 			const short = shortenVerdict(s.verdict);
@@ -83,34 +105,42 @@ export function renderDetection(ctx: ReportContext): ReportFile {
 			byTarget.set(s.targetId, existing);
 		}
 
-		const targetRows = [...byTarget.entries()].map(([targetId, entries]) => {
-			// Find "normal" environment result
-			const normal = entries.find((e) => e.envId === 'normal') ?? entries[0];
-			return {
-				target: targetId,
-				active4: r(normal.active_4sweeps, 2),
-				active10: r(normal.active_10sweeps, 2),
-				passive4hr: r(normal.passive_4hr, 2),
-				passive24hr: r(normal.passive_24hr, 2),
-				bestActive: normal.bestActiveAt !== null ? `${normal.bestActiveAt} sweeps` : '—',
-				bestPassive: normal.bestPassiveAt ?? '—',
-				verdict: normal.verdict,
-			};
-		});
+		const targetRows = [...byTarget.entries()].map(
+			([targetId, entries]) => {
+				// Find "normal" environment result
+				const normal =
+					entries.find((e) => e.envId === 'normal') ?? entries[0];
+				return {
+					target: targetId,
+					active4: r(normal.active_4sweeps, 2),
+					active10: r(normal.active_10sweeps, 2),
+					passive4hr: r(normal.passive_4hr, 2),
+					passive24hr: r(normal.passive_24hr, 2),
+					bestActive:
+						normal.bestActiveAt !== null
+							? `${normal.bestActiveAt} sweeps`
+							: '—',
+					bestPassive: normal.bestPassiveAt ?? '—',
+					verdict: normal.verdict,
+				};
+			}
+		);
 
-		lines.push(table(
-			[
-				['Target', 'target'],
-				['Active @4', 'active4'],
-				['Active @10', 'active10'],
-				['Passive @4hr', 'passive4hr'],
-				['Passive @24hr', 'passive24hr'],
-				['Best Active', 'bestActive'],
-				['Best Passive', 'bestPassive'],
-				['Verdict', 'verdict'],
-			],
-			targetRows,
-		));
+		lines.push(
+			table(
+				[
+					['Target', 'target'],
+					['Active @4', 'active4'],
+					['Active @10', 'active10'],
+					['Passive @4hr', 'passive4hr'],
+					['Passive @24hr', 'passive24hr'],
+					['Best Active', 'bestActive'],
+					['Best Passive', 'bestPassive'],
+					['Verdict', 'verdict'],
+				],
+				targetRows
+			)
+		);
 		lines.push('');
 	}
 
@@ -120,8 +150,12 @@ export function renderDetection(ctx: ReportContext): ReportFile {
 
 	const envRows = detection.environments.map((env) => {
 		const envEntries = detection.summary.filter((s) => s.envId === env.id);
-		const avgActive4 = envEntries.reduce((sum, e) => sum + e.active_4sweeps, 0) / envEntries.length;
-		const avgPassive4 = envEntries.reduce((sum, e) => sum + e.passive_4hr, 0) / envEntries.length;
+		const avgActive4 =
+			envEntries.reduce((sum, e) => sum + e.active_4sweeps, 0) /
+			envEntries.length;
+		const avgPassive4 =
+			envEntries.reduce((sum, e) => sum + e.passive_4hr, 0) /
+			envEntries.length;
 		return {
 			env: env.label,
 			noise: r(env.noise, 2),
@@ -130,15 +164,17 @@ export function renderDetection(ctx: ReportContext): ReportFile {
 		};
 	});
 
-	lines.push(table(
-		[
-			['Environment', 'env'],
-			['Noise', 'noise'],
-			['Avg Active @4', 'avgActive4'],
-			['Avg Passive @4hr', 'avgPassive4hr'],
-		],
-		envRows,
-	));
+	lines.push(
+		table(
+			[
+				['Environment', 'env'],
+				['Noise', 'noise'],
+				['Avg Active @4', 'avgActive4'],
+				['Avg Passive @4hr', 'avgPassive4hr'],
+			],
+			envRows
+		)
+	);
 	lines.push('');
 
 	// ── PVP Scan Encounters ──
@@ -151,17 +187,25 @@ export function renderDetection(ctx: ReportContext): ReportFile {
 
 		// Wolf scan summary
 		const wolfScan = encounter.wolfScan;
-		lines.push(`**Wolf scan:** per-scan chance ${r(wolfScan.perScanChance, 3)}, `
-			+ `70% at ${wolfScan.scansFor70 ?? 'never'} scans, `
-			+ `90% at ${wolfScan.scansFor90 ?? 'never'} scans, `
-			+ `max ${wolfScan.maxScansBeforeDry} scans before dry`);
+		lines.push(
+			`**Wolf scan:** per-scan chance ${r(wolfScan.perScanChance, 3)}, ` +
+				`70% at ${wolfScan.scansFor70 ?? 'never'} scans, ` +
+				`90% at ${wolfScan.scansFor90 ?? 'never'} scans, ` +
+				`max ${wolfScan.maxScansBeforeDry} scans before dry`
+		);
 		lines.push('');
 
 		// Counter-detection
-		const firstDetect = encounter.counterDetection.steps.find((s) => s.tier !== 'none');
+		const firstDetect = encounter.counterDetection.steps.find(
+			(s) => s.tier !== 'none'
+		);
 		if (firstDetect) {
-			lines.push(`**Counter-detection:** target detects wolf at scan ${firstDetect.scan} `
-				+ `(${firstDetect.elapsedSeconds}s, tier: ${firstDetect.tier}, confidence: ${r(firstDetect.targetConfidence, 2)})`);
+			lines.push(
+				`**Counter-detection:** target detects wolf at scan ${firstDetect.scan} ` +
+					`(${firstDetect.elapsedSeconds}s, tier: ${
+						firstDetect.tier
+					}, confidence: ${r(firstDetect.targetConfidence, 2)})`
+			);
 		} else {
 			lines.push('**Counter-detection:** target never detects wolf');
 		}
@@ -187,24 +231,28 @@ export function renderDetection(ctx: ReportContext): ReportFile {
 		wolf: cp.wolfId,
 		target: `${cp.targetHull} (${cp.targetHullIntegrity}HP + ${cp.targetShieldCapacity}S)`,
 		phaserDrain: `${cp.phaser.netDrainPerHour}/hr`,
-		shieldDepletion: cp.phaser.canDepleteShields ? `${cp.phaser.hoursToDeplete}hr` : 'never',
+		shieldDepletion: cp.phaser.canDepleteShields
+			? `${cp.phaser.hoursToDeplete}hr`
+			: 'never',
 		torpHits: `${cp.torpedo.expectedHits}/${cp.torpedo.magazineSize}`,
 		torpDamage: r(cp.torpedo.expectedTotalDamage, 0),
 		canKill: cp.torpedo.canKill ? 'yes' : 'no',
 	}));
 
-	lines.push(table(
-		[
-			['Wolf', 'wolf'],
-			['Target', 'target'],
-			['Phaser Net Drain', 'phaserDrain'],
-			['Shield Depletion', 'shieldDepletion'],
-			['Torpedo Hits', 'torpHits'],
-			['Torpedo Damage', 'torpDamage'],
-			['Can Kill?', 'canKill'],
-		],
-		combatRows,
-	));
+	lines.push(
+		table(
+			[
+				['Wolf', 'wolf'],
+				['Target', 'target'],
+				['Phaser Net Drain', 'phaserDrain'],
+				['Shield Depletion', 'shieldDepletion'],
+				['Torpedo Hits', 'torpHits'],
+				['Torpedo Damage', 'torpDamage'],
+				['Can Kill?', 'canKill'],
+			],
+			combatRows
+		)
+	);
 	lines.push('');
 
 	return {

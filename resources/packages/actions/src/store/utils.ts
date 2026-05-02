@@ -7,7 +7,10 @@ import { addQueryArgs } from '@wordpress/url';
  * When filters are added, they'll be folded into the path as query args,
  * giving each unique filter combination its own key in `queries` / `meta`.
  */
-export function createIndexQueryId( shipId: number, params?: Record< string, unknown > ): string {
-	const path = `/helm/v1/ships/${ shipId }/actions`;
-	return params ? addQueryArgs( path, params ) : path;
+export function createIndexQueryId(
+	shipId: number,
+	params?: Record<string, unknown>
+): string {
+	const path = `/helm/v1/ships/${shipId}/actions`;
+	return params ? addQueryArgs(path, params) : path;
 }

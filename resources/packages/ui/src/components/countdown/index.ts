@@ -1,2 +1,2 @@
-export { Countdown, formatTime } from "./countdown";
-export type { CountdownProps } from "./countdown";
+export { Countdown, formatTime } from './countdown';
+export type { CountdownProps } from './countdown';

@@ -15,14 +15,14 @@ export interface SystemComponent {
 }
 
 export type SystemComponentEmbeds = {
-	[ LinkRel.Product ]?: [ ProductEmbed ];
+	[LinkRel.Product]?: [ProductEmbed];
 };
 
 /**
  * A system component as returned from the REST API, with optional
  * WP REST `_links` and per-item `_embedded` product data.
  */
-export type SystemComponentResponse = WithRestLinks< SystemComponent > & {
+export type SystemComponentResponse = WithRestLinks<SystemComponent> & {
 	_embedded?: SystemComponentEmbeds;
 };
 
@@ -35,11 +35,11 @@ export interface SystemSlots {
 }
 
 export type SlotProducts = {
-	[ K in keyof SystemSlots ]: WithRestLinks< Product >;
+	[K in keyof SystemSlots]: WithRestLinks<Product>;
 };
 
 export interface ShipLoadout {
-	ship: WithRestLinks< ShipState >;
+	ship: WithRestLinks<ShipState>;
 	slots: SystemSlots;
 	products: SlotProducts;
 }

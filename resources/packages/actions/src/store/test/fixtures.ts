@@ -2,7 +2,7 @@ import type { ShipAction, State } from '../types';
 import { initializeDefaultState } from '../reducer';
 
 export function createShipAction(
-	overrides: Partial< ShipAction > = {}
+	overrides: Partial<ShipAction> = {}
 ): ShipAction {
 	return {
 		id: 1,
@@ -20,9 +20,9 @@ export function createShipAction(
 
 export function createState(
 	overrides: {
-		actions?: Partial< State[ 'actions' ] >;
-		create?: Partial< State[ 'create' ] >;
-		heartbeat?: Partial< State[ 'heartbeat' ] >;
+		actions?: Partial<State['actions']>;
+		create?: Partial<State['create']>;
+		heartbeat?: Partial<State['heartbeat']>;
 	} = {}
 ): State {
 	const defaults = initializeDefaultState();

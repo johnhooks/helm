@@ -1,2 +1,2 @@
-export { LcarsModal } from "./lcars-modal";
-export type { LcarsModalProps } from "./lcars-modal";
+export { LcarsModal } from './lcars-modal';
+export type { LcarsModalProps } from './lcars-modal';

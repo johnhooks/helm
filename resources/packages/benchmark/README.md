@@ -4,8 +4,8 @@ REST API benchmarking tools for Helm. Runs against the Lando dev environment.
 
 ## Requirements
 
-- Lando running with the Helm site (`lando start`)
-- Origin initialized and stars seeded (`lando wp helm status`)
+-   Lando running with the Helm site (`lando start`)
+-   Origin initialized and stars seeded (`lando wp helm status`)
 
 ## Usage
 
@@ -62,11 +62,11 @@ const { auth, apiBase } = await setup();
 
 Key exports from `src/`:
 
-- `setup()` — resolves API base URL, ensures auth, checks readiness
-- `bench({ label, url, iterations, auth, validate? })` — runs N iterations, returns `BenchResult | null`
-- `header(title)` — prints a section header
-- `formatResult(r)` / `formatComparison(r, baseline)` — format result lines
-- `buildReport(groups)` — creates a `BenchReport` with git metadata
-- `saveReport(report)` — saves to `results/`, returns filepath
-- `loadLatestReport(beforeTimestamp?)` — loads most recent saved report
-- `findResult(report, groupName, label)` — find a result for comparison
+-   `setup()` — resolves API base URL, ensures auth, checks readiness
+-   `bench({ label, url, iterations, auth, validate? })` — runs N iterations, returns `BenchResult | null`
+-   `header(title)` — prints a section header
+-   `formatResult(r)` / `formatComparison(r, baseline)` — format result lines
+-   `buildReport(groups)` — creates a `BenchReport` with git metadata
+-   `saveReport(report)` — saves to `results/`, returns filepath
+-   `loadLatestReport(beforeTimestamp?)` — loads most recent saved report
+-   `findResult(report, groupName, label)` — find a result for comparison

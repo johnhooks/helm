@@ -1,14 +1,14 @@
-import type { CSSProperties } from "react";
+import type { CSSProperties } from 'react';
 
-export const SPECTRAL_CLASSES = ["O", "B", "A", "F", "G", "K", "M"] as const;
+export const SPECTRAL_CLASSES = ['O', 'B', 'A', 'F', 'G', 'K', 'M'] as const;
 
 export const STELLAR_TYPES = [
-	"mainSequence",
-	"giant",
-	"whiteDwarf",
-	"neutron",
-	"pulsar",
-	"brownDwarf",
+	'mainSequence',
+	'giant',
+	'whiteDwarf',
+	'neutron',
+	'pulsar',
+	'brownDwarf',
 ] as const;
 
 export type SpectralClass = (typeof SPECTRAL_CLASSES)[number];
@@ -26,7 +26,7 @@ export interface StarGlyphProps {
 	/**
 	 * Size variant
 	 */
-	size?: "xxs" | "xs" | "sm" | "md" | "lg" | "xl" | "xxl";
+	size?: 'xxs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
 	/**
 	 * Additional CSS class names
 	 */
@@ -38,21 +38,21 @@ export interface StarGlyphProps {
 }
 
 export function StarGlyph({
-	spectralClass = "G",
-	stellarType = "mainSequence",
-	size = "md",
-	className = "",
+	spectralClass = 'G',
+	stellarType = 'mainSequence',
+	size = 'md',
+	className = '',
 	style,
 }: StarGlyphProps) {
 	const classNames = [
-		"helm-star-glyph",
+		'helm-star-glyph',
 		`helm-star-glyph--${spectralClass}`,
 		`helm-star-glyph--${stellarType}`,
 		`helm-star-glyph--${size}`,
 		className,
 	]
 		.filter(Boolean)
-		.join(" ");
+		.join(' ');
 
 	return <span className={classNames} style={style} aria-hidden="true" />;
 }

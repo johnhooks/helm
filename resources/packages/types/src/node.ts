@@ -11,5 +11,5 @@ export interface NavNode {
 }
 
 export interface ApiNodeResponse extends NavNode {
-	_embedded?: { [ LinkRel.Stars ]?: Star[] };
+	_embedded?: { [LinkRel.Stars]?: Star[] };
 }

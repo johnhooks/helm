@@ -582,10 +582,11 @@ TARIFF DISTRIBUTION:
 ```
 
 Origins can use treasury for:
-- Block rewards (subsidize new players)
-- Infrastructure (NPC stations)
-- Events/prizes
-- Whatever the admin decides
+
+-   Block rewards (subsidize new players)
+-   Infrastructure (NPC stations)
+-   Events/prizes
+-   Whatever the admin decides
 
 ## Emergent Gameplay
 
@@ -715,10 +716,11 @@ Federation through trade deals:
 6. **Emergent gameplay** - Trade wars, alliances, smuggling
 
 **The federation is:**
-- A web of bilateral agreements
-- Not a single global system
-- Political and economic
-- Player-influenced through lobbying
-- Admin-controlled through negotiation
+
+-   A web of bilateral agreements
+-   Not a single global system
+-   Political and economic
+-   Player-influenced through lobbying
+-   Admin-controlled through negotiation
 
 **No blockchain needed.** Just diplomacy, rules, and game mechanics.

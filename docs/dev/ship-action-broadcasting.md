@@ -39,10 +39,11 @@ GET /helm/v1/ship/{id}/actions?since={timestamp}
 Returns all ship_actions created after `since`. The client merges them into its local store.
 
 **Tradeoffs:**
-- Simple. No infrastructure beyond WordPress.
-- Works while the player is away — actions accumulate, next poll picks them all up.
-- Wasteful when nothing has changed. Every poll is a query.
-- Latency is bounded by poll interval. A 30s poll means up to 30s delay on new events.
+
+-   Simple. No infrastructure beyond WordPress.
+-   Works while the player is away — actions accumulate, next poll picks them all up.
+-   Wasteful when nothing has changed. Every poll is a query.
+-   Latency is bounded by poll interval. A 30s poll means up to 30s delay on new events.
 
 For the current stage of the game (async, check-in-when-you-want), polling is fine. Players aren't watching a real-time battle — they're checking what happened since their last visit.
 
@@ -91,6 +92,6 @@ How "deliver" works is the implementation detail. The rest of the system — act
 
 ## Not in Scope
 
-- **Authentication/authorization on channels** — WebSocket channel auth is a Reverb/WP concern, not a game design concern.
-- **Multi-ship views** (fleet commander seeing all ships) — future channel subscription model.
-- **Cross-origin broadcasting** (federation) — each Origin broadcasts its own ships. Federation protocol is separate.
+-   **Authentication/authorization on channels** — WebSocket channel auth is a Reverb/WP concern, not a game design concern.
+-   **Multi-ship views** (fleet commander seeing all ships) — future channel subscription model.
+-   **Cross-origin broadcasting** (federation) — each Origin broadcasts its own ships. Federation protocol is separate.

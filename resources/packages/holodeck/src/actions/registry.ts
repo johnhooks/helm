@@ -5,7 +5,7 @@ const handlers = new Map<ActionType, ActionHandler>();
 
 export function registerHandler(
 	type: ActionType,
-	handler: ActionHandler,
+	handler: ActionHandler
 ): void {
 	handlers.set(type, handler);
 }

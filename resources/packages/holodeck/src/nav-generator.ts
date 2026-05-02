@@ -24,20 +24,31 @@ export function sha256(input: string): string {
  * Generate the corridor seed for two nodes.
  * Always uses min/max ordering so A→B and B→A produce same seed.
  */
-export function corridorSeed(masterSeed: string, nodeAId: number, nodeBId: number): string {
+export function corridorSeed(
+	masterSeed: string,
+	nodeAId: number,
+	nodeBId: number
+): string {
 	const minId = Math.min(nodeAId, nodeBId);
 	const maxId = Math.max(nodeAId, nodeBId);
-	return sha256(`${masterSeed}:nav:${minId}-${maxId}:v${NAV_CONSTANTS.ALGORITHM_VERSION}`);
+	return sha256(
+		`${masterSeed}:nav:${minId}-${maxId}:v${NAV_CONSTANTS.ALGORITHM_VERSION}`
+	);
 }
 
 /**
  * Get a deterministic float from a seed.
  * Uses first 8 hex chars (32 bits) for the float.
  */
-export function seededFloat(seed: string, key: string, min: number, max: number): number {
+export function seededFloat(
+	seed: string,
+	key: string,
+	min: number,
+	max: number
+): number {
 	const hash = sha256(`${seed}:${key}`);
 	const intValue = parseInt(hash.substring(0, 8), 16);
-	const normalized = intValue / 0xFFFFFFFF;
+	const normalized = intValue / 0xffffffff;
 	return min + normalized * (max - min);
 }
 
@@ -48,7 +59,7 @@ export function waypointHash(
 	masterSeed: string,
 	nodeAId: number,
 	nodeBId: number,
-	waypointIndex = 0,
+	waypointIndex = 0
 ): string {
 	const seed = corridorSeed(masterSeed, nodeAId, nodeBId);
 	return sha256(`${seed}:wp:${waypointIndex}`);
@@ -61,14 +72,29 @@ export function waypointHash(
 export function computeWaypoint(
 	masterSeed: string,
 	from: GraphNode,
-	to: GraphNode,
+	to: GraphNode
 ): WaypointData {
 	const seed = corridorSeed(masterSeed, from.id, to.id);
 
 	const progress = seededFloat(seed, 'progress', 0.3, 0.6);
-	const scatterX = seededFloat(seed, 'scatter_x', -NAV_CONSTANTS.MAX_SCATTER, NAV_CONSTANTS.MAX_SCATTER);
-	const scatterY = seededFloat(seed, 'scatter_y', -NAV_CONSTANTS.MAX_SCATTER, NAV_CONSTANTS.MAX_SCATTER);
-	const scatterZ = seededFloat(seed, 'scatter_z', -NAV_CONSTANTS.MAX_SCATTER, NAV_CONSTANTS.MAX_SCATTER);
+	const scatterX = seededFloat(
+		seed,
+		'scatter_x',
+		-NAV_CONSTANTS.MAX_SCATTER,
+		NAV_CONSTANTS.MAX_SCATTER
+	);
+	const scatterY = seededFloat(
+		seed,
+		'scatter_y',
+		-NAV_CONSTANTS.MAX_SCATTER,
+		NAV_CONSTANTS.MAX_SCATTER
+	);
+	const scatterZ = seededFloat(
+		seed,
+		'scatter_z',
+		-NAV_CONSTANTS.MAX_SCATTER,
+		NAV_CONSTANTS.MAX_SCATTER
+	);
 
 	const dx = to.x - from.x;
 	const dy = to.y - from.y;
@@ -92,7 +118,7 @@ export function canDirectJump(
 	masterSeed: string,
 	from: GraphNode,
 	to: GraphNode,
-	maxRange: number = NAV_CONSTANTS.MAX_RANGE,
+	maxRange: number = NAV_CONSTANTS.MAX_RANGE
 ): boolean {
 	const dx = to.x - from.x;
 	const dy = to.y - from.y;
@@ -123,7 +149,7 @@ export function canDirectJump(
 export function corridorDifficulty(
 	masterSeed: string,
 	fromId: number,
-	toId: number,
+	toId: number
 ): number {
 	const seed = corridorSeed(masterSeed, fromId, toId);
 	return seededFloat(seed, 'difficulty', 0.0, 1.0);

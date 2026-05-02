@@ -1,4 +1,4 @@
-import type { SystemContents, SystemPlanet } from "@helm/types";
+import type { SystemContents, SystemPlanet } from '@helm/types';
 
 /**
  * Props for the top-level SystemView component.
@@ -11,7 +11,7 @@ export interface SystemViewProps {
 	/**
 	 * Called when a planet is clicked
 	 */
-	onPlanetSelect?: ( planet: SystemPlanet ) => void;
+	onPlanetSelect?: (planet: SystemPlanet) => void;
 	/**
 	 * Additional CSS class names
 	 */

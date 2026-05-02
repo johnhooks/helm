@@ -3,7 +3,7 @@ status: done
 area: navigation
 priority: p2
 depends_on:
-  - nav-06-persist-scan-discoveries
+    - nav-06-persist-scan-discoveries
 ---
 
 # Add a "Show routes" toggle to the viewport
@@ -38,17 +38,17 @@ its two node endpoints. Lines use the LCARS `sky` tone so the visual
 identity flows with the jumpable-star ring from nav-03 and the jump card
 family.
 
-- Default state is off. The player opts in.
-- Route lines render under the star sprites so stars stay the primary
-  visual element.
-- Every edge the datacore knows about renders, not only edges touching the
-  current node. The toggle shows the graph, not a jump preview.
-- Lines are static. No hover affordances, no click targets, no highlight
-  on selection in this task.
-- Toggle state persists using the same mechanism as the existing viewport
-  config values (`starSize`, `jumpRangeOnly`, `showLabels`).
-- The bridge route must remove the temporary latest-action route layer that
-  reads `action.result.edges` and `action.result.nodes`.
+-   Default state is off. The player opts in.
+-   Route lines render under the star sprites so stars stay the primary
+    visual element.
+-   Every edge the datacore knows about renders, not only edges touching the
+    current node. The toggle shows the graph, not a jump preview.
+-   Lines are static. No hover affordances, no click targets, no highlight
+    on selection in this task.
+-   Toggle state persists using the same mechanism as the existing viewport
+    config values (`starSize`, `jumpRangeOnly`, `showLabels`).
+-   The bridge route must remove the temporary latest-action route layer that
+    reads `action.result.edges` and `action.result.nodes`.
 
 This task should read the datacore edge graph only. Do not fall back to
 `action.result` on the actions store.

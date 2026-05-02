@@ -167,9 +167,9 @@ export interface DSPConstants {
  * Shape of one phase of the drive envelope (power curve model).
  */
 export interface EnvelopePhaseShape {
-	duration: number;     // seconds
-	peakPower: number;    // relative to drive's base emission
-	curve: number;        // <1 aggressive (front-loaded), =1 linear, >1 gentle (back-loaded)
+	duration: number; // seconds
+	peakPower: number; // relative to drive's base emission
+	curve: number; // <1 aggressive (front-loaded), =1 linear, >1 gentle (back-loaded)
 }
 
 /**
@@ -177,8 +177,8 @@ export interface EnvelopePhaseShape {
  */
 export interface DriveEnvelope {
 	label: string;
-	spool: EnvelopePhaseShape;    // attack — chirp, broadband burst
-	sustain: EnvelopePhaseShape;  // steady-state cruise emission
+	spool: EnvelopePhaseShape; // attack — chirp, broadband burst
+	sustain: EnvelopePhaseShape; // steady-state cruise emission
 	cooldown: EnvelopePhaseShape; // release — reverse chirp
 }
 
@@ -192,38 +192,39 @@ export interface DriveEnvelope {
  *
  * Scale: 0 = silent, 1.0 = moderate reference level.
  */
-export const DEFAULT_EMISSION_PROFILES: Record<EmissionType, EmissionProfile> = {
-	pnp_scan:       { base: 5.0,  spectralType: 'pulse' },
-	pvp_scan:       { base: 8.0,  spectralType: 'pulse' },
-	belt_scan:      { base: 3.0,  spectralType: 'sweep' },
-	system_survey:  { base: 2.0,  spectralType: 'sweep' },
-	planet_scan:    { base: 0.8,  spectralType: 'sweep' },
-	drive_spool:    { base: 4.0,  spectralType: 'pulse' },
-	drive_sustain:  { base: 2.0,  spectralType: 'continuous' },
-	drive_cooldown: { base: 1.5,  spectralType: 'continuous' },
-	mining:         { base: 1.0,  spectralType: 'continuous' },
-	salvaging:      { base: 1.0,  spectralType: 'continuous' },
-	weapons_fire:   { base: 6.0,  spectralType: 'pulse' },
-	ecm:            { base: 3.5,  spectralType: 'continuous' },
-	shield_regen:   { base: 0.2,  spectralType: 'continuous' },
-	idle:           { base: 0.0,  spectralType: 'continuous' },
-};
+export const DEFAULT_EMISSION_PROFILES: Record<EmissionType, EmissionProfile> =
+	{
+		pnp_scan: { base: 5.0, spectralType: 'pulse' },
+		pvp_scan: { base: 8.0, spectralType: 'pulse' },
+		belt_scan: { base: 3.0, spectralType: 'sweep' },
+		system_survey: { base: 2.0, spectralType: 'sweep' },
+		planet_scan: { base: 0.8, spectralType: 'sweep' },
+		drive_spool: { base: 4.0, spectralType: 'pulse' },
+		drive_sustain: { base: 2.0, spectralType: 'continuous' },
+		drive_cooldown: { base: 1.5, spectralType: 'continuous' },
+		mining: { base: 1.0, spectralType: 'continuous' },
+		salvaging: { base: 1.0, spectralType: 'continuous' },
+		weapons_fire: { base: 6.0, spectralType: 'pulse' },
+		ecm: { base: 3.5, spectralType: 'continuous' },
+		shield_regen: { base: 0.2, spectralType: 'continuous' },
+		idle: { base: 0.0, spectralType: 'continuous' },
+	};
 
 export const DEFAULT_DSP_CONSTANTS: DSPConstants = {
-	detectionThreshold: 6.0,    // passive: integration builds toward it over hours
-	activeThreshold: 1.0,       // active: per-sweep detection stays responsive
-	detectionSteepness: 0.5,    // very gradual sigmoid — wide transition zone (10%-90% spans ~8.8 SNR)
-	samplePeriodSeconds: 300,   // 5 minutes between passive samples (tunable 1-10 min)
+	detectionThreshold: 6.0, // passive: integration builds toward it over hours
+	activeThreshold: 1.0, // active: per-sweep detection stays responsive
+	detectionSteepness: 0.5, // very gradual sigmoid — wide transition zone (10%-90% spans ~8.8 SNR)
+	samplePeriodSeconds: 300, // 5 minutes between passive samples (tunable 1-10 min)
 	baseSweepCount: 6,
-	shipNoiseFactor: 0.3,       // spectral filtering, spatial separation, matched filter rejection
+	shipNoiseFactor: 0.3, // spectral filtering, spatial separation, matched filter rejection
 	passiveConfidenceCap: 0.95, // passive is free — never gives certainty
-	pvpScanPowerCost: 15,       // ~7 scans before dry on standard capacitor
-	pvpSweepsPerScan: 2,        // focused burst — fewer than PNP's 6
+	pvpScanPowerCost: 15, // ~7 scans before dry on standard capacitor
+	pvpSweepsPerScan: 2, // focused burst — fewer than PNP's 6
 	pvpDetectionThreshold: 3.0, // harder than active (1.0) — targeting lock, not just detection
 	pvpScanDurationSeconds: 120, // 2 minutes per scan — target has time to react
-	baseLockSeconds: 130,       // lock time = 130 / pvpGain. ACU: ~87s, DSC: ~325s.
-	phaserHullDamageMult: 40,   // bare hull: 35/hr drain × 40 = 1400/hr = ~23/min. Kills 60-hull Specter in ~154s.
-	torpedoFlightSeconds: 120,  // 2 minutes flight time — Striker has a window to kill before torpedoes arrive.
+	baseLockSeconds: 130, // lock time = 130 / pvpGain. ACU: ~87s, DSC: ~325s.
+	phaserHullDamageMult: 40, // bare hull: 35/hr drain × 40 = 1400/hr = ~23/min. Kills 60-hull Specter in ~154s.
+	torpedoFlightSeconds: 120, // 2 minutes flight time — Striker has a window to kill before torpedoes arrive.
 };
 
 /**
@@ -236,8 +237,8 @@ export const DEFAULT_DSP_CONSTANTS: DSPConstants = {
  * A 10-minute scanner has a ~20% chance of catching it during the window.
  */
 export const SCAN_FREQUENCY_RANGE = {
-	minSeconds: 60,     // 1 minute — maximum scan rate
-	maxSeconds: 600,    // 10 minutes — minimum scan rate
+	minSeconds: 60, // 1 minute — maximum scan rate
+	maxSeconds: 600, // 10 minutes — minimum scan rate
 	defaultSeconds: 300, // 5 minutes — balanced default
 } as const;
 
@@ -256,21 +257,21 @@ export const SCAN_FREQUENCY_RANGE = {
 export const DEFAULT_DRIVE_ENVELOPES: Record<string, DriveEnvelope> = {
 	'dr-305': {
 		label: 'DR-305 (civilian)',
-		spool:    { duration: 180, peakPower: 1.2, curve: 1.5 },   // 3 min — moderate
-		sustain:  { duration: 1,   peakPower: 1.0, curve: 1.0 },
-		cooldown: { duration: 120, peakPower: 0.8, curve: 0.8 },   // 2 min — cools fast
+		spool: { duration: 180, peakPower: 1.2, curve: 1.5 }, // 3 min — moderate
+		sustain: { duration: 1, peakPower: 1.0, curve: 1.0 },
+		cooldown: { duration: 120, peakPower: 0.8, curve: 0.8 }, // 2 min — cools fast
 	},
 	'dr-505': {
 		label: 'DR-505 (industrial)',
-		spool:    { duration: 240, peakPower: 1.5, curve: 1.0 },   // 4 min — big ship, long window
-		sustain:  { duration: 1,   peakPower: 1.2, curve: 1.0 },
-		cooldown: { duration: 180, peakPower: 1.0, curve: 1.2 },   // 3 min — heavy machinery settles slow
+		spool: { duration: 240, peakPower: 1.5, curve: 1.0 }, // 4 min — big ship, long window
+		sustain: { duration: 1, peakPower: 1.2, curve: 1.0 },
+		cooldown: { duration: 180, peakPower: 1.0, curve: 1.2 }, // 3 min — heavy machinery settles slow
 	},
 	'dr-705': {
 		label: 'DR-705 (military)',
-		spool:    { duration: 120, peakPower: 2.5, curve: 0.5 },   // 2 min — fast, combat-optimized
-		sustain:  { duration: 1,   peakPower: 0.8, curve: 1.0 },
-		cooldown: { duration: 150, peakPower: 1.8, curve: 0.6 },   // 2.5 min — arrives hot
+		spool: { duration: 120, peakPower: 2.5, curve: 0.5 }, // 2 min — fast, combat-optimized
+		sustain: { duration: 1, peakPower: 0.8, curve: 1.0 },
+		cooldown: { duration: 150, peakPower: 1.8, curve: 0.6 }, // 2.5 min — arrives hot
 	},
 };
 
@@ -282,9 +283,27 @@ export const DEFAULT_DRIVE_ENVELOPES: Record<string, DriveEnvelope> = {
  * DSC: patient listener. High passive affinity, strong continuous matched filter, poor PVP.
  */
 export const SENSOR_AFFINITIES: Record<string, SensorAffinity> = {
-	acu: { active: 1.4, passive: 0.6, pulseGain: 1.5, continuousGain: 0.7, pvpGain: 1.5 },
-	vrs: { active: 1.0, passive: 1.0, pulseGain: 1.0, continuousGain: 1.0, pvpGain: 0.8 },
-	dsc: { active: 0.7, passive: 1.3, pulseGain: 0.7, continuousGain: 1.25, pvpGain: 0.4 },
+	acu: {
+		active: 1.4,
+		passive: 0.6,
+		pulseGain: 1.5,
+		continuousGain: 0.7,
+		pvpGain: 1.5,
+	},
+	vrs: {
+		active: 1.0,
+		passive: 1.0,
+		pulseGain: 1.0,
+		continuousGain: 1.0,
+		pvpGain: 0.8,
+	},
+	dsc: {
+		active: 0.7,
+		passive: 1.3,
+		pulseGain: 0.7,
+		continuousGain: 1.25,
+		pvpGain: 0.4,
+	},
 };
 
 // ---------------------------------------------------------------------------
@@ -313,7 +332,7 @@ export interface TierThresholds {
 
 export const DEFAULT_TIER_THRESHOLDS: TierThresholds = {
 	anomaly: 0.15,
-	class: 0.40,
+	class: 0.4,
 	type: 0.65,
 	analysis: 0.85,
 };
@@ -408,13 +427,13 @@ export interface DSPModifiers {
  * these; the JS formula layer receives them as pre-computed values.
  */
 export interface PilotSkills {
-	scanning: number;    // from helm_scans_completed
-	jumping: number;     // from helm_jumps_completed
-	trading: number;     // from helm_trades_completed
-	mining: number;      // from helm_mines_completed
-	salvaging: number;   // from helm_salvages_completed
-	phasers: number;     // from helm_phaser_engagements
-	torpedoes: number;   // from helm_torpedo_launches
+	scanning: number; // from helm_scans_completed
+	jumping: number; // from helm_jumps_completed
+	trading: number; // from helm_trades_completed
+	mining: number; // from helm_mines_completed
+	salvaging: number; // from helm_salvages_completed
+	phasers: number; // from helm_phaser_engagements
+	torpedoes: number; // from helm_torpedo_launches
 }
 
 export const DEFAULT_PILOT_SKILLS: PilotSkills = {
@@ -445,7 +464,7 @@ export const DSP_MODIFIER_CAPS = {
 	/**
 	 * Equipment tier threshold bonus: 0 to 0.10 (best correlator)
 	 */
-	equipmentBonus: { min: 0, max: 0.10 },
+	equipmentBonus: { min: 0, max: 0.1 },
 	/**
 	 * Filter module self-interference reduction: 1.0 (none) to 0.3 (best filter)
 	 */

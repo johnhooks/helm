@@ -22,7 +22,7 @@ The first warp drives were literally WordPress installations with expensive hard
 
 The universe, apparently, is a legacy codebase.
 
-Warp-capable ships are called "jacks." You jack in via subspace FTL, and your ship is your body — cameras for eyes, sensors for ears. When you disconnect, the AI crew keeps working. "Shared hosting" means your ship is in a fleet. "Dedicated hosting" means your own warp core. The jokes write themselves. The hosting companies became empires and they *don't like being called megacorps* but everyone calls them megacorps anyway.
+Warp-capable ships are called "jacks." You jack in via subspace FTL, and your ship is your body — cameras for eyes, sensors for ears. When you disconnect, the AI crew keeps working. "Shared hosting" means your ship is in a fleet. "Dedicated hosting" means your own warp core. The jokes write themselves. The hosting companies became empires and they _don't like being called megacorps_ but everyone calls them megacorps anyway.
 
 For the full story (it involves an intern, three energy drinks, and a four-millimeter wormhole): see [docs/lore.md](docs/lore.md).
 
@@ -30,23 +30,23 @@ For the full story (it involves an intern, three energy drinks, and a four-milli
 
 This is a WordPress plugin. It currently has:
 
-- **Ship systems** — self-contained domains (navigation, sensors, shields) accessed through a hardware abstraction layer called ShipLink
-- **Timestamp-based state** — ship state computed on demand from "last known value + elapsed time," not ticked
-- **Action processing** — async actions that validate, execute, and resolve over real time via cron
-- **Procedural generation** — deterministic star systems from seeds, because the same seed should always produce the same universe
-- **An LCARS-inspired UI** — because if you're going to do this, you should *commit*
-- **REST API** — PHP and JS communicate exclusively through REST, like civilized systems that don't share a runtime
-- **A test suite** — we are reckless, not irresponsible
+-   **Ship systems** — self-contained domains (navigation, sensors, shields) accessed through a hardware abstraction layer called ShipLink
+-   **Timestamp-based state** — ship state computed on demand from "last known value + elapsed time," not ticked
+-   **Action processing** — async actions that validate, execute, and resolve over real time via cron
+-   **Procedural generation** — deterministic star systems from seeds, because the same seed should always produce the same universe
+-   **An LCARS-inspired UI** — because if you're going to do this, you should _commit_
+-   **REST API** — PHP and JS communicate exclusively through REST, like civilized systems that don't share a runtime
+-   **A test suite** — we are reckless, not irresponsible
 
 ## The Tech
 
-- PHP 8.1+ / WordPress 6.9
-- TypeScript / React
-- Bun workspaces
-- Action Scheduler for background jobs
-- WP-Browser + slic for testing
-- Vitest + Playwright
-- An unreasonable amount of design documentation for a project at this stage
+-   PHP 8.1+ / WordPress 6.9
+-   TypeScript / React
+-   Bun workspaces
+-   Action Scheduler for background jobs
+-   WP-Browser + slic for testing
+-   Vitest + Playwright
+-   An unreasonable amount of design documentation for a project at this stage
 
 ## Status
 
@@ -58,8 +58,8 @@ If this sounds interesting to you — if the phrase "space economy MMO on WordPr
 
 ## Getting Started
 
-- [docs/getting-started.md](docs/getting-started.md) — installing Helm on a WordPress host and initializing a game world.
-- [docs/dev/getting-started.md](docs/dev/getting-started.md) — setting up a local development environment (including the Lando setup we use).
+-   [docs/getting-started.md](docs/getting-started.md) — installing Helm on a WordPress host and initializing a game world.
+-   [docs/dev/getting-started.md](docs/dev/getting-started.md) — setting up a local development environment (including the Lando setup we use).
 
 ## License
 

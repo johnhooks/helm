@@ -7,10 +7,11 @@ There are no ship classes. There's a hull and what you bolt onto it.
 Every ship starts as the same first-generation hull — the **Pioneer frame**. What makes a ship a scout, a surveyor, or a hauler is the combination of core, drive, sensors, and equipment the pilot chooses to install. Roles are emergent, not prescribed.
 
 This means:
-- No wrong choice at creation
-- Refit at a station to change roles
-- Equipment combinations create personality
-- The same hull tells a different story depending on who flies it
+
+-   No wrong choice at creation
+-   Refit at a station to change roles
+-   Equipment combinations create personality
+-   The same hull tells a different story depending on who flies it
 
 ## The Pioneer Frame
 
@@ -89,11 +90,11 @@ Core components that every ship has. See `plans/.wip/ship-systems.md` for techni
 
 The power source. Determines operational tempo and ship lifespan.
 
-| Model | Life | Regen | Jump Cost | Footprint | Character |
-|-------|------|-------|-----------|-----------|-----------|
-| Epoch-E | 1000 ly | 5/hr | 0.75x | 20 m³ | Patient, enduring |
-| Epoch-S | 750 ly | 10/hr | 1.0x | 25 m³ | Balanced, reliable |
-| Epoch-R | 500 ly | 20/hr | 1.5x | 35 m³ | Aggressive, short-lived |
+| Model   | Life    | Regen | Jump Cost | Footprint | Character               |
+| ------- | ------- | ----- | --------- | --------- | ----------------------- |
+| Epoch-E | 1000 ly | 5/hr  | 0.75x     | 20 m³     | Patient, enduring       |
+| Epoch-S | 750 ly  | 10/hr | 1.0x      | 25 m³     | Balanced, reliable      |
+| Epoch-R | 500 ly  | 20/hr | 1.5x      | 35 m³     | Aggressive, short-lived |
 
 Hot cores need more cooling infrastructure. The Epoch-R's extra regen comes at a physical cost.
 
@@ -103,11 +104,11 @@ See `warp-core.md` for full details.
 
 How fast you go and how far you can jump.
 
-| Model | Speed | Power Appetite | Range | Footprint | Character |
-|-------|-------|----------------|-------|-----------|-----------|
-| DR-305 | 0.5x | 0.6x | 10 ly | 20 m³ | Slow, efficient, long range |
-| DR-505 | 1.0x | 1.0x | 7 ly | 30 m³ | Balanced |
-| DR-705 | 2.0x | 1.5x | 5 ly | 45 m³ | Fast, hungry, short range |
+| Model  | Speed | Power Appetite | Range | Footprint | Character                   |
+| ------ | ----- | -------------- | ----- | --------- | --------------------------- |
+| DR-305 | 0.5x  | 0.6x           | 10 ly | 20 m³     | Slow, efficient, long range |
+| DR-505 | 1.0x  | 1.0x           | 7 ly  | 30 m³     | Balanced                    |
+| DR-705 | 2.0x  | 1.5x           | 5 ly  | 45 m³     | Fast, hungry, short range   |
 
 Faster drives need bigger thrust assemblies and more fuel routing.
 
@@ -117,11 +118,11 @@ See `drives.md` for full details.
 
 What you can see and how well you can see it.
 
-| Model | Sustain Range | Survey Duration | Success Chance | Footprint | Character |
-|-------|---------------|-----------------|----------------|-----------|-----------|
-| DSC Mk I | 7 ly | 2.0x | 0.6 | 40 m³ | Far sight, slow, unreliable |
-| VRS Mk I | 5 ly | 1.0x | 0.7 | 25 m³ | Balanced |
-| ACU Mk I | 3 ly | 0.5x | 0.85 | 15 m³ | Short range, fast, accurate |
+| Model    | Sustain Range | Survey Duration | Success Chance | Footprint | Character                   |
+| -------- | ------------- | --------------- | -------------- | --------- | --------------------------- |
+| DSC Mk I | 7 ly          | 2.0x            | 0.6            | 40 m³     | Far sight, slow, unreliable |
+| VRS Mk I | 5 ly          | 1.0x            | 0.7            | 25 m³     | Balanced                    |
+| ACU Mk I | 3 ly          | 0.5x            | 0.85           | 15 m³     | Short range, fast, accurate |
 
 Long-range sensor arrays are physically large — antenna arrays, signal processors, shielded receivers. The DSC eats a huge chunk of internal space.
 
@@ -129,11 +130,11 @@ Long-range sensor arrays are physically large — antenna arrays, signal process
 
 Protection. Less relevant until combat exists, but shields also protect against environmental hazards — radiation, debris fields, asteroid impacts during mining.
 
-| Model | Capacity | Regen Rate | Footprint |
-|-------|----------|------------|-----------|
-| Aegis Alpha | 50 | 20/hr | 10 m³ |
-| Aegis Delta | 100 | 10/hr | 20 m³ |
-| Aegis Eta | 200 | 5/hr | 35 m³ |
+| Model       | Capacity | Regen Rate | Footprint |
+| ----------- | -------- | ---------- | --------- |
+| Aegis Alpha | 50       | 20/hr      | 10 m³     |
+| Aegis Delta | 100      | 10/hr      | 20 m³     |
+| Aegis Eta   | 200      | 5/hr       | 35 m³     |
 
 Heavy shields need emitter arrays and capacitor banks.
 
@@ -157,9 +158,9 @@ ACU Mk I v1 → ACU Mk I v2 isn't a firmware update. It's a retooled production 
 
 This creates real economics:
 
-- **A nerfed product where v1 was strong** — v1 units become scarce over time as they break down and get salvaged. Collectors and veterans hold onto them. The price climbs.
-- **A buffed product where v1 was weak** — v1 units become cheap junk. New players pick them up as beaters. Veterans sell off their old stock.
-- **A v3 that reverts closer to v1** — the collectors suddenly have competition again.
+-   **A nerfed product where v1 was strong** — v1 units become scarce over time as they break down and get salvaged. Collectors and veterans hold onto them. The price climbs.
+-   **A buffed product where v1 was weak** — v1 units become cheap junk. New players pick them up as beaters. Veterans sell off their old stock.
+-   **A v3 that reverts closer to v1** — the collectors suddenly have competition again.
 
 Versions are how balance changes ship without erasing history. The game's economy remembers every manufacturing run. A pilot flying a v1 DR-705 is flying a piece of history — and everyone in the system knows it.
 
@@ -195,7 +196,7 @@ Components come from manufacturers — Epoch Labs makes cores, the Aegis Foundry
 
 The interesting wrinkle: manufacturers sometimes release products outside their core competency. Aegis (shields) releases a drive. Epoch Labs (cores) releases a sensor array. These crossover products are objectively worse in their adopted category — but they carry some unique property from the manufacturer's home domain that can't exist in a native product.
 
-An Aegis drive might regenerate shields during warp transit. An Epoch sensor might bypass the normal power cost by tapping the core directly. These aren't better — they're *different* in a way that creates builds nobody planned for.
+An Aegis drive might regenerate shields during warp transit. An Epoch sensor might bypass the normal power cost by tapping the core directly. These aren't better — they're _different_ in a way that creates builds nobody planned for.
 
 Crossover products don't appear at Mk I. They show up at Mk II or Mk III, when the manufacturer has had time to experiment outside their comfort zone.
 
@@ -244,7 +245,7 @@ WEAPONS
 
 Weapons are equipment. Any hull can slot a phaser or torpedo launcher if it has a free equipment slot. The question is whether the power budget survives it. See **Weapon Systems** below.
 
-Three slots means hard choices. You can't do everything. And every piece of equipment you install shrinks your hold. The Cargo Expander is unique — it's structural modification that *adds* usable space, the only equipment with a negative footprint.
+Three slots means hard choices. You can't do everything. And every piece of equipment you install shrinks your hold. The Cargo Expander is unique — it's structural modification that _adds_ usable space, the only equipment with a negative footprint.
 
 ## Emergent Roles
 
@@ -353,24 +354,30 @@ The Bulwark's 150 integrity and Aegis Eta shields mean it can survive an ambush 
 The three-slot system means interesting hybrids. Component choices shift the cargo math.
 
 **The Prospector** (Scout + Surveyor)
+
 ```
 Equipment: Waypoint Scanner (15) + Mining Laser (10) + Veil Array (20)
 Equipment footprint: 45 m³
 ```
+
 Finds rogue planets, mines them personally. Keeps the secret. Pair with scout components and you've got ~125 m³ for ore.
 
 **The Logistics Ship** (Surveyor + Hauler)
+
 ```
 Equipment: Platform Deployer (25) + Cargo Expander (-50) + Ore Compressor (5)
 Equipment footprint: -20 m³
 ```
+
 Deploys platforms AND hauls the output. With hauler components (90 m³), you get ~230 m³ cargo. Self-sufficient but slow.
 
 **The Ghost Miner** (Surveyor + Scout)
+
 ```
 Equipment: Mining Laser (10) + Veil Array (20) + Ore Compressor (5)
 Equipment footprint: 35 m³
 ```
+
 Sneaks into someone else's belt, mines what's there, vanishes. With balanced components (~100 m³), you keep ~165 m³ for ore — a decent haul for a stealth run.
 
 ### "The Striker"
@@ -454,9 +461,9 @@ Phasers on a Specter are mechanically possible but self-defeating: the continuou
 
 The outcome depends on the Striker's weapon state when the torpedo arrives:
 
-*Phasers armed (shields at 25):* The torpedo punches through the halved Alpha and bites hull. But the Striker's phasers are already hot — if the ACU caught the launch pulse, it can lock the Specter and retaliate immediately. Phasers on 60 bare hull with zero shields ends the Specter before torpedo #2 arrives. The Striker takes damage but wins the fight.
+_Phasers armed (shields at 25):_ The torpedo punches through the halved Alpha and bites hull. But the Striker's phasers are already hot — if the ACU caught the launch pulse, it can lock the Specter and retaliate immediately. Phasers on 60 bare hull with zero shields ends the Specter before torpedo #2 arrives. The Striker takes damage but wins the fight.
 
-*Phasers disarmed (shields at 50):* The full Alpha absorbs more of the hit — the Striker survives in better shape. But now it needs to spin up phasers to fight back, and that takes time. The second torpedo might land before weapons are online. The Striker survives longer but can't retaliate.
+_Phasers disarmed (shields at 50):_ The full Alpha absorbs more of the hit — the Striker survives in better shape. But now it needs to spin up phasers to fight back, and that takes time. The second torpedo might land before weapons are online. The Striker survives longer but can't retaliate.
 
 This is the Striker's core dilemma: armed means vulnerable to the first hit but able to fight back, disarmed means surviving the first hit but defenseless against the second. The right answer depends on whether you detect the Specter — which you can't know in advance. The ambush favors the Specter, but an armed Striker that catches the launch pulse can turn it around fast.
 
@@ -470,13 +477,13 @@ Combat in Helm is an action you issue and check back on, like everything else. "
 
 The sustained pressure weapon. Lock on, drain shields, wait.
 
-- **Continuous shield drain** over hours. Low damage per tick but relentless.
-- **Constant power draw** (0.35 per array). While firing, your perfRatio drops. Everything else on the ship suffers — scans slow down, jump range shrinks, shields regen slower.
-- **Shield capacity reduction while armed.** Phaser field harmonics interfere with shield emitter geometry, physically shrinking the maximum shield envelope. Each armed phaser array reduces shield capacity by 25%. Dual phasers = 50% capacity reduction. An Aegis Alpha (50 cap) drops to 25. An Aegis Delta (100 cap) drops to 50. This penalty applies while phasers are armed and ready — not just while firing. Disarming takes a spin-down cycle, creating a commitment window. You choose to be combat-ready knowing your shields are halved for the duration.
-- **Continuous EM emission**. Phasers produce a `continuous` spectral signature while active. Every DSC sensor in range is building confidence on your position. You cannot fire from stealth.
-- **No ammo**. Phasers draw power, not physical resources. You can fire as long as your core lives.
-- **Requires sensor lock**. If the target breaks lock (jump, ECM, cloak), damage stops. Re-establishing lock takes time.
-- **Compact** (15 m³). Fits in any equipment slot without dominating the footprint budget.
+-   **Continuous shield drain** over hours. Low damage per tick but relentless.
+-   **Constant power draw** (0.35 per array). While firing, your perfRatio drops. Everything else on the ship suffers — scans slow down, jump range shrinks, shields regen slower.
+-   **Shield capacity reduction while armed.** Phaser field harmonics interfere with shield emitter geometry, physically shrinking the maximum shield envelope. Each armed phaser array reduces shield capacity by 25%. Dual phasers = 50% capacity reduction. An Aegis Alpha (50 cap) drops to 25. An Aegis Delta (100 cap) drops to 50. This penalty applies while phasers are armed and ready — not just while firing. Disarming takes a spin-down cycle, creating a commitment window. You choose to be combat-ready knowing your shields are halved for the duration.
+-   **Continuous EM emission**. Phasers produce a `continuous` spectral signature while active. Every DSC sensor in range is building confidence on your position. You cannot fire from stealth.
+-   **No ammo**. Phasers draw power, not physical resources. You can fire as long as your core lives.
+-   **Requires sensor lock**. If the target breaks lock (jump, ECM, cloak), damage stops. Re-establishing lock takes time.
+-   **Compact** (15 m³). Fits in any equipment slot without dominating the footprint budget.
 
 Phasers are the pursuit weapon. You chase someone down and grind. The tradeoff is that your shields are permanently diminished while you're combat-ready — a phaser boat is the loudest, most exposed thing in the system. Disarm to get full shields back, but the spin-down cycle means you can't toggle reactively. You commit to offense or defense, not both.
 
@@ -484,32 +491,32 @@ Phasers are the pursuit weapon. You chase someone down and grind. The tradeoff i
 
 The ambush weapon. Fire and forget, then disappear.
 
-- **High burst damage**. A single torpedo deals massive alpha — enough to crack a reduced shield or severely damage a light one. But a single hit won't kill a reasonably equipped target. Expect 2-3 torpedoes to finish a ship with full shields. Against a Striker with phaser-halved shield capacity? Maybe two.
-- **Single-fire launcher**. One torpedo at a time. Each launch is a separate firing cycle with its own detection risk. Sequential shots give the target (and anyone nearby) multiple chances to detect the pulse signature and react.
-- **Magazine of 4**. Each torpedo is a physical item (~20 m³ cargo per round). Four rounds is one real engagement — maybe a kill with 2-3 hits and a round to spare, or a miss and a hard decision about your remaining shots. When you're out, you resupply at a station.
-- **Power spike on launch**, then done. The launcher draws power for the firing cycle only, not continuously. Your perfRatio recovers immediately after firing.
-- **Low EM emission**. Torpedo launches produce a brief `pulse` signature — a short spike, then silence. The torpedo itself is a cold, unpowered projectile coasting to target. Far harder to detect than sustained phaser fire. But each shot is a separate pulse event — fire three torpedoes, that's three chances for an ACU to catch you.
-- **Travel time**. Torpedoes take minutes to reach the target. If the target detects the launch signature and spools their drive fast enough, they can jump out before impact.
-- **Can miss**. Hit probability depends on range, target drive state, and your sensor accuracy. A target in active drive spool is harder to hit (signature changing, position uncertain). Component experience on your sensor improves targeting.
-- **Bulky** (25 m³ launcher, plus ~20 m³ per torpedo in cargo). A full loadout of 4 rounds eats 80 m³ of cargo. On a Specter with 90 m³ available, that leaves almost nothing — the boat is single-purpose when loaded for combat.
+-   **High burst damage**. A single torpedo deals massive alpha — enough to crack a reduced shield or severely damage a light one. But a single hit won't kill a reasonably equipped target. Expect 2-3 torpedoes to finish a ship with full shields. Against a Striker with phaser-halved shield capacity? Maybe two.
+-   **Single-fire launcher**. One torpedo at a time. Each launch is a separate firing cycle with its own detection risk. Sequential shots give the target (and anyone nearby) multiple chances to detect the pulse signature and react.
+-   **Magazine of 4**. Each torpedo is a physical item (~20 m³ cargo per round). Four rounds is one real engagement — maybe a kill with 2-3 hits and a round to spare, or a miss and a hard decision about your remaining shots. When you're out, you resupply at a station.
+-   **Power spike on launch**, then done. The launcher draws power for the firing cycle only, not continuously. Your perfRatio recovers immediately after firing.
+-   **Low EM emission**. Torpedo launches produce a brief `pulse` signature — a short spike, then silence. The torpedo itself is a cold, unpowered projectile coasting to target. Far harder to detect than sustained phaser fire. But each shot is a separate pulse event — fire three torpedoes, that's three chances for an ACU to catch you.
+-   **Travel time**. Torpedoes take minutes to reach the target. If the target detects the launch signature and spools their drive fast enough, they can jump out before impact.
+-   **Can miss**. Hit probability depends on range, target drive state, and your sensor accuracy. A target in active drive spool is harder to hit (signature changing, position uncertain). Component experience on your sensor improves targeting.
+-   **Bulky** (25 m³ launcher, plus ~20 m³ per torpedo in cargo). A full loadout of 4 rounds eats 80 m³ of cargo. On a Specter with 90 m³ available, that leaves almost nothing — the boat is single-purpose when loaded for combat.
 
 Torpedoes are the submarine weapon. Sneak in, fire from the dark, disappear. The launch pulse is brief and easy to miss — unlike phasers, a torpedo boat can fire and go quiet before anyone builds a detection track. But each torpedo is a separate detection event, ammo is severely limited, and a single hit isn't a kill. The Specter's advantage is patience, not firepower.
 
 ### The Tradeoff
 
-| | Phasers | Torpedoes |
-|---|---|---|
-| Damage pattern | Sustained drain | Burst alpha (2-3 hits to kill) |
-| Power cost | Constant draw (tanks perfRatio) | Per-shot spike (recovers after) |
-| Ammo | Unlimited (power only) | 4 rounds (~20 m³ each in cargo) |
-| Fire rate | Continuous | One at a time |
-| Shield penalty | -25% shield capacity per armed array | None |
-| EM signature | Continuous (loud, trackable) | Brief pulse per shot (covert) |
-| Counter | Break sensor lock | Evade before impact (if you detect the pulse) |
-| DSP counter-sensor | DSC (continuous specialist) | ACU (pulse specialist, per launch) |
-| Range | Short (must maintain lock) | Long (fire and forget) |
-| Footprint | 15 m³ | 25 m³ launcher + 80 m³ ammo cargo |
-| Playstyle | Pursuit predator | Ambush predator |
+|                    | Phasers                              | Torpedoes                                     |
+| ------------------ | ------------------------------------ | --------------------------------------------- |
+| Damage pattern     | Sustained drain                      | Burst alpha (2-3 hits to kill)                |
+| Power cost         | Constant draw (tanks perfRatio)      | Per-shot spike (recovers after)               |
+| Ammo               | Unlimited (power only)               | 4 rounds (~20 m³ each in cargo)               |
+| Fire rate          | Continuous                           | One at a time                                 |
+| Shield penalty     | -25% shield capacity per armed array | None                                          |
+| EM signature       | Continuous (loud, trackable)         | Brief pulse per shot (covert)                 |
+| Counter            | Break sensor lock                    | Evade before impact (if you detect the pulse) |
+| DSP counter-sensor | DSC (continuous specialist)          | ACU (pulse specialist, per launch)            |
+| Range              | Short (must maintain lock)           | Long (fire and forget)                        |
+| Footprint          | 15 m³                                | 25 m³ launcher + 80 m³ ammo cargo             |
+| Playstyle          | Pursuit predator                     | Ambush predator                               |
 
 You can mix — one phaser and one torpedo launcher — but the power budget rarely supports it well, and you're mediocre at both styles. Most combat pilots specialize.
 
@@ -517,10 +524,10 @@ You can mix — one phaser and one torpedo launcher — but the power budget rar
 
 Ships can be reconfigured at stations:
 
-- Swap any component (core, drive, sensors, shields)
-- Swap equipment in/out
-- Core swap is expensive (old core is spent or sold)
-- Equipment swap is cheap (just labor time)
+-   Swap any component (core, drive, sensors, shields)
+-   Swap equipment in/out
+-   Core swap is expensive (old core is spent or sold)
+-   Equipment swap is cheap (just labor time)
 
 Refitting takes time (async — queue the refit, check back later). This prevents instant role-switching in the field. You commit to a loadout for an expedition, then refit when you return.
 
@@ -721,20 +728,20 @@ MARKET VALUE FACTORS
 
 A 10,000-use scanner is rare because someone (or something) spent months building those scans. It might be worth 10x a new one. This creates a genuine secondary market:
 
-- Manufacturers sell new components (baseline)
-- Salvagers sell recovered components (damaged but experienced)
-- Veterans sell their old gear when upgrading (premium)
-- Station markets list components with full stats visible
+-   Manufacturers sell new components (baseline)
+-   Salvagers sell recovered components (damaged but experienced)
+-   Veterans sell their old gear when upgrading (premium)
+-   Station markets list components with full stats visible
 
 ### Bots and the Economy
 
 In an async game with webhook automation, bot fleets grinding component usage are inevitable. Rather than fighting this:
 
-- Bot fleets grinding scanners are *manufacturing* high-usage components through time investment
-- This is just industrialism — creating value through labor
-- Hunting bot fleets and salvaging their components is its own gameplay loop
-- The economy absorbs it: more supply of worn gear drives prices down
-- The real scarcity is the components with *extreme* usage (years of grinding)
+-   Bot fleets grinding scanners are _manufacturing_ high-usage components through time investment
+-   This is just industrialism — creating value through labor
+-   Hunting bot fleets and salvaging their components is its own gameplay loop
+-   The economy absorbs it: more supply of worn gear drives prices down
+-   The real scarcity is the components with _extreme_ usage (years of grinding)
 
 ## Player Progression
 
@@ -856,10 +863,10 @@ SALVAGER finds it later (150 m³ cargo)
 
 Over time, the game world fills with derelicts:
 
-- **Core systems**: Wrecks found and salvaged quickly
-- **Popular routes**: Occasional finds along well-traveled waypoints
-- **Deep frontier**: Wrecks sit for months, pristine salvage waiting
-- **The void**: Ships that ran out of core life mid-jump, drifting forever until someone scans the right waypoint
+-   **Core systems**: Wrecks found and salvaged quickly
+-   **Popular routes**: Occasional finds along well-traveled waypoints
+-   **Deep frontier**: Wrecks sit for months, pristine salvage waiting
+-   **The void**: Ships that ran out of core life mid-jump, drifting forever until someone scans the right waypoint
 
 Early game: empty space, fresh belts, no wrecks. A year in: depleted belts near Sol, derelicts along popular routes, a graveyard near contested sectors. The game world accumulates history that players create.
 
@@ -867,10 +874,10 @@ Early game: empty space, fresh belts, no wrecks. A year in: depleted belts near 
 
 What makes YOUR ship unique isn't a class — it's:
 
-- **Component history** — each piece has its own story, usage, and buffs
-- **Loadout choices** — what you bolted on and what you left behind
-- **Wear patterns** — which components are well-used, what buffs emerged
-- **Name** — the thing you typed when you created it and never want to lose
+-   **Component history** — each piece has its own story, usage, and buffs
+-   **Loadout choices** — what you bolted on and what you left behind
+-   **Wear patterns** — which components are well-used, what buffs emerged
+-   **Name** — the thing you typed when you created it and never want to lose
 
 Two Pioneers with identical loadouts play differently because of their component wear. Your scanner has 10,000 scans on it — it finds things others miss but drinks power. Your drive has been through 500 jumps — it spools up fast but burns fuel. That's not a stat sheet, it's a personality.
 
@@ -883,13 +890,14 @@ The Pioneer won't be the only hull forever. Hulls are how ship classes emerge �
 ### How Hulls Create Classes
 
 A hull defines:
-- **Slot layout** — how many of each slot type, and which special slots exist
-- **Internal space** — total footprint budget
-- **Hull integrity** — how much damage it can take
-- **Hull mass** — affects jump power cost. Heavier hulls cost more per lightyear to move. A combat frame is expensive to reposition; a scout goes anywhere cheap.
-- **Hull signature** — base EM emission multiplier. Bigger, more armored hulls radiate more just by existing. Feeds directly into the DSP detection chain. A combat hull sitting idle is louder than a scout sitting idle.
-- **Special capabilities** — things only this hull can do (cloak, dual sensors, weapon hardpoints)
-- **Hull-specific modifiers** — multipliers that change how specific systems perform (e.g., weapon draw reduction, scan speed bonus)
+
+-   **Slot layout** — how many of each slot type, and which special slots exist
+-   **Internal space** — total footprint budget
+-   **Hull integrity** — how much damage it can take
+-   **Hull mass** — affects jump power cost. Heavier hulls cost more per lightyear to move. A combat frame is expensive to reposition; a scout goes anywhere cheap.
+-   **Hull signature** — base EM emission multiplier. Bigger, more armored hulls radiate more just by existing. Feeds directly into the DSP detection chain. A combat hull sitting idle is louder than a scout sitting idle.
+-   **Special capabilities** — things only this hull can do (cloak, dual sensors, weapon hardpoints)
+-   **Hull-specific modifiers** — multipliers that change how specific systems perform (e.g., weapon draw reduction, scan speed bonus)
 
 A "scout" isn't someone who picked scout components from a menu. It's someone flying a hull with a cloak slot, tight internals, and a speed bonus. They fill it with whatever components fit their playstyle, but the hull defines what's possible.
 
@@ -1059,14 +1067,14 @@ The Pioneer remains the starting hull for all players. Hull upgrades are a signi
 
 All hulls share the same stat axes. The values create the identity.
 
-| Hull | Integrity | Space | Mass | Signature | Equipment | Bonus |
-|------|-----------|-------|------|-----------|-----------|-------|
-| Pioneer | 100 | 300 m³ | 1.0× | 1.0× | 3 | — |
-| Scout | 75 | 250 m³ | 0.7× | 0.6× | 2 | +15% amplitude, -30% spool/cooldown |
-| Surveyor | 100 | 325 m³ | 1.1× | 1.2× | 4 | Dual sensor slots, +20% scan speed |
-| Bulwark | 150 | 600 m³ | 1.4× | 1.4× | 1 | Cargo Expanders grant 75 m³ |
-| Striker | 75 | 200 m³ | 0.9× | 1.3× | 2 | 0.6× weapon draw |
-| Specter | 60 | 200 m³ | 0.8× | 0.5× | 2 | 0.5× stealth systems draw (cloak + torpedoes) |
+| Hull     | Integrity | Space  | Mass | Signature | Equipment | Bonus                                         |
+| -------- | --------- | ------ | ---- | --------- | --------- | --------------------------------------------- |
+| Pioneer  | 100       | 300 m³ | 1.0× | 1.0×      | 3         | —                                             |
+| Scout    | 75        | 250 m³ | 0.7× | 0.6×      | 2         | +15% amplitude, -30% spool/cooldown           |
+| Surveyor | 100       | 325 m³ | 1.1× | 1.2×      | 4         | Dual sensor slots, +20% scan speed            |
+| Bulwark  | 150       | 600 m³ | 1.4× | 1.4×      | 1         | Cargo Expanders grant 75 m³                   |
+| Striker  | 75        | 200 m³ | 0.9× | 1.3×      | 2         | 0.6× weapon draw                              |
+| Specter  | 60        | 200 m³ | 0.8× | 0.5×      | 2         | 0.5× stealth systems draw (cloak + torpedoes) |
 
 **Mass** multiplies jump power cost per lightyear. The scout goes everywhere cheap. The Striker is light for a combat frame but still costs more than a civilian hull would once the heavy combat hull arrives at 1.5×.
 
@@ -1074,7 +1082,7 @@ All hulls share the same stat axes. The values create the identity.
 
 ### Hulls and Power Budget
 
-The power budget is what makes hull choice matter. Every hull can slot the same components, but not every hull can *run* them.
+The power budget is what makes hull choice matter. Every hull can slot the same components, but not every hull can _run_ them.
 
 The Striker's weapon draw bonus (0.6×) is the defining example. Any Pioneer pilot can install a phaser — but two phasers at 0.35 draw each adds 0.70 to total draw, cratering perfRatio to ~0.74. The Striker pays only 0.42 for the same two phasers. That 0.28 difference is the gap between a functional warship and a floating wreck that can barely jump.
 
@@ -1084,7 +1092,7 @@ Future heavy combat hulls will push this further — dual shield slots, dedicate
 
 ## Ship Visualization
 
-The ship is not a 3D model flying through space. You are *inside* the ship. Your understanding of it comes from the ShipLink UI — readouts, graphs, diagrams, status indicators.
+The ship is not a 3D model flying through space. You are _inside_ the ship. Your understanding of it comes from the ShipLink UI — readouts, graphs, diagrams, status indicators.
 
 The ship is represented as an **LCARS schematic** — an SVG diagram showing the hull layout with labeled bays for each module slot. Each bay shows what's installed, its status, power draw, and condition. Upgrading a component means swapping a module in the diagram. The ship isn't a thing you look at from outside; it's a system you read from within.
 
@@ -1120,4 +1128,4 @@ SHIP SCHEMATIC (conceptual)
 └─────────────────────────────────────────────┘
 ```
 
-Different hull types have different schematic layouts. A combat hull shows weapon mounts and dual shield bays. A scout hull shows the cloak module. The diagram *is* the ship's identity — players recognize hull types by their schematic shape, not by a model rotating in 3D space.
+Different hull types have different schematic layouts. A combat hull shows weapon mounts and dual shield bays. A scout hull shows the cloak module. The diagram _is_ the ship's identity — players recognize hull types by their schematic shape, not by a model rotating in 3D space.

@@ -1,2 +1,2 @@
-export { WarpIndicator } from "./warp-indicator";
-export type { WarpIndicatorProps } from "./warp-indicator";
+export { WarpIndicator } from './warp-indicator';
+export type { WarpIndicatorProps } from './warp-indicator';

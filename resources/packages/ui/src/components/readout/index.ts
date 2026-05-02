@@ -1,2 +1,2 @@
-export { Readout } from "./readout";
-export type { ReadoutProps } from "./readout";
+export { Readout } from './readout';
+export type { ReadoutProps } from './readout';

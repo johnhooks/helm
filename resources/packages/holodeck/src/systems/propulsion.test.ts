@@ -7,12 +7,16 @@ import type { Constants } from '@helm/formulas';
 
 function createPropulsionSystem(
 	overrides: Parameters<typeof createInternalState>[1] = {},
-	constants?: Constants,
+	constants?: Constants
 ) {
 	const loadout = makeLoadout();
 	const state = createInternalState(loadout, overrides);
 	const power = new PowerSystem(state, loadout);
-	return { sys: new PropulsionSystem(state, loadout, power, constants), power, state };
+	return {
+		sys: new PropulsionSystem(state, loadout, power, constants),
+		power,
+		state,
+	};
 }
 
 describe('PropulsionSystem', () => {

@@ -11,16 +11,18 @@ export interface ErrorCompactContentProps {
 	detail?: string;
 }
 
-export function ErrorCompactContent( {
+export function ErrorCompactContent({
 	code,
 	detail,
-}: ErrorCompactContentProps ) {
+}: ErrorCompactContentProps) {
 	return (
 		<>
-			<StatusBadge tone="danger" size="sm">{ code }</StatusBadge>
-			{ detail && (
-				<span className="helm-error-compact__detail">{ detail }</span>
-			) }
+			<StatusBadge tone="danger" size="sm">
+				{code}
+			</StatusBadge>
+			{detail && (
+				<span className="helm-error-compact__detail">{detail}</span>
+			)}
 		</>
 	);
 }

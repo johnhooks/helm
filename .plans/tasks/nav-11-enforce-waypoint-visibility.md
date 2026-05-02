@@ -3,7 +3,7 @@ status: ready
 area: navigation
 priority: p3
 depends_on:
-  - nav-10-sync-user-edges-on-load
+    - nav-10-sync-user-edges-on-load
 ---
 
 # Enforce waypoint visibility on the backend
@@ -40,17 +40,17 @@ nodes, and it should remain compatible with the user-edge sync flow that
 hydrates the client datacore from `/helm/v1/edges`. In particular, the
 authorized waypoint load path should be explicit:
 
-- During user-edge sync, the client loads the player's discovered edges from
-  `/helm/v1/edges`, derives the referenced waypoint node ids, requests the
-  authorized waypoint nodes from the server, writes those nodes into datacore,
-  and only then writes the edges that reference them.
-- During on-demand waypoint loads, the client uses that same authorized node
-  surface instead of the globally readable node list. A known waypoint id is
-  not enough on its own; the backend still decides whether that waypoint is in
-  the player's discovered set.
-- The client should not have to know how to prove authorization. It supplies
-  node ids or uses a player-scoped waypoint route, and the server applies the
-  join against per-player discovery state.
+-   During user-edge sync, the client loads the player's discovered edges from
+    `/helm/v1/edges`, derives the referenced waypoint node ids, requests the
+    authorized waypoint nodes from the server, writes those nodes into datacore,
+    and only then writes the edges that reference them.
+-   During on-demand waypoint loads, the client uses that same authorized node
+    surface instead of the globally readable node list. A known waypoint id is
+    not enough on its own; the backend still decides whether that waypoint is in
+    the player's discovered set.
+-   The client should not have to know how to prove authorization. It supplies
+    node ids or uses a player-scoped waypoint route, and the server applies the
+    join against per-player discovery state.
 
 It does not need to solve team sharing or public-route promotion. It only
 needs to make private waypoint visibility a backend concern and provide a

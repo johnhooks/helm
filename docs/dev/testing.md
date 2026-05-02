@@ -2,11 +2,11 @@
 
 Helm has three test layers, each targeting a different boundary.
 
-| Layer | Tool | What it tests | Runs against |
-|-------|------|---------------|-------------|
-| PHP integration | wp-browser (Codeception) via slic | Models, repos, REST endpoints, services | Real WordPress + MariaDB in Docker |
-| JS unit | Vitest | Pure logic, mocked workers, in-memory SQLite | Node / happy-dom |
-| E2E | Playwright | Real worker + wa-sqlite + OPFS in a browser | Vite dev server (no WordPress) |
+| Layer           | Tool                              | What it tests                                | Runs against                       |
+| --------------- | --------------------------------- | -------------------------------------------- | ---------------------------------- |
+| PHP integration | wp-browser (Codeception) via slic | Models, repos, REST endpoints, services      | Real WordPress + MariaDB in Docker |
+| JS unit         | Vitest                            | Pure logic, mocked workers, in-memory SQLite | Node / happy-dom                   |
+| E2E             | Playwright                        | Real worker + wa-sqlite + OPFS in a browser  | Vite dev server (no WordPress)     |
 
 ## Commands
 
@@ -45,7 +45,7 @@ slic use helm
 
 wp-browser wraps each test in a database transaction that rolls back on teardown. This gives every test a clean slate without truncating tables.
 
-**Critical rule:** create test data in `set_up()`, not `_before()`. The `_before()` hook runs *before* `start_transaction()`, so anything created there leaks across tests.
+**Critical rule:** create test data in `set_up()`, not `_before()`. The `_before()` hook runs _before_ `start_transaction()`, so anything created there leaks across tests.
 
 ```php
 // Good - isolated per test
@@ -127,12 +127,14 @@ REST tests dispatch requests in-process via `rest_do_request()` - no HTTP involv
 Registered in `tests/Wpunit.suite.yml`, these provide test data factories through `$this->tester`:
 
 **`Tests\Support\Helper\Helm`** - domain factories:
-- `haveOrigin()`, `haveStar()`, `haveShip()`, `haveProduct()`, etc.
-- Navigation helpers: `getNodeForStar()`, `grabStar()`, `grabShip()`
-- Database assertions: `seeStarInDatabase()`, `dontSeeShipInDatabase()`
+
+-   `haveOrigin()`, `haveStar()`, `haveShip()`, `haveProduct()`, etc.
+-   Navigation helpers: `getNodeForStar()`, `grabStar()`, `grabShip()`
+-   Database assertions: `seeStarInDatabase()`, `dontSeeShipInDatabase()`
 
 **`Tests\Support\Helper\Rest`** - REST shortcuts:
-- `postAction($shipPostId, $body)` - dispatch a ship action POST
+
+-   `postAction($shipPostId, $body)` - dispatch a ship action POST
 
 ### Filtering tests
 
@@ -155,14 +157,16 @@ Most packages use `happy-dom` for DOM simulation. Datacore tests run in `node` e
 
 ```typescript
 class MockWorker {
-    onmessage: ((event: MessageEvent) => void) | null = null;
+	onmessage: ((event: MessageEvent) => void) | null = null;
 
-    postMessage(data: unknown): void { /* queue or handle */ }
-    receive(data: WorkerResponse): void {
-        this.onmessage?.({ data } as MessageEvent);
-    }
+	postMessage(data: unknown): void {
+		/* queue or handle */
+	}
+	receive(data: WorkerResponse): void {
+		this.onmessage?.({ data } as MessageEvent);
+	}
 
-    static instance: MockWorker;
+	static instance: MockWorker;
 }
 
 vi.stubGlobal('Worker', MockWorker);
@@ -174,13 +178,13 @@ vi.stubGlobal('Worker', MockWorker);
 let database: Database;
 
 beforeEach(async () => {
-    database = await openMemoryDb();
-    await exec(database, NODES_SCHEMA);
-    await exec(database, STARS_SCHEMA);
+	database = await openMemoryDb();
+	await exec(database, NODES_SCHEMA);
+	await exec(database, STARS_SCHEMA);
 });
 
 afterEach(async () => {
-    await database.sqlite3.close(database.db);
+	await database.sqlite3.close(database.db);
 });
 ```
 
@@ -217,15 +221,15 @@ Each test gets a completely fresh database:
 
 ```typescript
 test.beforeEach(async ({ page }) => {
-    await page.goto('/');
-    await wipeOpfs(page);
-    await bootDatacore(page);
+	await page.goto('/');
+	await wipeOpfs(page);
+	await bootDatacore(page);
 });
 
 test.afterEach(async ({ page }) => {
-    await page.evaluate(async () => {
-        if ((window as any).dc) await (window as any).dc.close();
-    });
+	await page.evaluate(async () => {
+		if ((window as any).dc) await (window as any).dc.close();
+	});
 });
 ```
 
@@ -235,15 +239,15 @@ All browser interaction happens through `page.evaluate()`. Pass data in, get res
 
 ```typescript
 test('insertNode round-trip', async ({ page }) => {
-    const node = makeNode();
+	const node = makeNode();
 
-    const result = await page.evaluate(async (n) => {
-        const dc = (window as any).dc;
-        await dc.insertNode(n);
-        return dc.getNode(n.id);
-    }, node);
+	const result = await page.evaluate(async (n) => {
+		const dc = (window as any).dc;
+		await dc.insertNode(n);
+		return dc.getNode(n.id);
+	}, node);
 
-    expect(result).toEqual(node);
+	expect(result).toEqual(node);
 });
 ```
 
@@ -254,6 +258,7 @@ test('insertNode round-trip', async ({ page }) => {
 **The browser never talks to WordPress during E2E tests.** Managing state between a live WP instance and Playwright would be a cleanup nightmare with no transaction rollback. Instead, E2E tests verify the client-side stack (datacore, workers, OPFS) in isolation. When we need to test components that consume REST data, we'll mock the API boundary (via `page.route()` or a service worker) using the response shapes that our Wpunit tests already verify.
 
 This keeps each layer focused:
-- PHP tests own the API contract
-- E2E tests own the client-side behavior
-- The API response shapes are the shared boundary between them
+
+-   PHP tests own the API contract
+-   E2E tests own the client-side behavior
+-   The API response shapes are the shared boundary between them

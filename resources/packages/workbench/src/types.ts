@@ -1,12 +1,22 @@
 import type { ActionTuning, Constants, PilotSkills } from '@helm/formulas';
 import type { Hull, CatalogProduct } from '@helm/holodeck';
-export { DEFAULT_CONSTANTS, DEFAULT_TUNING, DEFAULT_PILOT_SKILLS, PILOT_SKILL_RANGE } from '@helm/formulas';
+export {
+	DEFAULT_CONSTANTS,
+	DEFAULT_TUNING,
+	DEFAULT_PILOT_SKILLS,
+	PILOT_SKILL_RANGE,
+} from '@helm/formulas';
 
 export type { ActionTuning, Constants, PilotSkills };
 
 export type { Hull };
 
-export type { CatalogProduct, TuningConfig, DriveDSP, ComponentType } from '@helm/holodeck';
+export type {
+	CatalogProduct,
+	TuningConfig,
+	DriveDSP,
+	ComponentType,
+} from '@helm/holodeck';
 export type { SensorAffinity as SensorDSP } from '@helm/formulas';
 export type { EnvelopePhaseShape as DrivePhase } from '@helm/formulas';
 
@@ -45,7 +55,13 @@ export interface ShipReport {
 		powerCostPerLy: number;
 		durationPerLy: number;
 		successChance: number;
-		sampleScans: { distance: number; cost: number; duration: number; strain: number; chance: number }[];
+		sampleScans: {
+			distance: number;
+			cost: number;
+			duration: number;
+			strain: number;
+			chance: number;
+		}[];
 	};
 	jump: {
 		comfortRange: number;

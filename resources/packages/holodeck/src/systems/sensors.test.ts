@@ -5,9 +5,7 @@ import { createInternalState } from '../state';
 import type { InternalStateConfig } from '../state';
 import { makeLoadout } from '../test-helpers';
 
-function createSensorSystem(
-	overrides: InternalStateConfig = {},
-) {
+function createSensorSystem(overrides: InternalStateConfig = {}) {
 	const loadout = makeLoadout();
 	const state = createInternalState(loadout, overrides);
 	const power = new PowerSystem(state, loadout);
