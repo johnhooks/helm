@@ -27,7 +27,7 @@ export { RouteLine } from './components/route-line';
 export type { RouteLineProps } from './components/route-line';
 
 // Hooks
-export { useStarHover, useStarSelection } from './hooks';
+export { useNavigationEdges, useStarHover, useStarSelection } from './hooks';
 export type { UseStarHoverResult, UseStarSelectionResult } from './hooks';
 
 // Types
@@ -37,6 +37,9 @@ export type {
 	SpectralClass,
 	RouteStatus,
 	Route,
+	RouteOverlay,
+	RouteOverlayType,
+	RouteState,
 	DistanceRing,
 	StarSelectEvent,
 	RouteSelectEvent,

@@ -4,6 +4,7 @@ import {
 	Button,
 	Countdown,
 	LogCard,
+	ProgressBar,
 	Readout,
 	SystemCell,
 	SystemGrid,
@@ -12,7 +13,7 @@ import type { LcarsTone } from '@helm/ui';
 import type { ShipAction } from '@helm/actions';
 import { isActive } from '@helm/actions';
 import { ActionStatusBadge } from '../action-status';
-import { getRemainingSeconds } from '../utils';
+import { getProgressPercentage, getRemainingSeconds } from '../utils';
 import { getJumpTitle } from './utils';
 
 export function ActiveJumpCard({
@@ -73,22 +74,26 @@ export function ActiveJumpCard({
 						/>
 					</SystemCell>
 				</SystemGrid>
-				<ActiveJumpCountdown action={action} tone={tone} />
+				<ActiveJumpProgress action={action} tone={tone} />
 			</div>
 		</LogCard>
 	);
 }
 
-function ActiveJumpCountdown({
+function ActiveJumpProgress({
 	action,
 	tone,
 }: {
 	action: ShipAction<'jump'> & { status: 'pending' | 'running' };
 	tone: LcarsTone;
 }) {
+	const result = action.result;
 	const [remaining, setRemaining] = useState(() =>
 		getRemainingSeconds(action.deferred_until)
 	);
+	const progress = action.deferred_until
+		? getProgressPercentage(result?.duration, remaining)
+		: undefined;
 
 	useEffect(() => {
 		if (!action.deferred_until) {
@@ -106,21 +111,26 @@ function ActiveJumpCountdown({
 	}
 
 	return (
-		<div
-			className={`helm-flex helm-items-center helm-justify-between helm-gap-x-3 helm-tone--${tone}`}
-		>
-			<Countdown
-				label={__('Remaining', 'helm')}
-				remaining={remaining}
-				tone={tone}
-				active
-				size="sm"
-			/>
-			<div className="helm-flex helm-items-center helm-justify-end helm-gap-x-2">
-				<Button size="sm" variant="tertiary">
-					{__('Cancel', 'helm')}
-				</Button>
+		<>
+			{progress !== undefined && (
+				<ProgressBar value={progress} tone={tone} size="sm" active />
+			)}
+			<div
+				className={`helm-flex helm-items-center helm-justify-between helm-gap-x-3 helm-tone--${tone}`}
+			>
+				<Countdown
+					label={__('Remaining', 'helm')}
+					remaining={remaining}
+					tone={tone}
+					active
+					size="sm"
+				/>
+				<div className="helm-flex helm-items-center helm-justify-end helm-gap-x-2">
+					<Button size="sm" variant="tertiary">
+						{__('Cancel', 'helm')}
+					</Button>
+				</div>
 			</div>
-		</div>
+		</>
 	);
 }

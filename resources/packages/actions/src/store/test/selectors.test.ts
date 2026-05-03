@@ -80,6 +80,30 @@ describe('getLatestAction', () => {
 		expect(getLatestAction(state, 'jump')).toBe(jump);
 	});
 
+	it('filters by multiple types when provided', () => {
+		const scan = createShipAction({ id: 3, type: 'scan_route' });
+		const jump = createShipAction({ id: 5, type: 'jump' });
+		const survey = createShipAction({ id: 7, type: 'survey' });
+		const state = createState({
+			actions: {
+				byId: { 3: scan, 5: jump, 7: survey },
+			},
+		});
+
+		expect(getLatestAction(state, ['scan_route', 'jump'])).toBe(jump);
+	});
+
+	it('returns null when no actions match the provided types', () => {
+		const survey = createShipAction({ id: 7, type: 'survey' });
+		const state = createState({
+			actions: {
+				byId: { 7: survey },
+			},
+		});
+
+		expect(getLatestAction(state, ['scan_route', 'jump'])).toBeNull();
+	});
+
 	it('returns the latest of the filtered type', () => {
 		const oldScan = createShipAction({ id: 1, type: 'scan_route' });
 		const newScan = createShipAction({ id: 4, type: 'scan_route' });
@@ -147,6 +171,17 @@ describe('getDraft', () => {
 		const state = createState({ create: { action, isDraft: false } });
 
 		expect(getDraft(state)).toBeNull();
+	});
+
+	it('filters drafts by type when provided', () => {
+		const draft = {
+			type: 'survey' as const,
+			params: {},
+		};
+		const state = createState({ create: { action: draft, isDraft: true } });
+
+		expect(getDraft(state, ['scan_route', 'jump'])).toBeNull();
+		expect(getDraft(state, 'survey')).toBe(draft);
 	});
 });
 

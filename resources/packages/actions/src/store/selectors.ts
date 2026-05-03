@@ -7,7 +7,7 @@ import type {
 	ShipActionType,
 	State,
 } from './types';
-import { createIndexQueryId } from './utils';
+import { createIndexQueryId, matchesActionType } from './utils';
 
 export const getActions = createSelector(
 	(state: State, shipId: number): ShipAction[] => {
@@ -29,10 +29,13 @@ export const getAction = (state: State, actionId: number): ShipAction | null =>
 	state.actions.byId[actionId] ?? null;
 
 export const getLatestAction = createSelector(
-	(state: State, type?: ShipActionType): ShipAction | null => {
+	(
+		state: State,
+		type?: ShipActionType | readonly ShipActionType[]
+	): ShipAction | null => {
 		let latest: ShipAction | null = null;
 		for (const action of Object.values(state.actions.byId)) {
-			if (type && action.type !== type) {
+			if (!matchesActionType(action, type)) {
 				continue;
 			}
 			if (!latest || action.id > latest.id) {
@@ -41,11 +44,23 @@ export const getLatestAction = createSelector(
 		}
 		return latest;
 	},
-	(state: State, type?: ShipActionType) => [type, state.actions.byId]
+	(state: State, type?: ShipActionType | readonly ShipActionType[]) => [
+		type,
+		state.actions.byId,
+	]
 );
 
-export const getDraft = (state: State): DraftAction | null =>
-	state.create.isDraft ? state.create.action : null;
+export const getDraft = (
+	state: State,
+	type?: ShipActionType | readonly ShipActionType[]
+): DraftAction | null => {
+	if (!state.create.isDraft || !state.create.action) {
+		return null;
+	}
+	return matchesActionType(state.create.action, type)
+		? state.create.action
+		: null;
+};
 
 export const isCreating = (state: State): boolean => state.create.isSubmitting;
 

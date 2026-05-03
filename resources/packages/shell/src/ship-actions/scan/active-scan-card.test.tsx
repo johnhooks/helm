@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { afterEach, beforeEach, describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import type { ShipAction } from '@helm/actions';
 import { ActiveScanCard } from './active-scan-card';
@@ -22,6 +22,15 @@ const baseAction: ShipAction<'scan_route'> = {
 };
 
 describe('ActiveScanCard', () => {
+	beforeEach(() => {
+		vi.useFakeTimers();
+		vi.setSystemTime(new Date('2026-02-16T12:00:00Z'));
+	});
+
+	afterEach(() => {
+		vi.useRealTimers();
+	});
+
 	it('renders with null result', () => {
 		render(<ActiveScanCard action={baseAction} targetName={TARGET_NAME} />);
 		expect(screen.getByText(/Tau Ceti/)).toBeInTheDocument();
@@ -61,5 +70,24 @@ describe('ActiveScanCard', () => {
 		};
 		render(<ActiveScanCard action={action} targetName={TARGET_NAME} />);
 		expect(screen.getByText(/Remaining/)).toBeInTheDocument();
+	});
+
+	it('calculates progress from duration and deferred_until', () => {
+		const action: ShipAction<'scan_route'> = {
+			...baseAction,
+			deferred_until: '2026-02-16T12:30:00Z',
+			result: {
+				from_node_id: 1,
+				to_node_id: 7,
+				skill: 50,
+				efficiency: 60,
+				duration: 3600,
+			},
+		};
+		render(<ActiveScanCard action={action} targetName={TARGET_NAME} />);
+		expect(screen.getByRole('progressbar')).toHaveAttribute(
+			'aria-valuenow',
+			'50'
+		);
 	});
 });

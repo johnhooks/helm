@@ -13,7 +13,7 @@ import type { LcarsTone } from '@helm/ui';
 import type { ShipAction } from '@helm/actions';
 import { isActive } from '@helm/actions';
 import { ActionStatusBadge } from '../action-status';
-import { getRemainingSeconds } from '../utils';
+import { getProgressPercentage, getRemainingSeconds } from '../utils';
 import { getScanTitle } from './utils';
 
 export function ActiveScanCard({
@@ -90,6 +90,9 @@ function ActiveScanProgress({
 	const [remaining, setRemaining] = useState(() =>
 		getRemainingSeconds(action.deferred_until)
 	);
+	const progress = action.deferred_until
+		? getProgressPercentage(result?.duration, remaining)
+		: undefined;
 
 	useEffect(() => {
 		if (!action.deferred_until) {
@@ -104,12 +107,8 @@ function ActiveScanProgress({
 
 	return (
 		<>
-			{result && (
-				<ProgressBar
-					value={Math.max(0, Math.min(100, result.efficiency))}
-					tone={tone}
-					size="sm"
-				/>
+			{progress !== undefined && (
+				<ProgressBar value={progress} tone={tone} size="sm" active />
 			)}
 			{action.deferred_until && (
 				<div

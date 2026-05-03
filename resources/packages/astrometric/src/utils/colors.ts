@@ -1,5 +1,5 @@
 import { Color } from 'three';
-import type { SpectralClass } from '../types';
+import type { RouteOverlayType, SpectralClass } from '../types';
 
 /**
  * LCARS color palette for Three.js
@@ -72,20 +72,35 @@ export function getStarSystemColor(
  */
 export const routeStatusColors: Record<string, Color> = {
 	discovered: lcarsColors.sky.clone(),
-	plotted: lcarsColors.orange.clone(),
-	traveled: lcarsColors.gold.clone(),
+	plotted: lcarsColors.violet.clone(),
+	traveled: lcarsColors.success.clone(),
 	blocked: new Color('#ff6666'),
+};
+
+export const routeOverlayTypeColors: Record<RouteOverlayType, Color> = {
+	scan: lcarsColors.lilac.clone(),
+	jump: lcarsColors.sky.clone(),
 };
 
 /**
  * Get color for a route based on status
  */
-export function getRouteColor(status?: string, active?: boolean): Color {
-	if (active) {
-		return lcarsColors.orange.clone();
+export function getRouteColor(
+	status?: string,
+	active?: boolean,
+	type?: RouteOverlayType
+): Color {
+	if (status === 'blocked') {
+		return routeStatusColors.blocked.clone();
+	}
+	if (type) {
+		return routeOverlayTypeColors[type].clone();
 	}
 	if (status && status in routeStatusColors) {
 		return routeStatusColors[status].clone();
+	}
+	if (active) {
+		return lcarsColors.focus.clone();
 	}
 	return lcarsColors.gold.clone();
 }

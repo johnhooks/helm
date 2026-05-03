@@ -11,6 +11,18 @@ export function getRemainingSeconds(deferredUntil: string | null): number {
 	return Math.max(0, Math.floor((target - Date.now()) / 1000));
 }
 
+export function getProgressPercentage(
+	durationSeconds: number | null | undefined,
+	remainingSeconds: number
+): number | undefined {
+	if (!durationSeconds || durationSeconds <= 0) {
+		return undefined;
+	}
+
+	const elapsedSeconds = durationSeconds - remainingSeconds;
+	return Math.max(0, Math.min(100, (elapsedSeconds / durationSeconds) * 100));
+}
+
 export function getActionTitle(
 	titles: Record<string, string>,
 	fallback: string,

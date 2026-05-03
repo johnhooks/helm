@@ -3,3 +3,5 @@ export type { UseStarHoverResult } from './use-star-hover';
 
 export { useStarSelection } from './use-star-selection';
 export type { UseStarSelectionResult } from './use-star-selection';
+
+export { useNavigationEdges } from './use-navigation-edges/use-navigation-edges';

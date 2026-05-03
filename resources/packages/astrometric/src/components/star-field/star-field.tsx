@@ -5,6 +5,7 @@ import type { StarNode } from '@helm/types';
 import type {
 	StarFieldProps,
 	Route,
+	RouteOverlay,
 	StarSelectEvent,
 	RouteSelectEvent,
 	HoverState,
@@ -31,6 +32,7 @@ import './star-field.css';
 export function StarField({
 	stars,
 	routes = [],
+	routeOverlays = [],
 	distanceRings = DEFAULT_DISTANCE_RINGS,
 	backgroundStarCount = DEFAULT_BACKGROUND_STAR_COUNT,
 	nodePositions,
@@ -94,8 +96,29 @@ export function StarField({
 			ids.add(route.from);
 			ids.add(route.to);
 		});
+		routeOverlays.forEach((overlay) => {
+			ids.add(overlay.from);
+			ids.add(overlay.to);
+		});
 		return ids;
-	}, [routes]);
+	}, [routeOverlays, routes]);
+
+	const renderedRoutes = useMemo(() => {
+		if (routeOverlays.length === 0) {
+			return routes;
+		}
+
+		const displacedRouteIds = new Set(
+			routeOverlays
+				.map((overlay) => overlay.canonicalRouteId)
+				.filter((id): id is string => id !== undefined)
+		);
+
+		return [
+			...routes.filter((route) => !displacedRouteIds.has(route.id)),
+			...routeOverlays,
+		];
+	}, [routeOverlays, routes]);
 
 	// Handle star selection
 	const handleStarClick = useCallback(
@@ -124,7 +147,7 @@ export function StarField({
 
 	// Handle route selection
 	const handleRouteClick = useCallback(
-		(route: Route) => {
+		(route: Route | RouteOverlay) => {
 			if (!onRouteSelect) {
 				return;
 			}
@@ -165,7 +188,7 @@ export function StarField({
 	);
 
 	const handleRouteHover = useCallback(
-		(route: Route | null) => {
+		(route: Route | RouteOverlay | null) => {
 			hoverRef.current = { ...hoverRef.current, route };
 			onHoverChange?.(hoverRef.current);
 		},
@@ -233,7 +256,7 @@ export function StarField({
 				</MeasuringPivot>
 
 				{/* Routes between systems */}
-				{routes.map((route) => {
+				{renderedRoutes.map((route) => {
 					const from =
 						starsByNodeId.get(route.from) ??
 						nodePositions?.get(route.from);

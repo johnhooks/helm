@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactNode } from 'react';
-import type { StarNode } from '@helm/types';
+import type { NavNode, StarNode } from '@helm/types';
 
 /**
  * 3D position in light-years from origin
@@ -45,6 +45,22 @@ export interface Route {
 	 * Route discovery/travel status
 	 */
 	status?: RouteStatus;
+}
+
+export type RouteOverlayType = 'scan' | 'jump';
+
+export interface RouteOverlay extends Route {
+	type: RouteOverlayType;
+	status: RouteStatus;
+	canonicalRouteId?: string;
+	canonicalEdgeId?: number;
+	pulse?: boolean;
+}
+
+export interface RouteState {
+	routes: Route[];
+	overlays: RouteOverlay[];
+	nodes: NavNode[];
 }
 
 /**
@@ -157,6 +173,10 @@ export interface StarFieldProps {
 	 * Routes between systems
 	 */
 	routes?: Route[];
+	/**
+	 * Temporary route overlays that visually displace linked canonical routes.
+	 */
+	routeOverlays?: RouteOverlay[];
 	/**
 	 * Distance ring markers
 	 */

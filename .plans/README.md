@@ -5,7 +5,7 @@ Each entry points to the full task file in `.plans/tasks/`.
 
 ## Active
 
--   [nav-19-add-navigation-edge-states](tasks/nav-19-add-navigation-edge-states.md) - Add navigation edge states. `navigation` `p1`
+None.
 
 ## Blocked
 
@@ -27,7 +27,6 @@ Each entry points to the full task file in `.plans/tasks/`.
 -   [nav-15-clean-up-scan-results](tasks/nav-15-clean-up-scan-results.md) - Clean up scan results. `navigation` `p2`
 -   [nav-16-show-active-scan-line](tasks/nav-16-show-active-scan-line.md) - Show active scan lines on the starfield. `navigation` `p2`
 -   [nav-17-add-waypoint-nodes-to-starfield](tasks/nav-17-add-waypoint-nodes-to-starfield.md) - Add waypoint nodes to the starfield. `navigation` `p2`
--   [nav-18-fix-user-edge-total](tasks/nav-18-fix-user-edge-total.md) - Fix user edge totals. `navigation` `p1`
 -   [sec-01-address-security-audit-findings](tasks/sec-01-address-security-audit-findings.md) - Address security audit findings. `dev` `p1`
 
 ## Done
@@ -41,3 +40,5 @@ Each entry points to the full task file in `.plans/tasks/`.
 -   [nav-09-add-user-edge-datacore-queries](tasks/nav-09-add-user-edge-datacore-queries.md) - Add user edge datacore queries. `navigation` `p1`
 -   [nav-10-sync-user-edges-on-load](tasks/nav-10-sync-user-edges-on-load.md) - Sync user edges on load. `navigation` `p1`
 -   [nav-12-add-node-adjacency-path-selectors](tasks/nav-12-add-node-adjacency-path-selectors.md) - Add known path selectors. `navigation` `p2`
+-   [nav-18-fix-user-edge-total](tasks/nav-18-fix-user-edge-total.md) - Fix user edge totals. `navigation` `p1`
+-   [nav-19-add-navigation-edge-states](tasks/nav-19-add-navigation-edge-states.md) - Add astrometric navigation edge state. `navigation` `p1`

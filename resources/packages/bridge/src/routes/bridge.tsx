@@ -18,7 +18,8 @@ import { store as navStore } from '@helm/nav';
 import { log } from '@helm/logger';
 import { Panel, SideDrawer } from '@helm/ui';
 import { useShip } from '@helm/ships';
-import { isJump, isScanRoute, store as actionsStore } from '@helm/actions';
+import { store as actionsStore } from '@helm/actions';
+import { useNavigationEdges } from '@helm/astrometric';
 import type { StarSelectEvent, Position3D, Route } from '@helm/astrometric';
 import { ViewportConfig } from '../components/viewport-config';
 import { StarContextMenu } from '../components/star-context-menu';
@@ -73,15 +74,16 @@ export function BridgePage() {
 
 	const selectedStar = starSelectEvent?.star ?? null;
 
-	const userEdges = useSuspenseSelect(
-		(select) => select(navStore).getUserEdges(),
-		[]
-	);
-
 	const edgeNodes = useSelect(
 		(select) => select(navStore).getEdgeNodes(),
 		[]
 	);
+
+	const {
+		routes: navigationRoutes,
+		overlays: navigationRouteOverlays,
+		nodes: navigationRouteNodes,
+	} = useNavigationEdges();
 
 	const handleStarSelect = useCallback((event: StarSelectEvent | null) => {
 		setStarSelectEvent(event);
@@ -151,56 +153,13 @@ export function BridgePage() {
 		[]
 	);
 
-	const knownRoutes: Route[] = useMemo(() => {
-		if (!showRoutes) {
-			return [];
-		}
-
-		return (userEdges ?? []).map((edge) => ({
-			id: `user-edge-${edge.id}`,
-			from: edge.node_a_id,
-			to: edge.node_b_id,
-			status: 'discovered' as const,
-		}));
-	}, [showRoutes, userEdges]);
-
-	const actionRoutes: Route[] = useMemo(() => {
-		if (!showRoutes || !action?.result) {
-			return [];
-		}
-
-		if (isScanRoute(action) && action.result.edges) {
-			return action.result.edges.map((edge) => ({
-				id: `scan-${action.id}-${edge.id}`,
-				from: edge.node_a_id,
-				to: edge.node_b_id,
-				status: 'plotted' as const,
-				active: true,
-			}));
-		}
-
-		if (isJump(action)) {
-			return [
-				{
-					id: `jump-${action.id}`,
-					from: action.result.from_node_id,
-					to: action.result.to_node_id,
-					status: 'traveled' as const,
-					active: true,
-				},
-			];
-		}
-
-		return [];
-	}, [action, showRoutes]);
-
 	const routes: Route[] = useMemo(
-		() => [...knownRoutes, ...actionRoutes],
-		[actionRoutes, knownRoutes]
+		() => (showRoutes ? navigationRoutes : []),
+		[navigationRoutes, showRoutes]
 	);
 
 	const routeNodePositions = useMemo(() => {
-		if (!showRoutes) {
+		if (routes.length === 0 && navigationRouteOverlays.length === 0) {
 			return undefined;
 		}
 
@@ -211,13 +170,17 @@ export function BridgePage() {
 		for (const node of edgeNodes) {
 			positions.set(node.id, { x: node.x, y: node.y, z: node.z });
 		}
-		if (action && isScanRoute(action) && action.result?.nodes) {
-			for (const node of action.result.nodes) {
-				positions.set(node.id, { x: node.x, y: node.y, z: node.z });
-			}
+		for (const node of navigationRouteNodes) {
+			positions.set(node.id, { x: node.x, y: node.y, z: node.z });
 		}
 		return positions;
-	}, [action, allStars, edgeNodes, showRoutes]);
+	}, [
+		allStars,
+		edgeNodes,
+		navigationRouteNodes,
+		navigationRouteOverlays.length,
+		routes.length,
+	]);
 
 	const sizeMultiplier = STAR_SIZE_MULTIPLIER[starSize] ?? 1;
 	const viewportStyle = useMemo(
@@ -262,6 +225,7 @@ export function BridgePage() {
 						<StarField
 							stars={stars}
 							routes={routes}
+							routeOverlays={navigationRouteOverlays}
 							nodePositions={routeNodePositions}
 							currentNodeId={currentNodeId}
 							selectedStarId={selectedStar?.id ?? null}

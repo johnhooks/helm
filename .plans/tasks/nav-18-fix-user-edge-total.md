@@ -1,5 +1,5 @@
 ---
-status: draft
+status: done
 area: navigation
 priority: p1
 ---

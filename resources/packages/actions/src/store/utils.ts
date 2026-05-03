@@ -1,4 +1,5 @@
 import { addQueryArgs } from '@wordpress/url';
+import type { ShipActionType } from './types';
 
 /**
  * Build the query key for the actions index endpoint.
@@ -13,4 +14,17 @@ export function createIndexQueryId(
 ): string {
 	const path = `/helm/v1/ships/${shipId}/actions`;
 	return params ? addQueryArgs(path, params) : path;
+}
+
+export function matchesActionType(
+	action: { type: ShipActionType },
+	type?: ShipActionType | readonly ShipActionType[]
+): boolean {
+	if (!type) {
+		return true;
+	}
+	if (Array.isArray(type)) {
+		return type.includes(action.type);
+	}
+	return action.type === type;
 }
