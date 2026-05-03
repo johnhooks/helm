@@ -89,7 +89,7 @@ export function CompleteScanCard({
 					<SystemCell>
 						<Readout
 							label={__('Waypoints', 'helm')}
-							value={String(action.result.nodes.length)}
+							value={String(action.result.waypoints_created)}
 							tone={tone}
 							size="sm"
 						/>

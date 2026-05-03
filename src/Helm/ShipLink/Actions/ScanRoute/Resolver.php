@@ -52,8 +52,6 @@ final class Resolver implements ActionHandler
             $result['path'] = [];
             $result['discovered_edge_ids'] = [];
             $result['discovered_node_ids'] = [];
-            $result['nodes'] = [];
-            $result['edges'] = [];
         } else {
             $userId = $ship->getOwnerId();
             foreach ($scanResult->edges as $edge) {
@@ -80,18 +78,6 @@ final class Resolver implements ActionHandler
                 static fn(Node $n) => $n->id,
                 $scanResult->nodes
             );
-            $result['nodes'] = array_map(static fn(Node $n) => [
-                'id' => $n->id,
-                'type' => $n->isSystem() ? 'system' : 'waypoint',
-                'x' => $n->x,
-                'y' => $n->y,
-                'z' => $n->z,
-            ], $scanResult->nodes);
-            $result['edges'] = array_map(static fn(Edge $e) => [
-                'id' => $e->id,
-                'node_a_id' => $e->nodeAId,
-                'node_b_id' => $e->nodeBId,
-            ], $scanResult->edges);
         }
 
         $action->result = $result;

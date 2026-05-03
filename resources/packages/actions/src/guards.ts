@@ -3,7 +3,7 @@
  *
  * Compose type + status guards for full narrowing:
  *   if ( isScanRoute( action ) && isFulfilled( action ) ) {
- *     action.result.nodes; // fully typed
+ *     action.result.discovered_edge_ids; // fully typed
  *   }
  */
 import type { ActionContract } from './contracts';

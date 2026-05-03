@@ -18,14 +18,7 @@ interface ScanRouteActiveResult {
 	skill: number;
 	efficiency: number;
 	duration: number;
-	nodes?: Array<{
-		id: number;
-		type: string;
-		x: number;
-		y: number;
-		z: number;
-	}>;
-	edges?: Array<{ id: number; node_a_id: number; node_b_id: number }>;
+	waypoints_created?: number;
 	discovered_edge_ids?: number[];
 	discovered_node_ids?: number[];
 }
@@ -33,8 +26,6 @@ interface ScanRouteActiveResult {
 interface ScanRouteFulfilledResult extends ScanRouteActiveResult {
 	success: boolean;
 	complete: boolean;
-	nodes: Array<{ id: number; type: string; x: number; y: number; z: number }>;
-	edges: Array<{ id: number; node_a_id: number; node_b_id: number }>;
 	discovered_edge_ids: number[];
 	discovered_node_ids: number[];
 	edges_discovered: number;

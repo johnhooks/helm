@@ -78,8 +78,6 @@ class ResolverTest extends WPTestCase
         $this->assertArrayHasKey('path', $action->result);
         $this->assertArrayHasKey('discovered_edge_ids', $action->result);
         $this->assertArrayHasKey('discovered_node_ids', $action->result);
-        $this->assertArrayHasKey('nodes', $action->result);
-        $this->assertArrayHasKey('edges', $action->result);
 
         $this->assertIsBool($action->result['success']);
         $this->assertIsBool($action->result['complete']);
@@ -88,11 +86,11 @@ class ResolverTest extends WPTestCase
         $this->assertIsArray($action->result['path']);
         $this->assertIsArray($action->result['discovered_edge_ids']);
         $this->assertIsArray($action->result['discovered_node_ids']);
-        $this->assertIsArray($action->result['nodes']);
-        $this->assertIsArray($action->result['edges']);
+        $this->assertArrayNotHasKey('nodes', $action->result);
+        $this->assertArrayNotHasKey('edges', $action->result);
     }
 
-    public function test_serializes_node_and_edge_objects_on_success(): void
+    public function test_returns_discovery_ids_and_summary_without_embedded_graph_rows(): void
     {
         $star1 = $this->tester->haveStar(['id' => 'SERIAL_FROM', 'distanceLy' => 0.0]);
         $star2 = $this->tester->haveStar(['id' => 'SERIAL_TO', 'distanceLy' => 5.0]);
@@ -122,37 +120,12 @@ class ResolverTest extends WPTestCase
             $this->markTestSkipped('Scan did not succeed - probabilistic outcome');
         }
 
-        // Verify node structure
-        $this->assertNotEmpty($action->result['nodes']);
-        $firstNode = $action->result['nodes'][0];
-        $this->assertArrayHasKey('id', $firstNode);
-        $this->assertArrayHasKey('type', $firstNode);
-        $this->assertArrayHasKey('x', $firstNode);
-        $this->assertArrayHasKey('y', $firstNode);
-        $this->assertArrayHasKey('z', $firstNode);
-        $this->assertContains($firstNode['type'], ['system', 'waypoint']);
-
-        // Verify edge structure
-        $this->assertNotEmpty($action->result['edges']);
-        $firstEdge = $action->result['edges'][0];
-        $this->assertArrayHasKey('id', $firstEdge);
-        $this->assertArrayHasKey('node_a_id', $firstEdge);
-        $this->assertArrayHasKey('node_b_id', $firstEdge);
-        $this->assertArrayNotHasKey('distance', $firstEdge);
-        $this->assertArrayNotHasKey('discovered_at', $firstEdge);
-
-        // Path should match node IDs
-        $this->assertCount(count($action->result['nodes']), $action->result['path']);
-        // edges_discovered should match edges array length
-        $this->assertSame($action->result['edges_discovered'], count($action->result['edges']));
-        $this->assertSame(
-            array_column($action->result['edges'], 'id'),
-            $action->result['discovered_edge_ids']
-        );
-        $this->assertSame(
-            array_column($action->result['nodes'], 'id'),
-            $action->result['discovered_node_ids']
-        );
+        $this->assertNotEmpty($action->result['discovered_edge_ids']);
+        $this->assertNotEmpty($action->result['discovered_node_ids']);
+        $this->assertSame($action->result['edges_discovered'], count($action->result['discovered_edge_ids']));
+        $this->assertCount(count($action->result['discovered_node_ids']), $action->result['path']);
+        $this->assertArrayNotHasKey('nodes', $action->result);
+        $this->assertArrayNotHasKey('edges', $action->result);
     }
 
     public function test_failed_scan_still_completes(): void
@@ -189,7 +162,7 @@ class ResolverTest extends WPTestCase
         $this->assertIsArray($action->result['path']);
         $this->assertIsArray($action->result['discovered_edge_ids']);
         $this->assertIsArray($action->result['discovered_node_ids']);
-        $this->assertIsArray($action->result['nodes']);
-        $this->assertIsArray($action->result['edges']);
+        $this->assertArrayNotHasKey('nodes', $action->result);
+        $this->assertArrayNotHasKey('edges', $action->result);
     }
 }

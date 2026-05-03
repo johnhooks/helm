@@ -36,7 +36,7 @@ describe('ActiveScanCard', () => {
 		expect(screen.getByText(/Tau Ceti/)).toBeInTheDocument();
 	});
 
-	it('renders waypoint count when result has nodes', () => {
+	it('renders waypoint count when result has summary data', () => {
 		const action: ShipAction<'scan_route'> = {
 			...baseAction,
 			result: {
@@ -47,20 +47,15 @@ describe('ActiveScanCard', () => {
 				duration: 3600,
 				success: true,
 				complete: false,
-				nodes: [
-					{ id: 1, type: 'system', x: 0, y: 0, z: 0 },
-					{ id: 2, type: 'waypoint', x: 1, y: 1, z: 1 },
-				],
-				edges: [],
 				discovered_edge_ids: [],
 				discovered_node_ids: [1, 2],
 				edges_discovered: 0,
-				waypoints_created: 2,
+				waypoints_created: 1,
 				path: [1, 2],
 			},
 		};
 		render(<ActiveScanCard action={action} targetName={TARGET_NAME} />);
-		expect(screen.getByText('2')).toBeInTheDocument();
+		expect(screen.getByText('1')).toBeInTheDocument();
 	});
 
 	it('renders countdown when deferred_until is set', () => {

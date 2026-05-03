@@ -34,22 +34,16 @@ describe('CompleteScanCard', () => {
 				duration: 3600,
 				success: true,
 				complete: true,
-				nodes: [
-					{ id: 1, type: 'system', x: 0, y: 0, z: 0 },
-					{ id: 2, type: 'waypoint', x: 1, y: 1, z: 1 },
-					{ id: 3, type: 'system', x: 2, y: 2, z: 2 },
-				],
-				edges: [{ id: 1, node_a_id: 1, node_b_id: 2 }],
 				discovered_edge_ids: [1],
 				discovered_node_ids: [1, 2, 3],
 				edges_discovered: 1,
-				waypoints_created: 3,
+				waypoints_created: 1,
 				path: [1, 2, 3],
 			},
 		};
 		render(<CompleteScanCard action={action} targetName={TARGET_NAME} />);
 		expect(screen.getByText(/Tau Ceti/)).toBeInTheDocument();
-		expect(screen.getByText('3')).toBeInTheDocument();
+		expect(screen.getByText('1')).toBeInTheDocument();
 	});
 
 	it('renders failed state with cause', () => {

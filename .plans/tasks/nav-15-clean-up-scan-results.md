@@ -1,11 +1,10 @@
 ---
-status: draft
+status: done
 area: navigation
 priority: p2
 depends_on:
     - nav-06-persist-scan-discoveries
     - nav-07-show-routes-toggle
-    - nav-13-add-scan-result-reconciler
 ---
 
 # Clean up scan results
@@ -89,3 +88,14 @@ the canonical `/helm/v1/edges` shape.
 -   Tests must cover fulfilled scan cards with available nav graph data,
     fulfilled scan cards while graph data is unavailable, and active scan cards
     without embedded discovery payloads.
+
+## Implemented
+
+Scan route action results no longer include embedded `nodes` or `edges`.
+`ScanRoute\Resolver` now returns discovery identifiers and summary fields only.
+Scan cards use those summary fields for their readouts, and the obsolete bridge
+scan panel was removed.
+
+The richer nav-store selector work described above is no longer part of this
+cleanup. It should be handled by a separate task if completed scan cards later
+need to display canonical route or node details.

@@ -64,8 +64,8 @@ export function ActiveScanCard({
 						<Readout
 							label={__('Waypoints', 'helm')}
 							value={
-								result?.nodes
-									? String(result.nodes.length)
+								typeof result?.waypoints_created === 'number'
+									? String(result.waypoints_created)
 									: '--'
 							}
 							tone={tone}

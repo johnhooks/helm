@@ -1,5 +1,5 @@
 ---
-status: draft
+status: active
 area: navigation
 priority: p2
 depends_on:

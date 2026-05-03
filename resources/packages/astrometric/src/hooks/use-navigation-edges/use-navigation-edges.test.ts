@@ -198,8 +198,6 @@ describe('useNavigationEdges', () => {
 				duration: 60,
 				success: true,
 				complete: true,
-				nodes: [],
-				edges: [{ id: 99, node_a_id: 1, node_b_id: 2 }],
 				discovered_edge_ids: [99],
 				discovered_node_ids: [],
 				edges_discovered: 1,
@@ -309,16 +307,6 @@ describe('useNavigationEdges', () => {
 							duration: 60,
 							success: true,
 							complete: true,
-							nodes: [
-								{
-									id: 10,
-									type: 'waypoint',
-									x: 1,
-									y: 2,
-									z: 3,
-								},
-							],
-							edges: [{ id: 99, node_a_id: 1, node_b_id: 10 }],
 							discovered_edge_ids: [99],
 							discovered_node_ids: [10],
 							edges_discovered: 1,
@@ -340,7 +328,7 @@ describe('useNavigationEdges', () => {
 		]);
 	});
 
-	it('does not use embedded scan result nodes for route positioning', () => {
+	it('uses nav store edge nodes for route positioning without scan result nodes', () => {
 		expect(
 			renderNavigationEdges({
 				edgeNodes: [
@@ -365,16 +353,6 @@ describe('useNavigationEdges', () => {
 							duration: 60,
 							success: true,
 							complete: true,
-							nodes: [
-								{
-									id: 10,
-									type: 'waypoint',
-									x: 1,
-									y: 2,
-									z: 3,
-								},
-							],
-							edges: [{ id: 99, node_a_id: 1, node_b_id: 10 }],
 							discovered_edge_ids: [99],
 							discovered_node_ids: [10],
 							edges_discovered: 1,
