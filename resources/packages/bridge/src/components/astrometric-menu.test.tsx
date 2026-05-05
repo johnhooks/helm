@@ -2,9 +2,10 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { dispatch, select } from '@wordpress/data';
 import { describe, expect, it, vi } from 'vitest';
 import type { StarNode } from '@helm/types';
+import type { NavigationTarget } from '@helm/astrometric';
 import { store as actionsStore } from '@helm/actions';
 import { store as navStore } from '@helm/nav';
-import { StarContextMenu } from './star-context-menu';
+import { AstrometricMenu } from './astrometric-menu';
 
 const star: StarNode = {
 	id: 1,
@@ -20,18 +21,37 @@ const star: StarNode = {
 	node_type: 'star',
 };
 
+const starTarget: NavigationTarget = {
+	kind: 'star',
+	nodeId: star.node_id,
+	label: star.title,
+	x: star.x,
+	y: star.y,
+	z: star.z,
+	star,
+};
+
+const waypointTarget: NavigationTarget = {
+	kind: 'waypoint',
+	nodeId: 77,
+	label: 'Waypoint #77',
+	x: 1,
+	y: 2,
+	z: 3,
+};
+
 function seedDirectEdge(fromNodeId: number, targetNodeId: number): void {
 	dispatch(navStore).receiveAdjacency(fromNodeId, targetNodeId, true);
 }
 
-describe('StarContextMenu', () => {
+describe('AstrometricMenu', () => {
 	// Tests run sequentially in declaration order; the "no route known" cases
 	// are asserted before any seedDirectEdge() call so the module-singleton
 	// wp-data registry is still clean at that point.
 	it('renders the selected star header and a disabled Jump for the current star', () => {
 		render(
-			<StarContextMenu
-				star={star}
+			<AstrometricMenu
+				target={starTarget}
 				currentNodeId={star.node_id}
 				selectedDistance={0}
 				hasActiveAction={false}
@@ -51,8 +71,8 @@ describe('StarContextMenu', () => {
 
 	it('shows Scan Route and a disabled Jump when no route to this star is known', () => {
 		render(
-			<StarContextMenu
-				star={star}
+			<AstrometricMenu
+				target={starTarget}
 				currentNodeId={1}
 				selectedDistance={11.9}
 				hasActiveAction={false}
@@ -72,8 +92,8 @@ describe('StarContextMenu', () => {
 		seedDirectEdge(1, star.node_id);
 
 		render(
-			<StarContextMenu
-				star={star}
+			<AstrometricMenu
+				target={starTarget}
 				currentNodeId={1}
 				selectedDistance={11.9}
 				hasActiveAction={false}
@@ -91,8 +111,8 @@ describe('StarContextMenu', () => {
 
 	it('disables Jump with an in-progress detail when another action is active', () => {
 		render(
-			<StarContextMenu
-				star={star}
+			<AstrometricMenu
+				target={starTarget}
 				currentNodeId={1}
 				selectedDistance={11.9}
 				hasActiveAction={true}
@@ -110,8 +130,8 @@ describe('StarContextMenu', () => {
 		const onClose = vi.fn();
 
 		render(
-			<StarContextMenu
-				star={star}
+			<AstrometricMenu
+				target={starTarget}
 				currentNodeId={1}
 				selectedDistance={11.9}
 				hasActiveAction={false}
@@ -137,8 +157,8 @@ describe('StarContextMenu', () => {
 		const onClose = vi.fn();
 
 		render(
-			<StarContextMenu
-				star={star}
+			<AstrometricMenu
+				target={starTarget}
 				currentNodeId={star.node_id}
 				selectedDistance={0}
 				hasActiveAction={false}
@@ -147,6 +167,39 @@ describe('StarContextMenu', () => {
 		);
 		fireEvent.keyDown(document, { key: 'Escape' });
 
+		expect(onClose).toHaveBeenCalledTimes(1);
+	});
+
+	it('renders a waypoint header, hides Scan Route, and can draft a waypoint jump', () => {
+		dispatch(actionsStore).clearDraft();
+		seedDirectEdge(1, waypointTarget.nodeId);
+		const onClose = vi.fn();
+
+		render(
+			<AstrometricMenu
+				target={waypointTarget}
+				currentNodeId={1}
+				selectedDistance={4.2}
+				hasActiveAction={false}
+				onClose={onClose}
+			/>
+		);
+
+		expect(screen.getByText('Waypoint #77')).toBeInTheDocument();
+		expect(
+			screen.queryByRole('menuitem', { name: /^Scan Route/ })
+		).not.toBeInTheDocument();
+
+		fireEvent.click(screen.getByRole('menuitem', { name: /^Jump/ }));
+
+		expect(select(actionsStore).getDraft()).toEqual({
+			type: 'jump',
+			params: {
+				target_node_id: waypointTarget.nodeId,
+				source_node_id: 1,
+				distance_ly: 4.2,
+			},
+		});
 		expect(onClose).toHaveBeenCalledTimes(1);
 	});
 });

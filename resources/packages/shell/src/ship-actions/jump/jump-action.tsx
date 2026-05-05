@@ -7,17 +7,20 @@ import type { ShipActionRenderProps } from '../types';
 import { DraftJumpCard } from './draft-jump-card';
 import { ActiveJumpCard } from './active-jump-card';
 import { CompleteJumpCard } from './complete-jump-card';
+import { getJumpTargetName } from './utils';
 
 function DraftJump({ draft }: { draft: DraftAction<'jump'> }) {
 	const { shipId } = useShip();
-	const { targetName, isSubmitting } = useSelect(
+	const { targetNode, isSubmitting } = useSelect(
 		(select) => ({
-			targetName: select(navStore).expectNode(draft.params.target_node_id)
-				.title,
+			targetNode: select(navStore).expectNode(
+				draft.params.target_node_id
+			),
 			isSubmitting: select(actionsStore).isCreating(),
 		}),
 		[draft.params.target_node_id]
 	);
+	const targetName = getJumpTargetName(targetNode);
 	const { clearDraft, createAction } = useDispatch(actionsStore);
 	return (
 		<DraftJumpCard
@@ -31,26 +34,28 @@ function DraftJump({ draft }: { draft: DraftAction<'jump'> }) {
 }
 
 function ActiveJump({ action }: { action: ShipAction<'jump'> }) {
-	const { targetName } = useSelect(
+	const { targetNode } = useSelect(
 		(select) => ({
-			targetName: select(navStore).expectNode(
+			targetNode: select(navStore).expectNode(
 				action.params.target_node_id
-			).title,
+			),
 		}),
 		[action.params.target_node_id]
 	);
+	const targetName = getJumpTargetName(targetNode);
 	return <ActiveJumpCard action={action} targetName={targetName} />;
 }
 
 function CompleteJump({ action }: { action: ShipAction<'jump'> }) {
-	const { targetName } = useSelect(
+	const { targetNode } = useSelect(
 		(select) => ({
-			targetName: select(navStore).expectNode(
+			targetNode: select(navStore).expectNode(
 				action.params.target_node_id
-			).title,
+			),
 		}),
 		[action.params.target_node_id]
 	);
+	const targetName = getJumpTargetName(targetNode);
 	return <CompleteJumpCard action={action} targetName={targetName} />;
 }
 

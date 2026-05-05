@@ -6,6 +6,10 @@ import type { Position3D } from '../../types';
 
 export interface MeasuringPivotProps {
 	/**
+	 * Position to center the measuring rings around.
+	 */
+	position?: Position3D;
+	/**
 	 * Target position to align the measuring plane with
 	 */
 	alignTarget: Position3D | null;
@@ -23,6 +27,7 @@ export interface MeasuringPivotProps {
 const IDENTITY = new Quaternion();
 
 export function MeasuringPivot({
+	position,
 	alignTarget,
 	animationSpeed = 0.08,
 	children,
@@ -115,5 +120,14 @@ export function MeasuringPivot({
 		}
 	});
 
-	return <group ref={groupRef}>{children}</group>;
+	return (
+		<group
+			ref={groupRef}
+			position={
+				position ? [position.x, position.y, position.z] : undefined
+			}
+		>
+			{children}
+		</group>
+	);
 }

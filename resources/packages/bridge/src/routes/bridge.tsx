@@ -20,9 +20,14 @@ import { Panel, SideDrawer } from '@helm/ui';
 import { useShip } from '@helm/ships';
 import { store as actionsStore } from '@helm/actions';
 import { useNavigationEdges } from '@helm/astrometric';
-import type { StarSelectEvent, Position3D, Route } from '@helm/astrometric';
+import type {
+	NavigationTargetSelectEvent,
+	Position3D,
+	Route,
+	WaypointNode,
+} from '@helm/astrometric';
 import { ViewportConfig } from '../components/viewport-config';
-import { StarContextMenu } from '../components/star-context-menu';
+import { AstrometricMenu } from '../components/astrometric-menu';
 import { ShipSystemsCard } from '../components/ship-systems-card';
 import { ShipLog } from '@helm/shell';
 import { useBridgeViewportPreferences } from '../hooks/use-bridge-viewport-preferences';
@@ -59,8 +64,8 @@ export function BridgePage() {
 	);
 
 	const [stars, setStars] = useState(allStars);
-	const [starSelectEvent, setStarSelectEvent] =
-		useState<StarSelectEvent | null>(null);
+	const [targetSelectEvent, setTargetSelectEvent] =
+		useState<NavigationTargetSelectEvent | null>(null);
 	const [drawerOpen, setDrawerOpen] = useState(true);
 	const {
 		preferences: viewportPreferences,
@@ -72,7 +77,8 @@ export function BridgePage() {
 	const { starSize, jumpRangeOnly, showRoutes, showLabels } =
 		viewportPreferences;
 
-	const selectedStar = starSelectEvent?.star ?? null;
+	const selectedTarget = targetSelectEvent?.target ?? null;
+	const selectedStar = selectedTarget?.star ?? null;
 
 	const edgeNodes = useSelect(
 		(select) => select(navStore).getEdgeNodes(),
@@ -85,9 +91,12 @@ export function BridgePage() {
 		nodes: navigationRouteNodes,
 	} = useNavigationEdges();
 
-	const handleStarSelect = useCallback((event: StarSelectEvent | null) => {
-		setStarSelectEvent(event);
-	}, []);
+	const handleTargetSelect = useCallback(
+		(event: NavigationTargetSelectEvent | null) => {
+			setTargetSelectEvent(event);
+		},
+		[]
+	);
 
 	// Keep local filtered state in sync with store data.
 	useEffect(() => {
@@ -135,19 +144,6 @@ export function BridgePage() {
 		setStars(filtered);
 	}, [jumpRangeOnly, currentNodeId, jumpRange, allStars]);
 
-	const currentStar = useMemo(
-		() => allStars.find((s) => s.node_id === currentNodeId) ?? null,
-		[allStars, currentNodeId]
-	);
-
-	// Compute distance from current star to selected star.
-	const selectedDistance = useMemo(() => {
-		if (!currentStar || !selectedStar) {
-			return null;
-		}
-		return distance3D(currentStar, selectedStar);
-	}, [currentStar, selectedStar]);
-
 	const action = useSelect(
 		(select) => select(actionsStore).getLatestAction(),
 		[]
@@ -158,11 +154,31 @@ export function BridgePage() {
 		[navigationRoutes, showRoutes]
 	);
 
-	const routeNodePositions = useMemo(() => {
-		if (routes.length === 0 && navigationRouteOverlays.length === 0) {
-			return undefined;
+	const waypointNodes: WaypointNode[] = useMemo(() => {
+		if (!showRoutes) {
+			return [];
 		}
 
+		const knownNodeIds = new Set<number>();
+		for (const route of navigationRoutes) {
+			knownNodeIds.add(route.from);
+			knownNodeIds.add(route.to);
+		}
+
+		return navigationRouteNodes
+			.filter(
+				(node) => node.type === 'waypoint' && knownNodeIds.has(node.id)
+			)
+			.map((node) => ({
+				nodeId: node.id,
+				label: `Waypoint #${node.id}`,
+				x: node.x,
+				y: node.y,
+				z: node.z,
+			}));
+	}, [navigationRouteNodes, navigationRoutes, showRoutes]);
+
+	const routeNodePositions = useMemo(() => {
 		const positions = new Map<number, Position3D>();
 		for (const star of allStars) {
 			positions.set(star.node_id, { x: star.x, y: star.y, z: star.z });
@@ -174,13 +190,24 @@ export function BridgePage() {
 			positions.set(node.id, { x: node.x, y: node.y, z: node.z });
 		}
 		return positions;
-	}, [
-		allStars,
-		edgeNodes,
-		navigationRouteNodes,
-		navigationRouteOverlays.length,
-		routes.length,
-	]);
+	}, [allStars, edgeNodes, navigationRouteNodes]);
+
+	const selectedDistance = useMemo(() => {
+		if (!selectedTarget) {
+			return null;
+		}
+
+		const currentPosition =
+			routeNodePositions?.get(currentNodeId) ??
+			allStars.find((s) => s.node_id === currentNodeId) ??
+			null;
+
+		if (!currentPosition) {
+			return null;
+		}
+
+		return distance3D(currentPosition, selectedTarget);
+	}, [allStars, currentNodeId, routeNodePositions, selectedTarget]);
 
 	const sizeMultiplier = STAR_SIZE_MULTIPLIER[starSize] ?? 1;
 	const viewportStyle = useMemo(
@@ -196,8 +223,8 @@ export function BridgePage() {
 		!!action &&
 		(action.status === 'pending' || action.status === 'running');
 
-	const handleContextMenuClose = useCallback(() => {
-		setStarSelectEvent(null);
+	const handleAstrometricMenuClose = useCallback(() => {
+		setTargetSelectEvent(null);
 	}, []);
 
 	return (
@@ -224,26 +251,32 @@ export function BridgePage() {
 					<Suspense fallback={null}>
 						<StarField
 							stars={stars}
+							waypoints={waypointNodes}
 							routes={routes}
 							routeOverlays={navigationRouteOverlays}
 							nodePositions={routeNodePositions}
 							currentNodeId={currentNodeId}
 							selectedStarId={selectedStar?.id ?? null}
-							onStarSelect={handleStarSelect}
+							selectedTargetNodeId={
+								selectedTarget?.kind === 'waypoint'
+									? selectedTarget.nodeId
+									: null
+							}
+							onTargetSelect={handleTargetSelect}
 							starScale={sizeMultiplier}
 							showLabels={showLabels}
 							style={viewportStyle}
-							selectedStarOverlay={
-								starSelectEvent ? (
-									<StarContextMenu
-										star={starSelectEvent.star}
+							selectedTargetOverlay={
+								targetSelectEvent ? (
+									<AstrometricMenu
+										target={targetSelectEvent.target}
 										currentNodeId={currentNodeId}
 										selectedDistance={
 											selectedDistance ??
-											starSelectEvent.distance
+											targetSelectEvent.distance
 										}
 										hasActiveAction={hasActiveAction}
-										onClose={handleContextMenuClose}
+										onClose={handleAstrometricMenuClose}
 									/>
 								) : undefined
 							}

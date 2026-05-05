@@ -11,16 +11,22 @@ export const getStarNodes = createSelector(
 	(state: State) => [state.stars.byId]
 );
 
-export const getNode = (state: State, nodeId: number): StarNode | undefined =>
-	state.stars.byId[nodeId];
+export const getNode = (
+	state: State,
+	nodeId: number
+): StarNode | NavNode | undefined =>
+	state.stars.byId[nodeId] ?? state.graph.edgeNodes[nodeId];
 
 /**
  * Select a nav node by ID.
  *
  * @throws {HelmError} ErrorCode.NavNodeNotFound when the node is missing.
  */
-export const expectNode = (state: State, nodeId: number): StarNode => {
-	const node = state.stars.byId[nodeId];
+export const expectNode = (
+	state: State,
+	nodeId: number
+): StarNode | NavNode => {
+	const node = getNode(state, nodeId);
 	assert(node, ErrorCode.NavNodeNotFound, `Nav node not found: ${nodeId}`);
 	return node;
 };

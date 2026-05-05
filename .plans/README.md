@@ -5,8 +5,6 @@ Each entry points to the full task file in `.plans/tasks/`.
 
 ## Active
 
--   [nav-17-add-waypoint-nodes-to-starfield](tasks/nav-17-add-waypoint-nodes-to-starfield.md) - Add waypoint nodes to the starfield. `navigation` `p2`
-
 ## Blocked
 
 -   [nav-04-visual-scan-indicator](tasks/nav-04-visual-scan-indicator.md) - Visual Scan Indicator on Starfield. `navigation` `p2` Blocked by: nav-03 must define the shared ring layer and direct-jump precedence.
@@ -25,6 +23,7 @@ Each entry points to the full task file in `.plans/tasks/`.
 -   [nav-13-add-scan-result-reconciler](tasks/nav-13-add-scan-result-reconciler.md) - Add a scan result reconciler. `navigation` `p2`
 -   [nav-14-route-aware-jump-draft](tasks/nav-14-route-aware-jump-draft.md) - Add route-aware jump drafts. `navigation` `p2`
 -   [nav-16-show-active-scan-line](tasks/nav-16-show-active-scan-line.md) - Show active scan lines on the starfield. `navigation` `p2`
+-   [nav-20-investigate-route-animation-performance](tasks/nav-20-investigate-route-animation-performance.md) - Investigate route animation performance. `navigation` `p2`
 -   [sec-01-address-security-audit-findings](tasks/sec-01-address-security-audit-findings.md) - Address security audit findings. `dev` `p1`
 
 ## Done
@@ -39,5 +38,6 @@ Each entry points to the full task file in `.plans/tasks/`.
 -   [nav-10-sync-user-edges-on-load](tasks/nav-10-sync-user-edges-on-load.md) - Sync user edges on load. `navigation` `p1`
 -   [nav-12-add-node-adjacency-path-selectors](tasks/nav-12-add-node-adjacency-path-selectors.md) - Add known path selectors. `navigation` `p2`
 -   [nav-15-clean-up-scan-results](tasks/nav-15-clean-up-scan-results.md) - Clean up scan results. `navigation` `p2`
+-   [nav-17-add-waypoint-nodes-to-starfield](tasks/nav-17-add-waypoint-nodes-to-starfield.md) - Add waypoint nodes to the starfield. `navigation` `p2`
 -   [nav-18-fix-user-edge-total](tasks/nav-18-fix-user-edge-total.md) - Fix user edge totals. `navigation` `p1`
 -   [nav-19-add-navigation-edge-states](tasks/nav-19-add-navigation-edge-states.md) - Add astrometric navigation edge state. `navigation` `p1`

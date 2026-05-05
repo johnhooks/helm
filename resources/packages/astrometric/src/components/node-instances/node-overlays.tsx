@@ -1,23 +1,31 @@
 import { Html, Billboard, Ring } from '@react-three/drei';
 import type { StarNode } from '@helm/types';
-import { STAR_BASE_SIZE } from '../../constants';
+import type { WaypointNode } from '../../types';
+import {
+	ASTROMETRIC_LABEL_Z_INDEX_RANGE,
+	STAR_BASE_SIZE,
+} from '../../constants';
 import { lcarsColors } from '../../utils/colors';
 
-export interface StarOverlaysProps {
+export interface NodeOverlaysProps {
 	stars: StarNode[];
 	selectedStar: StarNode | null;
 	hoveredStar: StarNode | null;
+	selectedWaypoint?: WaypointNode | null;
+	hoveredWaypoint?: WaypointNode | null;
 	showLabels?: boolean;
 	getScale: (star: StarNode) => number;
 }
 
-export function StarOverlays({
+export function NodeOverlays({
 	stars,
 	selectedStar,
 	hoveredStar,
+	selectedWaypoint = null,
+	hoveredWaypoint = null,
 	showLabels = false,
 	getScale,
-}: StarOverlaysProps) {
+}: NodeOverlaysProps) {
 	return (
 		<>
 			{/* Selection ring - billboard that always faces camera */}
@@ -45,6 +53,20 @@ export function StarOverlays({
 					);
 				})()}
 
+			{selectedWaypoint && (
+				<Billboard
+					position={[
+						selectedWaypoint.x,
+						selectedWaypoint.y,
+						selectedWaypoint.z,
+					]}
+				>
+					<Ring args={[0.13, 0.14, 4]}>
+						<meshBasicMaterial color={lcarsColors.sky} />
+					</Ring>
+				</Billboard>
+			)}
+
 			{/* Label for hovered star (if different from selected) */}
 			{hoveredStar && hoveredStar.id !== selectedStar?.id && (
 				<Html
@@ -54,6 +76,7 @@ export function StarOverlays({
 						hoveredStar.z,
 					]}
 					center
+					zIndexRange={ASTROMETRIC_LABEL_Z_INDEX_RANGE}
 					style={{ pointerEvents: 'none', userSelect: 'none' }}
 				>
 					<div
@@ -73,6 +96,35 @@ export function StarOverlays({
 				</Html>
 			)}
 
+			{hoveredWaypoint &&
+				hoveredWaypoint.nodeId !== selectedWaypoint?.nodeId && (
+					<Html
+						position={[
+							hoveredWaypoint.x,
+							hoveredWaypoint.y + STAR_BASE_SIZE * 3,
+							hoveredWaypoint.z,
+						]}
+						center
+						zIndexRange={ASTROMETRIC_LABEL_Z_INDEX_RANGE}
+						style={{ pointerEvents: 'none', userSelect: 'none' }}
+					>
+						<div
+							style={{
+								background: 'rgba(10, 10, 10, 0.9)',
+								color: '#f0e6d2',
+								padding: '4px 8px',
+								borderRadius: '4px',
+								fontSize: '12px',
+								fontFamily: 'Antonio, sans-serif',
+								whiteSpace: 'nowrap',
+								border: '1px solid #2a2a2a',
+							}}
+						>
+							{hoveredWaypoint.label}
+						</div>
+					</Html>
+				)}
+
 			{/* Labels for all stars (when enabled, e.g. in jump-range view) */}
 			{showLabels &&
 				stars.map((star) => {
@@ -88,6 +140,7 @@ export function StarOverlays({
 						<Html
 							key={star.id}
 							position={[star.x, star.y, star.z]}
+							zIndexRange={ASTROMETRIC_LABEL_Z_INDEX_RANGE}
 							style={{
 								pointerEvents: 'none',
 								userSelect: 'none',

@@ -7,17 +7,20 @@ import type { ShipActionRenderProps } from '../types';
 import { DraftScanCard } from './draft-scan-card';
 import { ActiveScanCard } from './active-scan-card';
 import { CompleteScanCard } from './complete-scan-card';
+import { getScanTargetName } from './utils';
 
 function DraftScan({ draft }: { draft: DraftAction<'scan_route'> }) {
 	const { shipId } = useShip();
-	const { targetName, isSubmitting } = useSelect(
+	const { targetNode, isSubmitting } = useSelect(
 		(select) => ({
-			targetName: select(navStore).expectNode(draft.params.target_node_id)
-				.title,
+			targetNode: select(navStore).expectNode(
+				draft.params.target_node_id
+			),
 			isSubmitting: select(actionsStore).isCreating(),
 		}),
 		[draft.params.target_node_id]
 	);
+	const targetName = getScanTargetName(targetNode);
 	const { clearDraft, createAction } = useDispatch(actionsStore);
 	return (
 		<DraftScanCard
@@ -31,26 +34,28 @@ function DraftScan({ draft }: { draft: DraftAction<'scan_route'> }) {
 }
 
 function ActiveScan({ action }: { action: ShipAction<'scan_route'> }) {
-	const { targetName } = useSelect(
+	const { targetNode } = useSelect(
 		(select) => ({
-			targetName: select(navStore).expectNode(
+			targetNode: select(navStore).expectNode(
 				action.params.target_node_id
-			).title,
+			),
 		}),
 		[action.params.target_node_id]
 	);
+	const targetName = getScanTargetName(targetNode);
 	return <ActiveScanCard action={action} targetName={targetName} />;
 }
 
 function CompleteScan({ action }: { action: ShipAction<'scan_route'> }) {
-	const { targetName } = useSelect(
+	const { targetNode } = useSelect(
 		(select) => ({
-			targetName: select(navStore).expectNode(
+			targetNode: select(navStore).expectNode(
 				action.params.target_node_id
-			).title,
+			),
 		}),
 		[action.params.target_node_id]
 	);
+	const targetName = getScanTargetName(targetNode);
 	return <CompleteScanCard action={action} targetName={targetName} />;
 }
 

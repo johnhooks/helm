@@ -3,16 +3,20 @@ import { useFrame, useThree } from '@react-three/fiber';
 import type { InstancedMesh } from 'three';
 import { Object3D, Raycaster, Vector2 } from 'three';
 import type { StarNode } from '@helm/types';
+import type { WaypointNode } from '../../types';
 import { STAR_BASE_SIZE } from '../../constants';
-import { getStarSystemColor } from '../../utils/colors';
-import { StarOverlays } from './star-overlays';
+import { getStarSystemColor, lcarsColors } from '../../utils/colors';
+import { NodeOverlays } from './node-overlays';
 
 const HOVER_LERP_SPEED = 0.15;
 const HOVER_SCALE_MULT = 1.5;
+const WAYPOINT_BASE_SCALE = 0.5;
 
-export interface StarInstancesProps {
+export interface NodeInstancesProps {
 	stars: StarNode[];
+	waypoints?: WaypointNode[];
 	selectedStarId?: number | null;
+	selectedTargetNodeId?: number | null;
 	connectedNodeIds: Set<number>;
 	currentNodeId?: number | null;
 	visitedNodeIds?: Set<number>;
@@ -23,19 +27,26 @@ export interface StarInstancesProps {
 		star: StarNode,
 		screenPosition: { x: number; y: number }
 	) => void;
+	onWaypointSelect?: (
+		waypoint: WaypointNode,
+		screenPosition: { x: number; y: number }
+	) => void;
 	onStarHover?: (star: StarNode | null) => void;
 }
 
-export function StarInstances({
+export function NodeInstances({
 	stars,
+	waypoints = [],
 	selectedStarId,
+	selectedTargetNodeId,
 	connectedNodeIds,
 	reachableNodeIds,
 	starScale = 1,
 	showLabels = false,
 	onStarSelect,
+	onWaypointSelect,
 	onStarHover,
-}: StarInstancesProps) {
+}: NodeInstancesProps) {
 	const meshRef = useRef<InstancedMesh>(null);
 	const { camera, gl, invalidate } = useThree();
 
@@ -45,12 +56,17 @@ export function StarInstances({
 	// Track hovered instance (ref for animation loop, state for label rendering)
 	const hoveredRef = useRef<number | null>(null);
 	const [hoveredStar, setHoveredStar] = useState<StarNode | null>(null);
+	const [hoveredWaypoint, setHoveredWaypoint] = useState<WaypointNode | null>(
+		null
+	);
 
 	// Stable refs for callbacks (prevents event listener churn)
 	const onStarHoverRef = useRef(onStarHover);
 	onStarHoverRef.current = onStarHover;
 	const onStarSelectRef = useRef(onStarSelect);
 	onStarSelectRef.current = onStarSelect;
+	const onWaypointSelectRef = useRef(onWaypointSelect);
+	onWaypointSelectRef.current = onWaypointSelect;
 
 	// Hover animation state: at most 2 stars animating at once
 	const animRef = useRef<{
@@ -61,6 +77,8 @@ export function StarInstances({
 	// Raycaster for mouse interaction
 	const raycaster = useMemo(() => new Raycaster(), []);
 	const mouse = useMemo(() => new Vector2(), []);
+
+	const instanceCount = stars.length + waypoints.length;
 
 	// Calculate scales for each star based on stellar radius and connectivity
 	const getScale = useCallback(
@@ -108,6 +126,18 @@ export function StarInstances({
 			);
 		});
 
+		const waypointScale = WAYPOINT_BASE_SCALE * starScale;
+		waypoints.forEach((waypoint, index) => {
+			const instanceId = stars.length + index;
+
+			tmp.position.set(waypoint.x, waypoint.y, waypoint.z);
+			tmp.scale.setScalar(waypointScale);
+			tmp.updateMatrix();
+
+			meshRef.current!.setMatrixAt(instanceId, tmp.matrix);
+			meshRef.current!.setColorAt(instanceId, lcarsColors.lilac);
+		});
+
 		meshRef.current.instanceMatrix.needsUpdate = true;
 		if (meshRef.current.instanceColor) {
 			meshRef.current.instanceColor.needsUpdate = true;
@@ -115,8 +145,29 @@ export function StarInstances({
 
 		// Reset animation state when stars/scales change
 		animRef.current = { up: null, down: null };
+		setHoveredWaypoint(null);
 		invalidate();
-	}, [stars, getScale, invalidate]);
+	}, [getScale, invalidate, starScale, stars, waypoints]);
+
+	const getIntersectedTarget = useCallback(() => {
+		const intersects = meshRef.current
+			? raycaster.intersectObject(meshRef.current)
+			: [];
+
+		const hit = intersects[0];
+		if (!hit || hit.instanceId === undefined) {
+			return null;
+		}
+
+		if (hit.instanceId < stars.length) {
+			return { kind: 'star' as const, instanceId: hit.instanceId };
+		}
+
+		return {
+			kind: 'waypoint' as const,
+			instanceId: hit.instanceId - stars.length,
+		};
+	}, [raycaster, stars.length]);
 
 	// Handle pointer move for hover detection
 	const handlePointerMove = useCallback(
@@ -130,28 +181,37 @@ export function StarInstances({
 			mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
 
 			raycaster.setFromCamera(mouse, camera);
-			const intersects = raycaster.intersectObject(meshRef.current);
+			const intersected = getIntersectedTarget();
 
-			if (
-				intersects.length > 0 &&
-				intersects[0].instanceId !== undefined
-			) {
-				const instanceId = intersects[0].instanceId;
+			if (intersected?.kind === 'star') {
+				const instanceId = intersected.instanceId;
 				if (hoveredRef.current !== instanceId) {
 					hoveredRef.current = instanceId;
 					const star = stars[instanceId] ?? null;
 					setHoveredStar(star);
+					setHoveredWaypoint(null);
 					onStarHoverRef.current?.(star);
+					gl.domElement.style.cursor = 'pointer';
+				}
+			} else if (intersected?.kind === 'waypoint') {
+				const instanceId = intersected.instanceId;
+				if (hoveredRef.current !== stars.length + instanceId) {
+					hoveredRef.current = stars.length + instanceId;
+					const waypoint = waypoints[instanceId] ?? null;
+					setHoveredStar(null);
+					setHoveredWaypoint(waypoint);
+					onStarHoverRef.current?.(null);
 					gl.domElement.style.cursor = 'pointer';
 				}
 			} else if (hoveredRef.current !== null) {
 				hoveredRef.current = null;
 				setHoveredStar(null);
+				setHoveredWaypoint(null);
 				onStarHoverRef.current?.(null);
 				gl.domElement.style.cursor = 'auto';
 			}
 		},
-		[camera, gl, mouse, raycaster, stars]
+		[camera, getIntersectedTarget, gl, mouse, raycaster, stars, waypoints]
 	);
 
 	// Handle click for selection
@@ -166,13 +226,10 @@ export function StarInstances({
 			mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
 
 			raycaster.setFromCamera(mouse, camera);
-			const intersects = raycaster.intersectObject(meshRef.current);
+			const intersected = getIntersectedTarget();
 
-			if (
-				intersects.length > 0 &&
-				intersects[0].instanceId !== undefined
-			) {
-				const star = stars[intersects[0].instanceId];
+			if (intersected?.kind === 'star') {
+				const star = stars[intersected.instanceId];
 				if (star) {
 					const screenPosition = {
 						x: event.clientX - rect.left,
@@ -180,9 +237,18 @@ export function StarInstances({
 					};
 					onStarSelectRef.current?.(star, screenPosition);
 				}
+			} else if (intersected?.kind === 'waypoint') {
+				const waypoint = waypoints[intersected.instanceId];
+				if (waypoint) {
+					const screenPosition = {
+						x: event.clientX - rect.left,
+						y: event.clientY - rect.top,
+					};
+					onWaypointSelectRef.current?.(waypoint, screenPosition);
+				}
 			}
 		},
-		[camera, gl, mouse, raycaster, stars]
+		[camera, getIntersectedTarget, gl, mouse, raycaster, stars, waypoints]
 	);
 
 	// Attach event listeners
@@ -263,21 +329,29 @@ export function StarInstances({
 		selectedStarId !== null && selectedStarId !== undefined
 			? stars.find((s) => s.id === selectedStarId)
 			: null;
+	const selectedWaypoint =
+		selectedTargetNodeId !== null && selectedTargetNodeId !== undefined
+			? waypoints.find(
+					(waypoint) => waypoint.nodeId === selectedTargetNodeId
+			  )
+			: null;
 
 	return (
 		<>
 			<instancedMesh
 				ref={meshRef}
-				args={[undefined, undefined, stars.length]}
+				args={[undefined, undefined, instanceCount]}
 			>
 				<sphereGeometry args={[STAR_BASE_SIZE, 16, 16]} />
 				<meshBasicMaterial />
 			</instancedMesh>
 
-			<StarOverlays
+			<NodeOverlays
 				stars={stars}
 				selectedStar={selectedStar ?? null}
 				hoveredStar={hoveredStar}
+				selectedWaypoint={selectedWaypoint ?? null}
+				hoveredWaypoint={hoveredWaypoint}
 				showLabels={showLabels}
 				getScale={getScale}
 			/>

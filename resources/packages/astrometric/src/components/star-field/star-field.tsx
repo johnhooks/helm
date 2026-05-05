@@ -7,10 +7,12 @@ import type {
 	Route,
 	RouteOverlay,
 	StarSelectEvent,
+	NavigationTargetSelectEvent,
 	RouteSelectEvent,
 	HoverState,
 	CameraInfo,
 	Position3D,
+	WaypointNode,
 } from '../../types';
 import {
 	DEFAULT_BACKGROUND_STAR_COUNT,
@@ -18,30 +20,34 @@ import {
 	DEFAULT_DISTANCE_RINGS,
 	DEFAULT_MAX_DISTANCE,
 	DEFAULT_MIN_DISTANCE,
+	ASTROMETRIC_MENU_Z_INDEX_RANGE,
 } from '../../constants';
 import { lcarsColors, distanceFromOrigin } from '../../utils';
 import { CameraControls } from '../camera-controls';
 import { BackgroundStars } from '../background-stars';
 import { GalacticPlane } from '../galactic-plane';
 import { MeasuringPivot } from '../measuring-pivot';
-import { StarInstances } from '../star-instances';
+import { NodeInstances } from '../node-instances';
 import { DistanceRings } from '../distance-rings';
 import { RouteLine } from '../route-line';
 import './star-field.css';
 
 export function StarField({
 	stars,
+	waypoints = [],
 	routes = [],
 	routeOverlays = [],
 	distanceRings = DEFAULT_DISTANCE_RINGS,
 	backgroundStarCount = DEFAULT_BACKGROUND_STAR_COUNT,
 	nodePositions,
 	selectedStarId = null,
+	selectedTargetNodeId = null,
 	selectedRouteId = null,
 	currentNodeId,
 	visitedNodeIds,
 	reachableNodeIds,
 	onStarSelect,
+	onTargetSelect,
 	onRouteSelect,
 	onHoverChange,
 	onCameraChange,
@@ -54,7 +60,7 @@ export function StarField({
 	maxDistance = DEFAULT_MAX_DISTANCE,
 	cameraMode = 'perspective',
 	starScale = 1,
-	selectedStarOverlay,
+	selectedTargetOverlay,
 	className = '',
 	style,
 	'data-testid': testId,
@@ -68,26 +74,64 @@ export function StarField({
 		return map;
 	}, [stars]);
 
-	// Get selected star's position for camera focus
+	const waypointsByNodeId = useMemo(() => {
+		const map = new Map<number, WaypointNode>();
+		waypoints.forEach((waypoint) => map.set(waypoint.nodeId, waypoint));
+		return map;
+	}, [waypoints]);
+
+	// Get selected navigation target's position for camera focus
 	const focusTarget: Position3D | null = useMemo(() => {
+		if (
+			selectedTargetNodeId !== null &&
+			selectedTargetNodeId !== undefined
+		) {
+			const waypoint = waypointsByNodeId.get(selectedTargetNodeId);
+			if (waypoint) {
+				return { x: waypoint.x, y: waypoint.y, z: waypoint.z };
+			}
+		}
+
 		if (selectedStarId === null || selectedStarId === undefined) {
 			return null;
 		}
 		const star = stars.find((s) => s.id === selectedStarId);
 		return star ? { x: star.x, y: star.y, z: star.z } : null;
-	}, [selectedStarId, stars]);
+	}, [selectedStarId, selectedTargetNodeId, stars, waypointsByNodeId]);
 
-	// Camera orbits the current ship node. Falls back to origin when the node
-	// isn't in the loaded stars (e.g. ship is at a waypoint).
+	// Camera orbits the current ship node. Falls back to origin only when the
+	// current node is not present in any loaded star or graph-node coordinates.
 	const cameraTarget: Position3D = useMemo(() => {
 		if (currentNodeId === null || currentNodeId === undefined) {
 			return { x: 0, y: 0, z: 0 };
 		}
 		const star = starsByNodeId.get(currentNodeId);
-		return star
-			? { x: star.x, y: star.y, z: star.z }
+		if (star) {
+			return { x: star.x, y: star.y, z: star.z };
+		}
+
+		const waypoint = waypointsByNodeId.get(currentNodeId);
+		if (waypoint) {
+			return { x: waypoint.x, y: waypoint.y, z: waypoint.z };
+		}
+
+		const position = nodePositions?.get(currentNodeId);
+		return position
+			? { x: position.x, y: position.y, z: position.z }
 			: { x: 0, y: 0, z: 0 };
-	}, [currentNodeId, starsByNodeId]);
+	}, [currentNodeId, nodePositions, starsByNodeId, waypointsByNodeId]);
+
+	const measuringTarget: Position3D | null = useMemo(() => {
+		if (!focusTarget) {
+			return null;
+		}
+
+		return {
+			x: focusTarget.x - cameraTarget.x,
+			y: focusTarget.y - cameraTarget.y,
+			z: focusTarget.z - cameraTarget.z,
+		};
+	}, [cameraTarget, focusTarget]);
 
 	// Track which node IDs have routes connected
 	const connectedNodeIds = useMemo(() => {
@@ -123,12 +167,13 @@ export function StarField({
 	// Handle star selection
 	const handleStarClick = useCallback(
 		(star: StarNode, screenPosition: { x: number; y: number }) => {
-			if (!onStarSelect) {
+			if (!onStarSelect && !onTargetSelect) {
 				return;
 			}
 
 			if (selectedStarId === star.id) {
-				onStarSelect(null);
+				onStarSelect?.(null);
+				onTargetSelect?.(null);
 			} else {
 				const event: StarSelectEvent = {
 					star,
@@ -139,10 +184,53 @@ export function StarField({
 					}),
 					screenPosition,
 				};
-				onStarSelect(event);
+				onStarSelect?.(event);
+				onTargetSelect?.({
+					target: {
+						kind: 'star',
+						nodeId: star.node_id,
+						label: star.title,
+						x: star.x,
+						y: star.y,
+						z: star.z,
+						star,
+					},
+					distance: event.distance,
+					screenPosition,
+				});
 			}
 		},
-		[onStarSelect, selectedStarId]
+		[onStarSelect, onTargetSelect, selectedStarId]
+	);
+
+	const handleWaypointClick = useCallback(
+		(
+			waypoint: (typeof waypoints)[number],
+			screenPosition: { x: number; y: number }
+		) => {
+			if (!onTargetSelect) {
+				return;
+			}
+
+			if (selectedTargetNodeId === waypoint.nodeId) {
+				onTargetSelect(null);
+			} else {
+				const event: NavigationTargetSelectEvent = {
+					target: {
+						kind: 'waypoint',
+						nodeId: waypoint.nodeId,
+						label: waypoint.label,
+						x: waypoint.x,
+						y: waypoint.y,
+						z: waypoint.z,
+					},
+					distance: distanceFromOrigin(waypoint),
+					screenPosition,
+				};
+				onTargetSelect(event);
+			}
+		},
+		[onTargetSelect, selectedTargetNodeId]
 	);
 
 	// Handle route selection
@@ -247,8 +335,11 @@ export function StarField({
 					<BackgroundStars count={backgroundStarCount} />
 				)}
 
-				{/* Measuring rings - tilt to align with selected star */}
-				<MeasuringPivot alignTarget={focusTarget}>
+				{/* Measuring rings - tilt to align with selected navigation target */}
+				<MeasuringPivot
+					position={cameraTarget}
+					alignTarget={measuringTarget}
+				>
 					<DistanceRings
 						rings={distanceRings}
 						showLabels={showDistanceLabels}
@@ -283,9 +374,11 @@ export function StarField({
 				})}
 
 				{/* Local star systems (instanced for performance) */}
-				<StarInstances
+				<NodeInstances
 					stars={stars}
+					waypoints={waypoints}
 					selectedStarId={selectedStarId}
+					selectedTargetNodeId={selectedTargetNodeId}
 					connectedNodeIds={connectedNodeIds}
 					currentNodeId={currentNodeId}
 					visitedNodeIds={visitedNodeIds}
@@ -293,18 +386,20 @@ export function StarField({
 					starScale={starScale}
 					showLabels={showLabels}
 					onStarSelect={handleStarClick}
+					onWaypointSelect={handleWaypointClick}
 					onStarHover={handleStarHover}
 				/>
 
-				{/* Overlay content anchored to selected star (e.g. context menu) */}
-				{focusTarget && selectedStarOverlay && (
+				{/* Overlay content anchored to selected navigation target (e.g. context menu) */}
+				{focusTarget && selectedTargetOverlay && (
 					<Html
 						position={[focusTarget.x, focusTarget.y, focusTarget.z]}
 						center={false}
+						zIndexRange={ASTROMETRIC_MENU_Z_INDEX_RANGE}
 						style={{ pointerEvents: 'auto' }}
 					>
 						<div style={{ marginLeft: '28px', marginTop: '16px' }}>
-							{selectedStarOverlay}
+							{selectedTargetOverlay}
 						</div>
 					</Html>
 				)}
