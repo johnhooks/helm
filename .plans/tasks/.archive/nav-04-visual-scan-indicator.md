@@ -1,11 +1,7 @@
 ---
-status: blocked
+status: done
 area: navigation
 priority: p2
-depends_on:
-    - nav-03-visual-jump-indicator
-    - nav-06-persist-scan-discoveries
-blocked_by: nav-03 must define the shared ring layer and direct-jump precedence.
 ---
 
 # Visual Scan Indicator on Starfield
@@ -75,3 +71,11 @@ before the feature is considered done.
 -   Indicator state must update reactively: completing a scan should remove
     the lilac ring from newly-resolved stars as they gain the sky one.
 -   No change to the scan action's server or REST behavior.
+
+## Resolution
+
+Closed as superseded by the astrometric route overlay work. Helm now presents
+scan state through scan route overlays, draft lines, active lines, and result
+lines rather than through per-star scan eligibility rings. The original blocker
+on a shared ring layer no longer applies because per-star rings are no longer
+the chosen direction.
