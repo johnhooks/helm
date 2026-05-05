@@ -1,10 +1,7 @@
 ---
-status: ready
+status: done
 area: navigation
 priority: p2
-depends_on:
-    - nav-02-wire-jump-trigger
-    - nav-06-persist-scan-discoveries
 ---
 
 # Visual Jump Indicator on Starfield
@@ -71,3 +68,10 @@ result.
     the ring without a manual refresh.
 -   The current node itself must not receive the jumpable indicator.
 -   No change to the jump action's server or REST behavior.
+
+## Resolution
+
+Closed as superseded by the astrometric route overlay work. Helm now presents
+jump state through jump route overlays, draft lines, active lines, and result
+lines rather than through per-star direct-jump eligibility rings. The original
+ring-specific implementation details are no longer the chosen direction.
