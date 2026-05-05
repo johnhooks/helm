@@ -86,6 +86,15 @@ export const ROUTE_LINE_WIDTH = 2;
 export const ROUTE_LINE_WIDTH_ACTIVE = 4;
 
 /**
+ * Drei Html z-index ranges for astrometric overlays.
+ *
+ * Labels sit below interactive popovers so selected target menus remain usable
+ * even when they overlap star labels or distance ring labels.
+ */
+export const ASTROMETRIC_LABEL_Z_INDEX_RANGE = [100, 0];
+export const ASTROMETRIC_MENU_Z_INDEX_RANGE = [1000, 1000];
+
+/**
  * Orbit controls damping factor
  */
 export const ORBIT_DAMPING_FACTOR = 0.05;

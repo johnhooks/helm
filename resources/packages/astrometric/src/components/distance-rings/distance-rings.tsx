@@ -2,7 +2,10 @@ import { useMemo } from 'react';
 import { Line, Html } from '@react-three/drei';
 import { Vector3 } from 'three';
 import type { DistanceRing } from '../../types';
-import { DEFAULT_DISTANCE_RINGS } from '../../constants';
+import {
+	ASTROMETRIC_LABEL_Z_INDEX_RANGE,
+	DEFAULT_DISTANCE_RINGS,
+} from '../../constants';
 
 export interface DistanceRingsProps {
 	/**
@@ -105,6 +108,7 @@ export function DistanceRings({
 						{showLabels && ring.label && (
 							<Html
 								position={[ring.distance + 0.3, 0, 0]}
+								zIndexRange={ASTROMETRIC_LABEL_Z_INDEX_RANGE}
 								style={{
 									pointerEvents: 'none',
 									userSelect: 'none',

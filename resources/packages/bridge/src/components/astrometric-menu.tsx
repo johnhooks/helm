@@ -1,7 +1,7 @@
 /**
- * Star Context Menu — rendered beside a selected star via Html overlay.
+ * Astrometric Menu — rendered beside a selected astrometric target via Html overlay.
  *
- * Each context-menu entry is self-determining: it reads store state via
+ * Each astrometric action is self-determining: it reads store state via
  * useSelect and returns null when it doesn't apply. The menu composes them
  * inline; CSS (`.helm-context-menu__actions:empty`) hides the wrapper when
  * nothing renders, so the header stays flush on selections with no actions.
@@ -10,28 +10,28 @@
  */
 import { useEffect } from '@wordpress/element';
 import { ContextMenu } from '@helm/ui';
-import type { StarNode } from '@helm/types';
+import type { NavigationTarget } from '@helm/astrometric';
 import {
-	JumpContextAction,
-	ScanRouteContextAction,
-	type StarContextActionProps,
+	JumpAstrometricAction,
+	ScanRouteAstrometricAction,
+	type AstrometricActionProps,
 } from '@helm/shell';
 
-interface StarContextMenuProps {
-	star: StarNode;
+interface AstrometricMenuProps {
+	target: NavigationTarget;
 	currentNodeId: number;
 	selectedDistance: number | null;
 	hasActiveAction: boolean;
 	onClose: () => void;
 }
 
-export function StarContextMenu({
-	star,
+export function AstrometricMenu({
+	target,
 	currentNodeId,
 	selectedDistance,
 	hasActiveAction,
 	onClose,
-}: StarContextMenuProps) {
+}: AstrometricMenuProps) {
 	// Dismiss on Escape.
 	useEffect(() => {
 		const handleKeyDown = (event: KeyboardEvent) => {
@@ -43,8 +43,8 @@ export function StarContextMenu({
 		return () => document.removeEventListener('keydown', handleKeyDown);
 	}, [onClose]);
 
-	const actionProps: StarContextActionProps = {
-		star,
+	const actionProps: AstrometricActionProps = {
+		target,
 		currentNodeId,
 		selectedDistance,
 		hasActiveAction,
@@ -53,11 +53,15 @@ export function StarContextMenu({
 
 	return (
 		<ContextMenu
-			name={star.title}
-			subtitle={star.spectral_class ?? undefined}
+			name={target.label}
+			subtitle={
+				target.kind === 'star'
+					? target.star?.spectral_class ?? undefined
+					: undefined
+			}
 		>
-			<ScanRouteContextAction {...actionProps} />
-			<JumpContextAction {...actionProps} />
+			<ScanRouteAstrometricAction {...actionProps} />
+			<JumpAstrometricAction {...actionProps} />
 		</ContextMenu>
 	);
 }

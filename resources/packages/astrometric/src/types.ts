@@ -10,6 +10,20 @@ export interface Position3D {
 	z: number;
 }
 
+export interface WaypointNode extends Position3D {
+	nodeId: number;
+	label: string;
+}
+
+export type NavigationTargetKind = 'star' | 'waypoint';
+
+export interface NavigationTarget extends Position3D {
+	kind: NavigationTargetKind;
+	nodeId: number;
+	label: string;
+	star?: StarNode;
+}
+
 /**
  * Spectral classification for stars
  * O = Blue (hottest), M = Red (coolest)
@@ -99,6 +113,12 @@ export interface StarSelectEvent {
 	screenPosition: { x: number; y: number };
 }
 
+export interface NavigationTargetSelectEvent {
+	target: NavigationTarget;
+	distance: number;
+	screenPosition: { x: number; y: number };
+}
+
 /**
  * Event fired when a route is selected
  */
@@ -170,6 +190,10 @@ export interface StarFieldProps {
 	 */
 	stars: StarNode[];
 	/**
+	 * Known waypoint nodes to display separately from stars.
+	 */
+	waypoints?: WaypointNode[];
+	/**
 	 * Routes between systems
 	 */
 	routes?: Route[];
@@ -193,9 +217,13 @@ export interface StarFieldProps {
 	nodePositions?: Map<number, Position3D>;
 
 	/**
-	 * Currently selected star ID
+	 * Currently selected navigation target ID
 	 */
 	selectedStarId?: number | null;
+	/**
+	 * Currently selected node ID for non-star targets.
+	 */
+	selectedTargetNodeId?: number | null;
 	/**
 	 * Currently selected route ID
 	 */
@@ -218,6 +246,10 @@ export interface StarFieldProps {
 	 * Called when a star is selected (null = deselected)
 	 */
 	onStarSelect?: (event: StarSelectEvent | null) => void;
+	/**
+	 * Called when any navigation target is selected (null = deselected).
+	 */
+	onTargetSelect?: (event: NavigationTargetSelectEvent | null) => void;
 	/**
 	 * Called when a route is selected (null = deselected)
 	 */
@@ -269,10 +301,10 @@ export interface StarFieldProps {
 	starScale?: number;
 
 	/**
-	 * Content rendered beside the selected star via Html overlay.
-	 * Follows the star as the camera moves.
+	 * Content rendered beside the selected navigation target via Html overlay.
+	 * Follows the target as the camera moves.
 	 */
-	selectedStarOverlay?: ReactNode;
+	selectedTargetOverlay?: ReactNode;
 
 	/**
 	 * Additional CSS class name

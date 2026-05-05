@@ -9,8 +9,8 @@ export { ShipActionErrorFallback } from './ship-actions/ship-action-error-fallba
 export { ShipActionCard } from './ship-actions/ship-action-card';
 export type { ShipActionRenderProps } from './ship-actions/types';
 
-export { ScanRouteContextAction } from './star-context-actions/scan-route';
-export { JumpContextAction } from './star-context-actions/jump';
-export type { StarContextActionProps } from './star-context-actions/types';
+export { ScanRouteAstrometricAction } from './astrometric-actions/scan-route';
+export { JumpAstrometricAction } from './astrometric-actions/jump';
+export type { AstrometricActionProps } from './astrometric-actions/types';
 
 export { useErrorModal } from './hooks/use-error-modal';

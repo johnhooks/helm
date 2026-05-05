@@ -3,23 +3,23 @@ import { __ } from '@wordpress/i18n';
 import { store as actionsStore } from '@helm/actions';
 import { store as navStore } from '@helm/nav';
 import { ContextMenuActionItem } from '@helm/ui';
-import type { StarContextActionProps } from './types';
+import type { AstrometricActionProps } from './types';
 
-export function JumpContextAction({
-	star,
+export function JumpAstrometricAction({
+	target,
 	currentNodeId,
 	selectedDistance,
 	hasActiveAction,
 	onClose,
-}: StarContextActionProps) {
+}: AstrometricActionProps) {
 	const hasDirectEdge = useSelect(
 		(select) =>
-			select(navStore).hasDirectEdgeBetween(currentNodeId, star.node_id),
-		[currentNodeId, star.node_id]
+			select(navStore).hasDirectEdgeBetween(currentNodeId, target.nodeId),
+		[currentNodeId, target.nodeId]
 	);
 	const { draftCreate } = useDispatch(actionsStore);
 
-	const isCurrentNode = star.node_id === currentNodeId;
+	const isCurrentNode = target.nodeId === currentNodeId;
 	const disabled = isCurrentNode || hasDirectEdge !== true || hasActiveAction;
 
 	let detail: string;
@@ -42,7 +42,7 @@ export function JumpContextAction({
 				draftCreate({
 					type: 'jump',
 					params: {
-						target_node_id: star.node_id,
+						target_node_id: target.nodeId,
 						source_node_id: currentNodeId,
 						distance_ly: selectedDistance,
 					},
