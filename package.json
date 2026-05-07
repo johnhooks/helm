@@ -13,6 +13,8 @@
         "dev": "wp-scripts start",
         "lint": "wp-scripts lint-js resources/packages",
         "lint:js": "wp-scripts lint-js resources/packages",
+        "lint:md": "prettier --check \"**/*.md\"",
+        "lint:md:fix": "prettier --write \"**/*.md\"",
         "lint:fix": "wp-scripts lint-js resources/packages --fix",
         "format": "wp-scripts lint-js resources/packages --fix",
         "check-types": "tsc --noEmit",

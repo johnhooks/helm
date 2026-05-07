@@ -7,13 +7,15 @@ tasks. Completed tasks are archived in `.plans/tasks/.archive/`.
 
 ## Blocked
 
+-   [nav-14-route-aware-jump-draft](tasks/nav-14-route-aware-jump-draft.md) - Add route-aware jump drafts. `navigation` `p2` Blocked by: actions-01-add-multiphase-action-lifecycle.
+-   [nav-21-add-multiphase-route-scan](tasks/nav-21-add-multiphase-route-scan.md) - Add multiphase route scan. `navigation` `p2` Blocked by: actions-01-add-multiphase-action-lifecycle.
 -   [test-02-research-stub-candidates](tasks/test-02-research-stub-candidates.md) - Research stub mocking for NavigationService and ActionProcessor tests. `testing` `p3` Blocked by: test-01 should land first so this research can evaluate the established stub pattern.
 
 ## Ready
 
+-   [actions-01-add-multiphase-action-lifecycle](tasks/actions-01-add-multiphase-action-lifecycle.md) - Add multiphase action lifecycle. `dev` `p2`
 -   [dev-01-time-scale-constant](tasks/dev-01-time-scale-constant.md) - Add a time-scale constant for manual testing. `dev` `p2`
 -   [nav-11-enforce-waypoint-visibility](tasks/nav-11-enforce-waypoint-visibility.md) - Enforce waypoint visibility on the backend. `navigation` `p3`
--   [nav-14-route-aware-jump-draft](tasks/nav-14-route-aware-jump-draft.md) - Add route-aware jump drafts. `navigation` `p2`
 -   [rest-01-add-response-schemas](tasks/rest-01-add-response-schemas.md) - Add response schemas to REST controllers. `rest` `p2`
 -   [test-01-refactor-scan-resolver-test](tasks/test-01-refactor-scan-resolver-test.md) - Refactor scan resolver test to stub navigation service. `testing` `p2`
 
