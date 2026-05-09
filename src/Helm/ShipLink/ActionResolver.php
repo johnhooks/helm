@@ -7,6 +7,7 @@ namespace Helm\ShipLink;
 use Helm\Core\ErrorCode;
 use Helm\Database\Transaction;
 use Helm\Inventory\Contracts\InventoryRepository;
+use Helm\Lib\Date;
 use Helm\ShipLink\Contracts\ActionHandler;
 use Helm\ShipLink\Contracts\ActionRepository;
 use Helm\ShipLink\Contracts\ShipStateRepository;
@@ -43,30 +44,10 @@ final class ActionResolver
         }
 
         // Handle based on current status
-        if ($action->status->isComplete()) {
+        if ($action->status->isFinalState()) {
             // Action is in a terminal state (fulfilled, failed, partial)
             throw new ActionException(ErrorCode::ActionNotReady, __('Action has already been processed', 'helm'));
         }
-
-        // If Pending, need to claim it first
-        if ($action->status === ActionStatus::Pending) {
-            if (! $action->isReady()) {
-                throw new ActionException(ErrorCode::ActionNotReady, __('Action is not yet ready', 'helm'));
-            }
-
-            // Atomically claim
-            if (! $this->actionRepository->claim($actionId)) {
-                throw new ActionException(ErrorCode::ActionClaimFailed, __('Action is already being processed', 'helm'));
-            }
-
-            // Reload with Running status
-            $action = $this->actionRepository->find($actionId);
-            if ($action === null) {
-                throw new ActionException(ErrorCode::ActionNotFound, __('Action no longer exists', 'helm'));
-            }
-        }
-
-        // At this point, action is Running (either pre-claimed or just claimed)
 
         // Get resolver class
         $resolverClass = $action->type->getResolverClass();
@@ -92,7 +73,16 @@ final class ActionResolver
             // Resolver mutates action.result and ship state/systems
             $resolver->handle($action, $ship);
 
-            $action->fulfill();
+            if (! $action->type->isMultiphase() && ! $action->status->isFinalState()) {
+                $action->fulfill();
+            }
+
+            if (! $action->status->isFinalState()) {
+                $action->status = ActionStatus::Running;
+                $action->processing_at = null;
+                $action->broadcast_at = Date::now();
+            }
+
             $this->actionRepository->update($action);
             $this->stateRepository->update($ship->getState());
 
@@ -100,7 +90,9 @@ final class ActionResolver
                 $this->inventoryRepository->update($component);
             }
 
-            $this->stateRepository->updateCurrentAction($action->ship_post_id, null);
+            if ($action->status->isFinalState()) {
+                $this->stateRepository->updateCurrentAction($action->ship_post_id, null);
+            }
 
             Transaction::commit();
 

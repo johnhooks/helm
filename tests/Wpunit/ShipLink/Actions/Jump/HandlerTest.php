@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Wpunit\ShipLink\Actions\Jump;
 
 use DateTimeImmutable;
+use Helm\Lib\Date;
 use Helm\Navigation\Contracts\EdgeRepository;
 use Helm\Navigation\Contracts\NodeRepository;
 use Helm\ShipLink\Actions\Jump\Handler;
@@ -30,12 +31,19 @@ class HandlerTest extends WPTestCase
     public function _before(): void
     {
         parent::_before();
+        Date::setTestNow(null);
         $this->tester->haveOrigin();
 
         $this->handler = new Handler();
         $this->shipFactory = helm(ShipFactory::class);
         $this->nodeRepository = helm(NodeRepository::class);
         $this->edgeRepository = helm(EdgeRepository::class);
+    }
+
+    public function _after(): void
+    {
+        Date::setTestNow(null);
+        parent::_after();
     }
 
     public function test_sets_pending_status(): void
@@ -46,7 +54,8 @@ class HandlerTest extends WPTestCase
         $node1 = $this->tester->getNodeForStar($star1);
         $node2 = $this->tester->getNodeForStar($star2);
 
-        $this->edgeRepository->create($node1->id, $node2->id, 5.0);
+        $edge = $this->edgeRepository->create($node1->id, $node2->id, 5.0);
+        helm(\Helm\Navigation\Contracts\UserEdgeRepository::class)->upsert(1, $edge->id);
 
         $shipPost = $this->tester->haveShip(['node_id' => $node1->id]);
         $ship = $this->shipFactory->build($shipPost->postId());
@@ -54,7 +63,7 @@ class HandlerTest extends WPTestCase
         $action = new Action([
             'ship_post_id' => $shipPost->postId(),
             'type' => ActionType::Jump,
-            'params' => ['target_node_id' => $node2->id],
+            'params' => ['from_node_id' => $node1->id, 'target_node_id' => $node2->id, 'route' => [$edge->id]],
         ]);
 
         $this->handler->handle($action, $ship);
@@ -70,7 +79,8 @@ class HandlerTest extends WPTestCase
         $node1 = $this->tester->getNodeForStar($star1);
         $node2 = $this->tester->getNodeForStar($star2);
 
-        $this->edgeRepository->create($node1->id, $node2->id, 5.0);
+        $edge = $this->edgeRepository->create($node1->id, $node2->id, 5.0);
+        helm(\Helm\Navigation\Contracts\UserEdgeRepository::class)->upsert(1, $edge->id);
 
         $shipPost = $this->tester->haveShip(['node_id' => $node1->id]);
         $ship = $this->shipFactory->build($shipPost->postId());
@@ -78,7 +88,7 @@ class HandlerTest extends WPTestCase
         $action = new Action([
             'ship_post_id' => $shipPost->postId(),
             'type' => ActionType::Jump,
-            'params' => ['target_node_id' => $node2->id],
+            'params' => ['from_node_id' => $node1->id, 'target_node_id' => $node2->id, 'route' => [$edge->id]],
         ]);
 
         $before = new DateTimeImmutable();
@@ -88,7 +98,7 @@ class HandlerTest extends WPTestCase
         $this->assertGreaterThan($before, $action->deferred_until);
     }
 
-    public function test_stores_calculated_values_in_result(): void
+    public function test_does_not_prebuild_result(): void
     {
         $star1 = $this->tester->haveStar(['id' => 'CALC_FROM', 'distanceLy' => 0.0]);
         $star2 = $this->tester->haveStar(['id' => 'CALC_TO', 'distanceLy' => 5.0]);
@@ -96,7 +106,8 @@ class HandlerTest extends WPTestCase
         $node1 = $this->tester->getNodeForStar($star1);
         $node2 = $this->tester->getNodeForStar($star2);
 
-        $this->edgeRepository->create($node1->id, $node2->id, 5.0);
+        $edge = $this->edgeRepository->create($node1->id, $node2->id, 5.0);
+        helm(\Helm\Navigation\Contracts\UserEdgeRepository::class)->upsert(1, $edge->id);
 
         $shipPost = $this->tester->haveShip(['node_id' => $node1->id]);
         $ship = $this->shipFactory->build($shipPost->postId());
@@ -104,21 +115,12 @@ class HandlerTest extends WPTestCase
         $action = new Action([
             'ship_post_id' => $shipPost->postId(),
             'type' => ActionType::Jump,
-            'params' => ['target_node_id' => $node2->id],
+            'params' => ['from_node_id' => $node1->id, 'target_node_id' => $node2->id, 'route' => [$edge->id]],
         ]);
 
         $this->handler->handle($action, $ship);
 
-        $this->assertNotNull($action->result);
-        $this->assertArrayHasKey('from_node_id', $action->result);
-        $this->assertArrayHasKey('to_node_id', $action->result);
-        $this->assertArrayHasKey('distance', $action->result);
-        $this->assertArrayHasKey('core_cost', $action->result);
-        $this->assertArrayHasKey('duration', $action->result);
-
-        $this->assertSame($node1->id, $action->result['from_node_id']);
-        $this->assertSame($node2->id, $action->result['to_node_id']);
-        $this->assertSame(5.0, $action->result['distance']);
+        $this->assertNull($action->result);
     }
 
     public function test_longer_distance_means_longer_duration(): void
@@ -131,8 +133,10 @@ class HandlerTest extends WPTestCase
         $node2 = $this->tester->getNodeForStar($star2);
         $node3 = $this->tester->getNodeForStar($star3);
 
-        $this->edgeRepository->create($node1->id, $node2->id, 2.0);
-        $this->edgeRepository->create($node1->id, $node3->id, 10.0);
+        $edge = $this->edgeRepository->create($node1->id, $node2->id, 2.0);
+        helm(\Helm\Navigation\Contracts\UserEdgeRepository::class)->upsert(1, $edge->id);
+        $edgeFar = $this->edgeRepository->create($node1->id, $node3->id, 10.0);
+        helm(\Helm\Navigation\Contracts\UserEdgeRepository::class)->upsert(1, $edgeFar->id);
 
         $shipPost = $this->tester->haveShip(['node_id' => $node1->id]);
         $ship = $this->shipFactory->build($shipPost->postId());
@@ -141,7 +145,7 @@ class HandlerTest extends WPTestCase
         $shortAction = new Action([
             'ship_post_id' => $shipPost->postId(),
             'type' => ActionType::Jump,
-            'params' => ['target_node_id' => $node2->id],
+            'params' => ['from_node_id' => $node1->id, 'target_node_id' => $node2->id, 'route' => [$edge->id]],
         ]);
         $this->handler->handle($shortAction, $ship);
 
@@ -149,7 +153,7 @@ class HandlerTest extends WPTestCase
         $longAction = new Action([
             'ship_post_id' => $shipPost->postId(),
             'type' => ActionType::Jump,
-            'params' => ['target_node_id' => $node3->id],
+            'params' => ['from_node_id' => $node1->id, 'target_node_id' => $node3->id, 'route' => [$edgeFar->id]],
         ]);
         $this->handler->handle($longAction, $ship);
 
@@ -158,5 +162,48 @@ class HandlerTest extends WPTestCase
             $longAction->deferred_until,
             'Longer distance should result in later completion time'
         );
+    }
+
+    public function test_route_action_waits_for_first_leg_without_prebuilding_result(): void
+    {
+        Date::setTestNow('2026-04-01 00:00:00');
+
+        $star1 = $this->tester->haveStar(['id' => 'ROUTE_CALC_FROM', 'distanceLy' => 0.0]);
+        $star2 = $this->tester->haveStar(['id' => 'ROUTE_CALC_MID', 'distanceLy' => 3.0]);
+        $star3 = $this->tester->haveStar(['id' => 'ROUTE_CALC_TO', 'distanceLy' => 7.0]);
+
+        $node1 = $this->tester->getNodeForStar($star1);
+        $node2 = $this->tester->getNodeForStar($star2);
+        $node3 = $this->tester->getNodeForStar($star3);
+
+        $edge = $this->edgeRepository->create($node1->id, $node2->id, 3.0);
+        helm(\Helm\Navigation\Contracts\UserEdgeRepository::class)->upsert(1, $edge->id);
+        $edge2 = $this->edgeRepository->create($node2->id, $node3->id, 4.0);
+        helm(\Helm\Navigation\Contracts\UserEdgeRepository::class)->upsert(1, $edge2->id);
+
+        $shipPost = $this->tester->haveShip(['node_id' => $node1->id]);
+        $ship = $this->shipFactory->build($shipPost->postId());
+
+        $directFirstLeg = new Action([
+            'ship_post_id' => $shipPost->postId(),
+            'type' => ActionType::Jump,
+            'params' => ['from_node_id' => $node1->id, 'target_node_id' => $node2->id, 'route' => [$edge->id]],
+        ]);
+        $this->handler->handle($directFirstLeg, $ship);
+
+        $routeAction = new Action([
+            'ship_post_id' => $shipPost->postId(),
+            'type' => ActionType::Jump,
+            'params' => [
+                'from_node_id' => $node1->id,
+                'target_node_id' => $node3->id,
+                'route' => [$edge->id, $edge2->id],
+            ],
+        ]);
+        $this->handler->handle($routeAction, $ship);
+
+        $this->assertSame(ActionStatus::Pending, $routeAction->status);
+        $this->assertNull($routeAction->result);
+        $this->assertEquals($directFirstLeg->deferred_until, $routeAction->deferred_until);
     }
 }

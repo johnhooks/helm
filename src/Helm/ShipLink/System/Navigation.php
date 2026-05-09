@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Helm\ShipLink\System;
 
-use Helm\Navigation\EdgeInfo;
 use Helm\Navigation\NavigationService;
+use Helm\Navigation\EdgeInfo;
 use Helm\Navigation\Node;
 use Helm\Navigation\ScanResult;
 use Helm\ShipLink\Contracts\Navigation as NavigationContract;
@@ -31,6 +31,7 @@ final class Navigation implements NavigationContract
         private ShipState $state,
         private Loadout $loadout,
         private readonly NavigationService $navService,
+        private readonly int $ownerId,
     ) {
     }
 
@@ -89,6 +90,32 @@ final class Navigation implements NavigationContract
         }
 
         return $this->navService->getEdgeInfo($currentPosition, $targetNodeId);
+    }
+
+    /**
+     * @param int[] $route
+     * @return list<\Helm\Navigation\UserEdge>|\WP_Error
+     */
+    public function getRouteEdges(int $fromNodeId, int $targetNodeId, array $route): array|\WP_Error
+    {
+        if ($this->getCurrentPosition() === null) {
+            return new \WP_Error(
+                'no_position',
+                __('Ship is not at a valid position', 'helm')
+            );
+        }
+
+        $edges = $this->navService->getRouteEdges($this->ownerId, $route);
+        if (is_wp_error($edges)) {
+            return $edges;
+        }
+
+        $validation = $this->navService->validateRouteEdges($fromNodeId, $targetNodeId, $edges);
+        if (is_wp_error($validation)) {
+            return $validation;
+        }
+
+        return $edges;
     }
 
     public function scanForRoutes(int $targetNodeId): ScanResult

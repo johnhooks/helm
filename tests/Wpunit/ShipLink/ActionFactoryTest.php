@@ -64,12 +64,15 @@ class ActionFactoryTest extends WPTestCase
         $node1 = $this->tester->getNodeForStar($star1);
         $node2 = $this->tester->getNodeForStar($star2);
 
-        $this->edgeRepository->create($node1->id, $node2->id, 5.0);
+        $edge = $this->edgeRepository->create($node1->id, $node2->id, 5.0);
+        helm(\Helm\Navigation\Contracts\UserEdgeRepository::class)->upsert(1, $edge->id);
 
         $ship = $this->tester->haveShip(['node_id' => $node1->id, 'core_life' => 1000]);
 
         $action = $this->factory->create($ship->postId(), ActionType::Jump, [
+            'from_node_id' => $node1->id,
             'target_node_id' => $node2->id,
+            'route' => [$edge->id],
         ]);
 
         $this->assertInstanceOf(Action::class, $action);
@@ -87,12 +90,15 @@ class ActionFactoryTest extends WPTestCase
         $node1 = $this->tester->getNodeForStar($star1);
         $node2 = $this->tester->getNodeForStar($star2);
 
-        $this->edgeRepository->create($node1->id, $node2->id, 5.0);
+        $edge = $this->edgeRepository->create($node1->id, $node2->id, 5.0);
+        helm(\Helm\Navigation\Contracts\UserEdgeRepository::class)->upsert(1, $edge->id);
 
         $ship = $this->tester->haveShip(['node_id' => $node1->id, 'core_life' => 1000]);
 
         $action = $this->factory->create($ship->postId(), ActionType::Jump, [
+            'from_node_id' => $node1->id,
             'target_node_id' => $node2->id,
+            'route' => [$edge->id],
         ]);
 
         $fromDb = $this->actionRepository->find($action->id);
@@ -110,12 +116,15 @@ class ActionFactoryTest extends WPTestCase
         $node1 = $this->tester->getNodeForStar($star1);
         $node2 = $this->tester->getNodeForStar($star2);
 
-        $this->edgeRepository->create($node1->id, $node2->id, 5.0);
+        $edge = $this->edgeRepository->create($node1->id, $node2->id, 5.0);
+        helm(\Helm\Navigation\Contracts\UserEdgeRepository::class)->upsert(1, $edge->id);
 
         $ship = $this->tester->haveShip(['node_id' => $node1->id, 'core_life' => 1000]);
 
         $action = $this->factory->create($ship->postId(), ActionType::Jump, [
+            'from_node_id' => $node1->id,
             'target_node_id' => $node2->id,
+            'route' => [$edge->id],
         ]);
 
         $state = $this->stateRepository->find($ship->postId());
@@ -131,7 +140,8 @@ class ActionFactoryTest extends WPTestCase
         $node1 = $this->tester->getNodeForStar($star1);
         $node2 = $this->tester->getNodeForStar($star2);
 
-        $this->edgeRepository->create($node1->id, $node2->id, 5.0);
+        $edge = $this->edgeRepository->create($node1->id, $node2->id, 5.0);
+        helm(\Helm\Navigation\Contracts\UserEdgeRepository::class)->upsert(1, $edge->id);
 
         // Ship already has a current action
         $ship = $this->tester->haveShip([
@@ -142,7 +152,9 @@ class ActionFactoryTest extends WPTestCase
 
         try {
             $this->factory->create($ship->postId(), ActionType::Jump, [
+                'from_node_id' => $node1->id,
                 'target_node_id' => $node2->id,
+                'route' => [$edge->id],
             ]);
             $this->fail('Expected ActionException was not thrown');
         } catch (ActionException $e) {
@@ -191,12 +203,15 @@ class ActionFactoryTest extends WPTestCase
         $node1 = $this->tester->getNodeForStar($star1);
         $node2 = $this->tester->getNodeForStar($star2);
 
-        $this->edgeRepository->create($node1->id, $node2->id, 5.0);
+        $edge = $this->edgeRepository->create($node1->id, $node2->id, 5.0);
+        helm(\Helm\Navigation\Contracts\UserEdgeRepository::class)->upsert(1, $edge->id);
 
         $ship = $this->tester->haveShip(['node_id' => $node1->id, 'core_life' => 1000]);
 
         $action = $this->factory->create($ship->postId(), ActionType::Jump, [
+            'from_node_id' => $node1->id,
             'target_node_id' => $node2->id,
+            'route' => [$edge->id],
         ]);
 
         // Action should be stored with deferred_until set

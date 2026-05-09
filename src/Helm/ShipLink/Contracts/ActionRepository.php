@@ -65,6 +65,9 @@ interface ActionRepository
     /**
      * Find actions that are deferred until a specific time or earlier.
      *
+     * Includes pending actions and phase-waiting running actions whose
+     * processing lock is clear.
+     *
      * @param DateTimeImmutable $until
      * @return array<Action>
      */
@@ -145,6 +148,7 @@ interface ActionRepository
      * Claim a batch of ready actions for processing.
      *
      * Uses SKIP LOCKED for non-blocking concurrent access.
+     * Ready actions include pending actions and phase-waiting running actions.
      * Actions are atomically marked as Running before being returned.
      *
      * @param int $limit
@@ -164,7 +168,7 @@ interface ActionRepository
     /**
      * Atomically claim a single action for processing.
      *
-     * Transitions the action from Pending to Running status.
+     * Claims pending actions and phase-ready running actions.
      *
      * @param int $actionId
      * @return bool True if the action was successfully claimed

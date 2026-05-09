@@ -63,7 +63,8 @@ class ActionProcessorTest extends \Codeception\TestCase\WPTestCase
         $node2 = $this->tester->getNodeForStar($star2);
 
         // Create edge between nodes
-        $this->edgeRepository->create($node1->id, $node2->id, 5.0);
+        $edge = $this->edgeRepository->create($node1->id, $node2->id, 5.0);
+        helm(\Helm\Navigation\Contracts\UserEdgeRepository::class)->upsert(1, $edge->id);
 
         $ship = $this->tester->haveShip([
             'name' => 'Process Ship',
@@ -75,7 +76,7 @@ class ActionProcessorTest extends \Codeception\TestCase\WPTestCase
         $action = new Action([
             'ship_post_id' => $ship->postId(),
             'type' => ActionType::Jump,
-            'params' => ['target_node_id' => $node2->id],
+            'params' => ['from_node_id' => $node1->id, 'target_node_id' => $node2->id, 'route' => [$edge->id]],
         ]);
         $this->repository->insert($action);
         $this->stateRepository->updateCurrentAction($ship->postId(), $action->id);
@@ -120,7 +121,8 @@ class ActionProcessorTest extends \Codeception\TestCase\WPTestCase
         $node1 = $this->tester->getNodeForStar($star1);
         $node2 = $this->tester->getNodeForStar($star2);
 
-        $this->edgeRepository->create($node1->id, $node2->id, 5.0);
+        $edge = $this->edgeRepository->create($node1->id, $node2->id, 5.0);
+        helm(\Helm\Navigation\Contracts\UserEdgeRepository::class)->upsert(1, $edge->id);
 
         $ship = $this->tester->haveShip([
             'name' => 'Past Deferred Ship',
@@ -132,7 +134,7 @@ class ActionProcessorTest extends \Codeception\TestCase\WPTestCase
         $action = new Action([
             'ship_post_id' => $ship->postId(),
             'type' => ActionType::Jump,
-            'params' => ['target_node_id' => $node2->id],
+            'params' => ['from_node_id' => $node1->id, 'target_node_id' => $node2->id, 'route' => [$edge->id]],
             'deferred_until' => new DateTimeImmutable('-1 minute'),
         ]);
         $this->repository->insert($action);
@@ -156,7 +158,8 @@ class ActionProcessorTest extends \Codeception\TestCase\WPTestCase
             $node1 = $this->tester->getNodeForStar($star1);
             $node2 = $this->tester->getNodeForStar($star2);
 
-            $this->edgeRepository->create($node1->id, $node2->id, 5.0);
+            $edge = $this->edgeRepository->create($node1->id, $node2->id, 5.0);
+            helm(\Helm\Navigation\Contracts\UserEdgeRepository::class)->upsert(1, $edge->id);
 
             $ship = $this->tester->haveShip([
                 'name' => "Limit Ship {$i}",
@@ -167,7 +170,7 @@ class ActionProcessorTest extends \Codeception\TestCase\WPTestCase
             $action = new Action([
                 'ship_post_id' => $ship->postId(),
                 'type' => ActionType::Jump,
-                'params' => ['target_node_id' => $node2->id],
+                'params' => ['from_node_id' => $node1->id, 'target_node_id' => $node2->id, 'route' => [$edge->id]],
             ]);
             $this->repository->insert($action);
             $this->stateRepository->updateCurrentAction($ship->postId(), $action->id);

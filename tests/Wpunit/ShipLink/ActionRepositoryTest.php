@@ -174,6 +174,25 @@ class ActionRepositoryTest extends \Codeception\TestCase\WPTestCase
         $this->assertSame($ship1->postId(), $ready[0]->ship_post_id);
     }
 
+    public function test_find_deferred_until_includes_phase_ready_running_actions(): void
+    {
+        $ship = $this->tester->haveShip(['name' => 'Phase Deferred Ship']);
+
+        $action = new Action([
+            'ship_post_id' => $ship->postId(),
+            'type' => ActionType::Jump,
+            'status' => ActionStatus::Running,
+            'processing_at' => null,
+            'deferred_until' => new DateTimeImmutable('-1 minute'),
+        ]);
+        $this->repository->insert($action);
+
+        $ready = $this->repository->findDeferredUntil(new DateTimeImmutable());
+        $found = array_filter($ready, fn($a) => $a->id === $action->id);
+
+        $this->assertCount(1, $found);
+    }
+
     public function test_update_modifies_record(): void
     {
         $ship = $this->tester->haveShip(['name' => 'Update Ship']);
@@ -422,7 +441,7 @@ class ActionRepositoryTest extends \Codeception\TestCase\WPTestCase
         $this->assertCount(2, $claimed);
     }
 
-    public function test_claim_ready_skips_already_running(): void
+    public function test_claim_ready_skips_actively_processing_running_action(): void
     {
         $ship = $this->tester->haveShip(['name' => 'Claim Running Ship']);
 
@@ -435,9 +454,70 @@ class ActionRepositoryTest extends \Codeception\TestCase\WPTestCase
 
         $claimed = $this->repository->claimReady(10);
 
-        // Our action should not be claimed again
+        // Our action should not be claimed again while processing_at is set.
         $found = array_filter($claimed, fn($a) => $a->id === $action->id);
         $this->assertCount(0, $found);
+    }
+
+    public function test_claim_ready_claims_phase_ready_running_action(): void
+    {
+        $ship = $this->tester->haveShip(['name' => 'Claim Phase Ready Ship']);
+
+        $action = new Action([
+            'ship_post_id' => $ship->postId(),
+            'type' => ActionType::Jump,
+            'status' => ActionStatus::Running,
+            'processing_at' => null,
+            'deferred_until' => new DateTimeImmutable('-1 minute'),
+        ]);
+        $this->repository->insert($action);
+
+        $claimed = $this->repository->claimReady(10);
+        $found = array_filter($claimed, fn($a) => $a->id === $action->id);
+
+        $this->assertCount(1, $found);
+        $claimedAction = reset($found);
+        $this->assertSame(ActionStatus::Running, $claimedAction->status);
+        $this->assertNotNull($claimedAction->processing_at);
+    }
+
+    public function test_claim_ready_skips_running_action_with_future_deferred_until(): void
+    {
+        $ship = $this->tester->haveShip(['name' => 'Claim Phase Future Ship']);
+
+        $action = new Action([
+            'ship_post_id' => $ship->postId(),
+            'type' => ActionType::Jump,
+            'status' => ActionStatus::Running,
+            'processing_at' => null,
+            'deferred_until' => new DateTimeImmutable('+1 hour'),
+        ]);
+        $this->repository->insert($action);
+
+        $claimed = $this->repository->claimReady(10);
+        $found = array_filter($claimed, fn($a) => $a->id === $action->id);
+
+        $this->assertCount(0, $found);
+    }
+
+    public function test_claim_can_claim_phase_ready_running_action(): void
+    {
+        $ship = $this->tester->haveShip(['name' => 'Claim Single Phase Ship']);
+
+        $action = new Action([
+            'ship_post_id' => $ship->postId(),
+            'type' => ActionType::Jump,
+            'status' => ActionStatus::Running,
+            'processing_at' => null,
+            'deferred_until' => new DateTimeImmutable('-1 minute'),
+        ]);
+        $this->repository->insert($action);
+
+        $this->assertTrue($this->repository->claim($action->id));
+
+        $claimed = $this->repository->find($action->id);
+        $this->assertSame(ActionStatus::Running, $claimed->status);
+        $this->assertNotNull($claimed->processing_at);
     }
 
     public function test_claim_ready_marks_actions_as_running_in_db(): void

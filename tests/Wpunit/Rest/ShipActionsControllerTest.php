@@ -35,6 +35,9 @@ class ShipActionsControllerTest extends WPRestApiTestCase
     /** @var int Node ID for the "to" star. */
     private int $toNodeId;
 
+    /** @var int Discovered edge ID for the direct route. */
+    private int $edgeId;
+
     /**
      * Create test fixtures inside the WPLoader transaction.
      *
@@ -58,14 +61,17 @@ class ShipActionsControllerTest extends WPRestApiTestCase
         $node1 = $this->tester->getNodeForStar($star1);
         $node2 = $this->tester->getNodeForStar($star2);
 
-        $this->edgeRepository->create($node1->id, $node2->id, 5.0);
+        $edge = $this->edgeRepository->create($node1->id, $node2->id, 5.0);
 
         $this->fromNodeId = $node1->id;
         $this->toNodeId   = $node2->id;
+        $this->edgeId     = $edge->id;
 
         // Create users.
         $this->ownerId = self::factory()->user->create(['role' => 'subscriber']);
         $this->otherId = self::factory()->user->create(['role' => 'subscriber']);
+
+        helm(\Helm\Navigation\Contracts\UserEdgeRepository::class)->upsert($this->ownerId, $this->edgeId);
     }
 
     // ------------------------------------------------------------------
@@ -84,6 +90,18 @@ class ShipActionsControllerTest extends WPRestApiTestCase
             'node_id'   => $this->fromNodeId,
             'core_life' => 1000.0,
         ], $overrides));
+    }
+
+    /**
+     * @return array{from_node_id: int, target_node_id: int, route: int[]}
+     */
+    private function jumpParams(): array
+    {
+        return [
+            'from_node_id' => $this->fromNodeId,
+            'target_node_id' => $this->toNodeId,
+            'route' => [$this->edgeId],
+        ];
     }
 
     // ------------------------------------------------------------------
@@ -162,7 +180,7 @@ class ShipActionsControllerTest extends WPRestApiTestCase
         wp_set_current_user($this->ownerId);
         $response = $this->tester->postAction($ship->postId(), [
             'type'   => 'jump',
-            'params' => ['target_node_id' => $this->toNodeId],
+            'params' => $this->jumpParams(),
         ]);
 
         $this->assertSame(201, $response->get_status());
@@ -180,7 +198,7 @@ class ShipActionsControllerTest extends WPRestApiTestCase
         wp_set_current_user($this->ownerId);
         $response = $this->tester->postAction($ship->postId(), [
             'type'   => 'jump',
-            'params' => ['target_node_id' => $this->toNodeId],
+            'params' => $this->jumpParams(),
         ]);
 
         $data = $response->get_data();
@@ -209,7 +227,7 @@ class ShipActionsControllerTest extends WPRestApiTestCase
         wp_set_current_user($this->ownerId);
         $response = $this->tester->postAction($ship->postId(), [
             'type'   => 'jump',
-            'params' => ['target_node_id' => $this->toNodeId],
+            'params' => $this->jumpParams(),
         ]);
 
         $this->assertErrorResponse('helm.action.in_progress', $response, 409);

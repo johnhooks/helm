@@ -14,19 +14,20 @@ use Helm\ShipLink\Ship;
  * Validates jump actions.
  *
  * Checks:
- * - Target node is specified
+ * - Source and target nodes are specified
  * - Ship has a current position
  * - Ship is not already at target
- * - Route exists to target
- * - Ship has enough core life for the jump
+ * - Planned route edge IDs are known by the ship owner and connect in order
  */
 final class Validator implements ActionValidator
 {
     public function validate(Action $action, Ship $ship): void
     {
+        $fromNodeId = $action->get('from_node_id');
         $targetNodeId = $action->get('target_node_id');
+        $route = $action->get('route');
 
-        if ($targetNodeId === null) {
+        if ($fromNodeId === null || $targetNodeId === null) {
             throw new ActionException(
                 ErrorCode::NavigationMissingTarget,
                 __('No destination selected', 'helm')
@@ -42,6 +43,13 @@ final class Validator implements ActionValidator
             );
         }
 
+        if ((int) $fromNodeId !== $currentNodeId) {
+            throw new ActionException(
+                ErrorCode::NavigationNoRoute,
+                __('Route plan does not start at current position', 'helm')
+            );
+        }
+
         if ($currentNodeId === $targetNodeId) {
             throw new ActionException(
                 ErrorCode::NavigationAlreadyAtTarget,
@@ -49,29 +57,42 @@ final class Validator implements ActionValidator
             );
         }
 
-        // Verify route exists
-        $routeInfo = $ship->navigation()->getRouteInfo($targetNodeId);
-        if (is_wp_error($routeInfo)) {
+        if (!is_array($route) || count($route) === 0) {
             throw new ActionException(
                 ErrorCode::NavigationNoRoute,
-                __('No known route to destination', 'helm')
+                __('Route plan is invalid', 'helm')
             );
         }
 
-        // Check core life
-        $coreCost = $ship->propulsion()->calculateCoreCost($routeInfo->distance);
-        $coreLife = $ship->power()->getCoreLife();
-
-        if ($coreCost > $coreLife) {
+        $routeValidation = $ship->navigation()->getRouteEdges((int) $fromNodeId, (int) $targetNodeId, $this->routeEdgeIds($route));
+        if (is_wp_error($routeValidation)) {
             throw new ActionException(
-                ErrorCode::ShipInsufficientCore,
-                sprintf(
-                    /* translators: %1$.1f: required core life, %2$.1f: available core life */
-                    __('Core life too low for this jump (need %1$.1f, have %2$.1f)', 'helm'),
-                    $coreCost,
-                    $coreLife
-                )
+                ErrorCode::NavigationNoRoute,
+                $routeValidation->get_error_message()
             );
         }
+    }
+
+    /**
+     * @param array<mixed> $route
+     * @return int[]
+     */
+    private function routeEdgeIds(array $route): array
+    {
+        $edgeIds = [];
+
+        foreach ($route as $edgeId) {
+            $edgeId = (int) $edgeId;
+            if ($edgeId <= 0) {
+                throw new ActionException(
+                    ErrorCode::NavigationNoRoute,
+                    __('Route plan is invalid', 'helm')
+                );
+            }
+
+            $edgeIds[] = $edgeId;
+        }
+
+        return $edgeIds;
     }
 }

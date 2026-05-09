@@ -7,6 +7,8 @@ namespace Helm\ShipLink\Contracts;
 use Helm\Navigation\EdgeInfo;
 use Helm\Navigation\Node;
 use Helm\Navigation\ScanResult;
+use Helm\Navigation\UserEdge;
+use WP_Error;
 
 /**
  * Navigation system contract.
@@ -58,9 +60,17 @@ interface Navigation
      * Returns edge info including distance, or error if no route.
      *
      * @param int $targetNodeId Target node
-     * @return EdgeInfo|\WP_Error Edge info or error
+     * @return EdgeInfo|WP_Error Edge info or error
      */
-    public function getRouteInfo(int $targetNodeId): EdgeInfo|\WP_Error;
+    public function getRouteInfo(int $targetNodeId): EdgeInfo|WP_Error;
+
+    /**
+     * Load and validate a route plan made of discovered user edge IDs.
+     *
+     * @param int[] $route
+     * @return list<UserEdge>|WP_Error
+     */
+    public function getRouteEdges(int $fromNodeId, int $targetNodeId, array $route): array|WP_Error;
 
     /**
      * Scan for routes toward a destination.
