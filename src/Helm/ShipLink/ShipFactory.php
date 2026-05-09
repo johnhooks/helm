@@ -98,7 +98,7 @@ final class ShipFactory
         $sensors = new Sensors($loadout, $power);
 
         // Build remaining systems
-        $navigation = new Navigation($state, $loadout, $this->navigationService);
+        $navigation = new Navigation($state, $loadout, $this->navigationService, $ship->ownerId());
         $shields = new Shields($state, $loadout);
         $hull = new Hull($state);
         $cargo = new Cargo(

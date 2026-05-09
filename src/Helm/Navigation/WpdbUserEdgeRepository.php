@@ -19,6 +19,8 @@ use Helm\Navigation\Contracts\UserEdgeRepository;
  */
 final class WpdbUserEdgeRepository implements UserEdgeRepository
 {
+    private const CACHE_GROUP = 'helm_user_edges';
+
     public function upsert(int $userId, int $edgeId): void
     {
         global $wpdb;
@@ -34,6 +36,8 @@ final class WpdbUserEdgeRepository implements UserEdgeRepository
                 Date::now()->format('Y-m-d H:i:s'),
             )
         );
+
+        $this->setLastChanged($userId);
     }
 
     /**
@@ -98,6 +102,13 @@ final class WpdbUserEdgeRepository implements UserEdgeRepository
             return [];
         }
 
+        $cacheKey = $this->getManyCacheKey($userId, $edgeIds);
+        $cached = wp_cache_get($cacheKey, self::CACHE_GROUP);
+        if (is_array($cached)) {
+            /** @var UserEdge[] $cached */
+            return $cached;
+        }
+
         $userEdgeTable = $wpdb->prefix . Schema::TABLE_USER_EDGE;
         $edgesTable = $wpdb->prefix . Schema::TABLE_NAV_EDGES;
         $placeholders = implode(',', array_fill(0, count($edgeIds), '%d'));
@@ -117,7 +128,10 @@ final class WpdbUserEdgeRepository implements UserEdgeRepository
             ARRAY_A
         );
 
-        return array_map(fn ($row) => UserEdge::fromRow($row), $rows ?? []);
+        $edges = array_map(fn ($row) => UserEdge::fromRow($row), $rows ?? []);
+        wp_cache_set($cacheKey, $edges, self::CACHE_GROUP);
+
+        return $edges;
     }
 
     public function count(int $userId): int
@@ -159,5 +173,41 @@ final class WpdbUserEdgeRepository implements UserEdgeRepository
         // Stored as MySQL datetime in UTC; format as ISO 8601.
         $dt = new DateTimeImmutable($max . ' UTC');
         return $dt->format('c');
+    }
+
+    private function setLastChanged(int $userId): void
+    {
+        wp_cache_set($this->lastChangedKey($userId), microtime(), self::CACHE_GROUP);
+    }
+
+    private function getLastChanged(int $userId): string
+    {
+        $key = $this->lastChangedKey($userId);
+        $lastChanged = wp_cache_get($key, self::CACHE_GROUP);
+
+        if (!is_string($lastChanged) || $lastChanged === '') {
+            $lastChanged = microtime();
+            wp_cache_set($key, $lastChanged, self::CACHE_GROUP);
+        }
+
+        return $lastChanged;
+    }
+
+    /**
+     * @param int[] $edgeIds
+     */
+    private function getManyCacheKey(int $userId, array $edgeIds): string
+    {
+        return sprintf(
+            'get_many:%d:%s:%s',
+            $userId,
+            $this->getLastChanged($userId),
+            implode(',', $edgeIds)
+        );
+    }
+
+    private function lastChangedKey(int $userId): string
+    {
+        return "last_changed:{$userId}";
     }
 }

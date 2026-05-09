@@ -108,7 +108,11 @@ final class Action extends Model
      */
     public function isReady(?DateTimeImmutable $now = null): bool
     {
-        if ($this->status !== ActionStatus::Pending) {
+        if ($this->status === ActionStatus::Running && $this->processing_at !== null) {
+            return false;
+        }
+
+        if ($this->status !== ActionStatus::Pending && $this->status !== ActionStatus::Running) {
             return false;
         }
 

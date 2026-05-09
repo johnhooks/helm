@@ -9,6 +9,7 @@ use Helm\Celestials\CelestialType;
 use Helm\Core\ErrorCode;
 use Helm\Navigation\Contracts\EdgeRepository;
 use Helm\Navigation\Contracts\NodeRepository;
+use Helm\Navigation\Contracts\UserEdgeRepository;
 use Helm\Stars\StarRepository;
 
 /**
@@ -23,6 +24,7 @@ class NavigationService
         private readonly NavComputer $navComputer,
         private readonly NodeRepository $nodeRepository,
         private readonly EdgeRepository $edgeRepository,
+        private readonly UserEdgeRepository $userEdgeRepository,
         private readonly RouteRepository $routeRepository,
         private readonly StarRepository $starRepository,
         private readonly CelestialRepository $celestialRepository,
@@ -62,6 +64,99 @@ class NavigationService
         }
 
         return EdgeInfo::fromEdge($edge, $fromNodeId, $toNode);
+    }
+
+    /**
+     * Validate that loaded route edges form one continuous path.
+     *
+     * @param list<UserEdge> $edges
+     */
+    public function validateRouteEdges(int $fromNodeId, int $toNodeId, array $edges): bool|\WP_Error
+    {
+        if ($edges === []) {
+            return ErrorCode::NavigationNoRoute->error(
+                __('Route plan is invalid', 'helm')
+            );
+        }
+
+        $expectedFrom = $fromNodeId;
+        foreach ($edges as $edge) {
+            if ($edge->nodeAId === $expectedFrom) {
+                $expectedFrom = $edge->nodeBId;
+                continue;
+            }
+
+            if ($edge->nodeBId === $expectedFrom) {
+                $expectedFrom = $edge->nodeAId;
+                continue;
+            }
+
+            return ErrorCode::NavigationNoRoute->error(
+                __('Route plan is invalid', 'helm')
+            );
+        }
+
+        if ($expectedFrom !== $toNodeId) {
+            return ErrorCode::NavigationNoRoute->error(
+                __('Route plan does not reach destination', 'helm')
+            );
+        }
+
+        return true;
+    }
+
+    /**
+     * Load discovered route edges in submitted order.
+     *
+     * @param int[] $route
+     * @return list<UserEdge>|\WP_Error
+     */
+    public function getRouteEdges(int $userId, array $route): array|\WP_Error
+    {
+        $route = $this->normalizeRouteEdgeIds($route);
+        if ($route === []) {
+            return ErrorCode::NavigationNoRoute->error(
+                __('Route plan is invalid', 'helm')
+            );
+        }
+
+        $edgesById = [];
+        foreach ($this->userEdgeRepository->getMany($userId, $route) as $edge) {
+            $edgesById[$edge->edgeId] = $edge;
+        }
+
+        $edges = [];
+        foreach ($route as $edgeId) {
+            if (!isset($edgesById[$edgeId])) {
+                return ErrorCode::NavigationNoRoute->error(
+                    __('Route plan includes unknown legs', 'helm')
+                );
+            }
+
+            $edges[] = $edgesById[$edgeId];
+        }
+
+        return $edges;
+    }
+
+    /**
+     * @param mixed[] $route
+     * @return int[]
+     */
+    private function normalizeRouteEdgeIds(array $route): array
+    {
+        $edgeIds = [];
+
+        foreach ($route as $edgeId) {
+            $edgeId = (int) $edgeId;
+            if ($edgeId <= 0) {
+                return [];
+            }
+
+            $edgeIds[] = $edgeId;
+        }
+
+        return $edgeIds;
     }
 
     /**

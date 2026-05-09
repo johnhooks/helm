@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Helm\ShipLink\Actions\Jump;
 
 use Helm\Lib\Date;
+use Helm\Core\ErrorCode;
+use Helm\ShipLink\ActionException;
 use Helm\ShipLink\ActionStatus;
 use Helm\ShipLink\Contracts\ActionHandler;
 use Helm\ShipLink\Models\Action;
@@ -13,35 +15,46 @@ use Helm\ShipLink\Ship;
 /**
  * Handles jump action creation.
  *
- * Calculates jump parameters and stores them in result for the resolver.
- * This is the commitment point - all data needed to execute is captured here.
+ * Calculates the first wait window for jump actions.
+ *
  */
 final class Handler implements ActionHandler
 {
     public function handle(Action $action, Ship $ship): void
     {
+        $fromNodeId = (int) $action->get('from_node_id');
         $targetNodeId = $action->get('target_node_id');
-        $currentNodeId = $ship->navigation()->getCurrentPosition();
+        $route = $action->get('route');
 
-        // Get route info for distance calculation
-        $routeInfo = $ship->navigation()->getRouteInfo($targetNodeId);
-        $distance = $routeInfo->distance;
+        if (!is_array($route) || count($route) === 0 || $targetNodeId === null) {
+            throw new ActionException(
+                ErrorCode::NavigationNoRoute,
+                __('Route plan is invalid', 'helm')
+            );
+        }
 
-        // Calculate costs and duration
-        $coreCost = $ship->propulsion()->calculateCoreCost($distance);
-        $durationSeconds = $ship->propulsion()->getJumpDuration($distance);
+        $edges = $ship->navigation()->getRouteEdges($fromNodeId, (int) $targetNodeId, $this->routeEdgeIds($route));
+        if (is_wp_error($edges) || $edges === []) {
+            throw new ActionException(
+                ErrorCode::NavigationNoRoute,
+                is_wp_error($edges) ? $edges->get_error_message() : __('Route plan is invalid', 'helm')
+            );
+        }
+
+        $durationSeconds = $ship->propulsion()->getJumpDuration($edges[0]->distance);
         $completesAt = Date::addSeconds(Date::now(), $durationSeconds);
-
-        // Store calculated values in result - resolver will use these
-        $action->result = [
-            'from_node_id' => $currentNodeId,
-            'to_node_id' => $targetNodeId,
-            'distance' => $distance,
-            'core_cost' => $coreCost,
-            'duration' => $durationSeconds,
-        ];
 
         $action->status = ActionStatus::Pending;
         $action->deferred_until = $completesAt;
     }
+
+    /**
+     * @param array<mixed> $route
+     * @return int[]
+     */
+    private function routeEdgeIds(array $route): array
+    {
+        return array_map('intval', $route);
+    }
+
 }

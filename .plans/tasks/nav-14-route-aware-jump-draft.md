@@ -1,11 +1,10 @@
 ---
-status: blocked
+status: in_progress
 area: navigation
 priority: p2
 depends_on:
     - actions-01-add-multiphase-action-lifecycle
     - nav-12-add-node-adjacency-path-selectors
-blocked_by: actions-01-add-multiphase-action-lifecycle
 ---
 
 # Add route-aware jump drafts
@@ -26,8 +25,8 @@ still "jump there." The draft needs to show whether that jump is one direct leg
 or a longer known route.
 
 The generic multiphase action lifecycle is tracked separately in
-`actions-01-add-multiphase-action-lifecycle`. Once that lands, this task should
-use that resolver contract.
+`actions-01-add-multiphase-action-lifecycle`. This task now builds on that
+shape by letting `jump` opt into a route-aware continuation flow.
 
 ## Proposed solution
 
@@ -51,14 +50,28 @@ the remaining estimate should shift based on the completed progress, the next
 leg distance, and any updated route state.
 
 Submitting a route-aware jump should create one jump action that follows the
-known route leg by leg. The plotted route is action input and should be stored
-in a domain-specific `params.route` payload. Per-leg progress and outcomes are
-action output and should be stored under the multiphase `result.phases` shape
-established by `actions-01`. The jump resolver is responsible for validating
-the next leg against `params.route`, updating the ship's location when that leg
-completes, setting the next leg's `deferred_until`, and marking the action
-final only when the route is complete or cannot continue. The shared action
-resolver lifecycle should handle the non-final bookkeeping between legs.
+known route leg by leg. The plotted route is action input and is stored as an
+ordered list of discovered user edge IDs in `params.route`. The action params
+must include `from_node_id`, `target_node_id`, and `route`. Client-supplied
+node-pair legs and distances are not accepted as route input. The server loads
+the canonical user edges in one repository call. If any submitted edge ID is not
+returned, the user does not have permission to travel that edge and the action
+must fail validation. Validation then walks the returned edges in the submitted
+order: start at `from_node_id`, require `from_node_id` to match the ship's
+current node, require each edge to connect to the current node, advance to the
+other endpoint, and require the final node to equal `target_node_id`.
+
+The handler uses the first edge only to schedule the initial wait, but does not
+prebuild action output. Per-leg outcomes are action output and are appended to
+`result.phases` as each leg completes. Phase entries should not repeat route
+input fields from `params.route`; callers align route edges and phases by array
+index. The jump resolver is responsible for costing only the current edge,
+updating the ship's location when that edge completes, setting the next edge's
+`deferred_until`, and marking the action final only when the route is complete.
+The action should not calculate or reserve the whole route up front. If a later
+edge can no longer continue, the resolver should raise the existing action
+failure path rather than silently skipping it. The shared action resolver
+lifecycle handles the non-final bookkeeping between legs.
 
 Scan eligibility remains separate. A target can be reachable through an
 indirect known path and still be scannable if there is no direct edge from the
@@ -76,14 +89,33 @@ current node to that target.
     node for indirect paths.
 -   Submitting an indirect route should create one jump action that follows the
     full known route, not a sequence of separately drafted player actions.
--   The jump action must store the plotted route in `params.route`, including
-    the ordered route, per-leg distances, total distance, total planned cost,
-    and final target.
+-   The jump action must store the plotted route as `params.route`, an ordered
+    list of discovered user edge IDs.
+-   Route-aware jump params must include `from_node_id`, `target_node_id`, and
+    `route`.
+-   Route input must not include client-supplied node pairs or distances; the
+    server must look up canonical edge endpoints and distance for validation,
+    scheduling, cost, and result output.
+-   The jump validator must validate the entire planned route before the action
+    starts. It must fetch all submitted user edges for the ship owner in one
+    repository call, preserve submitted route order for path walking, reject
+    missing edge IDs, and walk the edge endpoints to prove the ordered edges
+    form one continuous route from the ship's current node to `target_node_id`.
+-   The jump validator must require `params.from_node_id` to equal the ship's
+    current node. Route walking starts at `params.from_node_id`, advances across
+    each submitted edge by endpoint connectivity, and must end exactly at
+    `params.target_node_id`.
+-   The jump handler must keep action input in `params` and avoid building any
+    `result` data before the resolver completes work.
 -   Route phase progress and per-leg outcomes must follow the `result.phases`
     convention established by the multiphase action lifecycle.
+-   Route phase entries must avoid duplicating `params.route` leg fields; a
+    phase describes the outcome for the route leg at the same array index.
 -   Each completed leg must update the ship's current node and action result,
     then set the next leg's `deferred_until` from that leg's distance before
     leaving the action non-final.
+-   Route jump cost, duration, and failure checks must happen per leg as that
+    leg is processed, not as an up-front calculation for the whole route.
 -   Non-final route phases should rely on the shared action resolver lifecycle
     to keep the ship busy, release the processing lock, and broadcast
     intermediate progress.

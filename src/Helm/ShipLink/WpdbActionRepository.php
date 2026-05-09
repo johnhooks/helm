@@ -227,12 +227,15 @@ final class WpdbActionRepository implements ActionRepository
         $rows = $wpdb->get_results(
             $wpdb->prepare(
                 "SELECT * FROM {$table}
-                 WHERE status = %s
+                 WHERE status IN (%s, %s)
                    AND deferred_until IS NOT NULL
                    AND deferred_until <= %s
+                   AND (status = %s OR processing_at IS NULL)
                  ORDER BY deferred_until ASC",
                 ActionStatus::Pending->value,
-                $until->format('Y-m-d H:i:s')
+                ActionStatus::Running->value,
+                $until->format('Y-m-d H:i:s'),
+                ActionStatus::Pending->value
             ),
             ARRAY_A
         );
@@ -454,19 +457,33 @@ final class WpdbActionRepository implements ActionRepository
         // Transaction for atomic claim (uses savepoints when nested)
         Transaction::begin();
 
-        // Select ready actions with row-level locking, skipping locked rows
-        // Ready = pending, deferred time passed (or null), not currently processing (or stale)
+        // Select ready actions with row-level locking, skipping locked rows.
+        // Ready = pending elapsed work, phase-waiting running work, or stale locks.
         $rows = $wpdb->get_results(
             $wpdb->prepare(
                 "SELECT * FROM {$table}
-                 WHERE status = %s
-                   AND (deferred_until IS NULL OR deferred_until <= %s)
-                   AND (processing_at IS NULL OR processing_at < %s)
+                 WHERE (
+                     status = %s
+                     AND (deferred_until IS NULL OR deferred_until <= %s)
+                     AND (processing_at IS NULL OR processing_at < %s)
+                 ) OR (
+                     status = %s
+                     AND processing_at IS NULL
+                     AND deferred_until IS NOT NULL
+                     AND deferred_until <= %s
+                 ) OR (
+                     status = %s
+                     AND processing_at < %s
+                 )
                  ORDER BY deferred_until ASC, id ASC
                  LIMIT %d
                  FOR UPDATE SKIP LOCKED",
                 ActionStatus::Pending->value,
                 $nowString,
+                $staleThreshold,
+                ActionStatus::Running->value,
+                $nowString,
+                ActionStatus::Running->value,
                 $staleThreshold,
                 $limit
             ),
@@ -495,6 +512,10 @@ final class WpdbActionRepository implements ActionRepository
                 ...$ids
             )
         );
+
+        foreach ($ids as $id) {
+            wp_cache_delete($id, self::CACHE_GROUP);
+        }
 
         Transaction::commit();
 
@@ -542,7 +563,7 @@ final class WpdbActionRepository implements ActionRepository
     /**
      * Atomically claim a single action for processing.
      *
-     * Transitions the action from Pending to Running status.
+     * Claims pending actions and phase-ready running actions.
      */
     public function claim(int $actionId): bool
     {
@@ -555,15 +576,33 @@ final class WpdbActionRepository implements ActionRepository
             $wpdb->prepare(
                 "UPDATE {$table}
                  SET status = %s, processing_at = %s, broadcast_at = %s, updated_at = %s
-                 WHERE id = %d AND status = %s",
+                 WHERE id = %d
+                   AND (
+                       (
+                           status = %s
+                           AND (deferred_until IS NULL OR deferred_until <= %s)
+                       ) OR (
+                           status = %s
+                           AND processing_at IS NULL
+                           AND deferred_until IS NOT NULL
+                           AND deferred_until <= %s
+                       )
+                   )",
                 ActionStatus::Running->value,
                 $nowString,
                 $nowString,
                 $nowString,
                 $actionId,
-                ActionStatus::Pending->value
+                ActionStatus::Pending->value,
+                $nowString,
+                ActionStatus::Running->value,
+                $nowString
             )
         );
+
+        if ($updated === 1) {
+            wp_cache_delete($actionId, self::CACHE_GROUP);
+        }
 
         return $updated === 1;
     }

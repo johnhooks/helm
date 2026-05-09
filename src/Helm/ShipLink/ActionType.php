@@ -101,6 +101,17 @@ enum ActionType: string
     }
 
     /**
+     * Check if this action resolves across multiple deferred phases.
+     */
+    public function isMultiphase(): bool
+    {
+        return match ($this) {
+            self::Jump => true,
+            default => false,
+        };
+    }
+
+    /**
      * Get human-readable label.
      */
     public function label(): string

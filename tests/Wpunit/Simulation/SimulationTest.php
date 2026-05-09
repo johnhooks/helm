@@ -207,7 +207,9 @@ class SimulationTest extends WPTestCase
 
         // Now jump to node 2
         $jump = $this->sim->dispatch($ship->getId(), ActionType::Jump, [
+            'from_node_id' => 1,
             'target_node_id' => 2,
+            'route' => $resolvedScan->result['discovered_edge_ids'],
         ]);
         $this->sim->advanceUntilIdle();
 

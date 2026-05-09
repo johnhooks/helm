@@ -27,9 +27,9 @@ enum ActionStatus: string
     }
 
     /**
-     * Check if this status represents a completed action (terminal state).
+     * Check if this status represents a final action state.
      */
-    public function isComplete(): bool
+    public function isFinalState(): bool
     {
         return match ($this) {
             self::Pending, self::Running => false,

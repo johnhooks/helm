@@ -57,9 +57,16 @@ final class MemoryActionRepository implements ActionRepository
     {
         return array_values(array_filter(
             $this->actions,
-            static fn (Action $a) => $a->status === ActionStatus::Pending
+            static fn (Action $a) => (
+                $a->status === ActionStatus::Pending
                 && $a->deferred_until !== null
-                && $a->deferred_until <= $until,
+                && $a->deferred_until <= $until
+            ) || (
+                $a->status === ActionStatus::Running
+                && $a->processing_at === null
+                && $a->deferred_until !== null
+                && $a->deferred_until <= $until
+            ),
         ));
     }
 
@@ -135,7 +142,7 @@ final class MemoryActionRepository implements ActionRepository
     }
 
     /**
-     * Claim ready actions — filter pending + deferred_until passed, transition to Running.
+     * Claim ready actions — filter pending and phase-ready running work.
      */
     public function claimReady(int $limit = 50): array
     {
@@ -147,11 +154,7 @@ final class MemoryActionRepository implements ActionRepository
                 break;
             }
 
-            if ($action->status !== ActionStatus::Pending) {
-                continue;
-            }
-
-            if ($action->deferred_until !== null && $action->deferred_until > $now) {
+            if (! $action->isReady($now)) {
                 continue;
             }
 
@@ -170,7 +173,7 @@ final class MemoryActionRepository implements ActionRepository
     }
 
     /**
-     * Get the earliest deferred_until timestamp among pending actions.
+     * Get the earliest deferred_until timestamp among pending or phase-waiting running actions.
      *
      * Used by Simulation::advanceUntilIdle() to jump the clock forward.
      */
@@ -179,7 +182,11 @@ final class MemoryActionRepository implements ActionRepository
         $earliest = null;
 
         foreach ($this->actions as $action) {
-            if ($action->status !== ActionStatus::Pending) {
+            if ($action->status !== ActionStatus::Pending && $action->status !== ActionStatus::Running) {
+                continue;
+            }
+
+            if ($action->status === ActionStatus::Running && $action->processing_at !== null) {
                 continue;
             }
 
@@ -196,12 +203,12 @@ final class MemoryActionRepository implements ActionRepository
     }
 
     /**
-     * Claim a single action — transition from Pending to Running.
+     * Claim a single pending or phase-ready running action.
      */
     public function claim(int $actionId): bool
     {
         $action = $this->find($actionId);
-        if ($action === null || $action->status !== ActionStatus::Pending) {
+        if ($action === null || ! $action->isReady()) {
             return false;
         }
 

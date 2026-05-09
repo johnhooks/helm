@@ -21,6 +21,7 @@ tasks. Completed tasks are archived in `.plans/tasks/.archive/`.
 
 ## Draft
 
+-   [actions-02-add-typed-action-contracts](tasks/actions-02-add-typed-action-contracts.md) - Add typed action contracts. `dev` `p2`
 -   [nav-13-add-scan-result-reconciler](tasks/nav-13-add-scan-result-reconciler.md) - Add a scan result reconciler. `navigation` `p2`
 -   [nav-16-show-active-scan-line](tasks/nav-16-show-active-scan-line.md) - Show active scan lines on the starfield. `navigation` `p2`
 -   [nav-20-investigate-route-animation-performance](tasks/nav-20-investigate-route-animation-performance.md) - Investigate route animation performance. `navigation` `p2`

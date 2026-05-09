@@ -7,6 +7,7 @@ namespace Helm\Simulation;
 use Helm\Inventory\Contracts\InventoryRepository;
 use Helm\Navigation\Contracts\EdgeRepository;
 use Helm\Navigation\Contracts\NodeRepository;
+use Helm\Navigation\Contracts\UserEdgeRepository;
 use Helm\Products\Contracts\ProductRepository;
 use Helm\Navigation\NavComputer;
 use Helm\Navigation\NavigationService;
@@ -38,6 +39,7 @@ final class Provider extends ServiceProvider
         $this->container->singleton(ProductRepository::class, MemoryProductRepository::class);
         $this->container->singleton(NodeRepository::class, MemoryNodeRepository::class);
         $this->container->singleton(EdgeRepository::class, MemoryEdgeRepository::class);
+        $this->container->singleton(UserEdgeRepository::class, MemoryUserEdgeRepository::class);
 
         // LoadoutFactory
         $this->container->singleton(LoadoutFactory::class, MemoryLoadoutFactory::class);
