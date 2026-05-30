@@ -1,5 +1,5 @@
 ---
-status: in_progress
+status: active
 area: navigation
 priority: p2
 depends_on:
