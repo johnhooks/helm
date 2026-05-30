@@ -1,10 +1,9 @@
 ---
-status: blocked
+status: ready
 area: navigation
 priority: p2
 depends_on:
     - actions-01-add-multiphase-action-lifecycle
-blocked_by: actions-01-add-multiphase-action-lifecycle
 ---
 
 # Add multiphase route scan

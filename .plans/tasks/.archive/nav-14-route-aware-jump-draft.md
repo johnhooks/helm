@@ -1,5 +1,5 @@
 ---
-status: active
+status: done
 area: navigation
 priority: p2
 depends_on:
@@ -7,7 +7,7 @@ depends_on:
     - nav-12-add-node-adjacency-path-selectors
 ---
 
-# Add route-aware jump drafts
+# Add route-aware jump backend
 
 ## Problem
 
