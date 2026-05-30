@@ -12,6 +12,7 @@ tasks. Completed tasks are archived in `.plans/tasks/.archive/`.
 ## Ready
 
 -   [dev-01-time-scale-constant](tasks/dev-01-time-scale-constant.md) - Add a time-scale constant for manual testing. `dev` `p2`
+-   [dev-03-add-action-prune-command](tasks/dev-03-add-action-prune-command.md) - Add action prune command. `dev` `p2`
 -   [nav-11-enforce-waypoint-visibility](tasks/nav-11-enforce-waypoint-visibility.md) - Enforce waypoint visibility on the backend. `navigation` `p3`
 -   [nav-21-add-multiphase-route-scan](tasks/nav-21-add-multiphase-route-scan.md) - Add multiphase route scan. `navigation` `p2`
 -   [nav-22-wire-route-aware-jump-ui](tasks/nav-22-wire-route-aware-jump-ui.md) - Wire route-aware jump draft UI. `navigation` `p2`
