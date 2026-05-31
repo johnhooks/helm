@@ -5,14 +5,29 @@ import { DraftJumpCard } from './draft-jump-card';
 
 const TARGET_NAME = 'Tau Ceti';
 const noop = vi.fn();
-const draftProps = { onCancel: noop, onSubmit: noop, isSubmitting: false };
+const routePath = {
+	reachable: true,
+	direct: false,
+	nodeIds: [1, 3, 7],
+	edgeIds: [101, 102],
+	totalDistance: 11.9,
+	nextNodeId: 3,
+};
+const routeNodeNames = ['Sol', 'Waypoint #3', TARGET_NAME];
+const draftProps = {
+	onCancel: noop,
+	onSubmit: noop,
+	isSubmitting: false,
+	routePath,
+	routeNodeNames,
+};
 
 const draft: DraftAction<'jump'> = {
 	type: 'jump',
 	params: {
+		from_node_id: 1,
 		target_node_id: 7,
-		source_node_id: 1,
-		distance_ly: 11.9,
+		route: [101],
 	},
 };
 
@@ -25,10 +40,10 @@ describe('DraftJumpCard', () => {
 				{...draftProps}
 			/>
 		);
-		expect(screen.getByText(/Tau Ceti/)).toBeInTheDocument();
+		expect(screen.getByText('Jump — Tau Ceti')).toBeInTheDocument();
 	});
 
-	it('renders the distance from params', () => {
+	it('renders route details from the known path', () => {
 		render(
 			<DraftJumpCard
 				draft={draft}
@@ -37,6 +52,9 @@ describe('DraftJumpCard', () => {
 			/>
 		);
 		expect(screen.getByText('11.9')).toBeInTheDocument();
+		expect(
+			screen.getByText(/Sol → Waypoint #3 → Tau Ceti/)
+		).toBeInTheDocument();
 	});
 
 	it('renders placeholder values for unknown fields', () => {

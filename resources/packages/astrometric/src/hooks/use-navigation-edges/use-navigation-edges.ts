@@ -63,7 +63,7 @@ export function useNavigationEdges(): RouteState {
 		}
 
 		if (draft !== null) {
-			if (isScanRoute(draft) || isJump(draft)) {
+			if (isScanRoute(draft)) {
 				const from = draft.params.source_node_id;
 				const to = draft.params.target_node_id;
 				const canonical = knownEdges.get(
@@ -76,9 +76,33 @@ export function useNavigationEdges(): RouteState {
 					to,
 					status: 'plotted',
 					active: true,
-					type: isScanRoute(draft) ? 'scan' : 'jump',
+					type: 'scan',
 					canonicalEdgeId: canonical?.edgeId,
 					canonicalRouteId: canonical?.routeId,
+				});
+			}
+
+			if (isJump(draft)) {
+				draft.params.route.forEach((edgeId, index) => {
+					const edge = userEdgesById.get(edgeId);
+					if (!edge) {
+						return;
+					}
+
+					const canonical = knownEdges.get(
+						createNavigationEdgeKey(edge.node_a_id, edge.node_b_id)
+					);
+
+					overlays.push({
+						id: `${draft.type}-draft-${draft.params.from_node_id}-${draft.params.target_node_id}-${index}`,
+						from: edge.node_a_id,
+						to: edge.node_b_id,
+						status: 'plotted',
+						active: true,
+						type: 'jump',
+						canonicalEdgeId: canonical?.edgeId,
+						canonicalRouteId: canonical?.routeId,
+					});
 				});
 			}
 
@@ -148,28 +172,34 @@ export function useNavigationEdges(): RouteState {
 
 		if (isJump(latestAction)) {
 			if (isActive(latestAction) || isFailed(latestAction)) {
-				const from =
-					latestAction.result?.from_node_id ??
-					latestAction.params.source_node_id;
-				const to =
-					latestAction.result?.to_node_id ??
-					latestAction.params.target_node_id;
 				const state = isActive(latestAction) ? 'active' : 'failed';
-				const canonical = knownEdges.get(
-					createNavigationEdgeKey(from, to)
-				);
+				const status = isActive(latestAction) ? 'plotted' : 'blocked';
 
-				overlays.push({
-					id: `${latestAction.type}-${state}-${latestAction.id}`,
-					from,
-					to,
-					status: isActive(latestAction) ? 'plotted' : 'blocked',
-					active: true,
-					type: 'jump',
-					canonicalEdgeId: canonical?.edgeId,
-					canonicalRouteId: canonical?.routeId,
-					pulse: isActive(latestAction),
-				});
+				for (const [
+					index,
+					edgeId,
+				] of latestAction.params.route.entries()) {
+					const edge = userEdgesById.get(edgeId);
+					if (!edge) {
+						continue;
+					}
+
+					const canonical = knownEdges.get(
+						createNavigationEdgeKey(edge.node_a_id, edge.node_b_id)
+					);
+
+					overlays.push({
+						id: `${latestAction.type}-${state}-${latestAction.id}-${index}`,
+						from: edge.node_a_id,
+						to: edge.node_b_id,
+						status,
+						active: true,
+						type: 'jump',
+						canonicalEdgeId: canonical?.edgeId,
+						canonicalRouteId: canonical?.routeId,
+						pulse: isActive(latestAction),
+					});
+				}
 
 				return { routes, overlays, nodes };
 			}
@@ -178,23 +208,27 @@ export function useNavigationEdges(): RouteState {
 				return { routes, overlays, nodes };
 			}
 
-			const canonical = knownEdges.get(
-				createNavigationEdgeKey(
-					latestAction.result.from_node_id,
-					latestAction.result.to_node_id
-				)
-			);
+			for (const [index, edgeId] of latestAction.params.route.entries()) {
+				const edge = userEdgesById.get(edgeId);
+				if (!edge) {
+					continue;
+				}
 
-			overlays.push({
-				id: `jump-result-${latestAction.id}`,
-				from: latestAction.result.from_node_id,
-				to: latestAction.result.to_node_id,
-				status: 'traveled',
-				active: true,
-				type: 'jump',
-				canonicalEdgeId: canonical?.edgeId,
-				canonicalRouteId: canonical?.routeId,
-			});
+				const canonical = knownEdges.get(
+					createNavigationEdgeKey(edge.node_a_id, edge.node_b_id)
+				);
+
+				overlays.push({
+					id: `jump-result-${latestAction.id}-${index}`,
+					from: edge.node_a_id,
+					to: edge.node_b_id,
+					status: 'traveled',
+					active: true,
+					type: 'jump',
+					canonicalEdgeId: canonical?.edgeId,
+					canonicalRouteId: canonical?.routeId,
+				});
+			}
 		}
 
 		return { routes, overlays, nodes };

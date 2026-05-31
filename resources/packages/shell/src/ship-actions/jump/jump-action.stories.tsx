@@ -22,9 +22,9 @@ const baseAction: ShipAction<'jump'> = {
 	type: 'jump',
 	status: 'pending',
 	params: {
+		from_node_id: 1,
 		target_node_id: 7,
-		source_node_id: 1,
-		distance_ly: 11.9,
+		route: [101],
 	},
 	result: null,
 	deferred_until: new Date(Date.now() + 1000 * 60 * 60 * 24).toISOString(),
@@ -35,9 +35,9 @@ const baseAction: ShipAction<'jump'> = {
 const baseDraft: DraftAction<'jump'> = {
 	type: 'jump',
 	params: {
+		from_node_id: 1,
 		target_node_id: 7,
-		source_node_id: 1,
-		distance_ly: 11.9,
+		route: [101],
 	},
 };
 
@@ -80,11 +80,8 @@ export const Running: Story = {
 					...baseAction,
 					status: 'running',
 					result: {
-						from_node_id: 1,
-						to_node_id: 7,
-						distance: 11.9,
-						core_cost: 12,
-						duration: 345600,
+						current_node_id: 1,
+						phases: [],
 					},
 				}}
 				targetName={TARGET_NAME}
@@ -101,11 +98,14 @@ export const Fulfilled: Story = {
 					...baseAction,
 					status: 'fulfilled',
 					result: {
-						from_node_id: 1,
-						to_node_id: 7,
-						distance: 11.9,
-						core_cost: 12,
-						duration: 345600,
+						phases: [
+							{
+								core_cost: 12,
+								core_before: 100,
+								remaining_core_life: 88,
+								completed_at: new Date().toISOString(),
+							},
+						],
 						remaining_core_life: 88,
 						core_before: 100,
 					},
@@ -125,11 +125,6 @@ export const Failed: Story = {
 					...baseAction,
 					status: 'failed',
 					result: {
-						from_node_id: 1,
-						to_node_id: 7,
-						distance: 11.9,
-						core_cost: 12,
-						duration: 345600,
 						cause: 'Blackhole',
 					},
 					deferred_until: null,

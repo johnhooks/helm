@@ -4,7 +4,6 @@ import {
 	Button,
 	Countdown,
 	LogCard,
-	ProgressBar,
 	Readout,
 	SystemCell,
 	SystemGrid,
@@ -13,7 +12,7 @@ import type { LcarsTone } from '@helm/ui';
 import type { ShipAction } from '@helm/actions';
 import { isActive } from '@helm/actions';
 import { ActionStatusBadge } from '../action-status';
-import { getProgressPercentage, getRemainingSeconds } from '../utils';
+import { getRemainingSeconds } from '../utils';
 import { getJumpTitle } from './utils';
 
 export function ActiveJumpCard({
@@ -30,6 +29,7 @@ export function ActiveJumpCard({
 	}
 
 	const result = action.result;
+	const completedLegs = result?.phases?.length ?? 0;
 	const title = getJumpTitle(action.type, targetName);
 	const status = <ActionStatusBadge status={action.status} />;
 
@@ -45,29 +45,26 @@ export function ActiveJumpCard({
 				<SystemGrid columns={3} gap="sm">
 					<SystemCell>
 						<Readout
-							label={__('Distance', 'helm')}
-							value={action.params.distance_ly}
-							unit="ly"
+							label={__('Hops', 'helm')}
+							value={action.params.route.length}
 							tone={tone}
 							size="sm"
 						/>
 					</SystemCell>
 					<SystemCell>
 						<Readout
-							label={__('Duration', 'helm')}
-							value={result?.duration ?? '--'}
+							label={__('Completed', 'helm')}
+							value={completedLegs}
 							tone={tone}
 							size="sm"
 						/>
 					</SystemCell>
 					<SystemCell>
 						<Readout
-							label={__('Core Cost', 'helm')}
-							value={result?.core_cost ?? '--'}
-							unit={
-								result?.core_cost !== undefined
-									? '%'
-									: undefined
+							label={__('Current Node', 'helm')}
+							value={
+								result?.current_node_id ??
+								action.params.from_node_id
 							}
 							tone="gold"
 							size="sm"
@@ -87,13 +84,9 @@ function ActiveJumpProgress({
 	action: ShipAction<'jump'> & { status: 'pending' | 'running' };
 	tone: LcarsTone;
 }) {
-	const result = action.result;
 	const [remaining, setRemaining] = useState(() =>
 		getRemainingSeconds(action.deferred_until)
 	);
-	const progress = action.deferred_until
-		? getProgressPercentage(result?.duration, remaining)
-		: undefined;
 
 	useEffect(() => {
 		if (!action.deferred_until) {
@@ -112,9 +105,6 @@ function ActiveJumpProgress({
 
 	return (
 		<>
-			{progress !== undefined && (
-				<ProgressBar value={progress} tone={tone} size="sm" active />
-			)}
 			<div
 				className={`helm-flex helm-items-center helm-justify-between helm-gap-x-3 helm-tone--${tone}`}
 			>

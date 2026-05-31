@@ -11,14 +11,25 @@ import { getJumpTargetName } from './utils';
 
 function DraftJump({ draft }: { draft: DraftAction<'jump'> }) {
 	const { shipId } = useShip();
-	const { targetNode, isSubmitting } = useSelect(
-		(select) => ({
-			targetNode: select(navStore).expectNode(
+	const { targetNode, isSubmitting, routePath, routeNodeNames } = useSelect(
+		(select) => {
+			const path = select(navStore).findKnownPath(
+				draft.params.from_node_id,
 				draft.params.target_node_id
-			),
-			isSubmitting: select(actionsStore).isCreating(),
-		}),
-		[draft.params.target_node_id]
+			);
+			return {
+				targetNode: select(navStore).expectNode(
+					draft.params.target_node_id
+				),
+				isSubmitting: select(actionsStore).isCreating(),
+				routePath: path,
+				routeNodeNames: (path?.nodeIds ?? [])
+					.map((nodeId) => select(navStore).getNode(nodeId))
+					.map((node) => (node ? getJumpTargetName(node) : null))
+					.filter((name): name is string => name !== null),
+			};
+		},
+		[draft.params.from_node_id, draft.params.target_node_id]
 	);
 	const targetName = getJumpTargetName(targetNode);
 	const { clearDraft, createAction } = useDispatch(actionsStore);
@@ -26,6 +37,8 @@ function DraftJump({ draft }: { draft: DraftAction<'jump'> }) {
 		<DraftJumpCard
 			draft={draft}
 			targetName={targetName}
+			routePath={routePath}
+			routeNodeNames={routeNodeNames}
 			onCancel={clearDraft}
 			onSubmit={() => createAction(shipId, draft.type, draft.params)}
 			isSubmitting={isSubmitting}

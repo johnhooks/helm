@@ -11,9 +11,9 @@ const baseAction: ShipAction<'jump'> = {
 	type: 'jump',
 	status: 'running',
 	params: {
+		from_node_id: 1,
 		target_node_id: 7,
-		source_node_id: 1,
-		distance_ly: 11.9,
+		route: [101],
 	},
 	result: null,
 	deferred_until: null,
@@ -36,20 +36,26 @@ describe('ActiveJumpCard', () => {
 		expect(screen.getByText(/Tau Ceti/)).toBeInTheDocument();
 	});
 
-	it('renders duration and core cost from result', () => {
+	it('renders route progress from phases', () => {
 		const action: ShipAction<'jump'> = {
 			...baseAction,
+			params: { ...baseAction.params, route: [101, 102] },
 			result: {
-				from_node_id: 1,
-				to_node_id: 7,
-				distance: 11.9,
-				core_cost: 12,
-				duration: 345600,
+				phases: [
+					{
+						core_cost: 12,
+						core_before: 100,
+						remaining_core_life: 88,
+						completed_at: '2026-02-16T12:00:00Z',
+					},
+				],
+				current_node_id: 3,
 			},
 		};
 		render(<ActiveJumpCard action={action} targetName={TARGET_NAME} />);
-		expect(screen.getByText('345600')).toBeInTheDocument();
-		expect(screen.getByText('12')).toBeInTheDocument();
+		expect(screen.getByText('2')).toBeInTheDocument();
+		expect(screen.getByText('1')).toBeInTheDocument();
+		expect(screen.getByText('3')).toBeInTheDocument();
 	});
 
 	it('renders countdown when deferred_until is set', () => {
@@ -61,22 +67,12 @@ describe('ActiveJumpCard', () => {
 		expect(screen.getByText(/Remaining/)).toBeInTheDocument();
 	});
 
-	it('calculates progress from duration and deferred_until', () => {
+	it('does not render a whole-route progress bar before route progress UI lands', () => {
 		const action: ShipAction<'jump'> = {
 			...baseAction,
 			deferred_until: '2026-02-16T12:30:00Z',
-			result: {
-				from_node_id: 1,
-				to_node_id: 7,
-				distance: 11.9,
-				core_cost: 12,
-				duration: 3600,
-			},
 		};
 		render(<ActiveJumpCard action={action} targetName={TARGET_NAME} />);
-		expect(screen.getByRole('progressbar')).toHaveAttribute(
-			'aria-valuenow',
-			'50'
-		);
+		expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
 	});
 });
