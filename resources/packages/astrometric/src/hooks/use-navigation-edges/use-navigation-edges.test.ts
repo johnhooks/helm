@@ -144,39 +144,43 @@ describe('useNavigationEdges', () => {
 
 		expect(
 			renderNavigationEdges({
+				userEdges: [
+					createUserEdge({ id: 50, node_a_id: 1, node_b_id: 5 }),
+				],
 				draft: {
 					type: 'jump',
 					params: {
-						source_node_id: 1,
+						from_node_id: 1,
 						target_node_id: 5,
-						distance_ly: 4,
+						route: [50],
 					},
 				},
 			}).overlays.at(-1)
 		).toMatchObject({
-			id: 'jump-draft-1-5',
+			id: 'jump-draft-1-5-0',
 			type: 'jump',
 		});
 	});
 
 	it('identifies active scan and jump states independently of UI preferences', () => {
 		const { overlays } = renderNavigationEdges({
+			userEdges: [createUserEdge({ id: 80, node_a_id: 8, node_b_id: 9 })],
 			actions: [
 				createAction({
 					id: 3,
 					type: 'jump',
 					status: 'pending',
 					params: {
-						source_node_id: 8,
+						from_node_id: 8,
 						target_node_id: 9,
-						distance_ly: 2,
+						route: [80],
 					},
 				}),
 			],
 		});
 
-		expect(overlays).toContainEqual({
-			id: 'jump-active-3',
+		expect(overlays.at(-1)).toMatchObject({
+			id: 'jump-active-3-0',
 			from: 8,
 			to: 9,
 			status: 'plotted',
@@ -262,12 +266,20 @@ describe('useNavigationEdges', () => {
 					id: 4,
 					type: 'jump',
 					status: 'fulfilled',
-					result: {
+					params: {
 						from_node_id: 1,
-						to_node_id: 2,
-						distance: 1.5,
-						core_cost: 2,
-						duration: 60,
+						target_node_id: 2,
+						route: [44],
+					},
+					result: {
+						phases: [
+							{
+								core_cost: 2,
+								core_before: 100,
+								remaining_core_life: 98,
+								completed_at: '2026-04-20T00:00:00+00:00',
+							},
+						],
 						remaining_core_life: 98,
 						core_before: 100,
 					},
@@ -276,7 +288,7 @@ describe('useNavigationEdges', () => {
 		});
 
 		expect(overlays.at(-1)).toMatchObject({
-			id: 'jump-result-4',
+			id: 'jump-result-4-0',
 			type: 'jump',
 			canonicalEdgeId: 44,
 		});
@@ -416,9 +428,9 @@ describe('useNavigationEdges', () => {
 					type: 'jump',
 					status: 'running',
 					params: {
-						source_node_id: 150,
-						target_node_id: 151,
-						distance_ly: 3,
+						from_node_id: 50,
+						target_node_id: 51,
+						route: [50],
 					},
 				}),
 			],

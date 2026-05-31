@@ -1,4 +1,5 @@
 import { __ } from '@wordpress/i18n';
+import type { KnownPathResult } from '@helm/datacore';
 import {
 	Button,
 	LogCard,
@@ -13,6 +14,8 @@ import { getJumpTitle } from './utils';
 interface DraftJumpCardProps {
 	draft: DraftAction<'jump'>;
 	targetName: string;
+	routePath?: KnownPathResult;
+	routeNodeNames?: string[];
 	onCancel: () => void;
 	onSubmit: () => void;
 	isSubmitting: boolean;
@@ -21,12 +24,19 @@ interface DraftJumpCardProps {
 export function DraftJumpCard({
 	draft,
 	targetName,
+	routePath,
+	routeNodeNames = [],
 	onCancel,
 	onSubmit,
 	isSubmitting,
 }: DraftJumpCardProps) {
 	const tone = 'sky';
 	const title = getJumpTitle(draft.type, targetName);
+	const routeDistance = routePath?.totalDistance ?? '--';
+	const pathLabel =
+		routeNodeNames.length > 0
+			? routeNodeNames.join(' → ')
+			: draft.params.route.join(' → ');
 
 	return (
 		<LogCard
@@ -65,17 +75,17 @@ export function DraftJumpCard({
 			<SystemGrid columns={3} gap="sm">
 				<SystemCell>
 					<Readout
-						label={__('Duration', 'helm')}
-						value="--"
+						label={__('Distance', 'helm')}
+						value={routeDistance}
+						unit={routePath ? 'ly' : undefined}
 						tone={tone}
 						size="sm"
 					/>
 				</SystemCell>
 				<SystemCell>
 					<Readout
-						label={__('Distance', 'helm')}
-						value={draft.params.distance_ly}
-						unit="ly"
+						label={__('Duration', 'helm')}
+						value="--"
 						tone={tone}
 						size="sm"
 					/>
@@ -89,6 +99,9 @@ export function DraftJumpCard({
 					/>
 				</SystemCell>
 			</SystemGrid>
+			<div className={`helm-tone--${tone}`} style={{ marginTop: 8 }}>
+				<strong>{__('Path', 'helm')}</strong>: {pathLabel}
+			</div>
 		</LogCard>
 	);
 }

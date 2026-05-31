@@ -17,6 +17,7 @@ export function CompleteJumpCard({
 	const title = getJumpTitle(action.type, targetName);
 	const status = <ActionStatusBadge status={action.status} />;
 	const time = formatTime(action.created_at);
+	const completedLegs = action.result?.phases?.length ?? 0;
 
 	if (isFailed(action)) {
 		return (
@@ -31,17 +32,16 @@ export function CompleteJumpCard({
 				<SystemGrid columns={3} gap="sm">
 					<SystemCell>
 						<Readout
-							label={__('Duration', 'helm')}
-							value={action.result.duration}
+							label={__('Route Legs', 'helm')}
+							value={action.params.route.length}
 							tone={tone}
 							size="sm"
 						/>
 					</SystemCell>
 					<SystemCell>
 						<Readout
-							label={__('Distance', 'helm')}
-							value={action.params.distance_ly}
-							unit="ly"
+							label={__('Completed', 'helm')}
+							value={completedLegs}
 							tone={tone}
 							size="sm"
 						/>
@@ -71,26 +71,24 @@ export function CompleteJumpCard({
 				<SystemGrid columns={3} gap="sm">
 					<SystemCell>
 						<Readout
-							label={__('Distance', 'helm')}
-							value={action.params.distance_ly}
-							unit="ly"
+							label={__('Route Legs', 'helm')}
+							value={action.params.route.length}
 							tone={tone}
 							size="sm"
 						/>
 					</SystemCell>
 					<SystemCell>
 						<Readout
-							label={__('Duration', 'helm')}
-							value={action.result.duration}
+							label={__('Completed', 'helm')}
+							value={completedLegs}
 							tone={tone}
 							size="sm"
 						/>
 					</SystemCell>
 					<SystemCell>
 						<Readout
-							label={__('Core Cost', 'helm')}
-							value={action.result.core_cost}
-							unit="%"
+							label={__('Core Life', 'helm')}
+							value={action.result.remaining_core_life}
 							tone="gold"
 							size="sm"
 						/>

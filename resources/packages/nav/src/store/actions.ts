@@ -1,7 +1,7 @@
 import { __ } from '@wordpress/i18n';
 import { createDatacore } from '@helm/datacore';
 import { ErrorCode, HelmError } from '@helm/errors';
-import type { Datacore } from '@helm/datacore';
+import type { Datacore, KnownPathResult } from '@helm/datacore';
 import type { Thunk } from '@helm/types';
 import type { Action } from './types';
 import type { store } from './index';
@@ -185,6 +185,23 @@ export function receiveAdjacency(
 		type: 'RECEIVE_ADJACENCY',
 		key: createGraphReadKey(fromNodeId, targetNodeId),
 		adjacent,
+	};
+}
+
+/**
+ * Cache a known path in the current user's known graph.
+ *
+ * @internal
+ */
+export function receiveKnownPath(
+	fromNodeId: number,
+	targetNodeId: number,
+	path: KnownPathResult
+): Action {
+	return {
+		type: 'KNOWN_PATH_READ_FINISHED',
+		key: createGraphReadKey(fromNodeId, targetNodeId),
+		path,
 	};
 }
 

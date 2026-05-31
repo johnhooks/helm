@@ -11,9 +11,9 @@ const baseAction: ShipAction<'jump'> = {
 	type: 'jump',
 	status: 'running',
 	params: {
+		from_node_id: 1,
 		target_node_id: 7,
-		source_node_id: 1,
-		distance_ly: 11.9,
+		route: [101],
 	},
 	result: null,
 	deferred_until: null,
@@ -22,23 +22,26 @@ const baseAction: ShipAction<'jump'> = {
 };
 
 describe('CompleteJumpCard', () => {
-	it('renders fulfilled state with core cost', () => {
+	it('renders fulfilled state with route progress', () => {
 		const action: ShipAction<'jump'> = {
 			...baseAction,
 			status: 'fulfilled',
 			result: {
-				from_node_id: 1,
-				to_node_id: 7,
-				distance: 11.9,
-				core_cost: 12,
-				duration: 345600,
+				phases: [
+					{
+						core_cost: 12,
+						core_before: 100,
+						remaining_core_life: 88,
+						completed_at: '2026-02-16T12:00:00Z',
+					},
+				],
 				remaining_core_life: 88,
 				core_before: 100,
 			},
 		};
 		render(<CompleteJumpCard action={action} targetName={TARGET_NAME} />);
 		expect(screen.getByText(/Tau Ceti/)).toBeInTheDocument();
-		expect(screen.getByText('12')).toBeInTheDocument();
+		expect(screen.getByText('88')).toBeInTheDocument();
 	});
 
 	it('renders failed state with cause', () => {
@@ -46,11 +49,6 @@ describe('CompleteJumpCard', () => {
 			...baseAction,
 			status: 'failed',
 			result: {
-				from_node_id: 1,
-				to_node_id: 7,
-				distance: 11.9,
-				core_cost: 12,
-				duration: 345600,
 				cause: 'Blackhole',
 			},
 		};
@@ -62,13 +60,7 @@ describe('CompleteJumpCard', () => {
 		const action: ShipAction<'jump'> = {
 			...baseAction,
 			status: 'failed',
-			result: {
-				from_node_id: 1,
-				to_node_id: 7,
-				distance: 11.9,
-				core_cost: 0,
-				duration: 0,
-			},
+			result: {},
 		};
 		render(<CompleteJumpCard action={action} targetName={TARGET_NAME} />);
 		expect(screen.getByText('Unknown')).toBeInTheDocument();

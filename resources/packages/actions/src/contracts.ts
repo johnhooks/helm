@@ -47,17 +47,23 @@ interface ScanRouteContract {
 // -- Jump ---------------------------------------------------------------------
 
 interface JumpParams {
+	from_node_id: number;
 	target_node_id: number;
-	source_node_id: number;
-	distance_ly: number;
+	route: number[];
+}
+
+interface JumpRoutePhase {
+	core_cost: number;
+	core_before: number;
+	remaining_core_life: number;
+	completed_at: string;
 }
 
 interface JumpActiveResult {
-	from_node_id: number;
-	to_node_id: number;
-	distance: number;
-	core_cost: number;
-	duration: number;
+	phases?: JumpRoutePhase[];
+	current_node_id?: number;
+	remaining_core_life?: number;
+	core_before?: number;
 }
 
 interface JumpFulfilledResult extends JumpActiveResult {
