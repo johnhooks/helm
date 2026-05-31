@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace Helm\CLI;
 
+use DateTimeImmutable;
+use Helm\Lib\Date;
 use Helm\ShipLink\ActionProcessor;
 use Helm\ShipLink\ActionStatus;
 use Helm\ShipLink\Contracts\ActionRepository;
+use InvalidArgumentException;
 use WP_CLI;
 
 /**
@@ -140,6 +143,72 @@ class ActionCommand
 
         WP_CLI::log('');
         WP_CLI::log(WP_CLI::colorize('%G═══════════════════════════════════════%n'));
+    }
+
+    /**
+     * Prune old completed actions.
+     *
+     * ## OPTIONS
+     *
+     * [--days=<number>]
+     * : Delete completed actions older than this many days.
+     * ---
+     * default: 30
+     * ---
+     *
+     * ## EXAMPLES
+     *
+     *     # Prune completed actions older than 30 days
+     *     wp helm action prune
+     *
+     *     # Prune completed actions older than 7 days
+     *     wp helm action prune --days=7
+     *
+     * @when after_wp_load
+     *
+     * @param array<string> $args
+     * @param array<string, string> $assoc_args
+     */
+    public function prune(array $args, array $assoc_args): void
+    {
+        try {
+            $days = $this->parsePruneDays($assoc_args);
+        } catch (InvalidArgumentException $e) {
+            WP_CLI::error($e->getMessage());
+        }
+
+        $olderThan = Date::now()->modify(sprintf('-%d days', $days));
+        if (! $olderThan instanceof DateTimeImmutable) {
+            WP_CLI::error('Failed to calculate prune cutoff.');
+        }
+
+        // This delete-based cleanup is acceptable while the actions table is
+        // small, but it is not the production-scale retention strategy. See
+        // docs/plans/queue.md#table-partitioning for the intended approach:
+        // date partitions with old history removed by dropping partitions.
+        $deleted = $this->repository->deleteOldCompleted($olderThan);
+
+        WP_CLI::success(sprintf(
+            'Pruned %d completed action%s older than %d day%s.',
+            $deleted,
+            $deleted === 1 ? '' : 's',
+            $days,
+            $days === 1 ? '' : 's'
+        ));
+    }
+
+    /**
+     * @param array<string, string> $assocArgs
+     */
+    private function parsePruneDays(array $assocArgs): int
+    {
+        $days = (int) ($assocArgs['days'] ?? 30);
+
+        if ($days <= 0) {
+            throw new InvalidArgumentException('Days must be a positive integer');
+        }
+
+        return $days;
     }
 
     /**
