@@ -1,7 +1,7 @@
 import { __ } from '@wordpress/i18n';
 import { LogCard, Readout, SystemCell, SystemGrid } from '@helm/ui';
 import type { ShipAction } from '@helm/actions';
-import { isFailed, isFulfilled } from '@helm/actions';
+import { getActionError, isFailed, isFulfilled } from '@helm/actions';
 import { ActionStatusBadge } from '../action-status';
 import { formatTime } from '../utils';
 import { getScanTitle } from './utils';
@@ -17,6 +17,14 @@ export function CompleteScanCard({
 	const title = getScanTitle(action.type, targetName);
 	const status = <ActionStatusBadge status={action.status} />;
 	const time = formatTime(action.created_at);
+	const actionError = getActionError(action);
+	const error = {
+		code: actionError?.message || __('Unknown', 'helm'),
+		detail: actionError?.detail,
+		causes: actionError?.causes
+			.map((cause) => cause.detail)
+			.filter((detail): detail is string => detail !== ''),
+	};
 
 	if (isFailed(action)) {
 		return (
@@ -26,9 +34,10 @@ export function CompleteScanCard({
 				tone={tone}
 				variant="default"
 				status={status}
+				error={error}
 				style={{ borderColor: 'var(--helm-ui-color-danger)' }}
 			>
-				<SystemGrid columns={3} gap="sm">
+				<SystemGrid columns={2} gap="sm">
 					<SystemCell>
 						<Readout
 							label={__('Duration', 'helm')}
@@ -43,14 +52,6 @@ export function CompleteScanCard({
 							value={action.params.distance_ly}
 							unit="ly"
 							tone={tone}
-							size="sm"
-						/>
-					</SystemCell>
-					<SystemCell>
-						<Readout
-							label={__('Cause', 'helm')}
-							value={action.result.cause ?? __('Unknown', 'helm')}
-							tone="orange"
 							size="sm"
 						/>
 					</SystemCell>

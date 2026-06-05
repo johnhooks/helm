@@ -56,5 +56,4 @@ final class Handler implements ActionHandler
     {
         return array_map('intval', $route);
     }
-
 }

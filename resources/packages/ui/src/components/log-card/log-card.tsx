@@ -1,5 +1,6 @@
 import type { CSSProperties, ReactNode } from 'react';
 import type { LcarsTone } from '../../tones';
+import type { ErrorContentProps } from '../error-display/error-content';
 import { Panel } from '../panel';
 import './log-card.css';
 
@@ -28,6 +29,10 @@ export interface LogCardProps {
 	 * Status indicator (e.g. StatusBadge) rendered at the end of the header row
 	 */
 	status?: ReactNode;
+	/**
+	 * Single error code and message rendered below the body.
+	 */
+	error?: Omit<ErrorContentProps, 'causes'>;
 	/**
 	 * Action area rendered below the body (e.g. buttons)
 	 */
@@ -62,6 +67,7 @@ export function LogCard({
 	tone = 'neutral',
 	variant = 'default',
 	status,
+	error,
 	action,
 	children,
 	className = '',
@@ -106,6 +112,18 @@ export function LogCard({
 				)}
 			</div>
 			{children && <div className="helm-log-card__body">{children}</div>}
+			{error && (
+				<div className="helm-log-card__error">
+					<span className="helm-log-card__error-code">
+						{error.code}
+					</span>
+					{error.detail && (
+						<span className="helm-log-card__error-detail">
+							{error.detail}
+						</span>
+					)}
+				</div>
+			)}
 			{action && <div className="helm-log-card__action">{action}</div>}
 			{variant === 'draft' && <div className="helm-log-card__sweep" />}
 		</Panel>

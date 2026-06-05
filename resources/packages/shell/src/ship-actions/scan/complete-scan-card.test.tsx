@@ -46,24 +46,27 @@ describe('CompleteScanCard', () => {
 		expect(screen.getByText('1')).toBeInTheDocument();
 	});
 
-	it('renders failed state with cause', () => {
+	it('renders failed state with server error message', () => {
 		const action: ShipAction<'scan_route'> = {
 			...baseAction,
 			status: 'failed',
 			result: {
 				from_node_id: 1,
 				to_node_id: 7,
-				skill: 50,
+				skill: 0,
 				efficiency: 0,
-				duration: 3600,
-				cause: 'Signal lost',
+				duration: 0,
+				error: {
+					code: 'helm.action.failed',
+					message: 'Signal lost',
+				},
 			},
 		};
 		render(<CompleteScanCard action={action} targetName={TARGET_NAME} />);
 		expect(screen.getByText('Signal lost')).toBeInTheDocument();
 	});
 
-	it('renders failed state with unknown cause when none provided', () => {
+	it('renders failed state with unknown error when none provided', () => {
 		const action: ShipAction<'scan_route'> = {
 			...baseAction,
 			status: 'failed',

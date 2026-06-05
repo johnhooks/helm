@@ -164,7 +164,11 @@ export const Failed: Story = {
 						skill: 50,
 						efficiency: 0,
 						duration: 3600,
-						cause: 'Signal lost',
+						error: {
+							code: 'helm.action.failed',
+							message: 'Signal lost',
+							data: { status: 500 },
+						},
 					},
 					deferred_until: null,
 				}}

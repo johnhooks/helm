@@ -1,8 +1,16 @@
+import type { WpRestErrorResponse } from '@helm/errors';
+
 /**
  * Per-action-type contracts for params and results at each lifecycle stage.
  *
  * Uses declaration merging: extend ActionTypeMap to add new action types.
  */
+
+interface ActionResultError {
+	error?: WpRestErrorResponse;
+}
+
+type FailedResult<T extends ActionResultError> = Partial<T> & ActionResultError;
 
 // -- Scan Route ---------------------------------------------------------------
 
@@ -12,7 +20,7 @@ interface ScanRouteParams {
 	distance_ly: number;
 }
 
-interface ScanRouteActiveResult {
+interface ScanRouteActiveResult extends ActionResultError {
 	from_node_id: number;
 	to_node_id: number;
 	skill: number;
@@ -33,9 +41,7 @@ interface ScanRouteFulfilledResult extends ScanRouteActiveResult {
 	path: number[];
 }
 
-interface ScanRouteFailedResult extends ScanRouteActiveResult {
-	cause?: string;
-}
+type ScanRouteFailedResult = FailedResult<ScanRouteActiveResult>;
 
 interface ScanRouteContract {
 	params: ScanRouteParams;
@@ -59,7 +65,7 @@ interface JumpRoutePhase {
 	completed_at: string;
 }
 
-interface JumpActiveResult {
+interface JumpActiveResult extends ActionResultError {
 	phases?: JumpRoutePhase[];
 	current_node_id?: number;
 	remaining_core_life?: number;
@@ -71,9 +77,7 @@ interface JumpFulfilledResult extends JumpActiveResult {
 	core_before: number;
 }
 
-interface JumpFailedResult extends JumpActiveResult {
-	cause?: string;
-}
+type JumpFailedResult = FailedResult<JumpActiveResult>;
 
 interface JumpContract {
 	params: JumpParams;
