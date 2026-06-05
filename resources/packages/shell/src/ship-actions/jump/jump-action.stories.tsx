@@ -125,7 +125,11 @@ export const Failed: Story = {
 					...baseAction,
 					status: 'failed',
 					result: {
-						cause: 'Blackhole',
+						error: {
+							code: 'helm.ship.insufficient_core',
+							message: 'Core life too low for this jump',
+							data: { status: 422 },
+						},
 					},
 					deferred_until: null,
 				}}

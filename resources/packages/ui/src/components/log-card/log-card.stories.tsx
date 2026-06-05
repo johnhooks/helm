@@ -43,6 +43,50 @@ export const Default: Story = {
 };
 
 /* ================================================================
+ *  Error — completed entry with single error detail
+ * ============================================================= */
+
+export const Error: Story = {
+	args: {
+		time: '08:42',
+		title: 'Jump to Tau Ceti',
+		tone: 'sky',
+		status: (
+			<StatusBadge tone="danger" size="sm">
+				Failed
+			</StatusBadge>
+		),
+		error: {
+			code: 'helm.ship.insufficient_core',
+			detail: 'Core life too low for this jump',
+		},
+	},
+};
+
+export const ErrorWithReadouts: Story = {
+	args: {
+		time: '08:42',
+		title: 'Jump to Tau Ceti',
+		tone: 'sky',
+		status: (
+			<StatusBadge tone="danger" size="sm">
+				Failed
+			</StatusBadge>
+		),
+		children: (
+			<div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+				<Readout label="Route Legs" value={3} tone="sky" size="sm" />
+				<Readout label="Completed" value={2} tone="sky" size="sm" />
+			</div>
+		),
+		error: {
+			code: 'helm.navigation.no_route',
+			detail: 'Route can no longer continue',
+		},
+	},
+};
+
+/* ================================================================
  *  Active — in-progress with progress bar + countdown
  * ============================================================= */
 

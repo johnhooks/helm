@@ -13,5 +13,6 @@ export type {
 	ActionTypeMap,
 	DefaultActionContract,
 } from './contracts';
+export { getActionError } from './utils';
 export { isActive, isFailed, isFulfilled, isJump, isScanRoute } from './guards';
 export type { ActiveAction, FailedAction, FulfilledAction } from './guards';

@@ -44,19 +44,24 @@ describe('CompleteJumpCard', () => {
 		expect(screen.getByText('88')).toBeInTheDocument();
 	});
 
-	it('renders failed state with cause', () => {
+	it('renders failed state with server error message', () => {
 		const action: ShipAction<'jump'> = {
 			...baseAction,
 			status: 'failed',
 			result: {
-				cause: 'Blackhole',
+				error: {
+					code: 'helm.ship.insufficient_core',
+					message: 'Core life too low for this jump',
+				},
 			},
 		};
 		render(<CompleteJumpCard action={action} targetName={TARGET_NAME} />);
-		expect(screen.getByText('Blackhole')).toBeInTheDocument();
+		expect(
+			screen.getByText('Core life too low for this jump')
+		).toBeInTheDocument();
 	});
 
-	it('renders failed state with unknown cause when none provided', () => {
+	it('renders failed state with unknown error when none provided', () => {
 		const action: ShipAction<'jump'> = {
 			...baseAction,
 			status: 'failed',
