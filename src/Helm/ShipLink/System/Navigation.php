@@ -4,13 +4,17 @@ declare(strict_types=1);
 
 namespace Helm\ShipLink\System;
 
+use Helm\Core\ErrorCode;
 use Helm\Navigation\NavigationService;
 use Helm\Navigation\EdgeInfo;
 use Helm\Navigation\Node;
+use Helm\Navigation\RouteLeg;
 use Helm\Navigation\ScanResult;
+use Helm\Navigation\UserEdge;
 use Helm\ShipLink\Contracts\Navigation as NavigationContract;
 use Helm\ShipLink\Loadout;
 use Helm\ShipLink\Models\ShipState;
+use WP_Error;
 
 /**
  * Navigation system implementation.
@@ -78,12 +82,12 @@ final class Navigation implements NavigationContract
         return !is_wp_error($edgeInfo);
     }
 
-    public function getRouteInfo(int $targetNodeId): EdgeInfo|\WP_Error
+    public function getRouteInfo(int $targetNodeId): EdgeInfo|WP_Error
     {
         $currentPosition = $this->getCurrentPosition();
 
         if ($currentPosition === null) {
-            return new \WP_Error(
+            return new WP_Error(
                 'no_position',
                 __('Ship is not at a valid position', 'helm')
             );
@@ -94,12 +98,12 @@ final class Navigation implements NavigationContract
 
     /**
      * @param int[] $route
-     * @return list<\Helm\Navigation\UserEdge>|\WP_Error
+     * @return list<UserEdge>|WP_Error
      */
-    public function getRouteEdges(int $fromNodeId, int $targetNodeId, array $route): array|\WP_Error
+    public function getRouteEdges(int $fromNodeId, int $targetNodeId, array $route): array|WP_Error
     {
         if ($this->getCurrentPosition() === null) {
-            return new \WP_Error(
+            return new WP_Error(
                 'no_position',
                 __('Ship is not at a valid position', 'helm')
             );
@@ -116,6 +120,21 @@ final class Navigation implements NavigationContract
         }
 
         return $edges;
+    }
+
+    /**
+     * @param list<UserEdge> $route
+     */
+    public function getRouteLeg(array $route, int $phaseIndex): RouteLeg|WP_Error
+    {
+        $currentNodeId = $this->getCurrentPosition();
+        if ($currentNodeId === null) {
+            return ErrorCode::NavigationNoRoute->error(
+                __('Route can no longer continue', 'helm')
+            );
+        }
+
+        return $this->navService->getRouteLeg($route, $phaseIndex, $currentNodeId);
     }
 
     public function scanForRoutes(int $targetNodeId): ScanResult

@@ -160,6 +160,45 @@ class NavigationService
     }
 
     /**
+     * Resolve a route edge into a directional leg from the current node.
+     *
+     * @param list<UserEdge> $route
+     */
+    public function getRouteLeg(array $route, int $phaseIndex, int $currentNodeId): RouteLeg|\WP_Error
+    {
+        $edge = $route[$phaseIndex] ?? null;
+        if ($edge === null) {
+            return ErrorCode::NavigationNoRoute->error(
+                __('Route can no longer continue', 'helm')
+            );
+        }
+
+        if ($currentNodeId === $edge->nodeAId) {
+            $toNodeId = $edge->nodeBId;
+        } elseif ($currentNodeId === $edge->nodeBId) {
+            $toNodeId = $edge->nodeAId;
+        } else {
+            return ErrorCode::NavigationNoRoute->error(
+                __('Route can no longer continue', 'helm')
+            );
+        }
+
+        $nextEdge = $route[$phaseIndex + 1] ?? null;
+        if ($nextEdge !== null && $nextEdge->nodeAId !== $toNodeId && $nextEdge->nodeBId !== $toNodeId) {
+            return ErrorCode::NavigationNoRoute->error(
+                __('Route can no longer continue', 'helm')
+            );
+        }
+
+        return new RouteLeg(
+            edge: $edge,
+            fromNodeId: $currentNodeId,
+            toNodeId: $toNodeId,
+            nextEdge: $nextEdge,
+        );
+    }
+
+    /**
      * Scan for routes toward a destination.
      *
      * Uses nav computer to discover waypoints based on skill and efficiency.

@@ -6,6 +6,7 @@ namespace Helm\ShipLink\Actions\Jump;
 
 use Helm\Core\ErrorCode;
 use Helm\Lib\Date;
+use Helm\Navigation\UserEdge;
 use Helm\ShipLink\ActionException;
 use Helm\ShipLink\ActionStatus;
 use Helm\ShipLink\Contracts\ActionHandler;
@@ -48,7 +49,7 @@ final class Resolver implements ActionHandler
     /**
      * Resolve one leg of a route-aware jump.
      *
-     * @param list<\Helm\Navigation\UserEdge> $route
+     * @param list<UserEdge> $route
      */
     private function handleRouteLeg(Action $action, Ship $ship, array $route): void
     {
@@ -65,22 +66,15 @@ final class Resolver implements ActionHandler
             return;
         }
 
-        $edge = $route[$phaseIndex];
-        $currentNodeId = $ship->navigation()->getCurrentPosition();
-
-        if ($currentNodeId === $edge->nodeAId) {
-            $toNodeId = $edge->nodeBId;
-        } elseif ($currentNodeId === $edge->nodeBId) {
-            $toNodeId = $edge->nodeAId;
-        } else {
+        $leg = $ship->navigation()->getRouteLeg($route, $phaseIndex);
+        if (is_wp_error($leg)) {
             throw new ActionException(
                 ErrorCode::NavigationNoRoute,
                 __('Route can no longer continue', 'helm')
             );
         }
 
-        $distance = $edge->distance;
-        $coreCost = $ship->propulsion()->calculateCoreCost($distance);
+        $coreCost = $ship->propulsion()->calculateCoreCost($leg->distance());
         $coreComponent = $ship->getLoadout()->core()->component();
         $currentCoreLife = $coreComponent->life ?? 0;
 
@@ -98,7 +92,7 @@ final class Resolver implements ActionHandler
 
         $newCoreLife = max(0, $currentCoreLife - (int) ceil($coreCost));
 
-        $ship->getState()->node_id = $toNodeId;
+        $ship->getState()->node_id = $leg->toNodeId;
         $coreComponent->life = $newCoreLife;
 
         $phases[] = [
@@ -109,25 +103,17 @@ final class Resolver implements ActionHandler
         ];
 
         $result['phases'] = $phases;
-        $result['current_node_id'] = $toNodeId;
+        $result['current_node_id'] = $leg->toNodeId;
         $result['remaining_core_life'] = $newCoreLife;
         $result['core_before'] = $currentCoreLife;
         $action->result = $result;
 
-        $nextEdge = $route[$phaseIndex + 1] ?? null;
-        if ($nextEdge === null) {
+        if ($leg->nextEdge === null) {
             $action->fulfill();
             return;
         }
 
-        if ($nextEdge->nodeAId !== $toNodeId && $nextEdge->nodeBId !== $toNodeId) {
-            throw new ActionException(
-                ErrorCode::NavigationNoRoute,
-                __('Route can no longer continue', 'helm')
-            );
-        }
-
-        $nextDuration = $ship->propulsion()->getJumpDuration($nextEdge->distance);
+        $nextDuration = $ship->propulsion()->getJumpDuration($leg->nextEdge->distance);
         $action->status = ActionStatus::Running;
         $action->deferred_until = Date::addSeconds($phaseDueAt, $nextDuration);
     }
