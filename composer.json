@@ -49,7 +49,7 @@
     },
     "scripts": {
         "strauss-install": [
-            "test -f ./bin/strauss.phar || curl -o bin/strauss.phar -L -C - https://github.com/BrianHenryIE/strauss/releases/download/0.19.4/strauss.phar"
+            "mkdir -p bin && STRAUSS_VERSION=0.27.3; if ! test -f ./bin/strauss.phar || ! php ./bin/strauss.phar --version | grep -q \"strauss ${STRAUSS_VERSION}\"; then curl -fsSL --proto '=https' --tlsv1.2 --retry 3 -o bin/strauss.phar \"https://github.com/BrianHenryIE/strauss/releases/download/${STRAUSS_VERSION}/strauss.phar\"; fi"
         ],
         "strauss": [
             "@strauss-install",
