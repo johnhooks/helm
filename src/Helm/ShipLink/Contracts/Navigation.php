@@ -6,6 +6,7 @@ namespace Helm\ShipLink\Contracts;
 
 use Helm\Navigation\EdgeInfo;
 use Helm\Navigation\Node;
+use Helm\Navigation\RouteLeg;
 use Helm\Navigation\ScanResult;
 use Helm\Navigation\UserEdge;
 use WP_Error;
@@ -71,6 +72,15 @@ interface Navigation
      * @return list<UserEdge>|WP_Error
      */
     public function getRouteEdges(int $fromNodeId, int $targetNodeId, array $route): array|WP_Error;
+
+    /**
+     * Resolve a route edge into the current directional leg.
+     *
+     * @param list<UserEdge> $route
+     * @param int $phaseIndex
+     * @return RouteLeg|WP_Error
+     */
+    public function getRouteLeg(array $route, int $phaseIndex): RouteLeg|WP_Error;
 
     /**
      * Scan for routes toward a destination.
