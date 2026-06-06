@@ -52,6 +52,7 @@ final class Resolver implements ActionHandler
      */
     private function handleRouteLeg(Action $action, Ship $ship, array $route): void
     {
+        $phaseDueAt = $action->deferred_until ?? Date::now();
         $result = $action->result ?? [];
         /** @var array<int, JumpRoutePhase> $phases */
         $phases = isset($result['phases']) && is_array($result['phases'])
@@ -128,6 +129,6 @@ final class Resolver implements ActionHandler
 
         $nextDuration = $ship->propulsion()->getJumpDuration($nextEdge->distance);
         $action->status = ActionStatus::Running;
-        $action->deferred_until = Date::addSeconds(Date::now(), $nextDuration);
+        $action->deferred_until = Date::addSeconds($phaseDueAt, $nextDuration);
     }
 }
