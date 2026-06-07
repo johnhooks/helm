@@ -1,28 +1,34 @@
 import { describe, expect, it } from 'vitest';
-import { getRouteColor, lcarsColors, routeStatusColors } from './colors';
+import { getRouteEdgeColor, lcarsColors } from './colors';
 
-describe('getRouteColor', () => {
-	it('uses action overlay colors for scan and jump routes', () => {
-		expect(getRouteColor('plotted', true, 'scan').getHexString()).toBe(
+describe('getRouteEdgeColor', () => {
+	it('uses edge type colors for route, scan, and jump edges', () => {
+		expect(getRouteEdgeColor('route', 'idle').getHexString()).toBe(
+			lcarsColors.muted.getHexString()
+		);
+		expect(getRouteEdgeColor('scan', 'planned').getHexString()).toBe(
 			lcarsColors.lilac.getHexString()
 		);
-		expect(getRouteColor('traveled', true, 'jump').getHexString()).toBe(
+		expect(getRouteEdgeColor('jump', 'active').getHexString()).toBe(
 			lcarsColors.sky.getHexString()
 		);
 	});
 
-	it('keeps failed overlays on the blocked route color', () => {
-		expect(getRouteColor('blocked', true, 'jump').getHexString()).toBe(
-			routeStatusColors.blocked.getHexString()
+	it('keeps complete edges in their type color family', () => {
+		expect(getRouteEdgeColor('jump', 'complete').getHexString()).toBe(
+			lcarsColors.sky.getHexString()
+		);
+		expect(getRouteEdgeColor('scan', 'complete').getHexString()).toBe(
+			lcarsColors.lilac.getHexString()
 		);
 	});
 
-	it('uses status colors for canonical routes', () => {
-		expect(getRouteColor('discovered').getHexString()).toBe(
-			routeStatusColors.discovered.getHexString()
+	it('uses danger color for failed edges regardless of type', () => {
+		expect(getRouteEdgeColor('jump', 'failed').getHexString()).toBe(
+			lcarsColors.danger.getHexString()
 		);
-		expect(getRouteColor('traveled').getHexString()).toBe(
-			routeStatusColors.traveled.getHexString()
+		expect(getRouteEdgeColor('scan', 'failed').getHexString()).toBe(
+			lcarsColors.danger.getHexString()
 		);
 	});
 });

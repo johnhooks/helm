@@ -1,13 +1,22 @@
-import { useEffect, useState, useMemo, useRef } from 'react';
-import { useFrame, useThree } from '@react-three/fiber';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useFrame, useThree, type ThreeEvent } from '@react-three/fiber';
 import { Line } from '@react-three/drei';
-import type { Route, Position3D, RouteOverlayType } from '../../types';
+import type {
+	Position3D,
+	Route,
+	RouteEdgeState,
+	RouteEdgeType,
+} from '../../types';
 import { ROUTE_LINE_WIDTH, ROUTE_LINE_WIDTH_ACTIVE } from '../../constants';
-import { getRouteColor } from '../../utils/colors';
+import { getRouteEdgeColor } from '../../utils/colors';
 import { toVector3 } from '../../utils/coordinates';
 
-const ROUTE_LINE_OPACITY = 0.32;
-const ROUTE_LINE_OPACITY_ACTIVE = 0.9;
+const ROUTE_LINE_OPACITY_IDLE = 0.32;
+const ROUTE_LINE_OPACITY_PLANNED = 0.32;
+const ROUTE_LINE_OPACITY_COMPLETE = 0.18;
+const ROUTE_LINE_OPACITY_FAILED = 0.4;
+const ROUTE_LINE_OPACITY_SELECTED_BOOST = 0.32;
+const ROUTE_LINE_OPACITY_MAX = 0.9;
 const ROUTE_LINE_OPACITY_PULSE_MIN = 0.45;
 const ROUTE_LINE_OPACITY_PULSE_MAX = 0.95;
 
@@ -16,6 +25,14 @@ interface RouteLineHandle {
 		opacity?: number;
 		linewidth?: number;
 	};
+}
+
+interface RouteLineStyle {
+	color: string;
+	opacity: number;
+	lineWidth: number;
+	dashed: boolean;
+	animated: boolean;
 }
 
 export interface RouteLineProps {
@@ -45,6 +62,56 @@ export interface RouteLineProps {
 	onHover?: (hovering: boolean) => void;
 }
 
+function routeOpacity(state: RouteEdgeState): number {
+	switch (state) {
+		case 'complete':
+			return ROUTE_LINE_OPACITY_COMPLETE;
+		case 'failed':
+			return ROUTE_LINE_OPACITY_FAILED;
+		case 'active':
+		case 'planned':
+			return ROUTE_LINE_OPACITY_PLANNED;
+		case 'idle':
+		default:
+			return ROUTE_LINE_OPACITY_IDLE;
+	}
+}
+
+function resolveRouteLineStyle(
+	route: Route,
+	selected: boolean,
+	hovered: boolean
+): RouteLineStyle {
+	const type: RouteEdgeType = route.type ?? 'route';
+	const state: RouteEdgeState = route.state ?? 'idle';
+	const focused = route.selected === true || selected;
+	const animated = state === 'active';
+
+	const baseOpacity = routeOpacity(state);
+	const focusedOpacity = focused
+		? Math.min(
+				baseOpacity + ROUTE_LINE_OPACITY_SELECTED_BOOST,
+				ROUTE_LINE_OPACITY_MAX
+		  )
+		: baseOpacity;
+	const hoverOpacity = Math.min(
+		Math.max(
+			focusedOpacity,
+			ROUTE_LINE_OPACITY_PLANNED + ROUTE_LINE_OPACITY_SELECTED_BOOST
+		),
+		ROUTE_LINE_OPACITY_MAX
+	);
+	const opacity = hovered ? hoverOpacity : focusedOpacity;
+
+	return {
+		color: `#${getRouteEdgeColor(type, state).getHexString()}`,
+		opacity,
+		lineWidth: animated ? ROUTE_LINE_WIDTH_ACTIVE : ROUTE_LINE_WIDTH,
+		dashed: false,
+		animated,
+	};
+}
+
 export function RouteLine({
 	route,
 	from,
@@ -61,26 +128,18 @@ export function RouteLine({
 		return [toVector3(from), toVector3(to)];
 	}, [from, to]);
 
-	const routeType =
-		'type' in route ? (route.type as RouteOverlayType) : undefined;
-	const color = useMemo(() => {
-		return getRouteColor(route.status, route.active || selected, routeType);
-	}, [route.status, route.active, routeType, selected]);
-
-	const active = route.active || selected || hovered;
-	const pulsing = 'pulse' in route && route.pulse === true;
-	const lineWidth =
-		selected || hovered ? ROUTE_LINE_WIDTH_ACTIVE : ROUTE_LINE_WIDTH;
-	const opacity = active ? ROUTE_LINE_OPACITY_ACTIVE : ROUTE_LINE_OPACITY;
+	const style = useMemo(() => {
+		return resolveRouteLineStyle(route, selected, hovered);
+	}, [hovered, route, selected]);
 
 	useEffect(() => {
-		if (pulsing) {
+		if (style.animated) {
 			invalidate();
 		}
-	}, [invalidate, pulsing]);
+	}, [invalidate, style.animated]);
 
 	useFrame((state) => {
-		if (!pulsing || !lineRef.current?.material) {
+		if (!style.animated || !lineRef.current?.material) {
 			return;
 		}
 
@@ -89,26 +148,26 @@ export function RouteLine({
 			ROUTE_LINE_OPACITY_PULSE_MIN +
 			(ROUTE_LINE_OPACITY_PULSE_MAX - ROUTE_LINE_OPACITY_PULSE_MIN) *
 				pulse;
-		lineRef.current.material.linewidth =
-			ROUTE_LINE_WIDTH +
-			(ROUTE_LINE_WIDTH_ACTIVE - ROUTE_LINE_WIDTH) * pulse;
+		lineRef.current.material.linewidth = style.lineWidth;
 		invalidate();
 	});
 
-	const handlePointerOver = () => {
+	const handlePointerOver = (event: ThreeEvent<PointerEvent>) => {
+		event.stopPropagation();
 		setHovered(true);
 		onHover?.(true);
 		document.body.style.cursor = 'pointer';
 	};
 
-	const handlePointerOut = () => {
+	const handlePointerOut = (event: ThreeEvent<PointerEvent>) => {
+		event.stopPropagation();
 		setHovered(false);
 		onHover?.(false);
 		document.body.style.cursor = 'auto';
 	};
 
-	const handleClick = (e: { stopPropagation: () => void }) => {
-		e.stopPropagation();
+	const handleClick = (event: ThreeEvent<MouseEvent>) => {
+		event.stopPropagation();
 		onSelect?.();
 	};
 
@@ -118,11 +177,11 @@ export function RouteLine({
 				lineRef.current = instance as RouteLineHandle | null;
 			}}
 			points={points}
-			color={color}
-			lineWidth={lineWidth}
+			color={style.color}
+			lineWidth={style.lineWidth}
 			transparent
-			opacity={opacity}
-			dashed={route.status === 'blocked'}
+			opacity={style.opacity}
+			dashed={style.dashed}
 			dashSize={0.3}
 			gapSize={0.15}
 			onClick={handleClick}

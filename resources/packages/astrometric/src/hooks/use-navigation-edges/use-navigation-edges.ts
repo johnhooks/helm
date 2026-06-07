@@ -10,7 +10,12 @@ import {
 } from '@helm/actions';
 import { store as navStore } from '@helm/nav';
 import type { NavNode, UserEdge } from '@helm/types';
-import type { Route, RouteOverlay, RouteState } from '../../types';
+import type {
+	Route,
+	RouteEdgeState,
+	RouteOverlay,
+	RouteState,
+} from '../../types';
 import { createNavigationEdgeKey } from './utils';
 
 /**
@@ -50,7 +55,8 @@ export function useNavigationEdges(): RouteState {
 				id: routeId,
 				from: edge.node_a_id,
 				to: edge.node_b_id,
-				status: 'discovered',
+				type: 'route',
+				state: 'idle',
 			});
 			knownEdges.set(
 				createNavigationEdgeKey(edge.node_a_id, edge.node_b_id),
@@ -74,8 +80,8 @@ export function useNavigationEdges(): RouteState {
 					id: `${draft.type}-draft-${draft.params.source_node_id}-${draft.params.target_node_id}`,
 					from,
 					to,
-					status: 'plotted',
-					active: true,
+					state: 'planned',
+					selected: true,
 					type: 'scan',
 					canonicalEdgeId: canonical?.edgeId,
 					canonicalRouteId: canonical?.routeId,
@@ -97,8 +103,8 @@ export function useNavigationEdges(): RouteState {
 						id: `${draft.type}-draft-${draft.params.from_node_id}-${draft.params.target_node_id}-${index}`,
 						from: edge.node_a_id,
 						to: edge.node_b_id,
-						status: 'plotted',
-						active: true,
+						state: 'planned',
+						selected: true,
 						type: 'jump',
 						canonicalEdgeId: canonical?.edgeId,
 						canonicalRouteId: canonical?.routeId,
@@ -121,7 +127,9 @@ export function useNavigationEdges(): RouteState {
 				const to =
 					latestAction.result?.to_node_id ??
 					latestAction.params.target_node_id;
-				const state = isActive(latestAction) ? 'active' : 'failed';
+				const state: RouteEdgeState = isActive(latestAction)
+					? 'active'
+					: 'failed';
 				const canonical = knownEdges.get(
 					createNavigationEdgeKey(from, to)
 				);
@@ -130,12 +138,11 @@ export function useNavigationEdges(): RouteState {
 					id: `${latestAction.type}-${state}-${latestAction.id}`,
 					from,
 					to,
-					status: isActive(latestAction) ? 'plotted' : 'blocked',
-					active: true,
+					state,
+					selected: true,
 					type: 'scan',
 					canonicalEdgeId: canonical?.edgeId,
 					canonicalRouteId: canonical?.routeId,
-					pulse: isActive(latestAction),
 				});
 
 				return { routes, overlays, nodes };
@@ -159,8 +166,8 @@ export function useNavigationEdges(): RouteState {
 					id: `scan-result-${latestAction.id}-${edge.id}`,
 					from: edge.node_a_id,
 					to: edge.node_b_id,
-					status: 'plotted',
-					active: true,
+					state: 'complete',
+					selected: true,
 					type: 'scan',
 					canonicalEdgeId: canonical?.edgeId,
 					canonicalRouteId: canonical?.routeId,
@@ -172,8 +179,14 @@ export function useNavigationEdges(): RouteState {
 
 		if (isJump(latestAction)) {
 			if (isActive(latestAction) || isFailed(latestAction)) {
-				const state = isActive(latestAction) ? 'active' : 'failed';
-				const status = isActive(latestAction) ? 'plotted' : 'blocked';
+				const actionIsActive = isActive(latestAction);
+				const actionIsFailed = isFailed(latestAction);
+				const completedPhaseCount =
+					latestAction.result?.phases?.length ?? 0;
+				const currentRouteIndex = Math.min(
+					completedPhaseCount,
+					Math.max(latestAction.params.route.length - 1, 0)
+				);
 
 				for (const [
 					index,
@@ -188,16 +201,28 @@ export function useNavigationEdges(): RouteState {
 						createNavigationEdgeKey(edge.node_a_id, edge.node_b_id)
 					);
 
+					let state: RouteEdgeState;
+					let selected = true;
+					if (index < completedPhaseCount) {
+						state = 'complete';
+					} else if (actionIsFailed) {
+						state = 'failed';
+						selected = index <= currentRouteIndex;
+					} else if (actionIsActive && index === currentRouteIndex) {
+						state = 'active';
+					} else {
+						state = 'planned';
+					}
+
 					overlays.push({
 						id: `${latestAction.type}-${state}-${latestAction.id}-${index}`,
 						from: edge.node_a_id,
 						to: edge.node_b_id,
-						status,
-						active: true,
+						state,
+						selected,
 						type: 'jump',
 						canonicalEdgeId: canonical?.edgeId,
 						canonicalRouteId: canonical?.routeId,
-						pulse: isActive(latestAction),
 					});
 				}
 
@@ -208,7 +233,11 @@ export function useNavigationEdges(): RouteState {
 				return { routes, overlays, nodes };
 			}
 
-			for (const [index, edgeId] of latestAction.params.route.entries()) {
+			const completedPhaseCount =
+				latestAction.result?.phases?.length ?? 0;
+			for (const [index, edgeId] of latestAction.params.route
+				.slice(0, completedPhaseCount)
+				.entries()) {
 				const edge = userEdgesById.get(edgeId);
 				if (!edge) {
 					continue;
@@ -222,8 +251,8 @@ export function useNavigationEdges(): RouteState {
 					id: `jump-result-${latestAction.id}-${index}`,
 					from: edge.node_a_id,
 					to: edge.node_b_id,
-					status: 'traveled',
-					active: true,
+					state: 'complete',
+					selected: true,
 					type: 'jump',
 					canonicalEdgeId: canonical?.edgeId,
 					canonicalRouteId: canonical?.routeId,

@@ -4,8 +4,8 @@ export {
 	getSpectralColor,
 	defaultStarColor,
 	getStarSystemColor,
-	routeStatusColors,
-	getRouteColor,
+	routeEdgeTypeColors,
+	getRouteEdgeColor,
 } from './colors';
 
 export {
