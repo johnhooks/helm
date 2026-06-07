@@ -2,9 +2,9 @@ const defaultConfig = require('@wordpress/scripts/config/webpack.config');
 const path = require('path');
 
 // Extract the plugin constructor from the default config (avoids bun resolution issues).
-const DependencyExtractionWebpackPlugin = defaultConfig.plugins
-	.find((p) => p.constructor.name === 'DependencyExtractionWebpackPlugin')
-	.constructor;
+const DependencyExtractionWebpackPlugin = defaultConfig.plugins.find(
+	(p) => p.constructor.name === 'DependencyExtractionWebpackPlugin'
+).constructor;
 
 const packages = path.resolve(__dirname, 'resources/packages');
 
@@ -57,6 +57,7 @@ const datastoreExternals = {
  */
 const shellExternals = {
 	...datastoreExternals,
+	'@helm/live': { global: ['helm', 'live'], handle: 'helm-live' },
 	'@helm/shell': { global: ['helm', 'shell'], handle: 'helm-shell' },
 };
 
@@ -140,6 +141,10 @@ module.exports = [
 				import: path.resolve(packages, 'actions/src/index.ts'),
 				library: { name: ['helm', 'actions'], type: 'window' },
 			},
+			live: {
+				import: path.resolve(packages, 'live/src/index.ts'),
+				library: { name: ['helm', 'live'], type: 'window' },
+			},
 		},
 		plugins: [
 			...basePlugins,
@@ -193,7 +198,10 @@ module.exports = [
 		name: 'apps',
 		entry: {
 			bridge: path.resolve(packages, 'bridge/src/index.tsx'),
-			'admin-settings': path.resolve(packages, 'admin-settings/src/index.tsx'),
+			'admin-settings': path.resolve(
+				packages,
+				'admin-settings/src/index.tsx'
+			),
 			'datacore-worker': path.resolve(packages, 'datacore/src/worker.ts'),
 		},
 		plugins: [

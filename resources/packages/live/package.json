@@ -1,0 +1,17 @@
+{
+	"name": "@helm/live",
+	"version": "0.1.0",
+	"description": "Live broadcast transport and dispatcher for Helm",
+	"private": true,
+	"main": "src/index.ts",
+	"types": "src/index.ts",
+	"dependencies": {
+		"@helm/actions": "workspace:*",
+		"@helm/core": "workspace:*",
+		"@helm/ships": "workspace:*",
+		"@helm/types": "workspace:*"
+	},
+	"peerDependencies": {
+		"@wordpress/data": "^10.0.0"
+	}
+}

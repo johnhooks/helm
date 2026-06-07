@@ -114,6 +114,69 @@ describe('reducer', () => {
 		});
 	});
 
+	describe('RECEIVE_SHIP_STATE', () => {
+		it('merges operational ship state into the current ship', () => {
+			const ship = createShipState({ id: 45, node_id: 8 });
+			const prev = createState({ ship: { ship } });
+
+			const state = reduce(prev, {
+				type: 'RECEIVE_SHIP_STATE',
+				state: {
+					ship_post_id: 45,
+					power_mode: 'overdrive',
+					power_full_at: null,
+					power_max: 120,
+					shields_full_at: '2026-06-07T12:00:00+00:00',
+					shields_max: 80,
+					hull_integrity: 75,
+					hull_max: 100,
+					node_id: 9,
+					current_action_id: 123,
+					created_at: '2026-06-07T11:00:00+00:00',
+					updated_at: '2026-06-07T12:00:00+00:00',
+				},
+			});
+
+			expect(state.ship.ship).toMatchObject({
+				id: 45,
+				node_id: 9,
+				power_mode: 'overdrive',
+				power_full_at: null,
+				power_max: 120,
+				shields_full_at: '2026-06-07T12:00:00+00:00',
+				shields_max: 80,
+				hull_integrity: 75,
+				hull_max: 100,
+				current_action_id: 123,
+			});
+		});
+
+		it('ignores operational state for another ship', () => {
+			const ship = createShipState({ id: 45, hull_integrity: 100 });
+			const prev = createState({ ship: { ship } });
+
+			const state = reduce(prev, {
+				type: 'RECEIVE_SHIP_STATE',
+				state: {
+					ship_post_id: 99,
+					power_mode: 'overdrive',
+					power_full_at: null,
+					power_max: 120,
+					shields_full_at: null,
+					shields_max: 80,
+					hull_integrity: 75,
+					hull_max: 100,
+					node_id: 9,
+					current_action_id: 123,
+					created_at: '2026-06-07T11:00:00+00:00',
+					updated_at: '2026-06-07T12:00:00+00:00',
+				},
+			});
+
+			expect(state.ship.ship).toBe(ship);
+		});
+	});
+
 	describe('FETCH_SYSTEMS_FINISHED', () => {
 		it('stores the systems and clears systems error', () => {
 			const systems = [createSystemComponent()];

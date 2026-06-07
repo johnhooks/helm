@@ -1,6 +1,7 @@
 import type { HelmError } from '@helm/errors';
 import { LinkRel } from '@helm/types';
 import type {
+	OperationalShipState,
 	ShipState,
 	SystemComponentResponse,
 	WithRestLinks,
@@ -13,6 +14,7 @@ export type Action =
 	| { type: 'FETCH_SYSTEMS_FAILED'; error: HelmError }
 	| { type: 'RECEIVE_SHIP'; ship: WithRestLinks<ShipState> }
 	| { type: 'RECEIVE_SYSTEMS'; systems: SystemComponentResponse[] }
+	| { type: 'RECEIVE_SHIP_STATE'; state: OperationalShipState }
 	| { type: 'EDIT_SHIP'; edits: Partial<ShipState> }
 	| { type: 'PATCH_SHIP_START'; edits?: Partial<ShipState> }
 	| { type: 'PATCH_SHIP_FINISHED'; ship: WithRestLinks<ShipState> }

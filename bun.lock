@@ -202,6 +202,19 @@
         "@helm/types": "workspace:*",
       },
     },
+    "resources/packages/live": {
+      "name": "@helm/live",
+      "version": "0.1.0",
+      "dependencies": {
+        "@helm/actions": "workspace:*",
+        "@helm/core": "workspace:*",
+        "@helm/ships": "workspace:*",
+        "@helm/types": "workspace:*",
+      },
+      "peerDependencies": {
+        "@wordpress/data": "^10.0.0",
+      },
+    },
     "resources/packages/logger": {
       "name": "@helm/logger",
       "version": "0.1.0",
@@ -718,6 +731,8 @@
     "@helm/formulas": ["@helm/formulas@workspace:resources/packages/formulas"],
 
     "@helm/holodeck": ["@helm/holodeck@workspace:resources/packages/holodeck"],
+
+    "@helm/live": ["@helm/live@workspace:resources/packages/live"],
 
     "@helm/logger": ["@helm/logger@workspace:resources/packages/logger"],
 
