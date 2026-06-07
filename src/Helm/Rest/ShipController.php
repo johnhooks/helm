@@ -7,6 +7,7 @@ namespace Helm\Rest;
 use Helm\Core\ErrorCode;
 use Helm\ShipLink\Components\PowerMode;
 use Helm\ShipLink\Contracts\ShipStateRepository;
+use Helm\ShipLink\Resources\ShipStateResource;
 use Helm\ShipLink\Ship;
 use Helm\ShipLink\ShipFactory;
 use Helm\Ships\ShipPost;
@@ -210,17 +211,6 @@ final class ShipController
      */
     private function serializeShip(Ship $ship): array
     {
-        $state = $ship->getState();
-
-        return [
-            'id'                => $ship->getId(),
-            'node_id'           => $state->node_id,
-            'power_full_at'     => $state->power_full_at?->format('c'),
-            'shields_full_at'   => $state->shields_full_at?->format('c'),
-            'hull_integrity'    => $state->hull_integrity,
-            'power_mode'        => $state->power_mode->slug(),
-            'cargo'             => $ship->cargo()->all(),
-            'current_action_id' => $state->current_action_id,
-        ];
+        return (new ShipStateResource($ship->getState()))->resolve();
     }
 }

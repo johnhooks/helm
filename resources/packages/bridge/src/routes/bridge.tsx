@@ -123,6 +123,11 @@ export function BridgePage() {
 			return;
 		}
 
+		if (currentNodeId === null) {
+			setStars(allStars);
+			return;
+		}
+
 		const origin = allStars.find((s) => s.node_id === currentNodeId);
 		if (!origin) {
 			setStars(allStars);
@@ -197,8 +202,12 @@ export function BridgePage() {
 			return null;
 		}
 
+		if (currentNodeId === null) {
+			return null;
+		}
+
 		const currentPosition =
-			routeNodePositions?.get(currentNodeId) ??
+			routeNodePositions.get(currentNodeId) ??
 			allStars.find((s) => s.node_id === currentNodeId) ??
 			null;
 
@@ -267,7 +276,7 @@ export function BridgePage() {
 							showLabels={showLabels}
 							style={viewportStyle}
 							selectedTargetOverlay={
-								targetSelectEvent ? (
+								targetSelectEvent && currentNodeId !== null ? (
 									<AstrometricMenu
 										target={targetSelectEvent.target}
 										currentNodeId={currentNodeId}

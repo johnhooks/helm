@@ -75,8 +75,8 @@ class ResourcesTest extends WPTestCase
 
         $resource = (new ShipStateResource($state))->resolve();
 
-        $this->assertSame(45, $resource['ship_post_id']);
-        $this->assertSame(PowerMode::Overdrive->value, $resource['power_mode']);
+        $this->assertSame(45, $resource['id']);
+        $this->assertSame('overdrive', $resource['power_mode']);
         $this->assertSame('2026-06-07T12:35:56+00:00', $resource['power_full_at']);
         $this->assertSame(120.0, $resource['power_max']);
         $this->assertSame(9, $resource['node_id']);

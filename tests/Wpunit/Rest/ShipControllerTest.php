@@ -97,13 +97,17 @@ class ShipControllerTest extends WPRestApiTestCase
 
         $expectedKeys = [
             'id',
-            'node_id',
-            'power_full_at',
-            'shields_full_at',
-            'hull_integrity',
             'power_mode',
-            'cargo',
+            'power_full_at',
+            'power_max',
+            'shields_full_at',
+            'shields_max',
+            'hull_integrity',
+            'hull_max',
+            'node_id',
             'current_action_id',
+            'created_at',
+            'updated_at',
         ];
 
         foreach ($expectedKeys as $key) {
@@ -120,17 +124,6 @@ class ShipControllerTest extends WPRestApiTestCase
 
         $data = $response->get_data();
         $this->assertSame(100.0, $data['hull_integrity']);
-    }
-
-    public function test_cargo_defaults_to_empty(): void
-    {
-        $ship = $this->createShip();
-
-        wp_set_current_user($this->ownerId);
-        $response = $this->getShip($ship->postId());
-
-        $data = $response->get_data();
-        $this->assertSame([], $data['cargo']);
     }
 
     public function test_cargo_endpoint_returns_empty_array(): void
