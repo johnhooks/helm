@@ -35,6 +35,21 @@ the server. The UI should treat `params.route` as the ordered route input and
 details should come from the navigation store, not from client-supplied action
 result fields.
 
+Represent astrometric route edges with a small semantic model:
+
+-   `type`: `route`, `scan`, or `jump`, matching the route/action family.
+-   `state`: route/action lifecycle context such as `idle`, `planned`,
+    `active`, `complete`, or `failed`.
+-   UI flags such as `selected` and hover remain separate from lifecycle state.
+
+For the current implementation we may still use the narrower field names already
+in the code, but the intended model is documented in
+`docs/design/starmap-edges.md` and should guide any cleanup. Selected route
+segments should keep the whole planned route visually connected. Only the
+current active leg should use active animation and active line width. Completed
+legs should recede, upcoming legs should remain selected/static, and hover
+should brighten opacity without changing selection state.
+
 Active jump cards and astrometric overlays should show the submitted route,
 completed legs, the current or next leg, remaining route context, and the current
 `deferred_until` countdown. The display should distinguish the original planned

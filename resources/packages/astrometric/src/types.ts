@@ -30,10 +30,14 @@ export interface NavigationTarget extends Position3D {
  */
 export type SpectralClass = 'O' | 'B' | 'A' | 'F' | 'G' | 'K' | 'M';
 
-/**
- * Route status between systems
- */
-export type RouteStatus = 'discovered' | 'plotted' | 'traveled' | 'blocked';
+export type RouteEdgeType = 'route' | 'scan' | 'jump';
+
+export type RouteEdgeState =
+	| 'idle'
+	| 'planned'
+	| 'active'
+	| 'complete'
+	| 'failed';
 
 /**
  * A route connecting two star systems
@@ -52,23 +56,28 @@ export interface Route {
 	 */
 	to: number;
 	/**
-	 * Whether route is currently selected/active
+	 * Domain/action family represented by the edge.
+	 * Defaults to `route` for canonical known routes.
 	 */
-	active?: boolean;
+	type?: RouteEdgeType;
 	/**
-	 * Route discovery/travel status
+	 * Route/action lifecycle state, separate from UI interaction state.
+	 * Defaults to `idle` for canonical known routes.
 	 */
-	status?: RouteStatus;
+	state?: RouteEdgeState;
+	/**
+	 * Whether route is part of the selected/plotted route.
+	 */
+	selected?: boolean;
 }
 
-export type RouteOverlayType = 'scan' | 'jump';
+export type RouteOverlayType = Exclude<RouteEdgeType, 'route'>;
 
 export interface RouteOverlay extends Route {
 	type: RouteOverlayType;
-	status: RouteStatus;
+	state: Exclude<RouteEdgeState, 'idle'>;
 	canonicalRouteId?: string;
 	canonicalEdgeId?: number;
-	pulse?: boolean;
 }
 
 export interface RouteState {

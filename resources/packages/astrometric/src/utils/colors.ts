@@ -1,5 +1,5 @@
 import { Color } from 'three';
-import type { RouteOverlayType, SpectralClass } from '../types';
+import type { RouteEdgeState, RouteEdgeType, SpectralClass } from '../types';
 
 /**
  * LCARS color palette for Three.js
@@ -67,40 +67,22 @@ export function getStarSystemColor(
 	return defaultStarColor.clone();
 }
 
-/**
- * Colors for route status - vibrant LCARS palette
- */
-export const routeStatusColors: Record<string, Color> = {
-	discovered: lcarsColors.sky.clone(),
-	plotted: lcarsColors.violet.clone(),
-	traveled: lcarsColors.success.clone(),
-	blocked: new Color('#ff6666'),
-};
-
-export const routeOverlayTypeColors: Record<RouteOverlayType, Color> = {
+export const routeEdgeTypeColors: Record<RouteEdgeType, Color> = {
+	route: lcarsColors.muted.clone(),
 	scan: lcarsColors.lilac.clone(),
 	jump: lcarsColors.sky.clone(),
 };
 
 /**
- * Get color for a route based on status
+ * Get color for a route edge.
  */
-export function getRouteColor(
-	status?: string,
-	active?: boolean,
-	type?: RouteOverlayType
+export function getRouteEdgeColor(
+	type: RouteEdgeType,
+	state: RouteEdgeState = 'idle'
 ): Color {
-	if (status === 'blocked') {
-		return routeStatusColors.blocked.clone();
+	if (state === 'failed') {
+		return lcarsColors.danger.clone();
 	}
-	if (type) {
-		return routeOverlayTypeColors[type].clone();
-	}
-	if (status && status in routeStatusColors) {
-		return routeStatusColors[status].clone();
-	}
-	if (active) {
-		return lcarsColors.focus.clone();
-	}
-	return lcarsColors.gold.clone();
+
+	return routeEdgeTypeColors[type].clone();
 }

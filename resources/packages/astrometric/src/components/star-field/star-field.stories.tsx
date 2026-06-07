@@ -4,10 +4,12 @@ import { StarField } from './star-field';
 import type { StarNode } from '@helm/types';
 import type {
 	Route,
+	RouteOverlay,
 	StarSelectEvent,
 	RouteSelectEvent,
 	HoverState,
 	CameraMode,
+	WaypointNode,
 } from '../../types';
 
 const meta: Meta<typeof StarField> = {
@@ -143,11 +145,11 @@ const sampleStars: StarNode[] = [
 ];
 
 const sampleRoutes: Route[] = [
-	{ id: 'route-1', from: 1, to: 2, status: 'traveled' },
-	{ id: 'route-2', from: 1, to: 3, status: 'discovered' },
-	{ id: 'route-3', from: 2, to: 5, status: 'plotted' },
-	{ id: 'route-4', from: 3, to: 6, status: 'discovered' },
-	{ id: 'route-5', from: 4, to: 7, status: 'blocked' },
+	{ id: 'route-1', from: 1, to: 2, state: 'complete' },
+	{ id: 'route-2', from: 1, to: 3 },
+	{ id: 'route-3', from: 2, to: 5, selected: true },
+	{ id: 'route-4', from: 3, to: 6 },
+	{ id: 'route-5', from: 4, to: 7, state: 'failed' },
 ];
 
 const sampleReachableNodeIds = new Set([1, 2, 3, 4, 5, 6]);
@@ -178,6 +180,171 @@ export const Minimal: Story = {
 		showBackground: false,
 		showDistanceLabels: false,
 		distanceRings: [],
+	},
+};
+
+const routeStoryStars: StarNode[] = [
+	{
+		...sampleStars[0],
+		id: 1,
+		node_id: 1,
+		title: 'Sol',
+		x: 0,
+		y: 0,
+		z: 0,
+	},
+	{
+		...sampleStars[1],
+		id: 12,
+		node_id: 12,
+		title: 'Lacaille 9352',
+		catalog_id: 'LAC_9352',
+		x: 2.58,
+		y: -0.62,
+		z: -1.92,
+	},
+];
+
+const routeStoryWaypoints: WaypointNode[] = [
+	{
+		nodeId: 3874,
+		label: 'Waypoint 3874',
+		x: 3.05,
+		y: 0.88,
+		z: -3.17,
+	},
+	{
+		nodeId: 3875,
+		label: 'Waypoint 3875',
+		x: 2.96,
+		y: 2.03,
+		z: -3.66,
+	},
+];
+
+const routeStoryNodePositions = new Map(
+	routeStoryWaypoints.map((waypoint) => [
+		waypoint.nodeId,
+		{ x: waypoint.x, y: waypoint.y, z: waypoint.z },
+	])
+);
+
+const multiphaseRoutes: Route[] = [
+	{ id: 'known-1-12', from: 1, to: 12 },
+	{ id: 'known-12-3874', from: 12, to: 3874 },
+	{ id: 'known-3874-3875', from: 3874, to: 3875 },
+];
+
+function jumpOverlay(
+	id: string,
+	from: number,
+	to: number,
+	canonicalRouteId: string,
+	overrides: Partial<RouteOverlay> = {}
+): RouteOverlay {
+	return {
+		id,
+		from,
+		to,
+		type: 'jump',
+		state: 'planned',
+		canonicalRouteId,
+		...overrides,
+	};
+}
+
+const activeJumpOverlays: RouteOverlay[] = [
+	jumpOverlay('jump-traveled-1', 1, 12, 'known-1-12', {
+		state: 'complete',
+		selected: true,
+	}),
+	jumpOverlay('jump-active-2', 12, 3874, 'known-12-3874', {
+		state: 'active',
+		selected: true,
+	}),
+	jumpOverlay('jump-pending-3', 3874, 3875, 'known-3874-3875', {
+		state: 'planned',
+		selected: true,
+	}),
+];
+
+const plottedJumpOverlays: RouteOverlay[] = multiphaseRoutes.map((route) =>
+	jumpOverlay(`jump-plotted-${route.id}`, route.from, route.to, route.id, {
+		state: 'planned',
+		selected: true,
+	})
+);
+
+const failedJumpOverlays: RouteOverlay[] = [
+	jumpOverlay('jump-failed-traveled-1', 1, 12, 'known-1-12', {
+		state: 'complete',
+		selected: true,
+	}),
+	jumpOverlay('jump-failed-current-2', 12, 3874, 'known-12-3874', {
+		state: 'failed',
+		selected: true,
+	}),
+	jumpOverlay('jump-failed-planned-3', 3874, 3875, 'known-3874-3875', {
+		state: 'failed',
+	}),
+];
+
+/**
+ * Active multiphase jump route: traveled legs recede, the current leg pulses,
+ * and upcoming legs remain selected but static.
+ */
+export const MultiphaseJumpRoute: Story = {
+	args: {
+		stars: routeStoryStars,
+		waypoints: routeStoryWaypoints,
+		nodePositions: routeStoryNodePositions,
+		routes: multiphaseRoutes,
+		routeOverlays: activeJumpOverlays,
+		currentNodeId: 12,
+		selectedRouteId: 'jump-active-2',
+		reachableNodeIds: sampleReachableNodeIds,
+		visitedNodeIds: sampleVisitedNodeIds,
+		showBackground: false,
+		showDistanceLabels: true,
+	},
+};
+
+/**
+ * Planned multiphase jump route before travel begins.
+ */
+export const PlottedMultiphaseJumpRoute: Story = {
+	args: {
+		stars: routeStoryStars,
+		waypoints: routeStoryWaypoints,
+		nodePositions: routeStoryNodePositions,
+		routes: multiphaseRoutes,
+		routeOverlays: plottedJumpOverlays,
+		currentNodeId: 1,
+		selectedRouteId: 'jump-plotted-known-1-2',
+		reachableNodeIds: sampleReachableNodeIds,
+		visitedNodeIds: sampleVisitedNodeIds,
+		showBackground: false,
+		showDistanceLabels: true,
+	},
+};
+
+/**
+ * Failed multiphase jump route: completed travel recedes, the failed leg is
+ * strong danger, and untraveled future legs are subtle danger.
+ */
+export const FailedMultiphaseJumpRoute: Story = {
+	args: {
+		stars: routeStoryStars,
+		waypoints: routeStoryWaypoints,
+		nodePositions: routeStoryNodePositions,
+		routes: multiphaseRoutes,
+		routeOverlays: failedJumpOverlays,
+		currentNodeId: 12,
+		selectedRouteId: 'jump-failed-current-2',
+		reachableNodeIds: sampleReachableNodeIds,
+		visitedNodeIds: sampleVisitedNodeIds,
+		showBackground: false,
+		showDistanceLabels: true,
 	},
 };
 

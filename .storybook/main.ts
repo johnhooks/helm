@@ -9,6 +9,7 @@ const config: StorybookConfig = {
     "../resources/packages/ui/src/**/*.mdx",
     "../resources/packages/ui/src/**/*.stories.@(js|jsx|mjs|ts|tsx)",
     "../resources/packages/shell/src/**/*.stories.@(js|jsx|mjs|ts|tsx)",
+    "../resources/packages/astrometric/src/**/*.stories.@(js|jsx|mjs|ts|tsx)",
     "../resources/packages/stellar/src/**/*.stories.@(js|jsx|mjs|ts|tsx)",
   ],
   framework: {
@@ -27,6 +28,7 @@ const config: StorybookConfig = {
           "@helm/ui": join(__dirname, "../resources/packages/ui/src"),
           "@helm/actions": join(__dirname, "../resources/packages/actions/src"),
           "@helm/shell": join(__dirname, "../resources/packages/shell/src"),
+          "@helm/astrometric": join(__dirname, "../resources/packages/astrometric/src"),
           "@helm/errors": join(__dirname, "../resources/packages/errors/src"),
           "@helm/stellar": join(__dirname, "../resources/packages/stellar/src"),
           "@helm/types": join(__dirname, "../resources/packages/types/src"),

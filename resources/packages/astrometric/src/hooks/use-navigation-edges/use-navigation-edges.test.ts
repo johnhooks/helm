@@ -120,7 +120,8 @@ describe('useNavigationEdges', () => {
 				id: 'known-9',
 				from: 1,
 				to: 2,
-				status: 'discovered',
+				type: 'route',
+				state: 'idle',
 			},
 		]);
 	});
@@ -183,11 +184,110 @@ describe('useNavigationEdges', () => {
 			id: 'jump-active-3-0',
 			from: 8,
 			to: 9,
-			status: 'plotted',
-			active: true,
+			state: 'active',
+			selected: true,
 			type: 'jump',
-			pulse: true,
 		});
+	});
+
+	it('keeps the whole active jump route selected while activating only the current edge', () => {
+		const { overlays } = renderNavigationEdges({
+			userEdges: [
+				createUserEdge({ id: 80, node_a_id: 8, node_b_id: 9 }),
+				createUserEdge({ id: 81, node_a_id: 9, node_b_id: 10 }),
+				createUserEdge({ id: 82, node_a_id: 10, node_b_id: 11 }),
+			],
+			actions: [
+				createAction({
+					id: 3,
+					type: 'jump',
+					status: 'running',
+					params: {
+						from_node_id: 8,
+						target_node_id: 11,
+						route: [80, 81, 82],
+					},
+					result: {
+						phases: [
+							{
+								core_cost: 2,
+								core_before: 100,
+								remaining_core_life: 98,
+								completed_at: '2026-04-20T00:00:00+00:00',
+							},
+						],
+					},
+				}),
+			],
+		});
+
+		expect(overlays).toMatchObject([
+			{
+				id: 'jump-complete-3-0',
+				state: 'complete',
+				selected: true,
+			},
+			{
+				id: 'jump-active-3-1',
+				state: 'active',
+				selected: true,
+			},
+			{
+				id: 'jump-planned-3-2',
+				state: 'planned',
+				selected: true,
+			},
+		]);
+	});
+
+	it('renders failed jump routes with completed progress and subtle failed future legs', () => {
+		const { overlays } = renderNavigationEdges({
+			userEdges: [
+				createUserEdge({ id: 80, node_a_id: 8, node_b_id: 9 }),
+				createUserEdge({ id: 81, node_a_id: 9, node_b_id: 10 }),
+				createUserEdge({ id: 82, node_a_id: 10, node_b_id: 11 }),
+			],
+			actions: [
+				createAction({
+					id: 5,
+					type: 'jump',
+					status: 'failed',
+					params: {
+						from_node_id: 8,
+						target_node_id: 11,
+						route: [80, 81, 82],
+					},
+					result: {
+						phases: [
+							{
+								core_cost: 2,
+								core_before: 100,
+								remaining_core_life: 98,
+								completed_at: '2026-04-20T00:00:00+00:00',
+							},
+						],
+					},
+				}),
+			],
+		});
+
+		expect(overlays).toMatchObject([
+			{
+				id: 'jump-complete-5-0',
+				state: 'complete',
+				selected: true,
+			},
+			{
+				id: 'jump-failed-5-1',
+				state: 'failed',
+				selected: true,
+			},
+			{
+				id: 'jump-failed-5-2',
+				state: 'failed',
+				selected: false,
+			},
+		]);
 	});
 
 	it('dismisses scan results when a newer draft or action appears', () => {
@@ -232,9 +332,7 @@ describe('useNavigationEdges', () => {
 				},
 			}).overlays.some(
 				(edge) =>
-					edge.type === 'scan' &&
-					edge.status === 'plotted' &&
-					edge.id.startsWith('scan-result-')
+					edge.type === 'scan' && edge.id.startsWith('scan-result-')
 			)
 		).toBe(false);
 
@@ -251,9 +349,7 @@ describe('useNavigationEdges', () => {
 				],
 			}).overlays.some(
 				(edge) =>
-					edge.type === 'scan' &&
-					edge.status === 'plotted' &&
-					edge.id.startsWith('scan-result-')
+					edge.type === 'scan' && edge.id.startsWith('scan-result-')
 			)
 		).toBe(false);
 	});
@@ -290,6 +386,7 @@ describe('useNavigationEdges', () => {
 		expect(overlays.at(-1)).toMatchObject({
 			id: 'jump-result-4-0',
 			type: 'jump',
+			state: 'complete',
 			canonicalEdgeId: 44,
 		});
 	});
@@ -405,10 +502,10 @@ describe('useNavigationEdges', () => {
 		).toMatchObject({
 			id: 'scan_route-failed-6',
 			type: 'scan',
-			status: 'blocked',
+			state: 'failed',
+			selected: true,
 			from: 3,
 			to: 5,
-			pulse: false,
 		});
 	});
 
@@ -440,7 +537,7 @@ describe('useNavigationEdges', () => {
 		expect(routes).toHaveLength(100);
 		expect(overlays.at(-1)).toMatchObject({
 			type: 'jump',
-			status: 'plotted',
+			state: 'active',
 		});
 	});
 });
