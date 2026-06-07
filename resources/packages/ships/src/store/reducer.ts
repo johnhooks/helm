@@ -15,6 +15,27 @@ function ship(state: State['ship'], action: Action): State['ship'] {
 		case 'RECEIVE_SHIP':
 			return { ...state, ship: action.ship, error: null };
 
+		case 'RECEIVE_SHIP_STATE':
+			if (!state.ship || state.ship.id !== action.state.ship_post_id) {
+				return state;
+			}
+
+			return {
+				...state,
+				ship: {
+					...state.ship,
+					node_id: action.state.node_id ?? state.ship.node_id,
+					power_full_at: action.state.power_full_at,
+					power_max: action.state.power_max,
+					shields_full_at: action.state.shields_full_at,
+					shields_max: action.state.shields_max,
+					hull_integrity: action.state.hull_integrity,
+					hull_max: action.state.hull_max,
+					power_mode: action.state.power_mode,
+					current_action_id: action.state.current_action_id,
+				},
+			};
+
 		case 'FETCH_SHIP_FAILED':
 			return { ...state, error: action.error };
 

@@ -17,6 +17,8 @@ declare global {
 		datacore: typeof import('@helm/datacore');
 		/** Webpack library: window.helm.nav (handle: helm-nav). */
 		nav: typeof import('@helm/nav');
+		/** Webpack library: window.helm.live (handle: helm-live). */
+		live: typeof import('@helm/live');
 	}
 
 	interface Window {

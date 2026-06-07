@@ -4,6 +4,7 @@ import { ErrorCode, HelmError } from '@helm/errors';
 import { store as productsStore } from '@helm/products';
 import { LinkRel } from '@helm/types';
 import type {
+	OperationalShipState,
 	ShipState,
 	SystemComponentResponse,
 	Thunk,
@@ -21,6 +22,10 @@ export function receiveShip(ship: WithRestLinks<ShipState>): Action {
 
 export function receiveSystems(systems: SystemComponentResponse[]): Action {
 	return { type: 'RECEIVE_SYSTEMS', systems };
+}
+
+export function receiveShipState(state: OperationalShipState): Action {
+	return { type: 'RECEIVE_SHIP_STATE', state };
 }
 
 export function editShip(edits: Partial<ShipState>): Action {
