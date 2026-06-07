@@ -3,20 +3,25 @@ import type {
 	ProductEmbed,
 	ShipState,
 	SystemComponent,
+	WithRestLinks,
 } from '@helm/types';
-import type { EditsState, ShipSlice, State, SystemsState } from '../types';
+import type { EditsState, State, SystemsState } from '../types';
 import { initializeDefaultState } from '../reducer';
 
 export function createShipState(overrides: Partial<ShipState> = {}): ShipState {
 	return {
 		id: 1,
 		node_id: 100,
-		power_full_at: '2025-01-01T00:00:00+00:00',
-		shields_full_at: '2025-01-01T00:00:00+00:00',
-		hull_integrity: 100,
 		power_mode: 'normal',
-		cargo: {},
+		power_full_at: '2025-01-01T00:00:00+00:00',
+		power_max: 100,
+		shields_full_at: '2025-01-01T00:00:00+00:00',
+		shields_max: 100,
+		hull_integrity: 100,
+		hull_max: 100,
 		current_action_id: null,
+		created_at: '2025-01-01T00:00:00+00:00',
+		updated_at: '2025-01-01T00:00:00+00:00',
 		...overrides,
 	};
 }
@@ -75,14 +80,16 @@ export function createEditsState(
 
 export function createState(
 	overrides: {
-		ship?: Partial<ShipSlice>;
+		shipState?: WithRestLinks<ShipState> | null;
+		shipError?: State['shipError'];
 		systems?: Partial<SystemsState>;
 		edits?: Partial<EditsState>;
 	} = {}
 ): State {
 	const defaults = initializeDefaultState();
 	return {
-		ship: { ...defaults.ship, ...overrides.ship },
+		shipState: overrides.shipState ?? defaults.shipState,
+		shipError: overrides.shipError ?? defaults.shipError,
 		systems: { ...defaults.systems, ...overrides.systems },
 		edits: { ...defaults.edits, ...overrides.edits },
 	};

@@ -83,7 +83,7 @@ class EventRepositoryTest extends WPTestCase
         $ship45Second = $this->repository->append(new Event([
             'channel' => Channel::privateShip(45),
             'type' => EventType::ShipStateUpdated,
-            'payload' => ['ship_state' => ['ship_post_id' => 45]],
+            'payload' => ['ship_state' => ['id' => 45]],
             'resource_type' => 'ship',
             'resource_id' => 45,
         ]));
@@ -137,7 +137,7 @@ class EventRepositoryTest extends WPTestCase
         $event = $this->repository->append(new Event([
             'channel' => Channel::privateShip(45),
             'type' => EventType::ShipStateUpdated,
-            'payload' => ['ship_state' => ['ship_post_id' => 45]],
+            'payload' => ['ship_state' => ['id' => 45]],
         ]));
 
         $events = $this->repository->findAfterCursorForChannel(Channel::privateShip(45), 0);

@@ -19,6 +19,12 @@ const POWER_MODES = {
 
 type PowerModeKey = keyof typeof POWER_MODES;
 
+function normalizePowerMode(value: unknown): PowerModeKey {
+	return typeof value === 'string' && value in POWER_MODES
+		? (value as PowerModeKey)
+		: 'normal';
+}
+
 const MODE_OPTIONS = [
 	{ value: 'efficiency', label: __('Efficiency', 'helm') },
 	{ value: 'normal', label: __('Normal', 'helm') },
@@ -73,10 +79,7 @@ export function ShipSystemsCard() {
 		[]
 	);
 
-	const powerMode: PowerModeKey =
-		(edits?.power_mode as PowerModeKey) ??
-		(ship.power_mode as PowerModeKey) ??
-		'normal';
+	const powerMode = normalizePowerMode(edits?.power_mode ?? ship.power_mode);
 
 	const handlePowerModeChange = useCallback(
 		(value: string) => {

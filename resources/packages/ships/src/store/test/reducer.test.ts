@@ -19,7 +19,8 @@ describe('reducer', () => {
 	describe('initializeDefaultState', () => {
 		it('returns null ship, systems, and initial edits', () => {
 			expect(initializeDefaultState()).toEqual({
-				ship: { ship: null, error: null },
+				shipState: null,
+				shipError: null,
 				systems: { systems: null, error: null },
 				edits: {
 					ship: null,
@@ -34,7 +35,7 @@ describe('reducer', () => {
 		it('stores the ship and clears ship error', () => {
 			const ship = createShipState();
 			const prev = createState({
-				ship: { error: new HelmError('helm.test', 'Error') },
+				shipError: new HelmError('helm.test', 'Error'),
 			});
 
 			const state = reduce(prev, {
@@ -42,21 +43,21 @@ describe('reducer', () => {
 				ship,
 			});
 
-			expect(state.ship.ship).toBe(ship);
-			expect(state.ship.error).toBeNull();
+			expect(state.shipState).toBe(ship);
+			expect(state.shipError).toBeNull();
 		});
 
 		it('replaces an existing ship', () => {
 			const original = createShipState({ hull_integrity: 80 });
 			const updated = createShipState({ hull_integrity: 100 });
-			const prev = createState({ ship: { ship: original } });
+			const prev = createState({ shipState: original });
 
 			const state = reduce(prev, {
 				type: 'FETCH_SHIP_FINISHED',
 				ship: updated,
 			});
 
-			expect(state.ship.ship?.hull_integrity).toBe(100);
+			expect(state.shipState?.hull_integrity).toBe(100);
 		});
 
 		it('does not affect systems', () => {
@@ -81,19 +82,19 @@ describe('reducer', () => {
 				error,
 			});
 
-			expect(state.ship.error).toBe(error);
+			expect(state.shipError).toBe(error);
 		});
 
 		it('does not remove existing ship data', () => {
 			const ship = createShipState();
-			const prev = createState({ ship: { ship } });
+			const prev = createState({ shipState: ship });
 
 			const state = reduce(prev, {
 				type: 'FETCH_SHIP_FAILED',
 				error: new HelmError('helm.test', 'Error'),
 			});
 
-			expect(state.ship.ship).toBe(ship);
+			expect(state.shipState).toBe(ship);
 		});
 	});
 
@@ -101,7 +102,7 @@ describe('reducer', () => {
 		it('stores the ship and clears ship error', () => {
 			const ship = createShipState();
 			const prev = createState({
-				ship: { error: new HelmError('helm.test', 'Error') },
+				shipError: new HelmError('helm.test', 'Error'),
 			});
 
 			const state = reduce(prev, {
@@ -109,35 +110,14 @@ describe('reducer', () => {
 				ship,
 			});
 
-			expect(state.ship.ship).toBe(ship);
-			expect(state.ship.error).toBeNull();
+			expect(state.shipState).toBe(ship);
+			expect(state.shipError).toBeNull();
 		});
 	});
 
 	describe('RECEIVE_SHIP_STATE', () => {
-		it('merges operational ship state into the current ship', () => {
-			const ship = createShipState({ id: 45, node_id: 8 });
-			const prev = createState({ ship: { ship } });
-
-			const state = reduce(prev, {
-				type: 'RECEIVE_SHIP_STATE',
-				state: {
-					ship_post_id: 45,
-					power_mode: 'overdrive',
-					power_full_at: null,
-					power_max: 120,
-					shields_full_at: '2026-06-07T12:00:00+00:00',
-					shields_max: 80,
-					hull_integrity: 75,
-					hull_max: 100,
-					node_id: 9,
-					current_action_id: 123,
-					created_at: '2026-06-07T11:00:00+00:00',
-					updated_at: '2026-06-07T12:00:00+00:00',
-				},
-			});
-
-			expect(state.ship.ship).toMatchObject({
+		it('stores the latest ship state', () => {
+			const ship = createShipState({
 				id: 45,
 				node_id: 9,
 				power_mode: 'overdrive',
@@ -149,31 +129,13 @@ describe('reducer', () => {
 				hull_max: 100,
 				current_action_id: 123,
 			});
-		});
 
-		it('ignores operational state for another ship', () => {
-			const ship = createShipState({ id: 45, hull_integrity: 100 });
-			const prev = createState({ ship: { ship } });
-
-			const state = reduce(prev, {
+			const state = reduce(undefined, {
 				type: 'RECEIVE_SHIP_STATE',
-				state: {
-					ship_post_id: 99,
-					power_mode: 'overdrive',
-					power_full_at: null,
-					power_max: 120,
-					shields_full_at: null,
-					shields_max: 80,
-					hull_integrity: 75,
-					hull_max: 100,
-					node_id: 9,
-					current_action_id: 123,
-					created_at: '2026-06-07T11:00:00+00:00',
-					updated_at: '2026-06-07T12:00:00+00:00',
-				},
+				ship,
 			});
 
-			expect(state.ship.ship).toBe(ship);
+			expect(state.shipState).toBe(ship);
 		});
 	});
 
@@ -208,14 +170,14 @@ describe('reducer', () => {
 
 		it('does not affect ship', () => {
 			const ship = createShipState();
-			const prev = createState({ ship: { ship } });
+			const prev = createState({ shipState: ship });
 
 			const state = reduce(prev, {
 				type: 'FETCH_SYSTEMS_FINISHED',
 				systems: [createSystemComponent()],
 			});
 
-			expect(state.ship.ship).toBe(ship);
+			expect(state.shipState).toBe(ship);
 		});
 	});
 
@@ -290,14 +252,14 @@ describe('reducer', () => {
 
 		it('does not affect other state', () => {
 			const ship = createShipState();
-			const prev = createState({ ship: { ship } });
+			const prev = createState({ shipState: ship });
 
 			const state = reduce(prev, {
 				type: 'EDIT_SHIP',
 				edits: { power_mode: 'overdrive' },
 			});
 
-			expect(state.ship.ship).toBe(ship);
+			expect(state.shipState).toBe(ship);
 		});
 	});
 
@@ -353,7 +315,7 @@ describe('reducer', () => {
 				ship,
 			});
 
-			expect(state.ship.ship).toBe(ship);
+			expect(state.shipState).toBe(ship);
 			expect(state.edits.ship).toBeNull();
 			expect(state.edits.isSubmitting).toBe(false);
 			expect(state.edits.error).toBeNull();
@@ -401,7 +363,7 @@ describe('reducer', () => {
 		it('does not remove existing ship data', () => {
 			const ship = createShipState();
 			const prev = createState({
-				ship: { ship },
+				shipState: ship,
 				edits: createEditsState({ isSubmitting: true }),
 			});
 
@@ -410,7 +372,7 @@ describe('reducer', () => {
 				error: new HelmError('helm.test', 'Error'),
 			});
 
-			expect(state.ship.ship).toBe(ship);
+			expect(state.shipState).toBe(ship);
 		});
 	});
 

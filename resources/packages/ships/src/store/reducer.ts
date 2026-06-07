@@ -3,44 +3,41 @@ import type { Action, State } from './types';
 
 export function initializeDefaultState(): State {
 	return {
-		ship: { ship: null, error: null },
+		shipState: null,
+		shipError: null,
 		systems: { systems: null, error: null },
 		edits: { ship: null, isSubmitting: false, error: null },
 	};
 }
 
-function ship(state: State['ship'], action: Action): State['ship'] {
+function shipState(
+	state: State['shipState'],
+	action: Action
+): State['shipState'] {
 	switch (action.type) {
 		case 'FETCH_SHIP_FINISHED':
 		case 'RECEIVE_SHIP':
-			return { ...state, ship: action.ship, error: null };
-
 		case 'RECEIVE_SHIP_STATE':
-			if (!state.ship || state.ship.id !== action.state.ship_post_id) {
-				return state;
-			}
+		case 'PATCH_SHIP_FINISHED':
+			return action.ship;
 
-			return {
-				...state,
-				ship: {
-					...state.ship,
-					node_id: action.state.node_id ?? state.ship.node_id,
-					power_full_at: action.state.power_full_at,
-					power_max: action.state.power_max,
-					shields_full_at: action.state.shields_full_at,
-					shields_max: action.state.shields_max,
-					hull_integrity: action.state.hull_integrity,
-					hull_max: action.state.hull_max,
-					power_mode: action.state.power_mode,
-					current_action_id: action.state.current_action_id,
-				},
-			};
+		default:
+			return state;
+	}
+}
+
+function shipError(
+	state: State['shipError'],
+	action: Action
+): State['shipError'] {
+	switch (action.type) {
+		case 'FETCH_SHIP_FINISHED':
+		case 'RECEIVE_SHIP':
+		case 'RECEIVE_SHIP_STATE':
+			return null;
 
 		case 'FETCH_SHIP_FAILED':
-			return { ...state, error: action.error };
-
-		case 'PATCH_SHIP_FINISHED':
-			return { ...state, ship: action.ship };
+			return action.error;
 
 		default:
 			return state;
@@ -86,4 +83,9 @@ function edits(state: State['edits'], action: Action): State['edits'] {
 	}
 }
 
-export const reducer = combineReducers({ ship, systems, edits });
+export const reducer = combineReducers({
+	shipState,
+	shipError,
+	systems,
+	edits,
+});

@@ -59,7 +59,7 @@ describe('live broadcast dispatcher', () => {
 
 	it('dispatches ship state events to the ships store', () => {
 		const shipState = {
-			ship_post_id: 45,
+			id: 45,
 			power_mode: 'normal',
 			power_full_at: null,
 			power_max: 100,

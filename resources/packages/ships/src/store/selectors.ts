@@ -14,10 +14,9 @@ import { expectLoadout, getSystemSlots } from './utils';
 export const getShip = (
 	state: State,
 	_shipId: number
-): WithRestLinks<ShipState> | undefined => state.ship.ship ?? undefined;
+): WithRestLinks<ShipState> | undefined => state.shipState ?? undefined;
 
-export const getShipError = (state: State): HelmError | null =>
-	state.ship.error;
+export const getShipError = (state: State): HelmError | null => state.shipError;
 
 export const getSystems = (
 	state: State,
@@ -75,7 +74,7 @@ export const getSystemStats = createRegistrySelector((select) =>
 			};
 		},
 		(state: State) => {
-			const { ship } = state.ship;
+			const ship = state.shipState;
 			const { systems } = state.systems;
 
 			if (!systems) {

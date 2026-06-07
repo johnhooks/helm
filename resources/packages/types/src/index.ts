@@ -16,7 +16,7 @@ export type {
 	WithRestEmbeds,
 	WithRestLinks,
 } from './rest';
-export type { OperationalShipState, ShipState } from './ship';
+export type { ShipState } from './ship';
 export type {
 	ShipLoadout,
 	SlotProducts,

@@ -58,7 +58,7 @@ export function expectLoadout(
 	select: typeof globalSelect
 ): ShipLoadout {
 	try {
-		const ship = state.ship.ship;
+		const ship = state.shipState;
 		assert(ship, ErrorCode.ShipsNotLoaded, 'Expected ship to be loaded');
 
 		const systems = state.systems.systems;

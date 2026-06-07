@@ -27,8 +27,8 @@ final class ShipStateResource extends Resource
         $state = $this->resource;
 
         return [
-            'ship_post_id'      => $state->ship_post_id,
-            'power_mode'        => $state->power_mode->value,
+            'id'                => $state->ship_post_id,
+            'power_mode'        => $state->power_mode->slug(),
             'power_full_at'     => $state->power_full_at?->format('c'),
             'power_max'         => $state->power_max,
             'shields_full_at'   => $state->shields_full_at?->format('c'),

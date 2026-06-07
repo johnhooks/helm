@@ -24,7 +24,7 @@ import {
 describe('getShip', () => {
 	it('returns the ship when it exists', () => {
 		const ship = createShipState();
-		const state = createState({ ship: { ship } });
+		const state = createState({ shipState: ship });
 
 		expect(getShip(state, 1)).toBe(ship);
 	});
@@ -39,7 +39,7 @@ describe('getShip', () => {
 describe('getShipError', () => {
 	it('returns the error when it exists', () => {
 		const error = new HelmError('helm.ship.not_found', 'Not found');
-		const state = createState({ ship: { error } });
+		const state = createState({ shipError: error });
 
 		expect(getShipError(state)).toBe(error);
 	});
@@ -217,7 +217,7 @@ function mockRegistry(
 
 function createLoadedState() {
 	return createState({
-		ship: { ship: createShipState() },
+		shipState: createShipState(),
 		systems: {
 			systems: [
 				createSystemComponent({
@@ -277,7 +277,7 @@ describe('getShipWithLoadout', () => {
 
 	it('throws when systems are not loaded', () => {
 		const state = createState({
-			ship: { ship: createShipState() },
+			shipState: createShipState(),
 		});
 
 		expect(() => getShipWithLoadout(state, 1)).toThrow(HelmError);
@@ -287,7 +287,7 @@ describe('getShipWithLoadout', () => {
 		const state = createLoadedState();
 		const loadout = getShipWithLoadout(state, 1);
 
-		expect(loadout.ship).toBe(state.ship.ship);
+		expect(loadout.ship).toBe(state.shipState);
 		expect(loadout.slots.core.slot).toBe('core');
 		expect(loadout.slots.drive.slot).toBe('drive');
 		expect(loadout.slots.sensor.slot).toBe('sensor');
@@ -302,7 +302,7 @@ describe('getShipWithLoadout', () => {
 
 	it('throws a safe ship link error when a required slot is missing', () => {
 		const state = createState({
-			ship: { ship: createShipState() },
+			shipState: createShipState(),
 			systems: {
 				systems: [
 					createSystemComponent({

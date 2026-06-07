@@ -1,5 +1,5 @@
 import type { ShipAction } from '@helm/actions';
-import type { OperationalShipState } from '@helm/types';
+import type { ShipState } from '@helm/types';
 
 export type BroadcastEventType = 'ship.action.updated' | 'ship.state.updated';
 
@@ -20,7 +20,7 @@ export type ShipActionUpdatedEvent = BroadcastEventBase<
 
 export type ShipStateUpdatedEvent = BroadcastEventBase<
 	'ship.state.updated',
-	{ ship_state: OperationalShipState }
+	{ ship_state: ShipState }
 >;
 
 export type BroadcastEvent = ShipActionUpdatedEvent | ShipStateUpdatedEvent;
