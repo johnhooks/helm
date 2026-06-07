@@ -21,6 +21,9 @@ tasks. Completed tasks are archived in `.plans/tasks/.archive/`.
 
 -   [actions-02-add-typed-action-contracts](tasks/actions-02-add-typed-action-contracts.md) - Add typed action contracts. `dev` `p2`
 -   [actions-03-standardize-multiphase-processing](tasks/actions-03-standardize-multiphase-processing.md) - Standardize multiphase action processing. `dev` `p1`
+-   [broadcast-01-add-event-outbox](tasks/broadcast-01-add-event-outbox.md) - Add a broadcast event outbox. `dev` `p1`
+-   [broadcast-02-publish-ship-events](tasks/broadcast-02-publish-ship-events.md) - Publish ship broadcast events. `dev` `p1`
+-   [broadcast-03-poll-events-with-heartbeat](tasks/broadcast-03-poll-events-with-heartbeat.md) - Poll broadcast events with heartbeat. `dev` `p1`
 -   [dev-02-convert-js-tooling-to-pnpm](tasks/dev-02-convert-js-tooling-to-pnpm.md) - Convert JavaScript tooling to pnpm. `dev` `p1`
 -   [errors-01-review-helm-error-api](tasks/errors-01-review-helm-error-api.md) - Review HelmError display API. `dev` `p3`
 -   [nav-13-add-scan-result-reconciler](tasks/nav-13-add-scan-result-reconciler.md) - Add a scan result reconciler. `navigation` `p2`
