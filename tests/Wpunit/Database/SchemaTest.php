@@ -18,6 +18,7 @@ class SchemaTest extends WPTestCase
         $this->assertContains(Schema::TABLE_NAV_NODES, Schema::TABLES);
         $this->assertContains(Schema::TABLE_NAV_EDGES, Schema::TABLES);
         $this->assertContains(Schema::TABLE_NAV_ROUTES, Schema::TABLES);
+        $this->assertContains(Schema::TABLE_BROADCAST_EVENTS, Schema::TABLES);
     }
 
     public function test_table_returns_prefixed_name(): void
@@ -141,6 +142,28 @@ class SchemaTest extends WPTestCase
         $this->assertContains('jump_count', $columns);
         $this->assertContains('visibility', $columns);
         $this->assertContains('traversal_count', $columns);
+    }
+
+    public function test_broadcast_events_table_has_correct_structure(): void
+    {
+        global $wpdb;
+
+        Schema::createTables();
+
+        $columns = $wpdb->get_col(
+            $wpdb->prepare(
+                "SHOW COLUMNS FROM %i",
+                Schema::table(Schema::TABLE_BROADCAST_EVENTS)
+            )
+        );
+
+        $this->assertContains('id', $columns);
+        $this->assertContains('channel', $columns);
+        $this->assertContains('event_type', $columns);
+        $this->assertContains('payload', $columns);
+        $this->assertContains('resource_type', $columns);
+        $this->assertContains('resource_id', $columns);
+        $this->assertContains('created_at', $columns);
     }
 
     public function test_discoveries_table_has_correct_structure(): void

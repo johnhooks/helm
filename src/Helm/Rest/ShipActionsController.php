@@ -10,6 +10,7 @@ use Helm\ShipLink\ActionFactory;
 use Helm\ShipLink\ActionType;
 use Helm\ShipLink\Contracts\ActionRepository;
 use Helm\ShipLink\Models\Action;
+use Helm\ShipLink\Resources\ActionResource;
 use Helm\Ships\ShipPost;
 use WP_Error;
 use WP_REST_Request;
@@ -203,7 +204,7 @@ final class ShipActionsController
         );
 
         $data = array_map(
-            fn(Action $action) => $this->serializeAction($action),
+            fn(Action $action) => (new ActionResource($action))->resolve(),
             $result['actions']
         );
 
@@ -243,7 +244,7 @@ final class ShipActionsController
             return $error;
         }
 
-        return new WP_REST_Response($this->serializeAction($action), 201);
+        return new WP_REST_Response((new ActionResource($action))->resolve(), 201);
     }
 
     /**
@@ -267,7 +268,7 @@ final class ShipActionsController
             );
         }
 
-        return new WP_REST_Response($this->serializeAction($action));
+        return new WP_REST_Response((new ActionResource($action))->resolve());
     }
 
     /**
@@ -280,26 +281,6 @@ final class ShipActionsController
     {
         $action = $this->actionRepository->find((int) $request->get_param('actionId'));
 
-        return new WP_REST_Response($this->serializeAction($action));
-    }
-
-    /**
-     * Serialize an Action model for JSON response.
-     *
-     * @return array<string, mixed>
-     */
-    private function serializeAction(Action $action): array
-    {
-        return [
-            'id'             => $action->id,
-            'ship_post_id'   => $action->ship_post_id,
-            'type'           => $action->type->value,
-            'status'         => $action->status->value,
-            'params'         => $action->params,
-            'result'         => $action->result,
-            'deferred_until' => $action->deferred_until?->format('c'),
-            'created_at'     => $action->created_at->format('c'),
-            'updated_at'     => $action->updated_at->format('c'),
-        ];
+        return new WP_REST_Response((new ActionResource($action))->resolve());
     }
 }
