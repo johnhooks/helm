@@ -6,6 +6,7 @@ namespace Helm\ShipLink;
 
 use Helm\Lib\Date;
 use Helm\ShipLink\Contracts\ActionRepository;
+use Helm\ShipLink\Resources\ActionResource;
 
 /**
  * Delivers action state updates via the WordPress Heartbeat API.
@@ -52,30 +53,13 @@ final class ActionHeartbeat
         $actions = $this->actionRepository->findBroadcastsSince($since, $userId);
 
         $response['helm_actions'] = [
-            'actions'     => array_map([$this, 'serialize'], $actions),
+            'actions'     => array_map(
+                static fn (Models\Action $action): array => (new ActionResource($action))->resolve(),
+                $actions
+            ),
             'server_time' => Date::now()->format('c'),
         ];
 
         return $response;
-    }
-
-    /**
-     * Serialize an action for the heartbeat response.
-     *
-     * @return array<string, mixed>
-     */
-    private function serialize(Models\Action $action): array
-    {
-        return [
-            'id'             => $action->id,
-            'ship_post_id'   => $action->ship_post_id,
-            'type'           => $action->type->value,
-            'status'         => $action->status->value,
-            'params'         => $action->params,
-            'result'         => $action->result,
-            'deferred_until' => $action->deferred_until?->format('c'),
-            'created_at'     => $action->created_at->format('c'),
-            'updated_at'     => $action->updated_at->format('c'),
-        ];
     }
 }

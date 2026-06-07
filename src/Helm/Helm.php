@@ -11,11 +11,13 @@ if (! defined('ABSPATH')) {
 
 use Helm\Admin\Provider as AdminProvider;
 use Helm\Anomalies\Provider as AnomaliesProvider;
+use Helm\Broadcasting\Provider as BroadcastingProvider;
 use Helm\Celestials\Provider as CelestialsProvider;
 use Helm\CLI\Provider as CLIProvider;
 use Helm\Config\Provider as ConfigProvider;
 use Helm\Database\Provider as DatabaseProvider;
 use Helm\Discovery\Provider as DiscoveryProvider;
+use Helm\Events\Provider as EventsProvider;
 use Helm\Generation\Provider as GenerationProvider;
 use Helm\Inventory\Provider as InventoryProvider;
 use Helm\lucatume\DI52\Container;
@@ -58,6 +60,8 @@ final class Helm
         CLIProvider::class,
         ConfigProvider::class,
         DatabaseProvider::class,
+        EventsProvider::class,
+        BroadcastingProvider::class,
         DiscoveryProvider::class,
         GenerationProvider::class,
         InventoryProvider::class,

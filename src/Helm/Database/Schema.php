@@ -24,6 +24,7 @@ final class Schema
     public const TABLE_INVENTORY = 'helm_inventory';
     public const TABLE_SHIP_STATE = 'helm_ship_state';
     public const TABLE_SHIP_ACTIONS = 'helm_ship_actions';
+    public const TABLE_BROADCAST_EVENTS = 'helm_broadcast_events';
     public const TABLE_USER_EDGE = 'helm_user_edge';
 
     /**
@@ -39,6 +40,7 @@ final class Schema
         self::TABLE_INVENTORY,
         self::TABLE_SHIP_STATE,
         self::TABLE_SHIP_ACTIONS,
+        self::TABLE_BROADCAST_EVENTS,
         self::TABLE_USER_EDGE,
     ];
 
@@ -46,7 +48,7 @@ final class Schema
      * Current schema version.
      * Increment when making schema changes.
      */
-    public const VERSION = 4;
+    public const VERSION = 5;
 
     /**
      * Option key for stored schema version.
@@ -75,6 +77,7 @@ final class Schema
              . self::getInventoryTableSql($prefix, $charsetCollate)
              . self::getShipStateTableSql($prefix, $charsetCollate)
              . self::getShipActionsTableSql($prefix, $charsetCollate)
+             . self::getBroadcastEventsTableSql($prefix, $charsetCollate)
              . self::getUserEdgeTableSql($prefix, $charsetCollate);
 
         // Run dbDelta with error handling
@@ -472,6 +475,37 @@ CREATE TABLE {$prefix}helm_ship_actions (
     KEY ship_status (ship_post_id,status),
     KEY idx_ready (status,deferred_until,processing_at),
     KEY idx_broadcast (broadcast_at)
+) {$charsetCollate};
+";
+    }
+
+    /**
+     * Broadcast events table SQL.
+     *
+     * Durable delivery stream for client-facing broadcasts. The event id is the
+     * client cursor. Channels define who may receive the event; authorization is
+     * enforced by the transport when polling or subscribing to channels.
+     *
+     * resource_type/resource_id optionally identify the primary domain resource
+     * the event is about, such as a ship, ship_action, station, or navigation
+     * discovery. They are for lookup and diagnostics, not delivery authority.
+     */
+    private static function getBroadcastEventsTableSql(string $prefix, string $charsetCollate): string
+    {
+        return "
+CREATE TABLE {$prefix}helm_broadcast_events (
+    id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+    channel varchar(191) NOT NULL,
+    event_type varchar(64) NOT NULL,
+    payload JSON NOT NULL,
+    resource_type varchar(64) DEFAULT NULL,
+    resource_id bigint(20) unsigned DEFAULT NULL,
+    created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY  (id),
+    KEY channel_id (channel,id),
+    KEY event_type_id (event_type,id),
+    KEY resource (resource_type,resource_id,id),
+    KEY created_at (created_at)
 ) {$charsetCollate};
 ";
     }
