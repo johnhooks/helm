@@ -91,6 +91,20 @@ export function BridgePage() {
 		nodes: navigationRouteNodes,
 	} = useNavigationEdges();
 
+	const routeNodePositions = useMemo(() => {
+		const positions = new Map<number, Position3D>();
+		for (const star of allStars) {
+			positions.set(star.node_id, { x: star.x, y: star.y, z: star.z });
+		}
+		for (const node of edgeNodes) {
+			positions.set(node.id, { x: node.x, y: node.y, z: node.z });
+		}
+		for (const node of navigationRouteNodes) {
+			positions.set(node.id, { x: node.x, y: node.y, z: node.z });
+		}
+		return positions;
+	}, [allStars, edgeNodes, navigationRouteNodes]);
+
 	const handleTargetSelect = useCallback(
 		(event: NavigationTargetSelectEvent | null) => {
 			setTargetSelectEvent(event);
@@ -128,7 +142,7 @@ export function BridgePage() {
 			return;
 		}
 
-		const origin = allStars.find((s) => s.node_id === currentNodeId);
+		const origin = routeNodePositions.get(currentNodeId);
 		if (!origin) {
 			setStars(allStars);
 			return;
@@ -147,7 +161,7 @@ export function BridgePage() {
 
 		log.info('bridge.jumprange.filtered', { count: filtered.length });
 		setStars(filtered);
-	}, [jumpRangeOnly, currentNodeId, jumpRange, allStars]);
+	}, [jumpRangeOnly, currentNodeId, jumpRange, allStars, routeNodePositions]);
 
 	const action = useSelect(
 		(select) => select(actionsStore).getLatestAction(),
@@ -182,20 +196,6 @@ export function BridgePage() {
 				z: node.z,
 			}));
 	}, [navigationRouteNodes, navigationRoutes, showRoutes]);
-
-	const routeNodePositions = useMemo(() => {
-		const positions = new Map<number, Position3D>();
-		for (const star of allStars) {
-			positions.set(star.node_id, { x: star.x, y: star.y, z: star.z });
-		}
-		for (const node of edgeNodes) {
-			positions.set(node.id, { x: node.x, y: node.y, z: node.z });
-		}
-		for (const node of navigationRouteNodes) {
-			positions.set(node.id, { x: node.x, y: node.y, z: node.z });
-		}
-		return positions;
-	}, [allStars, edgeNodes, navigationRouteNodes]);
 
 	const selectedDistance = useMemo(() => {
 		if (!selectedTarget) {
