@@ -82,6 +82,16 @@ class ShipCommand
             WP_CLI::error(sprintf('User %d not found', $ownerId));
         }
 
+        $existingShip = ShipPost::findForUser($ownerId);
+        if ($existingShip !== null) {
+            WP_CLI::error(sprintf(
+                'User %d already has ship "%s" (Post ID: %d)',
+                $ownerId,
+                $existingShip->name(),
+                $existingShip->postId()
+            ));
+        }
+
         // Create the ship CPT post
         $postId = wp_insert_post([
             'post_type' => PostTypeRegistry::POST_TYPE_SHIP,
