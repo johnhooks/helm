@@ -189,6 +189,10 @@ final class PostTypeRegistry
             'rewrite' => false,
             'show_in_rest' => true,
             'rest_base' => 'ships',
+            'capabilities' => [
+                'create_posts' => 'do_not_allow',
+            ],
+            'map_meta_cap' => true,
         ]);
     }
 

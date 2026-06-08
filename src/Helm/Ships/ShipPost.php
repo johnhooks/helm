@@ -97,6 +97,8 @@ final class ShipPost implements ShipIdentity
             'post_author' => $userId,
             'numberposts' => 1,
             'post_status' => 'publish',
+            'orderby'     => 'ID',
+            'order'       => 'DESC',
         ]);
 
         if ($posts === []) {

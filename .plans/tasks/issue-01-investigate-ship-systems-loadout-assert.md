@@ -14,6 +14,12 @@ This has been observed after ship systems were initially loaded, so the issue ma
 
 A component-level error fallback can keep the bridge from crashing, but it does not solve the data integrity or store synchronization problem.
 
+## Findings so far
+
+Local Lando data had three published `helm_ship` posts owned by the same `admin` user. The current active-looking ship, post `4068`, had a complete five-slot fitted loadout including `nav`. Two older ships, posts `4065` and `4066`, had ship state records but no fitted inventory rows, so their systems endpoint would return an empty systems array. Those two stale ship posts and their state/meta rows were removed locally.
+
+This is a plausible contributor but not a confirmed smoking gun. Current `wp_helm_broadcast_events` rows only referenced `private-ship.4068`; no events referenced `4065` or `4066`, so there is no evidence that a heartbeat ship-state update for an older ship overwrote the active ship state. The remaining theory is that one of the duplicate incomplete ships may have been selected or preloaded at some point by `ShipPost::findForUser()`, but the original failing client state was not captured.
+
 ## Proposed solution
 
 Investigate which store action causes the systems slice to become incomplete. Add temporary or structured debug logging around `RECEIVE_SYSTEMS` and `FETCH_SYSTEMS_FINISHED` that records the ship id, action type, and received system slots. Compare those logs with the `/helm/v1/ships/{id}?_embed[]=helm:systems` and `/helm/v1/ships/{id}/systems?_embed[]=helm:product` responses.
