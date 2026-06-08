@@ -15,39 +15,31 @@ import type { State } from './types';
 export function getSystemSlots(
 	systems: SystemComponentResponse[]
 ): SystemSlots {
-	const core = systems.find((s) => s.slot === 'core');
-	const drive = systems.find((s) => s.slot === 'drive');
-	const sensor = systems.find((s) => s.slot === 'sensor');
-	const shield = systems.find((s) => s.slot === 'shield');
-	const nav = systems.find((s) => s.slot === 'nav');
+	const slots = {
+		core: systems.find((s) => s.slot === 'core'),
+		drive: systems.find((s) => s.slot === 'drive'),
+		sensor: systems.find((s) => s.slot === 'sensor'),
+		shield: systems.find((s) => s.slot === 'shield'),
+		nav: systems.find((s) => s.slot === 'nav'),
+	};
+	const missingSlots = Object.entries(slots)
+		.filter(([, system]) => system === undefined)
+		.map(([slot]) => slot);
 
-	assert(
-		core,
-		ErrorCode.ShipsMissingSystem,
-		'Ship missing required system: core'
-	);
-	assert(
-		drive,
-		ErrorCode.ShipsMissingSystem,
-		'Ship missing required system: drive'
-	);
-	assert(
-		sensor,
-		ErrorCode.ShipsMissingSystem,
-		'Ship missing required system: sensor'
-	);
-	assert(
-		shield,
-		ErrorCode.ShipsMissingSystem,
-		'Ship missing required system: shield'
-	);
-	assert(
-		nav,
-		ErrorCode.ShipsMissingSystem,
-		'Ship missing required system: nav'
-	);
+	if (missingSlots.length > 0) {
+		throw new HelmError(
+			ErrorCode.ShipsMissingSystem,
+			`Ship missing required system: ${missingSlots.join(', ')}`,
+			{
+				data: {
+					missing_slots: missingSlots,
+					received_slots: systems.map((system) => system.slot),
+				},
+			}
+		);
+	}
 
-	return { core, drive, sensor, shield, nav };
+	return slots as SystemSlots;
 }
 
 /**

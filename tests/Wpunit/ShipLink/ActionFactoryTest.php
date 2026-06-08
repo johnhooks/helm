@@ -9,12 +9,15 @@ use Helm\Navigation\Contracts\EdgeRepository;
 use Helm\Navigation\Contracts\NodeRepository;
 use Helm\ShipLink\ActionException;
 use Helm\ShipLink\ActionFactory;
+use Helm\ShipLink\Broadcasting\ShipActionUpdated;
+use Helm\ShipLink\Broadcasting\ShipStateUpdated;
 use Helm\ShipLink\Contracts\ActionRepository;
 use Helm\ShipLink\ActionStatus;
 use Helm\ShipLink\ActionType;
 use Helm\ShipLink\Models\Action;
 use Helm\ShipLink\Contracts\ShipStateRepository;
 use lucatume\WPBrowser\TestCase\WPTestCase;
+use Tests\Support\FakeEventDispatcher;
 use Tests\Support\WpunitTester;
 
 /**
@@ -27,6 +30,7 @@ class ActionFactoryTest extends WPTestCase
     private ActionFactory $factory;
     private ActionRepository $actionRepository;
     private ShipStateRepository $stateRepository;
+    private FakeEventDispatcher $eventDispatcher;
     private NodeRepository $nodeRepository;
     private EdgeRepository $edgeRepository;
 
@@ -35,6 +39,8 @@ class ActionFactoryTest extends WPTestCase
         parent::_before();
 
         $this->tester->haveOrigin();
+
+        $this->eventDispatcher = $this->tester->fakeEventDispatcher([ActionFactory::class]);
 
         $this->factory = helm(ActionFactory::class);
         $this->actionRepository = helm(ActionRepository::class);
@@ -130,6 +136,37 @@ class ActionFactoryTest extends WPTestCase
         $state = $this->stateRepository->find($ship->postId());
 
         $this->assertSame($action->id, $state->current_action_id);
+    }
+
+    public function test_broadcasts_created_deferred_action_and_ship_state(): void
+    {
+        $star1 = $this->tester->haveStar(['id' => 'CREATE_BROADCAST_FROM', 'distanceLy' => 0.0]);
+        $star2 = $this->tester->haveStar(['id' => 'CREATE_BROADCAST_TO', 'distanceLy' => 5.0]);
+
+        $node1 = $this->tester->getNodeForStar($star1);
+        $node2 = $this->tester->getNodeForStar($star2);
+
+        $edge = $this->edgeRepository->create($node1->id, $node2->id, 5.0);
+        helm(\Helm\Navigation\Contracts\UserEdgeRepository::class)->upsert(1, $edge->id);
+
+        $ship = $this->tester->haveShip(['node_id' => $node1->id, 'core_life' => 1000]);
+
+        $action = $this->factory->create($ship->postId(), ActionType::Jump, [
+            'from_node_id' => $node1->id,
+            'target_node_id' => $node2->id,
+            'route' => [$edge->id],
+        ]);
+
+        $this->eventDispatcher->assertDispatchedCount(2);
+        $this->eventDispatcher->assertDispatched(
+            ShipActionUpdated::class,
+            fn (ShipActionUpdated $event): bool => $event->payload()['action']['id'] === $action->id
+                && $event->payload()['action']['status'] === 'pending'
+        );
+        $this->eventDispatcher->assertDispatched(
+            ShipStateUpdated::class,
+            fn (ShipStateUpdated $event): bool => $event->payload()['ship_state']['current_action_id'] === $action->id
+        );
     }
 
     public function test_throws_when_ship_has_current_action(): void

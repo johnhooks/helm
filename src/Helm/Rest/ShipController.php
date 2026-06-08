@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Helm\Rest;
 
 use Helm\Core\ErrorCode;
+use Helm\Database\Transaction;
+use Helm\Events\Contracts\EventDispatcher;
+use Helm\ShipLink\Broadcasting\ShipStateUpdated;
 use Helm\ShipLink\Components\PowerMode;
 use Helm\ShipLink\Contracts\ShipStateRepository;
 use Helm\ShipLink\Resources\ShipStateResource;
@@ -32,6 +35,7 @@ final class ShipController
     public function __construct(
         private readonly ShipFactory $shipFactory,
         private readonly ShipStateRepository $stateRepository,
+        private readonly EventDispatcher $events,
     ) {
     }
 
@@ -186,7 +190,10 @@ final class ShipController
             $state->power_mode = $mode;
         }
 
-        $this->stateRepository->update($state);
+        Transaction::run(function () use ($state): void {
+            $this->stateRepository->update($state);
+            $this->events->dispatch(new ShipStateUpdated($state));
+        });
 
         return $this->show($request);
     }

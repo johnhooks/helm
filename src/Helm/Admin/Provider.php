@@ -212,10 +212,16 @@ final class Provider extends ServiceProvider
         $asset = include $assetFile;
 
         add_action('admin_enqueue_scripts', function () use ($handle, $entry, $asset, $cssDeps): void {
+            $dependencies = $asset['dependencies'];
+
+            if ($handle === 'helm-live' && ! in_array('heartbeat', $dependencies, true)) {
+                $dependencies[] = 'heartbeat';
+            }
+
             wp_enqueue_script(
                 $handle,
                 HELM_URL . "build/{$entry}.js",
-                $asset['dependencies'],
+                $dependencies,
                 $asset['version'],
                 true,
             );

@@ -4,7 +4,7 @@ import type { HelmError } from '@helm/errors';
 import type { KnownPathResult } from '@helm/datacore';
 import type { NavNode, StarNode, UserEdge } from '@helm/types';
 import type { State, SyncResult } from './types';
-import { createGraphReadKey } from './utils';
+import { createGraphReadKey, getNodeName } from './utils';
 
 export const getStarNodes = createSelector(
 	(state: State): StarNode[] => Object.values(state.stars.byId),
@@ -60,3 +60,22 @@ export const findKnownPath = (
 	targetNodeId: number
 ): KnownPathResult | undefined =>
 	state.graph.paths[createGraphReadKey(fromNodeId, targetNodeId)];
+
+export const getKnownPathNodeNames = createSelector(
+	(state: State, fromNodeId: number, targetNodeId: number): string[] => {
+		const path = findKnownPath(state, fromNodeId, targetNodeId);
+
+		return (path?.nodeIds ?? [])
+			.map((nodeId) => getNode(state, nodeId))
+			.map((node) => (node ? getNodeName(node) : null))
+			.filter((name): name is string => name !== null);
+	},
+	(state: State, fromNodeId: number, targetNodeId: number) => {
+		const path = findKnownPath(state, fromNodeId, targetNodeId);
+
+		return [
+			path,
+			...(path?.nodeIds ?? []).map((nodeId) => getNode(state, nodeId)),
+		];
+	}
+);

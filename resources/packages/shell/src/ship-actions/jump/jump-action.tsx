@@ -23,10 +23,10 @@ function DraftJump({ draft }: { draft: DraftAction<'jump'> }) {
 				),
 				isSubmitting: select(actionsStore).isCreating(),
 				routePath: path,
-				routeNodeNames: (path?.nodeIds ?? [])
-					.map((nodeId) => select(navStore).getNode(nodeId))
-					.map((node) => (node ? getJumpTargetName(node) : null))
-					.filter((name): name is string => name !== null),
+				routeNodeNames: select(navStore).getKnownPathNodeNames(
+					draft.params.from_node_id,
+					draft.params.target_node_id
+				),
 			};
 		},
 		[draft.params.from_node_id, draft.params.target_node_id]

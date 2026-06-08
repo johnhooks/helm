@@ -9,6 +9,8 @@ use Codeception\TestInterface;
 use Helm\Celestials\CelestialRepository;
 use Helm\Celestials\CelestialType;
 use Helm\Database\Transaction;
+use Helm\Events\Contracts\EventDispatcher;
+use Helm\Events\Dispatcher;
 use Helm\Generation\PlanetType;
 use Helm\Inventory\Contracts\InventoryRepository;
 use Helm\Inventory\LocationType;
@@ -28,6 +30,7 @@ use Helm\Ships\ShipPost;
 use Helm\Stars\Star;
 use Helm\Stars\StarPost;
 use Helm\Stars\StarRepository;
+use Tests\Support\FakeEventDispatcher;
 
 /**
  * Helm-specific test helper.
@@ -39,6 +42,13 @@ use Helm\Stars\StarRepository;
  */
 class Helm extends Module
 {
+    private ?FakeEventDispatcher $fakeEventDispatcher = null;
+
+    /**
+     * @var array<class-string>
+     */
+    private array $fakeEventDispatcherRefreshSingletons = [];
+
     /**
      * Re-register post meta before each test.
      *
@@ -58,6 +68,7 @@ class Helm extends Module
      */
     public function _after(TestInterface $test): void
     {
+        $this->restoreEventDispatcher();
         Transaction::reset();
     }
 
@@ -76,6 +87,54 @@ class Helm extends Module
         $origin->reset();
 
         return $origin->initialize($id, $seed);
+    }
+
+    /**
+     * Replace the domain event dispatcher with a fake for the current test.
+     *
+     * Pass singleton class names that should be rebuilt after the dispatcher is
+     * rebound, such as ActionFactory::class or ActionResolver::class.
+     *
+     * @param array<class-string> $refreshSingletons
+     */
+    public function fakeEventDispatcher(array $refreshSingletons = []): FakeEventDispatcher
+    {
+        $fake = new FakeEventDispatcher();
+        $this->fakeEventDispatcher = $fake;
+        $this->fakeEventDispatcherRefreshSingletons = array_values(array_unique([
+            ...$this->fakeEventDispatcherRefreshSingletons,
+            ...$refreshSingletons,
+        ]));
+
+        helm()->getContainer()->singleton(
+            EventDispatcher::class,
+            fn (): FakeEventDispatcher => $fake
+        );
+
+        foreach ($refreshSingletons as $singleton) {
+            helm()->getContainer()->singleton($singleton);
+        }
+
+        return $fake;
+    }
+
+    private function restoreEventDispatcher(): void
+    {
+        if ($this->fakeEventDispatcher === null) {
+            return;
+        }
+
+        $this->fakeEventDispatcher->reset();
+        $this->fakeEventDispatcher = null;
+
+        helm()->getContainer()->singleton(EventDispatcher::class, Dispatcher::class);
+        helm()->getContainer()->singleton(Dispatcher::class);
+
+        foreach ($this->fakeEventDispatcherRefreshSingletons as $singleton) {
+            helm()->getContainer()->singleton($singleton);
+        }
+
+        $this->fakeEventDispatcherRefreshSingletons = [];
     }
 
     /**

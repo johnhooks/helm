@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Wpunit\Rest;
 
+use Helm\Broadcasting\Channel;
+use Helm\Broadcasting\Contracts\EventRepository;
 use Helm\ShipLink\Contracts\ShipStateRepository;
 use Helm\Ships\ShipPost;
 use lucatume\WPBrowser\TestCase\WPRestApiTestCase;
@@ -231,6 +233,26 @@ class ShipControllerTest extends WPRestApiTestCase
         // Verify it persisted
         $state = helm(ShipStateRepository::class)->find($ship->postId());
         $this->assertSame('overdrive', $state->power_mode->slug());
+    }
+
+    public function test_patch_broadcasts_ship_state_update(): void
+    {
+        $ship = $this->createShip();
+
+        wp_set_current_user($this->ownerId);
+        $response = $this->patchShip($ship->postId(), ['power_mode' => 'overdrive']);
+
+        $this->assertSame(200, $response->get_status());
+
+        $events = helm(EventRepository::class)->findAfterCursorForChannel(
+            Channel::privateShip($ship->postId()),
+            0
+        );
+
+        $this->assertCount(1, $events);
+        $this->assertSame('ship.state.updated', $events[0]->type->value);
+        $this->assertSame($ship->postId(), $events[0]->payload['ship_state']['id']);
+        $this->assertSame('overdrive', $events[0]->payload['ship_state']['power_mode']);
     }
 
     public function test_patch_rejects_invalid_power_mode(): void

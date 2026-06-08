@@ -6,7 +6,6 @@ namespace Tests\Wpunit\ShipLink;
 
 use DateTimeImmutable;
 use Helm\Core\ErrorCode;
-use Helm\Events\Contracts\EventDispatcher;
 use Helm\Lib\Date;
 use Helm\Navigation\Contracts\EdgeRepository;
 use Helm\Navigation\Contracts\NodeRepository;
@@ -20,7 +19,7 @@ use Helm\ShipLink\Broadcasting\ShipStateUpdated;
 use Helm\ShipLink\Models\Action;
 use Helm\ShipLink\Contracts\ShipStateRepository;
 use lucatume\WPBrowser\TestCase\WPTestCase;
-use Tests\Support\RecordingEventDispatcher;
+use Tests\Support\FakeEventDispatcher;
 use Tests\Support\WpunitTester;
 
 /**
@@ -33,7 +32,7 @@ class ActionResolverTest extends WPTestCase
     private ActionResolver $resolver;
     private ActionRepository $actionRepository;
     private ShipStateRepository $stateRepository;
-    private RecordingEventDispatcher $eventDispatcher;
+    private FakeEventDispatcher $eventDispatcher;
     private NodeRepository $nodeRepository;
     private EdgeRepository $edgeRepository;
 
@@ -44,12 +43,7 @@ class ActionResolverTest extends WPTestCase
 
         $this->tester->haveOrigin();
 
-        $this->eventDispatcher = new RecordingEventDispatcher();
-        helm()->getContainer()->singleton(
-            EventDispatcher::class,
-            fn (): RecordingEventDispatcher => $this->eventDispatcher
-        );
-        helm()->getContainer()->singleton(ActionResolver::class);
+        $this->eventDispatcher = $this->tester->fakeEventDispatcher([ActionResolver::class]);
 
         $this->resolver = helm(ActionResolver::class);
         $this->actionRepository = helm(ActionRepository::class);
@@ -217,14 +211,16 @@ class ActionResolverTest extends WPTestCase
 
         $this->resolver->resolve($action->id);
 
-        $events = $this->eventDispatcher->events;
-
-        $this->assertCount(2, $events);
-        $this->assertInstanceOf(ShipActionUpdated::class, $events[0]);
-        $this->assertSame($action->id, $events[0]->payload()['action']['id']);
-        $this->assertInstanceOf(ShipStateUpdated::class, $events[1]);
-        $this->assertSame($ship->postId(), $events[1]->payload()['ship_state']['id']);
-        $this->assertNull($events[1]->payload()['ship_state']['current_action_id']);
+        $this->eventDispatcher->assertDispatchedCount(2);
+        $this->eventDispatcher->assertDispatched(
+            ShipActionUpdated::class,
+            fn (ShipActionUpdated $event): bool => $event->payload()['action']['id'] === $action->id
+        );
+        $this->eventDispatcher->assertDispatched(
+            ShipStateUpdated::class,
+            fn (ShipStateUpdated $event): bool => $event->payload()['ship_state']['id'] === $ship->postId()
+                && $event->payload()['ship_state']['current_action_id'] === null
+        );
     }
 
     public function test_clears_current_action_after_success(): void
@@ -304,13 +300,15 @@ class ActionResolverTest extends WPTestCase
             // Expected.
         }
 
-        $events = $this->eventDispatcher->events;
-
-        $this->assertCount(2, $events);
-        $this->assertInstanceOf(ShipActionUpdated::class, $events[0]);
-        $this->assertSame('failed', $events[0]->payload()['action']['status']);
-        $this->assertInstanceOf(ShipStateUpdated::class, $events[1]);
-        $this->assertNull($events[1]->payload()['ship_state']['current_action_id']);
+        $this->eventDispatcher->assertDispatchedCount(2);
+        $this->eventDispatcher->assertDispatched(
+            ShipActionUpdated::class,
+            fn (ShipActionUpdated $event): bool => $event->payload()['action']['status'] === 'failed'
+        );
+        $this->eventDispatcher->assertDispatched(
+            ShipStateUpdated::class,
+            fn (ShipStateUpdated $event): bool => $event->payload()['ship_state']['current_action_id'] === null
+        );
     }
 
     public function test_clears_current_action_after_failure(): void
