@@ -47,9 +47,9 @@ export function receiveAction(action: ShipAction): Action {
 }
 
 export const receiveHeartbeat =
-	(actions: ShipAction[], cursor: string): Thunk<Action, typeof store> =>
+	(actions: ShipAction[]): Thunk<Action, typeof store> =>
 	async ({ dispatch, registry }) => {
-		dispatch({ type: 'RECEIVE_HEARTBEAT', actions, cursor });
+		dispatch({ type: 'RECEIVE_HEARTBEAT', actions });
 
 		// A fulfilled jump has moved ship.node_id and burned core life on the
 		// server. Invalidate the ship resolver so the next read refetches.

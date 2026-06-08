@@ -87,6 +87,3 @@ export const getActionError = (
 	state: State,
 	actionId: number
 ): HelmError | null => state.actions.error[actionId] ?? null;
-
-export const getHeartbeatCursor = (state: State): string | null =>
-	state.heartbeat.cursor;

@@ -186,28 +186,20 @@ describe('receiveHeartbeat', () => {
 			createShipAction({ id: 2, ship_post_id: 2 }),
 		];
 
-		await receiveHeartbeat(
-			actions,
-			'2025-06-01T00:00:00Z'
-		)({ dispatch, registry } as never);
+		await receiveHeartbeat(actions)({ dispatch, registry } as never);
 
 		expect(dispatch).toHaveBeenCalledWith({
 			type: 'RECEIVE_HEARTBEAT',
 			actions,
-			cursor: '2025-06-01T00:00:00Z',
 		});
 	});
 
 	it('dispatches a RECEIVE_HEARTBEAT action for empty array', async () => {
-		await receiveHeartbeat(
-			[],
-			'2025-06-01T00:00:00Z'
-		)({ dispatch, registry } as never);
+		await receiveHeartbeat([])({ dispatch, registry } as never);
 
 		expect(dispatch).toHaveBeenCalledWith({
 			type: 'RECEIVE_HEARTBEAT',
 			actions: [],
-			cursor: '2025-06-01T00:00:00Z',
 		});
 	});
 
@@ -227,10 +219,7 @@ describe('receiveHeartbeat', () => {
 			}),
 		];
 
-		await receiveHeartbeat(
-			actions,
-			'2025-06-01T00:00:00Z'
-		)({ dispatch, registry } as never);
+		await receiveHeartbeat(actions)({ dispatch, registry } as never);
 
 		expect(invalidateResolution).toHaveBeenCalledWith('getShip', [1]);
 		expect(invalidateResolution).toHaveBeenCalledWith('getShip', [2]);
@@ -252,10 +241,7 @@ describe('receiveHeartbeat', () => {
 			}),
 		];
 
-		await receiveHeartbeat(
-			actions,
-			'2025-06-01T00:00:00Z'
-		)({ dispatch, registry } as never);
+		await receiveHeartbeat(actions)({ dispatch, registry } as never);
 
 		expect(invalidateResolution).toHaveBeenCalledTimes(1);
 		expect(invalidateResolution).toHaveBeenCalledWith('getShip', [1]);
@@ -277,10 +263,7 @@ describe('receiveHeartbeat', () => {
 			}),
 		];
 
-		await receiveHeartbeat(
-			actions,
-			'2025-06-01T00:00:00Z'
-		)({ dispatch, registry } as never);
+		await receiveHeartbeat(actions)({ dispatch, registry } as never);
 
 		expect(invalidateResolution).not.toHaveBeenCalled();
 	});
@@ -329,10 +312,7 @@ describe('receiveHeartbeat', () => {
 			}),
 		];
 
-		await receiveHeartbeat(
-			actions,
-			'2025-06-01T00:00:00Z'
-		)({ dispatch, registry } as never);
+		await receiveHeartbeat(actions)({ dispatch, registry } as never);
 
 		expect(syncUserEdgesByIds).toHaveBeenCalledTimes(1);
 		expect(syncUserEdgesByIds).toHaveBeenCalledWith([7, 8]);
@@ -362,10 +342,7 @@ describe('receiveHeartbeat', () => {
 			}),
 		];
 
-		await receiveHeartbeat(
-			actions,
-			'2025-06-01T00:00:00Z'
-		)({ dispatch, registry } as never);
+		await receiveHeartbeat(actions)({ dispatch, registry } as never);
 
 		expect(syncUserEdgesByIds).not.toHaveBeenCalled();
 	});

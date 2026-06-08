@@ -44,6 +44,10 @@ enum ErrorCode: string
     case ShipSystemsNotFound = 'ship.systems_not_found';
     case ShipInvalidPowerMode = 'ship.invalid_power_mode';
 
+    // Broadcast errors
+    case BroadcastChannelForbidden = 'broadcast.channel_forbidden';
+    case BroadcastTooManyChannels = 'broadcast.too_many_channels';
+
     // Product errors
     case ProductNotFound = 'product.not_found';
 
@@ -97,6 +101,9 @@ enum ErrorCode: string
             self::AnomalyNotFound,
             self::ShipSystemsNotFound,
             self::ProductNotFound => 404,
+
+            // Forbidden
+            self::BroadcastChannelForbidden => 403,
 
             // Conflict
             self::ActionInProgress => 409,

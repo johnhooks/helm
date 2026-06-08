@@ -6,6 +6,7 @@ namespace Tests\Wpunit\ShipLink;
 
 use DateTimeImmutable;
 use Helm\Core\ErrorCode;
+use Helm\Events\Contracts\EventDispatcher;
 use Helm\Lib\Date;
 use Helm\Navigation\Contracts\EdgeRepository;
 use Helm\Navigation\Contracts\NodeRepository;
@@ -14,9 +15,12 @@ use Helm\ShipLink\Contracts\ActionRepository;
 use Helm\ShipLink\ActionResolver;
 use Helm\ShipLink\ActionStatus;
 use Helm\ShipLink\ActionType;
+use Helm\ShipLink\Broadcasting\ShipActionUpdated;
+use Helm\ShipLink\Broadcasting\ShipStateUpdated;
 use Helm\ShipLink\Models\Action;
 use Helm\ShipLink\Contracts\ShipStateRepository;
 use lucatume\WPBrowser\TestCase\WPTestCase;
+use Tests\Support\RecordingEventDispatcher;
 use Tests\Support\WpunitTester;
 
 /**
@@ -29,6 +33,7 @@ class ActionResolverTest extends WPTestCase
     private ActionResolver $resolver;
     private ActionRepository $actionRepository;
     private ShipStateRepository $stateRepository;
+    private RecordingEventDispatcher $eventDispatcher;
     private NodeRepository $nodeRepository;
     private EdgeRepository $edgeRepository;
 
@@ -38,6 +43,13 @@ class ActionResolverTest extends WPTestCase
         Date::setTestNow(null);
 
         $this->tester->haveOrigin();
+
+        $this->eventDispatcher = new RecordingEventDispatcher();
+        helm()->getContainer()->singleton(
+            EventDispatcher::class,
+            fn (): RecordingEventDispatcher => $this->eventDispatcher
+        );
+        helm()->getContainer()->singleton(ActionResolver::class);
 
         $this->resolver = helm(ActionResolver::class);
         $this->actionRepository = helm(ActionRepository::class);
@@ -178,6 +190,43 @@ class ActionResolverTest extends WPTestCase
         $this->assertSame(ActionStatus::Fulfilled, $result->status);
     }
 
+    public function test_broadcasts_action_and_ship_state_after_success(): void
+    {
+        $star1 = $this->tester->haveStar(['id' => 'BROADCAST_FROM', 'distanceLy' => 0.0]);
+        $star2 = $this->tester->haveStar(['id' => 'BROADCAST_TO', 'distanceLy' => 5.0]);
+
+        $node1 = $this->tester->getNodeForStar($star1);
+        $node2 = $this->tester->getNodeForStar($star2);
+
+        $edge = $this->edgeRepository->create($node1->id, $node2->id, 5.0);
+        helm(\Helm\Navigation\Contracts\UserEdgeRepository::class)->upsert(1, $edge->id);
+
+        $ship = $this->tester->haveShip([
+            'node_id' => $node1->id,
+            'core_life' => 1000,
+        ]);
+
+        $action = new Action([
+            'ship_post_id' => $ship->postId(),
+            'type' => ActionType::Jump,
+            'params' => ['from_node_id' => $node1->id, 'target_node_id' => $node2->id, 'route' => [$edge->id]],
+        ]);
+        $this->actionRepository->insert($action);
+        $this->stateRepository->updateCurrentAction($ship->postId(), $action->id);
+        $this->claimForResolve($action);
+
+        $this->resolver->resolve($action->id);
+
+        $events = $this->eventDispatcher->events;
+
+        $this->assertCount(2, $events);
+        $this->assertInstanceOf(ShipActionUpdated::class, $events[0]);
+        $this->assertSame($action->id, $events[0]->payload()['action']['id']);
+        $this->assertInstanceOf(ShipStateUpdated::class, $events[1]);
+        $this->assertSame($ship->postId(), $events[1]->payload()['ship_state']['id']);
+        $this->assertNull($events[1]->payload()['ship_state']['current_action_id']);
+    }
+
     public function test_clears_current_action_after_success(): void
     {
         $star1 = $this->tester->haveStar(['id' => 'CLEAR_FROM', 'distanceLy' => 0.0]);
@@ -234,6 +283,34 @@ class ActionResolverTest extends WPTestCase
         $this->assertSame(ActionStatus::Failed, $fromDb->status);
         $this->assertArrayHasKey('error', $fromDb->result);
         $this->assertSame('helm.action.no_resolver', $fromDb->result['error']['code']);
+    }
+
+    public function test_broadcasts_action_and_ship_state_after_no_resolver_failure(): void
+    {
+        $ship = $this->tester->haveShip();
+
+        $action = new Action([
+            'ship_post_id' => $ship->postId(),
+            'type' => ActionType::Survey,
+            'params' => [],
+        ]);
+        $this->actionRepository->insert($action);
+        $this->stateRepository->updateCurrentAction($ship->postId(), $action->id);
+        $this->claimForResolve($action);
+
+        try {
+            $this->resolver->resolve($action->id);
+        } catch (ActionException $e) {
+            // Expected.
+        }
+
+        $events = $this->eventDispatcher->events;
+
+        $this->assertCount(2, $events);
+        $this->assertInstanceOf(ShipActionUpdated::class, $events[0]);
+        $this->assertSame('failed', $events[0]->payload()['action']['status']);
+        $this->assertInstanceOf(ShipStateUpdated::class, $events[1]);
+        $this->assertNull($events[1]->payload()['ship_state']['current_action_id']);
     }
 
     public function test_clears_current_action_after_failure(): void
@@ -368,7 +445,6 @@ class ActionResolverTest extends WPTestCase
         $this->assertSame($edge1->id, $firstPass->params['route'][0]);
         $this->assertArrayNotHasKey('to_node_id', $firstPass->result['phases'][0]);
         $this->assertNull($firstPass->processing_at);
-        $this->assertSame('2026-04-01 00:00:00', Date::toString($firstPass->broadcast_at));
         $this->assertGreaterThan(Date::now(), $firstPass->deferred_until);
 
         $stateAfterFirstPass = $this->stateRepository->find($ship->postId());

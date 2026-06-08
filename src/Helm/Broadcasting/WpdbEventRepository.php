@@ -72,6 +72,21 @@ final class WpdbEventRepository implements EventRepository
         );
     }
 
+    public function latestCursorForChannel(string $channel): int
+    {
+        global $wpdb;
+
+        $cursor = $wpdb->get_var(
+            $wpdb->prepare(
+                'SELECT MAX(id) FROM %i WHERE channel = %s',
+                Schema::table(Schema::TABLE_BROADCAST_EVENTS),
+                $channel,
+            )
+        );
+
+        return max(0, (int) $cursor);
+    }
+
     /**
      * Hydrate a model from a database row.
      *

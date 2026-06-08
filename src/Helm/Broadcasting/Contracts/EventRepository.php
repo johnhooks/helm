@@ -25,4 +25,6 @@ interface EventRepository
         int $cursor,
         int $limit = self::DEFAULT_LIMIT
     ): array;
+
+    public function latestCursorForChannel(string $channel): int;
 }

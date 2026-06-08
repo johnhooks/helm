@@ -6,12 +6,15 @@ namespace Helm\ShipLink;
 
 use Helm\Core\ErrorCode;
 use Helm\Database\Transaction;
+use Helm\Events\Contracts\EventDispatcher;
 use Helm\Inventory\Contracts\InventoryRepository;
-use Helm\Lib\Date;
 use Helm\ShipLink\Contracts\ActionHandler;
+use Helm\ShipLink\Broadcasting\ShipActionUpdated;
+use Helm\ShipLink\Broadcasting\ShipStateUpdated;
 use Helm\ShipLink\Contracts\ActionRepository;
 use Helm\ShipLink\Contracts\ShipStateRepository;
 use Helm\ShipLink\Models\Action;
+use Helm\ShipLink\Models\ShipState;
 use Helm\lucatume\DI52\Container;
 
 /**
@@ -28,6 +31,7 @@ final class ActionResolver
         private readonly ShipStateRepository $stateRepository,
         private readonly InventoryRepository $inventoryRepository,
         private readonly ShipFactory $shipFactory,
+        private readonly EventDispatcher $events,
     ) {
     }
 
@@ -56,8 +60,7 @@ final class ActionResolver
                 ErrorCode::ActionNoResolver,
                 __('This action type is not available', 'helm')
             );
-            $this->fail($actionId, $error);
-            $this->stateRepository->updateCurrentAction($action->ship_post_id, null);
+            $this->failAndDispatch($actionId, $action->ship_post_id, $error);
             throw $error;
         }
 
@@ -67,9 +70,21 @@ final class ActionResolver
         /** @var ActionHandler $resolver */
         $resolver = $this->container->get($resolverClass);
 
-        Transaction::begin();
-
         try {
+            return $this->resolveAndDispatch($action, $ship, $resolver);
+        } catch (ActionException $e) {
+            $this->failAndDispatch($actionId, $action->ship_post_id, $e);
+            throw $e;
+        } catch (\Throwable $e) {
+            $error = new ActionException(ErrorCode::ActionFailed, __('Action failed unexpectedly', 'helm'), $e);
+            $this->failAndDispatch($actionId, $action->ship_post_id, $error);
+            throw $error;
+        }
+    }
+
+    private function resolveAndDispatch(Action $action, Ship $ship, ActionHandler $resolver): Action
+    {
+        return Transaction::run(function () use ($action, $ship, $resolver): Action {
             // Resolver mutates action.result and ship state/systems
             $resolver->handle($action, $ship);
 
@@ -80,46 +95,73 @@ final class ActionResolver
             if (! $action->status->isFinalState()) {
                 $action->status = ActionStatus::Running;
                 $action->processing_at = null;
-                $action->broadcast_at = Date::now();
             }
 
             $this->actionRepository->update($action);
-            $this->stateRepository->update($ship->getState());
+
+            $state = $ship->getState();
+            if ($action->status->isFinalState()) {
+                $state->current_action_id = null;
+            }
+
+            $this->stateRepository->update($state);
 
             foreach ($ship->getLoadout()->dirtyComponents() as $component) {
                 $this->inventoryRepository->update($component);
             }
 
-            if ($action->status->isFinalState()) {
-                $this->stateRepository->updateCurrentAction($action->ship_post_id, null);
-            }
-
-            Transaction::commit();
+            $this->dispatchUpdates($action, $state);
 
             return $action;
-        } catch (ActionException $e) {
-            Transaction::rollback();
-            $this->fail($actionId, $e);
-            $this->stateRepository->updateCurrentAction($action->ship_post_id, null);
-            throw $e;
-        } catch (\Throwable $e) {
-            Transaction::rollback();
-            $error = new ActionException(ErrorCode::ActionFailed, __('Action failed unexpectedly', 'helm'), $e);
-            $this->fail($actionId, $error);
-            $this->stateRepository->updateCurrentAction($action->ship_post_id, null);
-            throw $error;
-        }
+        });
+    }
+
+    private function failAndDispatch(int $actionId, int $shipPostId, ActionException $error): ?Action
+    {
+        return Transaction::run(function () use ($actionId, $shipPostId, $error): ?Action {
+            $failedAction = $this->fail($actionId, $error);
+            $state = $this->clearCurrentAction($shipPostId);
+            $this->dispatchUpdates($failedAction, $state);
+
+            return $failedAction;
+        });
     }
 
     /**
      * Mark an action as failed.
      */
-    private function fail(int $actionId, ActionException $error): void
+    private function fail(int $actionId, ActionException $error): ?Action
     {
         $action = $this->actionRepository->find($actionId);
         if ($action !== null) {
             $action->fail($error->toWpError());
             $this->actionRepository->update($action);
+        }
+
+        return $action;
+    }
+
+    private function clearCurrentAction(int $shipPostId): ?ShipState
+    {
+        $state = $this->stateRepository->find($shipPostId);
+        if ($state === null) {
+            return null;
+        }
+
+        $state->current_action_id = null;
+        $this->stateRepository->update($state);
+
+        return $state;
+    }
+
+    private function dispatchUpdates(?Action $action, ?ShipState $state): void
+    {
+        if ($action !== null) {
+            $this->events->dispatch(new ShipActionUpdated($action));
+        }
+
+        if ($state !== null) {
+            $this->events->dispatch(new ShipStateUpdated($state));
         }
     }
 }

@@ -17,9 +17,6 @@ export function initializeDefaultState(): State {
 			isSubmitting: false,
 			error: null,
 		},
-		heartbeat: {
-			cursor: null,
-		},
 	};
 }
 
@@ -221,16 +218,4 @@ function create(state: State['create'], action: Action): State['create'] {
 	}
 }
 
-function heartbeat(
-	state: State['heartbeat'],
-	action: Action
-): State['heartbeat'] {
-	switch (action.type) {
-		case 'RECEIVE_HEARTBEAT':
-			return { ...state, cursor: action.cursor };
-		default:
-			return state;
-	}
-}
-
-export const reducer = combineReducers({ actions, create, heartbeat });
+export const reducer = combineReducers({ actions, create });

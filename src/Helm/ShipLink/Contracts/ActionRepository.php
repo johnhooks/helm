@@ -157,15 +157,6 @@ interface ActionRepository
     public function claimReady(int $limit = 50): array;
 
     /**
-     * Find all actions broadcast since a given time for a user's ships.
-     *
-     * @param DateTimeImmutable $since
-     * @param int $userId
-     * @return array<Action>
-     */
-    public function findBroadcastsSince(DateTimeImmutable $since, int $userId): array;
-
-    /**
      * Atomically claim a single action for processing.
      *
      * Claims pending actions and phase-ready running actions.

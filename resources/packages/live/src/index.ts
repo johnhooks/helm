@@ -1,14 +1,10 @@
 import { registerHeartbeatTransport } from './heartbeat';
 
-export {
-	advanceBroadcastCursorFromEvents,
-	getBroadcastCursor,
-	resetBroadcastCursor,
-	setBroadcastCursor,
-} from './cursor';
-export { dispatchBroadcastEvent, dispatchBroadcastEvents } from './dispatcher';
+export { store } from './store';
 export { registerHeartbeatTransport } from './heartbeat';
 export type {
+	BroadcastChannelCursors,
+	BroadcastChannelResponse,
 	BroadcastEvent,
 	BroadcastEventType,
 	BroadcastHeartbeatRequest,
@@ -16,5 +12,6 @@ export type {
 	ShipActionUpdatedEvent,
 	ShipStateUpdatedEvent,
 } from './types';
+export type { LiveChannelError, LiveChannelState, State } from './store/types';
 
 registerHeartbeatTransport();

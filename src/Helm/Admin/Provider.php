@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Helm\Admin;
 
+use Helm\Broadcasting\Channel;
+use Helm\Broadcasting\Contracts\EventRepository;
 use Helm\lucatume\DI52\ServiceProvider;
 use Helm\Rest\LinkRel;
 use Helm\Ships\ShipPost;
@@ -94,7 +96,7 @@ final class Provider extends ServiceProvider
         $ship = ShipPost::findForUser(get_current_user_id());
         $shipPostId = $ship?->postId();
 
-        $this->enqueueHelmGlobals('helm-bridge', $shipPostId);
+        $this->enqueueHelmGlobals('helm-live', $shipPostId);
 
         if ($shipPostId !== null) {
             $this->preloadRestPaths([
@@ -115,7 +117,7 @@ final class Provider extends ServiceProvider
         $ship = ShipPost::findForUser(get_current_user_id());
         $shipPostId = $ship?->postId();
 
-        $this->enqueueHelmGlobals('helm-admin-settings', $shipPostId);
+        $this->enqueueHelmGlobals('helm-live', $shipPostId);
 
         if ($shipPostId !== null) {
             $this->preloadRestPaths([
@@ -147,14 +149,23 @@ final class Provider extends ServiceProvider
     private function enqueueHelmGlobals(string $handle, ?int $shipPostId = null): void
     {
         add_action('admin_enqueue_scripts', function () use ($handle, $shipPostId): void {
+            $liveCursors = [];
+            if ($shipPostId !== null) {
+                $channel = Channel::privateShip($shipPostId);
+                $liveCursors[$channel] = $this->container
+                    ->get(EventRepository::class)
+                    ->latestCursorForChannel($channel);
+            }
+
             wp_add_inline_script(
                 $handle,
                 'window.helm = window.helm || {};'
                 . 'window.helm.settings = ' . wp_json_encode([
-                    'workerUrl' => HELM_URL . 'build/datacore-worker.js',
-                    'debug'    => defined('WP_DEBUG') && WP_DEBUG,
-                    'userId'   => get_current_user_id(),
-                    'shipId'   => $shipPostId,
+                    'workerUrl'    => HELM_URL . 'build/datacore-worker.js',
+                    'debug'        => defined('WP_DEBUG') && WP_DEBUG,
+                    'userId'       => get_current_user_id(),
+                    'shipId'       => $shipPostId,
+                    'liveCursors'  => $liveCursors,
                 ]) . ';',
                 'before',
             );

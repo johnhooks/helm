@@ -25,13 +25,30 @@ export type ShipStateUpdatedEvent = BroadcastEventBase<
 
 export type BroadcastEvent = ShipActionUpdatedEvent | ShipStateUpdatedEvent;
 
+export type BroadcastChannelCursors = Record<string, number | null>;
+
 export interface BroadcastHeartbeatRequest {
-	channels: string[];
-	cursor: number;
+	channels: BroadcastChannelCursors;
+}
+
+export interface WpRestErrorResponse {
+	code: string;
+	message: string;
+	data?: { status?: number; [key: string]: unknown };
+	additional_errors?: Array<{
+		code: string;
+		message: string;
+		data?: { status?: number; [key: string]: unknown };
+	}>;
+}
+
+export interface BroadcastChannelResponse {
+	events?: BroadcastEvent[];
+	cursor?: number;
+	error?: WpRestErrorResponse;
 }
 
 export interface BroadcastHeartbeatResponse {
-	events?: BroadcastEvent[];
-	cursor?: number;
-	server_time?: string;
+	channels?: Record<string, BroadcastChannelResponse>;
+	error?: WpRestErrorResponse;
 }

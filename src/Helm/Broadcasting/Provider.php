@@ -17,10 +17,12 @@ final class Provider extends ServiceProvider
     {
         $this->container->singleton(EventRepository::class, WpdbEventRepository::class);
         $this->container->singleton(Broadcaster::class);
+        $this->container->singleton(Heartbeat::class);
     }
 
     public function boot(): void
     {
         add_action(Dispatcher::HOOK, $this->container->callback(Broadcaster::class, 'handleEvent'));
+        add_filter('heartbeat_received', $this->container->callback(Heartbeat::class, 'handle'), 10, 2);
     }
 }

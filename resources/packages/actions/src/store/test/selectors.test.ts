@@ -7,7 +7,6 @@ import {
 	isCreating,
 	getDraft,
 	getCreateError,
-	getHeartbeatCursor,
 	canLoadMore,
 	isLoading,
 	isLoadingAction,
@@ -226,22 +225,6 @@ describe('getActionError', () => {
 		const state = createState();
 
 		expect(getActionError(state, 42)).toBeNull();
-	});
-});
-
-describe('getHeartbeatCursor', () => {
-	it('returns the cursor when set', () => {
-		const state = createState({
-			heartbeat: { cursor: '2025-06-01T00:00:00Z' },
-		});
-
-		expect(getHeartbeatCursor(state)).toBe('2025-06-01T00:00:00Z');
-	});
-
-	it('returns null when not set', () => {
-		const state = createState();
-
-		expect(getHeartbeatCursor(state)).toBeNull();
 	});
 });
 
