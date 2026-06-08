@@ -1,5 +1,5 @@
 ---
-status: draft
+status: done
 area: rest
 priority: p3
 ---
