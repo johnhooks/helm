@@ -435,10 +435,73 @@ describe('reducer', () => {
 			expect(state.actions.byId[5]!.status).toBe('fulfilled');
 		});
 
-		it('does not modify queries', () => {
+		it('prepends new actions to loaded queries for the same ship', () => {
 			const prev = createState({
 				actions: {
 					queries: { '/helm/v1/ships/1/actions': [5] },
+				},
+			});
+
+			const state = reduce(prev, {
+				type: 'RECEIVE_HEARTBEAT',
+				actions: [createShipAction({ id: 10, ship_post_id: 1 })],
+			});
+
+			expect(state.actions.queries['/helm/v1/ships/1/actions']).toEqual([
+				10, 5,
+			]);
+		});
+
+		it('does not duplicate action ids in loaded queries', () => {
+			const prev = createState({
+				actions: {
+					queries: { '/helm/v1/ships/1/actions': [10, 5] },
+				},
+			});
+
+			const state = reduce(prev, {
+				type: 'RECEIVE_HEARTBEAT',
+				actions: [createShipAction({ id: 10, ship_post_id: 1 })],
+			});
+
+			expect(state.actions.queries).toBe(prev.actions.queries);
+			expect(state.actions.queries['/helm/v1/ships/1/actions']).toEqual([
+				10, 5,
+			]);
+		});
+
+		it('does not create unloaded queries from heartbeat actions', () => {
+			const state = reduce(undefined, {
+				type: 'RECEIVE_HEARTBEAT',
+				actions: [createShipAction({ id: 10, ship_post_id: 1 })],
+			});
+
+			expect(
+				state.actions.queries['/helm/v1/ships/1/actions']
+			).toBeUndefined();
+		});
+
+		it('does not update loaded queries for other ships', () => {
+			const prev = createState({
+				actions: {
+					queries: { '/helm/v1/ships/2/actions': [20] },
+				},
+			});
+
+			const state = reduce(prev, {
+				type: 'RECEIVE_HEARTBEAT',
+				actions: [createShipAction({ id: 10, ship_post_id: 1 })],
+			});
+
+			expect(state.actions.queries).toBe(prev.actions.queries);
+		});
+
+		it('does not update filtered ship action queries', () => {
+			const prev = createState({
+				actions: {
+					queries: {
+						'/helm/v1/ships/1/actions?status=fulfilled': [5],
+					},
 				},
 			});
 

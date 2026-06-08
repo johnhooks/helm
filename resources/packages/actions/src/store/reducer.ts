@@ -20,6 +20,41 @@ export function initializeDefaultState(): State {
 	};
 }
 
+function prependActionId(ids: number[], actionId: number): number[] {
+	if (ids.includes(actionId)) {
+		return ids;
+	}
+
+	return [actionId, ...ids].sort((a, b) => b - a);
+}
+
+function prependActionToLoadedQueries(
+	queries: State['actions']['queries'],
+	action: { id: number; ship_post_id: number }
+): State['actions']['queries'] {
+	const baseQueryId = createIndexQueryId(action.ship_post_id);
+	let nextQueries = queries;
+
+	for (const [queryId, ids] of Object.entries(queries)) {
+		if (queryId !== baseQueryId) {
+			continue;
+		}
+
+		const nextIds = prependActionId(ids, action.id);
+		if (nextIds === ids) {
+			continue;
+		}
+
+		if (nextQueries === queries) {
+			nextQueries = { ...queries };
+		}
+
+		nextQueries[queryId] = nextIds;
+	}
+
+	return nextQueries;
+}
+
 function actions(state: State['actions'], action: Action): State['actions'] {
 	switch (action.type) {
 		case 'CREATE_ACTION_FINISHED': {
@@ -74,10 +109,12 @@ function actions(state: State['actions'], action: Action): State['actions'] {
 				return state;
 			}
 			const mergedById = { ...state.byId };
+			let queries = state.queries;
 			for (const a of action.actions) {
 				mergedById[a.id] = a;
+				queries = prependActionToLoadedQueries(queries, a);
 			}
-			return { ...state, byId: mergedById };
+			return { ...state, byId: mergedById, queries };
 		}
 		case 'FETCH_ACTIONS_START':
 			return {

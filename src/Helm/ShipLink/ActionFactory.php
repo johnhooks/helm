@@ -6,12 +6,16 @@ namespace Helm\ShipLink;
 
 use Helm\Core\ErrorCode;
 use Helm\Database\Transaction;
+use Helm\Events\Contracts\EventDispatcher;
 use Helm\Inventory\Contracts\InventoryRepository;
+use Helm\ShipLink\Broadcasting\ShipActionUpdated;
+use Helm\ShipLink\Broadcasting\ShipStateUpdated;
 use Helm\ShipLink\Contracts\ActionHandler;
 use Helm\ShipLink\Contracts\ActionRepository;
 use Helm\ShipLink\Contracts\ActionValidator;
 use Helm\ShipLink\Contracts\ShipStateRepository;
 use Helm\ShipLink\Models\Action;
+use Helm\ShipLink\Models\ShipState;
 use Helm\lucatume\DI52\Container;
 
 /**
@@ -28,6 +32,7 @@ final class ActionFactory
         private readonly ShipStateRepository $stateRepository,
         private readonly InventoryRepository $inventoryRepository,
         private readonly ShipFactory $shipFactory,
+        private readonly EventDispatcher $events,
     ) {
     }
 
@@ -98,13 +103,17 @@ final class ActionFactory
                 );
             }
 
-            $this->stateRepository->updateCurrentAction($shipPostId, $action->id);
+            $state = $ship->getState();
+            $state->current_action_id = $action->id;
+            $this->stateRepository->update($state);
 
             // Deferred actions stay in DB - cron will pick them up when ready
             // Immediate actions are resolved inline
             if ($action->deferred_until === null) {
                 $action = $this->resolveImmediate($action, $type, $ship);
             }
+
+            $this->dispatchUpdates($action, $ship->getState());
 
             Transaction::commit();
 
@@ -139,14 +148,21 @@ final class ActionFactory
 
         $action->fulfill();
         $this->actionRepository->update($action);
-        $this->stateRepository->update($ship->getState());
+
+        $state = $ship->getState();
+        $state->current_action_id = null;
+        $this->stateRepository->update($state);
 
         foreach ($ship->getLoadout()->dirtyComponents() as $component) {
             $this->inventoryRepository->update($component);
         }
 
-        $this->stateRepository->updateCurrentAction($action->ship_post_id, null);
-
         return $action;
+    }
+
+    private function dispatchUpdates(Action $action, ShipState $state): void
+    {
+        $this->events->dispatch(new ShipActionUpdated($action));
+        $this->events->dispatch(new ShipStateUpdated($state));
     }
 }
