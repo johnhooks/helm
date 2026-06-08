@@ -341,6 +341,7 @@ export function NodeInstances({
 			<instancedMesh
 				ref={meshRef}
 				args={[undefined, undefined, instanceCount]}
+				frustumCulled={false}
 			>
 				<sphereGeometry args={[STAR_BASE_SIZE, 16, 16]} />
 				<meshBasicMaterial />
