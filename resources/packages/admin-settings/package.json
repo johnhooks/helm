@@ -13,6 +13,7 @@
 		"@helm/actions": "workspace:*",
 		"@helm/core": "workspace:*",
 		"@helm/logger": "workspace:*",
+		"@helm/live": "workspace:*",
 		"@helm/nav": "workspace:*",
 		"@helm/shell": "workspace:*",
 		"@helm/ships": "workspace:*",

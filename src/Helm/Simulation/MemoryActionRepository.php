@@ -167,11 +167,6 @@ final class MemoryActionRepository implements ActionRepository
         return $claimed;
     }
 
-    public function findBroadcastsSince(DateTimeImmutable $since, int $userId): array
-    {
-        throw new \BadMethodCallException('MemoryActionRepository::findBroadcastsSince() is not implemented.');
-    }
-
     /**
      * Get the earliest deferred_until timestamp among pending or phase-waiting running actions.
      *

@@ -4,6 +4,7 @@ declare global {
 		debug: boolean;
 		userId: number;
 		shipId: number | null;
+		liveCursors: Record<string, number>;
 	}
 
 	interface HelmGlobal {

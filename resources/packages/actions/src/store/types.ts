@@ -63,14 +63,9 @@ export interface CreateState {
 	error: HelmError | null;
 }
 
-export interface HeartbeatState {
-	cursor: string | null;
-}
-
 export interface State {
 	actions: ActionsState;
 	create: CreateState;
-	heartbeat: HeartbeatState;
 }
 
 export type Action =
@@ -81,7 +76,7 @@ export type Action =
 	| { type: 'FETCH_ACTION_FINISHED'; action: ShipAction }
 	| { type: 'FETCH_ACTION_FAILED'; actionId: number; error: HelmError }
 	| { type: 'RECEIVE_ACTION'; action: ShipAction }
-	| { type: 'RECEIVE_HEARTBEAT'; actions: ShipAction[]; cursor: string }
+	| { type: 'RECEIVE_HEARTBEAT'; actions: ShipAction[] }
 	| { type: 'CREATE_DRAFT'; action: DraftAction }
 	| { type: 'CLEAR_DRAFT' }
 	| { type: 'FETCH_ACTIONS_START'; queryId: string }

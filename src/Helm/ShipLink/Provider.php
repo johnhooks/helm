@@ -26,13 +26,11 @@ final class Provider extends ServiceProvider
         $this->container->singleton(ActionFactory::class);
         $this->container->singleton(ActionResolver::class);
         $this->container->singleton(ActionProcessor::class);
-        $this->container->singleton(ActionHeartbeat::class);
     }
 
     public function boot(): void
     {
         add_action(ActionProcessor::HOOK, $this->container->callback(ActionProcessor::class, 'processReady'));
-        add_filter('heartbeat_received', $this->container->callback(ActionHeartbeat::class, 'handle'), 10, 2);
 
         // Deferred to `init` because Action Scheduler registers its API
         // functions (as_has_scheduled_action, etc.) on that hook.

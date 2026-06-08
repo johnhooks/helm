@@ -19,7 +19,7 @@ import {
 } from '@helm/ui';
 import { ErrorBoundary } from 'react-error-boundary';
 import { store as navStore } from '@helm/nav';
-import { store as actionsStore } from '@helm/actions';
+import { store as liveStore } from '@helm/live';
 import { HelmError } from '@helm/core';
 import { HelmErrorFallback } from '@helm/shell';
 import { log } from '@helm/logger';
@@ -107,8 +107,11 @@ function Settings() {
 	);
 
 	const cursor = useSelect(
-		(select) => select(actionsStore).getHeartbeatCursor(),
-		[]
+		(select) =>
+			shipId
+				? select(liveStore).getChannelCursor(`private-ship.${shipId}`)
+				: null,
+		[shipId]
 	);
 
 	const { syncNodes } = useDispatch(navStore);

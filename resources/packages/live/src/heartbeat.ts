@@ -1,10 +1,6 @@
+import { dispatch, select } from '@wordpress/data';
 import { log } from '@helm/core';
-import {
-	advanceBroadcastCursorFromEvents,
-	getBroadcastCursor,
-	setBroadcastCursor,
-} from './cursor';
-import { dispatchBroadcastEvents } from './dispatcher';
+import { store } from './store';
 import type {
 	BroadcastHeartbeatRequest,
 	BroadcastHeartbeatResponse,
@@ -16,21 +12,43 @@ declare const jQuery:
 			on: (event: string, handler: (...args: unknown[]) => void) => void;
 	  });
 
-function getChannels(): string[] {
-	const shipId = window.helm?.settings?.shipId;
-	return shipId ? [`private-ship.${shipId}`] : [];
-}
+const RESUME_HEARTBEAT_AFTER_MS = 60_000;
+let lastHeartbeatAt = Date.now();
 
-function createRequest(): BroadcastHeartbeatRequest | null {
-	const channels = getChannels();
-	if (channels.length === 0) {
-		return null;
+function subscribeInitialShipChannel(): void {
+	const shipId = window.helm?.settings?.shipId;
+	if (!shipId) {
+		return;
 	}
 
-	return {
-		channels,
-		cursor: getBroadcastCursor(),
-	};
+	const channel = `private-ship.${shipId}`;
+	const cursor = window.helm?.settings?.liveCursors?.[channel] ?? null;
+	dispatch(store).subscribeChannel(channel, cursor);
+}
+
+function requestResumeHeartbeat(reason: string): void {
+	const elapsed = Date.now() - lastHeartbeatAt;
+	if (elapsed < RESUME_HEARTBEAT_AFTER_MS) {
+		return;
+	}
+
+	dispatch(store).requestHeartbeatNow(reason);
+}
+
+function registerResumeHeartbeatTrigger(): void {
+	document.addEventListener('visibilitychange', () => {
+		if (!document.hidden) {
+			requestResumeHeartbeat('visibilitychange');
+		}
+	});
+
+	window.addEventListener('focus', () => {
+		requestResumeHeartbeat('focus');
+	});
+
+	window.addEventListener('pageshow', () => {
+		requestResumeHeartbeat('pageshow');
+	});
 }
 
 export function registerHeartbeatTransport(): void {
@@ -38,9 +56,14 @@ export function registerHeartbeatTransport(): void {
 		return;
 	}
 
+	subscribeInitialShipChannel();
+	registerResumeHeartbeatTrigger();
+
 	jQuery(document).on('heartbeat-send', (...args: unknown[]) => {
 		const data = args[1] as Record<string, unknown>;
-		const request = createRequest();
+		const request = select(
+			store
+		).getHeartbeatRequest() as BroadcastHeartbeatRequest | null;
 
 		if (!request) {
 			return;
@@ -61,18 +84,11 @@ export function registerHeartbeatTransport(): void {
 			return;
 		}
 
-		const events = response.events ?? [];
-		dispatchBroadcastEvents(events);
-
-		if (typeof response.cursor === 'number') {
-			setBroadcastCursor(response.cursor);
-		} else {
-			advanceBroadcastCursorFromEvents(events);
-		}
+		lastHeartbeatAt = Date.now();
+		dispatch(store).receiveHeartbeat(response);
 
 		log.debug('live.heartbeat.tick', {
-			events: events.length,
-			cursor: getBroadcastCursor(),
+			channels: Object.keys(response.channels ?? {}).length,
 		});
 	});
 }

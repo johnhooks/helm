@@ -237,7 +237,10 @@ final class WpdbShipStateRepository implements ShipStateRepository
 
         $result = $wpdb->update(
             $table,
-            ['node_id' => $nodeId],
+            [
+                'node_id'    => $nodeId,
+                'updated_at' => Date::nowString(),
+            ],
             ['ship_post_id' => $shipPostId]
         );
 
@@ -255,7 +258,10 @@ final class WpdbShipStateRepository implements ShipStateRepository
 
         $result = $wpdb->update(
             $table,
-            ['current_action_id' => $actionId],
+            [
+                'current_action_id' => $actionId,
+                'updated_at'        => Date::nowString(),
+            ],
             ['ship_post_id' => $shipPostId]
         );
 

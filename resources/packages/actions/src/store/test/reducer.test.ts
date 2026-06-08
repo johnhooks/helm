@@ -27,9 +27,6 @@ describe('reducer', () => {
 					isSubmitting: false,
 					error: null,
 				},
-				heartbeat: {
-					cursor: null,
-				},
 			});
 		});
 	});
@@ -124,14 +121,6 @@ describe('reducer', () => {
 			const state = reduce(prev, { type: 'CREATE_ACTION_START' });
 
 			expect(state.actions.byId[2]).toBe(action);
-		});
-
-		it('does not affect heartbeat', () => {
-			const prev = createState({ heartbeat: { cursor: 'test-cursor' } });
-
-			const state = reduce(prev, { type: 'CREATE_ACTION_START' });
-
-			expect(state.heartbeat.cursor).toBe('test-cursor');
 		});
 	});
 
@@ -379,7 +368,7 @@ describe('reducer', () => {
 	});
 
 	describe('RECEIVE_HEARTBEAT', () => {
-		it('merges actions into byId and sets heartbeat cursor', () => {
+		it('merges actions into byId', () => {
 			const actions = [
 				createShipAction({ id: 10, ship_post_id: 1 }),
 				createShipAction({ id: 20, ship_post_id: 1 }),
@@ -388,12 +377,10 @@ describe('reducer', () => {
 			const state = reduce(undefined, {
 				type: 'RECEIVE_HEARTBEAT',
 				actions,
-				cursor: '2025-06-01T00:00:00Z',
 			});
 
 			expect(state.actions.byId[10]).toBe(actions[0]);
 			expect(state.actions.byId[20]).toBe(actions[1]);
-			expect(state.heartbeat.cursor).toBe('2025-06-01T00:00:00Z');
 		});
 
 		it('merges with existing actions in byId', () => {
@@ -406,25 +393,11 @@ describe('reducer', () => {
 			const state = reduce(prev, {
 				type: 'RECEIVE_HEARTBEAT',
 				actions: [incoming],
-				cursor: '2025-06-01T00:00:00Z',
 			});
 
 			expect(state.actions.byId[1]).toBe(existing);
 			expect(state.actions.byId[2]).toBe(incoming);
 		});
-
-		it('updates cursor even with empty actions array', () => {
-			const prev = createState({ heartbeat: { cursor: 'old-cursor' } });
-
-			const state = reduce(prev, {
-				type: 'RECEIVE_HEARTBEAT',
-				actions: [],
-				cursor: 'new-cursor',
-			});
-
-			expect(state.heartbeat.cursor).toBe('new-cursor');
-		});
-
 		it('does not modify byId reference for empty actions', () => {
 			const existing = createShipAction();
 			const prev = createState({
@@ -434,7 +407,6 @@ describe('reducer', () => {
 			const state = reduce(prev, {
 				type: 'RECEIVE_HEARTBEAT',
 				actions: [],
-				cursor: 'new-cursor',
 			});
 
 			expect(state.actions.byId).toBe(prev.actions.byId);
@@ -458,7 +430,6 @@ describe('reducer', () => {
 			const state = reduce(prev, {
 				type: 'RECEIVE_HEARTBEAT',
 				actions: [updated],
-				cursor: '2025-06-01T00:00:00Z',
 			});
 
 			expect(state.actions.byId[5]!.status).toBe('fulfilled');
@@ -474,7 +445,6 @@ describe('reducer', () => {
 			const state = reduce(prev, {
 				type: 'RECEIVE_HEARTBEAT',
 				actions: [createShipAction({ id: 10, ship_post_id: 1 })],
-				cursor: '2025-06-01T00:00:00Z',
 			});
 
 			expect(state.actions.queries).toBe(prev.actions.queries);
