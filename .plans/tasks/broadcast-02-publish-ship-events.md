@@ -1,5 +1,5 @@
 ---
-status: draft
+status: done
 area: dev
 priority: p1
 depends_on:

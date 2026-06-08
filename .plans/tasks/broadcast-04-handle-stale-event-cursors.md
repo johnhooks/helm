@@ -1,5 +1,5 @@
 ---
-status: draft
+status: ready
 area: dev
 priority: p1
 depends_on:
@@ -20,6 +20,8 @@ Teach the broadcast Heartbeat response to distinguish normal incremental deliver
 
 The client should respond by reloading canonical state through REST, including the current ship, operational ship state, recent ship actions, and any view-specific resources that cannot be reconstructed from broadcasts. Only after the reload succeeds should the client accept the server-provided broadcast cursor.
 
-A first-time or uninitialized cursor should be handled as initialization, not as a request to replay all retained events. The server may return the current channel tail cursor with no events so the client can begin live incremental delivery after its initial REST load.
+A first-time or uninitialized cursor should be handled as initialization, not as a request to replay all retained events. The current implementation already returns the current channel tail cursor with no events for nonnumeric cursors so the client can begin live incremental delivery after its initial REST load.
+
+The remaining work is stale cursor recovery after event retention is introduced. Add repository support for the oldest retained cursor per channel, define the Heartbeat response state for reload-required, and teach the live client to reload canonical REST state before accepting the server-provided cursor.
 
 The response contract should make these states explicit enough for the browser to handle them without guessing from an empty event list.
