@@ -94,7 +94,6 @@ final class ActionResolver
 
             if (! $action->status->isFinalState()) {
                 $action->status = ActionStatus::Running;
-                $action->processing_at = null;
             }
 
             $this->actionRepository->update($action);

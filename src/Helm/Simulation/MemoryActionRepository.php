@@ -213,4 +213,16 @@ final class MemoryActionRepository implements ActionRepository
 
         return true;
     }
+
+    public function release(Action $action): bool
+    {
+        $action->clearProcessingLock();
+        return $this->update($action);
+    }
+
+    public function releaseForRetry(Action $action, DateTimeImmutable $retryAt): bool
+    {
+        $action->releaseForRetry($retryAt);
+        return $this->update($action);
+    }
 }

@@ -40,10 +40,10 @@ tasks. Completed tasks are archived in `.plans/tasks/.archive/`.
 ## Ideas
 
 -   [actions-04-research-processor-owned-resolution](tasks/actions-04-research-processor-owned-resolution.md) - Research processor-owned action resolution. `dev` `p2`
--   [actions-05-evaluate-overdue-phase-catchup](tasks/actions-05-evaluate-overdue-phase-catchup.md) - Evaluate overdue phase catchup. `dev` `p2`
 
 ## Done
 
+-   [actions-05-evaluate-overdue-phase-catchup](tasks/actions-05-evaluate-overdue-phase-catchup.md) - Add locked overdue phase draining. `dev` `p1`
 -   [broadcast-01-add-event-outbox](tasks/broadcast-01-add-event-outbox.md) - Add a broadcast event outbox. `dev` `p1`
 -   [broadcast-02-publish-ship-events](tasks/broadcast-02-publish-ship-events.md) - Publish ship broadcast events. `dev` `p1`
 -   [broadcast-03-poll-events-with-heartbeat](tasks/broadcast-03-poll-events-with-heartbeat.md) - Poll broadcast events with heartbeat. `dev` `p1`
