@@ -366,6 +366,47 @@ class ActionRepositoryTest extends \Codeception\TestCase\WPTestCase
         $this->assertSame(ActionStatus::Running, $found->status);
     }
 
+    public function test_release_clears_processing_lock(): void
+    {
+        $ship = $this->tester->haveShip(['name' => 'Release Ship']);
+
+        $action = new Action(['ship_post_id' => $ship->postId(), 'type' => ActionType::Jump]);
+        $this->repository->insert($action);
+
+        $action->start();
+        $this->repository->update($action);
+
+        $result = $this->repository->release($action);
+
+        $this->assertTrue($result);
+
+        $found = $this->repository->find($action->id);
+        $this->assertSame(ActionStatus::Running, $found->status);
+        $this->assertNull($found->processing_at);
+    }
+
+    public function test_release_for_retry_clears_processing_lock_and_defers_action(): void
+    {
+        $ship = $this->tester->haveShip(['name' => 'Release Retry Ship']);
+        $retryAt = new DateTimeImmutable('+10 minutes');
+
+        $action = new Action(['ship_post_id' => $ship->postId(), 'type' => ActionType::Jump]);
+        $this->repository->insert($action);
+
+        $action->start();
+        $this->repository->update($action);
+
+        $result = $this->repository->releaseForRetry($action, $retryAt);
+
+        $this->assertTrue($result);
+
+        $found = $this->repository->find($action->id);
+        $this->assertSame(ActionStatus::Running, $found->status);
+        $this->assertNull($found->processing_at);
+        $this->assertSame($retryAt->format('Y-m-d H:i:s'), $found->deferred_until->format('Y-m-d H:i:s'));
+        $this->assertSame(1, $found->attempts);
+    }
+
     public function test_claim_ready_returns_pending_actions(): void
     {
         $ship = $this->tester->haveShip(['name' => 'Claim Ship']);

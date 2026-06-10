@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Helm\ShipLink;
 
+use Helm\Lib\Date;
 use Helm\ShipLink\Contracts\ActionRepository;
+use Helm\ShipLink\Models\Action;
 
 /**
  * Processes ready actions from the queue.
@@ -17,6 +19,7 @@ final class ActionProcessor
     public const HOOK = 'helm_process_ready_actions';
     public const BATCH_SIZE = 50;
     public const INTERVAL_SECONDS = 60;
+    public const MAX_PHASES_PER_ACTION = 50;
 
     public function __construct(
         private readonly ActionRepository $actionRepository,
@@ -36,7 +39,7 @@ final class ActionProcessor
 
         foreach ($actions as $action) {
             try {
-                $this->actionResolver->resolve($action->id);
+                $this->processClaimedAction($action->id);
                 $processed++;
             } catch (\Throwable) {
                 // Action already marked as failed by resolver
@@ -45,6 +48,43 @@ final class ActionProcessor
         }
 
         return new ProcessingResult($processed, $failed);
+    }
+
+    /**
+     * Drain due phases for a claimed action.
+     */
+    private function processClaimedAction(int $actionId): void
+    {
+        for ($phaseCount = 0; $phaseCount < self::MAX_PHASES_PER_ACTION; $phaseCount++) {
+            $action = $this->actionResolver->resolve($actionId);
+
+            if ($action->status->isFinalState()) {
+                return;
+            }
+
+            if (! $this->isDueForImmediateProcessing($action)) {
+                $this->actionRepository->release($action);
+                return;
+            }
+        }
+
+        $action = $this->actionRepository->find($actionId);
+        if ($action !== null && ! $action->status->isFinalState()) {
+            $this->actionRepository->release($action);
+        }
+    }
+
+    private function isDueForImmediateProcessing(Action $action): bool
+    {
+        if ($action->status->isFinalState()) {
+            return false;
+        }
+
+        if ($action->deferred_until === null) {
+            return true;
+        }
+
+        return $action->deferred_until <= Date::now();
     }
 
     /**

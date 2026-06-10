@@ -165,4 +165,21 @@ interface ActionRepository
      * @return bool True if the action was successfully claimed
      */
     public function claim(int $actionId): bool;
+
+    /**
+     * Release an action's processing lock.
+     *
+     * @param Action $action
+     * @return bool True if the action was released
+     */
+    public function release(Action $action): bool;
+
+    /**
+     * Release an action for retry at a later time.
+     *
+     * @param Action $action
+     * @param DateTimeImmutable $retryAt
+     * @return bool True if the action was released
+     */
+    public function releaseForRetry(Action $action, DateTimeImmutable $retryAt): bool;
 }

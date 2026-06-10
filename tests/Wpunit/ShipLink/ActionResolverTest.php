@@ -442,12 +442,15 @@ class ActionResolverTest extends WPTestCase
         $this->assertCount(1, $firstPass->result['phases']);
         $this->assertSame($edge1->id, $firstPass->params['route'][0]);
         $this->assertArrayNotHasKey('to_node_id', $firstPass->result['phases'][0]);
-        $this->assertNull($firstPass->processing_at);
+        $this->assertNotNull($firstPass->processing_at);
         $this->assertGreaterThan(Date::now(), $firstPass->deferred_until);
 
         $stateAfterFirstPass = $this->stateRepository->find($ship->postId());
         $this->assertSame($action->id, $stateAfterFirstPass->current_action_id);
         $this->assertSame($node2->id, $stateAfterFirstPass->node_id);
+
+        $firstPass->clearProcessingLock();
+        $this->actionRepository->update($firstPass);
 
         Date::setTestNow($firstPass->deferred_until->modify('+1 second'));
         $this->assertTrue($this->actionRepository->claim($action->id));

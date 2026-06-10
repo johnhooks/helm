@@ -573,6 +573,24 @@ final class WpdbActionRepository implements ActionRepository
     }
 
     /**
+     * Release the processing lock on an action.
+     */
+    public function release(Action $action): bool
+    {
+        $action->clearProcessingLock();
+        return $this->update($action);
+    }
+
+    /**
+     * Release an action and defer it for a later retry.
+     */
+    public function releaseForRetry(Action $action, DateTimeImmutable $retryAt): bool
+    {
+        $action->releaseForRetry($retryAt);
+        return $this->update($action);
+    }
+
+    /**
      * Hydrate a model from a database row.
      *
      * @param array<string, mixed> $row
