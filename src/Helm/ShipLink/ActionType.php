@@ -106,7 +106,8 @@ enum ActionType: string
     public function isMultiphase(): bool
     {
         return match ($this) {
-            self::Jump => true,
+            self::Jump,
+            self::ScanRoute => true,
             default => false,
         };
     }

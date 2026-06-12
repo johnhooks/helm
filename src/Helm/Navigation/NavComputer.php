@@ -19,7 +19,7 @@ final class NavComputer
      * Diminishing returns factor for multi-hop discovery.
      * Each hop beyond the first has (skill * efficiency * DECAY^hopIndex) probability.
      */
-    private const DISCOVERY_DECAY = 0.85;
+    public const DISCOVERY_DECAY = 0.85;
 
     /**
      * Scale factor for distance penalty on first-hop success.
@@ -70,6 +70,55 @@ final class NavComputer
 
         // Discover waypoints
         return $this->discoverPath($input);
+    }
+
+    /**
+     * Resolve one scan checkpoint.
+     *
+     * This never discovers more than one hop. Multi-waypoint scans are built by
+     * the action resolver scheduling another checkpoint after a continuation
+     * roll succeeds.
+     */
+    public function scanNextHop(ScanInput $input, bool $rollFirstHop): ScanPhaseResult
+    {
+        $from = $input->from;
+        $to = $input->to;
+
+        if ($this->generator->canDirectJump($from, $to, self::MAX_RANGE)) {
+            return ScanPhaseResult::direct($to, $this->findOrCreateEdge($from, $to));
+        }
+
+        if ($rollFirstHop && !$this->rollFirstHop($input)) {
+            return ScanPhaseResult::failure();
+        }
+
+        $waypointData = $this->generator->computeWaypoint($from, $to);
+        $waypointNode = $this->findOrCreateWaypoint($waypointData);
+        $edge = $this->findOrCreateEdge($from, $waypointNode);
+
+        return ScanPhaseResult::waypoint($waypointNode, $edge);
+    }
+
+    public function continuationProbability(ScanInput $input, int $hopIndex): float
+    {
+        $probability = $input->skill * $input->efficiency * pow(self::DISCOVERY_DECAY, $hopIndex);
+
+        return max(0.01, min(0.95, $probability));
+    }
+
+    /**
+     * @return array{probability: float, roll: float, continues: bool}
+     */
+    public function rollContinuation(ScanInput $input, int $hopIndex): array
+    {
+        $probability = $this->continuationProbability($input, $hopIndex);
+        $roll = $this->random();
+
+        return [
+            'probability' => $probability,
+            'roll' => $roll,
+            'continues' => $roll < $probability,
+        ];
     }
 
     /**
@@ -157,12 +206,9 @@ final class NavComputer
      */
     private function rollBonusHop(ScanInput $input, int $hopIndex): bool
     {
-        $probability = $input->skill * $input->efficiency * pow(self::DISCOVERY_DECAY, $hopIndex);
+        $roll = $this->rollContinuation($input, $hopIndex);
 
-        // Minimum 1% chance, maximum 95%
-        $probability = max(0.01, min(0.95, $probability));
-
-        return $this->random() < $probability;
+        return $roll['continues'];
     }
 
     /**

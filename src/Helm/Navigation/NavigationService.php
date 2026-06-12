@@ -233,6 +233,65 @@ class NavigationService
         return $this->navComputer->scan($input);
     }
 
+    public function scanNextHop(
+        int $fromNodeId,
+        int $toNodeId,
+        float $skill,
+        float $efficiency,
+        bool $rollFirstHop,
+    ): ScanPhaseResult {
+        $fromNode = $this->nodeRepository->get($fromNodeId);
+        $toNode = $this->nodeRepository->get($toNodeId);
+
+        if ($fromNode === null || $toNode === null) {
+            return ScanPhaseResult::failure();
+        }
+
+        return $this->navComputer->scanNextHop(
+            new ScanInput(
+                from: $fromNode,
+                to: $toNode,
+                chance: 1.0,
+                skill: $skill,
+                efficiency: $efficiency,
+            ),
+            $rollFirstHop,
+        );
+    }
+
+    /**
+     * @return array{probability: float, roll: float, continues: bool}
+     */
+    public function rollScanContinuation(
+        int $fromNodeId,
+        int $toNodeId,
+        float $skill,
+        float $efficiency,
+        int $hopIndex,
+    ): array {
+        $fromNode = $this->nodeRepository->get($fromNodeId);
+        $toNode = $this->nodeRepository->get($toNodeId);
+
+        if ($fromNode === null || $toNode === null) {
+            return [
+                'probability' => 0.0,
+                'roll' => 1.0,
+                'continues' => false,
+            ];
+        }
+
+        return $this->navComputer->rollContinuation(
+            new ScanInput(
+                from: $fromNode,
+                to: $toNode,
+                chance: 1.0,
+                skill: $skill,
+                efficiency: $efficiency,
+            ),
+            $hopIndex,
+        );
+    }
+
     /**
      * Get all nodes connected to a given node.
      *

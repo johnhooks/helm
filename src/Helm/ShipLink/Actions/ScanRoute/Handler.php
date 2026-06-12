@@ -18,7 +18,8 @@ use Helm\ShipLink\Ship;
  */
 final class Handler implements ActionHandler
 {
-    private const SCAN_DURATION_SECONDS = 3600; // 1 hour base scan time
+    private const SCAN_CYCLE_SECONDS = 300;
+    private const MAX_SCAN_PHASES = 50;
 
     public function handle(Action $action, Ship $ship): void
     {
@@ -29,9 +30,8 @@ final class Handler implements ActionHandler
         $skill = $ship->navigation()->getSkill();
         $efficiency = $ship->navigation()->getEfficiency();
 
-        // Calculate scan duration
-        $durationSeconds = (int) (self::SCAN_DURATION_SECONDS / max(0.1, $efficiency));
-        $completesAt = Date::addSeconds(Date::now(), $durationSeconds);
+        $startedAt = Date::now();
+        $firstCheckpointAt = Date::addSeconds($startedAt, self::SCAN_CYCLE_SECONDS);
 
         // Store calculated values in result - resolver will use these
         $action->result = [
@@ -39,10 +39,14 @@ final class Handler implements ActionHandler
             'to_node_id' => $targetNodeId,
             'skill' => $skill,
             'efficiency' => $efficiency,
-            'duration' => $durationSeconds,
+            'started_at' => Date::toString($startedAt),
+            'cycle_seconds' => self::SCAN_CYCLE_SECONDS,
+            'max_scan_phases' => self::MAX_SCAN_PHASES,
+            'duration' => self::SCAN_CYCLE_SECONDS,
+            'phases' => [],
         ];
 
         $action->status = ActionStatus::Pending;
-        $action->deferred_until = $completesAt;
+        $action->deferred_until = $firstCheckpointAt;
     }
 }

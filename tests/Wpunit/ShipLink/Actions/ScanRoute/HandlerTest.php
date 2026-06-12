@@ -81,7 +81,7 @@ class HandlerTest extends WPTestCase
         $this->assertGreaterThan($before, $action->deferred_until);
     }
 
-    public function test_base_duration_is_approximately_one_hour(): void
+    public function test_first_scan_cycle_is_five_minutes(): void
     {
         $star1 = $this->tester->haveStar(['id' => 'TIME_FROM', 'distanceLy' => 0.0]);
         $star2 = $this->tester->haveStar(['id' => 'TIME_TO', 'distanceLy' => 5.0]);
@@ -101,12 +101,10 @@ class HandlerTest extends WPTestCase
         $before = new DateTimeImmutable();
         $this->handler->handle($action, $ship);
 
-        // With default efficiency of 1.0, scan should take ~1 hour (3600 seconds)
-        // Allow some variance for efficiency calculations
         $durationSeconds = $action->deferred_until->getTimestamp() - $before->getTimestamp();
 
-        $this->assertGreaterThan(1800, $durationSeconds, 'Scan should take at least 30 minutes');
-        $this->assertLessThanOrEqual(7200, $durationSeconds, 'Scan should take at most 2 hours');
+        $this->assertGreaterThanOrEqual(299, $durationSeconds);
+        $this->assertLessThanOrEqual(300, $durationSeconds);
     }
 
     public function test_stores_calculated_values_in_result(): void
@@ -134,6 +132,10 @@ class HandlerTest extends WPTestCase
         $this->assertArrayHasKey('skill', $action->result);
         $this->assertArrayHasKey('efficiency', $action->result);
         $this->assertArrayHasKey('duration', $action->result);
+        $this->assertArrayHasKey('started_at', $action->result);
+        $this->assertArrayHasKey('cycle_seconds', $action->result);
+        $this->assertArrayHasKey('max_scan_phases', $action->result);
+        $this->assertArrayHasKey('phases', $action->result);
 
         $this->assertSame($node1->id, $action->result['from_node_id']);
         $this->assertSame($node2->id, $action->result['to_node_id']);
