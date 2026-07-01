@@ -54,6 +54,30 @@ class ResourcesTest extends WPTestCase
         $this->assertSame('2026-06-07T12:35:56+00:00', $resource['deferred_until']);
     }
 
+    public function test_action_resource_never_exposes_runtime_state(): void
+    {
+        Date::setTestNow('2026-06-07 12:34:56');
+
+        $action = new Action([
+            'id' => 123,
+            'ship_post_id' => 45,
+            'type' => ActionType::ScanRoute,
+            'status' => ActionStatus::Running,
+            'params' => ['target_node_id' => 9],
+            'runtime_state' => ['cycle' => 3, 'misses' => [1, 2]],
+            'created_at' => Date::now(),
+            'updated_at' => Date::now(),
+        ]);
+
+        $resource = (new ActionResource($action))->resolve();
+
+        $this->assertArrayNotHasKey('runtime_state', $resource);
+        $this->assertSame(
+            ['id', 'ship_post_id', 'type', 'status', 'params', 'result', 'deferred_until', 'created_at', 'updated_at'],
+            array_keys($resource)
+        );
+    }
+
     public function test_ship_state_resource_serializes_operational_state(): void
     {
         Date::setTestNow('2026-06-07 12:34:56');

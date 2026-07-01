@@ -263,6 +263,7 @@ class ActionTest extends \Codeception\TestCase\WPTestCase
             'processing_at' => '2025-01-15 09:30:00',
             'attempts' => 1,
             'result' => null,
+            'runtime_state' => null,
             'created_at' => '2025-01-15 09:00:00',
             'updated_at' => '2025-01-15 09:30:00',
         ];
@@ -291,6 +292,7 @@ class ActionTest extends \Codeception\TestCase\WPTestCase
             'processing_at' => null,
             'attempts' => 0,
             'result' => '{"core_used":5.5,"duration":120}',
+            'runtime_state' => '{"cycle":2}',
             'created_at' => '2025-01-15 09:00:00',
             'updated_at' => '2025-01-15 09:30:00',
         ];
@@ -299,6 +301,7 @@ class ActionTest extends \Codeception\TestCase\WPTestCase
 
         $this->assertSame(ActionStatus::Fulfilled, $action->status);
         $this->assertSame(['core_used' => 5.5, 'duration' => 120], $action->result);
+        $this->assertSame(['cycle' => 2], $action->runtime_state);
     }
 
     public function test_is_set_tracks_set_properties(): void

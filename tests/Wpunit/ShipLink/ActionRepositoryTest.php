@@ -238,6 +238,40 @@ class ActionRepositoryTest extends \Codeception\TestCase\WPTestCase
         $this->assertSame('helm.test.out_of_range', $found->result['error']['code']);
     }
 
+    public function test_insert_persists_runtime_state(): void
+    {
+        $ship = $this->tester->haveShip(['name' => 'Runtime Ship']);
+
+        $action = new Action([
+            'ship_post_id' => $ship->postId(),
+            'type' => ActionType::ScanRoute,
+            'runtime_state' => ['cycle' => 1, 'misses' => []],
+        ]);
+        $this->repository->insert($action);
+
+        $found = $this->repository->find($action->id);
+        $this->assertSame(['cycle' => 1, 'misses' => []], $found->runtime_state);
+    }
+
+    public function test_update_persists_runtime_state_changes(): void
+    {
+        $ship = $this->tester->haveShip(['name' => 'Runtime Update Ship']);
+
+        $action = new Action([
+            'ship_post_id' => $ship->postId(),
+            'type' => ActionType::ScanRoute,
+            'runtime_state' => ['cycle' => 1],
+        ]);
+        $this->repository->insert($action);
+
+        $found = $this->repository->find($action->id);
+        $found->runtime_state = array_merge($found->runtime_state, ['cycle' => 2, 'misses' => [7]]);
+        $this->repository->update($found);
+
+        $refetched = $this->repository->find($action->id);
+        $this->assertSame(['cycle' => 2, 'misses' => [7]], $refetched->runtime_state);
+    }
+
     public function test_delete_removes_record(): void
     {
         $ship = $this->tester->haveShip(['name' => 'Delete Ship']);

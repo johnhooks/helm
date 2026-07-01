@@ -26,6 +26,7 @@ use Helm\StellarWP\Models\ModelPropertyDefinition;
  * @property DateTimeImmutable|null $processing_at Timestamp lock for concurrent workers
  * @property int $attempts Processing attempts (0 = never picked up, 1 = first attempt, etc.)
  * @property array<string, mixed>|null $result
+ * @property array<string, mixed>|null $runtime_state Private progress for the running action; never client-facing
  * @property DateTimeImmutable $created_at
  * @property DateTimeImmutable $updated_at
  */
@@ -75,6 +76,11 @@ final class Action extends Model
                 ->default(0),
 
             'result' => (new ModelPropertyDefinition())
+                ->type('array')
+                ->nullable()
+                ->castWith(static fn ($v) => self::castJson($v)),
+
+            'runtime_state' => (new ModelPropertyDefinition())
                 ->type('array')
                 ->nullable()
                 ->castWith(static fn ($v) => self::castJson($v)),
