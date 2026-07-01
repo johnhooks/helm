@@ -11,6 +11,7 @@ tasks. Completed tasks are archived in `.plans/tasks/.archive/`.
 
 ## Ready
 
+-   [actions-06-store-private-action-state](tasks/actions-06-store-private-action-state.md) - Store private runtime state on actions. `dev` `p1`
 -   [broadcast-04-handle-stale-event-cursors](tasks/broadcast-04-handle-stale-event-cursors.md) - Handle stale broadcast cursors. `dev` `p1`
 -   [dev-01-time-scale-constant](tasks/dev-01-time-scale-constant.md) - Add a time-scale constant for manual testing. `dev` `p2`
 -   [nav-11-enforce-waypoint-visibility](tasks/nav-11-enforce-waypoint-visibility.md) - Enforce waypoint visibility on the backend. `navigation` `p3`
@@ -21,11 +22,6 @@ tasks. Completed tasks are archived in `.plans/tasks/.archive/`.
 ## Draft
 
 -   [actions-02-add-typed-action-contracts](tasks/actions-02-add-typed-action-contracts.md) - Add typed action contracts. `dev` `p2`
-<<<<<<< Updated upstream
--   [actions-03-standardize-multiphase-processing](tasks/actions-03-standardize-multiphase-processing.md) - Standardize multiphase action processing. `dev` `p1`
-=======
--   [actions-06-store-private-action-state](tasks/actions-06-store-private-action-state.md) - Store private runtime state on actions. `dev` `p1`
->>>>>>> Stashed changes
 -   [dev-02-convert-js-tooling-to-pnpm](tasks/dev-02-convert-js-tooling-to-pnpm.md) - Convert JavaScript tooling to pnpm. `dev` `p1`
 -   [errors-01-review-helm-error-api](tasks/errors-01-review-helm-error-api.md) - Review HelmError display API. `dev` `p3`
 -   [issue-01-investigate-ship-systems-loadout-assert](tasks/issue-01-investigate-ship-systems-loadout-assert.md) - Investigate ship systems loadout assert. `ui` `p2`
@@ -47,6 +43,7 @@ tasks. Completed tasks are archived in `.plans/tasks/.archive/`.
 
 ## Done
 
+-   [actions-03-standardize-multiphase-processing](tasks/actions-03-standardize-multiphase-processing.md) - Standardize multiphase action processing. `dev` `p1`
 -   [actions-05-evaluate-overdue-phase-catchup](tasks/actions-05-evaluate-overdue-phase-catchup.md) - Add locked overdue phase draining. `dev` `p1`
 -   [broadcast-01-add-event-outbox](tasks/broadcast-01-add-event-outbox.md) - Add a broadcast event outbox. `dev` `p1`
 -   [broadcast-02-publish-ship-events](tasks/broadcast-02-publish-ship-events.md) - Publish ship broadcast events. `dev` `p1`

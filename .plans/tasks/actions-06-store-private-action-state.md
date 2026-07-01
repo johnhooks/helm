@@ -1,5 +1,5 @@
 ---
-status: draft
+status: ready
 area: dev
 priority: p1
 ---
@@ -17,6 +17,8 @@ The key boundary should be simple. Global facts about the ship belong on ship st
 ## Proposed solution
 
 Add a private runtime state field to ship actions and use it for long-running action internals. Keep action params as the stable command intent and action result as the public outcome. The runtime state field must not be exposed through REST resources, broadcasts, or other player-facing serializers unless a future endpoint explicitly needs internal debugging data.
+
+Runtime state should record anchors and history needed to resume, not precomputed future outcomes. Keeping the state private hides the scan's progress from the player, but resolvers should still calculate each checkpoint against live ship state so mid-action changes to the ship affect what happens next.
 
 For route scans, the scan action should own its private cycle state. The action params should capture the scan intent, including the source node captured at creation time and the target node. The private state should hold cycle timing, cycle count, private miss records or summaries, and any internal data needed to resume. The public result should only be written when a route or waypoint is discovered or when the scan reaches a terminal no-result state.
 
