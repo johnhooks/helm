@@ -21,7 +21,11 @@ tasks. Completed tasks are archived in `.plans/tasks/.archive/`.
 ## Draft
 
 -   [actions-02-add-typed-action-contracts](tasks/actions-02-add-typed-action-contracts.md) - Add typed action contracts. `dev` `p2`
+<<<<<<< Updated upstream
 -   [actions-03-standardize-multiphase-processing](tasks/actions-03-standardize-multiphase-processing.md) - Standardize multiphase action processing. `dev` `p1`
+=======
+-   [actions-06-store-private-action-state](tasks/actions-06-store-private-action-state.md) - Store private runtime state on actions. `dev` `p1`
+>>>>>>> Stashed changes
 -   [dev-02-convert-js-tooling-to-pnpm](tasks/dev-02-convert-js-tooling-to-pnpm.md) - Convert JavaScript tooling to pnpm. `dev` `p1`
 -   [errors-01-review-helm-error-api](tasks/errors-01-review-helm-error-api.md) - Review HelmError display API. `dev` `p3`
 -   [issue-01-investigate-ship-systems-loadout-assert](tasks/issue-01-investigate-ship-systems-loadout-assert.md) - Investigate ship systems loadout assert. `ui` `p2`
