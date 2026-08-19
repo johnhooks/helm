@@ -4,7 +4,7 @@ import type { ShipAction } from '@helm/actions';
 import { getActionError, isFailed, isFulfilled } from '@helm/actions';
 import { ActionStatusBadge } from '../action-status';
 import { formatTime } from '../utils';
-import { getScanTitle } from './utils';
+import { getScanTitle, getScanWaypointCount } from './utils';
 
 export function CompleteScanCard({
 	action,
@@ -41,7 +41,7 @@ export function CompleteScanCard({
 					<SystemCell>
 						<Readout
 							label={__('Duration', 'helm')}
-							value={action.result.duration}
+							value="--"
 							tone={tone}
 							size="sm"
 						/>
@@ -82,7 +82,7 @@ export function CompleteScanCard({
 					<SystemCell>
 						<Readout
 							label={__('Duration', 'helm')}
-							value={action.result.duration}
+							value="--"
 							tone={tone}
 							size="sm"
 						/>
@@ -90,7 +90,7 @@ export function CompleteScanCard({
 					<SystemCell>
 						<Readout
 							label={__('Waypoints', 'helm')}
-							value={String(action.result.waypoints_created)}
+							value={getScanWaypointCount(action) ?? 0}
 							tone={tone}
 							size="sm"
 						/>

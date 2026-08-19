@@ -27,18 +27,10 @@ describe('CompleteScanCard', () => {
 			...baseAction,
 			status: 'fulfilled',
 			result: {
-				from_node_id: 1,
-				to_node_id: 7,
-				skill: 50,
-				efficiency: 100,
-				duration: 3600,
-				success: true,
-				complete: true,
-				discovered_edge_ids: [1],
-				discovered_node_ids: [1, 2, 3],
-				edges_discovered: 1,
-				waypoints_created: 1,
-				path: [1, 2, 3],
+				discovered_edge_ids: [1, 2],
+				discovered_node_ids: [2, 7],
+				path: [1, 2, 7],
+				phases: [],
 			},
 		};
 		render(<CompleteScanCard action={action} targetName={TARGET_NAME} />);
@@ -51,11 +43,6 @@ describe('CompleteScanCard', () => {
 			...baseAction,
 			status: 'failed',
 			result: {
-				from_node_id: 1,
-				to_node_id: 7,
-				skill: 0,
-				efficiency: 0,
-				duration: 0,
 				error: {
 					code: 'helm.action.failed',
 					message: 'Signal lost',
@@ -70,13 +57,7 @@ describe('CompleteScanCard', () => {
 		const action: ShipAction<'scan_route'> = {
 			...baseAction,
 			status: 'failed',
-			result: {
-				from_node_id: 1,
-				to_node_id: 7,
-				skill: 0,
-				efficiency: 0,
-				duration: 0,
-			},
+			result: {},
 		};
 		render(<CompleteScanCard action={action} targetName={TARGET_NAME} />);
 		expect(screen.getByText('Unknown')).toBeInTheDocument();

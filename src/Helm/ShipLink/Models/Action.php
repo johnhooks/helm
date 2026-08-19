@@ -151,6 +151,21 @@ final class Action extends Model
     }
 
     /**
+     * Mark the action as partially completed.
+     *
+     * If result is provided, it merges into the existing result.
+     *
+     * @param array<string, mixed> $result
+     */
+    public function partial(array $result): self
+    {
+        $this->status = ActionStatus::Partial;
+        $this->result = array_merge($this->result ?? [], $result);
+        $this->processing_at = null;
+        return $this;
+    }
+
+    /**
      * Mark the action as failed with an error.
      *
      * Serializes the WP_Error using REST conventions and stores in result.error.

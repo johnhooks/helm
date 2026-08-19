@@ -35,6 +35,7 @@ final class Provider extends ServiceProvider
         $this->container->singleton(UserEdgeRepository::class, WpdbUserEdgeRepository::class);
         $this->container->singleton(RouteRepository::class);
         $this->container->singleton(NodeGenerator::class);
+        $this->container->singleton(Contracts\RandomSource::class, NativeRandomSource::class);
         $this->container->singleton(NavComputer::class);
         $this->container->singleton(NavigationService::class);
     }

@@ -18,27 +18,35 @@ interface ScanRouteParams {
 	target_node_id: number;
 	source_node_id: number;
 	distance_ly: number;
+	/**
+	 * Captured from the ship's position at creation; absent on drafts.
+	 */
+	from_node_id?: number;
 }
 
+/**
+ * Public discoveries accumulate while the scan is active. Private attempts
+ * and continuation mechanics stay in server runtime state.
+ */
 interface ScanRouteActiveResult extends ActionResultError {
-	from_node_id: number;
-	to_node_id: number;
-	skill: number;
-	efficiency: number;
-	duration: number;
-	waypoints_created?: number;
+	path?: number[];
+	phases?: ScanRouteResultPhase[];
 	discovered_edge_ids?: number[];
 	discovered_node_ids?: number[];
 }
 
+interface ScanRouteResultPhase {
+	from_node_id: number;
+	target_node_id: number;
+	discovered_node_id: number;
+	discovered_edge_id: number;
+}
+
 interface ScanRouteFulfilledResult extends ScanRouteActiveResult {
-	success: boolean;
-	complete: boolean;
 	discovered_edge_ids: number[];
 	discovered_node_ids: number[];
-	edges_discovered: number;
-	waypoints_created: number;
 	path: number[];
+	phases: ScanRouteResultPhase[];
 }
 
 type ScanRouteFailedResult = FailedResult<ScanRouteActiveResult>;

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests\Wpunit\ShipLink\Actions\ScanRoute;
 
 use Helm\Core\ErrorCode;
-use Helm\Navigation\Contracts\NodeRepository;
+use Helm\Navigation\NavigationService;
 use Helm\ShipLink\ActionException;
 use Helm\ShipLink\Actions\ScanRoute\Validator;
 use Helm\ShipLink\ActionType;
@@ -23,16 +23,14 @@ class ValidatorTest extends WPTestCase
 {
     private Validator $validator;
     private ShipFactory $shipFactory;
-    private NodeRepository $nodeRepository;
 
     public function _before(): void
     {
         parent::_before();
         $this->tester->haveOrigin();
 
-        $this->validator = new Validator();
+        $this->validator = new Validator(helm(NavigationService::class));
         $this->shipFactory = helm(ShipFactory::class);
-        $this->nodeRepository = helm(NodeRepository::class);
     }
 
     public function test_throws_when_target_node_missing(): void
@@ -95,7 +93,54 @@ class ValidatorTest extends WPTestCase
         }
     }
 
-    public function test_passes_when_valid(): void
+    public function test_throws_when_target_node_does_not_exist(): void
+    {
+        $star = $this->tester->haveStar(['id' => 'SCAN_REAL_FROM', 'distanceLy' => 0.0]);
+        $node = $this->tester->getNodeForStar($star);
+
+        $shipPost = $this->tester->haveShip(['node_id' => $node->id]);
+        $ship = $this->shipFactory->build($shipPost->postId());
+
+        $action = new Action([
+            'ship_post_id' => $shipPost->postId(),
+            'type' => ActionType::ScanRoute,
+            'params' => ['target_node_id' => 999999],
+        ]);
+
+        try {
+            $this->validator->validate($action, $ship);
+            $this->fail('Expected ActionException was not thrown');
+        } catch (ActionException $e) {
+            $this->assertSame(ErrorCode::NavigationInvalidTarget, $e->errorCode);
+        }
+    }
+
+    public function test_throws_when_target_beyond_scan_range(): void
+    {
+        $star1 = $this->tester->haveStar(['id' => 'RANGE_FROM', 'distanceLy' => 0.0]);
+        $star2 = $this->tester->haveStar(['id' => 'RANGE_TO', 'distanceLy' => 1000.0]);
+
+        $node1 = $this->tester->getNodeForStar($star1);
+        $node2 = $this->tester->getNodeForStar($star2);
+
+        $shipPost = $this->tester->haveShip(['node_id' => $node1->id]);
+        $ship = $this->shipFactory->build($shipPost->postId());
+
+        $action = new Action([
+            'ship_post_id' => $shipPost->postId(),
+            'type' => ActionType::ScanRoute,
+            'params' => ['target_node_id' => $node2->id],
+        ]);
+
+        try {
+            $this->validator->validate($action, $ship);
+            $this->fail('Expected ActionException was not thrown');
+        } catch (ActionException $e) {
+            $this->assertSame(ErrorCode::NavigationBeyondRange, $e->errorCode);
+        }
+    }
+
+    public function test_passes_and_captures_from_node_when_valid(): void
     {
         $star1 = $this->tester->haveStar(['id' => 'SCAN_FROM', 'distanceLy' => 0.0]);
         $star2 = $this->tester->haveStar(['id' => 'SCAN_TO', 'distanceLy' => 5.0]);
@@ -112,10 +157,8 @@ class ValidatorTest extends WPTestCase
             'params' => ['target_node_id' => $node2->id],
         ]);
 
-        // Should not throw - no route required for scanning
         $this->validator->validate($action, $ship);
 
-        // If we got here, validation passed
-        $this->assertTrue(true);
+        $this->assertSame($node1->id, $action->params['from_node_id']);
     }
 }

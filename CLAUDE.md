@@ -2,6 +2,13 @@
 
 A slow, asynchronous space exploration game built on WordPress.
 
+## Conversational Style
+
+- Keep answers short and concise
+- No emojis in commits, issues, PR comments, or code
+- No fluff or cheerful filler text
+- Technical prose only, be kind but direct
+
 ## What This Is
 
 Helm is a space MMO where WordPress is the game server. Players are WordPress users. Ships are player-owned entities stored as data. The game runs on a single WordPress instance (the "Origin") that tracks all state, processes work, and manages the economy.

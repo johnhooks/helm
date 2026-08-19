@@ -59,7 +59,7 @@ export const receiveHeartbeat =
 			if (isJump(action) && isFulfilled(action)) {
 				refreshedShipIds.add(action.ship_post_id);
 			}
-			if (isScanRoute(action) && isFulfilled(action) && action.result) {
+			if (isScanRoute(action) && action.result) {
 				for (const edgeId of action.result.discovered_edge_ids ?? []) {
 					discoveredEdgeIds.add(edgeId);
 				}

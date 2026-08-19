@@ -4,7 +4,6 @@ import {
 	Button,
 	Countdown,
 	LogCard,
-	ProgressBar,
 	Readout,
 	SystemCell,
 	SystemGrid,
@@ -13,8 +12,8 @@ import type { LcarsTone } from '@helm/ui';
 import type { ShipAction } from '@helm/actions';
 import { isActive } from '@helm/actions';
 import { ActionStatusBadge } from '../action-status';
-import { getProgressPercentage, getRemainingSeconds } from '../utils';
-import { getScanTitle } from './utils';
+import { getRemainingSeconds } from '../utils';
+import { getScanTitle, getScanWaypointCount } from './utils';
 
 export function ActiveScanCard({
 	action,
@@ -29,7 +28,6 @@ export function ActiveScanCard({
 		return null;
 	}
 
-	const result = action.result;
 	const title = getScanTitle(action.type, targetName);
 	const status = <ActionStatusBadge status={action.status} />;
 
@@ -55,7 +53,7 @@ export function ActiveScanCard({
 					<SystemCell>
 						<Readout
 							label={__('Duration', 'helm')}
-							value={result?.duration ?? '--'}
+							value="--"
 							tone={tone}
 							size="sm"
 						/>
@@ -63,11 +61,7 @@ export function ActiveScanCard({
 					<SystemCell>
 						<Readout
 							label={__('Waypoints', 'helm')}
-							value={
-								typeof result?.waypoints_created === 'number'
-									? String(result.waypoints_created)
-									: '--'
-							}
+							value={getScanWaypointCount(action) ?? '--'}
 							tone={tone}
 							size="sm"
 						/>
@@ -86,13 +80,9 @@ function ActiveScanProgress({
 	action: ShipAction<'scan_route'> & { status: 'pending' | 'running' };
 	tone: LcarsTone;
 }) {
-	const result = action.result;
 	const [remaining, setRemaining] = useState(() =>
 		getRemainingSeconds(action.deferred_until)
 	);
-	const progress = action.deferred_until
-		? getProgressPercentage(result?.duration, remaining)
-		: undefined;
 
 	useEffect(() => {
 		if (!action.deferred_until) {
@@ -107,15 +97,12 @@ function ActiveScanProgress({
 
 	return (
 		<>
-			{progress !== undefined && (
-				<ProgressBar value={progress} tone={tone} size="sm" active />
-			)}
 			{action.deferred_until && (
 				<div
 					className={`helm-flex helm-items-center helm-justify-between helm-gap-x-3 helm-tone--${tone}`}
 				>
 					<Countdown
-						label={__('Remaining', 'helm')}
+						label={__('Next update', 'helm')}
 						remaining={remaining}
 						tone={tone}
 						active

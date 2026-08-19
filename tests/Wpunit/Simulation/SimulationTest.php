@@ -13,6 +13,7 @@ use Helm\ShipLink\ActionType;
 use Helm\ShipLink\Contracts\ShipStateRepository;
 use Helm\ShipLink\Ship;
 use Helm\Simulation\Simulation;
+use Tests\Support\WpunitTester;
 use lucatume\WPBrowser\TestCase\WPTestCase;
 
 /**
@@ -21,6 +22,8 @@ use lucatume\WPBrowser\TestCase\WPTestCase;
  * Proves the game loop works without database I/O by using
  * in-memory repositories for all state.
  *
+ * @property WpunitTester $tester
+ *
  * @covers \Helm\Simulation\Simulation
  * @covers \Helm\Simulation\Provider
  */
@@ -28,30 +31,12 @@ class SimulationTest extends WPTestCase
 {
     private Simulation $sim;
 
-    public function set_up(): void
+    public function _before(): void
     {
-        parent::set_up();
-
-        // Register the simulation provider — overrides all Wpdb* bindings
-        $provider = new \Helm\Simulation\Provider(helm()->getContainer());
-        $provider->register();
-        $provider->boot();
-
-        // Freeze time
-        Date::setTestNow('2300-01-01 00:00:00');
-
-        // Seed a minimal graph: two nodes close enough for direct jump (< 1 ly)
-        $nodeRepo = helm(NodeRepository::class);
-        $nodeRepo->create(0.0, 0.0, 0.0, NodeType::System);  // Node 1 (Sol)
-        $nodeRepo->create(0.5, 0.3, 0.1, NodeType::System);  // Node 2 (nearby)
-
-        $this->sim = helm(Simulation::class);
-    }
-
-    public function tear_down(): void
-    {
-        Date::setTestNow(null);
-        parent::tear_down();
+        parent::_before();
+        $this->sim = $this->tester->haveSimulation();
+        $this->tester->haveSimulationNode(0.0);
+        $this->tester->haveSimulationNode(0.5, 0.3, 0.1);
     }
 
     public function test_create_ship(): void
@@ -142,10 +127,10 @@ class SimulationTest extends WPTestCase
         $resolved = $this->sim->findAction($action->id);
         $this->assertSame(ActionStatus::Fulfilled, $resolved->status);
 
-        // Result should contain scan data
+        // Result should contain the public route data
         $this->assertNotNull($resolved->result);
-        $this->assertTrue($resolved->result['success']);
-        $this->assertGreaterThan(0, $resolved->result['edges_discovered']);
+        $this->assertNotEmpty($resolved->result['discovered_edge_ids']);
+        $this->assertNotEmpty($resolved->result['path']);
 
         // Ship should have current_action_id cleared
         $state = helm(ShipStateRepository::class)->find($ship->getId());
@@ -203,7 +188,7 @@ class SimulationTest extends WPTestCase
 
         $resolvedScan = $this->sim->findAction($scan->id);
         $this->assertSame(ActionStatus::Fulfilled, $resolvedScan->status);
-        $this->assertTrue($resolvedScan->result['success']);
+        $this->assertNotEmpty($resolvedScan->result['discovered_edge_ids']);
 
         // Now jump to node 2
         $jump = $this->sim->dispatch($ship->getId(), ActionType::Jump, [
@@ -236,5 +221,27 @@ class SimulationTest extends WPTestCase
         $this->assertNotNull($node1);
         $this->assertNotNull($node2);
         $this->assertSame(NodeType::System, $node1->type);
+    }
+
+    public function test_starting_a_new_simulation_resets_fixtures_clock_and_rolls(): void
+    {
+        $ship = $this->tester->haveSimulationShip();
+        $this->tester->dispatchSimulationAction($ship->getId(), ActionType::ScanRoute, ['target_node_id' => 2]);
+        $this->tester->advanceSimulationUntilIdle();
+        $this->assertSame(1, helm(\Helm\Navigation\Contracts\UserEdgeRepository::class)->count(1));
+        $this->tester->haveSimulationRolls(1.0);
+
+        $this->tester->haveSimulation(startedAt: '2301-01-01 00:00:00');
+        $this->assertSame('2301-01-01 00:00:00', Date::nowString());
+        $this->assertSame(0, helm(NodeRepository::class)->count());
+        $this->assertSame(0, helm(\Helm\Navigation\Contracts\UserEdgeRepository::class)->count(1));
+        $this->assertSame(0, $this->tester->advanceSimulationToNextCheckpoint()->processed);
+        $node = $this->tester->haveSimulationNode(3.0);
+        $this->assertSame(1, $node->id);
+        $this->assertSame($node, $this->tester->grabSimulationNode($node->id));
+        $this->assertSame(1, $this->tester->haveSimulationShip()->getId());
+        $source = helm(\Helm\Navigation\Contracts\RandomSource::class);
+        $expected = new \Helm\Simulation\SimulationRandomSource('simulation-test');
+        $this->assertSame($expected->next(), $source->next());
     }
 }

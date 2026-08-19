@@ -122,11 +122,9 @@ export function useNavigationEdges(): RouteState {
 		if (isScanRoute(latestAction)) {
 			if (isActive(latestAction) || isFailed(latestAction)) {
 				const from =
-					latestAction.result?.from_node_id ??
+					latestAction.params.from_node_id ??
 					latestAction.params.source_node_id;
-				const to =
-					latestAction.result?.to_node_id ??
-					latestAction.params.target_node_id;
+				const to = latestAction.params.target_node_id;
 				const state: RouteEdgeState = isActive(latestAction)
 					? 'active'
 					: 'failed';

@@ -71,6 +71,7 @@ $action = $sim->dispatch($ship->getId(), ActionType::ScanRoute, [
 // Advance time
 $result = $sim->advance(3600);           // Advance 1 hour, process ready actions
 $result = $sim->processReady();          // Process without advancing
+$result = $sim->advanceToNextCheckpoint(); // Inspect the next scan cycle or jump leg
 $result = $sim->advanceUntilIdle();      // Jump clock until all actions resolve
 
 // Inspect
@@ -81,7 +82,7 @@ $action = $sim->findAction($actionId);   // Look up an action
 $sim->seedGraph('tests/_data/catalog/graph.json');  // Load star catalog
 ```
 
-`advanceUntilIdle()` is the workhorse for scenarios. It finds the next `deferred_until` timestamp among pending actions, jumps the clock to it, processes, and repeats until nothing is pending. A multi-step scan-and-jump resolves in one call.
+`advanceUntilIdle()` finds the next `deferred_until` among pending and waiting running actions, advances to it, and repeats until no scheduled work remains. It completes all phases of each dispatched action. Dispatch subsequent scan or jump actions separately. Use `advanceToNextCheckpoint()` to inspect discoveries and ship positions between phases; overdue checkpoints still use the shared processor’s catch-up behavior.
 
 ## CLI Commands
 
@@ -203,6 +204,77 @@ Ships are created at the specified `node` (default 1). The navigation graph is l
 
 ## Testing
 
+### Codeception simulation module
+
+`Tests\Support\Helper\Simulation` is enabled in the Wpunit suite. Extend
+`WPTestCase` imported with `use lucatume\WPBrowser\TestCase\WPTestCase;`
+and access its methods through `$this->tester`.
+The module installs the in-memory repositories, seeds products, freezes time,
+and records events through a fake dispatcher. It restores the previous service
+instances and clock after the test. Origin configuration uses WordPress options
+and is cleaned up by WPLoader's test transaction.
+
+```php
+$this->tester->haveSimulation('exploration-seed');
+$this->tester->haveSimulationNode(0.0);
+$this->tester->haveSimulationNode(20.0);
+// A test-only range override makes a long, multi-waypoint corridor scannable.
+$this->tester->haveSimulationProduct('vrs_mk1', ['range' => 30.0]);
+$this->tester->haveSimulationRolls(...array_fill(0, 50, 0.0));
+$ship = $this->tester->haveSimulationShip('Explorer');
+$scan = $this->tester->dispatchSimulationAction(
+    $ship->getId(),
+    ActionType::ScanRoute,
+    ['target_node_id' => 2],
+);
+$this->tester->advanceSimulationToNextCheckpoint();
+$scan = $this->tester->grabSimulationAction($scan->id);
+$this->tester->advanceSimulationUntilIdle();
+$scan = $this->tester->grabSimulationAction($scan->id);
+$path = $scan->result['path'];
+$jump = $this->tester->dispatchSimulationAction(
+    $ship->getId(),
+    ActionType::Jump,
+    [
+        'from_node_id' => $path[0],
+        'target_node_id' => $path[count($path) - 1],
+        'route' => $scan->result['discovered_edge_ids'],
+    ],
+);
+$this->tester->advanceSimulationToNextCheckpoint();
+$ship = $this->tester->grabSimulationShip($ship->getId());
+$this->tester->setSimulationCoreLife($ship->getId(), 0);
+```
+
+`advanceSimulation($seconds)` advances an explicit interval;
+`processSimulationReadyActions()` processes work at the current clock.
+`grabSimulationNode($id)` retrieves a generated waypoint.
+
+Navigation consumes the `RandomSource` interface. Production binds
+`NativeRandomSource`; simulation binds `SimulationRandomSource`, whose seeded
+sequence is independent of PHP's global random state. `haveSimulationRolls()`
+replaces the next scripted rolls; seeded rolls resume when the script is consumed.
+
+Rebuild actor methods after changing the module: `slic cc build`.
+
+### ExplorationTest
+
+`tests/Wpunit/Simulation/ExplorationTest.php` exercises generated routes through
+real scan and jump handlers. It verifies incremental public discoveries, private
+scan state, owner-specific edges, waypoint reuse, per-leg position and core costs,
+partial scans followed by further exploration, overdue processing, reverse
+routes, and failure at the last reached waypoint when the core is depleted.
+Continuation rolls are scripted; waypoint generation and route validation are real.
+Completed and failed scans retain private runtime state for debugging, including
+the last resolved cycle and continuation decision. Terminal action status prevents
+that history from being used to resume execution. Runtime state remains excluded
+from REST resources and broadcasts.
+The long-distance fixture raises sensor range without changing the production catalog.
+
+```bash
+slic run Wpunit Simulation
+```
+
 ### SimulationTest
 
 End-to-end tests that prove the game loop works without database I/O. Located at `tests/Wpunit/Simulation/SimulationTest.php`.
@@ -213,7 +285,7 @@ slic run "Wpunit --filter SimulationTest"
 
 Covers: ship creation, default loadout, starting position, power state, ship rebuild, scan route dispatch and resolution, time advancement, `advanceUntilIdle`, multi-step scan-then-jump, graph seeding.
 
-Each test boots `Simulation\Provider`, freezes time, seeds a minimal 2-node graph, and runs through the `Simulation` class. No database writes, no WordPress posts.
+Each test uses `haveSimulation()`, seeds a minimal two-node graph, and runs through the `Simulation` class. Game entities use in-memory repositories; no ship posts are created.
 
 ### ContractTest
 

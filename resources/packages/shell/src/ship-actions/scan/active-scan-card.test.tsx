@@ -36,26 +36,44 @@ describe('ActiveScanCard', () => {
 		expect(screen.getByText(/Tau Ceti/)).toBeInTheDocument();
 	});
 
-	it('renders waypoint count when result has summary data', () => {
+	it('renders waypoint count from public discoveries', () => {
 		const action: ShipAction<'scan_route'> = {
 			...baseAction,
 			result: {
-				from_node_id: 1,
-				to_node_id: 7,
-				skill: 50,
-				efficiency: 60,
-				duration: 3600,
-				success: true,
-				complete: false,
 				discovered_edge_ids: [],
 				discovered_node_ids: [1, 2],
-				edges_discovered: 0,
-				waypoints_created: 1,
 				path: [1, 2],
+				phases: [],
 			},
 		};
 		render(<ActiveScanCard action={action} targetName={TARGET_NAME} />);
 		expect(screen.getByText('1')).toBeInTheDocument();
+	});
+
+	it('updates the waypoint count from discoveries while still running', () => {
+		const action: ShipAction<'scan_route'> = {
+			...baseAction,
+			result: {
+				path: [1, 2],
+				discovered_node_ids: [2],
+				discovered_edge_ids: [10],
+				phases: [],
+			},
+		};
+		const { rerender } = render(
+			<ActiveScanCard action={action} targetName={TARGET_NAME} />
+		);
+		expect(screen.getByText('1')).toBeInTheDocument();
+		rerender(
+			<ActiveScanCard
+				action={{
+					...action,
+					result: { ...action.result, discovered_node_ids: [2, 3] },
+				}}
+				targetName={TARGET_NAME}
+			/>
+		);
+		expect(screen.getByText('2')).toBeInTheDocument();
 	});
 
 	it('renders countdown when deferred_until is set', () => {
@@ -64,25 +82,16 @@ describe('ActiveScanCard', () => {
 			deferred_until: new Date(Date.now() + 1000 * 60 * 30).toISOString(),
 		};
 		render(<ActiveScanCard action={action} targetName={TARGET_NAME} />);
-		expect(screen.getByText(/Remaining/)).toBeInTheDocument();
+		expect(screen.getByText(/Next update/)).toBeInTheDocument();
 	});
 
-	it('calculates progress from duration and deferred_until', () => {
+	it('does not imply total scan progress from a checkpoint', () => {
 		const action: ShipAction<'scan_route'> = {
 			...baseAction,
 			deferred_until: '2026-02-16T12:30:00Z',
-			result: {
-				from_node_id: 1,
-				to_node_id: 7,
-				skill: 50,
-				efficiency: 60,
-				duration: 3600,
-			},
+			result: {},
 		};
 		render(<ActiveScanCard action={action} targetName={TARGET_NAME} />);
-		expect(screen.getByRole('progressbar')).toHaveAttribute(
-			'aria-valuenow',
-			'50'
-		);
+		expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
 	});
 });

@@ -36,6 +36,11 @@ tasks. Completed tasks are archived in `.plans/tasks/.archive/`.
 -   [nav-28-base-jumps-on-start-time](tasks/nav-28-base-jumps-on-start-time.md) - Base jump progress on start time. `navigation` `p1`
 -   [sec-01-address-security-audit-findings](tasks/sec-01-address-security-audit-findings.md) - Address security audit findings. `dev` `p1`
 -   [ship-01-add-ship-event-ledger](tasks/ship-01-add-ship-event-ledger.md) - Add a ship event ledger. `simulation` `p2`
+-   [ui-01-add-tests-for-interactive-components](tasks/ui-01-add-tests-for-interactive-components.md) - Add tests for interactive ui components. `ui` `p2`
+-   [ui-02-decide-fate-of-unused-exports](tasks/ui-02-decide-fate-of-unused-exports.md) - Decide fate of unused ui exports. `ui` `p2`
+-   [ui-03-add-log-card-failed-treatment](tasks/ui-03-add-log-card-failed-treatment.md) - Add failed visual treatment to LogCard. `ui` `p2`
+-   [ui-04-add-spacing-scale-to-tokens](tasks/ui-04-add-spacing-scale-to-tokens.md) - Add a spacing scale to ui tokens. `ui` `p3`
+-   [ui-05-clean-up-ui-package-cruft](tasks/ui-05-clean-up-ui-package-cruft.md) - Clean up ui package cruft. `ui` `p3`
 
 ## Ideas
 

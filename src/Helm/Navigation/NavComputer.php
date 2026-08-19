@@ -40,6 +40,7 @@ final class NavComputer
         private readonly NodeGenerator $generator,
         private readonly Contracts\NodeRepository $nodeRepository,
         private readonly Contracts\EdgeRepository $edgeRepository,
+        private readonly Contracts\RandomSource $randomSource,
     ) {
     }
 
@@ -273,10 +274,10 @@ final class NavComputer
     /**
      * Generate a random float 0.0-1.0.
      *
-     * Separated for testing (can be mocked).
+     * Simulations may inject a repeatable random source.
      */
     protected function random(): float
     {
-        return mt_rand() / mt_getrandmax();
+        return $this->randomSource->next();
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Helm\ShipLink\Actions\ScanRoute;
 
+use Helm\Core\ErrorCode;
 use Helm\Lib\Date;
 use Helm\Navigation\Contracts\UserEdgeRepository;
 use Helm\Navigation\NavigationService;
@@ -13,13 +14,14 @@ use Helm\ShipLink\Models\Action;
 use Helm\ShipLink\Ship;
 
 /**
- * Resolves route scan actions one checkpoint at a time.
+ * Resolves route scan actions one cycle at a time.
+ *
+ * Private progress lives in the action's runtime state. Each cycle is
+ * resolved against live ship stats when its checkpoint is processed.
+ * Discoveries accumulate publicly while continuation bookkeeping stays private.
  */
 final class Resolver implements ActionHandler
 {
-    private const DEFAULT_SCAN_CYCLE_SECONDS = 300;
-    private const DEFAULT_MAX_SCAN_PHASES = 50;
-
     public function __construct(
         private readonly NavigationService $navigationService,
         private readonly UserEdgeRepository $userEdgeRepository,
@@ -28,216 +30,154 @@ final class Resolver implements ActionHandler
 
     public function handle(Action $action, Ship $ship): void
     {
-        $result = $action->result ?? [];
-        $phases = $this->phases($result);
-        $phaseNumber = count($phases) + 1;
-
-        if ($this->hasReachedPhaseLimit($result, $phaseNumber)) {
-            $this->finishAtPhaseLimit($action, $result);
+        if ($action->status->isFinalState()) {
             return;
         }
 
-        $originalFromNodeId = (int) ($result['from_node_id'] ?? $ship->navigation()->getCurrentPosition());
-        $fromNodeId = $this->currentScanSource($result, $originalFromNodeId);
-        $toNodeId = (int) ($result['to_node_id'] ?? $action->get('target_node_id'));
-        $skill = (float) ($result['skill'] ?? $ship->navigation()->getSkill());
-        $efficiency = (float) ($result['efficiency'] ?? $ship->navigation()->getEfficiency());
+        $fromNodeId = $action->get('from_node_id');
+        $targetNodeId = $action->get('target_node_id');
+        $currentNodeId = $ship->navigation()->getCurrentPosition();
+
+        if (
+            $fromNodeId === null
+            || $targetNodeId === null
+            || $action->runtime_state === null
+            || $currentNodeId !== (int) $fromNodeId
+        ) {
+            $action->fail(ErrorCode::ActionFailed->error(
+                __('Route scan no longer matches ship state', 'helm')
+            ));
+            return;
+        }
+
+        $fromNodeId = (int) $fromNodeId;
+        $targetNodeId = (int) $targetNodeId;
+        $state = RuntimeState::fromArray($action->runtime_state);
+
+        if ($state->hasExceededMaxCycles()) {
+            $this->finishIncomplete($action, $fromNodeId);
+            return;
+        }
+
+        $scanSource = $state->currentNodeId ?? $fromNodeId;
+
+        // Live stats each cycle: mid-scan changes affect remaining cycles
+        $skill = $ship->navigation()->getSkill();
+        $efficiency = $ship->navigation()->getEfficiency();
 
         $scanPhase = $this->navigationService->scanNextHop(
-            fromNodeId: $fromNodeId,
-            toNodeId: $toNodeId,
+            fromNodeId: $scanSource,
+            toNodeId: $targetNodeId,
             skill: $skill,
             efficiency: $efficiency,
-            rollFirstHop: $phaseNumber === 1,
+            rollFirstHop: $state->depth === 0,
         );
 
-        if ($scanPhase->failed || $scanPhase->edge === null || $scanPhase->node === null) {
-            $phase = [
-                'phase_number' => $phaseNumber,
-                'from_node_id' => $fromNodeId,
-                'target_node_id' => $toNodeId,
-                'outcome' => 'failed',
-                'complete' => false,
-                'completed_at' => Date::nowString(),
-            ];
+        $record = [
+            'cycle_index' => $state->cycleIndex,
+            'resolved_at' => Date::nowString(),
+            'from_node_id' => $scanSource,
+            'target_node_id' => $targetNodeId,
+            'skill' => $skill,
+            'efficiency' => $efficiency,
+        ];
 
-            $phases[] = $phase;
-            $result['phases'] = $phases;
-            $this->updateSummary($result, success: false, complete: false);
-            $action->fulfill($result);
+        if ($scanPhase->failed || $scanPhase->edge === null || $scanPhase->node === null) {
+            $record['outcome'] = 'no_discovery';
+            $this->continueScan($action, $state->withRecordedCycle($record), $fromNodeId);
             return;
         }
 
         $this->userEdgeRepository->upsert($ship->getOwnerId(), $scanPhase->edge->id);
 
-        $phase = [
-            'phase_number' => $phaseNumber,
-            'from_node_id' => $fromNodeId,
-            'target_node_id' => $toNodeId,
+        $result = $action->result ?? $this->emptyResult($fromNodeId);
+        $revisited = in_array($scanPhase->node->id, $result['path'], true);
+        $result['path'][] = $scanPhase->node->id;
+        $result['phases'][] = [
+            'from_node_id' => $scanSource,
+            'target_node_id' => $targetNodeId,
             'discovered_node_id' => $scanPhase->node->id,
             'discovered_edge_id' => $scanPhase->edge->id,
-            'hop_depth' => $phaseNumber,
-            'outcome' => $scanPhase->complete ? 'complete' : 'waypoint',
-            'complete' => $scanPhase->complete,
-            'completed_at' => Date::nowString(),
         ];
-
-        $path = $this->intList($result['path'] ?? []);
-        $edgeIds = $this->intList($result['discovered_edge_ids'] ?? []);
-        $nodeIds = $this->intList($result['discovered_node_ids'] ?? []);
-
-        if (! $scanPhase->complete && in_array($scanPhase->node->id, $path, true)) {
-            $phase['outcome'] = 'cycle_detected';
-            $phase['continues'] = false;
-            $phases[] = $phase;
-            $result['phases'] = $phases;
-            $this->updateSummary($result, success: true, complete: false);
-            $action->result = $result;
-            $action->status = ActionStatus::Partial;
-            $action->processing_at = null;
-            return;
-        }
-
-        $path[] = $scanPhase->node->id;
-        $edgeIds[] = $scanPhase->edge->id;
-        $nodeIds[] = $scanPhase->node->id;
-
-        $result['path'] = $path;
-        $result['discovered_edge_ids'] = $edgeIds;
-        $result['discovered_node_ids'] = $nodeIds;
+        $result['discovered_edge_ids'] = array_values(array_unique([
+            ...$result['discovered_edge_ids'], $scanPhase->edge->id,
+        ]));
+        $result['discovered_node_ids'] = array_values(array_unique([
+            ...$result['discovered_node_ids'], $scanPhase->node->id,
+        ]));
+        $action->result = $result;
+        $record['discovered_node_id'] = $scanPhase->node->id;
+        $record['discovered_edge_id'] = $scanPhase->edge->id;
 
         if ($scanPhase->complete) {
-            $phases[] = $phase;
-            $result['phases'] = $phases;
-            $this->updateSummary($result, success: true, complete: true);
-            $action->fulfill($result);
+            $record['outcome'] = 'target_reached';
+            $action->runtime_state = $state->withDiscovery($scanPhase->node->id)->withRecordedCycle($record)->toArray();
+            $action->fulfill();
             return;
         }
 
+        if ($revisited) {
+            $record['outcome'] = 'revisited_node';
+            $action->runtime_state = $state->withRecordedCycle($record)->toArray();
+            $this->finishIncomplete($action, $fromNodeId);
+            return;
+        }
+
+        $state = $state->withDiscovery($scanPhase->node->id);
         $continuation = $this->navigationService->rollScanContinuation(
             fromNodeId: $scanPhase->node->id,
-            toNodeId: $toNodeId,
+            toNodeId: $targetNodeId,
             skill: $skill,
             efficiency: $efficiency,
-            hopIndex: $phaseNumber,
+            hopIndex: $state->depth,
         );
-
-        $phase['continuation_probability'] = $continuation['probability'];
-        $phase['continuation_roll'] = $continuation['roll'];
-        $phase['continues'] = $continuation['continues'];
-        $phases[] = $phase;
-        $result['phases'] = $phases;
+        $record['outcome'] = 'waypoint';
+        $record['continuation'] = $continuation;
+        $state = $state->withRecordedCycle($record);
+        $action->runtime_state = $state->toArray();
 
         if (! $continuation['continues']) {
-            $this->updateSummary($result, success: true, complete: false);
-            $action->result = $result;
-            $action->status = ActionStatus::Partial;
-            $action->processing_at = null;
+            $this->finishIncomplete($action, $fromNodeId);
             return;
         }
 
-        $this->updateSummary($result, success: true, complete: false);
-        $action->result = $result;
+        $this->continueScan($action, $state, $fromNodeId);
+    }
+
+    private function continueScan(Action $action, RuntimeState $state, int $origin): void
+    {
+        $action->runtime_state = $state->toArray();
+        $next = $state->nextCycle();
+        if ($next->hasExceededMaxCycles()) {
+            $this->finishIncomplete($action, $origin);
+            return;
+        }
+
+        $action->runtime_state = $next->toArray();
         $action->status = ActionStatus::Running;
-        $action->deferred_until = $this->checkpointAt($result, count($phases) + 1);
+        $action->deferred_until = $next->checkpointAt();
     }
 
-    /**
-     * @param array<string, mixed> $result
-     * @return array<int, array<string, mixed>>
-     */
-    private function phases(array $result): array
+    private function finishIncomplete(Action $action, int $origin): void
     {
-        return isset($result['phases']) && is_array($result['phases'])
-            ? array_values($result['phases'])
-            : [];
-    }
-
-    /**
-     * @param array<string, mixed> $result
-     */
-    private function currentScanSource(array $result, int $originalFromNodeId): int
-    {
-        $path = $this->intList($result['path'] ?? []);
-
-        return $path !== [] ? $path[array_key_last($path)] : $originalFromNodeId;
-    }
-
-    /**
-     * @param mixed $value
-     * @return int[]
-     */
-    private function intList(mixed $value): array
-    {
-        if (! is_array($value)) {
-            return [];
+        $result = $action->result ?? $this->emptyResult($origin);
+        if ($result['discovered_edge_ids'] !== []) {
+            $action->partial($result);
+        } else {
+            $action->fulfill($result);
         }
-
-        return array_values(array_map('intval', $value));
     }
 
     /**
-     * @param array<string, mixed> $result
+     * @return array{path: list<int>, phases: list<array<string, int>>, discovered_edge_ids: list<int>, discovered_node_ids: list<int>}
      */
-    private function hasReachedPhaseLimit(array $result, int $phaseNumber): bool
+    private function emptyResult(int $origin): array
     {
-        $maxPhases = (int) ($result['max_scan_phases'] ?? self::DEFAULT_MAX_SCAN_PHASES);
-
-        return $phaseNumber > max(1, $maxPhases);
-    }
-
-    /**
-     * @param array<string, mixed> $result
-     */
-    private function finishAtPhaseLimit(Action $action, array $result): void
-    {
-        $hasDiscoveries = $this->intList($result['discovered_edge_ids'] ?? []) !== [];
-        $result['phases'] = $this->phases($result);
-        $result['stopped_reason'] = 'phase_limit';
-        $this->updateSummary($result, success: $hasDiscoveries, complete: false);
-
-        $action->result = $result;
-        $action->status = $hasDiscoveries ? ActionStatus::Partial : ActionStatus::Fulfilled;
-        $action->processing_at = null;
-    }
-
-    /**
-     * @param array<string, mixed> $result
-     */
-    private function updateSummary(array &$result, bool $success, bool $complete): void
-    {
-        $edgeIds = $this->intList($result['discovered_edge_ids'] ?? []);
-        $nodeIds = $this->intList($result['discovered_node_ids'] ?? []);
-        $waypointCount = 0;
-
-        foreach ($result['phases'] ?? [] as $phase) {
-            if (! is_array($phase) || ($phase['outcome'] ?? null) !== 'waypoint') {
-                continue;
-            }
-
-            $waypointCount++;
-        }
-
-        $result['success'] = $success;
-        $result['complete'] = $complete;
-        $result['edges_discovered'] = count($edgeIds);
-        $result['waypoints_created'] = $waypointCount;
-        $result['path'] = $this->intList($result['path'] ?? []);
-        $result['discovered_edge_ids'] = $edgeIds;
-        $result['discovered_node_ids'] = $nodeIds;
-    }
-
-    /**
-     * @param array<string, mixed> $result
-     */
-    private function checkpointAt(array $result, int $phaseNumber): \DateTimeImmutable
-    {
-        $startedAt = isset($result['started_at']) && is_string($result['started_at'])
-            ? Date::fromString($result['started_at'])
-            : Date::now();
-        $cycleSeconds = (int) ($result['cycle_seconds'] ?? self::DEFAULT_SCAN_CYCLE_SECONDS);
-        $cycleSeconds = max(1, $cycleSeconds);
-
-        return Date::addSeconds($startedAt, $cycleSeconds * $phaseNumber);
+        return [
+            'path' => [$origin],
+            'phases' => [],
+            'discovered_edge_ids' => [],
+            'discovered_node_ids' => [],
+        ];
     }
 }

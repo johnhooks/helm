@@ -102,6 +102,23 @@ final class Simulation
     }
 
     /**
+     * Advance to the next scheduled checkpoint and process due work.
+     * Returns no work when the simulation has no scheduled actions.
+     */
+    public function advanceToNextCheckpoint(): ProcessingResult
+    {
+        $repository = $this->actionRepository;
+        assert($repository instanceof MemoryActionRepository);
+        $next = $repository->nextDeferredUntil();
+
+        if ($next === null) {
+            return new ProcessingResult(0, 0);
+        }
+
+        return $this->advance(max(0, $next->getTimestamp() - Date::now()->getTimestamp()));
+    }
+
+    /**
      * Advance clock until all pending actions have resolved.
      *
      * Loops: find next deferred timestamp, jump clock to it,
@@ -121,14 +138,7 @@ final class Simulation
                 break;
             }
 
-            // Advance clock to the deferred timestamp
-            $now = Date::now();
-            $delta = $next->getTimestamp() - $now->getTimestamp();
-            if ($delta > 0) {
-                Date::advanceTestNow($delta);
-            }
-
-            $result = $this->processor->processReady();
+            $result = $this->advanceToNextCheckpoint();
             $totalProcessed += $result->processed;
             $totalFailed += $result->failed;
 

@@ -32,6 +32,8 @@ final class Provider extends ServiceProvider
 {
     public function register(): void
     {
+        $this->container->singleton(\Helm\Navigation\Contracts\RandomSource::class, SimulationRandomSource::class);
+
         // Repositories
         $this->container->singleton(ShipStateRepository::class, MemoryShipStateRepository::class);
         $this->container->singleton(ActionRepository::class, MemoryActionRepository::class);

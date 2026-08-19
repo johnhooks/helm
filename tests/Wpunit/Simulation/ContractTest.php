@@ -6,15 +6,18 @@ namespace Tests\Wpunit\Simulation;
 
 use DateTimeImmutable;
 use Helm\Products\Contracts\ProductRepository;
-use lucatume\WPBrowser\TestCase\WPTestCase;
+use Tests\Support\WpunitTester;
 use Tests\Support\Helper\FixtureLoader;
 use Tests\Support\Helper\SystemBuilder;
+use lucatume\WPBrowser\TestCase\WPTestCase;
 
 /**
  * Contract tests driven by shared JSON fixtures.
  *
  * Each fixture case specifies state + loadout + expected values.
  * The same fixtures run in TypeScript (holodeck) to verify parity.
+ *
+ * @property WpunitTester $tester
  *
  * @covers \Helm\ShipLink\System\Power
  * @covers \Helm\ShipLink\System\Shields
@@ -25,13 +28,11 @@ class ContractTest extends WPTestCase
 {
     private SystemBuilder $builder;
 
-    public function set_up(): void
+    public function _before(): void
     {
-        parent::set_up();
+        parent::_before();
 
-        $provider = new \Helm\Simulation\Provider(helm()->getContainer());
-        $provider->register();
-        $provider->boot();
+        $this->tester->haveSimulation();
 
         $this->builder = new SystemBuilder(helm(ProductRepository::class));
     }

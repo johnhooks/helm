@@ -1,4 +1,5 @@
 import { __ } from '@wordpress/i18n';
+import type { ShipAction } from '@helm/actions';
 import type { NavNode, StarNode } from '@helm/types';
 import { getActionTitle } from '../utils';
 
@@ -16,4 +17,14 @@ export function getScanTargetName(node: StarNode | NavNode): string {
 	}
 
 	return `Node #${node.id}`;
+}
+
+export function getScanWaypointCount(
+	action: ShipAction<'scan_route'>
+): number | undefined {
+	const result = action.result;
+	const origin = action.params.from_node_id ?? action.params.source_node_id;
+	return result?.discovered_node_ids?.filter(
+		(id) => id !== origin && id !== action.params.target_node_id
+	).length;
 }

@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Wpunit\ShipLink\Actions\ScanRoute;
 
-use DateTimeImmutable;
-use Helm\Navigation\Contracts\NodeRepository;
+use Helm\Lib\Date;
 use Helm\ShipLink\Actions\ScanRoute\Handler;
 use Helm\ShipLink\ActionStatus;
 use Helm\ShipLink\ActionType;
@@ -23,7 +22,6 @@ class HandlerTest extends WPTestCase
 {
     private Handler $handler;
     private ShipFactory $shipFactory;
-    private NodeRepository $nodeRepository;
 
     public function _before(): void
     {
@@ -32,112 +30,72 @@ class HandlerTest extends WPTestCase
 
         $this->handler = new Handler();
         $this->shipFactory = helm(ShipFactory::class);
-        $this->nodeRepository = helm(NodeRepository::class);
+    }
+
+    public function _after(): void
+    {
+        Date::setTestNow(null);
+        parent::_after();
+    }
+
+    private function buildAction(int $shipPostId): Action
+    {
+        return new Action([
+            'ship_post_id' => $shipPostId,
+            'type' => ActionType::ScanRoute,
+            'params' => ['target_node_id' => 2, 'from_node_id' => 1],
+        ]);
     }
 
     public function test_sets_pending_status(): void
     {
-        $star1 = $this->tester->haveStar(['id' => 'SCAN_FROM', 'distanceLy' => 0.0]);
-        $star2 = $this->tester->haveStar(['id' => 'SCAN_TO', 'distanceLy' => 5.0]);
-
-        $node1 = $this->tester->getNodeForStar($star1);
-        $node2 = $this->tester->getNodeForStar($star2);
-
-        $shipPost = $this->tester->haveShip(['node_id' => $node1->id]);
+        $shipPost = $this->tester->haveShip();
         $ship = $this->shipFactory->build($shipPost->postId());
 
-        $action = new Action([
-            'ship_post_id' => $shipPost->postId(),
-            'type' => ActionType::ScanRoute,
-            'params' => ['target_node_id' => $node2->id],
-        ]);
-
+        $action = $this->buildAction($shipPost->postId());
         $this->handler->handle($action, $ship);
 
         $this->assertSame(ActionStatus::Pending, $action->status);
     }
 
-    public function test_sets_deferred_until_in_future(): void
-    {
-        $star1 = $this->tester->haveStar(['id' => 'DEFER_FROM', 'distanceLy' => 0.0]);
-        $star2 = $this->tester->haveStar(['id' => 'DEFER_TO', 'distanceLy' => 5.0]);
-
-        $node1 = $this->tester->getNodeForStar($star1);
-        $node2 = $this->tester->getNodeForStar($star2);
-
-        $shipPost = $this->tester->haveShip(['node_id' => $node1->id]);
-        $ship = $this->shipFactory->build($shipPost->postId());
-
-        $action = new Action([
-            'ship_post_id' => $shipPost->postId(),
-            'type' => ActionType::ScanRoute,
-            'params' => ['target_node_id' => $node2->id],
-        ]);
-
-        $before = new DateTimeImmutable();
-        $this->handler->handle($action, $ship);
-
-        $this->assertNotNull($action->deferred_until);
-        $this->assertGreaterThan($before, $action->deferred_until);
-    }
-
     public function test_first_scan_cycle_is_five_minutes(): void
     {
-        $star1 = $this->tester->haveStar(['id' => 'TIME_FROM', 'distanceLy' => 0.0]);
-        $star2 = $this->tester->haveStar(['id' => 'TIME_TO', 'distanceLy' => 5.0]);
+        Date::setTestNow('2026-04-01 00:00:00');
 
-        $node1 = $this->tester->getNodeForStar($star1);
-        $node2 = $this->tester->getNodeForStar($star2);
-
-        $shipPost = $this->tester->haveShip(['node_id' => $node1->id]);
+        $shipPost = $this->tester->haveShip();
         $ship = $this->shipFactory->build($shipPost->postId());
 
-        $action = new Action([
-            'ship_post_id' => $shipPost->postId(),
-            'type' => ActionType::ScanRoute,
-            'params' => ['target_node_id' => $node2->id],
-        ]);
-
-        $before = new DateTimeImmutable();
+        $action = $this->buildAction($shipPost->postId());
         $this->handler->handle($action, $ship);
 
-        $durationSeconds = $action->deferred_until->getTimestamp() - $before->getTimestamp();
-
-        $this->assertGreaterThanOrEqual(299, $durationSeconds);
-        $this->assertLessThanOrEqual(300, $durationSeconds);
+        $this->assertSame('2026-04-01 00:05:00', Date::toString($action->deferred_until));
     }
 
-    public function test_stores_calculated_values_in_result(): void
+    public function test_seeds_runtime_state_with_anchors_and_empty_history(): void
     {
-        $star1 = $this->tester->haveStar(['id' => 'CALC_FROM', 'distanceLy' => 0.0]);
-        $star2 = $this->tester->haveStar(['id' => 'CALC_TO', 'distanceLy' => 5.0]);
+        Date::setTestNow('2026-04-01 00:00:00');
 
-        $node1 = $this->tester->getNodeForStar($star1);
-        $node2 = $this->tester->getNodeForStar($star2);
-
-        $shipPost = $this->tester->haveShip(['node_id' => $node1->id]);
+        $shipPost = $this->tester->haveShip();
         $ship = $this->shipFactory->build($shipPost->postId());
 
-        $action = new Action([
-            'ship_post_id' => $shipPost->postId(),
-            'type' => ActionType::ScanRoute,
-            'params' => ['target_node_id' => $node2->id],
-        ]);
-
+        $action = $this->buildAction($shipPost->postId());
         $this->handler->handle($action, $ship);
 
-        $this->assertNotNull($action->result);
-        $this->assertArrayHasKey('from_node_id', $action->result);
-        $this->assertArrayHasKey('to_node_id', $action->result);
-        $this->assertArrayHasKey('skill', $action->result);
-        $this->assertArrayHasKey('efficiency', $action->result);
-        $this->assertArrayHasKey('duration', $action->result);
-        $this->assertArrayHasKey('started_at', $action->result);
-        $this->assertArrayHasKey('cycle_seconds', $action->result);
-        $this->assertArrayHasKey('max_scan_phases', $action->result);
-        $this->assertArrayHasKey('phases', $action->result);
+        $this->assertNotNull($action->runtime_state);
+        $this->assertSame(1, $action->runtime_state['cycle_index']);
+        $this->assertSame(300, $action->runtime_state['cycle_seconds']);
+        $this->assertSame('2026-04-01 00:00:00', $action->runtime_state['started_at']);
+        $this->assertSame([], $action->runtime_state['cycles']);
+    }
 
-        $this->assertSame($node1->id, $action->result['from_node_id']);
-        $this->assertSame($node2->id, $action->result['to_node_id']);
+    public function test_leaves_public_result_empty(): void
+    {
+        $shipPost = $this->tester->haveShip();
+        $ship = $this->shipFactory->build($shipPost->postId());
+
+        $action = $this->buildAction($shipPost->postId());
+        $this->handler->handle($action, $ship);
+
+        $this->assertNull($action->result);
     }
 }

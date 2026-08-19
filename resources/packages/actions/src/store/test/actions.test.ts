@@ -276,18 +276,10 @@ describe('receiveHeartbeat', () => {
 				type: 'scan_route',
 				status: 'fulfilled',
 				result: {
-					from_node_id: 1,
-					to_node_id: 3,
-					skill: 1,
-					efficiency: 1,
-					duration: 3600,
-					success: true,
-					complete: true,
 					discovered_edge_ids: [7],
 					discovered_node_ids: [2],
-					edges_discovered: 1,
-					waypoints_created: 1,
 					path: [1, 2, 3],
+					phases: [],
 				},
 			}),
 			createShipAction({
@@ -296,18 +288,10 @@ describe('receiveHeartbeat', () => {
 				type: 'scan_route',
 				status: 'partial',
 				result: {
-					from_node_id: 1,
-					to_node_id: 4,
-					skill: 1,
-					efficiency: 1,
-					duration: 3600,
-					success: true,
-					complete: false,
 					discovered_edge_ids: [8],
 					discovered_node_ids: [3],
-					edges_discovered: 1,
-					waypoints_created: 1,
 					path: [1, 2, 3],
+					phases: [],
 				},
 			}),
 		];
@@ -318,6 +302,26 @@ describe('receiveHeartbeat', () => {
 		expect(syncUserEdgesByIds).toHaveBeenCalledWith([7, 8]);
 	});
 
+	it.each(['running', 'failed'] as const)(
+		'syncs discoveries from a %s scan before terminal success',
+		async (status) => {
+			const action = createShipAction({
+				type: 'scan_route',
+				status,
+				result: {
+					discovered_edge_ids: [7, 8],
+					discovered_node_ids: [2, 3],
+					path: [1, 2, 3],
+					phases: [],
+				},
+			});
+
+			await receiveHeartbeat([action])({ dispatch, registry } as never);
+
+			expect(syncUserEdgesByIds).toHaveBeenCalledWith([7, 8]);
+		}
+	);
+
 	it('does not sync scan edges when terminal scan has no discovered ids', async () => {
 		const actions = [
 			createShipAction({
@@ -326,18 +330,10 @@ describe('receiveHeartbeat', () => {
 				type: 'scan_route',
 				status: 'fulfilled',
 				result: {
-					from_node_id: 1,
-					to_node_id: 3,
-					skill: 1,
-					efficiency: 1,
-					duration: 3600,
-					success: false,
-					complete: false,
 					discovered_edge_ids: [],
 					discovered_node_ids: [],
-					edges_discovered: 0,
-					waypoints_created: 0,
 					path: [],
+					phases: [],
 				},
 			}),
 		];

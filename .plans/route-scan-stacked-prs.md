@@ -43,7 +43,8 @@ Scope:
     from the public result.
 -   No-discovery cycles stay non-final and schedule the next checkpoint from
     the scan start anchor.
--   Terminal states write only public outcome data to `result`.
+-   Discovery checkpoints append public route data to `result` while the scan
+    can continue; terminal states retain accumulated discoveries.
 
 ### PR 3: Clean public route scan action contract
 

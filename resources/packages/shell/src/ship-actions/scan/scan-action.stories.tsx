@@ -24,12 +24,26 @@ const baseAction: ShipAction<'scan_route'> = {
 	params: {
 		target_node_id: 7,
 		source_node_id: 1,
+		from_node_id: 1,
 		distance_ly: 11.9,
 	},
 	result: null,
 	deferred_until: new Date(Date.now() + 1000 * 60 * 60).toISOString(),
 	created_at: new Date(Date.now() - 1000 * 60 * 10).toISOString(),
 	updated_at: new Date().toISOString(),
+};
+
+const firstDiscovery = {
+	from_node_id: 1,
+	target_node_id: 7,
+	discovered_node_id: 2,
+	discovered_edge_id: 1,
+};
+const finalDiscovery = {
+	from_node_id: 2,
+	target_node_id: 7,
+	discovered_node_id: 7,
+	discovered_edge_id: 2,
 };
 
 const baseDraft: DraftAction<'scan_route'> = {
@@ -80,11 +94,10 @@ export const Running: Story = {
 					...baseAction,
 					status: 'running',
 					result: {
-						from_node_id: 1,
-						to_node_id: 7,
-						skill: 50,
-						efficiency: 32,
-						duration: 3600,
+						path: [1, 2],
+						phases: [firstDiscovery],
+						discovered_edge_ids: [1],
+						discovered_node_ids: [2],
 					},
 				}}
 				targetName={TARGET_NAME}
@@ -101,18 +114,10 @@ export const Fulfilled: Story = {
 					...baseAction,
 					status: 'fulfilled',
 					result: {
-						from_node_id: 1,
-						to_node_id: 7,
-						skill: 50,
-						efficiency: 100,
-						duration: 3600,
-						success: true,
-						complete: true,
 						discovered_edge_ids: [1, 2],
-						discovered_node_ids: [1, 2, 3],
-						edges_discovered: 2,
-						waypoints_created: 1,
-						path: [1, 2, 3],
+						discovered_node_ids: [2, 7],
+						path: [1, 2, 7],
+						phases: [firstDiscovery, finalDiscovery],
 					},
 					deferred_until: null,
 				}}
@@ -130,18 +135,10 @@ export const Partial: Story = {
 					...baseAction,
 					status: 'partial',
 					result: {
-						from_node_id: 1,
-						to_node_id: 7,
-						skill: 50,
-						efficiency: 60,
-						duration: 3600,
-						success: true,
-						complete: false,
 						discovered_edge_ids: [1],
-						discovered_node_ids: [1, 2],
-						edges_discovered: 1,
-						waypoints_created: 1,
+						discovered_node_ids: [2],
 						path: [1, 2],
+						phases: [firstDiscovery],
 					},
 					deferred_until: null,
 				}}
@@ -159,11 +156,6 @@ export const Failed: Story = {
 					...baseAction,
 					status: 'failed',
 					result: {
-						from_node_id: 1,
-						to_node_id: 7,
-						skill: 50,
-						efficiency: 0,
-						duration: 3600,
 						error: {
 							code: 'helm.action.failed',
 							message: 'Signal lost',
