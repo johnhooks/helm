@@ -82,6 +82,7 @@
       "dependencies": {
         "@helm/actions": "workspace:*",
         "@helm/core": "workspace:*",
+        "@helm/live": "workspace:*",
         "@helm/logger": "workspace:*",
         "@helm/nav": "workspace:*",
         "@helm/shell": "workspace:*",

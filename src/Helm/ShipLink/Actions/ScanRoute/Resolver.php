@@ -34,15 +34,16 @@ final class Resolver implements ActionHandler
             return;
         }
 
-        $fromNodeId = $action->get('from_node_id');
-        $targetNodeId = $action->get('target_node_id');
+        $params = Params::fromArray($action->params);
+        $fromNodeId = $params->fromNodeId;
+        $targetNodeId = $params->targetNodeId;
         $currentNodeId = $ship->navigation()->getCurrentPosition();
 
         if (
             $fromNodeId === null
             || $targetNodeId === null
             || $action->runtime_state === null
-            || $currentNodeId !== (int) $fromNodeId
+            || $currentNodeId !== $fromNodeId
         ) {
             $action->fail(ErrorCode::ActionFailed->error(
                 __('Route scan no longer matches ship state', 'helm')
@@ -50,8 +51,6 @@ final class Resolver implements ActionHandler
             return;
         }
 
-        $fromNodeId = (int) $fromNodeId;
-        $targetNodeId = (int) $targetNodeId;
         $state = RuntimeState::fromArray($action->runtime_state);
 
         if ($state->hasExceededMaxCycles()) {
@@ -90,22 +89,22 @@ final class Resolver implements ActionHandler
 
         $this->userEdgeRepository->upsert($ship->getOwnerId(), $scanPhase->edge->id);
 
-        $result = $action->result ?? $this->emptyResult($fromNodeId);
-        $revisited = in_array($scanPhase->node->id, $result['path'], true);
-        $result['path'][] = $scanPhase->node->id;
-        $result['phases'][] = [
+        $result = $action->result === null ? new Result(path: [$fromNodeId]) : Result::fromArray($action->result);
+        $revisited = in_array($scanPhase->node->id, $result->path, true);
+        $result->path[] = $scanPhase->node->id;
+        $result->phases[] = [
             'from_node_id' => $scanSource,
             'target_node_id' => $targetNodeId,
             'discovered_node_id' => $scanPhase->node->id,
             'discovered_edge_id' => $scanPhase->edge->id,
         ];
-        $result['discovered_edge_ids'] = array_values(array_unique([
-            ...$result['discovered_edge_ids'], $scanPhase->edge->id,
+        $result->discoveredEdgeIds = array_values(array_unique([
+            ...$result->discoveredEdgeIds, $scanPhase->edge->id,
         ]));
-        $result['discovered_node_ids'] = array_values(array_unique([
-            ...$result['discovered_node_ids'], $scanPhase->node->id,
+        $result->discoveredNodeIds = array_values(array_unique([
+            ...$result->discoveredNodeIds, $scanPhase->node->id,
         ]));
-        $action->result = $result;
+        $action->result = $result->toArray();
         $record['discovered_node_id'] = $scanPhase->node->id;
         $record['discovered_edge_id'] = $scanPhase->edge->id;
 
@@ -160,24 +159,11 @@ final class Resolver implements ActionHandler
 
     private function finishIncomplete(Action $action, int $origin): void
     {
-        $result = $action->result ?? $this->emptyResult($origin);
-        if ($result['discovered_edge_ids'] !== []) {
-            $action->partial($result);
+        $result = $action->result === null ? new Result(path: [$origin]) : Result::fromArray($action->result);
+        if ($result->discoveredEdgeIds !== []) {
+            $action->partial($result->toArray());
         } else {
-            $action->fulfill($result);
+            $action->fulfill($result->toArray());
         }
-    }
-
-    /**
-     * @return array{path: list<int>, phases: list<array<string, int>>, discovered_edge_ids: list<int>, discovered_node_ids: list<int>}
-     */
-    private function emptyResult(int $origin): array
-    {
-        return [
-            'path' => [$origin],
-            'phases' => [],
-            'discovered_edge_ids' => [],
-            'discovered_node_ids' => [],
-        ];
     }
 }

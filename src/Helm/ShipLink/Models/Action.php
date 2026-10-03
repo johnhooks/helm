@@ -15,18 +15,20 @@ use Helm\StellarWP\Models\ModelPropertyDefinition;
 /**
  * Represents a ship action in the helm_ship_actions table.
  *
- * Actions track intent and lifecycle - from pending through completion.
+ * Params capture intent once; runtime state holds mutable execution bookkeeping;
+ * result collects public state during execution. Status determines finality.
+ * See docs/dev/ship-actions.md for the field contract.
  *
  * @property int|null $id
  * @property int $ship_post_id
  * @property ActionType $type
- * @property array<string, mixed> $params
- * @property ActionStatus $status
- * @property DateTimeImmutable|null $deferred_until
+ * @property array<string, mixed> $params Command and context; unchanged after initialization
+ * @property ActionStatus $status Lifecycle state; determines whether execution is final
+ * @property DateTimeImmutable|null $deferred_until Next processing checkpoint due time
  * @property DateTimeImmutable|null $processing_at Timestamp lock for concurrent workers
  * @property int $attempts Processing attempts (0 = never picked up, 1 = first attempt, etc.)
- * @property array<string, mixed>|null $result
- * @property array<string, mixed>|null $runtime_state Private progress for the running action; never client-facing
+ * @property array<string, mixed>|null $result Accumulated public state; available before and after completion
+ * @property array<string, mixed>|null $runtime_state Private execution bookkeeping and retained history; excluded from public resources
  * @property DateTimeImmutable $created_at
  * @property DateTimeImmutable $updated_at
  */
@@ -151,7 +153,7 @@ final class Action extends Model
     }
 
     /**
-     * Mark the action as partially completed.
+     * Finish the action with a partial outcome; this is a terminal state.
      *
      * If result is provided, it merges into the existing result.
      *

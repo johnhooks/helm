@@ -13,17 +13,34 @@ use Helm\Lib\Date;
  * Holds only anchors and history. Cycle outcomes are calculated at
  * checkpoint time against live ship state, never precomputed.
  * Retained after termination for debugging; action status controls execution.
+ *
+ * @phpstan-type ScanCycle array{cycle_index: int, resolved_at: string, from_node_id: int, target_node_id: int, skill: float, efficiency: float, outcome: 'no_discovery'|'waypoint'|'target_reached'|'revisited_node', discovered_node_id?: int, discovered_edge_id?: int, continuation?: array{probability: float, roll: float, continues: bool}}
  */
 final class RuntimeState
 {
     /**
-     * @param list<array<string, mixed>> $cycles
+     * @param list<ScanCycle> $cycles
      */
     public function __construct(
+        /**
+         * One-based checkpoint index; remains at the final attempt after termination.
+         */
         public readonly int $cycleIndex,
+        /**
+         * Seconds between scan checkpoints.
+         */
         public readonly int $cycleSeconds,
+        /**
+         * Maximum number of attempts.
+         */
         public readonly int $maxCycles,
+        /**
+         * Schedule anchor; late processing does not shift it.
+         */
         public readonly DateTimeImmutable $startedAt,
+        /**
+         * Private history of resolved attempts, discoveries, and continuation rolls.
+         */
         public readonly array $cycles = [],
         /**
          * Last discovered node to scan from; null means the original origin.
@@ -68,7 +85,7 @@ final class RuntimeState
     }
 
     /**
-     * @param array<string, mixed> $record
+     * @param ScanCycle $record
      */
     public function withRecordedCycle(array $record): self
     {
@@ -140,7 +157,7 @@ final class RuntimeState
     }
 
     /**
-     * @return list<array<string, mixed>>
+     * @return list<ScanCycle>
      */
     private static function cyclesFromArray(mixed $cycles): array
     {
@@ -151,6 +168,9 @@ final class RuntimeState
         $records = [];
         foreach ($cycles as $cycle) {
             if (is_array($cycle)) {
+                /**
+                 * @var ScanCycle $cycle
+                 */
                 $records[] = $cycle;
             }
         }

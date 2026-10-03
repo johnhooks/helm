@@ -22,9 +22,10 @@ final class Handler implements ActionHandler
 {
     public function handle(Action $action, Ship $ship): void
     {
-        $fromNodeId = (int) $action->get('from_node_id');
-        $targetNodeId = $action->get('target_node_id');
-        $route = $action->get('route');
+        $params = Params::fromArray($action->params);
+        $fromNodeId = $params->fromNodeId ?? 0;
+        $targetNodeId = $params->targetNodeId;
+        $route = $params->route;
 
         if (!is_array($route) || count($route) === 0 || $targetNodeId === null) {
             throw new ActionException(
@@ -33,7 +34,7 @@ final class Handler implements ActionHandler
             );
         }
 
-        $edges = $ship->navigation()->getRouteEdges($fromNodeId, (int) $targetNodeId, $this->routeEdgeIds($route));
+        $edges = $ship->navigation()->getRouteEdges($fromNodeId, $targetNodeId, $route);
         if (is_wp_error($edges) || $edges === []) {
             throw new ActionException(
                 ErrorCode::NavigationNoRoute,
@@ -46,14 +47,5 @@ final class Handler implements ActionHandler
 
         $action->status = ActionStatus::Pending;
         $action->deferred_until = $completesAt;
-    }
-
-    /**
-     * @param array<mixed> $route
-     * @return int[]
-     */
-    private function routeEdgeIds(array $route): array
-    {
-        return array_map('intval', $route);
     }
 }

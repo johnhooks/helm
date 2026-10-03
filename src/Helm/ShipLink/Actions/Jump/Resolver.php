@@ -17,16 +17,15 @@ use Helm\ShipLink\Ship;
  * Resolves jump actions.
  *
  * Executes jump work and builds action result data as progress happens.
- *
- * @phpstan-type JumpRoutePhase array{core_cost: float, core_before: int, remaining_core_life: int, completed_at: string}
  */
 final class Resolver implements ActionHandler
 {
     public function handle(Action $action, Ship $ship): void
     {
-        $fromNodeId = (int) $action->get('from_node_id');
-        $targetNodeId = $action->get('target_node_id');
-        $route = $action->get('route');
+        $params = Params::fromArray($action->params);
+        $fromNodeId = $params->fromNodeId ?? 0;
+        $targetNodeId = $params->targetNodeId;
+        $route = $params->route;
 
         if (!is_array($route) || count($route) === 0 || $targetNodeId === null) {
             throw new ActionException(
@@ -35,7 +34,7 @@ final class Resolver implements ActionHandler
             );
         }
 
-        $edges = $ship->navigation()->getRouteEdges($fromNodeId, (int) $targetNodeId, array_map('intval', $route));
+        $edges = $ship->navigation()->getRouteEdges($fromNodeId, $targetNodeId, $route);
         if (is_wp_error($edges)) {
             throw new ActionException(
                 ErrorCode::NavigationNoRoute,
@@ -54,15 +53,12 @@ final class Resolver implements ActionHandler
     private function handleRouteLeg(Action $action, Ship $ship, array $route): void
     {
         $phaseDueAt = $action->deferred_until ?? Date::now();
-        $result = $action->result ?? [];
-        /** @var array<int, JumpRoutePhase> $phases */
-        $phases = isset($result['phases']) && is_array($result['phases'])
-            ? array_values($result['phases'])
-            : [];
+        $result = Result::fromArray($action->result ?? []);
+        $phases = $result->phases ?? [];
         $phaseIndex = count($phases);
 
         if (!isset($route[$phaseIndex])) {
-            $action->fulfill($result);
+            $action->fulfill($result->toArray());
             return;
         }
 
@@ -102,11 +98,11 @@ final class Resolver implements ActionHandler
             'completed_at' => Date::nowString(),
         ];
 
-        $result['phases'] = $phases;
-        $result['current_node_id'] = $leg->toNodeId;
-        $result['remaining_core_life'] = $newCoreLife;
-        $result['core_before'] = $currentCoreLife;
-        $action->result = $result;
+        $result->phases = $phases;
+        $result->currentNodeId = $leg->toNodeId;
+        $result->remainingCoreLife = $newCoreLife;
+        $result->coreBefore = $currentCoreLife;
+        $action->result = $result->toArray();
 
         if ($leg->nextEdge === null) {
             $action->fulfill();
