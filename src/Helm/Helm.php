@@ -9,6 +9,7 @@ if (! defined('ABSPATH')) {
     exit;
 }
 
+use Helm\Abilities\Provider as AbilitiesProvider;
 use Helm\Admin\Provider as AdminProvider;
 use Helm\Anomalies\Provider as AnomaliesProvider;
 use Helm\Broadcasting\Provider as BroadcastingProvider;
@@ -57,6 +58,7 @@ final class Helm
      * @var class-string[]
      */
     private array $serviceProviders = [
+        AbilitiesProvider::class,
         CLIProvider::class,
         ConfigProvider::class,
         DatabaseProvider::class,
