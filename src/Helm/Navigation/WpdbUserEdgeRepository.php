@@ -209,6 +209,25 @@ final class WpdbUserEdgeRepository implements UserEdgeRepository
         return array_keys($found);
     }
 
+    /** @return list<UserEdge> */
+    public function fromNode(int $userId, int $nodeId): array
+    {
+        global $wpdb;
+        $rows = $wpdb->get_results($wpdb->prepare(
+            "SELECT ue.user_id, ue.edge_id, ue.discovered_at, e.node_a_id, e.node_b_id, e.distance
+            FROM %i ue
+            INNER JOIN %i e ON e.id = ue.edge_id
+            WHERE ue.user_id = %d AND (e.node_a_id = %d OR e.node_b_id = %d)
+            ORDER BY ue.discovered_at ASC, e.id ASC",
+            Schema::table(Schema::TABLE_USER_EDGE),
+            Schema::table(Schema::TABLE_NAV_EDGES),
+            $userId,
+            $nodeId,
+            $nodeId
+        ), ARRAY_A);
+        return array_map(static fn (array $row): UserEdge => UserEdge::fromRow($row), $rows);
+    }
+
     public function count(int $userId): int
     {
         global $wpdb;

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Wpunit\Navigation;
 
+use DateTimeImmutable;
 use Helm\Lib\Date;
 use Helm\Simulation\MemoryUserEdgeRepository;
 use Helm\Navigation\Contracts\EdgeRepository;
@@ -134,6 +135,26 @@ class UserEdgeRepositoryTest extends WPTestCase
                     $this->assertSame($before, $wpdb->num_queries);
                 }
             }
+        }
+    }
+
+    public function test_from_node_filters_player_and_endpoints_and_orders_like_frontend(): void
+    {
+        Date::setTestNow(new DateTimeImmutable('2026-01-01T00:00:00+00:00'));
+        $left = $this->nodeRepository->create(0, 0, 0)->id;
+        $center = $this->nodeRepository->create(1, 0, 0)->id;
+        $right = $this->nodeRepository->create(2, 0, 0)->id;
+        $a = $this->edgeRepository->create($left, $center, 1)->id;
+        $b = $this->edgeRepository->create($center, $right, 1)->id;
+        $unrelated = $this->edgeRepository->create($left, $right, 2)->id;
+        foreach ([$this->userEdgeRepository, new MemoryUserEdgeRepository($this->edgeRepository)] as $repository) {
+            $repository->upsert(43, $b);
+            $repository->upsert(42, $unrelated);
+            $repository->upsert(42, $b);
+            $repository->upsert(42, $a);
+            $this->assertSame([$a, $b], array_column($repository->fromNode(42, $center), 'edgeId'));
+            $this->assertSame([$b], array_column($repository->fromNode(43, $center), 'edgeId'));
+            $this->assertSame([], $repository->fromNode(44, $center));
         }
     }
 

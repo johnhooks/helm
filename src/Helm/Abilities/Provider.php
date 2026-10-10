@@ -10,6 +10,7 @@ use Helm\Abilities\Player\Jump;
 use Helm\Abilities\Player\ListKnownEdges;
 use Helm\Abilities\Player\ListScanTargets;
 use Helm\Abilities\Player\ListShips;
+use Helm\Abilities\Player\PlanRoute;
 use Helm\Abilities\Player\ScanRoute;
 use Helm\Abilities\System\GetProduct;
 use Helm\Abilities\System\InspectSystem;
@@ -26,6 +27,7 @@ final class Provider extends ServiceProvider
         InspectShip::class,
         ListScanTargets::class,
         ListKnownEdges::class,
+        PlanRoute::class,
         ScanRoute::class,
         Jump::class,
         GetAction::class,

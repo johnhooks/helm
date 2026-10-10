@@ -90,7 +90,7 @@ final class InspectSystem
         $id = (int) $input['node_id'];
         $node = $this->nodes->get($id);
         if ($node === null || ! $node->isSystem()) {
-            return ErrorCode::SystemNotFound->error('Star system not found. Use a system node_id from ship inspection or scan targets.', ['status' => ErrorCode::SystemNotFound->httpStatus(), 'node_id' => $id]);
+            return ErrorCode::SystemNotFound->error(__('Star system not found. Use a system node_id from ship inspection or scan targets.', 'helm'), ['status' => ErrorCode::SystemNotFound->httpStatus(), 'node_id' => $id]);
         }
         $links = $this->celestials->findByNodeIdAndType($id, CelestialType::Star);
         $stars = $this->stars->findByPostIds(array_map(static fn (Celestial $link): int => $link->contentId, $links));

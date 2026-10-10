@@ -55,7 +55,7 @@ final class GetAction
     public function canExecute(array $input): bool|WP_Error
     {
         if (! isset($input['action_id'])) {
-            return ErrorCode::InputActionIdRequired->error('action_id is required. Inspect your ship to find its current_action_id.', ['status' => ErrorCode::InputActionIdRequired->httpStatus()]);
+            return ErrorCode::InputActionIdRequired->error(__('action_id is required. Inspect your ship to find its current_action_id.', 'helm'), ['status' => ErrorCode::InputActionIdRequired->httpStatus()]);
         }
         /** @var WP_REST_Request<array<string, mixed>> $request */
         $request = new WP_REST_Request();

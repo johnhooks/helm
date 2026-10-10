@@ -87,6 +87,21 @@ final class MemoryUserEdgeRepository implements UserEdgeRepository
         return $found;
     }
 
+    /** @return list<UserEdge> */
+    public function fromNode(int $userId, int $nodeId): array
+    {
+        $ids = [];
+        foreach ($this->edgeRepository->fromNode($nodeId) as $edge) {
+            $ids[] = $edge->id;
+        }
+        $edges = $this->edgesFor($userId, $ids);
+        usort($edges, static function (UserEdge $a, UserEdge $b): int {
+            $byDiscovery = $a->discoveredAt <=> $b->discoveredAt;
+            return $byDiscovery !== 0 ? $byDiscovery : $a->edgeId <=> $b->edgeId;
+        });
+        return $edges;
+    }
+
     public function count(int $userId): int
     {
         return count($this->discoveries[$userId] ?? []);

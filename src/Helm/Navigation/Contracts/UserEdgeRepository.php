@@ -58,6 +58,13 @@ interface UserEdgeRepository
     public function nodesWithDiscoveredEdges(int $userId, array $nodeIds): array;
 
     /**
+     * Discovered edges touching one node, ordered by discovery time then edge ID.
+     *
+     * @return list<UserEdge>
+     */
+    public function fromNode(int $userId, int $nodeId): array;
+
+    /**
      * Total number of edges the user has discovered.
      */
     public function count(int $userId): int;

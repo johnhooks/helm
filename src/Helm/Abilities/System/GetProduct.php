@@ -76,7 +76,7 @@ final class GetProduct
         $id = (int) $input['product_id'];
         $product = $this->products->find($id);
         if ($product === null) {
-            return ErrorCode::ProductNotFound->error('Product not found. Use helm/list-products to find a catalog ID.', ['status' => ErrorCode::ProductNotFound->httpStatus(), 'product_id' => $id]);
+            return ErrorCode::ProductNotFound->error(__('Product not found. Use helm/list-products to find a catalog ID.', 'helm'), ['status' => ErrorCode::ProductNotFound->httpStatus(), 'product_id' => $id]);
         }
         return [
             'product_id' => $product->id,

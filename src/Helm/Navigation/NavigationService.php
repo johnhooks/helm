@@ -11,6 +11,8 @@ use Helm\Navigation\Contracts\EdgeRepository;
 use Helm\Navigation\Contracts\NodeRepository;
 use Helm\Navigation\Contracts\UserEdgeRepository;
 use Helm\Stars\StarRepository;
+use InvalidArgumentException;
+use WP_Error;
 
 /**
  * Graph operations for navigation.
@@ -20,6 +22,8 @@ use Helm\Stars\StarRepository;
  */
 class NavigationService
 {
+    public const MAX_PATH_EXPANSIONS = 1000;
+
     public function __construct(
         private readonly NavComputer $navComputer,
         private readonly NodeRepository $nodeRepository,
@@ -32,15 +36,96 @@ class NavigationService
     }
 
     /**
+     * Find the shortest player-discovered path without changing navigation state.
+     * Equal distances retain discovery/queue order, as in the frontend search.
+     * The expansion limit counts nodes whose adjacent edges are loaded.
+     */
+    public function findKnownPath(
+        int $userId,
+        int $fromNodeId,
+        int $targetNodeId,
+        int $maxExpansions = self::MAX_PATH_EXPANSIONS,
+    ): KnownPathResult|WP_Error {
+        if ($maxExpansions < 1 || $maxExpansions > self::MAX_PATH_EXPANSIONS) {
+            throw new InvalidArgumentException('Path expansion limit must be between 1 and ' . self::MAX_PATH_EXPANSIONS . '.');
+        }
+        if ($this->nodeRepository->get($fromNodeId) === null) {
+            return ErrorCode::NavigationInvalidNode->error(__('Origin node does not exist.', 'helm'), ['node_id' => $fromNodeId]);
+        }
+        if ($this->nodeRepository->get($targetNodeId) === null) {
+            return ErrorCode::NavigationInvalidTarget->error(__('Target node does not exist.', 'helm'), ['node_id' => $targetNodeId]);
+        }
+        if ($fromNodeId === $targetNodeId) {
+            return new KnownPathResult(true, false, [$fromNodeId], [], 0.0, null);
+        }
+
+        $distances = [$fromNodeId => 0.0];
+        $previous = [];
+        $visited = [];
+        $queue = [$fromNodeId => true];
+        // Cache both directions in encounter order, matching frontend adjacency.
+        $adjacency = [];
+        while ($queue !== []) {
+            $current = null;
+            $closest = INF;
+            foreach ($queue as $nodeId => $_) {
+                if ($distances[$nodeId] < $closest) {
+                    $current = $nodeId;
+                    $closest = $distances[$nodeId];
+                }
+            }
+            if ($current === null) {
+                break;
+            }
+            unset($queue[$current]);
+            if ($current === $targetNodeId) {
+                $nodeIds = [$current];
+                $edgeIds = [];
+                while ($current !== $fromNodeId) {
+                    $step = $previous[$current];
+                    array_unshift($edgeIds, $step['edge']);
+                    $current = $step['node'];
+                    array_unshift($nodeIds, $current);
+                }
+                return new KnownPathResult(true, count($edgeIds) === 1, $nodeIds, $edgeIds, $closest, $nodeIds[1]);
+            }
+            if (count($visited) >= $maxExpansions) {
+                return ErrorCode::NavigationSearchLimit->error(
+                    __('Path search reached its expansion limit; reachability is undetermined.', 'helm'),
+                    ['from_node_id' => $fromNodeId, 'target_node_id' => $targetNodeId, 'max_expansions' => $maxExpansions]
+                );
+            }
+            $visited[$current] = true;
+            foreach ($this->userEdgeRepository->fromNode($userId, $current) as $edge) {
+                $adjacency[$edge->nodeAId][$edge->edgeId] = ['node' => $edge->nodeBId, 'edge' => $edge->edgeId, 'distance' => $edge->distance];
+                $adjacency[$edge->nodeBId][$edge->edgeId] = ['node' => $edge->nodeAId, 'edge' => $edge->edgeId, 'distance' => $edge->distance];
+            }
+            foreach ($adjacency[$current] ?? [] as $neighbor) {
+                $next = $neighbor['node'];
+                if (isset($visited[$next])) {
+                    continue;
+                }
+                $distance = $closest + $neighbor['distance'];
+                if ($distance < ($distances[$next] ?? INF)) {
+                    $distances[$next] = $distance;
+                    $previous[$next] = ['node' => $current, 'edge' => $neighbor['edge']];
+                    $queue[$next] = true;
+                }
+            }
+        }
+        return new KnownPathResult(false, false, [], [], 0.0, null);
+    }
+
+    /**
      * Get edge information between two nodes.
      *
      * Validates that both nodes exist and are connected.
      *
      * @param int $fromNodeId Starting node
      * @param int $toNodeId Target node
-     * @return EdgeInfo|\WP_Error Edge info on success, error if invalid
+     * @return EdgeInfo|WP_Error Edge info on success, error if invalid
      */
-    public function getEdgeInfo(int $fromNodeId, int $toNodeId): EdgeInfo|\WP_Error
+    public function getEdgeInfo(int $fromNodeId, int $toNodeId): EdgeInfo|WP_Error
     {
         $fromNode = $this->nodeRepository->get($fromNodeId);
         if ($fromNode === null) {
@@ -71,7 +156,7 @@ class NavigationService
      *
      * @param list<UserEdge> $edges
      */
-    public function validateRouteEdges(int $fromNodeId, int $toNodeId, array $edges): bool|\WP_Error
+    public function validateRouteEdges(int $fromNodeId, int $toNodeId, array $edges): bool|WP_Error
     {
         if ($edges === []) {
             return ErrorCode::NavigationNoRoute->error(
@@ -109,9 +194,9 @@ class NavigationService
      * Load discovered route edges in submitted order.
      *
      * @param int[] $route
-     * @return list<UserEdge>|\WP_Error
+     * @return list<UserEdge>|WP_Error
      */
-    public function getRouteEdges(int $userId, array $route): array|\WP_Error
+    public function getRouteEdges(int $userId, array $route): array|WP_Error
     {
         $route = $this->normalizeRouteEdgeIds($route);
         if ($route === []) {
@@ -164,7 +249,7 @@ class NavigationService
      *
      * @param list<UserEdge> $route
      */
-    public function getRouteLeg(array $route, int $phaseIndex, int $currentNodeId): RouteLeg|\WP_Error
+    public function getRouteLeg(array $route, int $phaseIndex, int $currentNodeId): RouteLeg|WP_Error
     {
         $edge = $route[$phaseIndex] ?? null;
         if ($edge === null) {

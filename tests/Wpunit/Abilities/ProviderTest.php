@@ -11,7 +11,7 @@ class ProviderTest extends WPTestCase
 {
     public function test_registers_discoverable_abilities_with_correct_annotations(): void
     {
-        foreach (['list-ships', 'inspect-ship', 'list-scan-targets', 'list-known-edges', 'get-action', 'scan-route', 'jump', 'inspect-system', 'list-products', 'get-product'] as $name) {
+        foreach (['plan-route', 'list-ships', 'inspect-ship', 'list-scan-targets', 'list-known-edges', 'get-action', 'scan-route', 'jump', 'inspect-system', 'list-products', 'get-product'] as $name) {
             $ability = wp_get_ability('helm/' . $name);
             $this->assertNotNull($ability);
             $this->assertSame('helm', $ability->get_category());

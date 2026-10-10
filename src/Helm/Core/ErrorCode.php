@@ -39,6 +39,7 @@ enum ErrorCode: string
     case NavigationInvalidTarget = 'navigation.invalid_target';
     case NavigationMissingTarget = 'navigation.missing_target';
     case NavigationNoRoute = 'navigation.no_route';
+    case NavigationSearchLimit = 'navigation.search_limit';
     case NavigationRouteLost = 'navigation.route_lost';
     case NavigationAlreadyAtTarget = 'navigation.already_at_target';
     case NavigationBeyondRange = 'navigation.beyond_range';

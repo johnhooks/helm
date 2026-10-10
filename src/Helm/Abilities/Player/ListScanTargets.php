@@ -65,7 +65,7 @@ final class ListScanTargets
     public function canExecute(array $input): bool|WP_Error
     {
         if (! isset($input['ship_id'])) {
-            return ErrorCode::InputShipIdRequired->error('ship_id is required. Use helm/list-ships to find your ship ID.', ['status' => ErrorCode::InputShipIdRequired->httpStatus()]);
+            return ErrorCode::InputShipIdRequired->error(__('ship_id is required. Use helm/list-ships to find your ship ID.', 'helm'), ['status' => ErrorCode::InputShipIdRequired->httpStatus()]);
         }
         /** @var WP_REST_Request<array<string, mixed>> $request */
         $request = new WP_REST_Request();
