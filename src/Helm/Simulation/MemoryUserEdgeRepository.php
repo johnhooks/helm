@@ -8,6 +8,7 @@ use Helm\Lib\Date;
 use Helm\Navigation\Contracts\EdgeRepository;
 use Helm\Navigation\Contracts\UserEdgeRepository;
 use Helm\Navigation\UserEdge;
+use InvalidArgumentException;
 
 /**
  * In-memory per-player edge discovery repository for simulation.
@@ -42,6 +43,48 @@ final class MemoryUserEdgeRepository implements UserEdgeRepository
     public function getMany(int $userId, array $edgeIds): array
     {
         return $this->edgesFor($userId, $edgeIds);
+    }
+
+    /**
+     * @param int[] $targetNodeIds
+     * @return int[]
+     */
+    public function discoveredTargets(int $userId, int $fromNodeId, array $targetNodeIds): array
+    {
+        if (count($targetNodeIds) > self::MAX_NODE_IDS) {
+            throw new InvalidArgumentException(sprintf('Node lookup accepts at most %d IDs; received %d.', self::MAX_NODE_IDS, count($targetNodeIds)));
+        }
+
+        $discovered = [];
+        foreach (array_unique($targetNodeIds) as $targetId) {
+            $edge = $this->edgeRepository->getBetween($fromNodeId, $targetId);
+            if ($edge !== null && isset($this->discoveries[$userId][$edge->id])) {
+                $discovered[] = $targetId;
+            }
+        }
+        return $discovered;
+    }
+
+    /**
+     * @param int[] $nodeIds
+     * @return int[]
+     */
+    public function nodesWithDiscoveredEdges(int $userId, array $nodeIds): array
+    {
+        if (count($nodeIds) > self::MAX_NODE_IDS) {
+            throw new InvalidArgumentException(sprintf('Node lookup accepts at most %d IDs; received %d.', self::MAX_NODE_IDS, count($nodeIds)));
+        }
+
+        $found = [];
+        foreach (array_unique($nodeIds) as $nodeId) {
+            foreach ($this->edgeRepository->fromNode($nodeId) as $edge) {
+                if (isset($this->discoveries[$userId][$edge->id])) {
+                    $found[] = $nodeId;
+                    break;
+                }
+            }
+        }
+        return $found;
     }
 
     public function count(int $userId): int

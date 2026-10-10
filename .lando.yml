@@ -8,6 +8,8 @@ config:
 services:
   appserver:
     overrides:
+      ports:
+        - "127.0.0.1:6010:443"
       volumes:
         - ./tmp/wordpress:/app
         - .:/app/wp-content/plugins/helm
@@ -37,6 +39,12 @@ proxy:
     - pma.helm.lndo.site
 
 tooling:
+  mcp-setup:
+    service: appserver
+    description: Install the local MCP adapter and provision a player connection
+    cmd: bash /app/wp-content/plugins/helm/bin/setup-mcp-adapter.sh
+    dir: /app
+
   xdebug-on:
     service: appserver
     description: Enable Xdebug

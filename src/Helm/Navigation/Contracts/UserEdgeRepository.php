@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace Helm\Navigation\Contracts;
 
 use Helm\Navigation\UserEdge;
+use InvalidArgumentException;
 
 /**
  * Repository contract for per-player edge discoveries.
  */
 interface UserEdgeRepository
 {
+    public const MAX_NODE_IDS = 100;
+
     /**
      * Record that the user has discovered the given edge.
      *
@@ -33,6 +36,26 @@ interface UserEdgeRepository
      * @return UserEdge[]
      */
     public function getMany(int $userId, array $edgeIds): array;
+
+    /**
+     * Target nodes with a direct edge discovered by this user from the origin.
+     * Only the supplied targets are considered; edge direction does not matter.
+     *
+     * @throws InvalidArgumentException When more than MAX_NODE_IDS entries are supplied, including duplicates.
+     * @param int[] $targetNodeIds
+     * @return int[]
+     */
+    public function discoveredTargets(int $userId, int $fromNodeId, array $targetNodeIds): array;
+
+    /**
+     * Supplied nodes touched by any edge discovered by the user, regardless of origin.
+     * This does not establish reachability from a ship.
+     *
+     * @throws InvalidArgumentException When more than MAX_NODE_IDS entries are supplied, including duplicates.
+     * @param int[] $nodeIds
+     * @return int[]
+     */
+    public function nodesWithDiscoveredEdges(int $userId, array $nodeIds): array;
 
     /**
      * Total number of edges the user has discovered.

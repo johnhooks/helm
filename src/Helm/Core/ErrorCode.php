@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Helm\Core;
 
+use WP_Error;
+
 /**
  * Centralized error codes for the Helm system.
  *
@@ -14,6 +16,13 @@ namespace Helm\Core;
  */
 enum ErrorCode: string
 {
+    // Ability input errors
+    case InputShipIdRequired = 'input.ship_id_required';
+    case InputActionIdRequired = 'input.action_id_required';
+
+    // System catalog errors
+    case SystemNotFound = 'system.not_found';
+
     // Action errors
     case ActionNotFound = 'action.not_found';
     case ActionNotReady = 'action.not_ready';
@@ -81,9 +90,9 @@ enum ErrorCode: string
      * @param string $message Error message
      * @param mixed $data Optional additional data
      */
-    public function error(string $message, mixed $data = null): \WP_Error
+    public function error(string $message, mixed $data = null): WP_Error
     {
-        return new \WP_Error($this->code(), $message, $data);
+        return new WP_Error($this->code(), $message, $data);
     }
 
     /**
@@ -97,6 +106,7 @@ enum ErrorCode: string
             self::ActionNotFound,
             self::StarNotFound,
             self::NodeNotFound,
+            self::SystemNotFound,
             self::StationNotFound,
             self::AnomalyNotFound,
             self::ShipSystemsNotFound,
@@ -134,7 +144,7 @@ enum ErrorCode: string
     /**
      * Check if a WP_Error has this error code.
      */
-    public function matches(\WP_Error $error): bool
+    public function matches(WP_Error $error): bool
     {
         return $error->get_error_code() === $this->code();
     }

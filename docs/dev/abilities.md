@@ -1,9 +1,27 @@
-# Player abilities
+# Game abilities
 
-Helm exposes player operations through the WordPress Abilities API (WordPress
+Helm exposes player operations and shared catalog reads through the WordPress Abilities API (WordPress
 6.9+). Each ability declares its inputs, outputs, permissions, and whether it
 changes state. These operations use the same action factory and public action
 serializer as the REST API. They operate on the running game's database.
+
+## Code structure
+
+Abilities are grouped by data scope under `src/Helm/Abilities`:
+
+- `Player/`: owned ships, player discoveries, and ship actions. Contains
+  `ListShips`, `InspectShip`, `ListScanTargets`, `ListKnownEdges`, `ScanRoute`,
+  `Jump`, and `GetAction`.
+- `System/`: star-system details and product catalog reads: `InspectSystem`,
+  `ListProducts`, and `GetProduct`. This is a
+  data scope, not an administrator permission level.
+- `Support/`: shared collection/action schemas and action submission diagnostics.
+- `Provider.php` and `McpServer.php`: registration and optional MCP transport.
+
+Each ability defines `register()`, `canExecute()`, and `execute()`, and receives
+only the services it uses. Add new abilities to the Provider's registration list
+and the MCP server's explicit tool list when exposing them over MCP. Game rules
+remain in existing services. Classes are imported with `use` declarations.
 
 ## Available operations
 
@@ -16,6 +34,9 @@ serializer as the REST API. They operate on the running game's database.
 | `helm/scan-route`        | `ship_id`, `target_node_id`                          | Queued scan action                                            |
 | `helm/jump`              | `ship_id`, `from_node_id`, `target_node_id`, `route` | Queued jump along ordered discovered edge IDs                 |
 | `helm/get-action`        | `action_id`                                          | Public action status, progress, and next checkpoint           |
+| `helm/inspect-system` | `node_id` | Published stars linked to a system: catalog IDs, spectral types, distance from Sol, physical properties, confirmed planet counts |
+| `helm/list-products` | Optional `type`, `page`, `per_page` | Component blueprint summaries, including all versions |
+| `helm/get-product` | `product_id` | Exact blueprint version and raw component stats |
 
 Pages default to 20 items and are limited to 100. Collection results include
 `total`, `page`, and `has_more`. Read all known-edge pages when planning a route.
@@ -25,8 +46,42 @@ discovery, route continuity, and normal gameplay constraints on submission.
 
 Ship and action access requires ownership, including for administrators. No
 ability accepts a caller-supplied owner. Scan targets expose star names and
-distances, not global route discovery information. Action output excludes
+distances, and `has_discovered_route`: whether this player has discovered a direct
+edge from the current node to that target. The flag does not mean indirectly
+reachable or previously scanned. It is fetched in one query limited to the
+current page of target IDs; empty pages skip that lookup. Global route discovery
+information is not exposed. `has_any_discovered_route` indicates whether any edge
+this player has discovered touches the target. It includes disconnected graph
+components and does not guarantee a path from the ship. It uses one additional
+query restricted to the current page of target IDs, skipped for empty pages.
+Both repository lookups reject more than 100 input IDs with an
+`InvalidArgumentException` before querying. Duplicates count toward the limit;
+the scan-target page schema uses that same repository limit. Action output excludes
 private runtime history, random rolls, and future outcomes.
+
+System abilities require a logged-in player but no ship ownership. System
+inspection accepts the node IDs returned by ship inspection or scan targets;
+it reads published catalog stars, not route discoveries or generated planets.
+Missing physical values are `null`, and distances are measured from Sol.
+
+Products describe blueprints, not inventory, stock, prices, or effective ship
+performance. Catalog types are `core`, `drive`, `sensor`, `shield`, and `nav`.
+`list-products` sorts by ID and includes old versions. It currently reads the
+matching catalog through the existing repository, then paginates in memory;
+it does not introduce a repository pagination method. `get-product` describes
+the type-dependent meanings of the raw stat columns in its tool description.
+
+From the plugin directory inside the WordPress environment:
+
+```bash
+wp --user=admin eval-file bin/run-ability.php helm/inspect-system '{"node_id":21}'
+wp --user=admin eval-file bin/run-ability.php helm/list-products '{"type":"sensor"}'
+wp --user=admin eval-file bin/run-ability.php helm/get-product '{"product_id":1}'
+```
+
+Use IDs from your installation. Tests mirror `Player/` and `System/`, with one
+class per ability. Each test class composes its own fixtures with existing Helm
+helpers; there is no shared, fixed ability scenario.
 
 ## Local harness
 
@@ -86,11 +141,60 @@ Use WordPress REST authentication, such as an application password for the
 player's account over HTTPS. The transport authenticates the user; ability
 permissions still enforce ownership.
 
-The abilities also set `meta.public` and `meta.mcp.public` for discovery through
-the official WordPress MCP Adapter when that plugin is installed and configured.
-Helm does not install the adapter, provision credentials, or connect an AI client.
-The local harness and REST API work without it. Public discovery metadata does
-not grant anonymous execution access.
+## Local MCP server (Lando)
+
+```bash
+lando rebuild -y         # once after pulling the port/tooling changes
+lando mcp-setup admin    # optional argument: WordPress player login
+```
+
+`lando mcp-setup` runs `bin/setup-mcp-adapter.sh`. Setup installs the
+pinned official WordPress MCP Adapter **0.7.0**, activates it, enables
+`HELM_MCP_ENABLED`, and disables debug display (logging stays enabled) so PHP
+notices do not corrupt protocol responses. It requires `WP_ENVIRONMENT_TYPE=local`.
+Repeated setup retains a saved, unrevoked application password for that player.
+
+The dedicated server ID is `helm`, with ten directly discoverable tools.
+MCP names replace the ability slash with a hyphen, e.g. `helm-inspect-ship`.
+The endpoint is:
+
+```text
+https://helm.lndo.site:6010/?rest_route=/helm-mcp/v1/server
+```
+
+The query route works even when WordPress pretty permalinks are disabled.
+Lando publishes HTTPS on **127.0.0.1:6010**. This is a local development setup;
+the route is also reachable through Lando's normal site URL. The dedicated
+server registers only when the local environment and enable flag both match.
+The adapter also provides its own default server; this switch does not disable
+that plugin's independent routes.
+
+Credentials are stored in gitignored `tmp/mcp/connection.json` with mode 0600,
+inside a mode 0700 directory. They authenticate as the selected player, so ship
+ownership checks still apply, including to administrators. Application passwords
+carry that account's WordPress permissions; they are not scoped exclusively to
+Helm. Prefer a player account for agent experiments. Revoke the named
+`Helm local MCP harness` password in the user's WordPress profile when finished;
+rerunning setup then generates a replacement. Switching players creates another
+password; revoke the previous player's password separately if no longer needed.
+
+For an MCP-capable agent client, configure an HTTP MCP connection with the saved
+`url` and an `Authorization` header containing the saved `authorization` value.
+Trust the Lando CA (`~/.lando/certs/LandoCA.crt`) in that client's runtime.
+Keep credentials in local client configuration, never tracked project files.
+Helm execution failures preserve `isError: true`
+and include JSON diagnostic text containing error codes, messages, and error
+data. Action rejection data includes the ship, action type, parameters, and
+next-step guidance. The adapter's earlier permission failures remain ordinary
+MCP error text; HTTP authentication failures retain their HTTP response body.
+No stack traces or private scan outcomes are returned. The same tools can support
+a future model-driven autopilot;
+this setup does not add an autonomous decision loop.
+
+To stop the dedicated server, set `HELM_MCP_ENABLED` to false in local wp-config.
+Deactivate `mcp-adapter` to stop all adapter servers. Remove the Lando port mapping
+and rebuild if the dedicated port is no longer wanted. The direct WP-CLI harness
+and Abilities REST routes work independently of the MCP plugin.
 
 See the [Abilities API PHP reference](https://developer.wordpress.org/apis/abilities-api/php-reference/)
 and [MCP Adapter](https://github.com/WordPress/mcp-adapter).

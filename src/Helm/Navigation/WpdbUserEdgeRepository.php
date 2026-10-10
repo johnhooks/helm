@@ -8,6 +8,7 @@ use DateTimeImmutable;
 use Helm\Database\Schema;
 use Helm\Lib\Date;
 use Helm\Navigation\Contracts\UserEdgeRepository;
+use InvalidArgumentException;
 
 /**
  * Per-player edge discovery repository backed by wpdb.
@@ -132,6 +133,80 @@ final class WpdbUserEdgeRepository implements UserEdgeRepository
         wp_cache_set($cacheKey, $edges, self::CACHE_GROUP);
 
         return $edges;
+    }
+
+    /**
+     * @param int[] $targetNodeIds
+     * @return int[]
+     */
+    public function discoveredTargets(int $userId, int $fromNodeId, array $targetNodeIds): array
+    {
+        if (count($targetNodeIds) > self::MAX_NODE_IDS) {
+            throw new InvalidArgumentException(sprintf('Node lookup accepts at most %d IDs; received %d.', self::MAX_NODE_IDS, count($targetNodeIds)));
+        }
+
+        if ($targetNodeIds === []) {
+            return [];
+        }
+
+        global $wpdb;
+        $placeholders = implode(',', array_fill(0, count($targetNodeIds), '%d'));
+        $ids = $wpdb->get_col($wpdb->prepare(
+            "SELECT DISTINCT CASE WHEN e.node_a_id = %d THEN e.node_b_id ELSE e.node_a_id END
+            FROM %i ue
+            INNER JOIN %i e ON e.id = ue.edge_id
+            WHERE ue.user_id = %d AND (
+                (e.node_a_id = %d AND e.node_b_id IN ($placeholders)) OR
+                (e.node_b_id = %d AND e.node_a_id IN ($placeholders))
+            )",
+            ...[
+                $fromNodeId, Schema::table(Schema::TABLE_USER_EDGE), Schema::table(Schema::TABLE_NAV_EDGES),
+                $userId, $fromNodeId, ...$targetNodeIds, $fromNodeId, ...$targetNodeIds,
+            ]
+        ));
+
+        return array_map('intval', $ids);
+    }
+
+    /**
+     * @param int[] $nodeIds
+     * @return int[]
+     */
+    public function nodesWithDiscoveredEdges(int $userId, array $nodeIds): array
+    {
+        if (count($nodeIds) > self::MAX_NODE_IDS) {
+            throw new InvalidArgumentException(sprintf('Node lookup accepts at most %d IDs; received %d.', self::MAX_NODE_IDS, count($nodeIds)));
+        }
+
+        if ($nodeIds === []) {
+            return [];
+        }
+
+        global $wpdb;
+        $placeholders = implode(',', array_fill(0, count($nodeIds), '%d'));
+        $rows = $wpdb->get_results($wpdb->prepare(
+            "SELECT e.node_a_id, e.node_b_id
+            FROM %i ue
+            INNER JOIN %i e ON e.id = ue.edge_id
+            WHERE ue.user_id = %d
+                AND (e.node_a_id IN ($placeholders) OR e.node_b_id IN ($placeholders))",
+            ...[
+                Schema::table(Schema::TABLE_USER_EDGE), Schema::table(Schema::TABLE_NAV_EDGES),
+                $userId, ...$nodeIds, ...$nodeIds,
+            ]
+        ), ARRAY_A);
+
+        $requested = array_fill_keys($nodeIds, true);
+        $found = [];
+        foreach ($rows as $row) {
+            foreach (['node_a_id', 'node_b_id'] as $column) {
+                $id = (int) $row[$column];
+                if (isset($requested[$id])) {
+                    $found[$id] = true;
+                }
+            }
+        }
+        return array_keys($found);
     }
 
     public function count(int $userId): int
