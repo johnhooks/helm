@@ -36,6 +36,7 @@ tasks. Completed tasks are archived in `.plans/tasks/.archive/`.
 -   [nav-28-base-jumps-on-start-time](tasks/nav-28-base-jumps-on-start-time.md) - Base jump progress on start time. `navigation` `p1`
 -   [nav-29-add-player-route-planning-abilities](tasks/nav-29-add-player-route-planning-abilities.md) - Add player route planning abilities. `navigation` `p2`
 -   [nav-30-show-layered-scan-progress](tasks/nav-30-show-layered-scan-progress.md) - Show layered scan progress. `ui` `p2`
+-   [nav-31-add-accumulated-route-scan-work](tasks/nav-31-add-accumulated-route-scan-work.md) - Add accumulated work to route scans. `navigation` `p2`
 -   [sec-01-address-security-audit-findings](tasks/sec-01-address-security-audit-findings.md) - Address security audit findings. `dev` `p1`
 -   [ship-01-add-ship-event-ledger](tasks/ship-01-add-ship-event-ledger.md) - Add a ship event ledger. `simulation` `p2`
 -   [ui-01-add-tests-for-interactive-components](tasks/ui-01-add-tests-for-interactive-components.md) - Add tests for interactive ui components. `ui` `p2`
