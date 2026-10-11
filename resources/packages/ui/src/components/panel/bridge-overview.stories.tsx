@@ -17,7 +17,7 @@ import { SegmentedControl } from '../segmented-control';
  * ============================================================= */
 
 const meta = {
-	title: 'Compositions/Bridge Overview',
+	title: 'Design Explorations/Bridge/Overview',
 	component: Panel,
 	parameters: {
 		layout: 'fullscreen',

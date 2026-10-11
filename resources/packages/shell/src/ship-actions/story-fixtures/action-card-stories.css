@@ -1,0 +1,84 @@
+/* Story-only compositions; no changes to the application's action cards. */
+.ship-action-story {
+	color: var(--helm-ui-color-text);
+	font-family: var(--helm-ui-font-family);
+	font-size: 13px;
+}
+.ship-action-story .helm-log-card {
+	grid-template-columns: 6px minmax(0, 1fr);
+}
+.ship-action-story .helm-log-card__header {
+	display: grid;
+	grid-template-columns: 42px minmax(0, 1fr) 70px;
+	align-items: start;
+	min-height: 20px;
+}
+.ship-action-story .helm-log-card__status {
+	width: 70px;
+	margin-left: 0;
+	display: flex;
+	justify-content: flex-end;
+}
+.ship-action-story .helm-log-card__title {
+	min-width: 0;
+	overflow-wrap: anywhere;
+}
+.ship-action-story__stack {
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+}
+.ship-action-story p {
+	margin: 0;
+}
+.ship-action-story__caption {
+	color: var(--helm-ui-color-muted);
+	font-size: 10px;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+}
+.ship-action-story__headline {
+	padding-top: 5px;
+	font-size: 14px;
+	line-height: 1.5;
+	overflow-wrap: anywhere;
+}
+.ship-action-story__muted,
+.ship-action-story small {
+	color: var(--helm-ui-color-muted);
+	font-size: 11px;
+	line-height: 1.5;
+}
+.ship-action-story__metrics {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 8px;
+}
+.ship-action-story__search {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	color: var(--helm-ui-color-lilac);
+}
+.ship-action-story__search span {
+	width: 9px;
+	height: 9px;
+	border: 1px solid currentColor;
+	border-radius: 50%;
+}
+.ship-action-story__search span:last-child {
+	border-style: dashed;
+}
+.ship-action-story__search i {
+	flex: 1;
+	border-top: 1px dashed currentColor;
+	position: relative;
+}
+
+.ship-action-story__draft-actions {
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 8px;
+}

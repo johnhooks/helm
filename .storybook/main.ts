@@ -27,6 +27,8 @@ const config: StorybookConfig = {
         alias: {
           "@helm/ui": join(__dirname, "../resources/packages/ui/src"),
           "@helm/actions": join(__dirname, "../resources/packages/actions/src"),
+          "@helm/nav": join(__dirname, "../resources/packages/nav/src"),
+          "@helm/ships": join(__dirname, "../resources/packages/ships/src"),
           "@helm/shell": join(__dirname, "../resources/packages/shell/src"),
           "@helm/astrometric": join(__dirname, "../resources/packages/astrometric/src"),
           "@helm/errors": join(__dirname, "../resources/packages/errors/src"),

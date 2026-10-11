@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { LogCard, StatusBadge, Countdown, Button } from '@helm/ui';
 
 const meta = {
-	title: 'Bridge/ShipLog',
+	title: 'Design Explorations/Bridge/Ship Log',
 	component: LogCard,
 	parameters: {
 		layout: 'centered',
@@ -112,10 +112,10 @@ export const Active: Story = {
 				}
 			>
 				<Countdown
-					remaining={4320}
+					remaining={300}
 					tone="lilac"
 					active
-					label="ETA"
+					label="Next update"
 					size="sm"
 				/>
 			</LogCard>

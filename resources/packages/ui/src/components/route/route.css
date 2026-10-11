@@ -1,0 +1,349 @@
+/* =============================================================================
+   ROUTE
+   ============================================================================= */
+
+.helm-route {
+	/* One scale knob: the node box tracks the surrounding type scale within
+	   readable bounds, and every other dimension derives from it. */
+	--route-node-box-size: clamp(22px, 2em, 32px);
+	--route-node-glyph-size: calc(var(--route-node-box-size) * 0.43);
+	--route-leg-height: max(3px, calc(var(--route-node-box-size) / 7));
+	--route-leg-min-width: var(--route-node-box-size);
+	--route-leg-margin: 4px;
+	--route-glow-size: calc(var(--route-node-glyph-size) / 3);
+	--route-muted: var(--helm-ui-color-border, #2a2a2a);
+	--route-node-border: color-mix(
+		in srgb,
+		var(--helm-ui-color-muted, #a39a88) 40%,
+		var(--route-muted)
+	);
+	--route-surface: var(--helm-ui-color-surface, #141414);
+
+	display: flex;
+	align-items: center;
+	width: 100%;
+	min-width: 0;
+	padding: 0;
+	margin: 0;
+	font-family: var(--helm-ui-font-family);
+	list-style: none;
+}
+
+.helm-route--sm {
+	--route-node-box-size: clamp(18px, 1.6em, 24px);
+}
+
+.helm-route__step {
+	display: flex;
+	align-items: center;
+	flex: 1 1 0;
+	min-width: 0;
+}
+
+.helm-route__step:last-child {
+	flex: 0 0 auto;
+}
+
+/* Distance layout: each step's flex-basis covers its fixed parts (node box
+   plus leg margins), so the inline flex-grow from distanceLy distributes the
+   remaining space to the legs alone. Minimum leg width stays intact and nodes
+   can never run into each other. */
+.helm-route--distance .helm-route__step {
+	flex-basis: calc(var(--route-node-box-size) + var(--route-leg-margin) * 2);
+	flex-shrink: 0;
+}
+
+.helm-route--distance .helm-route__step:last-child {
+	flex-basis: auto;
+}
+
+.helm-route--distance .helm-route__leg {
+	flex: 1 1 0;
+	min-width: 0;
+}
+
+/* =============================================================================
+   NODES
+   ============================================================================= */
+
+.helm-route__node {
+	position: relative;
+	z-index: 1;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex: 0 0 var(--route-node-box-size);
+	width: var(--route-node-box-size);
+	height: var(--route-node-box-size);
+	padding: 0;
+	border: 1px solid var(--route-node-border);
+	border-radius: 50%;
+	background: color-mix(in srgb, var(--route-surface) 82%, transparent);
+	color: var(--route-node-border);
+	font: inherit;
+	cursor: default;
+	outline: none;
+	transform-origin: center;
+	transition:
+		border-color 0.16s ease,
+		box-shadow 0.16s ease,
+		opacity 0.16s ease,
+		transform 0.18s ease-out;
+}
+
+.helm-route__node-glyph {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: var(--route-node-glyph-size);
+	height: var(--route-node-glyph-size);
+	overflow: visible;
+	transform-origin: center;
+	transition:
+		transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1),
+		filter 0.16s ease;
+}
+
+/* Override StarGlyph size classes inside this normalized footprint. */
+.helm-route__node-glyph .helm-star-glyph {
+	width: var(--route-node-glyph-size);
+	height: var(--route-node-glyph-size);
+}
+
+/* Normalize stellar-type glows to the node footprint. The StarGlyph defaults
+   are sized for the star map and would swallow a route node. */
+.helm-route__node-glyph .helm-star-glyph--giant {
+	box-shadow: 0 0 var(--route-glow-size) 1px currentColor;
+}
+
+.helm-route__node-glyph .helm-star-glyph--whiteDwarf {
+	box-shadow: 0 0 var(--route-glow-size) 1px #f0f0ff;
+}
+
+.helm-route__node-glyph .helm-star-glyph--pulsar {
+	box-shadow: 0 0 var(--route-glow-size) 1px var(--helm-ui-color-violet);
+	animation-name: route-step-pulsar-glow;
+}
+
+@keyframes route-step-pulsar-glow {
+	0%,
+	100% {
+		box-shadow: 0 0 var(--route-glow-size) 1px var(--helm-ui-color-violet);
+	}
+	50% {
+		box-shadow: 0 0 calc(var(--route-glow-size) * 2) 2px
+			var(--helm-ui-color-violet);
+	}
+}
+
+/* Pending stops read as silhouettes; spectral color lights up as the route
+   completes, so completion state scans without reading borders. */
+.helm-route__node--pending .helm-route__node-glyph {
+	filter: grayscale(0.8) brightness(0.9);
+}
+
+.helm-route__node--complete {
+	border-color: var(--helm-tone);
+	color: var(--helm-tone);
+}
+
+.helm-route__node--active,
+.helm-route__node--current {
+	border-color: var(--helm-tone);
+	color: var(--helm-tone);
+}
+
+.helm-route__node--failed {
+	border-color: var(--helm-ui-color-danger, #cc4444);
+	color: var(--helm-ui-color-danger, #cc4444);
+}
+
+.helm-route__node--pending {
+	opacity: 0.72;
+}
+
+.helm-route__node--interactive {
+	cursor: pointer;
+}
+
+.helm-route__node--destination::before {
+	content: "";
+	position: absolute;
+	inset: -4px;
+	border: 1px dashed color-mix(in srgb, var(--helm-tone) 70%, transparent);
+	border-radius: 50%;
+	transform-origin: center;
+	transition: transform 0.22s ease-out;
+}
+
+.helm-route__node--waypoint .helm-route__node-marker {
+	width: calc(var(--route-node-glyph-size) * 0.9);
+	height: calc(var(--route-node-glyph-size) * 0.9);
+	border: 1px solid var(--helm-ui-color-lilac, #cc99cc);
+	background: color-mix(
+		in srgb,
+		var(--helm-ui-color-lilac, #cc99cc) 28%,
+		transparent
+	);
+	transform: rotate(45deg);
+	transform-origin: center;
+	transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.helm-route__node--unknown .helm-route__node-marker {
+	width: calc(var(--route-node-glyph-size) * 0.95);
+	height: calc(var(--route-node-glyph-size) * 0.95);
+	border: 1px dashed var(--helm-ui-color-muted, #a39a88);
+	border-radius: 50%;
+	transform-origin: center;
+	transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* =============================================================================
+   LEGS
+   ============================================================================= */
+
+.helm-route__leg {
+	position: relative;
+	display: flex;
+	align-items: center;
+	flex: 1 1 var(--route-leg-min-width);
+	min-width: var(--route-leg-min-width);
+	height: var(--route-node-box-size);
+	margin-inline: var(--route-leg-margin);
+	padding: 0;
+	border: 0;
+	background: transparent;
+	font: inherit;
+	cursor: default;
+	outline: none;
+}
+
+.helm-route__leg-track {
+	position: relative;
+	display: block;
+	width: 100%;
+	height: var(--route-leg-height);
+	overflow: hidden;
+	border-radius: 999px;
+	background: var(--route-muted);
+}
+
+.helm-route__leg-fill {
+	display: block;
+	width: 0;
+	height: 100%;
+	border-radius: inherit;
+	background: var(--helm-tone);
+	transition: width 0.2s ease;
+}
+
+.helm-route__leg--complete .helm-route__leg-fill,
+.helm-route__leg--failed .helm-route__leg-fill {
+	width: 100%;
+}
+
+.helm-route__leg--active .helm-route__leg-fill {
+	animation: route-step-leg-pulse 2s ease-in-out infinite;
+}
+
+/* Active legs without a progress value sweep instead of faking a
+   percentage; legs with progress get their fill width inline. */
+.helm-route__leg--indeterminate .helm-route__leg-fill {
+	width: 40%;
+	animation: route-step-leg-sweep 1.8s ease-in-out infinite;
+}
+
+.helm-route__leg--failed .helm-route__leg-fill {
+	background: var(--helm-ui-color-danger, #cc4444);
+}
+
+.helm-route__leg--pending {
+	opacity: 0.68;
+}
+
+.helm-route__leg--interactive {
+	cursor: pointer;
+}
+
+@keyframes route-step-leg-pulse {
+	0%,
+	100% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.6;
+	}
+}
+
+@keyframes route-step-leg-sweep {
+	0% {
+		transform: translateX(-110%);
+	}
+	100% {
+		transform: translateX(360%);
+	}
+}
+
+/* =============================================================================
+   HOVER + FOCUS
+   =============================================================================
+   Detail text is shown by the portaled Tooltip component; these rules only
+   handle the in-place emphasis effects. */
+
+.helm-route__node:hover,
+.helm-route__node:focus-visible,
+.helm-route__leg:hover,
+.helm-route__leg:focus-visible {
+	opacity: 1;
+}
+
+.helm-route__node:hover,
+.helm-route__node:focus-visible {
+	transform: scale(1.08);
+}
+
+.helm-route__node--destination:hover::before,
+.helm-route__node--destination:focus-visible::before {
+	transform: scale(1.08);
+}
+
+.helm-route__node:hover .helm-route__node-glyph,
+.helm-route__node:focus-visible .helm-route__node-glyph {
+	transform: scale(1.22);
+	filter: none;
+}
+
+.helm-route__node--waypoint:hover .helm-route__node-marker,
+.helm-route__node--waypoint:focus-visible .helm-route__node-marker {
+	transform: rotate(45deg) scale(1.22);
+}
+
+.helm-route__node--unknown:hover .helm-route__node-marker,
+.helm-route__node--unknown:focus-visible .helm-route__node-marker {
+	transform: scale(1.22);
+}
+
+.helm-route__node:focus-visible,
+.helm-route__leg:focus-visible {
+	box-shadow: 0 0 0 2px
+		color-mix(in srgb, var(--helm-ui-color-focus, #9cc7ff) 55%, transparent);
+	/* Forced-colors mode strips box-shadows but recolors this outline. */
+	outline: 2px solid transparent;
+	outline-offset: 1px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	/* Selectors must match or beat the specificity of every animation rule
+	   above — a bare .helm-route__leg-fill would lose to the
+	   two-class --active/--indeterminate rules and the motion would play. */
+	.helm-route__node,
+	.helm-route__node-glyph,
+	.helm-route__node-glyph .helm-star-glyph--pulsar,
+	.helm-route__leg-fill,
+	.helm-route__leg--active .helm-route__leg-fill,
+	.helm-route__leg--indeterminate .helm-route__leg-fill {
+		animation: none;
+		transition: none;
+	}
+}

@@ -6,7 +6,9 @@ import {
 	StatusBadge,
 	SystemCell,
 	SystemGrid,
+	RouteItinerary,
 } from '@helm/ui';
+import type { RouteItineraryProps } from '@helm/ui';
 import type { DraftAction } from '@helm/actions';
 import { getScanTitle } from './utils';
 
@@ -16,6 +18,7 @@ interface DraftScanCardProps {
 	onCancel: () => void;
 	onSubmit: () => void;
 	isSubmitting: boolean;
+	itinerary?: RouteItineraryProps;
 }
 
 export function DraftScanCard({
@@ -24,6 +27,7 @@ export function DraftScanCard({
 	onCancel,
 	onSubmit,
 	isSubmitting,
+	itinerary,
 }: DraftScanCardProps) {
 	const tone = 'lilac';
 	const title = getScanTitle(draft.type, targetName);
@@ -57,7 +61,7 @@ export function DraftScanCard({
 						onClick={onSubmit}
 						disabled={isSubmitting}
 					>
-						{__('Begin Scan', 'helm')}
+						{__('Confirm', 'helm')}
 					</Button>
 				</div>
 			}
@@ -89,6 +93,9 @@ export function DraftScanCard({
 					/>
 				</SystemCell>
 			</SystemGrid>
+			{itinerary && (
+				<RouteItinerary {...itinerary} className="helm-mt-4" />
+			)}
 		</LogCard>
 	);
 }

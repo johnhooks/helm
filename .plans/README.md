@@ -6,6 +6,7 @@ tasks. Completed tasks are archived in `.plans/tasks/.archive/`.
 ## Active
 
 -   [nav-31-add-accumulated-route-scan-work](tasks/nav-31-add-accumulated-route-scan-work.md) - Add accumulated work to route scans. `navigation` `p2`
+-   [nav-32-add-star-glyph-route-progress](tasks/nav-32-add-star-glyph-route-progress.md) - Add horizontal route and vertical itinerary components. `navigation` `p2`
 
 ## Blocked
 

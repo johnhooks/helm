@@ -7,20 +7,23 @@ import {
 	Readout,
 	SystemCell,
 	SystemGrid,
+	RouteItinerary,
 } from '@helm/ui';
-import type { LcarsTone } from '@helm/ui';
+import type { LcarsTone, RouteItineraryProps } from '@helm/ui';
 import type { ShipAction } from '@helm/actions';
 import { isActive } from '@helm/actions';
 import { ActionStatusBadge } from '../action-status';
 import { getRemainingSeconds } from '../utils';
-import { getScanTitle, getScanWaypointCount } from './utils';
+import { getScanTitle } from './utils';
 
 export function ActiveScanCard({
 	action,
 	targetName,
+	itinerary,
 }: {
 	action: ShipAction<'scan_route'>;
 	targetName: string;
+	itinerary?: RouteItineraryProps;
 }) {
 	const tone = 'lilac';
 
@@ -30,6 +33,10 @@ export function ActiveScanCard({
 
 	const title = getScanTitle(action.type, targetName);
 	const status = <ActionStatusBadge status={action.status} />;
+	const progress = action.result?.progress;
+	const chance = progress?.discovery_chance;
+	const hasChance = typeof chance === 'number' && Number.isFinite(chance);
+	const chanceLabel = hasChance ? `${(chance * 100).toFixed(1)}%` : '--';
 
 	return (
 		<LogCard
@@ -52,22 +59,25 @@ export function ActiveScanCard({
 					</SystemCell>
 					<SystemCell>
 						<Readout
-							label={__('Duration', 'helm')}
-							value="--"
+							label={__('Cycle', 'helm')}
+							value={progress?.cycle_number ?? '--'}
 							tone={tone}
 							size="sm"
 						/>
 					</SystemCell>
 					<SystemCell>
 						<Readout
-							label={__('Waypoints', 'helm')}
-							value={getScanWaypointCount(action) ?? '--'}
+							label={__('Chance', 'helm')}
+							value={chanceLabel}
 							tone={tone}
 							size="sm"
 						/>
 					</SystemCell>
 				</SystemGrid>
 				<ActiveScanProgress action={action} tone={tone} />
+				{itinerary && (
+					<RouteItinerary {...itinerary} className="helm-mt-2" />
+				)}
 			</div>
 		</LogCard>
 	);

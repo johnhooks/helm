@@ -29,10 +29,32 @@ interface ScanRouteParams {
  * and continuation mechanics stay in server runtime state.
  */
 interface ScanRouteActiveResult extends ActionResultError {
+	progress?: ScanRouteProgress;
 	path?: number[];
 	phases?: ScanRouteResultPhase[];
 	discovered_edge_ids?: number[];
 	discovered_node_ids?: number[];
+}
+
+interface ScanRouteProgress {
+	cycle_seconds: number;
+	completed_cycles: number;
+	cycle_number: number;
+	discovery_depth: number;
+	accumulated_work: number;
+	discovery_chance: number | null;
+	maximum_discovery_chance: number;
+	next_cycle_cost: { core_life: number };
+	spent: { core_life: number };
+	budget: { core_life: number };
+	stop_reason:
+		| 'low_discovery_chance'
+		| 'resource_budget_reached'
+		| 'resource_exhausted'
+		| 'cycle_limit_reached'
+		| 'revisited_node'
+		| null;
+	stop_message: string | null;
 }
 
 interface ScanRouteResultPhase {

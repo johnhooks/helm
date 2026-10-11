@@ -7,8 +7,9 @@ import {
 	Readout,
 	SystemCell,
 	SystemGrid,
+	RouteItinerary,
 } from '@helm/ui';
-import type { LcarsTone } from '@helm/ui';
+import type { LcarsTone, RouteItineraryProps } from '@helm/ui';
 import type { ShipAction } from '@helm/actions';
 import { isActive } from '@helm/actions';
 import { ActionStatusBadge } from '../action-status';
@@ -18,9 +19,11 @@ import { getJumpTitle } from './utils';
 export function ActiveJumpCard({
 	action,
 	targetName,
+	itinerary,
 }: {
 	action: ShipAction<'jump'>;
 	targetName: string;
+	itinerary?: RouteItineraryProps;
 }) {
 	const tone = 'sky';
 
@@ -72,6 +75,9 @@ export function ActiveJumpCard({
 					</SystemCell>
 				</SystemGrid>
 				<ActiveJumpProgress action={action} tone={tone} />
+				{itinerary && (
+					<RouteItinerary {...itinerary} className="helm-mt-2" />
+				)}
 			</div>
 		</LogCard>
 	);

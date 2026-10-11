@@ -1,140 +1,53 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import type { DraftAction, ShipAction } from '@helm/actions';
-import { DraftJumpCard } from './draft-jump-card';
-import { ActiveJumpCard } from './active-jump-card';
-import { CompleteJumpCard } from './complete-jump-card';
+import {
+	JumpCard,
+	JumpLifecycle,
+	OutcomeCard,
+} from '../story-fixtures/action-card-stories';
 
+// Card presentation scenarios; action data remains illustrative until app integration.
 const meta = {
-	title: 'Ship Actions/Jump',
-	parameters: {
-		layout: 'centered',
-		backgrounds: { default: 'dark' },
-		docs: { disable: true },
+	title: 'Design Explorations/Ship Actions/Jump',
+	parameters: { layout: 'centered' },
+	args: { width: 380 },
+	argTypes: {
+		width: { control: { type: 'range', min: 280, max: 720, step: 20 } },
 	},
-} satisfies Meta;
-
+	decorators: [
+		(Story, context) => (
+			<div
+				className="ship-action-story"
+				style={{
+					width: context.args.width,
+					maxWidth: 'calc(100vw - 32px)',
+				}}
+			>
+				<Story />
+			</div>
+		),
+	],
+} satisfies Meta<{ width: number }>;
 export default meta;
 type Story = StoryObj<typeof meta>;
-
-const baseAction: ShipAction<'jump'> = {
-	id: 201,
-	ship_post_id: 42,
-	type: 'jump',
-	status: 'pending',
-	params: {
-		from_node_id: 1,
-		target_node_id: 7,
-		route: [101],
-	},
-	result: null,
-	deferred_until: new Date(Date.now() + 1000 * 60 * 60 * 24).toISOString(),
-	created_at: new Date(Date.now() - 1000 * 60 * 10).toISOString(),
-	updated_at: new Date().toISOString(),
-};
-
-const baseDraft: DraftAction<'jump'> = {
-	type: 'jump',
-	params: {
-		from_node_id: 1,
-		target_node_id: 7,
-		route: [101],
-	},
-};
-
-const TARGET_NAME = 'Tau Ceti';
-const noop = () => {};
-const draftProps = { onCancel: noop, onSubmit: noop, isSubmitting: false };
-
-function Wrapper({ children }: { children: React.ReactNode }) {
-	return (
-		<div
-			style={{
-				width: 380,
-				display: 'flex',
-				flexDirection: 'column',
-				gap: 6,
-			}}
-		>
-			{children}
-		</div>
-	);
-}
-
-export const Draft: Story = {
-	render: () => (
-		<Wrapper>
-			<DraftJumpCard
-				draft={baseDraft}
-				targetName={TARGET_NAME}
-				{...draftProps}
-			/>
-		</Wrapper>
-	),
-};
-
-export const Running: Story = {
-	render: () => (
-		<Wrapper>
-			<ActiveJumpCard
-				action={{
-					...baseAction,
-					status: 'running',
-					result: {
-						current_node_id: 1,
-						phases: [],
-					},
-				}}
-				targetName={TARGET_NAME}
-			/>
-		</Wrapper>
-	),
-};
-
+export const Draft: Story = { render: () => <JumpLifecycle /> };
+export const Running: Story = { render: () => <JumpCard /> };
 export const Fulfilled: Story = {
-	render: () => (
-		<Wrapper>
-			<CompleteJumpCard
-				action={{
-					...baseAction,
-					status: 'fulfilled',
-					result: {
-						phases: [
-							{
-								core_cost: 12,
-								core_before: 100,
-								remaining_core_life: 88,
-								completed_at: new Date().toISOString(),
-							},
-						],
-						remaining_core_life: 88,
-						core_before: 100,
-					},
-					deferred_until: null,
-				}}
-				targetName={TARGET_NAME}
-			/>
-		</Wrapper>
-	),
+	render: () => <OutcomeCard outcome="fulfilled" />,
 };
-
-export const Failed: Story = {
-	render: () => (
-		<Wrapper>
-			<CompleteJumpCard
-				action={{
-					...baseAction,
-					status: 'failed',
-					result: {
-						error: {
-							code: 'helm.ship.insufficient_core',
-							message: 'Core life too low for this jump',
-							data: { status: 422 },
-						},
-					},
-					deferred_until: null,
-				}}
-				targetName={TARGET_NAME}
-			/>
-		</Wrapper>
-	),
+export const Partial: Story = {
+	render: () => <OutcomeCard outcome="partial" />,
+};
+export const Failed: Story = { render: () => <OutcomeCard outcome="failed" /> };
+export const DraftToActive: Story = { render: () => <JumpLifecycle /> };
+export const Narrow: Story = {
+	args: { width: 320 },
+	render: () => <JumpCard />,
+};
+export const LongDraft: Story = {
+	args: { width: 320 },
+	render: () => <JumpLifecycle long />,
+};
+export const WideDraft: Story = {
+	args: { width: 640 },
+	render: () => <JumpLifecycle />,
 };

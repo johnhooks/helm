@@ -1,0 +1,166 @@
+.helm-route-itinerary {
+	min-width: 0;
+	font-family: var(--helm-ui-font-family);
+	color: var(--helm-ui-color-text);
+}
+.helm-route-itinerary__steps {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+.helm-route-itinerary__step {
+	position: relative;
+	display: grid;
+	grid-template-columns: 24px minmax(0, 1fr);
+	gap: 10px;
+	padding-bottom: 24px;
+}
+.helm-route-itinerary__step:last-child:not(:has(.helm-route-itinerary__leg)) {
+	padding-bottom: 0;
+}
+.helm-route-itinerary__leg {
+	position: absolute;
+	top: 28px;
+	bottom: 4px;
+	left: 11px;
+	width: 2px;
+	box-sizing: border-box;
+	border-left: 1px dashed var(--helm-ui-color-border);
+}
+.helm-route-itinerary__leg[data-state="complete"] {
+	border-left: 2px solid var(--helm-tone);
+	opacity: 0.55;
+}
+.helm-route-itinerary__leg[data-state="active"] {
+	border: 0;
+	background: var(--helm-tone);
+}
+.helm-route-itinerary__leg[data-state="active"][data-animate="true"] {
+	background: linear-gradient(
+		to bottom,
+		color-mix(in srgb, var(--helm-tone) 30%, transparent),
+		var(--helm-tone),
+		color-mix(in srgb, var(--helm-tone) 30%, transparent)
+	);
+	background-size: 100% 200%;
+	animation: helm-route-itinerary-flow 1.8s linear infinite;
+}
+.helm-route-itinerary__leg[data-state="failed"] {
+	border-left: 2px solid var(--helm-ui-color-danger);
+}
+.helm-route-itinerary__marker {
+	display: grid;
+	place-items: center;
+	width: 24px;
+	height: 24px;
+	box-sizing: border-box;
+	border: 1px solid var(--helm-ui-color-muted);
+	border-radius: 50%;
+	color: var(--helm-tone);
+}
+.helm-route-itinerary__step[data-state="complete"]
+	.helm-route-itinerary__marker {
+	border-color: var(--helm-tone);
+	background: color-mix(in srgb, var(--helm-tone) 12%, transparent);
+}
+.helm-route-itinerary__step[data-state="pending"]
+	.helm-route-itinerary__marker
+	> * {
+	opacity: 0.45;
+}
+.helm-route-itinerary__step[data-state="active"] .helm-route-itinerary__marker {
+	border: 2px solid var(--helm-tone);
+	box-shadow: 0 0 0 3px color-mix(in srgb, var(--helm-tone) 15%, transparent);
+}
+.helm-route-itinerary__step[data-state="failed"] .helm-route-itinerary__marker {
+	border-color: var(--helm-ui-color-danger);
+}
+.helm-route-itinerary__marker > .helm-star-glyph {
+	width: 12px;
+	height: 12px;
+	box-shadow: none;
+}
+.helm-route-itinerary__waypoint {
+	width: 9px;
+	height: 9px;
+	border: 1px solid currentColor;
+	transform: rotate(45deg);
+	background: color-mix(in srgb, currentColor 15%, transparent);
+}
+.helm-route-itinerary__search {
+	width: 10px;
+	height: 10px;
+	border: 1px dashed currentColor;
+	border-radius: 50%;
+}
+.helm-route-itinerary__content {
+	min-width: 0;
+	overflow-wrap: anywhere;
+}
+.helm-route-itinerary__content strong {
+	display: flex;
+	align-items: center;
+	min-height: 24px;
+	font-size: 13px;
+	font-weight: 500;
+	line-height: 1.5;
+}
+.helm-route-itinerary__label {
+	min-width: 0;
+}
+.helm-route-itinerary__endpoint {
+	display: inline-flex;
+	flex: none;
+	color: var(--helm-tone);
+}
+.helm-route-itinerary__step[data-state="complete"] strong {
+	color: var(--helm-ui-color-muted);
+}
+.helm-route-itinerary__step[data-state="active"] strong {
+	color: var(--helm-tone);
+}
+.helm-route-itinerary__step[data-state="failed"] strong {
+	color: var(--helm-ui-color-danger);
+}
+.helm-route-itinerary__description,
+.helm-route-itinerary__leg-description,
+.helm-route-itinerary__summary {
+	margin: 4px 0 0;
+	font-size: 12px;
+	line-height: 1.5;
+	color: var(--helm-ui-color-muted);
+}
+.helm-route-itinerary__summary {
+	margin-bottom: 12px;
+}
+.helm-route-itinerary__leg-description[data-state="active"] {
+	color: var(--helm-tone);
+}
+.helm-route-itinerary__leg-description[data-state="failed"] {
+	color: var(--helm-ui-color-danger);
+}
+.helm-route-itinerary__target {
+	display: grid;
+	grid-template-columns: 24px minmax(0, 1fr);
+	gap: 10px;
+	margin-top: 14px;
+	border-top: 1px dashed var(--helm-tone);
+	padding-top: 16px;
+}
+.helm-route-itinerary__target .helm-route-itinerary__marker {
+	border: 1px dashed var(--helm-tone);
+}
+@keyframes helm-route-itinerary-flow {
+	from {
+		background-position: 0 200%;
+	}
+	to {
+		background-position: 0 0;
+	}
+}
+@media (prefers-reduced-motion: reduce) {
+	.helm-route-itinerary__leg[data-state="active"][data-animate="true"] {
+		animation: none;
+		background: var(--helm-tone);
+	}
+}

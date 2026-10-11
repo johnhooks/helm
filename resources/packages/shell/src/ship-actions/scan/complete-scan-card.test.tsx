@@ -38,6 +38,45 @@ describe('CompleteScanCard', () => {
 		expect(screen.getByText('1')).toBeInTheDocument();
 	});
 
+	it.each(['fulfilled', 'partial'] as const)(
+		'shows the server stop reason for a %s scan',
+		(status) => {
+			const action: ShipAction<'scan_route'> = {
+				...baseAction,
+				status,
+				result: {
+					path: [1],
+					phases: [],
+					discovered_node_ids: [],
+					discovered_edge_ids: [],
+					progress: {
+						cycle_seconds: 420,
+						completed_cycles: 10,
+						cycle_number: 10,
+						discovery_depth: 0,
+						accumulated_work: 4,
+						discovery_chance: null,
+						maximum_discovery_chance: 0.6,
+						next_cycle_cost: { core_life: 0 },
+						spent: { core_life: 10 },
+						budget: { core_life: 10 },
+						stop_reason: 'resource_budget_reached',
+						stop_message:
+							'Scanning stopped before exceeding its core budget.',
+					},
+				},
+			};
+			render(
+				<CompleteScanCard action={action} targetName={TARGET_NAME} />
+			);
+			expect(
+				screen.getByText(
+					'Scanning stopped before exceeding its core budget.'
+				)
+			).toBeInTheDocument();
+		}
+	);
+
 	it('renders failed state with server error message', () => {
 		const action: ShipAction<'scan_route'> = {
 			...baseAction,

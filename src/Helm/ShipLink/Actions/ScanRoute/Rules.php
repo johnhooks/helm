@@ -14,6 +14,11 @@ use Helm\ShipLink\Ship;
 final class Rules
 {
     /**
+     * Minimum discovery probability for each scan attempt.
+     */
+    public const MIN_DISCOVERY_CHANCE = 0.001;
+
+    /**
      * Maximum cycles allowed per action.
      */
     public const MAX_CYCLES = 720;
@@ -75,7 +80,7 @@ final class Rules
 
     public function chanceAt(RuntimeState $state, float $work): float
     {
-        return $state->ceiling * min(1.0, ($work / max(1.0, $state->required)) ** 12);
+        return max(self::MIN_DISCOVERY_CHANCE, $state->ceiling * min(1.0, ($work / max(1.0, $state->required)) ** 12));
     }
 
     /** Marginal chance for the next cycle, including its uncertain work gain. */

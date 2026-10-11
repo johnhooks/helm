@@ -1,0 +1,4 @@
+/* Story-only layout; disclosure styling lives in @helm/ui. */
+.helm-command-study {
+	max-width: calc(100vw - 32px);
+}

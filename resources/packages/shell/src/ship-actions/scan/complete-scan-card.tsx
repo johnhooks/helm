@@ -1,5 +1,13 @@
 import { __ } from '@wordpress/i18n';
-import { LogCard, Readout, SystemCell, SystemGrid } from '@helm/ui';
+import {
+	Disclosure,
+	LogCard,
+	Readout,
+	RouteItinerary,
+	SystemCell,
+	SystemGrid,
+} from '@helm/ui';
+import type { RouteItineraryProps } from '@helm/ui';
 import type { ShipAction } from '@helm/actions';
 import { getActionError, isFailed, isFulfilled } from '@helm/actions';
 import { ActionStatusBadge } from '../action-status';
@@ -9,9 +17,11 @@ import { getScanTitle, getScanWaypointCount } from './utils';
 export function CompleteScanCard({
 	action,
 	targetName,
+	itinerary,
 }: {
 	action: ShipAction<'scan_route'>;
 	targetName: string;
+	itinerary?: RouteItineraryProps;
 }) {
 	const tone = 'lilac';
 	const title = getScanTitle(action.type, targetName);
@@ -56,6 +66,19 @@ export function CompleteScanCard({
 						/>
 					</SystemCell>
 				</SystemGrid>
+				{action.result?.progress?.stop_message && (
+					<p className="helm-mt-2">
+						{action.result.progress.stop_message}
+					</p>
+				)}
+				{itinerary && (
+					<Disclosure
+						className="helm-mt-4"
+						label={__('Discoveries', 'helm')}
+					>
+						<RouteItinerary {...itinerary} />
+					</Disclosure>
+				)}
 			</LogCard>
 		);
 	}
@@ -96,6 +119,19 @@ export function CompleteScanCard({
 						/>
 					</SystemCell>
 				</SystemGrid>
+				{action.result.progress?.stop_message && (
+					<p className="helm-mt-2">
+						{action.result.progress.stop_message}
+					</p>
+				)}
+				{itinerary && (
+					<Disclosure
+						className="helm-mt-4"
+						label={__('Discoveries', 'helm')}
+					>
+						<RouteItinerary {...itinerary} />
+					</Disclosure>
+				)}
 			</LogCard>
 		);
 	}

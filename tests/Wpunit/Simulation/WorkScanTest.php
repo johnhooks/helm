@@ -42,7 +42,7 @@ class WorkScanTest extends WPTestCase
         $simulation->advanceToNextCheckpoint();
         $work = $action->runtime_state['work'];
         $this->assertGreaterThan(0, $work);
-        $this->assertGreaterThan($initial, (new ActionResource($action))->toArray()['result']['progress']['discovery_chance']);
+        $this->assertGreaterThanOrEqual($initial, (new ActionResource($action))->toArray()['result']['progress']['discovery_chance']);
         $simulation->advanceToNextCheckpoint();
         $this->assertSame($work, $action->runtime_state['work']);
         $this->assertEquals($core - 2, $simulation->getShip($ship->getId())->power()->getCoreLife());
@@ -58,6 +58,16 @@ class WorkScanTest extends WPTestCase
         $this->assertSame(0, $simulation->processReady()->processed);
         $this->assertSame($before, $action->result);
         $this->assertSame(ActionStatus::Running, $action->status);
+    }
+
+    public function test_first_cycle_can_discover_without_adding_work(): void
+    {
+        [$simulation, $ship, $action, $target] = $this->scenario();
+        $this->tester->haveSimulationRolls(1.0, 0.0005);
+        $simulation->advanceToNextCheckpoint();
+        $this->assertSame(ActionStatus::Fulfilled, $action->status);
+        $this->assertContains($target->id, $action->result['discovered_node_ids']);
+        $this->assertSame(1, $action->runtime_state['completed']);
     }
 
     public function test_budget_stops_before_an_extra_charge_and_preserves_partial_route_on_restart(): void
@@ -102,7 +112,7 @@ class WorkScanTest extends WPTestCase
         [$simulation, $ship, $action] = $this->scenario(20);
         $state = RuntimeState::fromArray($action->runtime_state);
         $rules = helm(Rules::class);
-        $this->assertLessThan(0.001, $rules->nextChance($state));
+        $this->assertEqualsWithDelta(0.001, $rules->nextChance($state), 1e-12);
         $this->assertNull($rules->stopReason($state, 1000));
         $initial = $state->ceiling;
         $action->runtime_state = [...$state->toArray(), 'minCeiling' => 0.5];

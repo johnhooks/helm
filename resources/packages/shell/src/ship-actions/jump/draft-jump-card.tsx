@@ -7,7 +7,9 @@ import {
 	StatusBadge,
 	SystemCell,
 	SystemGrid,
+	RouteItinerary,
 } from '@helm/ui';
+import type { RouteItineraryProps } from '@helm/ui';
 import type { DraftAction } from '@helm/actions';
 import { getJumpTitle } from './utils';
 
@@ -19,6 +21,7 @@ interface DraftJumpCardProps {
 	onCancel: () => void;
 	onSubmit: () => void;
 	isSubmitting: boolean;
+	itinerary?: RouteItineraryProps;
 }
 
 export function DraftJumpCard({
@@ -29,6 +32,7 @@ export function DraftJumpCard({
 	onCancel,
 	onSubmit,
 	isSubmitting,
+	itinerary,
 }: DraftJumpCardProps) {
 	const tone = 'sky';
 	const title = getJumpTitle(draft.type, targetName);
@@ -67,7 +71,7 @@ export function DraftJumpCard({
 						onClick={onSubmit}
 						disabled={isSubmitting}
 					>
-						{__('Confirm Jump', 'helm')}
+						{__('Confirm', 'helm')}
 					</Button>
 				</div>
 			}
@@ -99,9 +103,14 @@ export function DraftJumpCard({
 					/>
 				</SystemCell>
 			</SystemGrid>
-			<div className={`helm-tone--${tone}`} style={{ marginTop: 8 }}>
-				<strong>{__('Path', 'helm')}</strong>: {pathLabel}
-			</div>
+			{itinerary && (
+				<RouteItinerary {...itinerary} className="helm-mt-4" />
+			)}
+			{!itinerary && (
+				<div className={`helm-tone--${tone}`} style={{ marginTop: 8 }}>
+					<strong>{__('Path', 'helm')}</strong>: {pathLabel}
+				</div>
+			)}
 		</LogCard>
 	);
 }

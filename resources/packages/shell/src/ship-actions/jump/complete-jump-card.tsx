@@ -1,5 +1,13 @@
 import { __ } from '@wordpress/i18n';
-import { LogCard, Readout, SystemCell, SystemGrid } from '@helm/ui';
+import {
+	Disclosure,
+	LogCard,
+	Readout,
+	RouteItinerary,
+	SystemCell,
+	SystemGrid,
+} from '@helm/ui';
+import type { RouteItineraryProps } from '@helm/ui';
 import type { ShipAction } from '@helm/actions';
 import { getActionError, isFailed, isFulfilled } from '@helm/actions';
 import { ActionStatusBadge } from '../action-status';
@@ -9,9 +17,11 @@ import { getJumpTitle } from './utils';
 export function CompleteJumpCard({
 	action,
 	targetName,
+	itinerary,
 }: {
 	action: ShipAction<'jump'>;
 	targetName: string;
+	itinerary?: RouteItineraryProps;
 }) {
 	const tone = 'sky';
 	const title = getJumpTitle(action.type, targetName);
@@ -56,6 +66,14 @@ export function CompleteJumpCard({
 						/>
 					</SystemCell>
 				</SystemGrid>
+				{itinerary && (
+					<Disclosure
+						className="helm-mt-4"
+						label={__('Itinerary', 'helm')}
+					>
+						<RouteItinerary {...itinerary} />
+					</Disclosure>
+				)}
 			</LogCard>
 		);
 	}
@@ -95,6 +113,14 @@ export function CompleteJumpCard({
 						/>
 					</SystemCell>
 				</SystemGrid>
+				{itinerary && (
+					<Disclosure
+						className="helm-mt-4"
+						label={__('Itinerary', 'helm')}
+					>
+						<RouteItinerary {...itinerary} />
+					</Disclosure>
+				)}
 			</LogCard>
 		);
 	}

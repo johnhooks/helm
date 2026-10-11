@@ -344,6 +344,16 @@ Primary pattern for system controls:
 -   Respects `prefers-reduced-motion` — all animations disabled
 -   All interactive elements keyboard accessible
 
+## Storybook organization
+
+**Design Explorations** groups proposed screen compositions and illustrative
+action lifecycles. Stories for shipped components stay under their component
+categories, so exploratory examples do not imply that they render the live
+action cards or read production state. **Ship Actions / Jump** and
+**Ship Actions / Scan** render the real action wrappers against isolated
+`@wordpress/data` stores seeded with scenario state. Their resolvers are
+omitted, so the stories do not fetch from WordPress or Datacore.
+
 ## Future Considerations
 
 UI library additions under consideration:
@@ -351,3 +361,44 @@ UI library additions under consideration:
 -   **Alert**: Dismissible/persistent notifications
 -   **Elbow**: LCARS corner connector (adds complexity, deferred)
 -   **Data Table**: Dense list for contacts/logs
+
+### Route itinerary
+
+The horizontal `Route` and `RouteStepIndicator` remain available for compact
+overviews and wider layouts. Use the vertical itinerary when a narrow card needs
+readable stop labels and per-leg details.
+
+`RouteItinerary` is the presentational vertical route display exported by
+`@helm/ui`. The **Design Explorations / Ship Actions / Jump** and
+**Design Explorations / Ship Actions / Scan** stories demonstrate
+jump planning, active travel, scan discoveries, narrow layouts, and paired tones.
+
+The caller supplies `nodes`, each with an explicit `state`, optional `current`
+marker, celestial glyph information, and display text. Each node may have an
+`outgoingLeg` with its own state and description. A completed node can therefore
+have an active outgoing leg. Omit the leg to render no connector; a last node may
+have an open-ended outgoing leg for an ongoing scan. An optional `target` is rendered
+separately from the known path, without becoming a step or implying a connection.
+
+The component does not read ship/action stores, calculate time or percentages,
+infer progress, or manage expansion. Action-specific adapters own those decisions
+and pass presentation props down. Draft and active cards show the itinerary;
+terminal card compositions may collapse it while retaining the outcome summary.
+
+`tone` provides action identity and `activityTone` provides its activity accent.
+The current examples use sky/gold for navigation and lilac/orange for scanning,
+all from the existing palette. Defaults are neutral, with activity inheriting the
+base tone. Stars retain their spectral glyphs and waypoints retain diamonds.
+Completed segments use subdued solid connectors; upcoming segments are quiet;
+active connectors sweep in the activity tone; failed segments use danger styling.
+Current-step semantics are explicitly controlled by `current`, independently of
+animation. State text is available to assistive technology. Motion respects
+`prefers-reduced-motion` and can also be disabled with `animate={false}`.
+
+Ship action cards keep the same header geometry and three compact readout slots
+throughout their lifecycle. Jump readouts describe route distance, time, and core. Active scans use
+Distance, Cycle, and Chance; Chance is a plain readout with one decimal place.
+Completed scans show Distance, Duration, and Waypoints. Labels distinguish estimates and elapsed time
+where needed; unknown values display `—`. Phase descriptions and leg timing belong
+in the itinerary rather than the readouts. Drafts use Confirm and Cancel actions.
+Completed and active star glyphs remain fully opaque; pending glyphs are subdued.

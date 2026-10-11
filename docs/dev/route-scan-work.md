@@ -32,7 +32,9 @@ Neither missed work nor missed discovery erases previous work.
   discount for subdividing the route.
 - The probability ceiling is
   `min(0.9, (0.55 + 0.3 * skill) * (1 - 0.2 * difficulty)) * 0.65^depth`.
-- Discovery chance is `ceiling * min(1, (work / required_work)^12)`.
+- Discovery chance is `max(0.001, ceiling * min(1, (work / required_work)^12))`.
+  Every attempt has at least a 0.1% chance, including the first cycle and cycles
+  that add no useful work. The existing ceiling-based stopping rule still applies.
 
 The steep ramp limits early lucky discoveries and keeps timing variation modest.
 Reaching required work reaches the ceiling, not guaranteed discovery. Discovery

@@ -104,6 +104,22 @@ export type { LcarsModalProps } from './components/lcars-modal';
 export { ProgressBar } from './components/progress-bar';
 export type { ProgressBarProps } from './components/progress-bar';
 
+export { Route } from './components/route';
+export type {
+	RouteLeg,
+	RouteNode,
+	RouteNodeKind,
+	RouteNodeState,
+	RouteProps,
+	RouteState,
+} from './components/route';
+
+export { RouteStepIndicator } from './components/route-step-indicator';
+export type { RouteStepIndicatorProps } from './components/route-step-indicator';
+
+export { Tooltip } from './components/tooltip';
+export type { TooltipPlacement, TooltipProps } from './components/tooltip';
+
 export { ErrorContent } from './components/error-display';
 export type { ErrorContentProps } from './components/error-display';
 
@@ -146,3 +162,14 @@ export type {
 	SpectralClass,
 	StellarType,
 } from './components/glyphs';
+
+export { RouteItinerary } from './components/route-itinerary';
+export type {
+	RouteItineraryProps,
+	RouteItineraryNode,
+	RouteItineraryLeg,
+	RouteItineraryTarget,
+} from './components/route-itinerary';
+
+export { Disclosure } from './components/disclosure';
+export type { DisclosureProps } from './components/disclosure';
