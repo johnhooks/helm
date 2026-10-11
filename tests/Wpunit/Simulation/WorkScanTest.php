@@ -9,6 +9,7 @@ use Helm\Core\ErrorCode;
 use Helm\Navigation\Contracts\EdgeRepository;
 use Helm\Navigation\Contracts\UserEdgeRepository;
 use Helm\ShipLink\ActionException;
+use Helm\ShipLink\ActionCancellation;
 use Helm\ShipLink\ActionStatus;
 use Helm\ShipLink\ActionType;
 use Helm\ShipLink\Components\PowerMode;
@@ -36,6 +37,23 @@ class WorkScanTest extends WPTestCase
         $ship = $this->tester->haveSimulationShip('Explorer', 1, $origin->id);
         $action = $simulation->dispatch($ship->getId(), ActionType::ScanRoute, ['target_node_id' => $target->id]);
         return [$simulation, $ship, $action, $target];
+    }
+
+    public function test_cancellation_prevents_further_simulated_work_and_costs(): void
+    {
+        [$simulation, $ship, $action] = $this->scenario(20);
+        $this->tester->haveSimulationRolls(0.0, 0.0);
+        $simulation->advanceToNextCheckpoint();
+        $this->assertNotEmpty($action->result['discovered_edge_ids']);
+        $runtime = $action->runtime_state;
+        $edges = $action->result['discovered_edge_ids'];
+        helm(ActionCancellation::class)->cancel($action->id);
+        $this->assertSame(ActionStatus::Partial, $action->status);
+        $this->assertSame('player_stopped', $action->result['stop_reason']);
+        $this->assertNull($simulation->getShip($ship->getId())->getState()->current_action_id);
+        $this->assertSame(0, $simulation->advance(86400)->processed);
+        $this->assertSame($runtime, $action->runtime_state);
+        $this->assertSame($edges, $action->result['discovered_edge_ids']);
     }
 
     public function test_power_mode_changes_apply_after_the_current_cycle(): void

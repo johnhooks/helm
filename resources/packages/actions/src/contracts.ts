@@ -52,6 +52,7 @@ interface ScanRouteProgress {
 	next_cycle_cost: { power: number };
 	spent: { power: number };
 	stop_reason:
+		| 'player_stopped'
 		| 'low_discovery_chance'
 		| 'resource_exhausted'
 		| 'cycle_limit_reached'

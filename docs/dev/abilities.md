@@ -11,7 +11,7 @@ Abilities are grouped by data scope under `src/Helm/Abilities`:
 
 - `Player/`: owned ships, player discoveries, and ship actions. Contains
   `ListShips`, `InspectShip`, `ListScanTargets`, `ListKnownEdges`, `ScanRoute`,
-  `Jump`, and `GetAction`.
+  `Jump`, `GetAction`, and `CancelAction`.
 - `System/`: star-system details and product catalog reads: `InspectSystem`,
   `ListProducts`, and `GetProduct`. This is a
   data scope, not an administrator permission level.
@@ -34,6 +34,7 @@ remain in existing services. Classes are imported with `use` declarations.
 | `helm/scan-route`        | `ship_id`, `target_node_id`                          | Queued scan action                                            |
 | `helm/jump`              | `ship_id`, `from_node_id`, `target_node_id`, `route` | Queued jump along ordered discovered edge IDs                 |
 | `helm/get-action`        | `action_id`                                          | Public action status, progress, and next checkpoint           |
+| `helm/cancel-action` | `action_id` | Updated action after stopping a route scan; finished actions are unchanged |
 | `helm/inspect-system` | `node_id` | Published stars linked to a system: catalog IDs, spectral types, distance from Sol, physical properties, confirmed planet counts |
 | `helm/list-products` | Optional `type`, `page`, `per_page` | Component blueprint summaries, including all versions |
 | `helm/get-product` | `product_id` | Exact blueprint version and raw component stats |
@@ -82,6 +83,30 @@ wp --user=admin eval-file bin/run-ability.php helm/get-product '{"product_id":1}
 Use IDs from your installation. Tests mirror `Player/` and `System/`, with one
 class per ability. Each test class composes its own fixtures with existing Helm
 helpers; there is no shared, fixed ability scenario.
+
+## Action cancellation
+
+`helm/cancel-action` accepts `{"action_id": 123}`. The MCP Adapter exposes it as
+`helm-cancel-action`. It shares the `ActionCancellation` service with
+`POST /helm/v1/actions/{actionId}/cancel`; both enforce ship ownership.
+
+Currently only route scans can be stopped. Stopping preserves discoveries,
+completed cycles, and power already spent, but does not run the pending cycle.
+The result reports `progress.stop_reason: "player_stopped"`; the action becomes
+`partial` with discoveries or `fulfilled` without them. The next checkpoint is
+cleared and the ship is available immediately. A subsequent scan retains known
+connections but starts with zero accumulated work.
+
+The service locks the action row and reads fresh state before changing it.
+If a queue worker already holds a processing claim, cancellation returns
+`helm.action.in_progress` (HTTP 409). Inspect the action and retry after that
+update; this error does not mean the scan stopped. Otherwise cancellation wins
+over unclaimed overdue work. Repeated cancellation returns finished actions
+unchanged and emits no duplicate updates.
+
+Jump cancellation returns `helm.action.cancellation_unsupported`; stopping at
+the next waypoint is a separate follow-up. The scan card button is not wired
+yet. Refresh MCP tool discovery after deploying the ability.
 
 ## Local harness
 

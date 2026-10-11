@@ -62,6 +62,17 @@ final class WpdbActionRepository implements ActionRepository
         return $this->hydrate($row);
     }
 
+    public function findForUpdate(int $id): ?Action
+    {
+        global $wpdb;
+        $row = $wpdb->get_row($wpdb->prepare(
+            'SELECT * FROM %i WHERE id = %d FOR UPDATE',
+            Schema::table(Schema::TABLE_SHIP_ACTIONS),
+            $id,
+        ), ARRAY_A);
+        return $row === null ? null : $this->hydrate($row);
+    }
+
     public function findLatestScan(int $shipId, int $origin, int $target): ?Action
     {
         global $wpdb;

@@ -7,6 +7,7 @@ namespace Helm\Rest;
 use Psr\Log\LoggerInterface;
 use Helm\Core\ErrorCode;
 use Helm\ShipLink\ActionException;
+use Helm\ShipLink\ActionCancellation;
 use Helm\ShipLink\ActionFactory;
 use Helm\ShipLink\ActionType;
 use Helm\ShipLink\Contracts\ActionRepository;
@@ -32,6 +33,7 @@ final class ShipActionsController
 
     public function __construct(
         private readonly ActionFactory $actionFactory,
+        private readonly ActionCancellation $cancellation,
         private readonly ActionRepository $actionRepository,
         private readonly LoggerInterface $logger,
     ) {
@@ -42,6 +44,11 @@ final class ShipActionsController
      */
     public function register(): void
     {
+        register_rest_route(self::NAMESPACE, '/actions/(?P<actionId>\d+)/cancel', [
+            'methods' => 'POST',
+            'callback' => [$this, 'cancel'],
+            'permission_callback' => [$this, 'actionPermissions'],
+        ]);
         register_rest_route(
             self::NAMESPACE,
             self::ROUTE,
@@ -108,6 +115,21 @@ final class ShipActionsController
                 'permission_callback' => [$this, 'actionPermissions'],
             ]
         );
+    }
+
+    /**
+     * @param WP_REST_Request<array<string, mixed>> $request
+     */
+    public function cancel(WP_REST_Request $request): WP_REST_Response|WP_Error
+    {
+        try {
+            $action = $this->cancellation->cancel((int) $request->get_param('actionId'));
+            return new WP_REST_Response((new ActionResource($action))->resolve());
+        } catch (ActionException $exception) {
+            $error = $exception->toWpError();
+            $error->add_data(['status' => $exception->errorCode->httpStatus()]);
+            return $error;
+        }
     }
 
     /**

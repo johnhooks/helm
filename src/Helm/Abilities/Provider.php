@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Helm\Abilities;
 
+use Helm\Abilities\Player\CancelAction;
 use Helm\Abilities\Player\GetAction;
 use Helm\Abilities\Player\InspectShip;
 use Helm\Abilities\Player\Jump;
@@ -33,6 +34,7 @@ final class Provider extends ServiceProvider
         ScanRoute::class,
         Jump::class,
         GetAction::class,
+        CancelAction::class,
         InspectSystem::class,
         ListProducts::class,
         GetProduct::class,

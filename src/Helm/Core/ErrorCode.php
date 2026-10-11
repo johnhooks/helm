@@ -33,6 +33,7 @@ enum ErrorCode: string
     case ActionNoHandler = 'action.no_handler';
     case ActionNoResolver = 'action.no_resolver';
     case ActionInsertFailed = 'action.insert_failed';
+    case ActionCancellationUnsupported = 'action.cancellation_unsupported';
     case ActionFailed = 'action.failed';
     case ActionCancelled = 'action.cancelled';
 

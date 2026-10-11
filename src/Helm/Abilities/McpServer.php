@@ -29,7 +29,7 @@ final class McpServer
             null,
             [
                 'helm/list-ships', 'helm/inspect-ship', 'helm/list-scan-targets',
-                'helm/simulate-scan', 'helm/plan-route', 'helm/list-known-edges', 'helm/scan-route', 'helm/jump', 'helm/get-action',
+                'helm/simulate-scan', 'helm/plan-route', 'helm/list-known-edges', 'helm/scan-route', 'helm/jump', 'helm/get-action', 'helm/cancel-action',
                 'helm/inspect-system', 'helm/list-products', 'helm/get-product',
             ],
             [],

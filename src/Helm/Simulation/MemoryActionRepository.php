@@ -26,6 +26,11 @@ final class MemoryActionRepository implements ActionRepository
         return $this->actions[$id] ?? null;
     }
 
+    public function findForUpdate(int $id): ?Action
+    {
+        return $this->find($id);
+    }
+
     public function findLatestScan(int $shipId, int $origin, int $target): ?Action
     {
         foreach (array_reverse($this->actions) as $action) {

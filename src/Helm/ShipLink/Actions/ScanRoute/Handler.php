@@ -42,7 +42,7 @@ final class Handler implements ActionHandler
             $prior = RuntimeState::fromArray($previous->runtime_state);
             $state->source = $prior->source;
             $state->depth = $prior->depth;
-            $state->work = $prior->work;
+            $state->work = ($previous->result['stop_reason'] ?? null) === StopReason::PlayerStopped->value ? 0 : $prior->work;
             $result = Result::fromArray($previous->result ?? []);
         }
         if ($state->source === $target) {

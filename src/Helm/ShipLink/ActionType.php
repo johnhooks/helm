@@ -7,6 +7,7 @@ namespace Helm\ShipLink;
 use Helm\ShipLink\Actions\Jump\Handler as JumpHandler;
 use Helm\ShipLink\Actions\Jump\Resolver as JumpResolver;
 use Helm\ShipLink\Actions\Jump\Validator as JumpValidator;
+use Helm\ShipLink\Actions\ScanRoute\CancellationHandler as ScanRouteCancellationHandler;
 use Helm\ShipLink\Actions\ScanRoute\Handler as ScanRouteHandler;
 use Helm\ShipLink\Actions\ScanRoute\Resolver as ScanRouteResolver;
 use Helm\ShipLink\Actions\ScanRoute\Validator as ScanRouteValidator;
@@ -96,6 +97,17 @@ enum ActionType: string
         return match ($this) {
             self::Jump => JumpResolver::class,
             self::ScanRoute => ScanRouteResolver::class,
+            default => null,
+        };
+    }
+
+    /**
+     * @return class-string<\Helm\ShipLink\Contracts\ActionHandler>|null
+     */
+    public function getCancellationHandlerClass(): ?string
+    {
+        return match ($this) {
+            self::ScanRoute => ScanRouteCancellationHandler::class,
             default => null,
         };
     }

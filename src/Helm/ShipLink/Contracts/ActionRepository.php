@@ -21,6 +21,11 @@ interface ActionRepository
      */
     public function find(int $id): ?Action;
 
+    /**
+     * Read fresh action state under a row lock. Caller must hold a transaction.
+     */
+    public function findForUpdate(int $id): ?Action;
+
     /** Latest scan of this corridor by this ship, for retained discovery depth. */
     public function findLatestScan(int $shipId, int $origin, int $target): ?Action;
 
