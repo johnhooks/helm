@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Helm\ShipLink\Actions\ScanRoute;
 
 /**
- * Command intent. Populate during initialization; do not change during execution.
+ * Scan intent and origin context.
  */
 final class Params
 {
@@ -26,6 +26,10 @@ final class Params
          * Client-supplied target distance in light years.
          */
         public readonly ?float $distanceLy = null,
+        /**
+         * Requested scan speed and cost mode; null uses normal intensity.
+         */
+        public readonly ?string $intensity = null,
     ) {
     }
 
@@ -39,6 +43,7 @@ final class Params
             targetNodeId: isset($params['target_node_id']) ? (int) $params['target_node_id'] : null,
             sourceNodeId: isset($params['source_node_id']) ? (int) $params['source_node_id'] : null,
             distanceLy: isset($params['distance_ly']) ? (float) $params['distance_ly'] : null,
+            intensity: isset($params['intensity']) ? (string) $params['intensity'] : null,
         );
     }
 
@@ -52,6 +57,7 @@ final class Params
             'target_node_id' => $this->targetNodeId,
             'source_node_id' => $this->sourceNodeId,
             'distance_ly' => $this->distanceLy,
+            'intensity' => $this->intensity,
         ], static fn (mixed $value): bool => $value !== null);
     }
 }

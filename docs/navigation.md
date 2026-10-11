@@ -118,15 +118,18 @@ Scanning is how players discover the space between stars. You point your navigat
 -   **Diminishing returns** — each successive waypoint revealed is harder than the last
 -   **Async** — scanning is a ship action that takes real time. Duration depends on distance, nav computer quality, and ship configuration.
 
-### Scan Variables
+### Scan variables
 
-Three abstract variables affect scan success. The game layer decides what feeds into them (nav computer tier, crew experience, upgrades, etc.).
+New route scans use accumulated work with separate cycle-success and discovery
+rolls. Sensor range and quality affect useful-work reliability; navigation skill
+controls work gain and efficiency controls cycle duration. Discovery odds rise
+with work and have a lower ceiling after each discovered connection. Low ceiling,
+core budget, resource exhaustion, or a safety limit stop further attempts.
 
-| Variable     | Range   | Role                                                                    |
-| ------------ | ------- | ----------------------------------------------------------------------- |
-| `chance`     | 0.0–1.0 | Base success rate. 1.0 = guaranteed first hop. Safety valve for tuning. |
-| `skill`      | 0.0–1.0 | Probability of revealing additional hops beyond the first               |
-| `efficiency` | 0.0–1.0 | Probability of revealing additional hops beyond the first               |
+See [route scan work](dev/route-scan-work.md) for the current model and simulator.
+The low-level navigation routines retain their earlier chance/skill/efficiency
+inputs for direct callers. They do not define the timing
+or costs of newly queued route actions.
 
 ### Success Factors
 
@@ -230,7 +233,7 @@ This is both a scanning tool and a route planner — it shows what you know and 
 
 ### Same Waypoints, Different Discovery
 
-A skilled navigator reveals the same waypoints as a novice — just more of them at once. The waypoint network is deterministic; what varies is how much of it you can see.
+A skilled navigator reveals the same waypoints as a novice, but builds scan work faster and can sustain more discoveries before the chance cutoff. The waypoint network is deterministic; what varies is how much of it you can see.
 
 ### Waypoint Positioning
 
@@ -407,5 +410,5 @@ Scanning and traversing unknown space should carry risk and reward. A navigator 
 -   **Routes are convenience** — a saved path through known edges. Multiple routes can share edges.
 -   **Bidirectional edges** — if you can go A→B, you can go B→A.
 -   **Two layers** — deterministic (where are waypoints?) is separate from gameplay (can you find them?).
--   **Same waypoints, different discovery** — a skilled navigator reveals the same waypoints as a novice, just more of them at once.
+-   **Same waypoints, different discovery** — equipment changes work rate and attainable discovery odds, not the underlying waypoint network.
 -   **Corridor-based** — waypoints belong to node-pair corridors. Sol→TauCeti has different waypoints than Sol→Proxima.

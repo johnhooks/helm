@@ -17,6 +17,14 @@ final class Origin
 
     private ?OriginConfig $config = null;
 
+    /** Construct a detached origin without reading or writing WordPress options. */
+    public static function detached(OriginConfig $config): self
+    {
+        $origin = new self();
+        $origin->config = $config;
+        return $origin;
+    }
+
     /**
      * Get the current Origin configuration.
      *

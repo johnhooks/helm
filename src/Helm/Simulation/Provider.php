@@ -19,6 +19,8 @@ use Helm\ShipLink\Contracts\LoadoutFactory;
 use Helm\ShipLink\Contracts\ShipStateRepository;
 use Helm\ShipLink\ShipFactory;
 use Helm\lucatume\DI52\ServiceProvider;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 
 /**
  * Re-binds the container for simulation mode.
@@ -33,6 +35,8 @@ final class Provider extends ServiceProvider
     public function register(): void
     {
         $this->container->singleton(\Helm\Navigation\Contracts\RandomSource::class, SimulationRandomSource::class);
+
+        $this->container->singleton(LoggerInterface::class, NullLogger::class);
 
         // Repositories
         $this->container->singleton(ShipStateRepository::class, MemoryShipStateRepository::class);

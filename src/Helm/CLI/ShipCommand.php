@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Helm\CLI;
 
+use Psr\Log\LoggerInterface;
 use Helm\Celestials\CelestialService;
 use Helm\Core\ErrorCode;
 use Helm\Navigation\Contracts\EdgeRepository;
@@ -38,6 +39,7 @@ class ShipCommand
         private readonly ActionFactory $actionFactory,
         private readonly ActionRepository $actionRepository,
         private readonly CelestialService $celestialService,
+        private readonly LoggerInterface $logger,
     ) {
     }
 
@@ -164,6 +166,11 @@ class ShipCommand
         try {
             $ship = $this->factory->build($postId);
         } catch (\InvalidArgumentException $e) {
+            $this->logger->warning('Operation {event} failed', [
+                'event' => 'cli.ship_failed',
+                'command' => __FUNCTION__,
+                'reason' => $e->getMessage(),
+            ]);
             WP_CLI::error($e->getMessage());
         }
 
@@ -216,6 +223,11 @@ class ShipCommand
         try {
             $ship = $this->factory->build($postId);
         } catch (\InvalidArgumentException $e) {
+            $this->logger->warning('Operation {event} failed', [
+                'event' => 'cli.ship_failed',
+                'command' => __FUNCTION__,
+                'reason' => $e->getMessage(),
+            ]);
             WP_CLI::error($e->getMessage());
         }
 
@@ -698,6 +710,11 @@ class ShipCommand
         try {
             $ship = $this->factory->build($postId);
         } catch (\InvalidArgumentException $e) {
+            $this->logger->warning('Operation {event} failed', [
+                'event' => 'cli.ship_failed',
+                'command' => __FUNCTION__,
+                'reason' => $e->getMessage(),
+            ]);
             WP_CLI::error($e->getMessage());
         }
 
@@ -843,6 +860,11 @@ class ShipCommand
         try {
             $ship = $this->factory->build($postId);
         } catch (\InvalidArgumentException $e) {
+            $this->logger->warning('Operation {event} failed', [
+                'event' => 'cli.ship_failed',
+                'command' => __FUNCTION__,
+                'reason' => $e->getMessage(),
+            ]);
             WP_CLI::error($e->getMessage());
         }
 
@@ -1003,6 +1025,11 @@ class ShipCommand
         try {
             $result = $this->actionFactory->create($postId, ActionType::Jump, ['target_node_id' => $targetNodeId]);
         } catch (ActionException $e) {
+            $this->logger->warning('Operation {event} failed', [
+                'event' => 'cli.ship_failed',
+                'command' => __FUNCTION__,
+                'reason' => $e->getMessage(),
+            ]);
             WP_CLI::error($e->getMessage());
         }
 
@@ -1065,6 +1092,11 @@ class ShipCommand
         try {
             $ship = $this->factory->build($postId);
         } catch (\InvalidArgumentException $e) {
+            $this->logger->warning('Operation {event} failed', [
+                'event' => 'cli.ship_failed',
+                'command' => __FUNCTION__,
+                'reason' => $e->getMessage(),
+            ]);
             WP_CLI::error($e->getMessage());
         }
 

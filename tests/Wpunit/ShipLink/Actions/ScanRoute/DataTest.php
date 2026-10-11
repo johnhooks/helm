@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Wpunit\ShipLink\Actions\ScanRoute;
 
-use DateTimeImmutable;
 use Helm\ShipLink\Actions\ScanRoute\Params;
 use Helm\ShipLink\Actions\ScanRoute\Result;
 use Helm\ShipLink\Actions\ScanRoute\RuntimeState;
@@ -19,11 +18,13 @@ class DataTest extends WPTestCase
             'from_node_id' => '2',
             'source_node_id' => '1',
             'distance_ly' => '0',
+            'intensity' => 'fast',
         ]);
         $this->assertSame(2, $params->fromNodeId);
         $this->assertSame(1, $params->sourceNodeId);
         $this->assertSame(9, $params->targetNodeId);
         $this->assertSame(0.0, $params->distanceLy);
+        $this->assertSame('fast', $params->intensity);
         $this->assertSame($params->toArray(), Params::fromArray($params->toArray())->toArray());
     }
 
@@ -69,28 +70,35 @@ class DataTest extends WPTestCase
         $this->assertEquals($stored, $result->toArray());
     }
 
-    public function test_runtime_round_trip_preserves_anchor_and_private_history(): void
+    public function test_runtime_round_trip_preserves_progress(): void
     {
-        $state = RuntimeState::start(300, 50, new DateTimeImmutable('2026-10-02 12:00:00 UTC'));
-        $record = [
-            'cycle_index' => 1,
-            'resolved_at' => '2026-10-02 12:08:00',
-            'from_node_id' => 1,
-            'target_node_id' => 9,
-            'skill' => 0.5,
-            'efficiency' => 0.8,
-            'outcome' => 'waypoint',
-            'discovered_node_id' => 3,
-            'discovered_edge_id' => 12,
-            'continuation' => ['probability' => 0.8, 'roll' => 0.1, 'continues' => true],
+        $state = new RuntimeState();
+        $state->startedAt = '2026-10-02 12:00:00';
+        $state->completed = 3;
+        $state->work = 2.5;
+        $state->depth = 1;
+        $state->source = 3;
+        $state->spent = 6;
+        $stored = json_decode(wp_json_encode($state->toArray()), true);
+        $this->assertSame($state->toArray(), RuntimeState::fromArray($stored)->toArray());
+    }
+    public function test_operating_values_round_trip_through_runtime_state(): void
+    {
+        $operatingValues = [
+            'cycleSeconds' => 300,
+            'coreCost' => 2,
+            'coreBudget' => 100,
+            'workGain' => 1.0,
+            'skill' => 0.6,
+            'sensorRange' => 5.0,
+            'sensorQuality' => 0.8,
+            'initialDistance' => 2.0,
+            'minCeiling' => 0.12,
+            'maxCycles' => 720,
         ];
-        $next = RuntimeState::fromArray($state->withDiscovery(3)->withRecordedCycle($record)->nextCycle()->toArray());
-        $this->assertSame(1, $state->cycleIndex);
-        $this->assertSame(2, $next->cycleIndex);
-        $this->assertSame(3, $next->currentNodeId);
-        $this->assertSame(1, $next->depth);
-        $this->assertSame([$record], $next->cycles);
-        $this->assertSame('2026-10-02 12:10:00', $next->checkpointAt()->format('Y-m-d H:i:s'));
-        $this->assertSame($next->toArray(), RuntimeState::fromArray($next->toArray())->toArray());
+        $state = RuntimeState::fromArray($operatingValues);
+        $stored = json_decode(wp_json_encode($state->toArray()), true);
+        $this->assertSame($state->toArray(), RuntimeState::fromArray($stored)->toArray());
+        $this->assertSame($operatingValues, array_intersect_key($state->toArray(), $operatingValues));
     }
 }

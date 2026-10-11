@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Helm\Planets;
 
+use Psr\Log\LoggerInterface;
 use Helm\Generation\SystemGenerator;
 use Helm\Origin\Origin;
 use Helm\Stars\StarRepository;
@@ -27,6 +28,7 @@ final class PlanetBatchGenerator
         private readonly PlanetRepository $planetRepository,
         private readonly SystemGenerator $systemGenerator,
         private readonly Origin $origin,
+        private readonly LoggerInterface $logger,
     ) {
     }
 
@@ -104,6 +106,11 @@ final class PlanetBatchGenerator
 
                 $starsProcessed++;
             } catch (\Throwable $e) {
+                $this->logger->error('Operation {event} failed', [
+                    'event' => 'generation.planets_failed',
+                    'star_id' => $starPost->catalogId(),
+                    'exception' => $e,
+                ]);
                 $errors[] = [
                     'star_id' => $starPost->catalogId(),
                     'error' => $e->getMessage(),
@@ -227,6 +234,11 @@ final class PlanetBatchGenerator
 
                     $progress['stars_processed']++;
                 } catch (\Throwable $e) {
+                    $this->logger->error('Operation {event} failed', [
+                        'event' => 'generation.planets_failed',
+                        'star_id' => $starPost->catalogId(),
+                        'exception' => $e,
+                    ]);
                     $progress['errors'][] = [
                         'star_id' => $starPost->catalogId(),
                         'error' => $e->getMessage(),

@@ -6,6 +6,7 @@ namespace Tests\Wpunit\CLI;
 
 use DateTimeImmutable;
 use Helm\CLI\ActionCommand;
+use Psr\Log\NullLogger;
 use Helm\Database\Schema;
 use Helm\Lib\Date;
 use Helm\ShipLink\ActionProcessor;
@@ -29,7 +30,8 @@ class ActionCommandTest extends TestCase
         $this->repository = $this->container->get(ActionRepository::class);
         $this->command = new ActionCommand(
             $this->container->get(ActionProcessor::class),
-            $this->repository
+            $this->repository,
+            new NullLogger(),
         );
 
         Date::setTestNow(new DateTimeImmutable('2026-05-30 12:00:00'));

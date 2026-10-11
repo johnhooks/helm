@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Wpunit\Abilities\Player;
 
 use Helm\Ships\ShipPost;
+use Helm\ShipLink\Contracts\ActionRepository;
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use Tests\Support\WpunitTester;
 
@@ -36,12 +37,42 @@ class GetActionTest extends WPTestCase
         wp_set_current_user($this->owner);
     }
 
+    public function test_projects_progress_after_persistence_without_persisting_diagnostics(): void
+    {
+        $created = wp_get_ability('helm/scan-route')->execute([
+            'ship_id' => $this->ship->postId(), 'target_node_id' => $this->target,
+        ]);
+        $repository = helm(ActionRepository::class);
+        $action = $repository->find($created['id']);
+        $state = $action->runtime_state;
+        $state['completed'] = 1;
+        $state['spent'] = 1;
+        $state['work'] = 0.5;
+        $action->runtime_state = $state;
+        $repository->update($action);
+        $stored = $repository->find($action->id);
+        $this->assertArrayNotHasKey('history', $stored->runtime_state);
+        $this->assertArrayNotHasKey('stop', $stored->runtime_state);
+        $this->assertArrayNotHasKey('progress', $stored->result);
+        $this->assertArrayNotHasKey('history', $stored->result);
+
+        $read = wp_get_ability('helm/get-action')->execute(['action_id' => $action->id]);
+        $this->assertArrayNotHasKey('history', $read['result']['progress']);
+        $this->assertSame(1, $read['result']['progress']['completed_cycles']);
+        $this->assertSame(0.5, $read['result']['progress']['accumulated_work']);
+        $this->assertArrayNotHasKey('runtime_state', $read);
+        $this->assertArrayNotHasKey('history', $read['result']);
+        $afterRead = $repository->find($action->id);
+        $this->assertSame($stored->runtime_state, $afterRead->runtime_state);
+        $this->assertSame($stored->result, $afterRead->result);
+    }
+
     public function test_reads_public_action_and_rejects_other_players(): void
     {
         $this->setExpectedIncorrectUsage('WP_Ability::execute');
         $action = wp_get_ability('helm/scan-route')->execute(['ship_id' => $this->ship->postId(), 'target_node_id' => $this->target]);
         $read = wp_get_ability('helm/get-action');
-        $this->assertSame($action, $read->execute(['action_id' => $action['id']]));
+        $this->assertEquals($action, $read->execute(['action_id' => $action['id']]));
         wp_set_current_user($this->other);
         $this->assertWPError($read->execute(['action_id' => $action['id']]));
         wp_set_current_user(0);

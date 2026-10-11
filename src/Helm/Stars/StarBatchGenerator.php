@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Helm\Stars;
 
+use Psr\Log\LoggerInterface;
+
 /**
  * Batch generator for Star CPTs using Action Scheduler.
  *
@@ -21,6 +23,7 @@ final class StarBatchGenerator
     public function __construct(
         private readonly StarCatalog $catalog,
         private readonly StarRepository $repository,
+        private readonly LoggerInterface $logger,
     ) {
     }
 
@@ -87,6 +90,11 @@ final class StarBatchGenerator
                 $this->repository->save($star);
                 $processed++;
             } catch (\Throwable $e) {
+                $this->logger->error('Operation {event} failed', [
+                    'event' => 'generation.star_failed',
+                    'star_id' => $starId,
+                    'exception' => $e,
+                ]);
                 $errors[] = [
                     'star_id' => $starId,
                     'error' => $e->getMessage(),
@@ -150,6 +158,11 @@ final class StarBatchGenerator
                     $this->repository->save($star);
                     $progress['processed']++;
                 } catch (\Throwable $e) {
+                    $this->logger->error('Operation {event} failed', [
+                        'event' => 'generation.star_failed',
+                        'star_id' => $starId,
+                        'exception' => $e,
+                    ]);
                     $progress['errors'][] = [
                         'star_id' => $starId,
                         'error' => $e->getMessage(),

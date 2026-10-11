@@ -47,7 +47,7 @@ class ScanRouteTest extends WPTestCase
         $this->assertIsArray($action);
         $this->assertSame('pending', $action['status']);
         $this->assertNotNull($action['deferred_until']);
-        $this->assertNull($action['result']);
+        $this->assertSame(0, $action['result']['progress']['completed_cycles']);
         $this->assertArrayNotHasKey('runtime_state', $action);
         $stored = helm(ActionRepository::class)->find($action['id']);
         $this->assertNotEmpty($stored->runtime_state);

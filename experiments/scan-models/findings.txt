@@ -1,0 +1,90 @@
+Scan model exploration
+
+Exploration only. No production scan classes or live game state changed.
+
+Reproduce
+  php experiments/scan-models/run.php 1000
+  Historical mock-resolver checks have been superseded by Simulation/WorkScanTest.php.
+
+Method
+  3 models x 4 distance/leg fixtures x 3 capability factors x 1,000 seeded trials.
+  36,000 independent model/fixture/capability runs; three speed/cost modes reuse
+  those cycle counts for 108 reported configurations. Common random seeds across
+  models and equipment; deterministic reruns. No trial hit the 10,000-cycle cap.
+  Nine additional cases run candidate resolvers through the actual in-memory
+  action factory, action processor, and checkpoint clock, compared to the same
+  standalone model. These are lifecycle checks, not full production scan logic.
+
+Assumptions
+  Reference expected cycles = 12 * (1 + distance_ly^1.5) * difficulty / capability.
+  Difficulty is 1 for near/Lacaille and 1.3 for long fixtures.
+  Capability factors 0.7, 1, 1.5 are hypothetical, not mapped to catalog equipment.
+  Near = 0.5 ly; Lacaille = 2.416057 ly; long = 6.5 ly.
+  Three-leg fixture splits the same 6.5 ly into three equal legs.
+  Economy: 600 seconds and 1 core per attempt.
+  Normal: 300 seconds and 2 core per attempt.
+  Fast: 150 seconds and 4 core per attempt.
+  Costs are illustrative accounting, not inventory deductions or tuned prices.
+  Resource exhaustion is reported against a 631-core budget but does not stop
+  trials. No baseline core decay, capacitor, or power regeneration is simulated.
+  Topology is supplied as fixtures, not generated from the actual star map.
+  No waypoint continuation-stop roll; trials keep working toward completion.
+
+Models
+  fixed: independent success probability 1 / expectedCycles each attempt.
+  rising: Weibull shape 2 conditional discovery probability after each miss,
+    scaled to the same continuous mean; discretization adds roughly half a cycle.
+  work: each attempt has 75% chance to gain one unit of work, requiring
+    ceil(0.75 * expectedCycles) units. No second discovery roll.
+
+Reference ship, normal speed (hours)
+model    scenario          mean   p10    median p90    p99    mean core
+fixed    near                1.34   0.17   0.92   3.00   5.58     32.1
+fixed    lacaille            4.54   0.50   3.25  10.42  19.33    109.0
+fixed    long               21.70   2.17  14.83  51.42  97.00    520.7
+fixed    long_three_legs    16.43   5.67  14.50  29.58  44.00    394.2
+rising   near                1.40   0.50   1.33   2.33   3.25     33.6
+rising   lacaille            4.70   1.67   4.42   8.00  11.42    112.7
+rising   long               22.73   8.33  21.25  38.50  56.25    545.5
+rising   long_three_legs    16.49  10.17  16.17  23.08  28.83    395.7
+work     near                1.44   1.17   1.42   1.67   2.00     34.6
+work     lacaille            4.79   4.33   4.75   5.25   5.75    114.8
+work     long               22.88  21.92  22.83  23.92  24.83    549.1
+work     long_three_legs    16.65  15.83  16.58  17.58  18.33    399.7
+
+Work model, long fixture
+equipment mode     mean hours mean core exceeds 631 core (%)
+basic     economy       65.34     392.0                  0.0
+basic     normal        32.67     784.1                100.0
+basic     fast          16.34    1568.2                100.0
+reference economy       45.76     274.5                  0.0
+reference normal        22.88     549.1                  0.0
+reference fast          11.44    1098.1                100.0
+advanced  economy       30.65     183.9                  0.0
+advanced  normal        15.32     367.7                  0.0
+advanced  fast           7.66     735.5                100.0
+
+Interpretation
+  Accumulated work gives the clearest progress-bar meaning and predictable
+  completion windows while retaining occasional unsuccessful cycles.
+  Fixed discovery rolls produce both first-cycle completions and very long tails.
+  Increasing odds reduces those extremes but still permits long outliers and
+  does not represent completed work.
+  Fast mode halves elapsed time and doubles total cost relative to normal.
+  The provisional prices are too expensive for long fast scans with 631 core.
+  Basic ships and economy settings exceed a day under this calibration.
+  Near scans average 1.44h, below a strict two-hour minimum; the fixed workload
+  term would need increasing if even nearby scans should take several hours.
+  Convex distance scaling makes three shorter legs cheaper than one long leg
+  of equal total length: 16.65h versus 22.88h in the work model. Decide whether
+  this is intended before applying the formula per waypoint.
+  At 24h roughly 288 five-minute attempts accumulate; full per-cycle history
+  should be reviewed for storage and serialization cost.
+  Existing Power already models a regenerating tactical resource. Examine its
+  intended relationship to scanning before adding a separate capacitor.
+
+Suggested next experiment
+  Tune a pure scan-work model shared by simulation and a future action resolver.
+  Separate difficulty, work gain, cycle duration, and cost. Compare total scan
+  budget versus per-leg budgets, and enforce resource exhaustion explicitly.
+  Keep equipment modifiers distinct from player-selected intensity.

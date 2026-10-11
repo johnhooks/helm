@@ -103,7 +103,7 @@ function ActiveScanProgress({
 				>
 					<Countdown
 						label={__('Next update', 'helm')}
-						remaining={remaining}
+						remaining={remaining === 0 ? '00:00' : remaining}
 						tone={tone}
 						active
 						size="sm"

@@ -28,7 +28,7 @@ use Helm\StellarWP\Models\ModelPropertyDefinition;
  * @property DateTimeImmutable|null $processing_at Timestamp lock for concurrent workers
  * @property int $attempts Processing attempts (0 = never picked up, 1 = first attempt, etc.)
  * @property array<string, mixed>|null $result Accumulated public state; available before and after completion
- * @property array<string, mixed>|null $runtime_state Private execution bookkeeping and retained history; excluded from public resources
+ * @property array<string, mixed>|null $runtime_state Private execution bookkeeping; excluded from public resources
  * @property DateTimeImmutable $created_at
  * @property DateTimeImmutable $updated_at
  */

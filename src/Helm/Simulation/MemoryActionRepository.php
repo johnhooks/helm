@@ -7,6 +7,7 @@ namespace Helm\Simulation;
 use DateTimeImmutable;
 use Helm\Lib\Date;
 use Helm\ShipLink\ActionStatus;
+use Helm\ShipLink\ActionType;
 use Helm\ShipLink\Contracts\ActionRepository;
 use Helm\ShipLink\Models\Action;
 
@@ -23,6 +24,20 @@ final class MemoryActionRepository implements ActionRepository
     public function find(int $id): ?Action
     {
         return $this->actions[$id] ?? null;
+    }
+
+    public function findLatestScan(int $shipId, int $origin, int $target): ?Action
+    {
+        foreach (array_reverse($this->actions) as $action) {
+            if (
+                $action->ship_post_id === $shipId && $action->type === ActionType::ScanRoute
+                && ($action->params['from_node_id'] ?? null) === $origin
+                && ($action->params['target_node_id'] ?? null) === $target
+            ) {
+                return $action;
+            }
+        }
+        return null;
     }
 
     public function findForShipPaginated(int $shipPostId, int $perPage = 20, ?int $before = null): array

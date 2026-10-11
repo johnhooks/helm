@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Helm\ShipLink;
 
 use Helm\Lib\Date;
+use Psr\Log\LoggerInterface;
+use Throwable;
 use Helm\ShipLink\Contracts\ActionRepository;
 use Helm\ShipLink\Models\Action;
 
@@ -24,6 +26,7 @@ final class ActionProcessor
     public function __construct(
         private readonly ActionRepository $actionRepository,
         private readonly ActionResolver $actionResolver,
+        private readonly LoggerInterface $logger,
     ) {
     }
 
@@ -41,7 +44,21 @@ final class ActionProcessor
             try {
                 $this->processClaimedAction($action->id);
                 $processed++;
-            } catch (\Throwable) {
+            } catch (Throwable $exception) {
+                $context = [
+                    'event' => 'action.processing_failed',
+                    'action_id' => $action->id,
+                    'ship_id' => $action->ship_post_id,
+                ];
+                if ($exception instanceof ActionException && $exception->getPrevious() === null) {
+                    $this->logger->warning('Action {action_id} could not be processed', $context + [
+                        'reason' => $exception->errorCode->value,
+                    ]);
+                } else {
+                    $this->logger->error('Action {action_id} processing failed', $context + [
+                        'exception' => $exception,
+                    ]);
+                }
                 // Action already marked as failed by resolver
                 $failed++;
             }
@@ -59,6 +76,14 @@ final class ActionProcessor
             $action = $this->actionResolver->resolve($actionId);
 
             if ($action->status->isFinalState()) {
+                $this->logger->info('Action {action_id} finished with status {status}', [
+                    'event' => 'action.finished',
+                    'action_id' => $action->id,
+                    'ship_id' => $action->ship_post_id,
+                    'status' => $action->status->value,
+                    'stop_reason' => $action->result['stop_reason'] ?? null,
+                    'error' => $action->result['error'] ?? null,
+                ]);
                 return;
             }
 

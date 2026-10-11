@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace Helm\CLI;
 
+use Psr\Log\LoggerInterface;
 use DateTimeImmutable;
 use Helm\Lib\Date;
 use Helm\ShipLink\ActionProcessor;
 use Helm\ShipLink\ActionStatus;
 use Helm\ShipLink\Contracts\ActionRepository;
+use Helm\ShipLink\Resources\DiagnosticActionResource;
 use InvalidArgumentException;
 use WP_CLI;
+use WP_CLI\Formatter;
 
 /**
  * Action queue management commands.
@@ -20,7 +23,62 @@ class ActionCommand
     public function __construct(
         private readonly ActionProcessor $processor,
         private readonly ActionRepository $repository,
+        private readonly LoggerInterface $logger,
     ) {
+    }
+
+    /**
+     * Get a complete action record, including private execution state.
+     *
+     * ## OPTIONS
+     *
+     * <id>
+     * : ID of the action to inspect.
+     *
+     * [--field=<field>]
+     * : Print a single field.
+     *
+     * [--fields=<fields>]
+     * : Comma-separated fields to display. Defaults to all fields.
+     *
+     * [--format=<format>]
+     * : Render output in a particular format.
+     * ---
+     * default: table
+     * options:
+     *   - table
+     *   - json
+     *   - csv
+     *   - yaml
+     * ---
+     *
+     * ## EXAMPLES
+     *
+     *     wp helm action get 39
+     *     wp helm action get 39 --format=json
+     *     wp helm action get 39 --field=status
+     *     wp helm action get 39 --fields=id,status,result --format=json
+     *
+     * @when after_wp_load
+     *
+     * @param array<string> $args
+     * @param array<string, string> $assoc_args
+     */
+    public function get(array $args, array $assoc_args): void
+    {
+        $id = filter_var($args[0] ?? '', FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+        if ($id === false) {
+            WP_CLI::error('Action ID must be a positive integer.');
+        }
+
+        $action = $this->repository->find($id);
+        if ($action === null) {
+            WP_CLI::error(sprintf('Action %d not found.', $id));
+        }
+
+        $data = (new DiagnosticActionResource($action))->resolve();
+        $formatter = new Formatter($assoc_args, array_keys($data));
+        $formatter->display_item($data);
     }
 
     /**
@@ -174,6 +232,11 @@ class ActionCommand
         try {
             $days = $this->parsePruneDays($assoc_args);
         } catch (InvalidArgumentException $e) {
+            $this->logger->warning('Operation {event} failed', [
+                'event' => 'cli.action_invalid',
+                'command' => __FUNCTION__,
+                'reason' => $e->getMessage(),
+            ]);
             WP_CLI::error($e->getMessage());
         }
 

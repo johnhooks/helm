@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Helm\Abilities\Support;
 
+use Psr\Log\LoggerInterface;
 use Helm\ShipLink\ActionException;
 use Helm\ShipLink\ActionFactory;
 use Helm\ShipLink\ActionType;
@@ -13,8 +14,10 @@ use WP_Error;
 /** Submit through the game service and preserve diagnostics for both write abilities. */
 final class ActionSubmission
 {
-    public function __construct(private readonly ActionFactory $actions)
-    {
+    public function __construct(
+        private readonly ActionFactory $actions,
+        private readonly LoggerInterface $logger,
+    ) {
     }
 
     /**
@@ -26,6 +29,10 @@ final class ActionSubmission
         try {
             return (new ActionResource($this->actions->create($shipId, $type, $params)))->resolve();
         } catch (ActionException $error) {
+            $this->logger->warning('Ability request rejected: {reason}', [
+                'event' => 'ability.action_rejected',
+                'reason' => $error->getMessage(),
+            ]);
             $result = $error->toWpError();
             $result->add_data([
                 'status' => $error->errorCode->httpStatus(),

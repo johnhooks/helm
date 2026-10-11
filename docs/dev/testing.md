@@ -262,3 +262,26 @@ This keeps each layer focused:
 -   PHP tests own the API contract
 -   E2E tests own the client-side behavior
 -   The API response shapes are the shared boundary between them
+
+## Recording logs
+
+The Wpunit logging helper discards application logs by default using Monolog's
+`NullHandler`. Each test starts and ends with null logging. To inspect logs:
+
+```php
+$logs = $this->tester->fakeLogging();
+
+// Exercise the service under test.
+$this->assertTrue($logs->hasWarningThatContains('stopped'));
+$records = $logs->getRecords();
+```
+
+`fakeLogging()` returns Monolog's in-memory `TestHandler`, captures every level
+immediately, and preserves PSR message interpolation and structured context.
+Calling it again starts a new recording. The helper swaps handlers on the same
+logger object, so services already constructed by the container use the recorder
+too. It works before or after `haveSimulation()`.
+
+The detached `ScanRunner` keeps its own isolated recording/null logger setup.
+Logger-provider tests use separate containers and temporary files to verify real
+formatting and buffering; ordinary tests never write application log files.

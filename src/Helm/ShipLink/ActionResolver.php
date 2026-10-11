@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Helm\ShipLink;
 
+use Psr\Log\LoggerInterface;
 use Helm\Core\ErrorCode;
 use Helm\Database\Transaction;
 use Helm\Events\Contracts\EventDispatcher;
@@ -32,6 +33,7 @@ final class ActionResolver
         private readonly InventoryRepository $inventoryRepository,
         private readonly ShipFactory $shipFactory,
         private readonly EventDispatcher $events,
+        private readonly LoggerInterface $logger,
     ) {
     }
 
@@ -73,9 +75,21 @@ final class ActionResolver
         try {
             return $this->resolveAndDispatch($action, $ship, $resolver);
         } catch (ActionException $e) {
+            $this->logger->warning('Operation {event} failed', [
+                'event' => 'action.rejected',
+                'action_id' => $actionId,
+                'ship_id' => $action->ship_post_id,
+                'reason' => $e->getMessage(),
+            ]);
             $this->failAndDispatch($actionId, $action->ship_post_id, $e);
             throw $e;
         } catch (\Throwable $e) {
+            $this->logger->error('Operation {event} failed', [
+                'event' => 'action.resolution_failed',
+                'action_id' => $actionId,
+                'ship_id' => $action->ship_post_id,
+                'exception' => $e,
+            ]);
             $error = new ActionException(ErrorCode::ActionFailed, __('Action failed unexpectedly', 'helm'), $e);
             $this->failAndDispatch($actionId, $action->ship_post_id, $error);
             throw $error;

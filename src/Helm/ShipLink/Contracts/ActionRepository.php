@@ -21,6 +21,9 @@ interface ActionRepository
      */
     public function find(int $id): ?Action;
 
+    /** Latest scan of this corridor by this ship, for retained discovery depth. */
+    public function findLatestScan(int $shipId, int $origin, int $target): ?Action;
+
     /**
      * Find actions for a ship with cursor-based pagination.
      *

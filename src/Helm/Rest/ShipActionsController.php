@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Helm\Rest;
 
+use Psr\Log\LoggerInterface;
 use Helm\Core\ErrorCode;
 use Helm\ShipLink\ActionException;
 use Helm\ShipLink\ActionFactory;
@@ -32,6 +33,7 @@ final class ShipActionsController
     public function __construct(
         private readonly ActionFactory $actionFactory,
         private readonly ActionRepository $actionRepository,
+        private readonly LoggerInterface $logger,
     ) {
     }
 
@@ -238,6 +240,12 @@ final class ShipActionsController
         try {
             $action = $this->actionFactory->create($shipPostId, $type, $params);
         } catch (ActionException $e) {
+            $this->logger->warning('Operation {event} failed', [
+                'event' => 'rest.action_rejected',
+                'ship_id' => $shipPostId,
+                'action_type' => $type->value,
+                'reason' => $e->getMessage(),
+            ]);
             $error  = $e->toWpError();
             $error->add_data(['status' => $e->errorCode->httpStatus()]);
 

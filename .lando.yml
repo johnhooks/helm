@@ -16,6 +16,9 @@ services:
         - ./tmp/logs:/var/log/helm
       environment:
         XDEBUG_MODE: "off"
+        HELM_LOG_DIR: /var/log/helm
+        HELM_LOG_LEVEL: debug
+        HELM_LOG_BUFFER_SIZE: "200"
     build_as_root:
       - rm -f /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini || true
 

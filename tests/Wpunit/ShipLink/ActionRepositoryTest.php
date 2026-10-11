@@ -28,6 +28,26 @@ class ActionRepositoryTest extends \Codeception\TestCase\WPTestCase
         $this->repository = new WpdbActionRepository();
     }
 
+    public function test_latest_scan_is_scoped_to_ship_origin_and_target(): void
+    {
+        $ship = $this->tester->haveShip();
+        $first = new Action(['ship_post_id' => $ship->postId(), 'type' => ActionType::ScanRoute,
+            'params' => ['from_node_id' => 1, 'target_node_id' => 2]]);
+        $this->repository->insert($first);
+        $second = new Action(['ship_post_id' => $ship->postId(), 'type' => ActionType::ScanRoute,
+            'params' => ['from_node_id' => 1, 'target_node_id' => 2],
+            'runtime_state' => ['depth' => 3]]);
+        $this->repository->insert($second);
+        $jump = new Action(['ship_post_id' => $ship->postId(), 'type' => ActionType::Jump,
+            'params' => ['from_node_id' => 1, 'target_node_id' => 2]]);
+        $this->repository->insert($jump);
+        $found = $this->repository->findLatestScan($ship->postId(), 1, 2);
+        $this->assertSame($second->id, $found->id);
+        $this->assertSame(3, $found->runtime_state['depth']);
+        $this->assertNull($this->repository->findLatestScan($ship->postId(), 2, 1));
+        $this->assertNull($this->repository->findLatestScan($ship->postId() + 1, 1, 2));
+    }
+
     public function test_insert_sets_id(): void
     {
         $ship = $this->tester->haveShip(['name' => 'Test Ship']);

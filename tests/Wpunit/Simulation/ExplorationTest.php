@@ -10,6 +10,7 @@ use Helm\Navigation\Contracts\NodeRepository;
 use Helm\Navigation\Contracts\UserEdgeRepository;
 use Helm\Navigation\NodeType;
 use Helm\ShipLink\ActionStatus;
+use Helm\ShipLink\Actions\ScanRoute\Resolver;
 use Helm\ShipLink\ActionType;
 use Helm\ShipLink\Models\Action;
 use Helm\ShipLink\Resources\ActionResource;
@@ -18,7 +19,7 @@ use Tests\Support\WpunitTester;
 use lucatume\WPBrowser\TestCase\WPTestCase;
 
 /**
- * Runs real navigation generation, action handlers, and scheduling in memory.
+ * End-to-end coverage for accumulated-work scans and route jumps.
  * Only random rolls are controlled; routes are discovered rather than seeded.
  *
  * @property WpunitTester $tester
@@ -50,7 +51,8 @@ class ExplorationTest extends WPTestCase
         $scan = $this->scan($ship, 2);
         $intent = $scan->params;
         $startedAt = Date::now();
-        $this->assertNull($scan->result);
+        $this->assertSame([], $scan->result['phases']);
+        $cycleSeconds = $scan->runtime_state['cycleSeconds'];
         $this->assertSame(0, $this->tester->advanceSimulation(299)->processed);
 
         for ($cycle = 1; $cycle <= 50; $cycle++) {
@@ -65,9 +67,8 @@ class ExplorationTest extends WPTestCase
             $this->assertNotContains($next->id, $path);
             $path[] = $next->id;
             $this->assertSame($path, $scan->result['path']);
-            $this->assertSame($next->id, $scan->runtime_state['current_node_id']);
+            $this->assertSame($next->id, $scan->runtime_state['source']);
             $this->assertSame($cycle, $scan->runtime_state['depth']);
-            $this->assertSame($cursor->id, $scan->runtime_state['cycles'][$cycle - 1]['from_node_id']);
             $cursor = $next;
 
             // Processing again at the same clock must not repeat the checkpoint.
@@ -81,7 +82,7 @@ class ExplorationTest extends WPTestCase
             $this->assertCount($cycle + 1, $scan->result['path']);
             $this->assertEquals($intent, $scan->params);
             $this->assertSame(1, $this->tester->grabSimulationShip($ship->getId())->navigation()->getCurrentPosition());
-            $this->assertSame($startedAt->getTimestamp() + 300 * $cycle, Date::now()->getTimestamp());
+            $this->assertSame($startedAt->getTimestamp() + $cycleSeconds * $cycle, Date::now()->getTimestamp());
             $this->assertArrayNotHasKey('runtime_state', (new ActionResource($scan))->toArray());
             $this->assertSame($cycle, helm(UserEdgeRepository::class)->count(1));
             $this->assertSame(0, helm(UserEdgeRepository::class)->count(2));
@@ -94,13 +95,12 @@ class ExplorationTest extends WPTestCase
         }
 
         $this->assertSame(ActionStatus::Fulfilled, $scan->status);
-        $this->assertCount(count($scan->result['phases']), $scan->runtime_state['cycles']);
         $this->assertGreaterThanOrEqual(3, count($scan->result['path']));
         $this->assertPath($scan, 1, 2);
         $history = $scan->runtime_state;
-        $this->assertSame('target_reached', $history['cycles'][count($history['cycles']) - 1]['outcome']);
+        $this->assertSame(2, $history['source']);
         $this->assertSame(0, $this->tester->advanceSimulation(300)->processed);
-        helm(\Helm\ShipLink\Actions\ScanRoute\Resolver::class)->handle($scan, $ship);
+        helm(Resolver::class)->handle($scan, $ship);
         $this->assertSame($history, $this->tester->grabSimulationAction($scan->id)->runtime_state);
         $this->assertSame(ActionStatus::Fulfilled, $scan->status);
         $jump = $this->jump($ship, $scan);
@@ -138,11 +138,12 @@ class ExplorationTest extends WPTestCase
     public function test_partial_scan_can_be_flown_then_scanning_resumes_from_the_waypoint(): void
     {
         $ship = $this->tester->haveSimulationShip('Explorer', 1);
-        $this->tester->haveSimulationRolls(...array_fill(0, 100, 1.0));
+        $this->tester->haveSimulationRolls(...array_fill(0, 100, 0.0));
         $visited = [1];
         for ($attempt = 0; $attempt < 50; $attempt++) {
             $origin = $this->tester->grabSimulationShip($ship->getId())->navigation()->getCurrentPosition();
             $scan = $this->scan($ship, 2);
+            $scan->runtime_state = [...$scan->runtime_state, 'coreBudget' => 1];
             $this->assertSame(0, $this->tester->advanceSimulationUntilIdle()->failed);
             $scan = $this->tester->grabSimulationAction($scan->id);
             $path = $scan->result['path'];
@@ -150,7 +151,6 @@ class ExplorationTest extends WPTestCase
             $this->assertPath($scan, $origin, $destination);
             $this->assertCount(1, $scan->result['phases']);
             $this->assertSame($destination === 2 ? ActionStatus::Fulfilled : ActionStatus::Partial, $scan->status);
-            $this->assertCount(count($scan->result['phases']), $scan->runtime_state['cycles']);
             $jump = $this->jump($ship, $scan);
             $this->assertSame(0, $this->tester->advanceSimulationUntilIdle()->failed);
             $this->assertSame(ActionStatus::Fulfilled, $this->tester->grabSimulationAction($jump->id)->status);
@@ -172,11 +172,13 @@ class ExplorationTest extends WPTestCase
         $first = $this->tester->grabSimulationAction($first->id);
         $nodeCount = helm(NodeRepository::class)->count();
         $edgeCount = helm(UserEdgeRepository::class)->count(1);
+        $ship = $this->tester->haveSimulationShip('Second explorer', 1);
         $second = $this->scan($ship, 2);
         $this->assertSame(0, $this->tester->advanceSimulation(300 * 50)->failed);
         $second = $this->tester->grabSimulationAction($second->id);
         $this->assertSame(ActionStatus::Fulfilled, $second->status);
-        $this->assertSame($first->result, $second->result);
+        $this->assertSame($first->result['path'], $second->result['path']);
+        $this->assertSame($first->result['discovered_edge_ids'], $second->result['discovered_edge_ids']);
         $this->assertSame($nodeCount, helm(NodeRepository::class)->count());
         $this->assertSame($edgeCount, helm(UserEdgeRepository::class)->count(1));
         $jump = $this->jump($ship, $second);
@@ -222,7 +224,11 @@ class ExplorationTest extends WPTestCase
 
     private function scan(Ship $ship, int $target): Action
     {
-        return $this->tester->dispatchSimulationAction($ship->getId(), ActionType::ScanRoute, ['target_node_id' => $target]);
+        $action = $this->tester->dispatchSimulationAction($ship->getId(), ActionType::ScanRoute, ['target_node_id' => $target]);
+        // These topology and travel tests allow the entire corridor to be discovered.
+        // Production cutoff behavior is covered by WorkScanTest.
+        $action->runtime_state = [...$action->runtime_state, 'minCeiling' => 0.0];
+        return $action;
     }
 
     private function jump(Ship $ship, Action $scan): Action

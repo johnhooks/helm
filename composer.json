@@ -8,6 +8,8 @@
     "require": {
         "php": ">=8.1",
         "lucatume/di52": "^4.0",
+        "monolog/monolog": "^3.0",
+        "psr/log": "^3.0",
         "stellarwp/models": "^2.0",
         "woocommerce/action-scheduler": "^3.8"
     },

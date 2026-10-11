@@ -69,19 +69,19 @@ First-generation sensors come from three competing manufacturers — **Deep Scan
 
 | Model    | Base Range | Survey Speed | Accuracy | Character               |
 | -------- | ---------- | ------------ | -------- | ----------------------- |
-| DSC Mk I | 20 ly      | 2x time      | 60%      | _"What's out there?"_   |
-| VRS Mk I | 12 ly      | 1x           | 70%      | _"Jack of all trades."_ |
-| ACU Mk I | 6 ly       | 0.5x time    | 85%      | _"What's down there?"_  |
+| DSC Mk I | 7 ly      | 2x time      | 60%      | _"What's out there?"_   |
+| VRS Mk I | 5 ly      | 1x           | 70%      | _"Jack of all trades."_ |
+| ACU Mk I | 3 ly       | 0.5x time    | 85%      | _"What's down there?"_  |
 
 _Starting values subject to balancing._
 
-Effective range scales with core output. At full power, you get base range. In efficiency mode (70% output), your VRS Mk I sees 8.4 ly instead of 12 ly. This creates meaningful tradeoffs when conserving power.
+Effective range scales with core output. At full power, you get base range. In efficiency mode (70% output), your VRS Mk I sees 3.5 ly instead of 5 ly. This creates meaningful tradeoffs when conserving power.
 
 ### DSC Mk I (DeepScan)
 
 Optimized for distance. Can detect and scan toward stars that other sensors can't reach.
 
--   Route scanning: Can target stars up to 20 ly away
+-   Route scanning: Can target stars up to 7 ly away
 -   System surveys: Slow and basic
 -   Good for: Scouts, frontier exploration, route discovery
 
@@ -89,7 +89,7 @@ Optimized for distance. Can detect and scan toward stars that other sensors can'
 
 Optimized for detail. Produces thorough surveys quickly.
 
--   Route scanning: Limited to nearby stars (6 ly)
+-   Route scanning: Limited to nearby stars (3 ly)
 -   System surveys: Fast and comprehensive
 -   Good for: Surveyors, resource hunting, thorough exploration
 
@@ -97,49 +97,38 @@ Optimized for detail. Produces thorough surveys quickly.
 
 The baseline. Adequate at both roles.
 
--   Route scanning: Moderate range (12 ly)
+-   Route scanning: Moderate range (5 ly)
 -   System surveys: Normal speed
 -   Good for: General purpose, new players, balanced builds
 
 ## Power Consumption
 
-All sensor operations consume power. This creates operational tempo - you can't spam scans.
+Route scans currently consume core life per attempted cycle, including cycles
+that gain no work or make no discovery. This is an interim implementation. System
+survey power costs and the intended regenerating-power scan-wait-jump rhythm
+remain separate from these route-scan costs. No new capacitor resource is added.
 
-| Operation                | Power Cost                 |
-| ------------------------ | -------------------------- |
-| Route scan               | 15-25 (varies by distance) |
-| System survey (per hour) | 5-10                       |
-| Passive detection        | Free                       |
-
-After scanning, you may need to wait for power to regenerate before jumping. This pacing is intentional - it gives weight to each action.
-
-### The Scan-Wait-Jump Rhythm
-
-```
-Scan toward destination → power depleted
-Wait for regeneration → core type matters
-Jump to waypoint → core life consumed
-Arrive → repeat
-```
-
-A hot core (Epoch-R) regens quickly - scan and jump frequently.
-A cold core (Epoch-E) regens slowly - plan your scans carefully.
+Normal route intensity costs one core per cycle. Fast intensity halves cycle
+duration and costs two core per cycle. Economy doubles cycle duration and costs
+one core per cycle; it currently reduces consumption per hour, not total cost.
+A scan budgets at most 400 core or 60% of its starting core life, whichever is
+lower. Actual remaining core is also checked before each cycle.
 
 ## How Sensors Affect Route Scanning
 
-Sensors feed data to the nav computer. Better sensor data means better route computation.
+Sensors set the targeting range and contribute to the probability that a cycle
+produces useful work. Longer range improves reliability at the same distance.
+Sensor accuracy supplies a smaller reliability adjustment. Survey speed is not
+used as a route-speed multiplier.
 
-**Sensor contribution:**
+Navigation skill determines work gained on a successful cycle. Navigation
+efficiency determines cycle duration. Work raises the discovery chance toward
+a ceiling; it does not guarantee discovery. After a connection is discovered,
+work resets and the next connection's probability ceiling decreases.
 
--   Range determines which stars you can target
--   Power/quality affects first-hop success rate
-
-**Nav computer contribution:**
-
--   Skill affects multi-hop discovery (reveal more waypoints per scan)
--   Efficiency affects... (TBD - power cost? accuracy?)
-
-The two systems work together. Great sensors with a bad nav computer means good data, poorly processed. Great nav computer with weak sensors means excellent processing of limited data.
+The scan snapshots equipment performance and intensity at launch. Resource
+availability remains live. See [route scan work](dev/route-scan-work.md) for the
+formulas, stop policies, simulation commands, and public progress contract.
 
 ## How Sensors Affect System Surveys
 
@@ -155,7 +144,7 @@ When surveying a star system (planets, resources, anomalies):
 -   High-res sensors might reveal hidden resources or anomalies
 -   Long-range sensors get basic data only
 
-Survey results are shared (see system-scanning.md) - the reward is discovery credit, not information hoarding.
+Survey results are private and tradeable, with permanent discovery credit (see system-scanning.md).
 
 ## Detection
 

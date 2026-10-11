@@ -1,5 +1,5 @@
 ---
-status: draft
+status: active
 area: navigation
 priority: p2
 ---
@@ -145,7 +145,7 @@ weaker equipment may take longer; report that tradeoff rather than hiding it.
 ## Verification and documentation
 
 Cover unsuccessful cycles, progress persistence, direct and waypoint discoveries,
-ship modifiers, configurable timing, resource charging and exhaustion, legacy
+ship modifiers, configurable timing, resource charging and exhaustion, persisted
 runtime state, repeatable seeds, and private-state exclusion from public output.
 Verify that inspection does not advance the action and that reprocessing does
 not double-charge resources or award duplicate progress. Verify chance builds

@@ -32,6 +32,9 @@ final class Validator implements ActionValidator
 
     public function validate(Action $action, Ship $ship): void
     {
+        if (!in_array($action->params['intensity'] ?? 'normal', ['economy', 'normal', 'fast'], true)) {
+            throw new ActionException(ErrorCode::ShipInvalidState, __('Unknown scan intensity.', 'helm'));
+        }
         $targetNodeId = $action->get('target_node_id');
 
         if ($targetNodeId === null) {

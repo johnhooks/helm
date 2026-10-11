@@ -5,6 +5,10 @@ declare(strict_types=1);
 namespace Tests\Wpunit\ShipLink\Actions\ScanRoute;
 
 use Codeception\Stub;
+use Psr\Log\NullLogger;
+use Helm\Lib\Date;
+use Helm\Navigation\Contracts\RandomSource;
+use Helm\ShipLink\Actions\ScanRoute\Rules;
 use Helm\Navigation\Contracts\EdgeRepository;
 use Helm\Navigation\Contracts\NodeRepository;
 use Helm\Navigation\Contracts\UserEdgeRepository;
@@ -64,10 +68,13 @@ class UserEdgeUpsertTest extends WPTestCase
     private function makeResolver(Node $node, Edge $edge): Resolver
     {
         return new Resolver(
+            helm(Rules::class),
+            Stub::makeEmpty(RandomSource::class, ['next' => 0.0]),
             Stub::make(NavigationService::class, [
                 'scanNextHop' => static fn () => ScanPhaseResult::direct($node, $edge),
             ], $this),
             $this->userEdgeRepository,
+            new NullLogger(),
         );
     }
 
@@ -81,12 +88,14 @@ class UserEdgeUpsertTest extends WPTestCase
                 'target_node_id' => $toNodeId,
                 'from_node_id' => $fromNodeId,
             ],
+            'deferred_until' => Date::now(),
             'runtime_state' => [
-                'cycle_index' => 1,
-                'cycle_seconds' => 300,
-                'max_cycles' => 50,
-                'started_at' => '2026-04-01 00:00:00',
-                'cycles' => [],
+                'cycleSeconds' => 300, 'skill' => 0.6, 'workGain' => 1.0,
+                'coreCost' => 1, 'coreBudget' => 100, 'maxCycles' => 50, 'minCeiling' => 0.12,
+                'source' => $fromNodeId,
+                'required' => 1.0,
+                'ceiling' => 0.9,
+                'workChance' => 1.0,
             ],
         ]);
     }

@@ -35,6 +35,9 @@ final class Result
          * Nodes revealed by the scan.
          */
         public array $discoveredNodeIds = [],
+        /**
+         * Additional public result fields preserved during serialization.
+         */
         private readonly array $extra = [],
     ) {
     }

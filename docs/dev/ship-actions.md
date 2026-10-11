@@ -49,3 +49,22 @@ Jump and route scan use action-specific `Params` and `Result` objects with
 object; jump does not currently use private runtime state. Nested discovery,
 leg, and cycle records use PHPStan array shapes. Validators check raw command
 input; DTOs describe the data used during execution.
+
+## CLI inspection
+
+Use `wp helm action get <id>` to inspect a complete stored record without
+processing the action. `DiagnosticActionResource` includes raw `params`, `result`,
+and `runtime_state`, worker lock and retry fields, and timestamps. It does not
+calculate public progress or include diagnostic logs. Player REST and MCP reads
+continue to use `ActionResource`, which excludes private state.
+
+```bash
+lando wp helm action get 39 --format=json
+lando wp helm action get 39 --field=status
+lando wp helm action get 39 --field=runtime_state --format=json
+lando wp helm action get 39 --fields=id,status,result --format=json
+```
+
+The default format is a field/value table; JSON, CSV, and YAML are also supported.
+JSON preserves nested data. Invalid IDs, missing actions, and unknown fields
+produce an error with a nonzero exit status.

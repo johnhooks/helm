@@ -16,6 +16,8 @@ use WP_Error;
  */
 enum ErrorCode: string
 {
+    case SimulationInvalidConfiguration = 'simulation.invalid_configuration';
+
     // Ability input errors
     case InputShipIdRequired = 'input.ship_id_required';
     case InputActionIdRequired = 'input.action_id_required';
@@ -44,6 +46,7 @@ enum ErrorCode: string
     case NavigationAlreadyAtTarget = 'navigation.already_at_target';
     case NavigationBeyondRange = 'navigation.beyond_range';
     case NavigationInsufficientFuel = 'navigation.insufficient_fuel';
+    case NavigationScanStopped = 'navigation.scan_stopped';
     case NavigationScanFailed = 'navigation.scan_failed';
 
     // Ship errors

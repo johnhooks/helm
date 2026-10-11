@@ -4,177 +4,130 @@ declare(strict_types=1);
 
 namespace Helm\ShipLink\Actions\ScanRoute;
 
-use DateTimeImmutable;
-use Helm\Lib\Date;
-
 /**
- * Private runtime state and execution history for a route scan.
- *
- * Holds only anchors and history. Cycle outcomes are calculated at
- * checkpoint time against live ship state, never precomputed.
- * Retained after termination for debugging; action status controls execution.
- *
- * @phpstan-type ScanCycle array{cycle_index: int, resolved_at: string, from_node_id: int, target_node_id: int, skill: float, efficiency: float, outcome: 'no_discovery'|'waypoint'|'target_reached'|'revisited_node', discovered_node_id?: int, discovered_edge_id?: int, continuation?: array{probability: float, roll: float, continues: bool}}
+ * Typed representation of the route scan action's saved runtime state.
  */
 final class RuntimeState
 {
-    /**
-     * @param list<ScanCycle> $cycles
-     */
     public function __construct(
         /**
-         * One-based checkpoint index; remains at the final attempt after termination.
+         * Cycle duration in seconds.
          */
-        public readonly int $cycleIndex,
+        public readonly int $cycleSeconds = 0,
         /**
-         * Seconds between scan checkpoints.
+         * Core life charged per cycle.
          */
-        public readonly int $cycleSeconds,
+        public readonly int $coreCost = 0,
         /**
-         * Maximum number of attempts.
+         * Maximum core life this action may spend.
          */
-        public readonly int $maxCycles,
+        public readonly int $coreBudget = 0,
         /**
-         * Schedule anchor; late processing does not shift it.
+         * Work added by a successful cycle.
          */
-        public readonly DateTimeImmutable $startedAt,
+        public readonly float $workGain = 0.0,
         /**
-         * Private history of resolved attempts, discoveries, and continuation rolls.
+         * Navigation skill captured at launch.
          */
-        public readonly array $cycles = [],
+        public readonly float $skill = 0.0,
         /**
-         * Last discovered node to scan from; null means the original origin.
+         * Effective sensor range in light years at launch.
          */
-        public readonly ?int $currentNodeId = null,
+        public readonly float $sensorRange = 0.0,
         /**
-         * Discovered hop count, independent of unsuccessful attempts.
+         * Sensor accuracy used to calculate useful-work probability.
          */
-        public readonly int $depth = 0,
+        public readonly float $sensorQuality = 0.0,
+        /**
+         * Server-calculated origin-to-target distance in light years.
+         */
+        public readonly float $initialDistance = 0.0,
+        /**
+         * Minimum achievable discovery probability required to continue.
+         */
+        public readonly float $minCeiling = 0.0,
+        /**
+         * Maximum cycles allowed for this action.
+         */
+        public readonly int $maxCycles = 0,
     ) {
     }
 
-    public static function start(
-        int $cycleSeconds,
-        int $maxCycles,
-        DateTimeImmutable $startedAt,
-    ): self {
-        return new self(
-            cycleIndex: 1,
-            cycleSeconds: max(1, $cycleSeconds),
-            maxCycles: max(1, $maxCycles),
-            startedAt: $startedAt,
-        );
-    }
+    /**
+     * Cycles processed during this action.
+     */
+    public int $completed = 0;
 
     /**
-     * @param array<string, mixed> $state
+     * Connections discovered along this scan, including resumed progress.
      */
-    public static function fromArray(array $state): self
-    {
-        return new self(
-            cycleIndex: max(1, (int) ($state['cycle_index'] ?? 1)),
-            cycleSeconds: max(1, (int) ($state['cycle_seconds'] ?? 300)),
-            maxCycles: max(1, (int) ($state['max_cycles'] ?? 50)),
-            startedAt: isset($state['started_at']) && is_string($state['started_at'])
-                ? Date::fromString($state['started_at'])
-                : Date::now(),
-            cycles: self::cyclesFromArray($state['cycles'] ?? []),
-            currentNodeId: isset($state['current_node_id']) ? (int) $state['current_node_id'] : null,
-            depth: max(0, (int) ($state['depth'] ?? 0)),
-        );
-    }
+    public int $depth = 0;
 
     /**
-     * @param ScanCycle $record
+     * Useful work accumulated toward the next connection.
      */
-    public function withRecordedCycle(array $record): self
-    {
-        return new self(
-            cycleIndex: $this->cycleIndex,
-            cycleSeconds: $this->cycleSeconds,
-            maxCycles: $this->maxCycles,
-            startedAt: $this->startedAt,
-            cycles: [...$this->cycles, $record],
-            currentNodeId: $this->currentNodeId,
-            depth: $this->depth,
-        );
-    }
-
-    public function withDiscovery(int $nodeId): self
-    {
-        return new self(
-            cycleIndex: $this->cycleIndex,
-            cycleSeconds: $this->cycleSeconds,
-            maxCycles: $this->maxCycles,
-            startedAt: $this->startedAt,
-            cycles: $this->cycles,
-            currentNodeId: $nodeId,
-            depth: $this->depth + 1,
-        );
-    }
-
-    public function nextCycle(): self
-    {
-        return new self(
-            cycleIndex: $this->cycleIndex + 1,
-            cycleSeconds: $this->cycleSeconds,
-            maxCycles: $this->maxCycles,
-            startedAt: $this->startedAt,
-            cycles: $this->cycles,
-            currentNodeId: $this->currentNodeId,
-            depth: $this->depth,
-        );
-    }
+    public float $work = 0.0;
 
     /**
-     * The due time for the current cycle, anchored to the scan start time
-     * so late processing never stretches the schedule.
+     * Core life consumed during this action.
      */
-    public function checkpointAt(): DateTimeImmutable
-    {
-        return Date::addSeconds($this->startedAt, $this->cycleSeconds * $this->cycleIndex);
-    }
-
-    public function hasExceededMaxCycles(): bool
-    {
-        return $this->cycleIndex > $this->maxCycles;
-    }
+    public int $spent = 0;
 
     /**
-     * @return array<string, mixed>
+     * Node being scanned from; initially the ship's origin.
      */
+    public int $source = 0;
+
+    /**
+     * Work needed to reach the discovery chance ceiling for this connection.
+     */
+    public float $required = 1.0;
+
+    /**
+     * Maximum discovery probability for the current connection, from zero to one.
+     */
+    public float $ceiling = 0.0;
+
+    /**
+     * Probability that a cycle adds useful work, from zero to one.
+     */
+    public float $workChance = 0.75;
+
+    /**
+     * Action start timestamp used to anchor cycle scheduling.
+     */
+    public string $startedAt = '';
+
+    /** @param array<string, mixed> $data */
+    public static function fromArray(array $data): self
+    {
+        $state = new self(
+            cycleSeconds: (int) ($data['cycleSeconds'] ?? 0),
+            coreCost: (int) ($data['coreCost'] ?? 0),
+            coreBudget: (int) ($data['coreBudget'] ?? 0),
+            workGain: (float) ($data['workGain'] ?? 0),
+            skill: (float) ($data['skill'] ?? 0),
+            sensorRange: (float) ($data['sensorRange'] ?? 0),
+            sensorQuality: (float) ($data['sensorQuality'] ?? 0),
+            initialDistance: (float) ($data['initialDistance'] ?? 0),
+            minCeiling: (float) ($data['minCeiling'] ?? 0),
+            maxCycles: (int) ($data['maxCycles'] ?? 0),
+        );
+        $state->completed = (int) ($data['completed'] ?? 0);
+        $state->depth = (int) ($data['depth'] ?? 0);
+        $state->spent = (int) ($data['spent'] ?? 0);
+        $state->source = (int) ($data['source'] ?? 0);
+        $state->work = (float) ($data['work'] ?? 0);
+        $state->required = (float) ($data['required'] ?? 0);
+        $state->ceiling = (float) ($data['ceiling'] ?? 0);
+        $state->workChance = (float) ($data['workChance'] ?? 0);
+        $state->startedAt = (string) ($data['startedAt'] ?? '');
+        return $state;
+    }
+
+    /** @return array<string, mixed> */
     public function toArray(): array
     {
-        return [
-            'cycle_index' => $this->cycleIndex,
-            'cycle_seconds' => $this->cycleSeconds,
-            'max_cycles' => $this->maxCycles,
-            'started_at' => Date::toString($this->startedAt),
-            'cycles' => $this->cycles,
-            'current_node_id' => $this->currentNodeId,
-            'depth' => $this->depth,
-        ];
-    }
-
-    /**
-     * @return list<ScanCycle>
-     */
-    private static function cyclesFromArray(mixed $cycles): array
-    {
-        if (! is_array($cycles)) {
-            return [];
-        }
-
-        $records = [];
-        foreach ($cycles as $cycle) {
-            if (is_array($cycle)) {
-                /**
-                 * @var ScanCycle $cycle
-                 */
-                $records[] = $cycle;
-            }
-        }
-
-        return $records;
+        return get_object_vars($this);
     }
 }

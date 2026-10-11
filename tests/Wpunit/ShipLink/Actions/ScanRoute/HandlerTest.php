@@ -5,97 +5,49 @@ declare(strict_types=1);
 namespace Tests\Wpunit\ShipLink\Actions\ScanRoute;
 
 use Helm\Lib\Date;
-use Helm\ShipLink\Actions\ScanRoute\Handler;
+use Helm\ShipLink\Resources\ActionResource;
 use Helm\ShipLink\ActionStatus;
 use Helm\ShipLink\ActionType;
-use Helm\ShipLink\Models\Action;
-use Helm\ShipLink\ShipFactory;
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use Tests\Support\WpunitTester;
 
 /**
  * @covers \Helm\ShipLink\Actions\ScanRoute\Handler
- *
  * @property WpunitTester $tester
  */
 class HandlerTest extends WPTestCase
 {
-    private Handler $handler;
-    private ShipFactory $shipFactory;
-
-    public function _before(): void
+    public function test_initializes_work_and_equipment_derived_state_without_charging(): void
     {
-        parent::_before();
-        $this->tester->haveOrigin();
-
-        $this->handler = new Handler();
-        $this->shipFactory = helm(ShipFactory::class);
-    }
-
-    public function _after(): void
-    {
-        Date::setTestNow(null);
-        parent::_after();
-    }
-
-    private function buildAction(int $shipPostId): Action
-    {
-        return new Action([
-            'ship_post_id' => $shipPostId,
-            'type' => ActionType::ScanRoute,
-            'params' => ['target_node_id' => 2, 'from_node_id' => 1],
+        $this->tester->haveSimulation();
+        $origin = $this->tester->haveSimulationNode(0);
+        $target = $this->tester->haveSimulationNode(1);
+        $ship = $this->tester->haveSimulationShip('Explorer', 1, $origin->id);
+        $core = $ship->power()->getCoreLife();
+        $action = $this->tester->dispatchSimulationAction($ship->getId(), ActionType::ScanRoute, [
+            'target_node_id' => $target->id,
+            'cycle_seconds' => 1, 'core_cost' => 0, 'core_budget' => 99999,
+            'work_gain' => 99999, 'skill' => 99, 'sensor_range' => 99999,
+            'sensor_quality' => 99, 'initial_distance' => 0,
+            'min_ceiling' => 0, 'max_cycles' => 99999,
         ]);
-    }
-
-    public function test_sets_pending_status(): void
-    {
-        $shipPost = $this->tester->haveShip();
-        $ship = $this->shipFactory->build($shipPost->postId());
-
-        $action = $this->buildAction($shipPost->postId());
-        $this->handler->handle($action, $ship);
-
         $this->assertSame(ActionStatus::Pending, $action->status);
-    }
-
-    public function test_first_scan_cycle_is_five_minutes(): void
-    {
-        Date::setTestNow('2026-04-01 00:00:00');
-
-        $shipPost = $this->tester->haveShip();
-        $ship = $this->shipFactory->build($shipPost->postId());
-
-        $action = $this->buildAction($shipPost->postId());
-        $this->handler->handle($action, $ship);
-
-        $this->assertSame('2026-04-01 00:05:00', Date::toString($action->deferred_until));
-    }
-
-    public function test_seeds_runtime_state_with_anchors_and_empty_history(): void
-    {
-        Date::setTestNow('2026-04-01 00:00:00');
-
-        $shipPost = $this->tester->haveShip();
-        $ship = $this->shipFactory->build($shipPost->postId());
-
-        $action = $this->buildAction($shipPost->postId());
-        $this->handler->handle($action, $ship);
-
-        $this->assertNotNull($action->runtime_state);
-        $this->assertSame(1, $action->runtime_state['cycle_index']);
-        $this->assertSame(300, $action->runtime_state['cycle_seconds']);
-        $this->assertSame('2026-04-01 00:00:00', $action->runtime_state['started_at']);
-        $this->assertSame([], $action->runtime_state['cycles']);
-    }
-
-    public function test_leaves_public_result_empty(): void
-    {
-        $shipPost = $this->tester->haveShip();
-        $ship = $this->shipFactory->build($shipPost->postId());
-
-        $action = $this->buildAction($shipPost->postId());
-        $this->handler->handle($action, $ship);
-
-        $this->assertNull($action->result);
+        $this->assertArrayNotHasKey('profile', $action->runtime_state);
+        $this->assertSame(['from_node_id', 'target_node_id'], array_keys($action->params));
+        $this->assertSame(420, $action->runtime_state['cycleSeconds']);
+        $this->assertSame(1, $action->runtime_state['coreCost']);
+        $this->assertSame(400, $action->runtime_state['coreBudget']);
+        $this->assertSame(0.5, $action->runtime_state['workGain']);
+        $this->assertSame($ship->navigation()->getSkill(), $action->runtime_state['skill']);
+        $this->assertSame($ship->sensors()->getRange(), $action->runtime_state['sensorRange']);
+        $this->assertSame($ship->sensors()->getScanSuccessChance(), $action->runtime_state['sensorQuality']);
+        $this->assertSame(1.0, $action->runtime_state['initialDistance']);
+        $this->assertSame(0.12, $action->runtime_state['minCeiling']);
+        $this->assertSame(720, $action->runtime_state['maxCycles']);
+        $this->assertSame(0, $action->runtime_state['completed']);
+        $this->assertArrayNotHasKey('history', (new ActionResource($action))->toArray()['result']['progress']);
+        $this->assertSame(420, (new ActionResource($action))->toArray()['result']['progress']['cycle_seconds']);
+        $this->assertSame(Date::now()->getTimestamp() + 420, $action->deferred_until->getTimestamp());
+        $this->assertSame($core, $ship->power()->getCoreLife());
     }
 }

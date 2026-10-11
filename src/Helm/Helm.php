@@ -21,6 +21,7 @@ use Helm\Discovery\Provider as DiscoveryProvider;
 use Helm\Events\Provider as EventsProvider;
 use Helm\Generation\Provider as GenerationProvider;
 use Helm\Inventory\Provider as InventoryProvider;
+use Helm\Logging\Provider as LoggingProvider;
 use Helm\lucatume\DI52\Container;
 use Helm\Navigation\Provider as NavigationProvider;
 use Helm\Origin\Provider as OriginProvider;
@@ -58,6 +59,7 @@ final class Helm
      * @var class-string[]
      */
     private array $serviceProviders = [
+        LoggingProvider::class,
         AbilitiesProvider::class,
         CLIProvider::class,
         ConfigProvider::class,

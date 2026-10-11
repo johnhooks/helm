@@ -62,6 +62,21 @@ final class WpdbActionRepository implements ActionRepository
         return $this->hydrate($row);
     }
 
+    public function findLatestScan(int $shipId, int $origin, int $target): ?Action
+    {
+        global $wpdb;
+        $row = $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM %i WHERE ship_post_id = %d AND action_type = 'scan_route'
+            AND JSON_EXTRACT(params, '$.from_node_id') = %d
+            AND JSON_EXTRACT(params, '$.target_node_id') = %d ORDER BY id DESC LIMIT 1",
+            Schema::table(Schema::TABLE_SHIP_ACTIONS),
+            $shipId,
+            $origin,
+            $target
+        ), ARRAY_A);
+        return $row === null ? null : $this->hydrate($row);
+    }
+
     /**
      * Find actions for a ship with cursor-based pagination.
      *

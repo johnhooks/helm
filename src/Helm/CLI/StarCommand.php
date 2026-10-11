@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Helm\CLI;
 
+use Psr\Log\LoggerInterface;
 use Helm\Config\Config;
 use Helm\Generation\SystemGenerator;
 use Helm\Origin\Origin;
@@ -25,6 +26,7 @@ class StarCommand
         private readonly PlanetRepository $planetRepository,
         private readonly SystemGenerator $systemGenerator,
         private readonly Origin $origin,
+        private readonly LoggerInterface $logger,
     ) {
     }
 
@@ -97,6 +99,11 @@ class StarCommand
                     $created++;
                 }
             } catch (\Exception $e) {
+                $this->logger->error('Operation {event} failed', [
+                    'event' => 'cli.star_failed',
+                    'command' => __FUNCTION__,
+                    'exception' => $e,
+                ]);
                 $errors++;
                 WP_CLI::debug(sprintf('Failed to seed star %s: %s', $star->id, $e->getMessage()));
             }

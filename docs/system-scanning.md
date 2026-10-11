@@ -44,7 +44,10 @@ You choose which planets to scan. Each takes time. A thorough explorer might sca
 
 ## Scan Time
 
-Scan duration depends on ship sensors, not fixed timers.
+System survey duration depends on ship sensors, not fixed timers. Survey-speed
+and resolution benefits remain distinct from route-scan work. Route scanning
+uses sensor range and reliability plus navigation-computer work rate; see
+[route scan work](dev/route-scan-work.md).
 
 **Scout ships** with advanced sensor arrays scan faster. **Haulers** and **combat ships** have basic sensors - they can scan, but it takes longer.
 

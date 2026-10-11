@@ -27,7 +27,7 @@ final class GetAction
 
         wp_register_ability('helm/get-action', [
             'label' => __('Inspect my action', 'helm'),
-            'description' => __('Read an action belonging to one of your ships, including status, public progress, and the next scheduled checkpoint. This read does not process or accelerate the action. Private scan rolls and runtime history are never returned.', 'helm'),
+            'description' => __('Read an action belonging to one of your ships, including status, public progress, and the next scheduled checkpoint. This read does not process or accelerate the action. Internal scan state and random rolls are never returned.', 'helm'),
             'category' => 'helm',
             'input_schema' => [
                 'type' => 'object',

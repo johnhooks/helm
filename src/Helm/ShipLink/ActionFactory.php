@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Helm\ShipLink;
 
 use Helm\Core\ErrorCode;
+use Psr\Log\LoggerInterface;
 use Helm\Database\Transaction;
 use Helm\Events\Contracts\EventDispatcher;
 use Helm\Inventory\Contracts\InventoryRepository;
@@ -33,6 +34,7 @@ final class ActionFactory
         private readonly InventoryRepository $inventoryRepository,
         private readonly ShipFactory $shipFactory,
         private readonly EventDispatcher $events,
+        private readonly LoggerInterface $logger,
     ) {
     }
 
@@ -82,6 +84,11 @@ final class ActionFactory
             try {
                 $currentActionId = $this->stateRepository->lockForUpdate($shipPostId);
             } catch (\RuntimeException $e) {
+                $this->logger->debug('Operation {event} failed', [
+                    'event' => 'action.lock_failed',
+                    'ship_id' => $shipPostId,
+                    'reason' => $e->getMessage(),
+                ]);
                 throw new ActionException(
                     ErrorCode::ActionInProgress,
                     __('Ship is busy with another action', 'helm')
@@ -116,9 +123,22 @@ final class ActionFactory
             $this->dispatchUpdates($action, $ship->getState());
 
             Transaction::commit();
+            $this->logger->info('Action {action_id} queued for ship {ship_id}', [
+                'event' => 'action.queued',
+                'action_id' => $action->id,
+                'ship_id' => $shipPostId,
+                'action_type' => $type->value,
+                'deferred_until' => $action->deferred_until?->format('c'),
+            ]);
 
             return $action;
         } catch (\Throwable $e) {
+            $this->logger->warning('Operation {event} failed', [
+                'event' => 'action.creation_failed',
+                'ship_id' => $shipPostId,
+                'action_type' => $type->value,
+                'reason' => $e->getMessage(),
+            ]);
             // Rollback undoes everything: insert, current_action_id update, etc.
             // Ship is left in clean state as if action was never attempted.
             Transaction::rollback();

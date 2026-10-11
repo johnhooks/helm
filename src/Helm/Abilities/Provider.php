@@ -13,6 +13,7 @@ use Helm\Abilities\Player\ListShips;
 use Helm\Abilities\Player\PlanRoute;
 use Helm\Abilities\Player\ScanRoute;
 use Helm\Abilities\System\GetProduct;
+use Helm\Abilities\Simulation\SimulateScan;
 use Helm\Abilities\System\InspectSystem;
 use Helm\Abilities\System\ListProducts;
 use Helm\lucatume\DI52\ServiceProvider;
@@ -28,6 +29,7 @@ final class Provider extends ServiceProvider
         ListScanTargets::class,
         ListKnownEdges::class,
         PlanRoute::class,
+        SimulateScan::class,
         ScanRoute::class,
         Jump::class,
         GetAction::class,

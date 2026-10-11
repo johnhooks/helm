@@ -1,62 +1,76 @@
 ---
-status: ready
+status: draft
 area: navigation
-priority: p3
-depends_on:
-    - nav-10-sync-user-edges-on-load
+priority: p2
 ---
 
-# Enforce waypoint visibility on the backend
+# Add private node discoveries
 
 ## Problem
 
-The navigation design says waypoint nodes are only supposed to become visible
-to a player after one of that player's discoveries references them. In
-practice, the current node REST surface exposes waypoint rows globally, and the
-client can load them without the server checking whether the authenticated
-player has actually discovered the related route data.
+Edge discoveries belong to individual players, but navigation nodes are globally
+readable by any logged-in player. The node API allows listing waypoints and
+fetching their coordinates by ID without checking discovery. The client can
+fetch the entire node collection, so hiding undiscovered locations in the map
+alone does not enforce private exploration.
 
-That is acceptable as a temporary development shortcut while the navigation
-sync work is being wired up, but it is not the intended fog-of-war model. The
-client should not be trusted to decide which hidden waypoint nodes a player is
-allowed to see. If waypoint visibility is only enforced in frontend code, the
-backend contract is wrong and any deployed client can bypass it.
+Waypoints are shared locations generated from deterministic route inputs.
+Discovering one should reveal it only to the discovering player. Another
+player must discover that same location independently before it appears on
+their map or becomes accessible through player-facing APIs.
+
+Visible stars are public because players can observe them. That does not make
+every location public. Future hidden black holes, rogue planets between stars,
+and wormhole entrances need the same private discovery model. Deriving all node
+knowledge from discovered edges cannot represent finding a location without
+also finding a travel connection.
 
 ## Proposed solution
 
-Add a backend-enforced visibility rule for waypoint node access so the server
-only returns waypoint coordinates the authenticated player is allowed to know.
-The authorized set should be derived from the player's discovered navigation
-state rather than from public node storage alone.
+Give nodes an explicit public or hidden visibility policy, separate from their
+type or attached celestial content. Preserve public access for existing visible
+star systems and make waypoints hidden by default. Allow future hidden
+locations to use the same policy without implementing their gameplay here.
 
-This can take the form of tighter filtering on existing node endpoints, a
-purpose-built endpoint for loading authorized waypoint nodes, or another small
-REST surface that keeps the permission check on the server. The important
-outcome is that client sync and on-demand waypoint loads stop relying on a
-globally readable waypoint list.
+Persist node discoveries per player, with the original discovery time preserved
+when discovery is repeated. Knowledge belongs to the player across ships,
+sessions, browsers, and devices. Keep the underlying nodes and deterministic
+waypoint identity shared across players.
 
-The task should preserve the current public behavior for stars and system
-nodes, and it should remain compatible with the user-edge sync flow that
-hydrates the client datacore from `/helm/v1/edges`. In particular, the
-authorized waypoint load path should be explicit:
+Record newly revealed node knowledge alongside edge knowledge as each route-scan
+checkpoint resolves. Preserve discoveries when a scan stops or its action data
+is later removed. Support node discoveries independently of edges. Knowing two
+locations must not grant knowledge of a connection between them. In particular,
+knowing a wormhole entrance must not automatically reveal its exit or connection.
 
--   During user-edge sync, the client loads the player's discovered edges from
-    `/helm/v1/edges`, derives the referenced waypoint node ids, requests the
-    authorized waypoint nodes from the server, writes those nodes into datacore,
-    and only then writes the edges that reference them.
--   During on-demand waypoint loads, the client uses that same authorized node
-    surface instead of the globally readable node list. A known waypoint id is
-    not enough on its own; the backend still decides whether that waypoint is in
-    the player's discovered set.
--   The client should not have to know how to prove authorization. It supplies
-    node ids or uses a player-scoped waypoint route, and the server applies the
-    join against per-player discovery state.
+Enforce public-or-discovered visibility consistently across player-facing node
+lists, pagination totals, individual and bulk lookups, related data, and any
+abilities exposing locations. Guessing a hidden node ID must not reveal its
+existence or coordinates, or allow it to be selected as a route-scan target.
+Apply the same knowledge rule to player-selected navigation targets while
+preserving existing discovered-edge requirements for travel. Internal universe
+generation and authorized administrative access must remain able to use the
+shared world data.
 
-It does not need to solve team sharing or public-route promotion. It only
-needs to make private waypoint visibility a backend concern and provide a
-datacore-safe load path for authorized waypoint rows.
+Make client loading, discovery updates, and map rendering reflect the player's
+known nodes, including discoveries without incident edges. Keep hidden-node
+caches isolated between players and invalidate previously cached global waypoint
+data. Preserve the datacore requirement that authorized nodes are available
+before edges referencing them are written. A cold client must rebuild the same
+knowledge as an existing session.
 
-This is a low-priority hardening task while route discovery is still local to
-the origin and scan reconciliation only requests nodes referenced by authorized
-user edges. It becomes more important before wider deployment, shared clients,
-or any feature that lets users request arbitrary waypoint ids directly.
+Preserve existing exploration progress when introducing the policy. Derive
+initial node discoveries from each player's known edge endpoints and account
+for ships already at hidden locations or traveling along known routes. Do not
+grant knowledge merely because a waypoint exists globally or was previously
+fetched through the unrestricted API.
+
+Update navigation documentation to describe the enforced visibility policy.
+Verify cross-player isolation, public-star access, hidden-node lookup and target
+rejection, repeated and interrupted scan discoveries, independent node discovery,
+existing-progress migration, and client cache isolation and rebuilding.
+
+This task provides private waypoint discovery and the common foundation for
+other hidden locations. Generating or detecting new celestial objects, wormhole
+travel mechanics, discovery trading, team sharing, public-route promotion, and
+changes to route seeding are outside its scope.

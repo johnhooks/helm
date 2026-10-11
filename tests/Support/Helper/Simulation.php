@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Support\Helper;
 
 use Codeception\Module;
+use Psr\Log\LoggerInterface;
 use Codeception\TestInterface;
 use DateTimeImmutable;
 use Helm\Events\Contracts\EventDispatcher;
@@ -67,6 +68,7 @@ class Simulation extends Module
         $container = helm()->getContainer();
         $this->previousTime = Date::getTestNow();
         $services = [
+            LoggerInterface::class,
             ShipStateRepository::class,
             ActionRepository::class,
             InventoryRepository::class,
@@ -99,6 +101,8 @@ class Simulation extends Module
         $container->singleton(EventDispatcher::class, new FakeEventDispatcher());
         $provider = new Provider($container);
         $provider->register();
+        // Keep the test's stable logger so fakeLogging works before or after setup.
+        $container->singleton(LoggerInterface::class, $this->previousServices[LoggerInterface::class]);
         $provider->boot();
         $container->singleton(RandomSource::class, new SimulationRandomSource($seed));
         $this->simulation = helm(Driver::class);
