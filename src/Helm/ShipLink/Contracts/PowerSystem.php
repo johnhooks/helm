@@ -20,7 +20,7 @@ interface PowerSystem
     /**
      * Get current available power units.
      */
-    public function getCurrentPower(): float;
+    public function getCurrentPower(?DateTimeImmutable $now = null): float;
 
     /**
      * Get maximum power capacity.

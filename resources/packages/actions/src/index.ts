@@ -16,3 +16,5 @@ export type {
 export { getActionError } from './utils';
 export { isActive, isFailed, isFulfilled, isJump, isScanRoute } from './guards';
 export type { ActiveAction, FailedAction, FulfilledAction } from './guards';
+
+export { formatScanPower } from './scan/format-power';

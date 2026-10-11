@@ -16,6 +16,7 @@ use Helm\Origin\OriginConfig;
 use Helm\Products\Contracts\ProductRepository;
 use Helm\ShipLink\ActionException;
 use Helm\ShipLink\ActionType;
+use Helm\ShipLink\ShipFactory;
 use Helm\ShipLink\Actions\ScanRoute\Rules;
 use Helm\ShipLink\Actions\ScanRoute\RuntimeState;
 use Helm\ShipLink\Actions\ScanRoute\StopReason;
@@ -44,10 +45,16 @@ final class ScanRunner
         $nav = (int) ($config['nav_tier'] ?? 3);
         $intensity = (string) ($config['intensity'] ?? 'normal');
         $life = (int) ($config['core_life'] ?? 1000);
+        $initialPower = (float) ($config['initial_power'] ?? 100);
+        $jumpDistance = (float) ($config['jump_distance_ly'] ?? 2.416);
+        $drive = (string) ($config['drive'] ?? 'dr_505');
         $coreSlug = (string) ($config['core'] ?? 'epoch_s');
         $powerMode = PowerMode::fromSlug((string) ($config['power_mode'] ?? 'normal'));
         if (
-            $trials < 1 || $trials > 30 || !is_finite($distance) || $distance <= 0 || $distance > 30
+            !is_finite($initialPower) || $initialPower < 0 || $initialPower > 100
+            || !is_finite($jumpDistance) || $jumpDistance <= 0 || $jumpDistance > 10
+            || !in_array($drive, ['dr_305', 'dr_505', 'dr_705'], true)
+            || $trials < 1 || $trials > 30 || !is_finite($distance) || $distance <= 0 || $distance > 30
             || strlen($seed) > 64 || $nav < 1 || $nav > 5 || $life < 1 || $life > 10000
             || !in_array($sensor, ['vrs_mk1', 'dsc_mk1', 'acu_mk1'], true)
             || !in_array($intensity, ['economy', 'normal', 'fast'], true) || $powerMode === null
@@ -56,6 +63,7 @@ final class ScanRunner
         }
         $config = [...$config, 'trials' => $trials, 'distance_ly' => $distance, 'seed' => $seed,
             'sensor' => $sensor, 'nav_tier' => $nav, 'intensity' => $intensity,
+            'initial_power' => $initialPower, 'jump_distance_ly' => $jumpDistance, 'drive' => $drive,
             'core_life' => $life, 'core' => $coreSlug, 'power_mode' => $powerMode->slug()];
         $previousTime = Date::getTestNow();
         $runs = [];
@@ -93,7 +101,7 @@ final class ScanRunner
                 $products = $container->get(ProductRepository::class);
                 /** @var InventoryRepository $inventory */
                 $inventory = $container->get(InventoryRepository::class);
-                foreach (['sensor' => $sensor, 'nav' => 'nav_tier_' . $nav, 'core' => $coreSlug] as $slot => $slug) {
+                foreach (['sensor' => $sensor, 'nav' => 'nav_tier_' . $nav, 'core' => $coreSlug, 'drive' => $drive] as $slot => $slug) {
                     $product = $products->findBySlug($slug);
                     if ($product === null || $product->type !== $slot) {
                         throw new InvalidArgumentException('Unknown simulation product: ' . $slug);
@@ -102,6 +110,7 @@ final class ScanRunner
                         'sensor' => $ship->getLoadout()->sensor(),
                         'nav' => $ship->getLoadout()->nav(),
                         'core' => $ship->getLoadout()->core(),
+                        'drive' => $ship->getLoadout()->drive(),
                     };
                     $item = new Item([...$component->component()->toArray(), 'product_id' => $product->id]);
                     if ($slot === 'core') {
@@ -109,7 +118,9 @@ final class ScanRunner
                     }
                     $inventory->update($item);
                 }
+                $ship = $container->get(ShipFactory::class)->build($ship->getId());
                 $ship->getState()->power_mode = $powerMode;
+                $ship->getState()->power_full_at = $ship->power()->calculatePowerFullAtAfterConsumption(100 - $initialPower);
                 $started = Date::now()->getTimestamp();
                 try {
                     $action = $simulation->dispatch($ship->getId(), ActionType::ScanRoute, ['target_node_id' => $target->id, 'intensity' => $intensity]);
@@ -135,11 +146,19 @@ final class ScanRunner
                     $action->status->isFinalState(),
                     $stopReason,
                 );
+                $endedAt = $action->deferred_until ?? Date::now();
+                $remainingPower = $ship->power()->getCurrentPower($endedAt);
+                $jumpPower = $ship->propulsion()->calculatePowerCost($jumpDistance);
+                $jumpPossible = $ship->propulsion()->canReach($jumpDistance) && $jumpPower <= $ship->power()->getMaxPower();
                 $runs[] = [
                     'trial' => $trial, 'status' => $action->status->value,
+                    'power_remaining' => $remainingPower,
+                    'core_spent' => $life - $ship->power()->getCoreLife(),
+                    'jump_power_cost' => $jumpPower,
+                    'jump_recharge_seconds' => $jumpPossible ? (int) ceil(max(0, $jumpPower - $remainingPower) / $ship->power()->getRegenRate() * 3600) : null,
                     'hours' => (($action->deferred_until?->getTimestamp() ?? $started) - $started) / 3600,
                     'cycles' => $progress['completed_cycles'] ?? 0,
-                    'core_spent' => $progress['spent']['core_life'] ?? 0,
+                    'power_spent' => $progress['spent']['power'] ?? 0,
                     'stop_reason' => $progress['stop_reason'] ?? null,
                     'discoveries' => count($action->result['discovered_edge_ids'] ?? []),
                     'history' => array_values(array_map(
@@ -158,7 +177,7 @@ final class ScanRunner
             'trials' => $trials, 'rejected' => $trials - count($hours),
             'completed' => count(array_filter($runs, static fn (array $run): bool => $run['status'] === 'fulfilled' && ($run['stop_reason'] ?? null) === null)),
             'partial' => count(array_filter($runs, static fn (array $run): bool => $run['status'] === 'partial')),
-            'mean_core_spent' => $hours === [] ? null : array_sum(array_column($runs, 'core_spent')) / count($hours),
+            'mean_power_spent' => $hours === [] ? null : array_sum(array_column($runs, 'power_spent')) / count($hours),
             'p10_hours' => $quantile(0.1), 'median_hours' => $quantile(0.5),
             'p90_hours' => $quantile(0.9), 'p99_hours' => $quantile(0.99),
         ]];

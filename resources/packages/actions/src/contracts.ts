@@ -1,3 +1,4 @@
+import type { ScanCalculationInputs } from '@helm/formulas';
 import type { WpRestErrorResponse } from '@helm/errors';
 
 /**
@@ -37,19 +38,21 @@ interface ScanRouteActiveResult extends ActionResultError {
 }
 
 interface ScanRouteProgress {
+	calculation_inputs?: ScanCalculationInputs;
 	cycle_seconds: number;
 	completed_cycles: number;
 	cycle_number: number;
 	discovery_depth: number;
 	accumulated_work: number;
+	required_work: number;
+	work_progress: number;
+	estimated_peak_seconds: number | null;
 	discovery_chance: number | null;
 	maximum_discovery_chance: number;
-	next_cycle_cost: { core_life: number };
-	spent: { core_life: number };
-	budget: { core_life: number };
+	next_cycle_cost: { power: number };
+	spent: { power: number };
 	stop_reason:
 		| 'low_discovery_chance'
-		| 'resource_budget_reached'
 		| 'resource_exhausted'
 		| 'cycle_limit_reached'
 		| 'revisited_node'

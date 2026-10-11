@@ -143,7 +143,7 @@ class ExplorationTest extends WPTestCase
         for ($attempt = 0; $attempt < 50; $attempt++) {
             $origin = $this->tester->grabSimulationShip($ship->getId())->navigation()->getCurrentPosition();
             $scan = $this->scan($ship, 2);
-            $scan->runtime_state = [...$scan->runtime_state, 'coreBudget' => 1];
+            $scan->runtime_state = [...$scan->runtime_state, 'maxCycles' => 1];
             $this->assertSame(0, $this->tester->advanceSimulationUntilIdle()->failed);
             $scan = $this->tester->grabSimulationAction($scan->id);
             $path = $scan->result['path'];

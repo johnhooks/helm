@@ -50,7 +50,7 @@ export function CompleteScanCard({
 				<SystemGrid columns={2} gap="sm">
 					<SystemCell>
 						<Readout
-							label={__('Duration', 'helm')}
+							label={__('DUR', 'helm')}
 							value="--"
 							tone={tone}
 							size="sm"
@@ -58,7 +58,7 @@ export function CompleteScanCard({
 					</SystemCell>
 					<SystemCell>
 						<Readout
-							label={__('Distance', 'helm')}
+							label={__('DST', 'helm')}
 							value={action.params.distance_ly}
 							unit="ly"
 							tone={tone}
@@ -95,7 +95,7 @@ export function CompleteScanCard({
 				<SystemGrid columns={3} gap="sm">
 					<SystemCell>
 						<Readout
-							label={__('Distance', 'helm')}
+							label={__('DST', 'helm')}
 							value={action.params.distance_ly}
 							unit="ly"
 							tone={tone}
@@ -104,7 +104,7 @@ export function CompleteScanCard({
 					</SystemCell>
 					<SystemCell>
 						<Readout
-							label={__('Duration', 'helm')}
+							label={__('DUR', 'helm')}
 							value="--"
 							tone={tone}
 							size="sm"

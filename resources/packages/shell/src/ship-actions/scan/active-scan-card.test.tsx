@@ -1,3 +1,4 @@
+import estimateCases from '../../../../../../tests/Fixtures/scan-estimates.json';
 import { afterEach, beforeEach, describe, it, expect, vi } from 'vitest';
 import { act, render, screen } from '@testing-library/react';
 import type { ShipAction } from '@helm/actions';
@@ -42,12 +43,14 @@ describe('ActiveScanCard', () => {
 			completed_cycles: 5,
 			cycle_number: 6,
 			discovery_depth: 0,
-			accumulated_work: 1.5,
+			accumulated_work: 36,
+			required_work: 72,
+			work_progress: 0.5,
+			estimated_peak_seconds: 4200,
 			discovery_chance: 1e-20,
 			maximum_discovery_chance: 0.59,
-			next_cycle_cost: { core_life: 1 },
-			spent: { core_life: 5 },
-			budget: { core_life: 376 },
+			next_cycle_cost: { power: 1 },
+			spent: { power: 5 },
 			stop_reason: null,
 			stop_message: null,
 		};
@@ -58,9 +61,17 @@ describe('ActiveScanCard', () => {
 		const { container, rerender } = render(
 			<ActiveScanCard action={action} targetName={TARGET_NAME} />
 		);
-		expect(screen.getByText('Cycle')).toBeVisible();
+		expect(screen.getByText('CYC')).toBeVisible();
 		expect(screen.getByText('6')).toBeVisible();
 		expect(screen.getByText('Chance')).toBeVisible();
+		expect(screen.getByText('50.0%')).toBeVisible();
+		expect(screen.getByText('~1.2')).toBeVisible();
+		expect(screen.getByText('PWR/CYC')).toBeVisible();
+		expect(
+			screen.getByRole('progressbar', {
+				name: 'Work toward peak scan effectiveness',
+			})
+		).toHaveAttribute('aria-valuenow', '50');
 		expect(screen.getByText('0.0%')).toBeVisible();
 		expect(screen.queryByText('Waypoints')).not.toBeInTheDocument();
 		rerender(
@@ -83,6 +94,112 @@ describe('ActiveScanCard', () => {
 		expect(
 			container.querySelector('.helm-arc-indicator')
 		).not.toBeInTheDocument();
+	});
+
+	it('advances only the cycle locally, holds at full, then resets at the next checkpoint', () => {
+		const action: ShipAction<'scan_route'> = {
+			...baseAction,
+			deferred_until: new Date(Date.now() + 210000).toISOString(),
+			result: {
+				progress: {
+					cycle_seconds: 420,
+					completed_cycles: 1,
+					cycle_number: 2,
+					discovery_depth: 0,
+					accumulated_work: 36,
+					required_work: 72,
+					work_progress: 0.5,
+					estimated_peak_seconds: 4200,
+					discovery_chance: 0.001,
+					maximum_discovery_chance: 0.6,
+					next_cycle_cost: { power: 1 },
+					spent: { power: 1 },
+					stop_reason: null,
+					stop_message: null,
+				},
+			},
+		};
+		const { rerender } = render(
+			<ActiveScanCard action={action} targetName={TARGET_NAME} />
+		);
+		const cycle = () =>
+			screen.getByRole('progressbar', { name: 'Current scan cycle' });
+		expect(cycle()).toHaveAttribute('aria-valuenow', '50');
+		act(() => vi.advanceTimersByTime(220000));
+		expect(cycle()).toHaveAttribute('aria-valuenow', '100');
+		expect(
+			screen.getByRole('progressbar', {
+				name: 'Work toward peak scan effectiveness',
+			})
+		).toHaveAttribute('aria-valuenow', '50');
+		rerender(
+			<ActiveScanCard
+				action={{
+					...action,
+					deferred_until: new Date(Date.now() + 420000).toISOString(),
+				}}
+				targetName={TARGET_NAME}
+			/>
+		);
+		expect(cycle()).toHaveAttribute('aria-valuenow', '0');
+	});
+
+	it('recalculates estimates when power mode changes without changing the current checkpoint', () => {
+		const action: ShipAction<'scan_route'> = {
+			...baseAction,
+			deferred_until: new Date(Date.now() + 420000).toISOString(),
+			result: {
+				progress: {
+					cycle_seconds: 420,
+					completed_cycles: 0,
+					cycle_number: 1,
+					discovery_depth: 0,
+					accumulated_work: 6,
+					required_work: 72,
+					work_progress: 6 / 72,
+					estimated_peak_seconds: 0,
+					discovery_chance: 0.001,
+					maximum_discovery_chance: 0.6,
+					next_cycle_cost: { power: 1 },
+					spent: { power: 0 },
+					stop_reason: null,
+					stop_message: null,
+					calculation_inputs: estimateCases[4].input,
+				},
+			},
+		};
+		const { rerender } = render(
+			<ActiveScanCard
+				action={action}
+				targetName={TARGET_NAME}
+				powerMode="normal"
+			/>
+		);
+		expect(screen.getByText('1.0')).toBeVisible();
+		const normal =
+			'~' +
+			(estimateCases[4].expected.estimated_peak_seconds / 3600).toFixed(
+				1
+			);
+		expect(screen.getByText(normal)).toBeVisible();
+		rerender(
+			<ActiveScanCard
+				action={action}
+				targetName={TARGET_NAME}
+				powerMode="overdrive"
+			/>
+		);
+		expect(screen.getByText('1.69')).toBeVisible();
+		const overdrive =
+			'~' +
+			(estimateCases[7].expected.estimated_peak_seconds / 3600).toFixed(
+				1
+			);
+		expect(screen.getByText(overdrive)).toBeVisible();
+		expect(
+			screen.getByText('Power mode change applies next cycle.')
+		).toBeVisible();
+		expect(screen.getByRole('timer')).toHaveTextContent('7m');
 	});
 
 	it('renders countdown when deferred_until is set', () => {

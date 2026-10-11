@@ -8,6 +8,11 @@ use Helm\Broadcasting\Channel;
 use Helm\Broadcasting\Contracts\EventRepository;
 use Helm\ShipLink\Contracts\ShipStateRepository;
 use Helm\Ships\ShipPost;
+use Helm\ShipLink\ShipFactory;
+use Helm\ShipLink\Contracts\ActionRepository;
+use Helm\ShipLink\Models\Action;
+use Helm\ShipLink\ActionType;
+use Helm\Lib\Date;
 use lucatume\WPBrowser\TestCase\WPRestApiTestCase;
 use Tests\Support\WpunitTester;
 
@@ -233,6 +238,48 @@ class ShipControllerTest extends WPRestApiTestCase
         // Verify it persisted
         $state = helm(ShipStateRepository::class)->find($ship->postId());
         $this->assertSame('overdrive', $state->power_mode->slug());
+    }
+
+    public function test_power_mode_change_preserves_stored_charge(): void
+    {
+        Date::setTestNow('2026-10-11 00:00:00');
+        try {
+            $post = $this->createShip();
+            $ship = helm(ShipFactory::class)->build($post->postId());
+            $ship->getState()->power_full_at = $ship->power()->calculatePowerFullAtAfterConsumption(60);
+            helm(ShipStateRepository::class)->update($ship->getState());
+            wp_set_current_user($this->ownerId);
+            foreach (['overdrive', 'efficiency', 'normal'] as $mode) {
+                $this->assertSame(200, $this->patchShip($post->postId(), ['power_mode' => $mode])->get_status());
+                $updated = helm(ShipFactory::class)->build($post->postId());
+                $this->assertEqualsWithDelta(40, $updated->power()->getCurrentPower(), 0.01);
+            }
+        } finally {
+            Date::setTestNow(null);
+        }
+    }
+
+    public function test_due_cycle_must_be_processed_before_power_mode_changes(): void
+    {
+        Date::setTestNow('2026-10-11 00:00:00');
+        try {
+            $post = $this->createShip();
+            $action = new Action([
+                'ship_post_id' => $post->postId(),
+                'type' => ActionType::ScanRoute,
+                'params' => [],
+                'deferred_until' => Date::now(),
+            ]);
+            $this->assertTrue(helm(ActionRepository::class)->insert($action));
+            $state = helm(ShipStateRepository::class)->find($post->postId());
+            $state->current_action_id = $action->id;
+            helm(ShipStateRepository::class)->update($state);
+            wp_set_current_user($this->ownerId);
+            $this->assertSame(409, $this->patchShip($post->postId(), ['power_mode' => 'overdrive'])->get_status());
+            $this->assertSame('normal', helm(ShipStateRepository::class)->find($post->postId())->power_mode->slug());
+        } finally {
+            Date::setTestNow(null);
+        }
     }
 
     public function test_patch_broadcasts_ship_state_update(): void

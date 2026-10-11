@@ -37,10 +37,11 @@ class ScanRunnerTest extends WPTestCase
             $this->assertArrayHasKey('work_after', $first['runs'][0]['history'][0]);
             $this->assertArrayNotHasKey('discovery_roll', $first['runs'][0]['history'][0]);
             $this->assertSame([], $first['runs'][1]['history']);
-            $this->assertGreaterThan(0, $first['runs'][0]['core_spent']);
+            $this->assertGreaterThan(0, $first['runs'][0]['power_spent']);
+            $this->assertEquals(0, $first['runs'][0]['core_spent']);
             $fast = $runner->run($config + ['intensity' => 'fast']);
             $this->assertEquals($first['runs'][0]['hours'] / 2, $fast['runs'][0]['hours']);
-            $this->assertSame($first['runs'][0]['core_spent'] * 2, $fast['runs'][0]['core_spent']);
+            $this->assertSame($first['runs'][0]['power_spent'] * 2, $fast['runs'][0]['power_spent']);
         } finally {
             remove_filter('query', $capture);
         }

@@ -39,7 +39,12 @@ interface Propulsion
     public function canReach(float $distanceLy): bool;
 
     /**
-     * Calculate core life cost for a jump.
+     * Calculate rechargeable power charged when a jump leg starts.
+     */
+    public function calculatePowerCost(float $distanceLy): float;
+
+    /**
+     * Calculate permanent core life cost for a jump.
      */
     public function calculateCoreCost(float $distanceLy): float;
 

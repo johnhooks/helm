@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Helm\Rest;
 
 use Helm\Core\ErrorCode;
+use Helm\Lib\Date;
+use Helm\ShipLink\Contracts\ActionRepository;
 use Helm\Database\Transaction;
 use Helm\Events\Contracts\EventDispatcher;
 use Helm\ShipLink\Broadcasting\ShipStateUpdated;
@@ -36,6 +38,7 @@ final class ShipController
         private readonly ShipFactory $shipFactory,
         private readonly ShipStateRepository $stateRepository,
         private readonly EventDispatcher $events,
+        private readonly ActionRepository $actions,
     ) {
     }
 
@@ -187,7 +190,16 @@ final class ShipController
                 );
             }
 
+            $action = $state->current_action_id === null ? null : $this->actions->find($state->current_action_id);
+            if ($mode !== $state->power_mode && $action !== null && !$action->status->isFinalState() && $action->deferred_until !== null && $action->deferred_until <= Date::now()) {
+                return ErrorCode::ActionInProgress->error(__('Wait for the pending action update before changing power mode.', 'helm'), ['status' => 409]);
+            }
+            $ship = $this->shipFactory->build($shipPostId);
+            $power = $ship->power()->getCurrentPower();
+            $ship->getState()->power_mode = $mode;
+            $ship->getState()->power_full_at = null;
             $state->power_mode = $mode;
+            $state->power_full_at = $ship->power()->calculatePowerFullAtAfterConsumption($state->power_max - $power);
         }
 
         Transaction::run(function () use ($state): void {

@@ -14,7 +14,7 @@ namespace Helm\ShipLink\Components;
  * - Decay multiplier: scales core life consumption during actions
  * - Regen multiplier: scales power regeneration rate
  *
- * Mode is locked during actions - plan your mode before starting long-running actions.
+ * Mode changes preserve stored charge. Route scans apply changes at cycle boundaries.
  */
 enum PowerMode: int
 {

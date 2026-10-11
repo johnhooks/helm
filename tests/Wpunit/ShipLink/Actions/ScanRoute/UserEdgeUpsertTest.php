@@ -91,7 +91,7 @@ class UserEdgeUpsertTest extends WPTestCase
             'deferred_until' => Date::now(),
             'runtime_state' => [
                 'cycleSeconds' => 300, 'skill' => 0.6, 'workGain' => 1.0,
-                'coreCost' => 1, 'coreBudget' => 100, 'maxCycles' => 50, 'minCeiling' => 0.12,
+                'powerCost' => 1, 'maxCycles' => 50, 'minCeiling' => 0.12,
                 'source' => $fromNodeId,
                 'required' => 1.0,
                 'ceiling' => 0.9,

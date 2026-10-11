@@ -79,6 +79,7 @@ class ActionProcessorTest extends \Codeception\TestCase\WPTestCase
             'name' => 'Process Ship',
             'node_id' => $node1->id,
             'core_life' => 1000.0,
+            'power_full_at' => new DateTimeImmutable('2026-03-01 00:00:00'),
         ]);
 
         // Create a ready action (no deferred_until means immediately ready)
@@ -137,6 +138,7 @@ class ActionProcessorTest extends \Codeception\TestCase\WPTestCase
             'name' => 'Past Deferred Ship',
             'node_id' => $node1->id,
             'core_life' => 1000.0,
+            'power_full_at' => new DateTimeImmutable('2026-03-01 00:00:00'),
         ]);
 
         // Create an action that was deferred but is now ready
@@ -174,6 +176,7 @@ class ActionProcessorTest extends \Codeception\TestCase\WPTestCase
                 'name' => "Limit Ship {$i}",
                 'node_id' => $node1->id,
                 'core_life' => 1000.0,
+            'power_full_at' => new DateTimeImmutable('2026-03-01 00:00:00'),
             ]);
 
             $action = new Action([
@@ -216,6 +219,7 @@ class ActionProcessorTest extends \Codeception\TestCase\WPTestCase
             'name' => 'Overdue Drain Ship',
             'node_id' => $nodes[0]->id,
             'core_life' => 1000.0,
+            'power_full_at' => new DateTimeImmutable('2026-03-01 00:00:00'),
         ]);
 
         $action = new Action([
@@ -266,6 +270,7 @@ class ActionProcessorTest extends \Codeception\TestCase\WPTestCase
             'name' => 'Future Drain Ship',
             'node_id' => $node1->id,
             'core_life' => 1000.0,
+            'power_full_at' => new DateTimeImmutable('2026-03-01 00:00:00'),
         ]);
         $resolvedShip = helm(ShipFactory::class)->build($ship->postId());
         $nextDuration = $resolvedShip->propulsion()->getJumpDuration($edge2->distance);

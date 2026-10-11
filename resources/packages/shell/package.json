@@ -12,7 +12,8 @@
 		"@helm/nav": "workspace:*",
 		"@helm/ships": "workspace:*",
 		"@helm/ui": "workspace:*",
-		"react-error-boundary": "^6.1.0"
+		"react-error-boundary": "^6.1.0",
+		"@helm/formulas": "workspace:*"
 	},
 	"peerDependencies": {
 		"@wordpress/components": "^28.0.0",

@@ -621,3 +621,46 @@ export const IndicatorsAsProgress: Story = {
 		</div>
 	),
 };
+
+export const ScanWorkAndCycle: Story = {
+	args: { value: 0 },
+	parameters: { controls: { disable: true } },
+	render: () => (
+		<div style={{ width: 340, display: 'grid', gap: 12 }}>
+			<div>
+				<div
+					style={{
+						marginBottom: 6,
+						fontSize: 11,
+						color: 'var(--helm-ui-color-lilac)',
+					}}
+				>
+					Work progress
+				</div>
+				<ProgressBar
+					value={35}
+					label="Work toward peak scan effectiveness"
+					tone="lilac"
+					size="sm"
+				/>
+			</div>
+			<div>
+				<div
+					style={{
+						marginBottom: 6,
+						fontSize: 11,
+						color: 'var(--helm-ui-color-lilac)',
+					}}
+				>
+					Cycle progress
+				</div>
+				<ProgressBar
+					value={70}
+					label="Current scan cycle"
+					tone="lilac"
+					size="sm"
+				/>
+			</div>
+		</div>
+	),
+};

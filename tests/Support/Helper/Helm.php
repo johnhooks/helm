@@ -299,6 +299,11 @@ class Helm extends Module
         $state = $stateRepository->findOrCreate($postId);
 
         // Apply state overrides
+        foreach (['power_full_at', 'power_max'] as $property) {
+            if (array_key_exists($property, $data)) {
+                $state->$property = $data[$property];
+            }
+        }
         if (array_key_exists('node_id', $data)) {
             $state->node_id = $data['node_id'];
         }

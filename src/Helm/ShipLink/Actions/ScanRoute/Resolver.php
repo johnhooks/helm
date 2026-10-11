@@ -46,12 +46,17 @@ final class Resolver implements ActionHandler
             $action->fail(ErrorCode::ShipNoPosition->error(__('Scan no longer matches the ship position.', 'helm')));
             return;
         }
+        if (!isset($action->runtime_state['powerCost'])) {
+            $this->logger->warning('Scan {action_id} has an unsupported runtime state', ['action_id' => $action->id]);
+            $action->fail(ErrorCode::ShipInvalidState->error(__('Scan state is outdated. Start a new scan.', 'helm')));
+            return;
+        }
         $state = RuntimeState::fromArray($action->runtime_state);
         $context = [
             'action_id' => $action->id,
             'ship_id' => $ship->getId(),
         ];
-        $reason = $this->rules->stopReason($state, $ship->power()->getCoreLife());
+        $reason = $this->rules->stopReason($state, $ship->power()->getCurrentPower($action->deferred_until));
         if ($reason !== null) {
             $this->finish($action, $state, $reason);
             return;
@@ -59,9 +64,8 @@ final class Resolver implements ActionHandler
 
         // Charge this cycle, then attempt useful work.
         $chance = $this->rules->nextChance($state);
-        $cost = $state->coreCost;
-        $core = $ship->getLoadout()->core()->component();
-        $core->life = ($core->life ?? 0) - $cost;
+        $cost = $state->powerCost;
+        $ship->getState()->power_full_at = $ship->power()->calculatePowerFullAtAfterConsumption($cost, $action->deferred_until);
         $state->spent += $cost;
         $state->completed++;
         $workRoll = $this->random->next();
@@ -122,7 +126,7 @@ final class Resolver implements ActionHandler
             'work_after' => $workAfter,
             'discovery_chance' => $chance,
             'discovered_node_id' => $discovered,
-            'cumulative_cost' => ['core_life' => $state->spent],
+            'cumulative_cost' => ['power' => $state->spent],
         ]);
 
         if ($reached) {
@@ -135,20 +139,22 @@ final class Resolver implements ActionHandler
             return;
         }
 
+        $state = $this->rules->nextCycle($state, $params, $ship);
         if (!$this->rules->prepareConnection($state, $params)) {
             $action->fail(ErrorCode::NavigationInvalidTarget->error(__('Scan destination is no longer available.', 'helm')));
             $action->runtime_state = $state->toArray();
             return;
         }
-        $reason = $this->rules->stopReason($state, $ship->power()->getCoreLife());
+        // Recharge may make the next cycle affordable; check power at that checkpoint.
+        $reason = $this->rules->stopReason($state, INF);
         if ($reason !== null) {
             $this->finish($action, $state, $reason);
             return;
         }
         $action->status = ActionStatus::Running;
         $action->deferred_until = Date::addSeconds(
-            Date::fromString($state->startedAt),
-            ($state->completed + 1) * $state->cycleSeconds,
+            $action->deferred_until,
+            $state->cycleSeconds,
         );
         $action->runtime_state = $state->toArray();
         $this->logger->debug('Scan {action_id} scheduled its next checkpoint', $context + [
@@ -166,10 +172,12 @@ final class Resolver implements ActionHandler
             'ship_id' => $action->ship_post_id,
             'cycle' => $state->completed,
             'reason' => $reason->value,
-            'core_spent' => $state->spent,
+            'power_spent' => $state->spent,
         ]);
         $action->result = [...($action->result ?? []), 'stop_reason' => $reason->value];
-        if (($action->result['discovered_edge_ids'] ?? []) !== []) {
+        if ($reason === StopReason::Resources) {
+            $action->fail(ErrorCode::ShipInsufficientPower->error($reason->message()));
+        } elseif (($action->result['discovered_edge_ids'] ?? []) !== []) {
             $action->partial($action->result ?? []);
         } else {
             // A completed attempt with no discoveries is not a technical failure.

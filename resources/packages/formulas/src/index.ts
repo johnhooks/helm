@@ -114,3 +114,8 @@ export {
 	ecmLockDegradation,
 	shieldAbsorption,
 } from './weapon';
+
+// Production accumulated-work route scan, verified against PHP.
+export { calculateRouteStats } from './scan/route-stats-calculator';
+export type { ScanCalculationInputs } from './scan/route-stats-calculator';
+export { calculateSystemReadouts } from './system-readouts';

@@ -30,7 +30,7 @@ final class ActionResource extends Resource
     {
         $action = $this->resource;
         $result = $action->result;
-        if ($action->type === ActionType::ScanRoute && $action->runtime_state !== null) {
+        if ($action->type === ActionType::ScanRoute && isset($action->runtime_state['powerCost'])) {
             $result ??= [];
             $stopReason = isset($result['stop_reason']) ? StopReason::from($result['stop_reason']) : null;
             $result['progress'] = [

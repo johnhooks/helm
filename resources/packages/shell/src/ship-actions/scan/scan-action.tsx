@@ -2,7 +2,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import type { DraftAction, ShipAction } from '@helm/actions';
 import { isScanRoute, store as actionsStore } from '@helm/actions';
 import { store as navStore } from '@helm/nav';
-import { useShip } from '@helm/ships';
+import { useShip, store as shipsStore } from '@helm/ships';
 import type { ShipActionRenderProps } from '../types';
 import { DraftScanCard } from './draft-scan-card';
 import { ActiveScanCard } from './active-scan-card';
@@ -48,6 +48,12 @@ function DraftScan({ draft }: { draft: DraftAction<'scan_route'> }) {
 }
 
 function ActiveScan({ action }: { action: ShipAction<'scan_route'> }) {
+	const { ship } = useShip();
+	const powerMode = useSelect(
+		(select) =>
+			select(shipsStore).getEdits()?.power_mode ?? ship.power_mode,
+		[ship.power_mode]
+	);
 	const { targetNode, details } = useSelect(
 		(select) => {
 			const nav = select(navStore);
@@ -75,6 +81,7 @@ function ActiveScan({ action }: { action: ShipAction<'scan_route'> }) {
 	const targetName = getScanTargetName(targetNode);
 	return (
 		<ActiveScanCard
+			powerMode={powerMode}
 			action={action}
 			targetName={targetName}
 			itinerary={scanItinerary(action, targetName, details)}

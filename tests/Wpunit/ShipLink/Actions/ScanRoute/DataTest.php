@@ -86,8 +86,7 @@ class DataTest extends WPTestCase
     {
         $operatingValues = [
             'cycleSeconds' => 300,
-            'coreCost' => 2,
-            'coreBudget' => 100,
+            'powerCost' => 2.0,
             'workGain' => 1.0,
             'skill' => 0.6,
             'sensorRange' => 5.0,

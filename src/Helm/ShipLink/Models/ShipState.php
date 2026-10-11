@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Helm\ShipLink\Models;
 
 use DateTimeImmutable;
+use Helm\Lib\Date;
 use Helm\ShipLink\Components\PowerMode;
 use Helm\StellarWP\Models\Model;
 use Helm\StellarWP\Models\ModelPropertyDefinition;
@@ -103,6 +104,8 @@ final class ShipState extends Model
     {
         return new self([
             'ship_post_id' => $shipPostId,
+            'power_full_at' => Date::now(),
+            'shields_full_at' => Date::now(),
             'node_id' => 1, // Sol - all ships start at Origin
         ]);
     }

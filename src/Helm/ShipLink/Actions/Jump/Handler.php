@@ -42,6 +42,17 @@ final class Handler implements ActionHandler
             );
         }
 
+        $powerCost = $ship->propulsion()->calculatePowerCost($edges[0]->distance);
+        if (!$ship->power()->hasAvailable($powerCost)) {
+            throw new ActionException(ErrorCode::ShipInsufficientPower, sprintf(
+                /* translators: %1$.1f: required power, %2$.1f: available power. */
+                __('Insufficient power to begin this jump (need %1$.1f MJ, have %2$.1f MJ). Wait for power to recharge.', 'helm'),
+                $powerCost,
+                $ship->power()->getCurrentPower()
+            ));
+        }
+        $ship->getState()->power_full_at = $ship->power()->calculatePowerFullAtAfterConsumption($powerCost);
+
         $durationSeconds = $ship->propulsion()->getJumpDuration($edges[0]->distance);
         $completesAt = Date::addSeconds(Date::now(), $durationSeconds);
 

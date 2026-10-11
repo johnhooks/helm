@@ -61,7 +61,7 @@ export const getSystemStats = createRegistrySelector((select) =>
 				},
 				navigation: {
 					range: products.drive.sustain ?? 0,
-					speed: products.drive.mult_a ?? 0,
+					speed: (products.drive.mult_c ?? 0) * 24,
 					draw: products.drive.mult_b ?? 0,
 					condition: slots.drive.condition * 100,
 				},

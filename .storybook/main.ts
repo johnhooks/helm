@@ -6,6 +6,7 @@ const __dirname = fileURLToPath(new URL(".", import.meta.url));
 
 const config: StorybookConfig = {
   stories: [
+    "../resources/packages/bridge/src/components/ship-systems-card.stories.tsx",
     "../resources/packages/ui/src/**/*.mdx",
     "../resources/packages/ui/src/**/*.stories.@(js|jsx|mjs|ts|tsx)",
     "../resources/packages/shell/src/**/*.stories.@(js|jsx|mjs|ts|tsx)",

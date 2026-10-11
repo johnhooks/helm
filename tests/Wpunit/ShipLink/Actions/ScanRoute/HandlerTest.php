@@ -35,8 +35,7 @@ class HandlerTest extends WPTestCase
         $this->assertArrayNotHasKey('profile', $action->runtime_state);
         $this->assertSame(['from_node_id', 'target_node_id'], array_keys($action->params));
         $this->assertSame(420, $action->runtime_state['cycleSeconds']);
-        $this->assertSame(1, $action->runtime_state['coreCost']);
-        $this->assertSame(400, $action->runtime_state['coreBudget']);
+        $this->assertSame(1.0, $action->runtime_state['powerCost']);
         $this->assertSame(0.5, $action->runtime_state['workGain']);
         $this->assertSame($ship->navigation()->getSkill(), $action->runtime_state['skill']);
         $this->assertSame($ship->sensors()->getRange(), $action->runtime_state['sensorRange']);

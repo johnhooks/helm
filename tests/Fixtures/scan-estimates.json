@@ -1,0 +1,212 @@
+[
+  {
+    "name": "efficiency economy",
+    "input": {
+      "navigation_efficiency": 0.5,
+      "base_sensor_range": 5,
+      "core_output": 1,
+      "sensor_quality": 0.8,
+      "work_gain": 0.5,
+      "remaining_distance": 3.6,
+      "required_work": 72,
+      "accumulated_work": 6,
+      "power_mode": "efficiency",
+      "intensity": "economy"
+    },
+    "expected": {
+      "cycle_seconds": 1200,
+      "power_cost": 0.24499999999999997,
+      "work_chance": 0.73,
+      "estimated_peak_seconds": 217200
+    }
+  },
+  {
+    "name": "efficiency normal",
+    "input": {
+      "navigation_efficiency": 0.5,
+      "base_sensor_range": 5,
+      "core_output": 1,
+      "sensor_quality": 0.8,
+      "work_gain": 0.5,
+      "remaining_distance": 3.6,
+      "required_work": 72,
+      "accumulated_work": 6,
+      "power_mode": "efficiency",
+      "intensity": "normal"
+    },
+    "expected": {
+      "cycle_seconds": 600,
+      "power_cost": 0.48999999999999994,
+      "work_chance": 0.73,
+      "estimated_peak_seconds": 108600
+    }
+  },
+  {
+    "name": "efficiency fast",
+    "input": {
+      "navigation_efficiency": 0.5,
+      "base_sensor_range": 5,
+      "core_output": 1,
+      "sensor_quality": 0.8,
+      "work_gain": 0.5,
+      "remaining_distance": 3.6,
+      "required_work": 72,
+      "accumulated_work": 6,
+      "power_mode": "efficiency",
+      "intensity": "fast"
+    },
+    "expected": {
+      "cycle_seconds": 300,
+      "power_cost": 0.9799999999999999,
+      "work_chance": 0.73,
+      "estimated_peak_seconds": 54300
+    }
+  },
+  {
+    "name": "normal economy",
+    "input": {
+      "navigation_efficiency": 0.5,
+      "base_sensor_range": 5,
+      "core_output": 1,
+      "sensor_quality": 0.8,
+      "work_gain": 0.5,
+      "remaining_distance": 3.6,
+      "required_work": 72,
+      "accumulated_work": 6,
+      "power_mode": "normal",
+      "intensity": "economy"
+    },
+    "expected": {
+      "cycle_seconds": 840,
+      "power_cost": 0.5,
+      "work_chance": 0.786,
+      "estimated_peak_seconds": 141120
+    }
+  },
+  {
+    "name": "normal normal",
+    "input": {
+      "navigation_efficiency": 0.5,
+      "base_sensor_range": 5,
+      "core_output": 1,
+      "sensor_quality": 0.8,
+      "work_gain": 0.5,
+      "remaining_distance": 3.6,
+      "required_work": 72,
+      "accumulated_work": 6,
+      "power_mode": "normal",
+      "intensity": "normal"
+    },
+    "expected": {
+      "cycle_seconds": 420,
+      "power_cost": 1,
+      "work_chance": 0.786,
+      "estimated_peak_seconds": 70560
+    }
+  },
+  {
+    "name": "normal fast",
+    "input": {
+      "navigation_efficiency": 0.5,
+      "base_sensor_range": 5,
+      "core_output": 1,
+      "sensor_quality": 0.8,
+      "work_gain": 0.5,
+      "remaining_distance": 3.6,
+      "required_work": 72,
+      "accumulated_work": 6,
+      "power_mode": "normal",
+      "intensity": "fast"
+    },
+    "expected": {
+      "cycle_seconds": 210,
+      "power_cost": 2,
+      "work_chance": 0.786,
+      "estimated_peak_seconds": 35280
+    }
+  },
+  {
+    "name": "overdrive economy",
+    "input": {
+      "navigation_efficiency": 0.5,
+      "base_sensor_range": 5,
+      "core_output": 1,
+      "sensor_quality": 0.8,
+      "work_gain": 0.5,
+      "remaining_distance": 3.6,
+      "required_work": 72,
+      "accumulated_work": 6,
+      "power_mode": "overdrive",
+      "intensity": "economy"
+    },
+    "expected": {
+      "cycle_seconds": 647,
+      "power_cost": 0.8450000000000001,
+      "work_chance": 0.8192307692307692,
+      "estimated_peak_seconds": 104814
+    }
+  },
+  {
+    "name": "overdrive normal",
+    "input": {
+      "navigation_efficiency": 0.5,
+      "base_sensor_range": 5,
+      "core_output": 1,
+      "sensor_quality": 0.8,
+      "work_gain": 0.5,
+      "remaining_distance": 3.6,
+      "required_work": 72,
+      "accumulated_work": 6,
+      "power_mode": "overdrive",
+      "intensity": "normal"
+    },
+    "expected": {
+      "cycle_seconds": 324,
+      "power_cost": 1.6900000000000002,
+      "work_chance": 0.8192307692307692,
+      "estimated_peak_seconds": 52488
+    }
+  },
+  {
+    "name": "overdrive fast",
+    "input": {
+      "navigation_efficiency": 0.5,
+      "base_sensor_range": 5,
+      "core_output": 1,
+      "sensor_quality": 0.8,
+      "work_gain": 0.5,
+      "remaining_distance": 3.6,
+      "required_work": 72,
+      "accumulated_work": 6,
+      "power_mode": "overdrive",
+      "intensity": "fast"
+    },
+    "expected": {
+      "cycle_seconds": 162,
+      "power_cost": 3.3800000000000003,
+      "work_chance": 0.8192307692307692,
+      "estimated_peak_seconds": 26244
+    }
+  },
+  {
+    "name": "at peak",
+    "input": {
+      "navigation_efficiency": 0.5,
+      "base_sensor_range": 5,
+      "core_output": 1,
+      "sensor_quality": 0.8,
+      "work_gain": 0.5,
+      "remaining_distance": 3.6,
+      "required_work": 72,
+      "accumulated_work": 72,
+      "power_mode": "normal",
+      "intensity": "normal"
+    },
+    "expected": {
+      "cycle_seconds": 420,
+      "power_cost": 1,
+      "work_chance": 0.786,
+      "estimated_peak_seconds": 0
+    }
+  }
+]

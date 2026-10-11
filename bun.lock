@@ -64,6 +64,7 @@
       "dependencies": {
         "@helm/core": "workspace:*",
         "@helm/errors": "workspace:*",
+        "@helm/formulas": "workspace:*",
         "@helm/nav": "workspace:*",
         "@helm/ships": "workspace:*",
         "@helm/types": "workspace:*",
@@ -133,6 +134,7 @@
         "@helm/astrometric": "workspace:*",
         "@helm/core": "workspace:*",
         "@helm/errors": "workspace:*",
+        "@helm/formulas": "workspace:*",
         "@helm/logger": "workspace:*",
         "@helm/nav": "workspace:*",
         "@helm/router": "workspace:*",
@@ -261,6 +263,7 @@
         "@helm/actions": "workspace:*",
         "@helm/core": "workspace:*",
         "@helm/errors": "workspace:*",
+        "@helm/formulas": "workspace:*",
         "@helm/nav": "workspace:*",
         "@helm/ships": "workspace:*",
         "@helm/ui": "workspace:*",

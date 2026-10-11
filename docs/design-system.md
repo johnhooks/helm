@@ -402,3 +402,8 @@ Completed scans show Distance, Duration, and Waypoints. Labels distinguish estim
 where needed; unknown values display `—`. Phase descriptions and leg timing belong
 in the itinerary rather than the readouts. Drafts use Confirm and Cancel actions.
 Completed and active star glyphs remain fully opaque; pending glyphs are subdued.
+
+## Abbreviations and units
+
+Use the [LCARS abbreviation reference](ui/abbreviations.md) for compact labels,
+unit spellings, and numeric readout formatting.

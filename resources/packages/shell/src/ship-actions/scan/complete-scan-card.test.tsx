@@ -55,14 +55,15 @@ describe('CompleteScanCard', () => {
 						cycle_number: 10,
 						discovery_depth: 0,
 						accumulated_work: 4,
+						required_work: 72,
+						work_progress: 4 / 72,
+						estimated_peak_seconds: null,
 						discovery_chance: null,
 						maximum_discovery_chance: 0.6,
-						next_cycle_cost: { core_life: 0 },
-						spent: { core_life: 10 },
-						budget: { core_life: 10 },
-						stop_reason: 'resource_budget_reached',
-						stop_message:
-							'Scanning stopped before exceeding its core budget.',
+						next_cycle_cost: { power: 0 },
+						spent: { power: 10 },
+						stop_reason: 'cycle_limit_reached',
+						stop_message: 'Scanning stopped at its cycle limit.',
 					},
 				},
 			};
@@ -70,9 +71,7 @@ describe('CompleteScanCard', () => {
 				<CompleteScanCard action={action} targetName={TARGET_NAME} />
 			);
 			expect(
-				screen.getByText(
-					'Scanning stopped before exceeding its core budget.'
-				)
+				screen.getByText('Scanning stopped at its cycle limit.')
 			).toBeInTheDocument();
 		}
 	);

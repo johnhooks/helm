@@ -155,6 +155,7 @@ const driveProduct = createProductEmbed({
 	label: 'Pulse-I Drive',
 	sustain: 80,
 	mult_a: 4.0,
+	mult_c: 4.0,
 	mult_b: 1.5,
 });
 
@@ -394,7 +395,7 @@ describe('getSystemStats', () => {
 
 		expect(stats.navigation).toEqual({
 			range: 80,
-			speed: 4.0,
+			speed: 96,
 			draw: 1.5,
 			condition: 80,
 		});

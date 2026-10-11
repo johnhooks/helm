@@ -109,6 +109,13 @@ final class Resolver implements ActionHandler
             return;
         }
 
+        $powerCost = $ship->propulsion()->calculatePowerCost($leg->nextEdge->distance);
+        if ($ship->power()->getCurrentPower($phaseDueAt) < $powerCost) {
+            $action->fail(ErrorCode::ShipInsufficientPower->error(__('Insufficient power to continue the route. Recharge before starting another jump.', 'helm')));
+            return;
+        }
+        $ship->getState()->power_full_at = $ship->power()->calculatePowerFullAtAfterConsumption($powerCost, $phaseDueAt);
+
         $nextDuration = $ship->propulsion()->getJumpDuration($leg->nextEdge->distance);
         $action->status = ActionStatus::Running;
         $action->deferred_until = Date::addSeconds($phaseDueAt, $nextDuration);

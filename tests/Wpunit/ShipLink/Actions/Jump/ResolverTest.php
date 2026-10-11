@@ -127,7 +127,7 @@ class ResolverTest extends WPTestCase
         $edge2 = $this->edgeRepository->create($node2->id, $node3->id, 4.0);
         helm(\Helm\Navigation\Contracts\UserEdgeRepository::class)->upsert(1, $edge2->id);
 
-        $shipPost = $this->tester->haveShip(['node_id' => $node1->id, 'core_life' => 1000]);
+        $shipPost = $this->tester->haveShip(['node_id' => $node1->id, 'core_life' => 1000, 'power_full_at' => new DateTimeImmutable('2026-03-01 00:00:00') ]);
         $ship = $this->shipFactory->build($shipPost->postId());
 
         $action = new Action([
@@ -149,6 +149,47 @@ class ResolverTest extends WPTestCase
         $this->assertArrayNotHasKey('distance', $action->result['phases'][0]);
         $this->assertSame($node2->id, $ship->getState()->node_id);
         $this->assertNotNull($action->deferred_until);
+    }
+
+    public function test_exhausted_power_allows_arrival_but_prevents_next_departure(): void
+    {
+        $star1 = $this->tester->haveStar(['id' => 'RES_ROUTE_FROM', 'distanceLy' => 0.0]);
+        $star2 = $this->tester->haveStar(['id' => 'RES_ROUTE_MID', 'distanceLy' => 3.0]);
+        $star3 = $this->tester->haveStar(['id' => 'RES_ROUTE_TO', 'distanceLy' => 7.0]);
+
+        $node1 = $this->tester->getNodeForStar($star1);
+        $node2 = $this->tester->getNodeForStar($star2);
+        $node3 = $this->tester->getNodeForStar($star3);
+
+        $edge = $this->edgeRepository->create($node1->id, $node2->id, 3.0);
+        helm(\Helm\Navigation\Contracts\UserEdgeRepository::class)->upsert(1, $edge->id);
+        $edge2 = $this->edgeRepository->create($node2->id, $node3->id, 4.0);
+        helm(\Helm\Navigation\Contracts\UserEdgeRepository::class)->upsert(1, $edge2->id);
+
+        $shipPost = $this->tester->haveShip(['node_id' => $node1->id, 'core_life' => 1000, 'power_full_at' => new DateTimeImmutable('2026-03-01 00:00:00') ]);
+        $ship = $this->shipFactory->build($shipPost->postId());
+
+        $action = new Action([
+            'ship_post_id' => $shipPost->postId(),
+            'type' => ActionType::Jump,
+            'params' => [
+                'from_node_id' => $node1->id,
+                'target_node_id' => $node3->id,
+                'route' => [$edge->id, $edge2->id],
+            ],
+        ]);
+
+        $ship->getState()->power_full_at = $ship->power()->calculatePowerFullAtAfterConsumption(100);
+        $this->resolver->handle($action, $ship);
+
+        $this->assertSame(ActionStatus::Failed, $action->status);
+        $this->assertCount(1, $action->result['phases']);
+        $this->assertArrayNotHasKey('from_node_id', $action->result['phases'][0]);
+        $this->assertArrayNotHasKey('to_node_id', $action->result['phases'][0]);
+        $this->assertArrayNotHasKey('distance', $action->result['phases'][0]);
+        $this->assertSame($node2->id, $ship->getState()->node_id);
+        $this->assertSame('helm.ship.insufficient_power', $action->result['error']['code']);
+        $this->assertEquals(0, $ship->power()->getCurrentPower());
     }
 
     public function test_route_resolver_schedules_next_leg_from_phase_due_time(): void

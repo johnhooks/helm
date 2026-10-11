@@ -10,8 +10,7 @@ progress, and schedules the next checkpoint. Other
 actions can use their own namespaced `Rules` class when cycle or phase logic
 warrants extraction; they do not need to share the route scan formulas.
 
-Fixed operating values are typed properties on `RuntimeState`: cycle seconds, core cost
-and budget, work gain, navigation skill, sensor range and quality, initial distance,
+Scheduled operating values are typed properties on `RuntimeState`: cycle seconds, power cost, work gain, navigation skill, sensor range and quality, initial distance,
 minimum discovery ceiling, and maximum cycles. Initialization calculates these
 from the ship and rules; callers cannot supply them through params. Resumed actions
 capture new operating values while retaining accumulated work and discoveries.
@@ -43,30 +42,42 @@ All coefficients are initial balance values, not physical constants.
 
 ## Timing and costs
 
-Normal cycle duration is `ceil(300 * 0.7 / nav_efficiency)` seconds. Economy uses
-twice that underlying duration and fast uses half, rounded once to full seconds.
-Cycle timestamps are anchored to launch, so delayed processing does not stretch
-the schedule. Captured operating values are immutable during an action, while actual core
-availability remains live. Future equipment changes take effect on the next scan.
+Cycle duration is `ceil(210 / nav_efficiency / intensity / mode_output)` seconds.
+Intensity is 0.5 for economy, 1 for normal, and 2 for fast. Mode output is 0.7 for
+efficiency, 1 for normal, and 1.3 for overdrive. Power cost per cycle is
+`intensity * mode_output²` MJ, including attempts that add no work. Costs retain
+full precision; readouts show at least one and at most two decimal places.
 
-Core cost is one per attempted economy or normal cycle, two per fast cycle.
-Economy currently saves core per hour but not per unit of completed work. Fast
-scanning costs twice as much per attempt, even when the attempt makes no progress.
-This core-only pricing is interim. Regenerating ship power exists but is not
-charged by this route action, and no capacitor has been introduced.
+The scheduled cycle keeps its duration and cost. At its checkpoint, a changed
+ship mode refreshes operating values for the following cycle, retaining work,
+discoveries, and spending. Checkpoints are scheduled from the previous due time,
+so catch-up does not stretch the schedule. Mode changes are rejected while an
+action checkpoint is overdue, preventing a new mode from rewriting past recharge.
+Recharge changes immediately when the ship mode changes, preserving current charge.
+Scanning does not consume core life.
 
-At launch a scan reserves a spending limit, not inventory, of the smaller of 400
-core or 60% of available core. It checks the next charge against that budget and
-actual resources. A 720-cycle safety limit bounds processing.
+PHP `ScanRoute\Rules::estimate` and TypeScript
+`formulas/src/scan/route-stats-calculator.ts` use the same formulas and shared
+fixtures in `tests/Fixtures/scan-estimates.json`. Public progress exposes the
+calculation inputs so the frontend can preview power-mode changes immediately.
+The current-cycle clock stays fixed; changed estimates describe subsequent cycles.
+
+There is no per-action spending budget. A 720-cycle safety limit bounds processing.
 
 The action stops automatically when the next connection's ceiling is below 12%,
-not when its initial chance is low. It also stops before a charge would exceed
-its budget or available core. Discovered routes are retained as partial results.
-A stopped action with no discoveries is fulfilled with an empty route and an
-explicit stop reason; it must not be interpreted as reaching the destination.
+not when its initial chance is low. Insufficient power at a checkpoint fails the
+action with `ship.insufficient_power` and retains discoveries. Recharge does not
+automatically resume a failed scan. Other policy stops retain partial results;
+an empty result with a stop reason does not mean the destination was reached.
+
+Jump departure consumes `5 * distance_ly * drive_consumption` MJ for each leg.
+Insufficient power rejects the first departure. Once accepted, that leg can arrive
+without another power charge; insufficient power for the next leg ends the route
+at the reached node. Permanent jump core wear remains separate. Power mode changes
+preserve stored charge while changing the recharge rate.
 
 Restarting the same ship/origin/target retains depth, source, and work from the
-latest action, and starts a fresh per-action spending budget. Traveling
+latest action, and starts a fresh per-action spending total. Traveling
 to a different origin starts a fresh search. Retention currently depends on action
 history; deleting old action records also removes this resume memory. Player
 intensity controls are not yet added to the UI or live scan ability. The backend
@@ -77,7 +88,10 @@ accepts `intensity` as economy, normal, or fast at action creation.
 The action resource calculates `result.progress` when read; it is not persisted.
 It includes completed cycles, cycle duration, discovery depth,
 accumulated work, next-cycle discovery chance, maximum chance, next-cycle cost,
-spend, budget, and stop reason/message. Resource amounts are keyed by `core_life`.
+spend, required work, work fraction, estimated seconds to peak effectiveness, and
+stop reason/message. Resource amounts are keyed by `power`. The peak estimate uses
+expected successful work per cycle; it is not an ETA for discovery. Work resets
+after each discovery, so the bar describes the current connection only.
 The action's `deferred_until` gives the next checkpoint timestamp.
 
 The advertised next-cycle chance marginalizes over the useful-work roll. It is
@@ -141,10 +155,13 @@ lando wp eval-file bin/simulate-route-scans.php
 ```
 
 The `helm/simulate-scan` ability exposes the same runner through REST and MCP to
-local administrators. It accepts catalog sensor/core slugs, nav tier, core life,
-power mode, distance, intensity, seed, and 1 to 30 trials. Each trial is bounded
+local administrators. It accepts catalog sensor/core/drive slugs, nav tier, core life,
+power mode, initial power, scan and prospective jump distances, intensity, seed,
+and 1 to 30 trials. Each trial is bounded
 by the normal scan policies. It returns per-trial outcomes, duration percentiles,
-and the first trial's diagnostic trace in `history`. The trace is collected
+remaining power, unchanged scan core life, and recharge time before a prospective
+jump, plus the first trial's diagnostic trace in `history`. Jump wait is a forecast
+using production propulsion costs and range, not an executed jump in every trial. The trace is collected
 from an in-memory logger; it is never persisted in action records. Other trials
 use a null logger. Percentiles include partial and stopped outcomes;
 inspect completion counts when comparing builds. Out-of-range attempts are

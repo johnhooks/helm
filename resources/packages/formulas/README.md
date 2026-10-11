@@ -4,7 +4,11 @@ Canonical game math for Helm ship systems. Every formula that computes ship beha
 
 ## Role
 
-These formulas are the **specification**. The PHP engine must produce identical outputs for identical inputs. The test suite defines expected behavior — it's the contract.
+This package contains both production calculations and experimental holodeck/DSP mechanics. Do not assume every exported formula is implemented by the PHP engine.
+
+The accumulated-work route scan calculator in `src/scan/route-stats-calculator.ts` is used by the live frontend and verified against PHP `ScanRoute\Rules` with shared fixtures. The older functions in `scan.ts` describe the separate holodeck scan model. `system-readouts.ts` computes live system readouts using the PHP system equations.
+
+For production calculations, PHP and TypeScript must produce identical outputs for identical inputs. Shared fixture tests define that contract.
 
 ## Design
 

@@ -53,6 +53,7 @@ enum ErrorCode: string
     case ShipNotFound = 'ship.not_found';
     case ShipNoPosition = 'ship.no_position';
     case ShipInvalidState = 'ship.invalid_state';
+    case ShipInsufficientPower = 'ship.insufficient_power';
     case ShipInsufficientCore = 'ship.insufficient_core';
     case ShipSystemsNotFound = 'ship.systems_not_found';
     case ShipInvalidPowerMode = 'ship.invalid_power_mode';

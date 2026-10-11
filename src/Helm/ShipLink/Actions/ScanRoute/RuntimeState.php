@@ -15,13 +15,9 @@ final class RuntimeState
          */
         public readonly int $cycleSeconds = 0,
         /**
-         * Core life charged per cycle.
+         * Power charged per cycle.
          */
-        public readonly int $coreCost = 0,
-        /**
-         * Maximum core life this action may spend.
-         */
-        public readonly int $coreBudget = 0,
+        public readonly float $powerCost = 0.0,
         /**
          * Work added by a successful cycle.
          */
@@ -50,6 +46,26 @@ final class RuntimeState
          * Maximum cycles allowed for this action.
          */
         public readonly int $maxCycles = 0,
+        /**
+         * Navigation efficiency used to calculate the cycle duration.
+         */
+        public readonly float $navigationEfficiency = 0.5,
+        /**
+         * Sensor range before core output and power mode scaling.
+         */
+        public readonly float $baseSensorRange = 0.0,
+        /**
+         * Core output before power mode scaling.
+         */
+        public readonly float $coreOutput = 1.0,
+        /**
+         * Power mode committed to the currently scheduled cycle.
+         */
+        public readonly string $powerMode = 'normal',
+        /**
+         * Intensity selected for this action.
+         */
+        public readonly string $intensity = 'normal',
     ) {
     }
 
@@ -69,9 +85,9 @@ final class RuntimeState
     public float $work = 0.0;
 
     /**
-     * Core life consumed during this action.
+     * Power consumed during this action.
      */
-    public int $spent = 0;
+    public float $spent = 0.0;
 
     /**
      * Node being scanned from; initially the ship's origin.
@@ -82,6 +98,11 @@ final class RuntimeState
      * Work needed to reach the discovery chance ceiling for this connection.
      */
     public float $required = 1.0;
+
+    /**
+     * Distance from the current scan source to its target in light years.
+     */
+    public float $remainingDistance = 0.0;
 
     /**
      * Maximum discovery probability for the current connection, from zero to one.
@@ -103,8 +124,7 @@ final class RuntimeState
     {
         $state = new self(
             cycleSeconds: (int) ($data['cycleSeconds'] ?? 0),
-            coreCost: (int) ($data['coreCost'] ?? 0),
-            coreBudget: (int) ($data['coreBudget'] ?? 0),
+            powerCost: (float) ($data['powerCost'] ?? 0),
             workGain: (float) ($data['workGain'] ?? 0),
             skill: (float) ($data['skill'] ?? 0),
             sensorRange: (float) ($data['sensorRange'] ?? 0),
@@ -112,12 +132,18 @@ final class RuntimeState
             initialDistance: (float) ($data['initialDistance'] ?? 0),
             minCeiling: (float) ($data['minCeiling'] ?? 0),
             maxCycles: (int) ($data['maxCycles'] ?? 0),
+            navigationEfficiency: (float) ($data['navigationEfficiency'] ?? 0.5),
+            baseSensorRange: (float) ($data['baseSensorRange'] ?? 0),
+            coreOutput: (float) ($data['coreOutput'] ?? 1),
+            powerMode: (string) ($data['powerMode'] ?? 'normal'),
+            intensity: (string) ($data['intensity'] ?? 'normal'),
         );
         $state->completed = (int) ($data['completed'] ?? 0);
         $state->depth = (int) ($data['depth'] ?? 0);
-        $state->spent = (int) ($data['spent'] ?? 0);
+        $state->spent = (float) ($data['spent'] ?? 0);
         $state->source = (int) ($data['source'] ?? 0);
         $state->work = (float) ($data['work'] ?? 0);
+        $state->remainingDistance = (float) ($data['remainingDistance'] ?? 0);
         $state->required = (float) ($data['required'] ?? 0);
         $state->ceiling = (float) ($data['ceiling'] ?? 0);
         $state->workChance = (float) ($data['workChance'] ?? 0);

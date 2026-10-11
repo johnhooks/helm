@@ -22,7 +22,8 @@
 		"@helm/types": "workspace:*",
 		"@helm/ui": "workspace:*",
 		"@tanstack/react-router": "^1.159.4",
-		"react-error-boundary": "^4.1.2"
+		"react-error-boundary": "^4.1.2",
+		"@helm/formulas": "workspace:*"
 	},
 	"peerDependencies": {
 		"@wordpress/api-fetch": "^7.0.0",

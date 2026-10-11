@@ -33,5 +33,19 @@ foreach (['easy-corridor', 'difficult-corridor', 'long-chain'] as $seed) {
 }
 $results[] = $runner->run(['core_life' => 20, 'distance_ly' => 2.416, 'trials' => 10]);
 $results[] = $runner->run(['intensity' => 'economy', 'distance_ly' => 2.416, 'trials' => 10]);
+// Stress combinations measure the reserve left for a 2.416 ly jump after scanning.
+foreach (['epoch_e', 'epoch_s', 'epoch_r'] as $core) {
+    foreach (['economy', 'normal', 'fast'] as $intensity) {
+        foreach ([25, 100] as $initialPower) {
+            foreach (['dr_305', 'dr_505', 'dr_705'] as $drive) {
+                $results[] = $runner->run([
+                    'core' => $core, 'drive' => $drive, 'intensity' => $intensity,
+                    'initial_power' => $initialPower, 'distance_ly' => 2.416,
+                    'jump_distance_ly' => 2.416, 'trials' => 20, 'seed' => 'power-reserve',
+                ]);
+            }
+        }
+    }
+}
 // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Machine-readable WP-CLI output.
 echo json_encode($results, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR) . "\n";

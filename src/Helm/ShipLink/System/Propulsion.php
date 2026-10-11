@@ -24,6 +24,11 @@ final class Propulsion implements PropulsionContract
      */
     private const BASE_SECONDS_PER_LY = 3600;
 
+    /**
+     * Departure power in MJ per light-year before drive consumption scaling.
+     */
+    private const BASE_POWER_PER_LY = 5.0;
+
     public function __construct(
         private Loadout $loadout,
         private PowerSystem $power,
@@ -55,6 +60,11 @@ final class Propulsion implements PropulsionContract
     public function canReach(float $distanceLy): bool
     {
         return $distanceLy <= $this->getMaxRange();
+    }
+
+    public function calculatePowerCost(float $distanceLy): float
+    {
+        return self::BASE_POWER_PER_LY * $distanceLy * $this->getConsumption();
     }
 
     public function calculateCoreCost(float $distanceLy): float

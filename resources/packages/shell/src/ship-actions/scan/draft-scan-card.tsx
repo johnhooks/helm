@@ -69,7 +69,7 @@ export function DraftScanCard({
 			<SystemGrid columns={3} gap="sm">
 				<SystemCell>
 					<Readout
-						label={__('Duration', 'helm')}
+						label={__('DUR', 'helm')}
 						value="--"
 						tone={tone}
 						size="sm"
@@ -77,7 +77,7 @@ export function DraftScanCard({
 				</SystemCell>
 				<SystemCell>
 					<Readout
-						label={__('Distance', 'helm')}
+						label={__('DST', 'helm')}
 						value={draft.params.distance_ly}
 						unit="ly"
 						tone={tone}
@@ -86,7 +86,7 @@ export function DraftScanCard({
 				</SystemCell>
 				<SystemCell>
 					<Readout
-						label={__('Power', 'helm')}
+						label={__('PWR', 'helm')}
 						value="--"
 						tone="gold"
 						size="sm"

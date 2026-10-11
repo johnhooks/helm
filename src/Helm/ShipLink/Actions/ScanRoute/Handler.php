@@ -14,7 +14,7 @@ use Helm\ShipLink\Contracts\ActionRepository;
 use Helm\ShipLink\Models\Action;
 use Helm\ShipLink\Ship;
 
-/** Snapshot scan performance at launch; available core is checked each cycle. */
+/** Snapshot scan performance at launch; available power is checked each cycle. */
 final class Handler implements ActionHandler
 {
     public function __construct(
@@ -51,7 +51,7 @@ final class Handler implements ActionHandler
         if (!$this->rules->prepareConnection($state, $params)) {
             throw new ActionException(ErrorCode::NavigationInvalidTarget, __('Scan destination is unavailable.', 'helm'));
         }
-        $stop = $this->rules->stopReason($state, $ship->power()->getCoreLife());
+        $stop = $this->rules->stopReason($state, $ship->power()->getCurrentPower());
         if ($stop !== null) {
             throw new ActionException(ErrorCode::NavigationScanStopped, $stop->message());
         }
@@ -60,6 +60,8 @@ final class Handler implements ActionHandler
         $action->status = ActionStatus::Pending;
         $action->deferred_until = Date::addSeconds(Date::now(), $state->cycleSeconds);
         // A resumed scan retains discoveries and starts a new attempt.
-        $action->result = [...$result->toArray(), 'stop_reason' => null];
+        $publicResult = [...$result->toArray(), 'stop_reason' => null];
+        unset($publicResult['error']);
+        $action->result = $publicResult;
     }
 }
